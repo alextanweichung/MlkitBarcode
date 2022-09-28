@@ -1,0 +1,151 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Styleguide</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Styleguide</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+
+    <p><strong>Text</strong></p>
+    <hr>
+
+    <h1>First Headline Lorem ipsum dolor sit.</h1>
+    <h2>Second Headline Lorem ipsum dolor sit amet, consetetur sadipscing.</h2>
+    <h3>Third Headline Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</h3>
+    <p>Default text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+    </p>
+    <ion-text color="medium">
+      <p>Light text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+      </p>
+    </ion-text>
+    <small>Small text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+      labore et dolore magna aliquyam erat, sed diam voluptua.</small>
+    <br>
+    <ion-text color="medium">
+      <small>Small light text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+        invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</small>
+    </ion-text>
+
+    <br>
+    <hr>
+    <br>
+    <br>
+
+    <p><strong>Buttons</strong></p>
+    <br>
+
+    <ion-button expand="block">
+      Primary button
+    </ion-button>
+    <ion-text color="medium">
+      <small class="ion-margin-top-small">Used for creating or updating data or navigation.</small>
+    </ion-text>
+
+    <br>
+
+    <ion-button expand="block" color="secondary">
+      Secondary button
+    </ion-button>
+    <ion-text color="medium">
+      <small class="ion-margin-top-small">Used for doing some real action.</small>
+    </ion-text>
+
+    <br>
+
+    <ion-button expand="block" color="medium" fill="clear">
+      Cancel action
+    </ion-button>
+    <ion-text color="medium">
+      <small class="ion-margin-top-small">Cancel things.</small>
+    </ion-text>
+
+    <br>
+
+    <ion-button expand="block">
+      <ion-icon slot="start" name="duplicate-outline"></ion-icon>
+      Button with icon start
+    </ion-button>
+
+    <br>
+
+    <ion-button expand="block">
+      <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+      Button with icon end
+    </ion-button>
+
+    <br>
+
+    <ion-button class="ion-button-small">
+      Button small
+    </ion-button>
+
+    <br>
+    <hr>
+    <br>
+    <br>
+
+    <p><strong>Cards</strong></p>
+    <hr>
+    <br>
+
+    <ion-card class="card-default ion-no-margin ion-no-padding">
+      <ion-card-header>
+        <ion-card-title>
+          <h2>Default card</h2>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo impedit aspernatur deleniti ratione vel sed
+          tempora, facere dolores, veritatis vitae velit quis labore at aliquid repellat quo nisi. Inventore, quae?</p>
+          <ion-text color="medium">
+            <h1>Awesome text</h1>
+          </ion-text>
+      </ion-card-content>
+    </ion-card>
+
+    <br><br>
+
+    <ion-card class="card-default ion-no-margin ion-no-padding" color="primary">
+      <ion-card-header>
+        <ion-card-title>
+          <h2>Light card</h2>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo impedit aspernatur deleniti ratione vel sed
+          tempora, facere dolores, veritatis vitae velit quis labore at aliquid repellat quo nisi. Inventore, quae?</p>
+      </ion-card-content>
+    </ion-card>
+
+    <br>
+    <hr>
+    <br>
+
+    <p><strong>Lists</strong></p>
+
+    <ion-list class="list-custom">
+      <ion-list-header class="list-header-compact">
+        Simple list
+      </ion-list-header>
+
+      <ion-item detail lines="full" *ngFor="let l of [].constructor(3);">
+        <ion-label>
+          <h3>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint nulla dolorum repellendus necessitatibus, laborum quidem enim ab excepturi quibusdam facilis culpa ex beatae, totam repudiandae mollitia natus ipsa aut vitae?</h3>
+          <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nobis expedita distinctio quod libero quidem placeat at corrupti sapiente quis veniam voluptate deleniti nam, amet saepe, dolores quam non quibusdam. Ipsa!</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+  </div>
+
+</ion-content>

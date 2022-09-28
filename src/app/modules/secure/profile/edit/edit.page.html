@@ -1,0 +1,51 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button text="Settings" defaultHref="/settings">
+      </ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Profile
+    </ion-title>
+    <ion-buttons slot="end">
+      <form class="form-default" [formGroup]="edit_profile_form" (ngSubmit)="submit()">
+        <ion-button type="submit">
+          Done
+        </ion-button>
+      </form>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="hero hero-light-gradient">
+    <ion-avatar>
+      <ion-icon class="avatar-icon-placeholder" name="person-circle" color="tertiary">
+      </ion-icon>
+    </ion-avatar>
+    <ion-button class="ion-button-small" color="primary" fill="clear" (click)="updateProfilePicture()">
+      Update profile picture
+    </ion-button>
+  </div>
+
+  <div class="ion-padding">
+
+    <form class="form-default" [formGroup]="edit_profile_form" (submit)="submit()">
+
+      <ion-list class="item-card-list" lines="none">
+        <ion-item>
+          <ion-label color="tertiary" position="stacked">First name</ion-label>
+          <ion-input formControlName="name_first" placeholder="First name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label color="tertiary" position="stacked">Last name</ion-label>
+          <ion-input formControlName="name_last" placeholder="Last name"></ion-input>
+        </ion-item>
+      </ion-list>
+
+    </form>
+
+  </div>
+
+</ion-content>

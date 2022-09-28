@@ -1,0 +1,149 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Cards
+    </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="addCard()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Cards</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+
+    <swiper class="swiper-cards" #swiper [config]="config">
+      <ng-template swiperSlide>
+        <div class="cc-template cc-template-color-1">
+          <div class="cc-bankname">Bank of America</div>
+          <div class="cc-number">
+            <ion-text *ngIf="card_details_visible" class="animate__animated animate__flipInX">0123 4567 8901 2345</ion-text>
+            <ion-text *ngIf="!card_details_visible" class="animate__animated animate__flipInX">&middot;&middot;&middot;&middot; &middot;&middot;&middot;&middot;
+              &middot;&middot;&middot;&middot; 2345</ion-text>
+          </div>
+          <div class="cc-footer">
+            <div>
+              <div class="cc-expiry-date">
+                <p>Expiry date</p>
+                <span>03/26</span>
+              </div>
+              <div class="cc-cvv">
+                <p>CVV</p>
+                <span>047</span>
+              </div>
+            </div>
+            <div>
+              <div class="cc-logo">
+                <img src="../../../../assets/sample/banking-logos/visa.svg">
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="cc-description">VISA 2345</p>
+      </ng-template>
+      <ng-template swiperSlide>
+        <div class="cc-template cc-template-color-2">
+          <div class="cc-bankname">Wells Fargo</div>
+          <div class="cc-number">
+            <ion-text *ngIf="card_details_visible" class="animate__animated animate__flipInX">9876 5432 1098 7654</ion-text>
+            <ion-text *ngIf="!card_details_visible" class="animate__animated animate__flipInX">&middot;&middot;&middot;&middot; &middot;&middot;&middot;&middot;
+              &middot;&middot;&middot;&middot; 7654</ion-text>
+          </div>
+          <div class="cc-footer">
+            <div>
+              <div class="cc-expiry-date">
+                <p>Expiry date</p>
+                <span>01/24</span>
+              </div>
+              <div class="cc-cvv">
+                <p>CVV</p>
+                <span>853</span>
+              </div>
+            </div>
+            <div>
+              <div class="cc-logo">
+                <img src="../../../../assets/sample/banking-logos/visa.svg">
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="cc-description">VISA 7654</p>
+      </ng-template>
+    </swiper>
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item button routerLink="/payments">
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="analytics"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>Transactions</h3>
+          <p class="font-size-smallest">View all transactions</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <hr class="hr-medium">
+
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Quick Actions</ion-label>
+    </ion-list-header>
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item button detail="false">
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="eye"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>Show card details</h3>
+          <p class="font-size-smallest">Hidden by default</p>
+        </ion-label>
+        <ion-toggle slot="end" [(ngModel)]="card_details_visible"></ion-toggle>
+      </ion-item>
+      <ion-item detail="false">
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="sync"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>Manual sync</h3>
+          <p class="font-size-smallest">Sync card</p>
+        </ion-label>
+        <ion-button slot="end" (click)="sync()">
+          Sync now
+        </ion-button>
+      </ion-item>
+      <ion-item button>
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>Details</h3>
+          <p class="font-size-smallest">More info about this card</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <hr class="hr-medium">
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item button detail="false" (click)="deleteCard()">
+        <ion-avatar slot="start" class="ion-avatar-danger-icon">
+          <ion-icon color="danger" name="close"></ion-icon>
+        </ion-avatar>
+        <ion-label color="danger">
+          <h3>Delete card</h3>
+          <p class="font-size-smallest">Remove this card</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+</ion-content>

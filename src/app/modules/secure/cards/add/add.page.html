@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        Cancel
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Add card
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="ion-padding">
+
+    <form class="form-default" [formGroup]="add_card_form" (submit)="save()">
+
+      <ion-list class="item-card-list" lines="none">
+        <ion-item>
+          <ion-label color="tertiary" position="stacked">Card number</ion-label>
+          <ion-input formControlName="card_number" placeholder="0000 0000 0000 0000" type="text" minlength="13" maxlength="22" inputmode="numeric" (ionChange)="formatCreditCardNumber($event)"></ion-input>
+        </ion-item>
+        <ion-text *ngIf="!add_card_form.controls.card_number.valid && submit_attempt" color="danger">
+          <small class="error-message-form">Credit card number not valid. Minimum digits is 9, maximum digits is 19.</small>
+        </ion-text>
+
+        <ion-item>
+          <ion-label color="tertiary" position="stacked">Expiry date</ion-label>
+          <ion-input formControlName="expiry_date" placeholder="MM/YY" type="text" minlength="5" maxlength="5" inputmode="numeric" length="5" (ionChange)="formatExpiryDate($event)"></ion-input>
+        </ion-item>
+        <ion-text *ngIf="!add_card_form.controls.expiry_date.valid && submit_attempt" color="danger">
+          <small class="error-message-form">Expiry date is required.</small>
+        </ion-text>
+
+        <ion-item>
+          <ion-label color="tertiary" position="stacked">CVC/CVV</ion-label>
+          <ion-input formControlName="cvv" placeholder="123" type="tel" pattern="[0-9]*" maxlength="3" inputmode="numeric"></ion-input>
+        </ion-item>
+        <ion-text *ngIf="!add_card_form.controls.cvv.valid && submit_attempt" color="danger">
+          <small class="error-message-form">CVC/CVV number is required to have exactly 3 digits.</small>
+        </ion-text>
+
+      </ion-list>
+
+    </form>
+
+  </div>
+
+</ion-content>
+
+<ion-footer class="modal-footer" collapse="fade">
+  <ion-toolbar>
+    <form class="form-default" [formGroup]="add_card_form" (submit)="save()">
+      <ion-button type="submit" expand="block" color="primary">
+        Save card
+      </ion-button>
+    </form>
+  </ion-toolbar>
+</ion-footer>

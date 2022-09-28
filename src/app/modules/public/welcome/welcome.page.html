@@ -1,0 +1,29 @@
+<ion-content>
+  <swiper class="swiper-welcome" #swiper [config]="config" (slideChange)="swiperSlideChanged($event)"
+    (reachEnd)="onLastSlide()">
+    <ng-template swiperSlide>
+      <ion-icon name="card" class="animate__animated animate__fadeInDown"></ion-icon>
+      <h3 class="animate__animated animate__fadeInUp">All your cards & accounts<br>in one place</h3>
+      <p class="animate__animated animate__fadeInUp">You can describe this feature here with a sentence of multiple lines.</p>
+    </ng-template>
+    <ng-template swiperSlide>
+      <ion-icon name="sync"></ion-icon>
+      <h3>Sync across<br>all your devices</h3>
+      <p>You can describe this feature here with a sentence of multiple lines.</p>
+    </ng-template>
+    <ng-template swiperSlide>
+      <ion-icon name="stats-chart"></ion-icon>
+      <h3>Extensive<br>insights</h3>
+      <p>You can describe this feature here with a sentence of multiple lines.</p>
+    </ng-template>
+  </swiper>
+</ion-content>
+
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp">
+  <ion-button class="ion-margin" expand="block" (click)="nextSlide()" *ngIf="!last_slide">
+    Next
+  </ion-button>
+  <ion-button class="ion-margin" expand="block" (click)="getStarted()" *ngIf="last_slide">
+    Get started
+  </ion-button>
+</ion-footer>

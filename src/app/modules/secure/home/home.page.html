@@ -1,0 +1,152 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Home
+    </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button routerLink="/settings">
+        <ion-icon slot="icon-only" name="cog"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Home</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar showCancelButton="focus" placeholder="Company, category, expense ..."></ion-searchbar>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+
+    <ion-list-header>
+      <ion-label color="dark">My accounts</ion-label>
+    </ion-list-header>
+
+    <!-- Skeletons -->
+    <ion-list class="item-card-list animate__animated animate__fadeIn" *ngIf="!content_loaded">
+      <ion-item lines="none" *ngFor="let i of [].constructor(3);">
+        <ion-avatar slot="start">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <h3><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h3>
+          <p><ion-skeleton-text animated style="width: 30%"></ion-skeleton-text></p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="item-card-list animate__animated animate__fadeIn" *ngIf="content_loaded" lines="none">
+      <ion-item button detail>
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon name="wallet"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>$71,648.13</h3>
+          <p>Bank of America</p>
+        </ion-label>
+      </ion-item>
+      <ion-item button detail>
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon name="logo-bitcoin"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>$64,155.21</h3>
+          <p>Bitcoin</p>
+        </ion-label>
+      </ion-item>
+      <ion-item button detail>
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon name="logo-paypal"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>$10,500.00</h3>
+          <p>PayPal</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <hr>
+
+    <ion-list-header>
+      <ion-label color="dark">Recent transactions</ion-label>
+      <ion-button *ngIf="content_loaded" routerLink="/payments">See All <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+
+    <!-- Skeletons -->
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!content_loaded">
+      <ion-item *ngFor="let i of [].constructor(3);">
+        <ion-label>
+          <h3><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h3>
+          <p><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></p>
+        </ion-label>
+        <ion-skeleton-text slot="end" animated style="width: 10%"></ion-skeleton-text>     
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="content_loaded">
+      <ion-item button detail="false">
+        <ion-label>
+          <h3>Coffee</h3>
+          <p>Starbucks &middot; 04.01.2022</p>
+        </ion-label>
+        <ion-badge color="danger" mode="ios" slot="end">- $8.60</ion-badge>        
+      </ion-item>
+      <ion-item button detail="false">
+        <ion-label>
+          <h3>Salary</h3>
+          <p>Apple Inc. &middot; 03.01.2022</p>
+        </ion-label>
+        <ion-badge color="medium" mode="ios" slot="end">$8412.48</ion-badge>        
+      </ion-item>
+      <ion-item button detail="false">
+        <ion-label>
+          <h3>Rent</h3>
+          <p>Housing Inc. &middot; 01.01.2022</p>
+        </ion-label>
+        <ion-badge color="danger" mode="ios" slot="end">- $1400.00</ion-badge>
+      </ion-item>
+    </ion-list>
+
+    <!-- Loading spinner -->
+  <!-- <ion-row class="spinner-container ion-justify-content-center ion-align-items-center">
+    <ion-spinner name="crescent" color="medium"></ion-spinner>
+  </ion-row> -->
+
+    <!-- <ion-button routerLink="/styleguide">
+     Style guide
+    </ion-button>
+
+    <br><br><br>
+
+    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+
+    <br>
+
+    <p class="animate__animated animate__fadeIn">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolorum cum ea repudiandae temporibus optio accusantium non! Autem ex quia architecto quod nostrum nam ipsa tempora? Obcaecati nobis numquam provident doloribus!</p>
+
+    <ion-text color="medium">
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea suscipit exercitationem deserunt tempora ratione, natus mollitia praesentium doloribus iure veritatis. Deserunt delectus impedit vitae suscipit illo laborum hic rerum recusandae.</p>
+    </ion-text>
+
+    <ion-text color="medium">
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea suscipit exercitationem deserunt tempora ratione, natus mollitia praesentium doloribus iure veritatis. Deserunt delectus impedit vitae suscipit illo laborum hic rerum recusandae.</p>
+    </ion-text>
+
+    <ion-text color="medium">
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea suscipit exercitationem deserunt tempora ratione, natus mollitia praesentium doloribus iure veritatis. Deserunt delectus impedit vitae suscipit illo laborum hic rerum recusandae.</p>
+    </ion-text>
+
+    <ion-text color="medium">
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea suscipit exercitationem deserunt tempora ratione, natus mollitia praesentium doloribus iure veritatis. Deserunt delectus impedit vitae suscipit illo laborum hic rerum recusandae.</p>
+    </ion-text> -->
+
+  </div>
+
+</ion-content>

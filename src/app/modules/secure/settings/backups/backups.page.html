@@ -1,0 +1,65 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button text="Settings" defaultHref="/settings">
+      </ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Backups
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="ion-padding">
+
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Backups (3)</ion-label>
+    </ion-list-header>
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item detail="false">
+        <ion-label>
+          <h3>01 Jan, 2022</h3>
+          <p class="font-size-smallest">10:00 AM &middot; 6.98 MB</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="primary">
+          Restore
+        </ion-button>
+      </ion-item>
+      <ion-item detail="false">
+        <ion-label>
+          <h3>01 Dec, 2021</h3>
+          <p class="font-size-smallest">10:00 AM &middot; 6.40 MB</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="primary">
+          Restore
+        </ion-button>
+      </ion-item>
+      <ion-item detail="false">
+        <ion-label>
+          <h3>01 Nov, 2021</h3>
+          <p class="font-size-smallest">10:00 AM &middot; 5.15 MB</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="primary">
+          Restore
+        </ion-button>
+      </ion-item>
+    </ion-list>
+    <p class="list-description">After restoring a backup you have to login again.</p>
+
+    <hr class="hr-medium">
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item button detail=false>
+        <ion-icon slot="start" color="primary" name="cloud-upload"></ion-icon>
+        <ion-label color="primary">
+          <h3>Create backup now</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+  </div>
+
+</ion-content>
