@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { LoginRequest } from 'src/app/services/auth/login-user';
 
 @Component({
   selector: 'app-signin',
@@ -24,7 +25,7 @@ export class SigninPage implements OnInit {
     private loadingController: LoadingController,
     private formBuilder: FormBuilder,
     private toastService: ToastService,
-    private router: Router
+    private navController: NavController
   ) { 
     this.currentVersion = environment.version;
   }
@@ -33,13 +34,13 @@ export class SigninPage implements OnInit {
 
     // Setup form
     this.signin_form = this.formBuilder.group({
-      email: ['', Validators.compose([Validators.email, Validators.required])],
+      userEmail: ['', Validators.compose([Validators.email, Validators.required])],
       password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
 
     // DEBUG: Prefill inputs
-    this.signin_form.get('email').setValue('john.doe@mail.com');
-    this.signin_form.get('password').setValue('123456');
+    this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+    this.signin_form.get('password').setValue('String1234');
   }
 
   // Sign in
@@ -63,14 +64,19 @@ export class SigninPage implements OnInit {
 
       // TODO: Add your sign in logic
       // ...
-
-      // Fake timeout
-      setTimeout(async () => {
-
-        // Sign in success
-        await this.router.navigate(['/home']);
+      
+      let loginModel: LoginRequest = this.signin_form.value;
+      (await this.authService.signIn(loginModel)).subscribe(async response => {
+        
+        await this.navController.navigateRoot('/home');
         loading.dismiss();
-      }, 2000);
+      });
+
+      // // Fake timeout
+      // setTimeout(async () => {
+
+      //   // Sign in success
+      // }, 2000);
 
     }
   }

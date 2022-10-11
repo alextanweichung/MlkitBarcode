@@ -1,9 +1,11 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
 SwiperCore.use([Pagination]);
 
-import { Router } from '@angular/router';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { NavController } from '@ionic/angular';
+import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 
 @Component({
   selector: 'app-welcome',
@@ -11,7 +13,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./welcome.page.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class WelcomePage implements AfterContentChecked {
+export class WelcomePage implements OnInit, AfterContentChecked {
 
   language: string = '';
   last_slide: boolean = false;
@@ -19,7 +21,7 @@ export class WelcomePage implements AfterContentChecked {
   @ViewChild('swiper') swiper: SwiperComponent;
 
   // Swiper config
-  config: SwiperOptions = {
+  swiperConfig: SwiperOptions = {
     slidesPerView: 1,
     spaceBetween: 50,
     pagination: { clickable: false },
@@ -27,12 +29,17 @@ export class WelcomePage implements AfterContentChecked {
   }
 
   constructor(
-    private router: Router,
-    private ref: ChangeDetectorRef
+    private configService: ConfigService,
+    private navController: NavController
   ) { }
 
-  ngAfterContentChecked(): void {
+  ngOnInit() {
+    if (this.configService.sys_parameter) {
+      this.navController.navigateRoot('/signin');
+    }
+  }
 
+  ngAfterContentChecked(): void {
     if (this.swiper) {
       this.swiper.updateSwiper({});
     }
@@ -53,11 +60,21 @@ export class WelcomePage implements AfterContentChecked {
     this.last_slide = true;
   }
 
+  activationCode: string = '';
   // Go to main content
   async getStarted() {
-
+    if (this.activationCode.length > 0) {
+      let code = atob(this.activationCode);
+      let config: Sys_Parameter = JSON.parse(code);
+      await this.configService.insert(config);
+    }
     // Navigate to /home
-    this.router.navigateByUrl('/signin');
+    this.navController.navigateRoot('/signin');
   }
+
+  // async insertConfig(config: Config) {
+  //   console.log(`inserting config`);
+  //   await this.configService.insertConfig(config);
+  // }
 
 }
