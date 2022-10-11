@@ -3,6 +3,8 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
+import { ConfigService } from './services/config/config.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -11,8 +13,12 @@ import { Platform } from '@ionic/angular';
 })
 export class AppComponent {
 
+  private initPlugin: boolean;
+
   constructor(
-    private platform: Platform
+    private platform: Platform,
+    private configService: ConfigService,
+    private router: Router
   ) {
     this.initializeApp();
   }

@@ -1,6 +1,5 @@
 <ion-content>
-  <swiper class="swiper-welcome" #swiper [config]="config" (slideChange)="swiperSlideChanged($event)"
-    (reachEnd)="onLastSlide()">
+  <swiper class="swiper-welcome" #swiper [config]="swiperConfig" (slideChange)="swiperSlideChanged($event)" (reachEnd)="onLastSlide()">
     <ng-template swiperSlide>
       <ion-icon name="card" class="animate__animated animate__fadeInDown"></ion-icon>
       <h3 class="animate__animated animate__fadeInUp">All your cards & accounts<br>in one place</h3>
@@ -15,6 +14,10 @@
       <ion-icon name="stats-chart"></ion-icon>
       <h3>Extensive<br>insights</h3>
       <p>You can describe this feature here with a sentence of multiple lines.</p>
+      <ion-item>
+        <ion-label color="tertiary" position="stacked">Activation Code</ion-label>
+        <ion-input [(ngModel)]="activationCode" autocomplete="off" placeholder="Activation Code"></ion-input>
+      </ion-item>
     </ng-template>
   </swiper>
 </ion-content>
