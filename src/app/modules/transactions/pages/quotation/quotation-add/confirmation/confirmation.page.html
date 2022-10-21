@@ -17,7 +17,8 @@
       <ion-item-sliding *ngFor="let item of itemToDisplay">
         <ion-item button detail="false" class="pr-2 no-ripple">
           <ion-grid class="ion-no-padding" *ngIf="item.variationTypeCode === '0'">
-            <ion-row class="py-1">              <ion-col>
+            <ion-row class="py-1">
+              <ion-col>
                 <p>{{item.itemCode}}</p>
               </ion-col>
               <ion-col>
@@ -31,7 +32,7 @@
             </ion-row>
             <ion-row class="py-1">
               <ion-col size="7">
-                Total Qty
+                <p style="font-size: smaller;">Total Qty</p>
               </ion-col>
               <ion-col size="5">                
                 <ion-grid class="ion-no-padding">

@@ -53,8 +53,7 @@ const routes: Routes = [
   {
     path: 'item-details',
     loadChildren: () => import('./shared/pages/item-details/item-details.module').then( m => m.ItemDetailsPageModule)
-  },
-
+  }
 ];
 @NgModule({
   imports: [
