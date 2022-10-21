@@ -1,14 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonPopover, IonRouterOutlet, ModalController, NavController, PopoverController } from '@ionic/angular';
+import { AlertController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { Customer } from 'src/app/modules/transactions/models/customer';
 import { Item, ItemList } from 'src/app/modules/transactions/models/item';
-import { QuotationDto, QuotationLine, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
-import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
+import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-confirmation',
@@ -18,11 +16,11 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 })
 export class ConfirmationPage implements OnInit {
 
-  customer: Customer;
+  private salesOrderHeader: SalesOrderHeader;
   itemInCart: Item[];
 
   constructor(
-    private quotationService: QuotationService,
+    private salesOrderService: SalesOrderService,
     private route: ActivatedRoute,
     private navController: NavController,
     private modalController: ModalController,
@@ -34,88 +32,22 @@ export class ConfirmationPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.customer = this.quotationService.selectedCustomer;
-    this.itemInCart = this.quotationService.itemInCart;
+    this.salesOrderHeader = this.salesOrderService.salesOrderHeader;
+    this.itemInCart = this.salesOrderService.itemInCart;
     if (this.itemInCart && this.itemInCart.length > 0) {
       this.combineItemWithVariations();
     }
     this.recalculateTotals();
-    console.log(this.itemInCart);
-    if (!this.customer || this.customer === undefined) {
+    if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
-      this.navController.navigateBack('/quotation/quotation-customer');
+      this.navController.navigateBack('/sales-order/sales-order-customer');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
       this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'top', 'medium', 1500);
     }
-    this.loadMasterList();
-  }
-
-  locationMasterList: MasterListDetails[] = [];
-  salesAgentMasterList: MasterListDetails[] = [];
-  termPeriodMasterList: MasterListDetails[] = [];
-  countryMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.quotationService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.termPeriodMasterList = response.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.countryMasterList = response.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.setDefaultValue();
-    }, error => {
-      console.log(error);
-    })
-  }
-
-  defaultLocation: number;
-  defaultTermPeriod: number;
-  defaultCountry: number;
-  defaultCurrency: number;
-  defaultExchangeRate: number;
-  setDefaultValue() {
-    if (this.customer.locationId) {
-      this.defaultLocation = this.customer.locationId;
-    } else {
-      let defaultLocation = this.locationMasterList.find(item => item.isPrimary)?.id;
-      if (defaultLocation) {
-        this.defaultLocation = defaultLocation;
-      }
-    }
-
-    if (this.customer.termPeriodId) {
-      this.defaultTermPeriod = this.customer.termPeriodId;
-    } else {
-      let defaultTermPeriod = this.termPeriodMasterList.find(item => item.isPrimary)?.id;
-      if (defaultTermPeriod) {
-        this.defaultTermPeriod = defaultTermPeriod;
-      }
-    }
-
-    if (this.customer.countryId) {
-      this.defaultCountry = this.customer.countryId
-    } else {
-      let defaultCountry = this.countryMasterList.find(item => item.isPrimary)?.id;
-      if (defaultCountry) {
-        this.defaultCountry = defaultCountry;
-      }
-    }
-
-    if (this.customer.currencyId) {
-      this.defaultCurrency = this.customer.currencyId;
-    } else {
-      let defaultCurrency = this.currencyMasterList.find(item => item.isPrimary)?.id;
-      if (defaultCurrency) {
-        this.defaultCurrency = defaultCurrency;
-      }
-    }
-
-    this.defaultExchangeRate = parseFloat(this.currencyMasterList.find(r => r.id == this.defaultCurrency).attribute1);
   }
 
   decreaseQty(item) {
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 118 ~ ConfirmationPage ~ decreaseQty ~ item", item)
     item.qtyRequest--;
     if (item.variationTypeCode === '0') {
       this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
@@ -133,11 +65,9 @@ export class ConfirmationPage implements OnInit {
     }
     this.recalculateTotals();
   }
-
+  
   resetQtyBackToOne(itemSku: string) {
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 137 ~ ConfirmationPage ~ resetQtyBackToOne ~ itemSku", itemSku)
     this.itemInCart
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 138 ~ ConfirmationPage ~ resetQtyBackToOne ~ this.itemInCart", this.itemInCart)
     this.ngZone.run(() => {
       this.itemInCart.find(r => r.itemSku === itemSku).qtyRequest = 1;
       this.combineItemWithVariations();
@@ -172,7 +102,6 @@ export class ConfirmationPage implements OnInit {
         })
       })
     }
-    console.log("🚀 ~ file: item.page.ts ~ line 89 ~ ItemPage ~ distinctItem ~ this.itemToDisplay", this.itemToDisplay)
   }
 
   getVariationSum(item: ItemList) {
@@ -231,14 +160,14 @@ export class ConfirmationPage implements OnInit {
   removeItem(itemSku: string) {
     this.itemInCart.splice(this.itemInCart.findIndex(r => r.itemSku === itemSku), 1);
     this.combineItemWithVariations();
-    this.quotationService.setChoosenItems(this.itemInCart);
+    this.salesOrderService.setChoosenItems(this.itemInCart);
     this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1500);
   }
 
   removeItemById(itemId: number) {
     this.itemInCart = this.itemInCart.filter(r => r.itemId !== itemId);
     this.combineItemWithVariations();
-    this.quotationService.setChoosenItems(this.itemInCart);
+    this.salesOrderService.setChoosenItems(this.itemInCart);
     this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1500);
   }
 
@@ -255,7 +184,7 @@ export class ConfirmationPage implements OnInit {
             text: 'OK',
             role: 'confirm',
             handler: async () => {
-              await this.insertQuotation();
+              await this.insertSalesOrder();
             },
           },
         ],
@@ -265,18 +194,16 @@ export class ConfirmationPage implements OnInit {
       this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1500);
     }
   }
-
-  async insertQuotation() {    
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 185 ~ ConfirmationPage ~ insertQuotation ~ this.itemInCart", this.itemInCart)
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 184 ~ ConfirmationPage ~ insertQuotation ~ this.customer", this.customer)
+  
+  async insertSalesOrder() {
     // const result = await this.presentInsertConfirmation();
     connectableObservableDescriptor.lo
     // if (result) {
-    let trxLineArray: QuotationLine[] = [];
-    this.quotationService.itemInCart.forEach(e => {
-      let objectLine: QuotationLine = {
-        quotationLineId: 0,
-        quotationId: 0,
+    let trxLineArray: SalesOrderLine[] = [];
+    this.salesOrderService.itemInCart.forEach(e => {
+      let objectLine: SalesOrderLine = {
+        salesOrderLineId: 0,
+        salesOrderId: 0,
         itemId: e.itemId,
         itemVariationXId: e.itemVariationLineXId,
         itemVariationYId: e.itemVariationLineYId,
@@ -288,55 +215,56 @@ export class ConfirmationPage implements OnInit {
         qtyRequest: e.qtyRequest,
         unitPrice: e.unitPrice,
         sequence: 0,
-        locationId: this.customer.locationId,
+        locationId: this.salesOrderHeader.locationId,
         deactivated: true
       }
       trxLineArray = [...trxLineArray, objectLine];
     });
-    let trxDto: QuotationDto = {
+    let trxDto: SalesOrderDto = {
       header: {
-        quotationId: 0,
-        quotationNum: null,
+        salesOrderId: 0,
+        salesOrderNum: null,
         trxDate: this.datePipe.transform(new Date, 'yyyy-MM-dd'),
-        businessModelType: this.customer.businessModelType,
-        typeCode: (this.customer.businessModelType === 'T' || this.customer.businessModelType === 'F') ? 'S' : 'T', // Sales
+        businessModelType: this.salesOrderHeader.businessModelType,
+        typeCode: this.salesOrderHeader.typeCode,
         sourceType: 'M', // Mobile
-        locationId: this.defaultLocation,
-        customerId: this.customer.customerId,
+        locationId: this.salesOrderHeader.locationId,
+        customerId: this.salesOrderHeader.customerId,
         attention: null,
-        salesAgentId: JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId,
-        termPeriodId: this.defaultTermPeriod,
-        countryId: this.defaultCountry,
-        currencyId: this.defaultCurrency,
-        currencyRate: this.defaultExchangeRate
+        salesAgentId: this.salesOrderHeader.salesAgentId,
+        termPeriodId: this.salesOrderHeader.termPeriodId,
+        countryId: this.salesOrderHeader.countryId,
+        currencyId: this.salesOrderHeader.currencyId,
+        currencyRate: this.salesOrderHeader.exchangeRate
       },
       details: trxLineArray,
     }
-    this.quotationService.insertQuotation(trxDto).subscribe(response => {
+    this.salesOrderService.insertSalesOrder(trxDto).subscribe(response => {
+      console.log("🚀 ~ file: confirmation.page.ts ~ line 245 ~ ConfirmationPage ~ this.salesOrderService.insertSalesOrder ~ response", response)
       let details: any[] = response.body["details"];
       let totalQty: number = 0;
       details.forEach(e => {
         totalQty += e.qtyRequest;
       })
 
-      let qs: QuotationSummary = {
-        quotationNum: response.body["header"]["quotationNum"],
-        customerName: this.customer.name,
+      let ss: SalesOrderSummary = {
+        salesOrderNum: response.body["header"]["salesOrderNum"],
+        customerId: this.salesOrderHeader.customerId,
         totalQuantity: totalQty,
         totalAmount: response.body["header"]["totalGrossAmt"]
       }
       
-      this.quotationService.setQuotationSummary(qs);
+      this.salesOrderService.setSalesOrderSummary(ss);
 
-      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'top', 'success', 1500);
-      this.navController.navigateRoot('/quotation/quotation-summary');
+      this.toastService.presentToast('Insert Complete', 'New sales order has been added', 'top', 'success', 1500);
+      this.navController.navigateRoot('/sales-order/sales-order-summary');
     }, error => {
       console.log(error);
     });
   }
 
   previousStep() {
-    this.navController.navigateBack('/quotation/quotation-item');
+    this.navController.navigateBack('/sales-order/sales-order-item');
   }
 
 }

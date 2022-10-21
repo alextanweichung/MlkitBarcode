@@ -1,10 +1,10 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { LoadingController, NavController, Platform } from '@ionic/angular';
-import { Customer } from 'src/app/modules/transactions/models/customer';
+import { LoadingController, NavController } from '@ionic/angular';
 import { Item, ItemImage, ItemList } from 'src/app/modules/transactions/models/item';
-import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
+import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
@@ -14,21 +14,22 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 })
 export class ItemPage implements OnInit {
 
-  private customer: Customer;
+  private salesOrderHeader: SalesOrderHeader
 
   constructor(
-    private quotationService: QuotationService,
+    private salesOrderService: SalesOrderService,
     private navController: NavController,
     private loadingController: LoadingController,
     private ngZone: NgZone,
-    private toastService: ToastService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
-    this.customer = this.quotationService.selectedCustomer;
-    if (!this.customer || this.customer === undefined) {
+    this.salesOrderHeader = this.salesOrderService.salesOrderHeader
+    console.log("🚀 ~ file: item.page.ts ~ line 26 ~ ItemPage ~ ngOnInit ~ this.salesOrderHeader", this.salesOrderHeader)
+    if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
-      this.navController.navigateBack('/quotation/quotation-customer');
+      this.navController.navigateBack('/sales-order/sales-order-customer');
     }
   }
 
@@ -37,7 +38,7 @@ export class ItemPage implements OnInit {
     this.itemToDisplay = [];
     this.availableImages = [];
   }
-
+  
   itemSearchText: string;
   availableItem: Item[] = [];
   availableImages: ItemImage[] = [];
@@ -49,13 +50,13 @@ export class ItemPage implements OnInit {
       }
       await this.showLoading();
 
-      this.quotationService.getItemImageFile(this.itemSearchText).subscribe(response => {
+      this.salesOrderService.getItemImageFile(this.itemSearchText).subscribe(response => {
         this.availableImages = response;
       }, error => {
         console.log(error);
       })
 
-      this.quotationService.getItemList(this.itemSearchText, this.customer.customerId, this.customer.locationId).subscribe(async response => {
+      this.salesOrderService.getItemList(this.itemSearchText, this.salesOrderHeader.customerId, this.salesOrderHeader.locationId).subscribe(async response => {
         this.availableItem = response;
         this.distinctItem();
         this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
@@ -86,9 +87,7 @@ export class ItemPage implements OnInit {
         })
       })
     }
-
-    console.log("🚀 ~ file: item.page.ts ~ line 89 ~ ItemPage ~ distinctItem ~ this.itemToDisplay", this.itemToDisplay)
-  }
+  }  
 
   matchImage(itemId: number) {
     let defaultImageUrl = "assets/icon/favicon.png";
@@ -212,13 +211,13 @@ export class ItemPage implements OnInit {
   /* #region  steps */
 
   nextStep() {
-    this.quotationService.setChoosenItems(this.itemInCart);
+    this.salesOrderService.setChoosenItems(this.itemInCart);
     this.itemInCart = [];
-    this.navController.navigateForward('/quotation/quotation-confirmation');
+    this.navController.navigateForward('/sales-order/sales-order-confirmation');
   }
 
   previousStep() {
-    this.navController.navigateBack('/quotation/quotation-customer');
+    this.navController.navigateBack('/sales-order/sales-order-customer');
   }
 
   /* #endregion */

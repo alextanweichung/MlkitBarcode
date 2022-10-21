@@ -2,23 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { QuotationList } from '../../models/quotation';
-import { QuotationService } from '../../services/quotation.service';
+import { SalesOrderList } from '../../models/sales-order';
+import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
 
 @Component({
-  selector: 'app-quotation',
-  templateUrl: './quotation.page.html',
-  styleUrls: ['./quotation.page.scss'],
-  providers: [IonRouterOutlet]
+  selector: 'app-sales-order',
+  templateUrl: './sales-order.page.html',
+  styleUrls: ['./sales-order.page.scss'],
 })
-export class QuotationPage implements OnInit {
+export class SalesOrderPage implements OnInit {
 
   content_loaded: boolean = false;
-  objects: QuotationList[] = [];
+  objects: SalesOrderList[] = [];
 
   constructor(
-    private quotationService: QuotationService,
+    private salesOrderService: SalesOrderService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
@@ -33,9 +32,9 @@ export class QuotationPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    this.quotationService.getQuotationList().subscribe(response => {
+    this.salesOrderService.getSalesOrderList().subscribe(response => {
       this.objects = response;
-      console.log(this.objects);
+      console.log("🚀 ~ file: sales-order.page.ts ~ line 37 ~ SalesOrderPage ~ this.salesOrderService.getSalesOrderList ~ this.objects", this.objects)
       if (this.objects.length > 0) {
         this.content_loaded = true;
       }
@@ -53,26 +52,27 @@ export class QuotationPage implements OnInit {
     if (salesAgentId === 0 || salesAgentId === undefined) {
       this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1500);
     } else {
-      this.navController.navigateForward('/quotation/quotation-customer');
+      this.navController.navigateForward('/sales-order/sales-order-customer');
     }
   }
 
   /* #endregion */
 
   async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      canDismiss: true,
-      presentingElement: this.routerOutlet.nativeEl
-    })
+    // const modal = await this.modalController.create({
+    //   component: FilterPage,
+    //   canDismiss: true,
+    //   presentingElement: this.routerOutlet.nativeEl
+    // })
 
-    await modal.present();
+    // await modal.present();
 
-    let { data } = await modal.onWillDismiss();
-    console.log(data);
-    if (data) {
-      this.loadObjects();
-    }
+    // let { data } = await modal.onWillDismiss();
+    // console.log("🚀 ~ file: sales-order.page.ts ~ line 71 ~ SalesOrderPage ~ filter ~ data", data)
+    
+    // if (data) {
+    //   this.loadObjects();
+    // }
   }
 
   // Select action
@@ -82,7 +82,7 @@ export class QuotationPage implements OnInit {
       cssClass: 'custom-action-sheet',
       buttons: [
         {
-          text: 'Add Quotation',
+          text: 'Add Sales Order',
           icon: 'document-outline',
           handler: () => {
             this.addObject();
@@ -97,13 +97,13 @@ export class QuotationPage implements OnInit {
     await actionSheet.present();
   }
 
-  goToDetail(quotationId: number) {
+  goToDetail(salesOrderId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        quotationId: quotationId
+        salesOrderId: salesOrderId
       }
     }
-    this.navController.navigateForward('/quotation/quotation-detail', navigationExtras);
+    this.navController.navigateForward('/sales-order/sales-order-detail', navigationExtras);
   }
 
 }

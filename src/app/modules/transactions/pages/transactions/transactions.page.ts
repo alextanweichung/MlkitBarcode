@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
-import { format, parseISO } from 'date-fns';
 import { QuotationList } from '../../models/quotation';
+import { SalesOrderList } from '../../models/sales-order';
 import { QuotationService } from '../../services/quotation.service';
-import { TransactionsService } from '../../services/transactions.service';
+import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
-import { DetailPage } from '../quotation/quotation-detail/detail/detail.page';
 
 @Component({
   selector: 'app-transactions',
@@ -19,12 +18,14 @@ export class TransactionsPage implements OnInit {
   quotations: QuotationList[] = [];
 
   sales_order_loaded: boolean = false;
+  salesOrders: SalesOrderList[] = [];
 
   constructor(
     private routerOutlet: IonRouterOutlet,
     private modalController: ModalController,
     private navController: NavController,
-    private quotationService: QuotationService
+    private quotationService: QuotationService,
+    private salesOrderService: SalesOrderService
   ) { }
 
   ngOnInit() {
@@ -44,13 +45,15 @@ export class TransactionsPage implements OnInit {
     })
 
     // sales order
-    // this.quotation_loaded = true;
-    // this.objectService.getSalesOrderRecentList().subscribe(response => {
-    //   console.log("🚀 ~ file: transactions.page.ts ~ line 30 ~ TransactionsPage ~ this.objectService.getSalesOrderRecentList ~ response", JSON.stringify(response))
-    //   // this.sales_order_loaded = true;
-    // }, error => {
-    //   console.log(error);
-    // })
+    this.salesOrderService.getSalesOrderList().subscribe(response => {
+      this.salesOrders = response;
+      if (this.salesOrders.length > 0) {
+        this.salesOrders = this.salesOrders.slice(0, 3); // only take latest 3
+        this.sales_order_loaded = true;
+      }
+    }, error => {
+      console.log(error);
+    })
   }
 
   async filter() {
@@ -73,7 +76,6 @@ export class TransactionsPage implements OnInit {
     }
   }
 
-
   /* #region  quotation */
 
   async goToQuotationDetail(quotationId: number) {
@@ -83,7 +85,21 @@ export class TransactionsPage implements OnInit {
         parent: "Transactions"
       }
     }
-    this.navController.navigateForward('/quotation/detail', navigationExtras);
+    this.navController.navigateForward('/quotation/quotation-detail', navigationExtras);
+  }
+
+  /* #endregion */
+
+  /* #region  quotation */
+
+  async goToSalesOrderDetail(salesOrderId: number) {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        salesOrderId: salesOrderId,
+        parent: "Transactions"
+      }
+    }
+    this.navController.navigateForward('/sales-order/sales-order-detail', navigationExtras);
   }
 
   /* #endregion */

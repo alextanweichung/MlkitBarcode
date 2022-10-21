@@ -7,7 +7,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
-import { QuotationDto, QuotationLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
+import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
 import { TransactionsService } from './transactions.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -18,15 +18,15 @@ const httpObserveHeader = {
 @Injectable({
   providedIn: 'root'
 })
-export class QuotationService {
+export class SalesOrderService {
 
   baseUrl: string;
   startDate: Date;
   endDate: Date;
 
-  selectedCustomer: Customer;
+  salesOrderHeader: SalesOrderHeader;
   itemInCart: Item[] = [];
-  quotationSummary: QuotationSummary;
+  salesOrderSummary: SalesOrderSummary;
 
   constructor(
     private http: HttpClient,
@@ -43,8 +43,8 @@ export class QuotationService {
     }
   }
 
-  setChoosenCustomer(customer: Customer) {
-    this.selectedCustomer = customer;
+  setChoosenCustomer(soHeader: SalesOrderHeader) {
+    this.salesOrderHeader = soHeader;
   }
 
   setChoosenItems(item: Item[]) {
@@ -52,35 +52,35 @@ export class QuotationService {
     console.log("🚀 ~ file: quotation.service.ts ~ line 52 ~ QuotationService ~ setChoosenItems ~ this.itemInCart", this.itemInCart)
   }
 
-  setQuotationSummary(qs: QuotationSummary) {
-    this.quotationSummary = qs;
+  setSalesOrderSummary(ss: SalesOrderSummary) {
+    this.salesOrderSummary = ss;
   }
 
   removeCustomer() {
-    this.selectedCustomer = null;
+    this.salesOrderHeader = null;
   }
 
   removeItems() {
     this.itemInCart = [];
   }
 
-  removeQuotationSummary() {
-    this.quotationSummary = null;
+  removeSalesOrderSummary() {
+    this.salesOrderSummary = null;
   }
 
   resetVariables() {
     this.removeCustomer();
     this.removeItems();
-    this.removeQuotationSummary();
+    this.removeSalesOrderSummary();
   }
 
-  flattenDtoDetail(quotation: QuotationRoot): QuotationDto {
-    let line: QuotationLine[] = [];
-    quotation.details.forEach(r => {
+  flattenDtoDetail(salesOrder: SalesOrderRoot): SalesOrderDto {
+    let line: SalesOrderLine[] = [];
+    salesOrder.details.forEach(r => {
       if (r.variationTypeCode === '0') {
-        let l: QuotationLine = {
-          quotationLineId: r.lineId,
-          quotationId: r.headerId,
+        let l: SalesOrderLine = {
+          salesOrderLineId: r.lineId,
+          salesOrderId: r.headerId,
           itemId: r.itemId,
           itemVariationXId: null,
           itemVariationYId: null,
@@ -99,9 +99,9 @@ export class QuotationService {
       } else {
         r.variationDetails.forEach(v => {
           v.details.forEach(d => {
-            let l: QuotationLine = {
-              quotationLineId: r.lineId,
-              quotationId: r.headerId,
+            let l: SalesOrderLine = {
+              salesOrderLineId: r.lineId,
+              salesOrderId: r.headerId,
               itemId: r.itemId,
               itemVariationXId: v.itemVariationXId,
               itemVariationYId: d.itemVariationYId,
@@ -111,7 +111,7 @@ export class QuotationService {
               extendedDescription: r.extendedDescription,
               qtyRequest: d.qtyRequest,
               unitPrice: r.unitPrice,
-              subTotal: (d.qtyRequest ?? 0) * (r.unitPrice ?? 0),
+              subTotal: (d.qtyRequest??0) * (r.unitPrice??0),
               sequence: r.sequence,
               locationId: r.locationId,
               deactivated: r.deactivated
@@ -124,23 +124,23 @@ export class QuotationService {
       }
     })
 
-    let dto: QuotationDto = {
+    let dto: SalesOrderDto = {
       header: {
-        quotationId: quotation.header.quotationId,
-        quotationNum: quotation.header.quotationNum,
-        trxDate: quotation.header.trxDate,
-        businessModelType: quotation.header.businessModelType,
-        typeCode: quotation.header.typeCode,
-        sourceType: quotation.header.sourceType,
-        customerId: quotation.header.customerId,
-        salesAgentId: quotation.header.salesAgentId,
-        attention: quotation.header.attention,
-        locationId: quotation.header.locationId,
-        termPeriodId: quotation.header.termPeriodId,
-        workFlowTransactionId: quotation.header.workFlowTransactionId,
-        countryId: quotation.header.countryId,
-        currencyId: quotation.header.currencyId,
-        currencyRate: quotation.header.currencyRate
+        salesOrderId: salesOrder.header.salesOrderId,
+        salesOrderNum: salesOrder.header.salesOrderNum,
+        trxDate: salesOrder.header.trxDate,
+        businessModelType: salesOrder.header.businessModelType,
+        typeCode: salesOrder.header.typeCode,
+        sourceType: salesOrder.header.sourceType,
+        customerId: salesOrder.header.customerId,
+        salesAgentId: salesOrder.header.salesAgentId,
+        attention: salesOrder.header.attention,
+        locationId: salesOrder.header.locationId,
+        termPeriodId: salesOrder.header.termPeriodId,
+        workFlowTransactionId: salesOrder.header.workFlowTransactionId,
+        countryId: salesOrder.header.countryId,
+        currencyId: salesOrder.header.currencyId,
+        currencyRate: salesOrder.header.currencyRate
       },
       details: line
     }
@@ -149,7 +149,7 @@ export class QuotationService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/masterlist").pipe(
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -157,19 +157,15 @@ export class QuotationService {
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/staticLov").pipe(
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/staticLov").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
     );
   }
 
-  getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer");
-  }
-
   getItemList(keyword: string, customerId: number, locationId: number) {
-    return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemList/" + keyword + "/" + customerId + "/" + locationId, { context: background_load() }).pipe(
+    return this.http.get<Item[]>(this.baseUrl + "MobileSalesOrder/item/itemList/" + keyword + "/" + customerId + "/" + locationId, { context: background_load() }).pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -177,19 +173,21 @@ export class QuotationService {
   }
 
   getItemImageFile(keyword: string) {
-    return this.http.get<ItemImage[]>(this.baseUrl + "MobileQuotation/itemList/imageFile/" + keyword, { context: background_load() });
+    return this.http.get<ItemImage[]>(this.baseUrl + "MobileSalesOrder/itemList/imageFile/" + keyword, { context: background_load() });
   }
 
-  getQuotationList() {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd'));
+  getSalesOrderList() {
+    console.log("🚀 ~ file: sales-order.service.ts ~ line 181 ~ SalesOrderService ~ getSalesOrderList ~ this.startDate", this.startDate)
+    console.log("🚀 ~ file: sales-order.service.ts ~ line 181 ~ SalesOrderService ~ getSalesOrderList ~ this.endDate", this.endDate)
+    return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing/" + format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd'));
   }
 
-  getQuotationDetail(quotationId: number) {
-    return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + quotationId);
+  getSalesOrderDetail(salesOrderId: number) {
+    return this.http.get<any>(this.baseUrl + "MobileSalesOrder/" + salesOrderId);
   }
 
-  insertQuotation(quotationDto: QuotationDto) {
-    return this.http.post(this.baseUrl + "MobileQuotation", quotationDto, httpObserveHeader);
+  insertSalesOrder(salesOrderDto: SalesOrderDto) {
+    return this.http.post(this.baseUrl + "MobileSalesOrder", salesOrderDto, httpObserveHeader);
   }
 
 }

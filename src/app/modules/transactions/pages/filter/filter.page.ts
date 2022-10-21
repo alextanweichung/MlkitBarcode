@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { QuotationService } from '../../services/quotation.service';
+import { SalesOrderService } from '../../services/sales-order.service';
 
 @Component({
   selector: 'app-filter',
@@ -22,6 +23,7 @@ export class FilterPage implements OnInit {
 
   constructor(
     private quotationService: QuotationService,
+    private salesOrderService: SalesOrderService,
     private modalController: ModalController
   ) { }
 
@@ -75,6 +77,9 @@ export class FilterPage implements OnInit {
     this.filters = { startDate: this.startDate, endDate: this.endDate };
     this.quotationService.startDate = new Date(this.startDate);
     this.quotationService.endDate = new Date(this.endDate);
+
+    this.salesOrderService.startDate = new Date(this.startDate);
+    this.salesOrderService.endDate = new Date(this.endDate);
 
     // Dismiss modal and apply filters
     this.modalController.dismiss(this.filters);

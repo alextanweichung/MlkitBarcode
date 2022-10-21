@@ -1,3 +1,5 @@
+import { VariationDetail } from "src/app/shared/models/variation-detail"
+
 export interface QuotationList {
    quotationId: number
    quotationNum: string
@@ -12,7 +14,7 @@ export interface QuotationList {
    createdById: number
  }
  
- export interface QuotationDto {
+export interface QuotationDto {
   header: Quotation
   details: QuotationLine[]
 }
@@ -228,30 +230,4 @@ export interface QuotationDetail {
   modifiedBy: any
   modifiedAt: any
   deactivated: boolean
-}
-
-export interface VariationDetail {
-  itemVariationXId: number
-  details: InnerVariationDetail[]
-}
-
-export interface InnerVariationDetail {
-  sequence: number
-  variationId: number
-  lineId: number
-  headerId: number
-  itemVariationYId: number
-  itemSku: string
-  itemBarcodeTagId: any
-  itemBarcode: any
-  qtyRequest?: number
-  qtyCommit: any
-  qtyApproved: any
-  qtyReceive: any
-  qtyBalance: any
-  parentVariationId: any
-  actualQty: any
-  openQty: any
-  availableQty: any
-  ratio?: number
 }

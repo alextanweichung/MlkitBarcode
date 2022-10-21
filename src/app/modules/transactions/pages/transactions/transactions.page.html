@@ -34,7 +34,7 @@
       <app-listing-skeleton [size]='3'></app-listing-skeleton>
     </ng-container>
 
-    <ng-container *ngIf="quotation_loaded">      
+    <ng-container *ngIf="quotation_loaded">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button detail="false" (click)="goToQuotationDetail(object.quotationId)" *ngFor="let object of quotations" >
           <ion-avatar slot="start" class="ion-avatar-default-icon">
@@ -53,13 +53,34 @@
 
     <ion-list-header>
       <ion-label color="dark">Sales Order</ion-label>
-      <!-- <ion-button *ngIf="sales_order_loaded" routerLink="/sales-order">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button> -->
+      <ion-button *ngIf="sales_order_loaded" routerLink="/sales-order">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
     </ion-list-header>
 
     <!-- Skeletons -->
     <ng-container *ngIf="!sales_order_loaded">
-      <app-listing-skeleton [size]='3'></app-listing-skeleton>
+      <p>
+        <!-- <ion-text color="warning"><ion-icon name="warning"></ion-icon></ion-text> -->
+        <ion-text color="tertiary">
+          <h3>H3: The quick brown fox jumps over the lazy dog</h3>
+        </ion-text>
+      </p>
     </ng-container>
+
+    <ng-container *ngIf="sales_order_loaded">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders" >
+          <ion-avatar slot="start" class="ion-avatar-default-icon">
+            <ion-icon name="cafe"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h3>{{object.salesOrderNum}}</h3>
+            <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+          </ion-label>
+          <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
 
     <hr class="hr-medium">
 

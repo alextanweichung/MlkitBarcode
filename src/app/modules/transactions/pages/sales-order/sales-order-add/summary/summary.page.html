@@ -1,0 +1,64 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Summary
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Summary</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item>
+        <ion-label>
+          <p>Document Num</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.salesOrderNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Customer Name</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.customerId|idMapping:customerMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Total Quantity</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.totalQuantity|number:'1.0'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Total Amount</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.totalAmount|number:'1.2'}}"></ion-input>
+      </ion-item>
+    </ion-list>
+  </div>
+
+</ion-content>
+
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0">
+  <!-- <ion-item class="ion-no-padding" lines="none"> -->
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <ion-button class="ion-margin" expand="block" (click)="done()">
+            Done
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  <!-- </ion-item> -->
+</ion-footer>

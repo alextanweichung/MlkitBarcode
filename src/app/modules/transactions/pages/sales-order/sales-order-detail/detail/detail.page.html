@@ -14,41 +14,41 @@
       <ion-title size="large">Detail</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="ion-padding" *ngIf="flattenQuotation">
+  <div class="ion-padding" *ngIf="flattenSalesOrder">
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
     <ion-list class="list-custom" lines="full">
       <ion-item>
         <ion-label>
-          <p>Quotation Number</p>
+          <p>Sales Order Number</p>
         </ion-label>
         <!-- <ion-badge color="danger" mode="ios" slot="end">- $8.60</ion-badge> -->
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenQuotation.header.quotationNum}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenSalesOrder.header.salesOrderNum}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Trx Date</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenQuotation.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenSalesOrder.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Location</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenQuotation.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenSalesOrder.header.locationId|idMapping:locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Total Quantity</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenQuotation.details|sum:'qtyRequest'|number}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenSalesOrder.details|sum:'qtyRequest'|number}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Grand Total</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenQuotation.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenSalesOrder.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
       </ion-item>
     </ion-list>
     <ion-list-header class="ion-list-header-small">
@@ -56,7 +56,7 @@
     </ion-list-header>
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" *ngFor="let item of quotation.details" class="no-ripple">
+      <ion-item button detail="false" *ngFor="let item of salesOrder.details" class="no-ripple">
 
         <ion-grid class="ion-no-padding" *ngIf="item.variationTypeCode === '0'">
           <ion-row class="py-1">
