@@ -34,6 +34,27 @@ const routes: Routes = [
     loadChildren: () => import('./modules/public/password-reset/password-reset.module').then( m => m.PasswordResetPageModule),
     // canActivate: [PublicGuard] // Prevent for signed in users
   },
+  {
+    path: 'quotation',
+    loadChildren: () => import('./modules/transactions/pages/quotation/quotation.module').then( m => m.QuotationPageModule)
+  },
+  {
+    path: 'filter',
+    loadChildren: () => import('./modules/transactions/pages/filter/filter.module').then( m => m.FilterPageModule)
+  },
+  {
+    path: 'listing-skeleton',
+    loadChildren: () => import('./shared/pages/listing-skeleton/listing-skeleton.module').then( m => m.ListingSkeletonPageModule)
+  },
+  {
+    path: 'transactions',
+    loadChildren: () => import('./modules/transactions/pages/transactions/transactions.module').then( m => m.TransactionsPageModule)
+  },
+  {
+    path: 'item-details',
+    loadChildren: () => import('./shared/pages/item-details/item-details.module').then( m => m.ItemDetailsPageModule)
+  },
+
 ];
 @NgModule({
   imports: [

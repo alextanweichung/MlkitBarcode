@@ -31,7 +31,11 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/assets/theme/variables.scss", "src/assets/global.scss"],
+            "styles": [
+              "src/assets/idcp/styles.scss",
+              "src/assets/theme/variables.scss",
+              "src/assets/global.scss"              
+            ],
             "scripts": [],
             "aot": false,
             "vendorChunk": true,

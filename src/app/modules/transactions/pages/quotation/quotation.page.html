@@ -1,0 +1,56 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Quotations</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Transactions" defaultHref="/transactions"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="filter()">
+        <ion-icon slot="icon-only" name="filter"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Quotations</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar showCancelButton="focus" placeholder="Quotation ..."></ion-searchbar>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+
+    <ng-container *ngIf="!content_loaded">      
+      <app-listing-skeleton [size]="5"></app-listing-skeleton>
+    </ng-container>
+
+    <ng-container *ngIf="content_loaded">
+      
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects" >
+          <ion-avatar slot="start" class="ion-avatar-default-icon">
+            <ion-icon name="cafe"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h3>{{object.quotationNum}}</h3>
+            <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+          </ion-label>
+          <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
+        </ion-item>
+      </ion-list>
+
+    </ng-container>
+
+  </div>
+
+  <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

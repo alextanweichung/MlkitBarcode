@@ -3,7 +3,6 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
-import { ConfigService } from './services/config/config.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -17,7 +16,6 @@ export class AppComponent {
 
   constructor(
     private platform: Platform,
-    private configService: ConfigService,
     private router: Router
   ) {
     this.initializeApp();
@@ -31,7 +29,7 @@ export class AppComponent {
 
       // If we're on a mobile platform (iOS / Android), not web
       if (Capacitor.getPlatform() !== 'web') {
-
+        this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)
         await StatusBar.setStyle({ style: Style.Dark });
       }

@@ -17,8 +17,8 @@ const routes: Routes = [
         pathMatch: 'full'
       },
       {
-        path: 'insights',
-        loadChildren: () => import('../secure/insights/insights.module').then(m => m.InsightsPageModule)
+        path: 'transactions',
+        loadChildren: () => import('../transactions/pages/transactions/transactions.module').then(m => m.TransactionsPageModule)
       },
       {
         path: 'payments',

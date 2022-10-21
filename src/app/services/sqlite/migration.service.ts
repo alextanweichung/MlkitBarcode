@@ -28,12 +28,6 @@ export class MigrationService {
     await this.createSystemParamTable();
   }
 
-  // async createSystemParamTable(): Promise<void> {
-  //   await this.databaseService.executeQuery(async (db) => {
-  //     await db.execute(createIdcpCore);
-  //   });
-  // }
-
   async createSystemParamTable(): Promise<void> {
     console.log(`going to create a connection`)
     const db = await this.sqliteService.createConnection(dbConfig.idcpcore, false, "no-encryption", 1);

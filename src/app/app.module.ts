@@ -10,12 +10,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
 import { Storage  } from '@ionic/storage';
 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InitializeAppService } from './services/sqlite/initialize.app.service';
 import { SQLiteService } from './services/sqlite/sqlite.service';
 import { DatabaseService } from './services/sqlite/database.service';
 import { MigrationService } from './services/sqlite/migration.service';
 import { DetailService } from './services/sqlite/detail.service';
+import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.interceptor';
 
 export function initializeFactory(init: InitializeAppService) {
   return () => init.initializeApp();
@@ -43,8 +44,10 @@ export function initializeFactory(init: InitializeAppService) {
     InitializeAppService,
     { provide: APP_INITIALIZER, useFactory: initializeFactory, deps: [InitializeAppService], multi: true },
     MigrationService,
-
-  { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, Storage],
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, 
+    Storage
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -6,7 +6,7 @@ import { DatabaseService } from 'src/app/services/sqlite/database.service';
 @Injectable({
   providedIn: 'root'
 })
-export class CommonService<T> {
+export class CommonQueryService<T> {
 
   constructor(
     @Inject(LOCALE_ID) private locale: string,
