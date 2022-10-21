@@ -211,9 +211,8 @@ export class ItemPage implements OnInit {
 
   /* #region  steps */
 
-  nextStep() {
-    this.quotationService.setChoosenItems(this.itemInCart);
-    this.itemInCart = [];
+  async nextStep() {
+    await this.quotationService.setChoosenItems(this.itemInCart);
     this.navController.navigateForward('/quotation/quotation-confirmation');
   }
 

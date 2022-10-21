@@ -53,9 +53,14 @@ const routes: Routes = [
   {
     path: 'item-details',
     loadChildren: () => import('./shared/pages/item-details/item-details.module').then( m => m.ItemDetailsPageModule)
-  },  {
+  },
+  {
     path: 'sales-order',
     loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order.module').then( m => m.SalesOrderPageModule)
+  },
+  {
+    path: 'search-dropdown',
+    loadChildren: () => import('./shared/pages/search-dropdown/search-dropdown.module').then( m => m.SearchDropdownPageModule)
   }
 
 ];

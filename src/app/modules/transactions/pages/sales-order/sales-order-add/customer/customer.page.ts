@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 
 @Component({
   selector: 'app-customer',
@@ -20,31 +22,15 @@ export class CustomerPage implements OnInit {
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private toastService: ToastService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private modalController: ModalController
   ) {
     this.newForm();
   }
 
   ngOnInit() {
-    // this.loadCustomerList();
     this.loadMasterList();
   }
-
-  // customers: Customer[] = [];
-  // selectedCustomer: Customer;
-  // filteredCustomers: Customer[];
-  // loadCustomerList() {
-  //   this.salesOrderService.getCustomerList().subscribe(response => {
-  //     this.customers = response;
-  //     this.filteredCustomers = this.customers;
-  //   }, error => {
-  //     console.log(error);
-  //   })
-  // }
-
-  // filterCustomer(event) {
-  //   this.filteredCustomers = this.customers.filter(item => (item.customerCode.toLowerCase().indexOf(event.detail.value.toLowerCase()) !== -1) || (item.name?.toLowerCase().indexOf(event.detail.value.toLowerCase()) !== -1));
-  // }
   
   locationMasterList: MasterListDetails[] = [];
   customerMasterList: MasterListDetails[] = [];
@@ -114,8 +100,37 @@ export class CustomerPage implements OnInit {
     }
   }
 
+  selectedCustomer: MasterListDetails;
+  async showCustomerSearchDropdown() {
+    let dropdownlist: SearchDropdownList[] = [];
+    this.customerMasterList.forEach(r => {
+      dropdownlist.push({
+        id: r.id,
+        code: r.code,
+        description: r.description
+      })
+    })
+    const modal = await this.modalController.create({
+      component: SearchDropdownPage,
+      componentProps: {
+        searchDropdownList: dropdownlist
+      },
+      canDismiss: true
+    });
+
+    await modal.present();
+
+    let { data } = await modal.onWillDismiss();
+
+    if (data) {
+      this.selectedCustomer = this.customerMasterList.find(r => r.id === data.id);
+      this.objectForm.patchValue({ customerId: this.selectedCustomer.id });
+    }
+  }
+
   customerChanged(event) {
     var lookupValue = this.customerMasterList?.find(e => e.id == event.detail.value);
+    this.selectedCustomer = lookupValue;
     // Auto map object type code
     this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
     if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {

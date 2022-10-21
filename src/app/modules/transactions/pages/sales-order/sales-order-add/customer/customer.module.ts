@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { CustomerPageRoutingModule } from './customer-routing.module';
 
 import { CustomerPage } from './customer.page';
+import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
 @NgModule({
   imports: [
@@ -14,7 +15,8 @@ import { CustomerPage } from './customer.page';
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
-    CustomerPageRoutingModule
+    CustomerPageRoutingModule,
+    IdMappingModule
   ],
   declarations: [CustomerPage]
 })

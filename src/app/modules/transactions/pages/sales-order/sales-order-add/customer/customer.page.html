@@ -24,12 +24,17 @@
             <ion-select-option *ngFor="let item of locationMasterList" [value]="item.id">{{item.description}}</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+        <ion-item (click)="showCustomerSearchDropdown()">
+          <ion-label position="stacked">Customer</ion-label>
+          <ion-input placeholder="Select Customer" formControlName="customerId" (ionChange)="customerChanged($event)" readonly hidden></ion-input>
+          {{objectForm.controls['customerId'].value|idMapping:customerMasterList}}
+        </ion-item>
+        <!-- <ion-item>
           <ion-label position="stacked">Customer</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Customer" formControlName="customerId" (ionChange)="customerChanged($event)">
             <ion-select-option *ngFor="let item of customerMasterList" [value]="item.id">{{item.description}}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </ion-item> -->
         <ion-item>
           <ion-label position="stacked">Currency</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Currency" formControlName="currencyId" (ionChange)="currencyChanged($event)">

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 
 @Component({
   selector: 'app-customer',
@@ -20,7 +22,8 @@ export class CustomerPage implements OnInit {
     private quotationService: QuotationService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private modalController: ModalController
   ) { }
 
   ngOnInit() {
@@ -41,6 +44,32 @@ export class CustomerPage implements OnInit {
 
   filterCustomer(event) {
     this.filteredCustomers = this.customers.filter(item => (item.customerCode.toLowerCase().indexOf(event.detail.value.toLowerCase()) !== -1) || (item.name?.toLowerCase().indexOf(event.detail.value.toLowerCase()) !== -1));
+  }
+
+  async showCustomerSearchDropdown() {
+    let dropdownlist: SearchDropdownList[] = [];
+    this.customers.forEach(r => {
+      dropdownlist.push({
+        id: r.customerId,
+        code: r.customerCode,
+        description: r.name
+      })
+    })
+    const modal = await this.modalController.create({
+      component: SearchDropdownPage,
+      componentProps: {
+        searchDropdownList: dropdownlist
+      },
+      canDismiss: true
+    });
+
+    await modal.present();
+
+    let { data } = await modal.onWillDismiss();
+
+    if (data) {
+      this.selectedCustomer = this.customers.find(r => r.customerId === data.id);
+    }
   }
 
   async cancelInsert() {    

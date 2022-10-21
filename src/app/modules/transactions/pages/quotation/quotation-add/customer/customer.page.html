@@ -15,13 +15,11 @@
     </ion-toolbar>
   </ion-header>
 
-  <div class="ion-padding">
-    <!-- <ion-searchbar showCancelButton="focus" placeholder="Search for Customer" (ionChange)="filterCustomer($event)"></ion-searchbar> -->    
+  <div class="ion-padding"> 
     <ion-list class="list-custom" lines="full">
-      <ion-item>
-        <ion-select interface="action-sheet" [(ngModel)]="selectedCustomer" placeholder="Select Customer">
-          <ion-select-option *ngFor="let customer of filteredCustomers" [value]="customer">{{customer.name}}</ion-select-option>
-        </ion-select>
+      <ion-item (click)="showCustomerSearchDropdown()">
+        <ion-label position="stacked">Customer</ion-label>
+        <ion-input placeholder="Select Customer" [value]="selectedCustomer?.name" readonly></ion-input>
       </ion-item>
     </ion-list>
   </div>
@@ -29,15 +27,13 @@
 </ion-content>
 
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0">
-  <!-- <ion-item class="ion-no-padding" lines="none"> -->
-    <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col>
-          <ion-button class="ion-margin" expand="block" (click)="nextStep()">
-            Next
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  <!-- </ion-item> -->
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col>
+        <ion-button class="ion-margin" expand="block" (click)="nextStep()">
+          Next
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-footer>
