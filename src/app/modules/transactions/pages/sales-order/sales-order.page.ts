@@ -34,7 +34,6 @@ export class SalesOrderPage implements OnInit {
   loadObjects() {
     this.salesOrderService.getSalesOrderList().subscribe(response => {
       this.objects = response;
-      console.log("🚀 ~ file: sales-order.page.ts ~ line 37 ~ SalesOrderPage ~ this.salesOrderService.getSalesOrderList ~ this.objects", this.objects)
       if (this.objects.length > 0) {
         this.content_loaded = true;
       }
@@ -68,7 +67,6 @@ export class SalesOrderPage implements OnInit {
     // await modal.present();
 
     // let { data } = await modal.onWillDismiss();
-    // console.log("🚀 ~ file: sales-order.page.ts ~ line 71 ~ SalesOrderPage ~ filter ~ data", data)
     
     // if (data) {
     //   this.loadObjects();

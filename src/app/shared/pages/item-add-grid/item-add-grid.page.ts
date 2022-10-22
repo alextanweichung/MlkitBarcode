@@ -11,6 +11,7 @@ export class ItemAddGridPage implements OnInit, OnChanges {
 
   @Input() availableItem: Item[] = [];
   @Input() availableImages: ItemImage[] = [];
+  @Input() itemInCart: Item[] = [];
   itemToDisplay: ItemList[] = [];
 
   @Output() onItemInCartEditCompleted: EventEmitter<Item[]> = new EventEmitter();
@@ -26,6 +27,7 @@ export class ItemAddGridPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    
   }
 
   distinctItem() {
@@ -44,7 +46,6 @@ export class ItemAddGridPage implements OnInit, OnChanges {
         })
       })
     }
-    console.log("🚀 ~ file: item-add-grid.page.ts ~ line 31 ~ ItemAddGridPage ~ distinctItem ~ this.itemToDisplay", this.itemToDisplay)
   }
 
   matchImage(itemId: number) {
@@ -78,7 +79,6 @@ export class ItemAddGridPage implements OnInit, OnChanges {
     // })
   }
 
-  itemInCart: Item[] = [];
   addItemToCart(data: ItemList) {
     // only for variationTypeCode === '0'
     if (this.itemInCart.findIndex(r => r.itemId === data.itemId && r.variationTypeCode === '0') > -1) {

@@ -40,7 +40,6 @@ export class CustomerPage implements OnInit {
   salesAgentMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.salesOrderService.getMasterList().subscribe(response => {
-      console.log("🚀 ~ file: customer.page.ts ~ line 46 ~ CustomerPage ~ this.salesOrderService.getMasterList ~ response", response)
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -189,7 +188,6 @@ export class CustomerPage implements OnInit {
   }
 
   nextStep() {
-    console.log("🚀 ~ file: customer.page.ts ~ line 159 ~ CustomerPage ~ nextStep ~ this.objectForm.value", this.objectForm.value)
     if (this.objectForm.valid) {
       this.salesOrderService.setChoosenCustomer(this.objectForm.value);
       this.salesOrderService.removeItems();

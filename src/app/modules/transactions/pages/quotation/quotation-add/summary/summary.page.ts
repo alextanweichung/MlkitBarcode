@@ -19,7 +19,6 @@ export class SummaryPage implements OnInit {
 
   ngOnInit() {
     this.quotationSummary = this.quotationService.quotationSummary;
-    console.log("🚀 ~ file: summary.page.ts ~ line 22 ~ SummaryPage ~ ngOnInit ~ this.quotationSummary", this.quotationSummary)  
   }
 
   done() {

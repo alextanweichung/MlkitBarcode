@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { LoadingController, NavController } from '@ionic/angular';
+import { LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
@@ -12,7 +12,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
   templateUrl: './item.page.html',
   styleUrls: ['./item.page.scss'],
 })
-export class ItemPage implements OnInit {
+export class ItemPage implements OnInit, ViewDidEnter {
 
   private customer: Customer;
 
@@ -22,6 +22,10 @@ export class ItemPage implements OnInit {
     private loadingController: LoadingController,
     private toastService: ToastService,
   ) { }
+
+  ionViewDidEnter(): void {
+    this.itemInCart = this.quotationService.itemInCart;
+  }
 
   ngOnInit() {
     this.customer = this.quotationService.selectedCustomer;
@@ -67,7 +71,6 @@ export class ItemPage implements OnInit {
 
   private itemInCart: Item[] = [];
   onItemInCartEditCompleted(event) {
-    console.log("🚀 ~ file: item.page.ts ~ line 69 ~ ItemPage ~ onItemInCartEditCompleted ~ event", event)   
     this.itemInCart = event; 
   }
 

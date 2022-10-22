@@ -49,7 +49,6 @@ export class SalesOrderService {
 
   setChoosenItems(item: Item[]) {
     this.itemInCart = item;
-    console.log("🚀 ~ file: quotation.service.ts ~ line 52 ~ QuotationService ~ setChoosenItems ~ this.itemInCart", this.itemInCart)
   }
 
   setSalesOrderSummary(ss: SalesOrderSummary) {
@@ -177,8 +176,6 @@ export class SalesOrderService {
   }
 
   getSalesOrderList() {
-    console.log("🚀 ~ file: sales-order.service.ts ~ line 181 ~ SalesOrderService ~ getSalesOrderList ~ this.startDate", this.startDate)
-    console.log("🚀 ~ file: sales-order.service.ts ~ line 181 ~ SalesOrderService ~ getSalesOrderList ~ this.endDate", this.endDate)
     return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing/" + format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd'));
   }
 

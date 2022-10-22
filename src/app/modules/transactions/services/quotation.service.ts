@@ -49,7 +49,6 @@ export class QuotationService {
 
   setChoosenItems(item: Item[]) {
     this.itemInCart = JSON.parse(JSON.stringify(item));
-    console.log("🚀 ~ file: quotation.service.ts ~ line 52 ~ QuotationService ~ setChoosenItems ~ this.itemInCart", this.itemInCart)
   }
 
   setQuotationSummary(qs: QuotationSummary) {

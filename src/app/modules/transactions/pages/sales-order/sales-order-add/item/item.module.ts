@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ItemPageRoutingModule } from './item-routing.module';
 
 import { ItemPage } from './item.page';
+import { ItemAddGridPageModule } from 'src/app/shared/pages/item-add-grid/item-add-grid.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ItemPageRoutingModule
+    ItemPageRoutingModule,
+    ItemAddGridPageModule
   ],
   declarations: [ItemPage]
 })

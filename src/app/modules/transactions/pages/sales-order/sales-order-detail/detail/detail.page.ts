@@ -60,9 +60,7 @@ export class DetailPage implements OnInit {
   loadDetail() {
     this.salesOrderService.getSalesOrderDetail(this.salesOrderId).subscribe(response => {
       this.salesOrder = response;
-      console.log("🚀 ~ file: detail.page.ts ~ line 63 ~ DetailPage ~ this.salesOrderService.getSalesOrderDetail ~ this.salesOrder", this.salesOrder)
       this.flattenSalesOrder = this.salesOrderService.flattenDtoDetail(this.salesOrder);
-      console.log("🚀 ~ file: detail.page.ts ~ line 65 ~ DetailPage ~ this.salesOrderService.getSalesOrderDetail ~ this.flattenSalesOrder", this.flattenSalesOrder)
     }, error => {
       console.log(error);
     })

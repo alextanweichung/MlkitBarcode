@@ -1,0 +1,94 @@
+<ion-item-sliding *ngFor="let item of itemToDisplay">
+  <ion-item button detail="false" class="no-ripple">
+    <ion-grid class="p-2 ion-no-padding">
+      <ion-row class="pt-2">
+        <ion-col>
+          <p>{{item.itemCode}}</p>
+        </ion-col>
+        <ion-col>
+          <p class="ion-text-right">{{item.unitPrice|number:'1.2'}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row class="pt-2">
+        <ion-col>
+          <p>{{item.description}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="7" class="ion-margin-auto">
+          <p>Total Qty</p>
+        </ion-col>
+        <ion-col size="5" *ngIf="item.variationTypeCode === '0'">                
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col class="ion-margin-auto">
+                <ion-button fill="clear" color="primary" size="small" (click)="decreaseQty(item)">
+                  <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                </ion-button>
+              </ion-col>
+              <ion-col>
+                <ion-input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0" (ionChange)="qtyChanged()"></ion-input>
+              </ion-col>
+              <ion-col class="ion-margin-auto">
+                <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(item)">
+                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+        <ion-col class="pt-2" size="5" *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col>
+                <ion-button fill="clear" color="primary" size="small" (click)="decreaseQty(item)" *ngIf="false">
+                  <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                </ion-button>
+              </ion-col>
+              <ion-col>
+                <p class="ion-text-center">{{getVariationSum(item)}}</p>
+              </ion-col>
+              <ion-col>
+                <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(item)" *ngIf="false">
+                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+      </ion-row>
+      <div *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
+        <ion-row *ngFor="let v of getVariations(item)">
+          <ion-col size="7" class="ion-margin-auto">
+            <p>
+              <span class="badge-green font-bold px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationLineXDescription"> {{v.itemVariationLineXDescription}}</span>
+              <span class="badge-purple font-bold px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationLineYDescription"> {{v.itemVariationLineYDescription}}</span>
+            </p>
+          </ion-col>              
+          <ion-col size="5" class="ion-margin-auto">
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col class="ion-margin-auto">
+                  <ion-button fill="clear" color="primary" size="small" (click)="decreaseQty(v)">
+                    <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                  </ion-button>
+                </ion-col>  
+                <ion-col class="ion-margin-auto">
+                  <ion-input class="ion-text-center" type="number" [min]="0" [(ngModel)]="v.qtyRequest" placeholder="0"></ion-input>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(v)">
+                    <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-col>
+        </ion-row>
+      </div>
+    </ion-grid>
+  </ion-item>
+  <ion-item-options>
+    <ion-item-option color="white" (click)="presentDeleteItemAlert(item.itemId)"><ion-icon color="danger" name="trash-outline"></ion-icon></ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>

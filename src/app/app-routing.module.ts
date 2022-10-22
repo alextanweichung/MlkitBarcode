@@ -65,7 +65,11 @@ const routes: Routes = [
   {
     path: 'item-add-grid',
     loadChildren: () => import('./shared/pages/item-add-grid/item-add-grid.module').then( m => m.ItemAddGridPageModule)
+  },  {
+    path: 'item-cart',
+    loadChildren: () => import('./shared/pages/item-cart/item-cart.module').then( m => m.ItemCartPageModule)
   }
+
 ];
 @NgModule({
   imports: [

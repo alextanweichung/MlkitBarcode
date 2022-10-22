@@ -8,6 +8,7 @@ import { ConfirmationPageRoutingModule } from './confirmation-routing.module';
 
 import { ConfirmationPage } from './confirmation.page';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     FormsModule,
     IonicModule,
     ConfirmationPageRoutingModule,
-    SumModule
+    SumModule,
+    ItemCartPageModule
   ],
   declarations: [ConfirmationPage]
 })

@@ -1,10 +1,9 @@
 import { DatePipe } from '@angular/common';
-import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonPopover, IonRouterOutlet, ModalController, NavController, PopoverController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { AlertController, NavController } from '@ionic/angular';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 import { Customer } from 'src/app/modules/transactions/models/customer';
-import { Item, ItemList } from 'src/app/modules/transactions/models/item';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { QuotationDto, QuotationLine, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -23,24 +22,16 @@ export class ConfirmationPage implements OnInit {
 
   constructor(
     private quotationService: QuotationService,
-    private route: ActivatedRoute,
     private navController: NavController,
-    private modalController: ModalController,
     private alertController: AlertController,
-    private ngZone: NgZone,
     private toastService: ToastService,
-    private routerOutlet: IonRouterOutlet,
     private datePipe: DatePipe
   ) { }
 
   ngOnInit() {
     this.customer = this.quotationService.selectedCustomer;
     this.itemInCart = this.quotationService.itemInCart;
-    if (this.itemInCart && this.itemInCart.length > 0) {
-      this.combineItemWithVariations();
-    }
     this.recalculateTotals();
-    console.log(this.itemInCart);
     if (!this.customer || this.customer === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
       this.navController.navigateBack('/quotation/quotation-customer');
@@ -114,35 +105,9 @@ export class ConfirmationPage implements OnInit {
     this.defaultExchangeRate = parseFloat(this.currencyMasterList.find(r => r.id == this.defaultCurrency).attribute1);
   }
 
-  decreaseQty(item) {
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 118 ~ ConfirmationPage ~ decreaseQty ~ item", item)
-    item.qtyRequest--;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
-    }
-    if (item.qtyRequest === 0) {
-      this.presentDeleteAlert(item.itemSku);
-    }
+  onItemInCartEditCompleted(event) {
+    this.itemInCart = event;
     this.recalculateTotals();
-  }
-
-  increaseQty(item) {
-    item.qtyRequest++;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
-    }
-    this.recalculateTotals();
-  }
-
-  resetQtyBackToOne(itemSku: string) {
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 137 ~ ConfirmationPage ~ resetQtyBackToOne ~ itemSku", itemSku)
-    this.itemInCart
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 138 ~ ConfirmationPage ~ resetQtyBackToOne ~ this.itemInCart", this.itemInCart)
-    this.ngZone.run(() => {
-      this.itemInCart.find(r => r.itemSku === itemSku).qtyRequest = 1;
-      this.combineItemWithVariations();
-      this.recalculateTotals();
-    })
   }
 
   totalQuantity: number = 0;
@@ -152,94 +117,6 @@ export class ConfirmationPage implements OnInit {
       this.totalQuantity = this.itemInCart.flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
       this.totalAmount = this.itemInCart.flatMap(r => r.qtyRequest * r.unitPrice).reduce((a, c) => Number(a) + Number(c));
     }
-  }
-
-  itemToDisplay: ItemList[] = [];
-  combineItemWithVariations() {
-    this.itemToDisplay = [];
-    if (this.itemInCart.length > 0) {
-      const itemIds = [...new Set(this.itemInCart.map(r => r.itemId))];
-      itemIds.forEach(r => {
-        let oneItem = this.itemInCart.find(rr => rr.itemId === r);
-        this.itemToDisplay.push({
-          itemId: r,
-          itemCode: oneItem.itemCode,
-          itemSku: oneItem.itemSku,
-          description: oneItem.description,
-          unitPrice: oneItem.unitPrice,
-          variationTypeCode: oneItem.variationTypeCode,
-          qtyRequest: oneItem.qtyRequest
-        })
-      })
-    }
-    console.log("🚀 ~ file: item.page.ts ~ line 89 ~ ItemPage ~ distinctItem ~ this.itemToDisplay", this.itemToDisplay)
-  }
-
-  getVariationSum(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId).flatMap(r => r.qtyRequest).reduce((a,c) => Number(a) + Number(c));
-  }
-  
-  getVariations(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId);
-  }
-
-  async presentDeleteAlert(itemSku: string) {
-    const alert = await this.alertController.create({
-      header: 'Are you sure to delete?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            this.resetQtyBackToOne(itemSku);
-          }
-        },
-        {
-          text: 'OK',
-          role: 'confirm',
-          handler: () => {
-            this.removeItem(itemSku);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  async presentDeleteItemAlert(itemId: number) {
-    const alert = await this.alertController.create({
-      header: 'Are you sure to delete?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'OK',
-          role: 'confirm',
-          handler: () => {
-            this.removeItemById(itemId);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  removeItem(itemSku: string) {
-    this.itemInCart.splice(this.itemInCart.findIndex(r => r.itemSku === itemSku), 1);
-    this.combineItemWithVariations();
-    this.quotationService.setChoosenItems(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1500);
-  }
-
-  removeItemById(itemId: number) {
-    this.itemInCart = this.itemInCart.filter(r => r.itemId !== itemId);
-    this.combineItemWithVariations();
-    this.quotationService.setChoosenItems(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1500);
   }
 
   async nextStep() {
@@ -266,9 +143,7 @@ export class ConfirmationPage implements OnInit {
     }
   }
 
-  async insertQuotation() {    
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 185 ~ ConfirmationPage ~ insertQuotation ~ this.itemInCart", this.itemInCart)
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 184 ~ ConfirmationPage ~ insertQuotation ~ this.customer", this.customer)
+  async insertQuotation() {
     // const result = await this.presentInsertConfirmation();
     connectableObservableDescriptor.lo
     // if (result) {
@@ -336,6 +211,7 @@ export class ConfirmationPage implements OnInit {
   }
 
   previousStep() {
+    this.quotationService.setChoosenItems(this.itemInCart);
     this.navController.navigateBack('/quotation/quotation-item');
   }
 

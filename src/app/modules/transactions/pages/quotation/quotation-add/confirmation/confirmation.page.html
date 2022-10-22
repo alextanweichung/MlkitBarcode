@@ -12,121 +12,9 @@
       <ion-title size="large">Confirmation</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="ion-padding">
+  <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding *ngFor="let item of itemToDisplay">
-        <ion-item button detail="false" class="pr-2 no-ripple">
-          <ion-grid class="ion-no-padding" *ngIf="item.variationTypeCode === '0'">
-            <ion-row class="py-1">
-              <ion-col>
-                <p>{{item.itemCode}}</p>
-              </ion-col>
-              <ion-col>
-                <p class="ion-text-right">{{item.unitPrice|number:'1.2'}}</p>
-              </ion-col>
-            </ion-row>
-            <ion-row class="py-1">
-              <ion-col>
-                <p style="font-size: small;">{{item.description}}</p>
-              </ion-col>
-            </ion-row>
-            <ion-row class="py-1">
-              <ion-col size="7">
-                <p style="font-size: smaller;">Total Qty</p>
-              </ion-col>
-              <ion-col size="5">                
-                <ion-grid class="ion-no-padding">
-                  <ion-row>
-                    <ion-col>
-                      <ion-button fill="clear" color="primary" size="small" (click)="decreaseQty(item)">
-                        <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                      </ion-button>
-                    </ion-col>
-                    <ion-col style="padding-top: 0.35rem;">
-                      <ion-input style="text-align: center;" class="ion-no-padding" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0" (ionChange)="recalculateTotals()"></ion-input>
-                    </ion-col>
-                    <ion-col>
-                      <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(item)">
-                        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                      </ion-button>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-          <ion-grid class="ion-no-padding" *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
-            <ion-row class="py-1">
-              <ion-col>
-                <p>{{item.itemCode}}</p>
-              </ion-col>
-              <ion-col>
-                <p class="ion-text-right">{{item.unitPrice|number:'1.2'}}</p>
-              </ion-col>
-            </ion-row>
-            <ion-row class="py-1">
-              <ion-col>
-                <p style="font-size: small;">{{item.description}}</p>
-              </ion-col>
-            </ion-row>
-            <ion-row class="py-1">
-              <ion-col size="7">
-                Total Qty
-              </ion-col>
-              <ion-col size="5">                
-                <ion-grid class="ion-no-padding">
-                  <ion-row>
-                    <ion-col>
-                      <ion-button fill="clear" color="primary" size="small" (click)="decreaseQty(item)" *ngIf="false">
-                        <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                      </ion-button>
-                    </ion-col>
-                    <ion-col>
-                      <p style="text-align: center;">{{getVariationSum(item)}}</p>
-                      <!-- <ion-input style="text-align: center;" class="ion-no-padding" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0"></ion-input> -->
-                    </ion-col>
-                    <ion-col>
-                      <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(item)" *ngIf="false">
-                        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                      </ion-button>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-              </ion-col>
-            </ion-row>
-            <ion-row *ngFor="let v of getVariations(item)">
-              <ion-col class="pt-1" size="7">
-                <p>
-                  <span class="badge-green font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="v.itemVariationLineXDescription"> {{v.itemVariationLineXDescription}}</span>
-                  <span class="badge-purple font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="v.itemVariationLineYDescription"> {{v.itemVariationLineYDescription}}</span>
-                </p>
-              </ion-col>              
-              <ion-col size="5">
-                <ion-grid class="ion-no-padding">
-                  <ion-row>
-                    <ion-col>
-                      <ion-button fill="clear" color="primary" size="small" (click)="decreaseQty(v)">
-                        <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                      </ion-button>
-                    </ion-col>
-                    <ion-col style="padding-top: 0.35rem;">
-                      <ion-input style="text-align: center;" class="ion-no-padding" type="number" [min]="0" [(ngModel)]="v.qtyRequest" placeholder="0" (ionChange)="recalculateTotals()"></ion-input>
-                    </ion-col>
-                    <ion-col>
-                      <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(v)">
-                        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                      </ion-button>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-item>
-        <ion-item-options>
-          <ion-item-option color="white" (click)="presentDeleteItemAlert(item.itemId)"><ion-icon color="danger" name="trash-outline"></ion-icon></ion-item-option>
-        </ion-item-options>
-      </ion-item-sliding>
+      <app-item-cart [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-cart>      
     </ion-list>
   </div>
 </ion-content>
@@ -142,7 +30,7 @@
       <ion-col class="ion-text-right">
         <ion-label style="color: black;">
           Total Amount: {{totalAmount|number:'1.2'}}
-        </ion-label>          
+        </ion-label>
       </ion-col>
     </ion-row>
     <ion-row>

@@ -36,7 +36,6 @@ export class ConfigService {
     }
     // this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
     // this.sys_parameter.apiUrl = "https://10.0.2.2:44351/api";
-    console.log("🚀 ~ file: config.service.ts ~ line 58 ~ ConfigService ~ load ~ this.sys_parameter", JSON.stringify(this.sys_parameter));
   }
 
   async insert(object: Sys_Parameter) {

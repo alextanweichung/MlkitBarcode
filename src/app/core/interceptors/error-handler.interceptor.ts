@@ -54,7 +54,6 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
 
       return next.handle(authReq).pipe(
          catchError(error => {
-            console.log("🚀 ~ file: error-handler.interceptor.ts ~ line 110 ~ ErrorHandlerInterceptor ~ intercept ~ error", error)
             if (error) {
                switch (error.status) {
                   case 400:

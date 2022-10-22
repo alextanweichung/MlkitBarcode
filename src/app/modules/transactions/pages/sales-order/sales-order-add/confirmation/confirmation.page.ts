@@ -240,7 +240,6 @@ export class ConfirmationPage implements OnInit {
       details: trxLineArray,
     }
     this.salesOrderService.insertSalesOrder(trxDto).subscribe(response => {
-      console.log("🚀 ~ file: confirmation.page.ts ~ line 245 ~ ConfirmationPage ~ this.salesOrderService.insertSalesOrder ~ response", response)
       let details: any[] = response.body["details"];
       let totalQty: number = 0;
       details.forEach(e => {

@@ -60,7 +60,6 @@ export class DetailPage implements OnInit {
   loadDetail() {
     this.quotationService.getQuotationDetail(this.quotationId).subscribe(response => {
       this.quotation = response;
-      console.log("🚀 ~ file: detail.page.ts ~ line 63 ~ DetailPage ~ this.quotationService.getQuotationDetail ~ this.quotation", this.quotation)
       this.flattenQuotation = this.quotationService.flattenDtoDetail(this.quotation);
     }, error => {
       console.log(error);

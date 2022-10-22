@@ -158,7 +158,6 @@ export class CommonQueryService<T> {
         SET ${sql}
         WHERE ${primaryKey}
       `;
-      console.log("🚀 ~ file: common.service.ts ~ line 132 ~ CommonService ~ returnthis._databaseService.executeQuery<any> ~ sqlcmd", sqlcmd)
       // let ret: any = await db.run(sqlcmd);
       // return ret;
     }, database)
