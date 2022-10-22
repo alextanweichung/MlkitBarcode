@@ -58,8 +58,8 @@
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" *ngFor="let item of quotation.details" class="no-ripple">
 
-        <ion-grid class="ion-no-padding" *ngIf="item.variationTypeCode === '0'">
-          <ion-row class="py-1">
+        <ion-grid class="p-2 ion-no-padding">
+          <ion-row>
             <ion-col>
               <p>{{item.itemCode}}</p>
             </ion-col>
@@ -67,54 +67,55 @@
               <p class="ion-text-right">{{item.unitPrice|number:'1.2'}}</p>
             </ion-col>
           </ion-row>
-          <ion-row class="py-1">
+          <ion-row class="pt-2">
             <ion-col>
-              <p style="font-size: small;">{{item.description}}</p>
+              <p>{{item.description}}</p>
             </ion-col>
           </ion-row>
-          <ion-row class="py-1">
-            <ion-col>
-              <p style="font-size: smaller;">Total Qty</p>
+          <ion-row class="pt-2">
+            <ion-col size="7" class="ion-margin-auto">
+              <p>Total Qty</p>
             </ion-col>
-            <ion-col>
-              <p style="font-size: smaller;" class="ion-text-right">{{item.qtyRequest|number:'1.0'}}</p>
+            <ion-col size="5" *ngIf="item.variationTypeCode === '0'">
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col>
+                    <p class="ion-text-right">{{item.qtyRequest|number:'1.0'}}</p>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
             </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <ion-grid class="ion-no-padding" *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
-          <ion-row class="py-1">
-            <ion-col>
-              <p>{{item.itemCode}}</p>
-            </ion-col>
-            <ion-col>
-              <p class="ion-text-right">{{item.unitPrice|number:'1.2'}}</p>
-            </ion-col>
-          </ion-row>
-          <ion-row class="py-1">
-            <ion-col>
-              <p style="font-size: small;">{{item.description}}</p>
-            </ion-col>
-          </ion-row>
-          <ion-row class="py-1">
-            <ion-col>
-              <p style="font-size: smaller;">Total Qty</p>
-            </ion-col>
-            <ion-col>
-              <p style="font-size: smaller;" class="ion-text-right">{{item.qtyRequest|number:'1.0'}}</p>
+            <ion-col size="5" *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col>
+                    <p class="ion-text-right">
+                      {{getFlattenVariations(item.itemId)|sum:'qtyRequest'|number:'1.0'}}
+                    </p>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
             </ion-col>
           </ion-row>
-          <ion-row *ngFor="let v of getFlattenVariations(item.itemId)">
-            <ion-col>
-              <p>
-                <span class="badge-green font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="v.itemVariationXId"> {{v.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="v.itemVariationYId"> {{v.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
-              </p>
-            </ion-col>
-            <ion-col>
-              <p style="font-size: smaller;" class="ion-text-right">{{v.qtyRequest|number:'1.0'}}</p>
-            </ion-col>
-          </ion-row>
+          <div *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'" class="py-2">
+            <ion-row *ngFor="let v of getFlattenVariations(item.itemId)">
+              <ion-col size="7" class="ion-margin-auto">
+                <p>
+                  <span class="badge-green font-bold px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationXId"> {{v.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                  <span class="badge-purple font-bold px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationYId"> {{v.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                </p>
+              </ion-col>
+              <ion-col size="5" class="ion-margin-auto">
+                <ion-grid class="ion-no-padding">
+                  <ion-row>
+                    <ion-col class="ion-margin-auto">
+                      <p class="ion-text-right">{{v.qtyRequest|number:'1.0'}}</p>                      
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-col>
+            </ion-row>
+          </div>
         </ion-grid>
 
       </ion-item>

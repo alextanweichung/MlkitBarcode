@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { QuotationDto, QuotationLine, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -22,7 +22,6 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private navController: NavController,
-    private modalController: ModalController,
     private toastService: ToastService,
     private quotationService: QuotationService
   ) {
