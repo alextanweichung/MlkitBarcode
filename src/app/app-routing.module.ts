@@ -61,8 +61,11 @@ const routes: Routes = [
   {
     path: 'search-dropdown',
     loadChildren: () => import('./shared/pages/search-dropdown/search-dropdown.module').then( m => m.SearchDropdownPageModule)
+  },
+  {
+    path: 'item-add-grid',
+    loadChildren: () => import('./shared/pages/item-add-grid/item-add-grid.module').then( m => m.ItemAddGridPageModule)
   }
-
 ];
 @NgModule({
   imports: [

@@ -8,6 +8,7 @@ import { ItemPageRoutingModule } from './item-routing.module';
 
 import { ItemPage } from './item.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
+import { ItemAddGridPageModule } from 'src/app/shared/pages/item-add-grid/item-add-grid.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton
     FormsModule,
     IonicModule,
     ItemPageRoutingModule,
-    ListingSkeletonPageModule
+    ListingSkeletonPageModule,
+    ItemAddGridPageModule
   ],
   declarations: [ItemPage]
 })
