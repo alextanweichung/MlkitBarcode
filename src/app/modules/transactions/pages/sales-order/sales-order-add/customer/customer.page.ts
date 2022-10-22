@@ -68,7 +68,6 @@ export class CustomerPage implements OnInit {
   }
 
   setDefaultValue() {
-
     let defaultLocation = this.locationMasterList.find(item => item.isPrimary)?.id;
     if (defaultLocation) {
       this.objectForm.patchValue({ locationId: defaultLocation });
@@ -100,9 +99,9 @@ export class CustomerPage implements OnInit {
     }
   }
 
-  selectedCustomer: MasterListDetails;
   async showCustomerSearchDropdown() {
     let dropdownlist: SearchDropdownList[] = [];
+    // change source
     this.customerMasterList.forEach(r => {
       dropdownlist.push({
         id: r.id,
@@ -117,20 +116,39 @@ export class CustomerPage implements OnInit {
       },
       canDismiss: true
     });
-
     await modal.present();
-
     let { data } = await modal.onWillDismiss();
-
     if (data) {
-      this.selectedCustomer = this.customerMasterList.find(r => r.id === data.id);
-      this.objectForm.patchValue({ customerId: this.selectedCustomer.id });
+      this.objectForm.patchValue({ customerId: data.id });
+    }
+  }
+
+  async showLocationSearchDropdown() {
+    let dropdownlist: SearchDropdownList[] = [];
+    // change source
+    this.locationMasterList.forEach(r => {
+      dropdownlist.push({
+        id: r.id,
+        code: r.code,
+        description: r.description
+      })
+    })
+    const modal = await this.modalController.create({
+      component: SearchDropdownPage,
+      componentProps: {
+        searchDropdownList: dropdownlist
+      },
+      canDismiss: true
+    });
+    await modal.present();
+    let { data } = await modal.onWillDismiss();
+    if (data) {
+      this.objectForm.patchValue({ locationId: data.id });
     }
   }
 
   customerChanged(event) {
     var lookupValue = this.customerMasterList?.find(e => e.id == event.detail.value);
-    this.selectedCustomer = lookupValue;
     // Auto map object type code
     this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
     if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {

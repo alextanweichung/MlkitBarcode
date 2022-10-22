@@ -17,10 +17,7 @@
 
   <div class="ion-padding"> 
     <ion-list class="list-custom" lines="full">
-      <ion-item (click)="showCustomerSearchDropdown()">
-        <ion-label position="stacked">Customer</ion-label>
-        <ion-input placeholder="Select Customer" [value]="selectedCustomer?.name" readonly></ion-input>
-      </ion-item>
+      <app-search-dropdown title="Customer" [searchDropdownList]="searchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
   </div>
 

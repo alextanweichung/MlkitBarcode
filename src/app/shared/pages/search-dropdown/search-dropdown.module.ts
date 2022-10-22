@@ -15,6 +15,9 @@ import { SearchDropdownPage } from './search-dropdown.page';
     IonicModule,
     SearchDropdownPageRoutingModule
   ],
+  exports: [
+    SearchDropdownPage
+  ],
   declarations: [SearchDropdownPage]
 })
 export class SearchDropdownPageModule {}

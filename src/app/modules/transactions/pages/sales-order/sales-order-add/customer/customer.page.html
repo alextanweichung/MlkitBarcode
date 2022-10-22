@@ -18,11 +18,11 @@
   <div class="ion-padding">
     <form [formGroup]="objectForm">      
       <ion-list class="list-custom" lines="full">
-        <ion-item>
+        
+        <ion-item (click)="showLocationSearchDropdown()">
           <ion-label position="stacked">Location</ion-label>
-          <ion-select interface="action-sheet" placeholder="Select Location" formControlName="locationId">
-            <ion-select-option *ngFor="let item of locationMasterList" [value]="item.id">{{item.description}}</ion-select-option>
-          </ion-select>
+          <ion-input placeholder="Select Location" formControlName="locationId" readonly hidden></ion-input>
+          {{objectForm.controls['locationId'].value|idMapping:locationMasterList}}
         </ion-item>
         <ion-item (click)="showCustomerSearchDropdown()">
           <ion-label position="stacked">Customer</ion-label>

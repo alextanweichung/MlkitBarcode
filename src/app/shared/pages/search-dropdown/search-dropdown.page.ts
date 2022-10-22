@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { IonSearchbar, LoadingController, ModalController } from '@ionic/angular';
@@ -13,17 +13,17 @@ export class SearchDropdownPage implements OnInit {
 
   @Input() title: string = "Search";
   @Input() searchDropdownList: SearchDropdownList[];
+  @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
+  selected: SearchDropdownList;
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
 
   constructor(
-    private modalController: ModalController,
     private loadingController: LoadingController,
   ) { }
 
   ngOnInit() {
-    this.tempDropdownList = this.searchDropdownList;
   }  
 
   async searchItem(event) {
@@ -42,8 +42,19 @@ export class SearchDropdownPage implements OnInit {
   }
   
   chooseThis(object: SearchDropdownList) {
-    console.log("🚀 ~ file: search-dropdown.page.ts ~ line 44 ~ SearchDropdownPage ~ chooseThis ~ object", object)
-    this.modalController.dismiss(object);
+    this.selected = object;
+    this.hideModal(object);
+  }
+
+  isModalOpen: boolean = false;
+  showModal() {
+    this.tempDropdownList = this.searchDropdownList;
+    this.isModalOpen = true;
+  }
+
+  hideModal(object: SearchDropdownList) {
+    this.onActionComplete.emit(object);
+    this.isModalOpen = false;
   }
 
   /* #region  misc */
@@ -66,16 +77,7 @@ export class SearchDropdownPage implements OnInit {
   // Cancel
   cancel() {
     // Dismiss modal
-    this.modalController.dismiss();
-  }  
-
-  // Apply filter
-  apply() {
-    // Add filter logic here...
-    // ...
-
-    // Dismiss modal and apply filters
-    this.modalController.dismiss();
+    this.hideModal(null);
   }
-
+  
 }

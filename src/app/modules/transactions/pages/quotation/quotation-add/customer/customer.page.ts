@@ -32,45 +32,53 @@ export class CustomerPage implements OnInit {
 
   customers: Customer[] = [];
   selectedCustomer: Customer;
-  filteredCustomers: Customer[];
+  searchDropdownList: SearchDropdownList[] = [];
   loadCustomerList() {
     this.quotationService.getCustomerList().subscribe(response => {
       this.customers = response;
-      this.filteredCustomers = this.customers;
+      this.customers.forEach(r => {
+        this.searchDropdownList.push({
+          id: r.customerId,
+          code: r.customerCode,
+          description: r.name
+        })
+      })
     }, error => {
       console.log(error);
     })
   }
 
-  filterCustomer(event) {
-    this.filteredCustomers = this.customers.filter(item => (item.customerCode.toLowerCase().indexOf(event.detail.value.toLowerCase()) !== -1) || (item.name?.toLowerCase().indexOf(event.detail.value.toLowerCase()) !== -1));
-  }
-
-  async showCustomerSearchDropdown() {
-    let dropdownlist: SearchDropdownList[] = [];
-    this.customers.forEach(r => {
-      dropdownlist.push({
-        id: r.customerId,
-        code: r.customerCode,
-        description: r.name
-      })
-    })
-    const modal = await this.modalController.create({
-      component: SearchDropdownPage,
-      componentProps: {
-        searchDropdownList: dropdownlist
-      },
-      canDismiss: true
-    });
-
-    await modal.present();
-
-    let { data } = await modal.onWillDismiss();
-
-    if (data) {
-      this.selectedCustomer = this.customers.find(r => r.customerId === data.id);
+  onCustomerSelected(event) {
+    if (event && event !== undefined) {
+      this.selectedCustomer = this.customers.find(r => r.customerId === event.id);
     }
   }
+
+  // async showCustomerSearchDropdown() {
+  //   let dropdownlist: SearchDropdownList[] = [];
+  //   this.customers.forEach(r => {
+  //     dropdownlist.push({
+  //       id: r.customerId,
+  //       code: r.customerCode,
+  //       description: r.name
+  //     })
+  //   })
+  //   const modal = await this.modalController.create({
+  //     component: SearchDropdownPage,
+  //     componentProps: {
+  //       searchDropdownList: dropdownlist
+  //     },
+  //     canDismiss: true
+  //   });
+
+  //   await modal.present();
+
+  //   let { data } = await modal.onWillDismiss();
+
+  //   if (data) {
+  //     this.selectedCustomer = this.customers.find(r => r.customerId === data.id);
+  //   }
+  // }
 
   async cancelInsert() {    
     const actionSheet = await this.actionSheetController.create({
