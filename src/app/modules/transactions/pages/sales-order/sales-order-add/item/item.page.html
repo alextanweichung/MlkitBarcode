@@ -17,7 +17,7 @@
     <ion-button class="mt-1" expand="block" (click)="searchItem()">Search</ion-button>
   </div>  
 
-  <app-item-add-grid [availableItem]="availableItem" [availableImages]="availableImages" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid>
+  <app-item-add-grid [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid>
 
 </ion-content>
 

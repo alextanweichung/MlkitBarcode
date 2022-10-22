@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ConfirmationPageRoutingModule } from './confirmation-routing.module';
 
 import { ConfirmationPage } from './confirmation.page';
+import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ConfirmationPageRoutingModule
+    ConfirmationPageRoutingModule,
+    ItemCartPageModule
   ],
   declarations: [ConfirmationPage]
 })

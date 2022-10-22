@@ -29,6 +29,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   ngOnInit() {
     this.customer = this.quotationService.selectedCustomer;
+    this.itemInCart = this.quotationService.itemInCart;
     if (!this.customer || this.customer === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
       this.navController.navigateBack('/quotation/quotation-customer');

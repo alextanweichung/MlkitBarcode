@@ -21,22 +21,15 @@ export class ConfirmationPage implements OnInit {
 
   constructor(
     private salesOrderService: SalesOrderService,
-    private route: ActivatedRoute,
     private navController: NavController,
-    private modalController: ModalController,
     private alertController: AlertController,
-    private ngZone: NgZone,
     private toastService: ToastService,
-    private routerOutlet: IonRouterOutlet,
     private datePipe: DatePipe
   ) { }
 
   ngOnInit() {
     this.salesOrderHeader = this.salesOrderService.salesOrderHeader;
     this.itemInCart = this.salesOrderService.itemInCart;
-    if (this.itemInCart && this.itemInCart.length > 0) {
-      this.combineItemWithVariations();
-    }
     this.recalculateTotals();
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
@@ -47,32 +40,9 @@ export class ConfirmationPage implements OnInit {
     }
   }
 
-  decreaseQty(item) {
-    item.qtyRequest--;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
-    }
-    if (item.qtyRequest === 0) {
-      this.presentDeleteAlert(item.itemSku);
-    }
+  onItemInCartEditCompleted(event) {
+    this.itemInCart = event;
     this.recalculateTotals();
-  }
-
-  increaseQty(item) {
-    item.qtyRequest++;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
-    }
-    this.recalculateTotals();
-  }
-  
-  resetQtyBackToOne(itemSku: string) {
-    this.itemInCart
-    this.ngZone.run(() => {
-      this.itemInCart.find(r => r.itemSku === itemSku).qtyRequest = 1;
-      this.combineItemWithVariations();
-      this.recalculateTotals();
-    })
   }
 
   totalQuantity: number = 0;
@@ -82,93 +52,6 @@ export class ConfirmationPage implements OnInit {
       this.totalQuantity = this.itemInCart.flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
       this.totalAmount = this.itemInCart.flatMap(r => r.qtyRequest * r.unitPrice).reduce((a, c) => Number(a) + Number(c));
     }
-  }
-
-  itemToDisplay: ItemList[] = [];
-  combineItemWithVariations() {
-    this.itemToDisplay = [];
-    if (this.itemInCart.length > 0) {
-      const itemIds = [...new Set(this.itemInCart.map(r => r.itemId))];
-      itemIds.forEach(r => {
-        let oneItem = this.itemInCart.find(rr => rr.itemId === r);
-        this.itemToDisplay.push({
-          itemId: r,
-          itemCode: oneItem.itemCode,
-          itemSku: oneItem.itemSku,
-          description: oneItem.description,
-          unitPrice: oneItem.unitPrice,
-          variationTypeCode: oneItem.variationTypeCode,
-          qtyRequest: oneItem.qtyRequest
-        })
-      })
-    }
-  }
-
-  getVariationSum(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId).flatMap(r => r.qtyRequest).reduce((a,c) => Number(a) + Number(c));
-  }
-  
-  getVariations(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId);
-  }
-
-  async presentDeleteAlert(itemSku: string) {
-    const alert = await this.alertController.create({
-      header: 'Are you sure to delete?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            this.resetQtyBackToOne(itemSku);
-          }
-        },
-        {
-          text: 'OK',
-          role: 'confirm',
-          handler: () => {
-            this.removeItem(itemSku);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  async presentDeleteItemAlert(itemId: number) {
-    const alert = await this.alertController.create({
-      header: 'Are you sure to delete?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'OK',
-          role: 'confirm',
-          handler: () => {
-            this.removeItemById(itemId);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  removeItem(itemSku: string) {
-    this.itemInCart.splice(this.itemInCart.findIndex(r => r.itemSku === itemSku), 1);
-    this.combineItemWithVariations();
-    this.salesOrderService.setChoosenItems(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1500);
-  }
-
-  removeItemById(itemId: number) {
-    this.itemInCart = this.itemInCart.filter(r => r.itemId !== itemId);
-    this.combineItemWithVariations();
-    this.salesOrderService.setChoosenItems(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1500);
   }
 
   async nextStep() {
@@ -194,7 +77,7 @@ export class ConfirmationPage implements OnInit {
       this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1500);
     }
   }
-  
+
   async insertSalesOrder() {
     // const result = await this.presentInsertConfirmation();
     connectableObservableDescriptor.lo
@@ -263,6 +146,7 @@ export class ConfirmationPage implements OnInit {
   }
 
   previousStep() {
+    this.salesOrderService.setChoosenItems(this.itemInCart);
     this.navController.navigateBack('/sales-order/sales-order-item');
   }
 

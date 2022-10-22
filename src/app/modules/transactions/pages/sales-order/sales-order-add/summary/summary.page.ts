@@ -32,7 +32,7 @@ export class SummaryPage implements OnInit {
 
   done() {
     this.salesOrderService.resetVariables();
-    this.navController.navigateRoot('/quotation');
+    this.navController.navigateRoot('/sales-rder');
   }
 
 }
