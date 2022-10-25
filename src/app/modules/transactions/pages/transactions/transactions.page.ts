@@ -34,10 +34,9 @@ export class TransactionsPage implements OnInit {
 
   loadAllRecentList() {
     // quotation
-    this.quotationService.getQuotationList().subscribe(response => {
+    this.quotationService.getRecentQuotationList().subscribe(response => {
       this.quotations = response;
       if (this.quotations.length > 0) {
-        this.quotations = this.quotations.slice(0, 3); // only take latest 3
         this.quotation_loaded = true;
       }
     }, error => {
@@ -45,10 +44,9 @@ export class TransactionsPage implements OnInit {
     })
 
     // sales order
-    this.salesOrderService.getSalesOrderList().subscribe(response => {
+    this.salesOrderService.getRecentSalesOrderList().subscribe(response => {
       this.salesOrders = response;
       if (this.salesOrders.length > 0) {
-        this.salesOrders = this.salesOrders.slice(0, 3); // only take latest 3
         this.sales_order_loaded = true;
       }
     }, error => {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
+import { CommonService } from '../../services/common.service';
 import { QuotationService } from '../../services/quotation.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 
@@ -18,24 +19,17 @@ export class FilterPage implements OnInit {
 
   date_from: any;
   date_to: any;
-  startDate: any;
-  endDate: any;
+  startDate: Date;
+  endDate: Date;
 
   constructor(
-    private quotationService: QuotationService,
-    private salesOrderService: SalesOrderService,
+    private commonService: CommonService,
     private modalController: ModalController
   ) { }
 
-  ngOnInit() {
-    if (!this.startDate) {
-      this.startDate = this.quotationService.startDate.toISOString()
-      this.date_from = format(parseISO(this.startDate), 'MMM d, yyyy');
-    }
-    if (!this.endDate) {
-      this.endDate = this.quotationService.endDate.toISOString();
-      this.date_to = format(parseISO(this.endDate), 'MMM d, yyyy');
-    }
+  ngOnInit() {    
+    this.date_from = format(parseISO(this.startDate.toISOString()), 'MMM d, yyyy');
+    this.date_to = format(parseISO(this.endDate.toISOString()), 'MMM d, yyyy');
   }
 
   // Toggle date from
@@ -75,11 +69,6 @@ export class FilterPage implements OnInit {
     // Add filter logic here...
     // ...
     this.filters = { startDate: this.startDate, endDate: this.endDate };
-    this.quotationService.startDate = new Date(this.startDate);
-    this.quotationService.endDate = new Date(this.endDate);
-
-    this.salesOrderService.startDate = new Date(this.startDate);
-    this.salesOrderService.endDate = new Date(this.endDate);
 
     // Dismiss modal and apply filters
     this.modalController.dismiss(this.filters);

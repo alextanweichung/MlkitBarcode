@@ -8,7 +8,6 @@ import { MasterList } from 'src/app/shared/models/master-list';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
 import { QuotationDto, QuotationLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
-import { TransactionsService } from './transactions.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,8 +20,6 @@ const httpObserveHeader = {
 export class QuotationService {
 
   baseUrl: string;
-  startDate: Date;
-  endDate: Date;
 
   selectedCustomer: Customer;
   itemInCart: Item[] = [];
@@ -30,17 +27,9 @@ export class QuotationService {
 
   constructor(
     private http: HttpClient,
-    private configService: ConfigService,
-    private transactionService: TransactionsService
+    private configService: ConfigService
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
-
-    if (!this.startDate) {
-      this.startDate = this.transactionService.getFirstDayOfTodayMonth();
-    }
-    if (!this.endDate) {
-      this.endDate = this.transactionService.getTodayDate();
-    }
   }
 
   setChoosenCustomer(customer: Customer) {
@@ -179,8 +168,12 @@ export class QuotationService {
     return this.http.get<ItemImage[]>(this.baseUrl + "MobileQuotation/itemList/imageFile/" + keyword, { context: background_load() });
   }
 
-  getQuotationList() {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd'));
+  getQuotationList(startDate: Date, endDate: Date) {
+    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
+  }
+  
+  getRecentQuotationList() {
+    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/recentListing");
   }
 
   getQuotationDetail(quotationId: number) {

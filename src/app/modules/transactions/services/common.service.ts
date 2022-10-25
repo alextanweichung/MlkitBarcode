@@ -1,18 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { format, parseISO } from 'date-fns';
-import { map } from 'rxjs/operators';
-import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { Customer } from '../models/customer';
-import { Item, ItemImage } from '../models/item';
-import { QuotationList } from '../models/quotation';
-import { SalesOrderList } from '../models/sales-order';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TransactionsService {
+export class CommonService {
 
   baseUrl: string;
   startDate: Date;
@@ -43,22 +36,5 @@ export class TransactionsService {
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     return today;
   }
-
-  /* #region  quotation */
-  
-
-  /* #endregion */
-
-  /* #region  sales order */
-
-  //getSalesOrderRecentList() {
-  //  return this.http.get<SalesOrderList[]>(this.baseUrl + "mobileSalesOrder/recentListing");
-  //}
-
-  //getSalesOrderList() {
-  //  return this.http.get<SalesOrderList[]>(this.baseUrl + "mobileSalesOrder/listing/" + format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd'));
-  //}
-
-  /* #endregion */
 
 }

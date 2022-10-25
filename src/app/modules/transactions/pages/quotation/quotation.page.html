@@ -1,18 +1,24 @@
 <ion-header collapse="fade" [translucent]="true">
   <ion-toolbar>
+
     <ion-title>Quotations</ion-title>
+
     <ion-buttons slot="start">
       <ion-back-button text="Transactions" defaultHref="/transactions"></ion-back-button>
     </ion-buttons>
+
     <ion-buttons slot="primary">
       <ion-button (click)="filter()">
         <ion-icon slot="icon-only" name="filter"></ion-icon>
       </ion-button>
     </ion-buttons>
+
   </ion-toolbar>
+
 </ion-header>
 
 <ion-content [fullscreen]="true">
+
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Quotations</ion-title>
@@ -41,7 +47,12 @@
           </ion-label>
           <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
         </ion-item>
+        
       </ion-list>
+
+      <!-- <ion-infinite-scroll threshold="100px" (ionInfinite)="loadObjects($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data"></ion-infinite-scroll-content>
+      </ion-infinite-scroll> -->
 
     </ng-container>
 

@@ -5,10 +5,8 @@ import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
 import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
-import { TransactionsService } from './transactions.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,8 +19,6 @@ const httpObserveHeader = {
 export class SalesOrderService {
 
   baseUrl: string;
-  startDate: Date;
-  endDate: Date;
 
   salesOrderHeader: SalesOrderHeader;
   itemInCart: Item[] = [];
@@ -30,17 +26,9 @@ export class SalesOrderService {
 
   constructor(
     private http: HttpClient,
-    private configService: ConfigService,
-    private transactionService: TransactionsService
+    private configService: ConfigService
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
-
-    if (!this.startDate) {
-      this.startDate = this.transactionService.getFirstDayOfTodayMonth();
-    }
-    if (!this.endDate) {
-      this.endDate = this.transactionService.getTodayDate();
-    }
   }
 
   setChoosenCustomer(soHeader: SalesOrderHeader) {
@@ -175,8 +163,12 @@ export class SalesOrderService {
     return this.http.get<ItemImage[]>(this.baseUrl + "MobileSalesOrder/itemList/imageFile/" + keyword, { context: background_load() });
   }
 
-  getSalesOrderList() {
-    return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing/" + format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd'));
+  getSalesOrderList(startDate: Date, endDate: Date) {
+    return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
+  }
+
+  getRecentSalesOrderList() {
+    return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/recentListing");
   }
 
   getSalesOrderDetail(salesOrderId: number) {

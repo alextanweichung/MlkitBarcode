@@ -3,6 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { QuotationList } from '../../models/quotation';
+import { CommonService } from '../../services/common.service';
 import { QuotationService } from '../../services/quotation.service';
 import { FilterPage } from '../filter/filter.page';
 
@@ -17,23 +18,32 @@ export class QuotationPage implements OnInit {
   content_loaded: boolean = false;
   objects: QuotationList[] = [];
 
+  startDate: Date;
+  endDate: Date;
+
   constructor(
+    private commonService: CommonService,
     private quotationService: QuotationService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
-    private toastService: ToastService,
-    private routerOutlet: IonRouterOutlet
-  ) { }
+    private toastService: ToastService
+   ) { }
 
   ngOnInit() {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
     this.loadObjects();
   }
 
   /* #region  crud */
 
-  loadObjects() {
-    this.quotationService.getQuotationList().subscribe(response => {
+  loadObjects() {    
+    this.quotationService.getQuotationList(this.startDate, this.endDate).subscribe(response => {
       this.objects = response;
       console.log(this.objects);
       if (this.objects.length > 0) {
@@ -58,19 +68,26 @@ export class QuotationPage implements OnInit {
   }
 
   /* #endregion */
-
+  
   async filter() {
     const modal = await this.modalController.create({
       component: FilterPage,
-      canDismiss: true,
-      presentingElement: this.routerOutlet.nativeEl
+      componentProps: {
+        startDate: this.startDate,
+        endDate: this.endDate
+      },
+      canDismiss: true
     })
 
     await modal.present();
 
     let { data } = await modal.onWillDismiss();
-    console.log(data);
-    if (data) {
+
+    if (data && data !== undefined) {
+      console.log("🚀 ~ file: quotation.page.ts ~ line 104 ~ QuotationPage ~ filter ~ data", data)
+      this.startDate = new Date(data.startDate);
+      this.endDate = new Date(data.endDate);
+
       this.loadObjects();
     }
   }

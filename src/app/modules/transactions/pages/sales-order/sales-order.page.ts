@@ -3,6 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList } from '../../models/sales-order';
+import { CommonService } from '../../services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
 
@@ -16,23 +17,31 @@ export class SalesOrderPage implements OnInit {
   content_loaded: boolean = false;
   objects: SalesOrderList[] = [];
 
+  startDate: Date;
+  endDate: Date;
+
   constructor(
+    private commonService: CommonService,
     private salesOrderService: SalesOrderService,
-    private modalController: ModalController,
     private actionSheetController: ActionSheetController,
+    private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService,
-    private routerOutlet: IonRouterOutlet
-  ) { }
+    private toastService: ToastService  ) { }
 
   ngOnInit() {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
     this.loadObjects();
   }
 
   /* #region  crud */
 
   loadObjects() {
-    this.salesOrderService.getSalesOrderList().subscribe(response => {
+    this.salesOrderService.getSalesOrderList(this.startDate, this.endDate).subscribe(response => {
       this.objects = response;
       if (this.objects.length > 0) {
         this.content_loaded = true;
@@ -58,19 +67,25 @@ export class SalesOrderPage implements OnInit {
   /* #endregion */
 
   async filter() {
-    // const modal = await this.modalController.create({
-    //   component: FilterPage,
-    //   canDismiss: true,
-    //   presentingElement: this.routerOutlet.nativeEl
-    // })
+    const modal = await this.modalController.create({
+      component: FilterPage,
+      componentProps: {
+        startDate: this.startDate,
+        endDate: this.endDate
+      },
+      canDismiss: true
+    })
 
-    // await modal.present();
+    await modal.present();
 
-    // let { data } = await modal.onWillDismiss();
-    
-    // if (data) {
-    //   this.loadObjects();
-    // }
+    let { data } = await modal.onWillDismiss();
+
+    if (data && data !== undefined) {
+      this.startDate = new Date(data.startDate);
+      this.endDate = new Date(data.endDate);
+
+      this.loadObjects();
+    }
   }
 
   // Select action
