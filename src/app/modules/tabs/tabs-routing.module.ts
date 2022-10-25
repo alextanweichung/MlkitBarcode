@@ -21,8 +21,8 @@ const routes: Routes = [
         loadChildren: () => import('../transactions/pages/transactions/transactions.module').then(m => m.TransactionsPageModule)
       },
       {
-        path: 'payments',
-        loadChildren: () => import('../secure/payments/payments.module').then(m => m.PaymentsPageModule)
+        path: 'others',
+        loadChildren: () => import('../others/pages/others/others.module').then(m => m.OthersPageModule)
       },
       {
         path: 'cards',

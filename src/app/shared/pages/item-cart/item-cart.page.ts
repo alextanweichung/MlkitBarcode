@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import { Item, ItemList } from 'src/app/modules/transactions/models/item';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ItemList } from '../../models/item-list';
 
 @Component({
   selector: 'app-item-cart',

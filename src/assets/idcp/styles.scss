@@ -149,3 +149,29 @@ input {
 margin: auto!important;
 padding-right: 0!important;
 }
+
+.color-primary{
+   color: var(--primary-dark-color);
+}
+.color-success{ 
+   color: #5cb85c;
+}
+.color-danger{
+   color: #d9534f;
+}
+.color-warning{
+   color: #f0ad4e;
+}
+.color-white{
+   color: #f7f7f7;
+}
+
+.font-half-size{
+   font-size: 0.75rem;
+}
+.font-bold {
+   font-weight: bold;
+}
+.font-uppercase{
+   text-transform: uppercase;
+}

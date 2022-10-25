@@ -1,9 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, NgZone, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { AlertController, NavController } from '@ionic/angular';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { Item, ItemList } from 'src/app/modules/transactions/models/item';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { ToastService } from 'src/app/services/toast/toast.service';

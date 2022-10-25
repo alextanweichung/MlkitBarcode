@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Item, ItemImage, ItemList } from 'src/app/modules/transactions/models/item';
+import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ItemList } from '../../models/item-list';
 
 @Component({
   selector: 'app-item-add-grid',

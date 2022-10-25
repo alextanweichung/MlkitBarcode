@@ -70,6 +70,15 @@ const routes: Routes = [
     path: 'item-cart',
     loadChildren: () => import('./shared/pages/item-cart/item-cart.module').then( m => m.ItemCartPageModule)
   },
+  {
+    path: 'others',
+    loadChildren: () => import('./modules/others/pages/others/others.module').then( m => m.OthersPageModule)
+  },  {
+    path: 'check-balance',
+    loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then( m => m.CheckBalancePageModule)
+  },
+
+
 
 ];
 @NgModule({
