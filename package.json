@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
     "@capacitor-community/sqlite": "^4.1.1",
-    "@capacitor/android": "4.3.0",
+    "@capacitor/android": "4.4.0",
     "@capacitor/app": "4.0.1",
     "@capacitor/core": "^4.3.0",
     "@capacitor/device": "^4.0.1",

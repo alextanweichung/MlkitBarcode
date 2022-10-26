@@ -36,8 +36,8 @@ export class DetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.salesOrderId) {
-      this.toastService.presentToast('Something went wrong!', 'Quotation Id not available', 'top', 'danger', 1500);
-      this.navController.navigateBack('/quotation')
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1500);
+      this.navController.navigateBack('/transactions')
     } else {
       this.loadMasterList();
       this.loadDetail();
@@ -60,7 +60,7 @@ export class DetailPage implements OnInit {
   loadDetail() {
     this.salesOrderService.getSalesOrderDetail(this.salesOrderId).subscribe(response => {
       this.salesOrder = response;
-      this.flattenSalesOrder = this.salesOrderService.flattenDtoDetail(this.salesOrder);
+      this.flattenSalesOrder = this.salesOrderService.unflattenDtoDetail(this.salesOrder);
     }, error => {
       console.log(error);
     })

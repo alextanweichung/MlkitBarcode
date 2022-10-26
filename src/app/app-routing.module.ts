@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
-import { PublicGuard } from './core/guards/public.guard';
 
 const routes: Routes = [
   {
@@ -35,44 +33,42 @@ const routes: Routes = [
     // canActivate: [PublicGuard] // Prevent for signed in users
   },
 
-  // process
+
+
+  // approval
   {
-    path: 'processes',
-    loadChildren: () => import('./modules/processes/pages/processes/processes.module').then(m => m.ProcessesPageModule)
+    path: 'approvals',
+    loadChildren: () => import('./modules/approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule)
   },
-  // process-quotation
+  // approval-quotation
   {
-    path: 'processes/quotation-pending-review',
-    loadChildren: () => import('./modules/processes/pages/quotation-pending-review/quotation-pending-review.module').then( m => m.QuotationPendingReviewPageModule)
-  },
-  {
-    path: 'processes/quotation-completed-review',
-    loadChildren: () => import('./modules/processes/pages/quotation-completed-review/quotation-completed-review.module').then( m => m.QuotationCompletedReviewPageModule)
+    path: 'approvals/quotation-reviews',
+    loadChildren: () => import('./modules/approvals/pages/quotation-reviews/quotation-reviews.module').then(m => m.QuotationReviewsPageModule)
   },
   {
-    path: 'processes/quotation-pending-approval',
-    loadChildren: () => import('./modules/processes/pages/quotation-pending-approval/quotation-pending-approval.module').then(m => m.QuotationPendingApprovalPageModule)
+    path: 'approvals/quotation-approvals',
+    loadChildren: () => import('./modules/approvals/pages/quotation-approvals/quotation-approvals.module').then(m => m.QuotationApprovalsPageModule)
+  },
+  // approval-sales-order
+  {
+    path: 'approvals/sales-order-reviews',
+    loadChildren: () => import('./modules/approvals/pages/sales-order-reviews/sales-order-reviews.module').then(m => m.SalesOrderReviewsPageModule)
   },
   {
-    path: 'processes/quotation-completed-approval',
-    loadChildren: () => import('./modules/processes/pages/quotation-completed-approval/quotation-completed-approval.module').then( m => m.QuotationCompletedApprovalPageModule)
+    path: 'approvals/sales-order-approvals',
+    loadChildren: () => import('./modules/approvals/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
+  },
+  // approval-purchase-order  
+  {
+    path: 'approvals/purchase-order-reviews',
+    loadChildren: () => import('./modules/approvals/pages/purchase-order-reviews/purchase-order-reviews.module').then( m => m.PurchaseOrderReviewsPageModule)
   },
   {
-    path: 'processes/sales-order-pending-review',
-    loadChildren: () => import('./modules/processes/pages/sales-order-pending-review/sales-order-pending-review.module').then( m => m.SalesOrderPendingReviewPageModule)
+    path: 'approvals/purchase-order-approvals',
+    loadChildren: () => import('./modules/approvals/pages/purchase-order-approvals/purchase-order-approvals.module').then( m => m.PurchaseOrderApprovalsPageModule)
   },
-  {
-    path: 'processes/sales-order-completed-review',
-    loadChildren: () => import('./modules/processes/pages/sales-order-completed-review/sales-order-completed-review.module').then( m => m.SalesOrderCompletedReviewPageModule)
-  },
-  {
-    path: 'processes/sales-order-pending-approval',
-    loadChildren: () => import('./modules/processes/pages/sales-order-pending-approval/sales-order-pending-approval.module').then( m => m.SalesOrderPendingPageModule)
-  },
-  {
-    path: 'processes/sales-order-completed-approval',
-    loadChildren: () => import('./modules/processes/pages/sales-order-completed-approval/sales-order-completed-approval.module').then( m => m.SalesOrderCompletedPageModule)
-  },
+
+
 
   // transaction
   {
@@ -97,6 +93,17 @@ const routes: Routes = [
     path: 'transactions/sales-order/sales-order-detail',
     loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/detail/detail.module').then(m => m.DetailPageModule)
   },
+  // transaction-picking  
+  {
+    path: 'transactions/picking',
+    loadChildren: () => import('./modules/transactions/pages/picking/picking.module').then(m => m.PickingPageModule)
+  },
+  {
+    path: 'transactions/picking/picking-detail',
+    loadChildren: () => import('./modules/transactions/pages/picking/picking-detail/detail/detail.module').then(m => m.DetailPageModule)
+  },
+
+
 
   // others
   {
@@ -108,6 +115,8 @@ const routes: Routes = [
     path: 'others/check-balance',
     loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
   },
+
+
 
   // shared
   {
@@ -136,8 +145,15 @@ const routes: Routes = [
   },
   {
     path: 'transaction-processing',
-    loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then( m => m.TransactionProcessingPageModule)
+    loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then(m => m.TransactionProcessingPageModule)
   },
+  {
+    path: 'item-add-list',
+    loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
+  },
+
+
+
 
 
 

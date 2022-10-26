@@ -13,6 +13,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Transactions</ion-title>
@@ -21,6 +22,11 @@
       <ion-searchbar showCancelButton="focus" placeholder="Sales Order, Quotation, Picking ..."></ion-searchbar>
     </ion-toolbar> -->
   </ion-header>
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content>
+    </ion-refresher-content>
+  </ion-refresher>
 
   <div class="ion-padding">
 
@@ -36,10 +42,10 @@
 
     <ng-container *ngIf="quotation_loaded">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button detail="false" (click)="goToQuotationDetail(object.quotationId)" *ngFor="let object of quotations" >
-          <ion-avatar slot="start" class="ion-avatar-default-icon">
+        <ion-item button detail="false" (click)="goToQuotationDetail(object.quotationId)" *ngFor="let object of quotations">
+          <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
             <ion-icon name="cafe"></ion-icon>
-          </ion-avatar>
+          </ion-avatar> -->
           <ion-label>
             <h3>{{object.quotationNum}}</h3>
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
@@ -49,7 +55,7 @@
       </ion-list>
     </ng-container>
 
-    <hr class="hr-medium">
+    <hr class="hr-small">
 
     <ion-list-header>
       <ion-label color="dark">Sales Order</ion-label>
@@ -61,17 +67,17 @@
       <p>
         <!-- <ion-text color="warning"><ion-icon name="warning"></ion-icon></ion-text> -->
         <ion-text color="tertiary">
-          <h3>H3: The quick brown fox jumps over the lazy dog</h3>
+          <h3>Nothing found!</h3>
         </ion-text>
       </p>
     </ng-container>
 
     <ng-container *ngIf="sales_order_loaded">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders" >
-          <ion-avatar slot="start" class="ion-avatar-default-icon">
+        <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders">
+          <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
             <ion-icon name="cafe"></ion-icon>
-          </ion-avatar>
+          </ion-avatar> -->
           <ion-label>
             <h3>{{object.salesOrderNum}}</h3>
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
@@ -81,8 +87,39 @@
       </ion-list>
     </ng-container>
 
+    <hr class="hr-small">
 
-    <hr class="hr-medium">
+    <ion-list-header>
+      <ion-label color="dark">Picking</ion-label>
+      <ion-button *ngIf="picking_loaded" routerLink="picking">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+    </ion-list-header>
+
+    <!-- Skeletons -->
+    <ng-container *ngIf="!picking_loaded">
+      <p>
+        <!-- <ion-text color="warning"><ion-icon name="warning"></ion-icon></ion-text> -->
+        <ion-text color="tertiary">
+          <h3>Nothing found!</h3>
+        </ion-text>
+      </p>
+    </ng-container>
+
+    <ng-container *ngIf="sales_order_loaded">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" (click)="goToPickingDetail(object.pickingId)" *ngFor="let object of pickings">
+          <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+            <ion-icon name="cafe"></ion-icon>
+          </ion-avatar> -->
+          <ion-label>
+            <h3>{{object.pickingNum}}</h3>
+            <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+          </ion-label>
+          <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
+    <hr class="hr-small">
 
     <!-- <ion-list-header>
       <ion-label color="dark">Picking</ion-label>

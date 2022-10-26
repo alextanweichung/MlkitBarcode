@@ -28,7 +28,7 @@ export class QuotationPage implements OnInit {
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private toastService: ToastService
-   ) { }
+  ) { }
 
   ngOnInit() {
     if (!this.startDate) {

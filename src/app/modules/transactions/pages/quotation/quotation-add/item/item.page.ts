@@ -5,7 +5,9 @@ import { LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
   selector: 'app-item',
@@ -16,7 +18,12 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   private customer: Customer;
 
+  moduleControl: ModuleControl[] = [];
+
+  loadImage: boolean = true;
+
   constructor(
+    private authService: AuthService,
     private quotationService: QuotationService,
     private navController: NavController,
     private loadingController: LoadingController,
@@ -34,6 +41,19 @@ export class ItemPage implements OnInit, ViewDidEnter {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
       this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
+    this.loadModuleControl();
+  }
+
+  loadModuleControl() {
+    this.authService.moduleControlConfig$.subscribe(obj => {
+      this.moduleControl = obj;      
+      let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
+      if (loadImage) {
+        this.loadImage = loadImage === '1' ? true : false;
+      }
+    }, error => {
+      console.log(error);
+    })
   }
 
   searchTextChanged() {
@@ -51,11 +71,13 @@ export class ItemPage implements OnInit, ViewDidEnter {
       }
       await this.showLoading();
       // get images
-      this.quotationService.getItemImageFile(this.itemSearchText).subscribe(response => {
-        this.availableImages = response;
-      }, error => {
-        console.log(error);
-      })
+      if (this.loadImage) {
+        this.quotationService.getItemImageFile(this.itemSearchText).subscribe(response => {
+          this.availableImages = response;
+        }, error => {
+          console.log(error);
+        })
+      }
       // get item
       this.quotationService.getItemList(this.itemSearchText, this.customer.customerId, this.customer.locationId).subscribe(async response => {
         this.availableItem = response;
@@ -70,7 +92,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     }
   }
 
-  private itemInCart: Item[] = [];
+  itemInCart: Item[] = [];
   onItemInCartEditCompleted(event) {
     this.itemInCart = event; 
   }

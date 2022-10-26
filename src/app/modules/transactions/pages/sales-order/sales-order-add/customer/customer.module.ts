@@ -8,6 +8,7 @@ import { CustomerPageRoutingModule } from './customer-routing.module';
 
 import { CustomerPage } from './customer.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     ReactiveFormsModule,
     IonicModule,
     CustomerPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    SearchDropdownPageModule
   ],
   declarations: [CustomerPage]
 })

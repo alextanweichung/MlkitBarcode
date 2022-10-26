@@ -68,7 +68,7 @@ export class SigninPage implements OnInit {
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {
         
-        await this.navController.navigateRoot('/processes');
+        await this.navController.navigateRoot('/approvals');
         loading.dismiss();
       });
 

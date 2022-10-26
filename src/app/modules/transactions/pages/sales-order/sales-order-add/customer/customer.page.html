@@ -20,45 +20,37 @@
     <form [formGroup]="objectForm">      
       <ion-list class="list-custom" lines="full">
         
-        <ion-item (click)="showLocationSearchDropdown()">
-          <ion-label position="stacked">Location</ion-label>
-          <ion-input placeholder="Select Location" formControlName="locationId" readonly hidden></ion-input>
-          {{objectForm.controls['locationId'].value|idMapping:locationMasterList}}
-        </ion-item>
-        <ion-item (click)="showCustomerSearchDropdown()">
-          <ion-label position="stacked">Customer</ion-label>
-          <ion-input placeholder="Select Customer" formControlName="customerId" (ionChange)="customerChanged($event)" readonly hidden></ion-input>
-          {{objectForm.controls['customerId'].value|idMapping:customerMasterList}}
-        </ion-item>
-        <!-- <ion-item>
-          <ion-label position="stacked">Customer</ion-label>
-          <ion-select interface="action-sheet" placeholder="Select Customer" formControlName="customerId" (ionChange)="customerChanged($event)">
-            <ion-select-option *ngFor="let item of customerMasterList" [value]="item.id">{{item.description}}</ion-select-option>
-          </ion-select>
-        </ion-item> -->
-        <ion-item>
+        <app-search-dropdown *ngIf="transactionShowDetailHeader" title="Location" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="locationChanged($event)"></app-search-dropdown>
+        
+        <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="customerChanged($event)"></app-search-dropdown>
+
+        <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Currency</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Currency" formControlName="currencyId" (ionChange)="currencyChanged($event)">
             <ion-select-option *ngFor="let item of currencyMasterList" [value]="item.id">{{item.description}}</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+
+        <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Exchange Rate</ion-label>
           <ion-input type="decimal" formControlName="exchangeRate"></ion-input>
         </ion-item>
-        <ion-item>
+
+        <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Country</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Country" formControlName="countryId">
             <ion-select-option *ngFor="let item of countryMasterList" [value]="item.id">{{item.description}}</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+
+        <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Term Period</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Term Period" formControlName="termPeriodId">
             <ion-select-option *ngFor="let item of termPeriodMasterList" [value]="item.id">{{item.description}}</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+
+        <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Agent</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Agent" formControlName="salesAgentId">
             <ion-select-option *ngFor="let item of salesAgentMasterList" [value]="item.id">{{item.description}}</ion-select-option>
@@ -75,7 +67,7 @@
     <ion-grid class="ion-no-padding">
       <ion-row>
         <ion-col>
-          <ion-button class="ion-margin" expand="block" (click)="nextStep()" [disabled]="!objectForm.valid">
+          <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()" [disabled]="!objectForm.valid">
             Next
           </ion-button>
         </ion-col>

@@ -8,6 +8,7 @@ import { ConfigService } from '../config/config.service';
 import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user';
 import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class AuthService {
   isDebug: string = 'False';
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
+  moduleControlConfig: ModuleControl[];
   // model: MenuItem[];
   // dashboardItem: MenuItem;
 
@@ -32,29 +34,21 @@ export class AuthService {
   // private menuItemSubject = new ReplaySubject<MenuItem[]>(1);
   // menuModel$ = this.menuItemSubject.asObservable();
 
+  //Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
+  private moduleControlSubject = new ReplaySubject<ModuleControl[]>(1);
+  moduleControlConfig$ = this.moduleControlSubject.asObservable();  
+
   constructor(
     private navController: NavController,
     private http: HttpClient,
     private configService: ConfigService
   ) {
     let apiUrl = configService.sys_parameter.apiUrl;
-    this.baseUrl = apiUrl;
-  }
+    this.baseUrl = apiUrl;    
 
-  // Get user session
-  async getSession() {
-
-    // ...
-    // put auth session here
-    // ...
-
-    // Sample only - remove this after real authentication / session
-    let session = {
-      email: 'john.doe@mail.com'
+    if (!this.isTokenExpired()){
+      this.buildAllObjects(); 
     }
-
-    return false;
-    // return session;
   }
 
   // Sign in
@@ -73,13 +67,6 @@ export class AuthService {
         }
       })
     )
-    // Sample only - remove this after real authentication / session
-    // let sample_user = {
-    //   email: email,
-    //   password: password
-    // }
-
-    // return sample_user;
   }
 
   refreshToken(tokenRequest: TokenRequest) {
@@ -124,7 +111,7 @@ export class AuthService {
   buildAllObjects() {
     this.buildMenuModel();
     // this.buildRestrictColumnsObject(); 
-    // this.buildModuleControlObject();   
+    this.buildModuleControlObject();   
     // this.buildMasterDefinedGroup();  
   }
 
@@ -143,6 +130,13 @@ export class AuthService {
     });
   }
   
+  buildModuleControlObject(){
+    this.getModuleControl().subscribe(response => {
+      this.moduleControlConfig = response;
+      this.setModuleControl(this.moduleControlConfig);
+    });
+  }
+  
   getMenuHierachy(){
     return this.http.get<MenuHierarchy[]>(this.baseUrl + 'account/menu').pipe(
       map((response: any) =>       
@@ -155,11 +149,39 @@ export class AuthService {
     // this.menuItemSubject.next(item);
   }
 
+  getModuleControl() {
+    return this.http.get<ModuleControl[]>(this.baseUrl + 'account/frontEndModuleControl').pipe(
+      map((response: any) =>
+        response.map((item: any) => item)
+      )
+    )
+  }
 
+  setModuleControl(item: any) {
+    this.moduleControlSubject.next(item);
+  }
 
+  isTokenExpired(token?: string): boolean {
+    if(!token) token = this.getToken();
+    if(!token) return true;
 
+    const tokenExpiryDate = this.getTokenExpirationDate(token);
+    if(tokenExpiryDate === undefined) return true;
+    return !(tokenExpiryDate.valueOf() > new Date().valueOf());
+  }
 
+  getToken(): string {
+    return JSON.parse(localStorage.getItem('loginUser'))?.token;
+  }
 
+  getTokenExpirationDate(token: string): Date {
+    const decoded: JwtPayload = jwt_decode(token);
+    if (decoded.exp === undefined) return null;
+
+    const date = new Date(0); 
+    date.setUTCSeconds(decoded.exp);
+    return date;
+  }
 
 
 

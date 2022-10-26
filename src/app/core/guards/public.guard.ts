@@ -13,7 +13,7 @@ export class PublicGuard implements CanActivate {
 
   async canActivate(): Promise<boolean> {
     
-    const is_signed_in = !!(await this.authService.getSession());
+    const is_signed_in = !!(await this.authService.isLoggedIn);
 
     // If signed in, redirect to home page
     if (is_signed_in) {

@@ -61,7 +61,7 @@ export class SalesOrderService {
     this.removeSalesOrderSummary();
   }
 
-  flattenDtoDetail(salesOrder: SalesOrderRoot): SalesOrderDto {
+  unflattenDtoDetail(salesOrder: SalesOrderRoot): SalesOrderDto {
     let line: SalesOrderLine[] = [];
     salesOrder.details.forEach(r => {
       if (r.variationTypeCode === '0') {

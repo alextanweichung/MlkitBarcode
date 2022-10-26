@@ -39,9 +39,9 @@
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         
         <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects" >
-          <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
             <ion-icon name="cafe"></ion-icon>
-          </ion-avatar>
+          </ion-avatar> -->
           <ion-label>
             <h3>{{object.quotationNum}}</h3>
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>

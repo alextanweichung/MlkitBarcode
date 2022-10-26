@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(): Promise<boolean> {
 
-    const is_signed_in = !!(await this.authService.getSession());
+    const is_signed_in = !!(await this.authService.isLoggedIn);
 
     // If not signed in, redirect to welcome page
     if (!is_signed_in) {
