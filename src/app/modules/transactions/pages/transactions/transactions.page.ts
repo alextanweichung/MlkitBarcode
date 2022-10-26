@@ -83,7 +83,7 @@ export class TransactionsPage implements OnInit {
         parent: "Transactions"
       }
     }
-    this.navController.navigateForward('/quotation/quotation-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/quotation/quotation-detail', navigationExtras);
   }
 
   /* #endregion */
@@ -97,7 +97,7 @@ export class TransactionsPage implements OnInit {
         parent: "Transactions"
       }
     }
-    this.navController.navigateForward('/sales-order/sales-order-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);
   }
 
   /* #endregion */

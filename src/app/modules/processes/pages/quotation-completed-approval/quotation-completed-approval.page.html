@@ -1,0 +1,28 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Completed</ion-title>    
+
+    <ion-buttons slot="start">
+      <ion-back-button text="Processes" defaultHref="/processes"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons slot="primary">
+      <ion-button (click)="filter()">
+        <ion-icon slot="icon-only" name="filter"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Completed</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <app-transaction-processing [objects]="objects" (onObjectUpdated)="onObjectUpdated($event)" parentType="Quotation" processType="Completed"></app-transaction-processing>
+
+</ion-content>

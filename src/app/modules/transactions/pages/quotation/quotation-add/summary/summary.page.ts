@@ -23,7 +23,7 @@ export class SummaryPage implements OnInit {
 
   done() {
     this.quotationService.resetVariables();
-    this.navController.navigateRoot('/quotation');
+    this.navController.navigateRoot('/transactions/quotation');
   }
 
 }

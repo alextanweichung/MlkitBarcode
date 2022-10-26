@@ -32,7 +32,7 @@ export class ConfirmationPage implements OnInit {
     this.recalculateTotals();
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
-      this.navController.navigateBack('/sales-order/sales-order-customer');
+      this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
       this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'top', 'medium', 1500);
@@ -138,7 +138,7 @@ export class ConfirmationPage implements OnInit {
       this.salesOrderService.setSalesOrderSummary(ss);
 
       this.toastService.presentToast('Insert Complete', 'New sales order has been added', 'top', 'success', 1500);
-      this.navController.navigateRoot('/sales-order/sales-order-summary');
+      this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
     }, error => {
       console.log(error);
     });
@@ -146,7 +146,7 @@ export class ConfirmationPage implements OnInit {
 
   previousStep() {
     this.salesOrderService.setChoosenItems(this.itemInCart);
-    this.navController.navigateBack('/sales-order/sales-order-item');
+    this.navController.navigateBack('/transactions/sales-order/sales-order-item');
   }
 
 }

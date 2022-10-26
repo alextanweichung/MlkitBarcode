@@ -16,8 +16,8 @@ export class DetailPage implements OnInit {
   parent: string = 'Sales Order'
 
   salesOrderId: number;
-  salesOrder: any;//QuotationRoot;
-  flattenSalesOrder: any;//QuotationDto;
+  salesOrder: any;
+  flattenSalesOrder: any;
 
   constructor(
     private route: ActivatedRoute,

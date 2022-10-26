@@ -34,7 +34,7 @@ export class ConfirmationPage implements OnInit {
     this.recalculateTotals();
     if (!this.customer || this.customer === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
-      this.navController.navigateBack('/quotation/quotation-customer');
+      this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
       this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'top', 'medium', 1500);
@@ -204,7 +204,7 @@ export class ConfirmationPage implements OnInit {
       this.quotationService.setQuotationSummary(qs);
 
       this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'top', 'success', 1500);
-      this.navController.navigateRoot('/quotation/quotation-summary');
+      this.navController.navigateRoot('/transactions/quotation/quotation-summary');
     }, error => {
       console.log(error);
     });
@@ -212,7 +212,7 @@ export class ConfirmationPage implements OnInit {
 
   previousStep() {
     this.quotationService.setChoosenItems(this.itemInCart);
-    this.navController.navigateBack('/quotation/quotation-item');
+    this.navController.navigateBack('/transactions/quotation/quotation-item');
   }
 
 }

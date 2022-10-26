@@ -1,0 +1,117 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Processes
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Processes</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="ion-padding">
+
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Quotation</ion-label>
+    </ion-list-header>
+
+    <ion-list class="list-custom" lines="full">
+      
+      <ion-item button routerLink="quotation-pending-review">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Pending Reviews</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+
+      <ion-item button routerLink="quotation-completed-review">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Completed Reviews</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+
+      <ion-item button routerLink="quotation-pending-approval">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Pending Approvals</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+
+      <ion-item button routerLink="quotation-completed-approval">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Completed Approvals</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+    
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Sales Order</ion-label>
+    </ion-list-header>
+
+    <ion-list class="list-custom" lines="full">
+      
+      <ion-item button routerLink="sales-order-pending-review">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Pending Reviews</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+  
+      <ion-item button routerLink="sales-order-completed-review">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Completed Reviews</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+
+      <ion-item button routerLink="sales-order-pending-approval">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Pending Approvals</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+
+      <ion-item button routerLink="sales-order-completed-approval">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="information"></ion-icon>
+        </ion-avatar> -->
+        <ion-label>
+          <h3>Completed Approvals</h3>
+          <!-- <p class="font-size-smallest">More info about this</p> -->
+        </ion-label>
+      </ion-item>
+      
+    </ion-list>
+
+  </div>
+
+</ion-content>

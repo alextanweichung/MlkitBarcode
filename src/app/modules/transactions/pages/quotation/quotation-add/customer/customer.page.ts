@@ -22,9 +22,7 @@ export class CustomerPage implements OnInit {
     private quotationService: QuotationService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
-    private toastService: ToastService,
-    private modalController: ModalController
-  ) { }
+    private toastService: ToastService  ) { }
 
   ngOnInit() {
     this.loadCustomerList();
@@ -54,32 +52,6 @@ export class CustomerPage implements OnInit {
     }
   }
 
-  // async showCustomerSearchDropdown() {
-  //   let dropdownlist: SearchDropdownList[] = [];
-  //   this.customers.forEach(r => {
-  //     dropdownlist.push({
-  //       id: r.customerId,
-  //       code: r.customerCode,
-  //       description: r.name
-  //     })
-  //   })
-  //   const modal = await this.modalController.create({
-  //     component: SearchDropdownPage,
-  //     componentProps: {
-  //       searchDropdownList: dropdownlist
-  //     },
-  //     canDismiss: true
-  //   });
-
-  //   await modal.present();
-
-  //   let { data } = await modal.onWillDismiss();
-
-  //   if (data) {
-  //     this.selectedCustomer = this.customers.find(r => r.customerId === data.id);
-  //   }
-  // }
-
   async cancelInsert() {    
     const actionSheet = await this.actionSheetController.create({
       header: 'Are you sure to cancel?',
@@ -100,7 +72,7 @@ export class CustomerPage implements OnInit {
 
     if (role === 'confirm') {
       this.quotationService.resetVariables();
-      this.navController.navigateBack('/quotation');
+      this.navController.navigateBack('/transactions/quotation');
     }
   }
 
@@ -108,7 +80,7 @@ export class CustomerPage implements OnInit {
     if (this.selectedCustomer) {
       this.quotationService.setChoosenCustomer(this.selectedCustomer);
       this.quotationService.removeItems();
-      this.navController.navigateForward('/quotation/quotation-item');
+      this.navController.navigateForward('/transactions/quotation/quotation-item');
     } else {
       this.toastService.presentToast('Error', 'Please select customer to continue', 'top', 'danger', 1500);
     }

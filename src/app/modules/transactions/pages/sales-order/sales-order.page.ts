@@ -60,7 +60,7 @@ export class SalesOrderPage implements OnInit {
     if (salesAgentId === 0 || salesAgentId === undefined) {
       this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1500);
     } else {
-      this.navController.navigateForward('/sales-order/sales-order-customer');
+      this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
     }
   }
 
@@ -116,7 +116,7 @@ export class SalesOrderPage implements OnInit {
         salesOrderId: salesOrderId
       }
     }
-    this.navController.navigateForward('/sales-order/sales-order-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);
   }
 
 }

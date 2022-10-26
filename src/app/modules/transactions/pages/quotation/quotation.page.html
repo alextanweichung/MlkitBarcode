@@ -37,6 +37,7 @@
     <ng-container *ngIf="content_loaded">
       
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        
         <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects" >
           <ion-avatar slot="start" class="ion-avatar-default-icon">
             <ion-icon name="cafe"></ion-icon>

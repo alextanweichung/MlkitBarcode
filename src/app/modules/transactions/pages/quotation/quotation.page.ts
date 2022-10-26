@@ -63,7 +63,7 @@ export class QuotationPage implements OnInit {
     if (salesAgentId === 0 || salesAgentId === undefined) {
       this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1500);
     } else {
-      this.navController.navigateForward('/quotation/quotation-customer');
+      this.navController.navigateForward('/transactions/quotation/quotation-customer');
     }
   }
 
@@ -84,7 +84,6 @@ export class QuotationPage implements OnInit {
     let { data } = await modal.onWillDismiss();
 
     if (data && data !== undefined) {
-      console.log("🚀 ~ file: quotation.page.ts ~ line 104 ~ QuotationPage ~ filter ~ data", data)
       this.startDate = new Date(data.startDate);
       this.endDate = new Date(data.endDate);
 
@@ -120,7 +119,7 @@ export class QuotationPage implements OnInit {
         quotationId: quotationId
       }
     }
-    this.navController.navigateForward('/quotation/quotation-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/quotation/quotation-detail', navigationExtras);
   }
 
 }

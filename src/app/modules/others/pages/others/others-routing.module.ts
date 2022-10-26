@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: OthersPage
+  },
+  {
+    path: 'check-balance',
+    loadChildren: () => import('../check-balance/check-balance.module').then( m => m.CheckBalancePageModule),
   }
 ];
 

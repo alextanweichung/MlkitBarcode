@@ -32,7 +32,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.itemInCart = this.salesOrderService.itemInCart;
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
-      this.navController.navigateBack('/sales-order/sales-order-customer');
+      this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
   }
 
@@ -98,11 +98,11 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   nextStep() {
     this.salesOrderService.setChoosenItems(this.itemInCart);
-    this.navController.navigateForward('/sales-order/sales-order-confirmation');
+    this.navController.navigateForward('/transactions/sales-order/sales-order-confirmation');
   }
 
   previousStep() {
-    this.navController.navigateBack('/sales-order/sales-order-customer');
+    this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
   }
 
   /* #endregion */

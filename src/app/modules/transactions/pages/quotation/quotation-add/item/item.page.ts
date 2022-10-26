@@ -32,7 +32,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.itemInCart = this.quotationService.itemInCart;
     if (!this.customer || this.customer === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
-      this.navController.navigateBack('/quotation/quotation-customer');
+      this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
   }
 
@@ -96,11 +96,11 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   async nextStep() {
     await this.quotationService.setChoosenItems(this.itemInCart);
-    this.navController.navigateForward('/quotation/quotation-confirmation');
+    this.navController.navigateForward('/transactions/quotation/quotation-confirmation');
   }
 
   previousStep() {
-    this.navController.navigateBack('/quotation/quotation-customer');
+    this.navController.navigateBack('/transactions/quotation/quotation-customer');
   }
 
   /* #endregion */

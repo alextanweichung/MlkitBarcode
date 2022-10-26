@@ -129,25 +129,30 @@ border-radius: 3px;
 .py-5 { padding-top:3rem!important;padding-bottom:3rem!important; }
 
 .item-inner {
-padding: 0;
+   padding: 0;
 }
 
 .no-ripple {
---ripple-color: transparent;
---background-activated: transparent;
+   --ripple-color: transparent;
+   --background-activated: transparent;
+   --background-activated-opacity: transparent;
+   --background-focused: transparent;
+   --background-focused-opacity: transparent;
+   --background-hover: transparent;
+   --background-hover-opacity: transparent;
 }
 
 .ion-button-custom {
-margin: auto!important;
+   margin: auto !important;
 }
 
 .ion-margin-auto {
-margin: auto!important;
+   margin: auto !important;
 }
 
 input {
-margin: auto!important;
-padding-right: 0!important;
+   margin: auto !important;
+   padding-right: 0 !important;
 }
 
 .color-primary{
@@ -169,9 +174,9 @@ padding-right: 0!important;
 .font-half-size{
    font-size: 0.75rem;
 }
-.font-bold {
-   font-weight: bold;
-}
+// .font-bold {
+//    font-weight: bold;
+// }
 .font-uppercase{
    text-transform: uppercase;
 }

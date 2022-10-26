@@ -183,15 +183,17 @@ export class CustomerPage implements OnInit {
 
     if (role === 'confirm') {
       this.salesOrderService.resetVariables();
-      this.navController.navigateBack('/sales-order');
+      this.navController.navigateBack('/transactions/sales-order');
     }
   }
 
   nextStep() {
     if (this.objectForm.valid) {
+      
+      console.log("🚀 ~ file: customer.page.ts ~ line 193 ~ CustomerPage ~ nextStep ~ this.objectForm.value", this.objectForm.value)
       this.salesOrderService.setChoosenCustomer(this.objectForm.value);
       this.salesOrderService.removeItems();
-      this.navController.navigateForward('/sales-order/sales-order-item');
+      this.navController.navigateForward('/transactions/sales-order/sales-order-item');
     } else {
       this.toastService.presentToast('Error', 'Please select customer to continue', 'top', 'danger', 1500);
     }

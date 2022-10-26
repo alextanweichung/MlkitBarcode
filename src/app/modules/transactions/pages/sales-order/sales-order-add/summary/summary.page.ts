@@ -32,7 +32,7 @@ export class SummaryPage implements OnInit {
 
   done() {
     this.salesOrderService.resetVariables();
-    this.navController.navigateRoot('/sales-rder');
+    this.navController.navigateRoot('/transactions/sales-order');
   }
 
 }

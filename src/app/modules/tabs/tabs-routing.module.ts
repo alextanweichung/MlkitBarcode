@@ -8,12 +8,12 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'home',
-        loadChildren: () => import('../secure/home/home.module').then(m => m.HomePageModule)
+        path: 'processes',
+        loadChildren: () => import('../processes/pages/processes/processes.module').then(m => m.ProcessesPageModule)
       },
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'processes',
         pathMatch: 'full'
       },
       {

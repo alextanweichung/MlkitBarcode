@@ -8,12 +8,18 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <ion-content fullscreen>
+
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Detail</ion-title>
+      <ion-buttons slot="start">
+        <ion-back-button text="{{parent}}"></ion-back-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
+  
   <div class="ion-padding" *ngIf="flattenQuotation">
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
