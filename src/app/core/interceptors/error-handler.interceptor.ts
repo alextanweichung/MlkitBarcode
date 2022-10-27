@@ -12,6 +12,7 @@ import { NavigationExtras, Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { LoadingController } from '@ionic/angular';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);
 
@@ -25,7 +26,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    constructor(
       private router: Router,
       private toastService: ToastService,
-      private loadingController: LoadingController
+      private spinner: NgxSpinnerService
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
@@ -40,15 +41,10 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       if (request.context.get(BACKGROUND_LOAD)) {
          finished = true;
       }
+      
       setTimeout(async () => {
          if (!finished) {
-            // Proceed with loading overlay
-            // const loading = await this.loadingController.create({
-            //    cssClass: 'default-loading',
-            //    message: '<p>Loading...</p><span>Please be patient.</span>',
-            //    spinner: 'crescent'
-            // });
-            // await loading.present();
+            this.spinner.show('sp1');
          }
       }, 800);
 
@@ -103,8 +99,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            // this.spinner.hide('sp1');
-            // this.loadingController.dismiss();
+            this.spinner.hide('sp1');
          })
       );
    }

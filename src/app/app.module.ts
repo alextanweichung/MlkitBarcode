@@ -17,6 +17,7 @@ import { DatabaseService } from './services/sqlite/database.service';
 import { MigrationService } from './services/sqlite/migration.service';
 import { DetailService } from './services/sqlite/detail.service';
 import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.interceptor';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 export function initializeFactory(init: InitializeAppService) {
   return () => init.initializeApp();
@@ -35,7 +36,8 @@ export function initializeFactory(init: InitializeAppService) {
     ReactiveFormsModule, 
     AppRoutingModule, 
     NgChartsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxSpinnerModule
   ],
   providers: [
     SQLiteService,

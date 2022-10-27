@@ -22,7 +22,7 @@ export class SigninPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private loadingController: LoadingController,
+    // private loadingController: LoadingController,
     private formBuilder: FormBuilder,
     private toastService: ToastService,
     private navController: NavController
@@ -55,21 +55,20 @@ export class SigninPage implements OnInit {
     } else {
 
       // Proceed with loading overlay
-      const loading = await this.loadingController.create({
-        cssClass: 'default-loading',
-        message: '<p>Signing in...</p><span>Please be patient.</span>',
-        spinner: 'crescent'
-      });
-      await loading.present();
+      // const loading = await this.loadingController.create({
+      //   cssClass: 'default-loading',
+      //   message: '<p>Signing in...</p><span>Please be patient.</span>',
+      //   spinner: 'crescent'
+      // });
+      // await loading.present();
 
       // TODO: Add your sign in logic
       // ...
       
       let loginModel: LoginRequest = this.signin_form.value;
-      (await this.authService.signIn(loginModel)).subscribe(async response => {
-        
+      (await this.authService.signIn(loginModel)).subscribe(async response => {        
         await this.navController.navigateRoot('/approvals');
-        loading.dismiss();
+        // loading.dismiss();
       });
 
       // // Fake timeout
