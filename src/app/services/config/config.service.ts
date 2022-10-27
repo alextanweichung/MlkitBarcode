@@ -25,7 +25,8 @@ export class ConfigService {
   async load() {
     this.sys_parameter = {
       Sys_ParameterId: 1,
-      apiUrl: 'https://localhost:44351/api/',
+      // apiUrl: 'https://localhost:44351/api/',
+      apiUrl: 'https://idcp-demo.com/api/',
       imgUrl: null,
       onlineMode: null,
       firstTimeLogin: null,

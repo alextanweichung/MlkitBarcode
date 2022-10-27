@@ -38,7 +38,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.salesOrderHeader = this.salesOrderService.salesOrderHeader
     this.itemInCart = this.salesOrderService.itemInCart;
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', '', 'top', 'danger', 1500);
       this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
     this.loadModuleControl();

@@ -4,6 +4,7 @@ import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
 import { AlertController, IonRouterOutlet, LoadingController, ModalController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AddPage } from '../../../modules/secure/cards/add/add.page';
+import { AuthService } from 'src/app/services/auth/auth.service';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -26,6 +27,7 @@ export class CardsPage implements AfterContentChecked {
   card_details_visible: boolean = false;
 
   constructor(
+    private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
     private loadingController: LoadingController,
@@ -81,6 +83,29 @@ export class CardsPage implements AfterContentChecked {
           cssClass: 'danger',
           handler: async () => {
             this.toastService.presentToast('Success', 'Card successfully deleted', 'top', 'success', 2000);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel'
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async signOut() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'Sign-out?',
+      buttons: [
+        {
+          text: 'Sign-out',
+          cssClass: 'danger',
+          handler: async () => {
+            this.authService.signOut();
           }
         },
         {

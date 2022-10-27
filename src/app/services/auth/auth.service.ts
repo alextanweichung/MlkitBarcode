@@ -9,6 +9,7 @@ import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user
 import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { MenuItem } from './menu-item';
 
 @Injectable({
   providedIn: 'root'
@@ -20,21 +21,21 @@ export class AuthService {
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
   moduleControlConfig: ModuleControl[];
-  // model: MenuItem[];
+  model: MenuItem[];
   // dashboardItem: MenuItem;
 
-  //1 is the size of buffer
+  // 1 is the size of buffer
   private currentUserSource = new ReplaySubject<LoginUser>(1);
   currentUser$ = this.currentUserSource.asObservable();
 
   private currentUserTokenSource = new ReplaySubject<CustomToken>(1);
   currentUserToken$ = this.currentUserTokenSource.asObservable();
 
-  //Create menuItemSubject to observe from value of HTTP Get for MenuHierarchy
-  // private menuItemSubject = new ReplaySubject<MenuItem[]>(1);
-  // menuModel$ = this.menuItemSubject.asObservable();
+  // Create menuItemSubject to observe from value of HTTP Get for MenuHierarchy
+  private menuItemSubject = new ReplaySubject<MenuItem[]>(1);
+  menuModel$ = this.menuItemSubject.asObservable();
 
-  //Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
+  // Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
   private moduleControlSubject = new ReplaySubject<ModuleControl[]>(1);
   moduleControlConfig$ = this.moduleControlSubject.asObservable();  
 
@@ -117,14 +118,15 @@ export class AuthService {
 
   buildMenuModel() {
     this.getMenuHierachy().subscribe(response => {
-      // this.model = response;
-      // //Manually add dashboard item and move it to the beginning of array
+      this.model = response;
+      // Manually add dashboard item and move it to the beginning of array
       // this.dashboardItem = { label: 'Dashboard', icon: 'pi pi-home', routerLink: ['/'], tabindex: "1" };
       // this.model.push(this.dashboardItem);
-      // //Only display menu which is not under Mobile Apps Module
-      // this.model = this.model.filter(x => x.fragment != "M");
-      // this.model = this.model.sort((a, b) => Number(a.tabindex) - Number(b.tabindex));
-      // this.setMenuHierarchy(this.model);
+      // Only display menu which is not under Mobile Apps Module
+      this.model = this.model.filter(x => x.fragment === "M");
+      this.model = this.model.sort((a, b) => Number(a.tabindex) - Number(b.tabindex));
+      console.log("🚀 ~ file: auth.service.ts ~ line 129 ~ AuthService ~ this.getMenuHierachy ~ this.model", this.model)
+      this.setMenuHierarchy(this.model);
     }, error => {
       console.log(error);
     });
@@ -146,7 +148,7 @@ export class AuthService {
   }
 
   setMenuHierarchy(item: any){    
-    // this.menuItemSubject.next(item);
+    this.menuItemSubject.next(item);
   }
 
   getModuleControl() {
@@ -183,8 +185,16 @@ export class AuthService {
     return date;
   }
 
-
-
+  async logout(){
+    localStorage.removeItem('loginUser');
+    localStorage.removeItem('rpParameters');
+    this.currentUserSource.next(null);
+    this.currentUserTokenSource.next(null);
+    // this.menuItemSubject.next(null);
+    this.navController.navigateRoot('/signin');
+    this.isLoggedIn = false;
+    this.isAdmin = false;
+  }
 
 
 

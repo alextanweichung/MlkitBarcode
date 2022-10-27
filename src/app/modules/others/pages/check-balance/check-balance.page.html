@@ -84,14 +84,10 @@
     </ion-accordion-group>
 
     <ion-card *ngIf="itemInfo" class="mx-0 my-1">
-      <ion-list class="list-custom" lines="none">
-        <ion-item>
-          <ion-label>Code: {{itemInfo.itemCode}}</ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>Description: {{itemInfo.description}}</ion-label>
-        </ion-item>
-      </ion-list>
+      <ion-card-header>
+        <ion-card-subtitle>{{itemInfo.itemCode}}</ion-card-subtitle>
+        <ion-card-title>{{itemInfo.description}}</ion-card-title>
+      </ion-card-header>
     </ion-card>
     
     <div *ngIf="selectedViewOptions === 'item'">

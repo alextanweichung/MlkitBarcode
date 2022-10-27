@@ -14,7 +14,7 @@ const routes: Routes = [
   },
   {
     path: 'picking-item',
-    loadChildren: () => import('./picking-add/item/item.module').then( m => m.ItemPageModule)
+    loadChildren: () => import('./picking-add/pick-item/pick-item.module').then( m => m.PickItemPageModule)
   }
 ];
 

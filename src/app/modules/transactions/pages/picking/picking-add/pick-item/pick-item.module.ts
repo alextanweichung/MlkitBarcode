@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ItemPageRoutingModule } from './item-routing.module';
+import { ItemPageRoutingModule } from './pick-item-routing.module';
 
-import { ItemPage } from './item.page';
+import { PickItemPage } from './pick-item.page';
 
 @NgModule({
   imports: [
@@ -15,6 +15,6 @@ import { ItemPage } from './item.page';
     IonicModule,
     ItemPageRoutingModule
   ],
-  declarations: [ItemPage]
+  declarations: [PickItemPage]
 })
-export class ItemPageModule {}
+export class PickItemPageModule {}

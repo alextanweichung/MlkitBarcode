@@ -144,6 +144,21 @@
         </ion-label>
       </ion-item>
     </ion-list>
+
+    <hr class="hr-medium">
+
+    <ion-list class="list-custom" lines="full">
+      <ion-item button detail="false" (click)="signOut()">
+        <ion-avatar slot="start" class="ion-avatar-danger-icon">
+          <ion-icon color="danger" name="log-out-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label color="danger">
+          <h3>Logout</h3>
+          <p class="font-size-smallest">Remove this user</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
   </div>
 
 </ion-content>

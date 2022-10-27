@@ -4,7 +4,7 @@
       <ion-col size="12" class="py-0" *ngFor="let item of itemToDisplay">
         <ion-card class="m-1">
           <ion-card-header class="px-2 pt-2 pb-0">
-            <ion-card-title>{{item.itemCode}}</ion-card-title>
+            <ion-card-title><div class="flex">{{item.itemCode}} <div class="ion-text-right">{{item.unitPrice|number:'1.2'}}</div></div></ion-card-title>
             <ion-card-subtitle>{{item.description}}</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content class="px-2 pt-0 pb-2" *ngIf="item.variationTypeCode === '0'">
