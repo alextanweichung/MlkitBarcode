@@ -8,10 +8,9 @@ import {
    HttpContext
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { LoadingController } from '@ionic/angular';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);

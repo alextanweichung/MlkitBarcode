@@ -32,6 +32,10 @@ export class PickingService {
     return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/staticLov");
   }
 
+  getSalesOrders(customerId: number, locationId: number) {
+    return this.http.get<any[]>(this.baseUrl + "MobilePicking/fromSO/customer/" + customerId + "/" + locationId);
+  }
+
   getPickingList(startDate: Date, endDate: Date) {
     return this.http.get<PickingList[]>(this.baseUrl + "MobilePicking/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
   }

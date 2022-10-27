@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -16,7 +16,7 @@ import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-
 })
 export class CustomerPage implements OnInit {
 
-  objectForm: FormGroup;
+  objectForm: UntypedFormGroup;
 
   moduleControl: ModuleControl[] = [];
 
@@ -28,7 +28,7 @@ export class CustomerPage implements OnInit {
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private toastService: ToastService,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private modalController: ModalController
   ) {
     this.newForm();
@@ -48,7 +48,7 @@ export class CustomerPage implements OnInit {
   loadMasterList() {
     this.salesOrderService.getMasterList().subscribe(response => {
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0 && y.attribute5 === 'T');
       this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.countryMasterList = response.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.termPeriodMasterList = response.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);

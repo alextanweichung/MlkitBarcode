@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, ModalController } from '@ionic/angular';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-add',
@@ -9,13 +9,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class AddPage implements OnInit {
 
-  add_card_form: FormGroup;
+  add_card_form: UntypedFormGroup;
   submit_attempt: boolean = false;
 
   constructor(
     private modalController: ModalController,
     private loadingController: LoadingController,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) { }
 
   ngOnInit() {

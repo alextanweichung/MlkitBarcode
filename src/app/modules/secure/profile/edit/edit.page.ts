@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ActionSheetController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -11,11 +11,11 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 })
 export class EditPage implements OnInit {
 
-  edit_profile_form: FormGroup;
+  edit_profile_form: UntypedFormGroup;
   submit_attempt: boolean = false;
 
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
     private navController: NavController,
     private actionSheetController: ActionSheetController

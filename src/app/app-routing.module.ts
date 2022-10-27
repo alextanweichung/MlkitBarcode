@@ -152,12 +152,6 @@ const routes: Routes = [
     loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
   },
 
-
-
-
-
-
-
 ];
 @NgModule({
   imports: [

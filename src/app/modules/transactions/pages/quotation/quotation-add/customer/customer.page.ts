@@ -22,7 +22,7 @@ export class CustomerPage implements OnInit {
     private quotationService: QuotationService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
-    private toastService: ToastService  ) { }
+    private toastService: ToastService) { }
 
   ngOnInit() {
     this.loadCustomerList();
@@ -30,12 +30,13 @@ export class CustomerPage implements OnInit {
 
   customers: Customer[] = [];
   selectedCustomer: Customer;
-  searchDropdownList: SearchDropdownList[] = [];
+  customerSearchDropdownList: SearchDropdownList[] = [];
   loadCustomerList() {
     this.quotationService.getCustomerList().subscribe(response => {
       this.customers = response;
+      this.customers = this.customers.filter(r => r.businessModelType === 'T');
       this.customers.forEach(r => {
-        this.searchDropdownList.push({
+        this.customerSearchDropdownList.push({
           id: r.customerId,
           code: r.customerCode,
           description: r.name

@@ -18,6 +18,8 @@ import { MigrationService } from './services/sqlite/migration.service';
 import { DetailService } from './services/sqlite/detail.service';
 import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.interceptor';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 export function initializeFactory(init: InitializeAppService) {
   return () => init.initializeApp();
@@ -28,28 +30,28 @@ export function initializeFactory(init: InitializeAppService) {
 // }
 
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
-  imports: [
-    BrowserModule, 
-    IonicModule.forRoot({ mode: 'ios' }), 
-    ReactiveFormsModule, 
-    AppRoutingModule, 
-    NgChartsModule,
-    HttpClientModule,
-    NgxSpinnerModule
-  ],
-  providers: [
-    SQLiteService,
-    DetailService,
-    DatabaseService,
-    InitializeAppService,
-    { provide: APP_INITIALIZER, useFactory: initializeFactory, deps: [InitializeAppService], multi: true },
-    MigrationService,
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, 
-    Storage
-  ],
-  bootstrap: [AppComponent],
+    declarations: [AppComponent],
+    imports: [
+        BrowserModule,
+        IonicModule.forRoot({ mode: 'ios' }),
+        ReactiveFormsModule,
+        AppRoutingModule,
+        NgChartsModule,
+        HttpClientModule,
+        NgxSpinnerModule,
+        BrowserAnimationsModule
+    ],
+    providers: [
+        SQLiteService,
+        DetailService,
+        DatabaseService,
+        InitializeAppService,
+        { provide: APP_INITIALIZER, useFactory: initializeFactory, deps: [InitializeAppService], multi: true },
+        MigrationService,
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
+        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+        Storage
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { SalesOrderPageRoutingModule } from './sales-order-routing.module';
 
 import { SalesOrderPage } from './sales-order.page';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    SalesOrderPageRoutingModule
+    SalesOrderPageRoutingModule,
+    SearchDropdownPageModule
   ],
   declarations: [SalesOrderPage]
 })

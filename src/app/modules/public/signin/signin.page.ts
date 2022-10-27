@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -17,13 +17,13 @@ export class SigninPage implements OnInit {
   current_year: number = new Date().getFullYear();
   currentVersion: string;
 
-  signin_form: FormGroup;
+  signin_form: UntypedFormGroup;
   submit_attempt: boolean = false;
 
   constructor(
     private authService: AuthService,
     // private loadingController: LoadingController,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
     private navController: NavController
   ) { 
