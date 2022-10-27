@@ -46,7 +46,8 @@
       </ion-item>
 
     </ion-list>
-    <ion-button class="pt-1" [disabled]="itemCode?.length === 0 && selectedViewOptions?.length === 0" expand="block" (click)="search()">
+
+    <ion-button class="py-1" [disabled]="itemCode?.length === 0 && selectedViewOptions?.length === 0" expand="block" size="small" (click)="search()">
       <ion-icon slot="start" name="search-outline"></ion-icon>Search
     </ion-button>
 

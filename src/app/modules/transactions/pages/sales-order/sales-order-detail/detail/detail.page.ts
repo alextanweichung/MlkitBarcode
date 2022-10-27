@@ -22,7 +22,6 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private navController: NavController,
-    private modalController: ModalController,
     private toastService: ToastService,
     private salesOrderService: SalesOrderService
   ) {
@@ -60,6 +59,7 @@ export class DetailPage implements OnInit {
   loadDetail() {
     this.salesOrderService.getSalesOrderDetail(this.salesOrderId).subscribe(response => {
       this.salesOrder = response;
+      console.log("🚀 ~ file: detail.page.ts ~ line 62 ~ DetailPage ~ this.salesOrderService.getSalesOrderDetail ~ this.salesOrder", this.salesOrder)
       this.flattenSalesOrder = this.salesOrderService.unflattenDtoDetail(this.salesOrder);
     }, error => {
       console.log(error);

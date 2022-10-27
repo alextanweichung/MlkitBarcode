@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActionSheetController, NavController } from '@ionic/angular';
+import { PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -31,7 +32,7 @@ export class SalesOrderPage implements OnInit {
   warehouseAgentMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.pickingService.getMasterList().subscribe(response => {
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0 && y.attribute5 === 'T');
       this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUom').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -63,8 +64,13 @@ export class SalesOrderPage implements OnInit {
   }
 
   customerId: number;
+  selectedCustomer: MasterListDetails;
   onCustomerSelected(event) {
     this.customerId = event ? event.id : null;
+    if (this.customerId) {
+      this.selectedCustomer = this.customerMasterList.find(r => r.id === this.customerId);
+      this.loadSalesOrders();
+    }
   }
 
   locationId: number;
@@ -72,14 +78,21 @@ export class SalesOrderPage implements OnInit {
     this.locationId = event ? event.id : null;
   }
 
+  pickingSalesOrders: PickingSalesOrderRoot[] = [];
   loadSalesOrders() {
-    if (this.customerId && this.locationId) {
-      this.pickingService.getSalesOrders(this.customerId, this.locationId).subscribe(response => {        
-        console.log("🚀 ~ file: sales-order.page.ts ~ line 80 ~ SalesOrderPage ~ this.pickingService.getSalesOrders ~ response", response)
+    if (this.customerId) {
+      this.pickingService.getSalesOrders(this.customerId).subscribe(response => {
+        this.pickingSalesOrders = response;
       })
     } else {
-      this.toastService.presentToast('Please select Customer and Location', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Please select Customer', '', 'top', 'danger', 1500);
     }
+  }
+
+  selectedSO: PickingSalesOrderRoot;
+  salesOrderSelected(pickingSalesOrder: PickingSalesOrderRoot) {
+    this.selectedSO = pickingSalesOrder;
+    this.nextStep();
   }
 
   async cancelInsert() {    
@@ -103,6 +116,16 @@ export class SalesOrderPage implements OnInit {
     if (role === 'confirm') {
       // this.quotationService.resetVariables();
       this.navController.navigateBack('/transactions/picking');
+    }
+  }
+
+  nextStep() {
+    if (this.selectedCustomer && this.selectedSO) {
+      this.pickingService.setChoosenCustomer(this.selectedCustomer);
+      this.pickingService.setChoosenSalesOrder(this.selectedSO);
+      this.navController.navigateForward('/transactions/picking/picking-item');
+    } else {
+      this.toastService.presentToast('Something went wrong.', '', 'top', 'danger', 1500);
     }
   }
 

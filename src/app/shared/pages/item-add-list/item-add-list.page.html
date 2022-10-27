@@ -4,8 +4,8 @@
       <ion-col size="12" class="py-0" *ngFor="let item of itemToDisplay">
         <ion-card class="m-1">
           <ion-card-header class="px-2 pt-2 pb-0">
-            <ion-card-title style="font-size: medium;">{{item.itemCode}}</ion-card-title>
-            <ion-card-subtitle style="font-size: x-small; font-weight: normal;">{{item.description}}</ion-card-subtitle>
+            <ion-card-title>{{item.itemCode}}</ion-card-title>
+            <ion-card-subtitle>{{item.description}}</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content class="px-2 pt-0 pb-2" *ngIf="item.variationTypeCode === '0'">
             <ion-grid class="ion-no-padding">

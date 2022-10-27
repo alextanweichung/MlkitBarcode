@@ -180,3 +180,55 @@ input {
 .font-uppercase{
    text-transform: uppercase;
 }
+
+.main-card {
+   // background: var(--ion-color-primary);
+   border-radius: 8px;
+   display: flex;
+   flex-wrap: wrap;
+   // margin: 12px;
+   overflow: hidden;
+
+   ion-col {
+      display: flex;
+      justify-content: center;
+      // padding: 4px;
+   }
+
+   ion-card {
+      //   background: #55bdef;
+      // margin-bottom: 12px;
+      // margin-top: 12px;
+      width: 100%;
+   }
+
+   // ion-card-content {
+   //    color: #fff;
+   //    position: absolute;
+   //    bottom: 0;
+   // }
+}
+
+ion-card-header {
+   padding: .5rem!important
+}
+
+ion-card-title {
+   font-size: medium;
+}
+
+ion-card-subtitle {
+   font-size: x-small;
+   font-weight: normal;
+}
+
+ion-card-content {
+   padding-top: 0;
+   padding-left: .5rem!important;
+   padding-right: .5rem!important;
+   padding-bottom: .5rem!important;
+}
+
+ion-item {
+   font-size: smaller;
+}
