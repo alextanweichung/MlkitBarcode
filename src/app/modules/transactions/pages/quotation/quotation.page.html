@@ -14,11 +14,8 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="font-x-large">Quotations</ion-title>
+      <ion-label class="label-title">Quotations</ion-label>
     </ion-toolbar>
-    <!-- <ion-toolbar>
-      <ion-searchbar showCancelButton="focus" placeholder="Quotation ..."></ion-searchbar>
-    </ion-toolbar> -->
   </ion-header>
   <div class="ion-padding">
     <ng-container *ngIf="!content_loaded">
@@ -26,10 +23,7 @@
     </ng-container>
     <ng-container *ngIf="content_loaded">      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">        
-        <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects" >
-          <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
-            <ion-icon name="cafe"></ion-icon>
-          </ion-avatar> -->
+        <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects">
           <ion-label>
             <h3>{{object.quotationNum}}</h3>
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
@@ -37,9 +31,6 @@
           <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
         </ion-item>        
       </ion-list>
-      <!-- <ion-infinite-scroll threshold="100px" (ionInfinite)="loadObjects($event)">
-        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data"></ion-infinite-scroll-content>
-      </ion-infinite-scroll> -->
     </ng-container>
   </div>
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">

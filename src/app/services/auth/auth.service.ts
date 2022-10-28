@@ -183,42 +183,16 @@ export class AuthService {
     date.setUTCSeconds(decoded.exp);
     return date;
   }
-
-  async logout(){
-    localStorage.removeItem('loginUser');
-    localStorage.removeItem('rpParameters');
-    this.currentUserSource.next(null);
-    this.currentUserTokenSource.next(null);
-    // this.menuItemSubject.next(null);
-    this.navController.navigateRoot('/signin');
-    this.isLoggedIn = false;
-    this.isAdmin = false;
-  }
-
-
-
-
-  // Sign up
-  async signUp(email: string, password: string) {
-
-    // Sample only - remove this after real authentication / session
-    let sample_user = {
-      email: email,
-      password: password
-    }
-
-    return sample_user;
-  }
-
+  
   // Sign out
   async signOut() {
 
     // ...
     localStorage.removeItem('loginUser');
-    localStorage.removeItem('rpParameters');
+    // localStorage.removeItem('rpParameters');
     this.currentUserSource.next(null);
     this.currentUserTokenSource.next(null);
-    // this.menuItemSubject.next(null);
+    this.menuItemSubject.next(null);
     this.isLoggedIn = false;
     this.isAdmin = false;
     // ...

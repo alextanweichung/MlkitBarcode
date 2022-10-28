@@ -36,23 +36,21 @@
     </ion-row>
   </ion-grid>
 </div>
-
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title size="large" class="font-x-large">Variations</ion-title>
+        <ion-title>Variations</ion-title>
         <ion-buttons slot="start">
           <ion-button (click)="hideModal()">Close</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-
     <ion-content>
       <div *ngIf="itemToViewVariation && itemToViewVariation.length > 0">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item button detail="false" class="pr-2 no-ripple">
-            <ion-grid class="ion-no-padding" *ngIf="itemToViewVariation[0].variationTypeCode === '1' || itemToViewVariation[0].variationTypeCode === '2'">          
+            <ion-grid class="ion-no-padding" *ngIf="itemToViewVariation[0].variationTypeCode === '1' || itemToViewVariation[0].variationTypeCode === '2'">
               <ion-row>
                 <ion-col>
                   <p>{{itemToViewVariation[0].itemCode}}</p>
@@ -60,20 +58,20 @@
                 <ion-col>
                   <p class="ion-text-right">{{itemToViewVariation[0].unitPrice|number:'1.2'}}</p>
                 </ion-col>
-              </ion-row>          
+              </ion-row>
               <ion-row>
                 <ion-col>
                   <p>{{itemToViewVariation[0].description}}</p>
                 </ion-col>
-              </ion-row>          
-              <ion-row *ngFor="let item of itemToViewVariation">          
+              </ion-row>
+              <ion-row *ngFor="let item of itemToViewVariation">
                 <ion-col size="7" class="ion-margin-auto">
                   <p>
                     <span class="badge-green font-bold px-1 mr-1" style="font-size: small;" *ngIf="item.itemVariationLineXDescription"> {{item.itemVariationLineXDescription}}</span>
                     <span class="badge-purple font-bold px-1 mr-1" style="font-size: small;" *ngIf="item.itemVariationLineYDescription"> {{item.itemVariationLineYDescription}}</span>
                   </p>
-                </ion-col>          
-                <ion-col size="5" class="ion-margin-auto">          
+                </ion-col>
+                <ion-col size="5" class="ion-margin-auto">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-margin-auto">
@@ -90,26 +88,18 @@
                         </ion-button>
                       </ion-col>
                     </ion-row>
-                  </ion-grid>          
-                </ion-col>          
-              </ion-row>          
+                  </ion-grid>
+                </ion-col>
+              </ion-row>
             </ion-grid>
           </ion-item>
         </ion-list>
       </div>
     </ion-content>
-
     <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-      <!-- <ion-grid class="ion-no-padding">
-        <ion-row>
-          <ion-col> -->
-            <ion-button class="ion-margin" expand="block" size="small" (click)="addItemVariationToCart()">
-              Add to cart
-            </ion-button>
-          <!-- </ion-col>
-        </ion-row>
-      </ion-grid> -->
+      <ion-button class="ion-margin" expand="block" size="small" (click)="addItemVariationToCart()">
+        Add to cart
+      </ion-button>
     </ion-footer>
-
   </ng-template>
 </ion-modal>

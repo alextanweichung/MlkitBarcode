@@ -9,7 +9,7 @@
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="font-x-large">Detail</ion-title>
+      <ion-label class="label-title">Detail</ion-label>
     </ion-toolbar>
   </ion-header>
   <div class="ion-padding" *ngIf="flattenSalesOrder">
@@ -21,7 +21,6 @@
         <ion-label>
           <p>Sales Order Number</p>
         </ion-label>
-        <!-- <ion-badge color="danger" mode="ios" slot="end">- $8.60</ion-badge> -->
         <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{flattenSalesOrder.header.salesOrderNum}}"></ion-input>
       </ion-item>
       <ion-item>
@@ -52,10 +51,8 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label>Details</ion-label>
     </ion-list-header>
-
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" *ngFor="let item of salesOrder.details" class="no-ripple">
-
         <ion-grid class="p-2 ion-no-padding">
           <ion-row>
             <ion-col>
@@ -115,9 +112,7 @@
             </ion-row>
           </div>
         </ion-grid>
-
       </ion-item>
     </ion-list>
-
   </div>
 </ion-content>
