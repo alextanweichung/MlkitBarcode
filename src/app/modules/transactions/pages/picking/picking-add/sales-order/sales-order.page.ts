@@ -85,7 +85,7 @@ export class SalesOrderPage implements OnInit {
         this.pickingSalesOrders = response;
       })
     } else {
-      this.toastService.presentToast('Please select Customer', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Please select Customer', '', 'bottom', 'danger', 1500);
     }
   }
 
@@ -125,7 +125,7 @@ export class SalesOrderPage implements OnInit {
       this.pickingService.setChoosenSalesOrder(this.selectedSO);
       this.navController.navigateForward('/transactions/picking/picking-item');
     } else {
-      this.toastService.presentToast('Something went wrong.', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong.', '', 'bottom', 'danger', 1500);
     }
   }
 

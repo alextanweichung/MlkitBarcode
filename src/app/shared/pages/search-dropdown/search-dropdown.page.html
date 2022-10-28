@@ -1,6 +1,6 @@
 <ion-item (click)="showModal()">
-  <ion-label position="stacked">{{title}}</ion-label>
-  <ion-input [placeholder]="'Select ' + title" [value]="selected?.description" readonly></ion-input>
+  <ion-label *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
+  <ion-input [placeholder]="'Select ' + title" [value]="selected?.[optionValue]" readonly></ion-input>
 </ion-item>
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">  
@@ -20,7 +20,7 @@
       <div class="p-2">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
           <ion-item button detail="false" *ngFor="let item of tempDropdownList" (click)="chooseThis(item)">
-            <ion-label>{{item?.description}}</ion-label>
+            <ion-label><b *ngIf="showCode">{{item?.code}} - </b>  {{item?.description}}</ion-label>
           </ion-item>
         </ion-list>
       </div>

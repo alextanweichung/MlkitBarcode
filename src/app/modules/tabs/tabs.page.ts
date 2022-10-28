@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { ActionSheetController } from '@ionic/angular';
+import { ActionSheetController, NavController } from '@ionic/angular';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-tabs',
@@ -9,7 +10,9 @@ import { ActionSheetController } from '@ionic/angular';
 export class TabsPage {
 
   constructor(
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private toastService: ToastService,
+    private navController: NavController
   ) {}
 
   // Select action
@@ -20,26 +23,30 @@ export class TabsPage {
       cssClass: 'custom-action-sheet',
       buttons: [
         {
-          text: 'Add account',
+          text: 'Add Quotation',
           icon: 'wallet',
           handler: () => {
-            // Put in logic ...
+            let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
+            if (salesAgentId === 0 || salesAgentId === undefined) {
+              this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
+            } else {
+              this.navController.navigateForward('/transactions/quotation/quotation-customer');
+            }
           }
         },
         {
-          text: 'Add transaction',
+          text: 'Add Sales Order',
           icon: 'swap-horizontal-outline',
           handler: () => {
-            // Put in logic ...
+            let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
+            if (salesAgentId === 0 || salesAgentId === undefined) {
+              this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
+            } else {
+              this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
+            }
           }
         },
         {
-          text: 'Set budget',
-          icon: 'calculator',
-          handler: () => {
-            // Put in logic ...
-          }
-        }, {
           text: 'Cancel',
           icon: 'close',
           role: 'cancel'

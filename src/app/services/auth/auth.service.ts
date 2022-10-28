@@ -125,7 +125,6 @@ export class AuthService {
       // Only display menu which is not under Mobile Apps Module
       this.model = this.model.filter(x => x.fragment === "M");
       this.model = this.model.sort((a, b) => Number(a.tabindex) - Number(b.tabindex));
-      console.log("🚀 ~ file: auth.service.ts ~ line 129 ~ AuthService ~ this.getMenuHierachy ~ this.model", this.model)
       this.setMenuHierarchy(this.model);
     }, error => {
       console.log(error);

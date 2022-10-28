@@ -1,32 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { QuotationDto, QuotationLine, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
-import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { PurchaseOrderLine } from '../../../models/purchase-order';
+import { PurchaseOrderService } from '../../../services/purchase-order.service';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: 'app-purchase-order-detail',
+  templateUrl: './purchase-order-detail.page.html',
+  styleUrls: ['./purchase-order-detail.page.scss'],
 })
-export class DetailPage implements OnInit {
+export class PurchaseOrderDetailPage implements OnInit {
 
-  parent: string = 'Quotations'
+  parent: string = 'Purchase Order'
 
-  quotationId: number;
-  quotation: QuotationRoot;
-  flattenQuotation: QuotationDto;
+  purchaseOrderId: number;
+  purchaseOrder: any;
+  flattenPurchaseOrder: any;
 
   constructor(
     private route: ActivatedRoute,
     private navController: NavController,
     private toastService: ToastService,
-    private quotationService: QuotationService
+    private purchaseOrderService: PurchaseOrderService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.quotationId = params['quotationId'];
+      this.purchaseOrderId = params['purchaseOrderId'];
       if (params['parent']) {
         this.parent = params['parent'];
       }
@@ -34,9 +34,9 @@ export class DetailPage implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.quotationId) {
-      this.toastService.presentToast('Something went wrong!', 'Quotation Id not available', 'bottom', 'danger', 1500);
-      this.navController.navigateBack('/quotation')
+    if (!this.purchaseOrderId) {
+      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1500);
+      this.navController.navigateBack('/transactions')
     } else {
       this.loadMasterList();
       this.loadDetail();
@@ -47,7 +47,7 @@ export class DetailPage implements OnInit {
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.quotationService.getMasterList().subscribe(response => {
+    this.purchaseOrderService.getMasterList().subscribe(response => {
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -57,25 +57,16 @@ export class DetailPage implements OnInit {
   }
 
   loadDetail() {
-    this.quotationService.getQuotationDetail(this.quotationId).subscribe(response => {
-      this.quotation = response;
-      this.flattenQuotation = this.quotationService.flattenDtoDetail(this.quotation);
+    this.purchaseOrderService.getPurchaseOrderDetail(this.purchaseOrderId).subscribe(response => {
+      this.purchaseOrder = response;
+      this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.purchaseOrder);
     }, error => {
       console.log(error);
     })
   }
 
-  matchImage(itemId: number) {
-    let defaultImageUrl = "assets/icon/favicon.png";
-    // let lookup = this.availableImages.find(r => r.keyId === itemId)?.imageSource;
-    // if (lookup) {
-    //   return "data:image/png;base64, " + lookup;
-    // }
-    return defaultImageUrl;
-  }
-
-  getFlattenVariations(itemId: number): QuotationLine[] {
-    return this.flattenQuotation.details.filter(r => r.itemId === itemId);
+  getFlattenVariations(itemId: number): PurchaseOrderLine[] {
+    return this.flattenPurchaseOrder.details.filter(r => r.itemId === itemId);
   }
 
 }

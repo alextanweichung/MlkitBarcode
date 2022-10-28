@@ -47,7 +47,7 @@ export class PickingPage implements OnInit {
       if (this.objects.length > 0) {
         this.content_loaded = true;
       }
-      this.toastService.presentToast('Search Completed.', '', 'top', 'success', 1500);
+      this.toastService.presentToast('Search Completed.', '', 'bottom', 'success', 1500);
     }, error => {
       console.log((error));
     })
@@ -60,7 +60,7 @@ export class PickingPage implements OnInit {
   async addObject() {
     let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
     if (salesAgentId === 0 || salesAgentId === undefined) {
-      this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1500);
     } else {
       this.navController.navigateForward('/transactions/picking/picking-sales-order');
     }

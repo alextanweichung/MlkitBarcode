@@ -50,7 +50,7 @@ export class SigninPage implements OnInit {
 
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
-      this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
+      this.toastService.presentToast('Error', 'Please input email and password', 'bottom', 'danger', 2000);
 
     } else {
 

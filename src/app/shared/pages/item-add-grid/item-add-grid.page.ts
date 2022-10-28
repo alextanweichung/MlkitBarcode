@@ -90,7 +90,7 @@ export class ItemAddGridPage implements OnInit, OnChanges {
       this.itemInCart.push(JSON.parse(JSON.stringify(d)));
     }    
     data.qtyRequest = null;
-    this.toastService.presentToast('Success', 'Item successfully added to cart.', 'top', 'success', 1500);
+    this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1500);
     this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
 
@@ -138,7 +138,7 @@ export class ItemAddGridPage implements OnInit, OnChanges {
     }
     this.hideModal();
     this.availableItem.forEach(r => r.qtyRequest = null);
-    this.toastService.presentToast('Success', 'Item successfully added to cart.', 'top', 'success', 1500);
+    this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1500);
     this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
 

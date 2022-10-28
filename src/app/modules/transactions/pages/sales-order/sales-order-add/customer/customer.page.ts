@@ -215,7 +215,7 @@ export class CustomerPage implements OnInit {
       this.salesOrderService.removeItems();
       this.navController.navigateForward('/transactions/sales-order/sales-order-item');
     } else {
-      this.toastService.presentToast('Error', 'Please select customer to continue', 'top', 'danger', 1500);
+      this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1500);
     }
   }
 

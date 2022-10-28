@@ -12,6 +12,9 @@ import { SearchDropdownList } from '../../models/search-dropdown-list';
 export class SearchDropdownPage implements OnInit {
 
   @Input() title: string = "Search";
+  @Input() showHeaderLabel: boolean = true;
+  @Input() optionValue: string = 'description';
+  @Input() showCode: boolean = false;
   @Input() searchDropdownList: SearchDropdownList[];
   @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
@@ -24,6 +27,7 @@ export class SearchDropdownPage implements OnInit {
   ) { }
 
   ngOnInit() {
+
   }  
 
   async searchItem(event) {

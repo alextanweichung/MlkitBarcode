@@ -39,7 +39,7 @@ export class SalesOrderPendingApproval implements OnInit {
   loadObjects() {
     this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
       this.pendingObjects = response.filter(r => !r.isComplete);
-      this.completedObjects = response.filter(r => !r.isComplete);
+      this.completedObjects = response.filter(r => r.isComplete);
     }, error => {
       console.log(error);
     })

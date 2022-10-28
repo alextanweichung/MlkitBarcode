@@ -82,7 +82,7 @@ export class CardsPage implements AfterContentChecked {
           text: 'Delete card',
           cssClass: 'danger',
           handler: async () => {
-            this.toastService.presentToast('Success', 'Card successfully deleted', 'top', 'success', 2000);
+            this.toastService.presentToast('Success', 'Card successfully deleted', 'bottom', 'success', 2000);
           }
         },
         {

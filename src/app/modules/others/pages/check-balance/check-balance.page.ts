@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonAccordionGroup } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { InventoryLevel, InventoryVariationLevel } from '../../models/check-balance';
 import { CheckBalanceService } from '../../services/check-balance.service';
 
@@ -10,6 +12,8 @@ import { CheckBalanceService } from '../../services/check-balance.service';
   styleUrls: ['./check-balance.page.scss'],
 })
 export class CheckBalancePage implements OnInit {
+
+  @ViewChild('accordionGroup', { static: false }) accordionGroup: IonAccordionGroup;
 
   itemList: ItemList[] = [];
   itemInfo: ItemList;
@@ -29,63 +33,78 @@ export class CheckBalancePage implements OnInit {
     this.loadItemList();
   }
 
+  itemSearchDropdownList: SearchDropdownList[] = [];
   loadItemList() {
     this.checkBalanceService.getItemList().subscribe(response => {
       this.itemList = response;
+      this.itemList.forEach(r => {
+        this.itemSearchDropdownList.push({
+          id: r.itemId,
+          code: r.itemCode,
+          description: r.description
+        })
+      })
     }, error => {
       console.log(error);
     })
   }
 
+  onItemChanged(event) {
+    if (event) {
+      this.itemCode = event.code;
+      this.validateItemCode();
+    }
+  }
+
   validateItemCode() {
     if (this.itemCode && this.itemCode.length > 0) {
       let lookUpItem = this.itemList.find(e => e.itemCode.toUpperCase() == this.itemCode.toUpperCase());
-      console.log("🚀 ~ file: check-balance.page.ts ~ line 37 ~ CheckBalancePage ~ validateItemCode ~ lookUpItem", lookUpItem)
       if (lookUpItem) {
         this.itemInfo = lookUpItem;
         if (this.itemInfo.variationTypeCode === "0") {
-          // this.selectedViewOptions = 'item';
+          this.selectedViewOptions = 'item';
         }
-        // this.search();
+        this.search();
       } else {
         this.itemCode = null;
         this.itemInfo = null;
-        this.toastService.presentToast('Invalid item code.', '', 'top', 'danger', 1500);
+        this.toastService.presentToast('Invalid item code.', '', 'bottom', 'danger', 1500);
       }
     }
   }
 
   search() {
     if (!this.itemCode) {
-      this.toastService.presentToast('Please enter valid item.', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Please enter valid item.', '', 'bottom', 'danger', 1500);
       return;
     }
     let lookUpItem = this.itemList.find(e => e.itemCode.toUpperCase() == this.itemCode.toUpperCase());
     if (lookUpItem) {
       this.itemInfo = lookUpItem;
-      if (this.selectedViewOptions === 'item') {
+      // if (this.selectedViewOptions === 'item') {
         this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevel = response;
-          this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1500);
+          this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
           this.computeLocationList();
           this.showEmpty = true;
           this.computeVariationXY();
         }, error => {
           console.log(error);
         })
-      } else {
+      // } else {
+      if (lookUpItem.variationTypeCode !== '0')
         this.checkBalanceService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevelVariation = response;
-          this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1500);
+          this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
           this.computeLocationList();
           this.showEmpty = true;
           this.computeVariationXY();
         }, error => {
           console.log(error);
         })
-      }
+      // }
     } else {
-      this.toastService.presentToast('Invalid Item Code', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Invalid Item Code', '', 'bottom', 'danger', 1500);
     }
   }
 
@@ -149,7 +168,7 @@ export class CheckBalancePage implements OnInit {
         if (!this.showEmpty) {
           this.inventoryLevel = this.inventoryLevel.filter(r => r.qty > 0);
         }
-        this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1500);
+        this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
       }, error => {
         console.log(error);
       })
@@ -220,7 +239,7 @@ export class CheckBalancePage implements OnInit {
           })
           this.inventoryLevelVariation = [...temp];
         }
-        this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1500);
+        this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
       }, error => {
         console.log(error);
       })

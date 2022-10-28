@@ -38,7 +38,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.customer = this.quotationService.selectedCustomer;
     this.itemInCart = this.quotationService.itemInCart;
     if (!this.customer || this.customer === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1500);
       this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
     this.loadModuleControl();
@@ -61,7 +61,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.availableImages = [];
   }
 
-  itemSearchText: string = 'a00';
+  itemSearchText: string;
   availableItem: Item[] = [];
   availableImages: ItemImage[] = [];
   async searchItem() {
@@ -81,14 +81,14 @@ export class ItemPage implements OnInit, ViewDidEnter {
       // get item
       this.quotationService.getItemList(this.itemSearchText, this.customer.customerId, this.customer.locationId).subscribe(async response => {
         this.availableItem = response;
-        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
         await this.hideLoading();
       }, async error => {
         console.log(error);
         await this.hideLoading();
       })
     } else {
-      this.toastService.presentToast('Error', 'Please key in 3 characters and above to search', 'top', 'danger', 1000);
+      this.toastService.presentToast('Error', 'Please key in 3 characters and above to search', 'bottom', 'danger', 1000);
     }
   }
 

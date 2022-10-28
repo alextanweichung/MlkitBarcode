@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, LoadingController, NavController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -8,7 +8,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
-  selector: 'app-item',
+  selector: 'app-pick-item',
   templateUrl: './pick-item.page.html',
   styleUrls: ['./pick-item.page.scss'],
 })
@@ -32,7 +32,7 @@ export class PickItemPage implements OnInit {
     this.pickingSalesOrder = this.pickingService.selectedSalesOrder;
     console.log("🚀 ~ file: item.page.ts ~ line 32 ~ ItemPage ~ ngOnInit ~ this.pickingSalesOrder", this.pickingSalesOrder)
     if (!this.pickingSalesOrder || this.pickingSalesOrder === undefined) {
-      this.toastService.presentToast('Something went wrong', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', '', 'bottom', 'danger', 1500);
       this.navController.navigateBack('/transactions/picking/picking-sales-order');
     }
     this.loadModuleControl();

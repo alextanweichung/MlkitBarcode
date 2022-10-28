@@ -1,5 +1,4 @@
 <div class="ion-padding">
-
   <ion-segment value="pending" [(ngModel)]="selectedSegment">
     <ion-segment-button value="pending">
       <ion-label>Pending</ion-label>
@@ -8,13 +7,9 @@
       <ion-label>Completed</ion-label>
     </ion-segment-button>
   </ion-segment>
-
   <hr class="hr-small">
-
-  <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="pendingObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'pending'">
-    
-    <ion-item-sliding *ngFor="let object of pendingObjects">
-      
+  <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="pendingObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'pending'">    
+    <ion-item-sliding *ngFor="let object of pendingObjects">      
       <ion-item button detail="false" class="no-ripple" (click)="openDetail(object.docId)">
         <ion-label>
         <h3>{{object.docNum}}</h3>
@@ -29,26 +24,19 @@
           </p>
         </ion-label>
       </ion-item>
-
       <ion-item-options side="start">
         <ion-item-option color="danger" (click)="presentConfirmAlert('REJECT', object.docId, object.docNum)"><ion-icon name="close-outline" slot="bottom"></ion-icon>Reject</ion-item-option>
       </ion-item-options>
-
       <ion-item-options side="end">
         <ion-item-option color="success" (click)="presentConfirmAlert('CONFIRM', object.docId, object.docNum)"><ion-icon name="checkmark-outline" slot="bottom"></ion-icon>Approve</ion-item-option>
       </ion-item-options>
-
-    </ion-item-sliding>
-    
+    </ion-item-sliding>    
   </ion-list>
-
-  <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="completedObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'completed'">
-    
-    <ion-item-sliding *ngFor="let object of completedObjects">
-      
+  <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="completedObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'completed'">    
+    <ion-item-sliding *ngFor="let object of completedObjects">      
       <ion-item button detail="false" class="no-ripple" (click)="openDetail(object.docId)">
         <ion-label>
-        <h3>{{object.docNum}}</h3>
+          <h3>{{object.docNum}}</h3>
           <p>Transaction Amt: {{object.amount|number:'1.2'}}</p>
           <p style="white-space: break-spaces;">
             <span class="badge-other font-bold px-1 mr-1" style="font-size: small;"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
@@ -60,13 +48,9 @@
           </p>
         </ion-label>
       </ion-item>
-
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="presentConfirmAlert('REVERSE', object.docId, object.docNum)"><ion-icon name="arrow-undo-outline" slot="bottom"></ion-icon>Reverse</ion-item-option>
       </ion-item-options>
-
-    </ion-item-sliding>
-    
+    </ion-item-sliding>    
   </ion-list>
-
 </div>

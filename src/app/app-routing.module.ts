@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
+import { MenuGuard } from './core/guards/menu.guard';
 
 const routes: Routes = [
   {
@@ -21,7 +23,7 @@ const routes: Routes = [
     path: 'signin',
     loadChildren: () => import('./modules/public/signin/signin.module').then(m => m.SigninPageModule),
     // canActivate: [PublicGuard] // Prevent for signed in users
-  },
+},
   {
     path: 'signup',
     loadChildren: () => import('./modules/public/signup/signup.module').then(m => m.SignupPageModule),
@@ -38,12 +40,16 @@ const routes: Routes = [
   // approval
   {
     path: 'approvals',
-    loadChildren: () => import('./modules/approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule)
+    loadChildren: () => import('./modules/approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule),
+    // runGuardsAndResolvers: 'always',
+    // canActivate: [AuthGuard, MenuGuard]
   },
   // approval-quotation
   {
     path: 'approvals/quotation-reviews',
-    loadChildren: () => import('./modules/approvals/pages/quotation-reviews/quotation-reviews.module').then(m => m.QuotationReviewsPageModule)
+    loadChildren: () => import('./modules/approvals/pages/quotation-reviews/quotation-reviews.module').then(m => m.QuotationReviewsPageModule),
+    // runGuardsAndResolvers: 'always',
+    // canActivate: [AuthGuard, MenuGuard]
   },
   {
     path: 'approvals/quotation-approvals',
@@ -72,6 +78,7 @@ const routes: Routes = [
 
   // transaction
   {
+    title: 'MACA001',
     path: 'transactions',
     loadChildren: () => import('./modules/transactions/pages/transactions/transactions.module').then(m => m.TransactionsPageModule)
   },
@@ -92,6 +99,11 @@ const routes: Routes = [
   {
     path: 'transactions/sales-order/sales-order-detail',
     loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/detail/detail.module').then(m => m.DetailPageModule)
+  },
+  // transactions-purchase-order
+  {
+    path: 'transactions/purchase-order/purchase-order-detail',
+    loadChildren: () => import('./modules/transactions/pages/purchase-order/purchase-order-detail/purchase-order-detail.module').then( m => m.PurchaseOrderDetailPageModule)
   },
   // transaction-picking  
   {
@@ -155,7 +167,12 @@ const routes: Routes = [
 ];
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules, relativeLinkResolution: 'legacy' })
+    RouterModule.forRoot(
+      routes,
+      { 
+        preloadingStrategy: PreloadAllModules, 
+        relativeLinkResolution: 'legacy'
+      })
   ],
   exports: [RouterModule]
 })

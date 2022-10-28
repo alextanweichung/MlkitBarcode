@@ -17,7 +17,7 @@ export class TransactionProcessingPage implements OnInit {
 
   @Input() pendingObjects: TransactionProcessingDoc[] = [];
   @Input() completedObjects: TransactionProcessingDoc[] = [];
-  @Output() onObjectUpdated: EventEmitter<TransactionProcessingDoc> = new EventEmitter();
+  @Output() onObjectUpdated: EventEmitter<number> = new EventEmitter();
 
   selectedSegment: string = 'pending';
 
@@ -54,18 +54,18 @@ export class TransactionProcessingPage implements OnInit {
   }
 
   updateDoc(action: string, docId: number) {    
-    // this.transactionProcessingService.updateDocumentStatus(action, docId).subscribe(async response => {
-    //   console.log("🚀 ~ file: transaction-processing.page.ts ~ line 62 ~ TransactionProcessingPage ~ this.transactionProcessingService.updateDocumentStatus ~ response", response)
-    //   if (response.status == 204) {
-    //     this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1500);
-    //     this.onObjectUpdated.emit(this.objects.find(r => r.docId === docId));
-    //   }
-    // }, error => {
-    //   console.log(error);
-    // })
+    this.transactionProcessingService.updateDocumentStatus(action, docId).subscribe(async response => {
+      if (response.status == 204) {
+        this.toastService.presentToast("Doc review is completed.", "", "bottom", "success", 1500);
+        this.onObjectUpdated.emit(docId);
+      }
+    }, error => {
+      console.log(error);
+    })
   }
 
   async openDetail(docId: number) {
+    console.log("🚀 ~ file: transaction-processing.page.ts ~ line 68 ~ TransactionProcessingPage ~ openDetail ~ docId", docId)
     let navigationExtras: NavigationExtras;
     if (this.parentType.toLowerCase() === 'quotation') {
       navigationExtras = {
@@ -79,6 +79,14 @@ export class TransactionProcessingPage implements OnInit {
       navigationExtras = {
         queryParams: {
           salesOrderId: docId,
+          parent: this.processType
+        }
+      }
+    }
+    if (this.parentType.toLowerCase() === 'purchase-order') {
+      navigationExtras = {
+        queryParams: {
+          purchaseOrderId: docId,
           parent: this.processType
         }
       }

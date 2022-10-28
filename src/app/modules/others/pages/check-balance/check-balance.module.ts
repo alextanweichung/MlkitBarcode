@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { CheckBalancePageRoutingModule } from './check-balance-routing.module';
 
 import { CheckBalancePage } from './check-balance.page';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    CheckBalancePageRoutingModule
+    CheckBalancePageRoutingModule,
+    SearchDropdownPageModule
   ],
   declarations: [CheckBalancePage]
 })

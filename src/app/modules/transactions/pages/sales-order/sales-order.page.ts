@@ -58,7 +58,7 @@ export class SalesOrderPage implements OnInit {
   async addObject() {
     let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     if (salesAgentId === 0 || salesAgentId === undefined) {
-      this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1500);
+      this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
     } else {
       this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
     }

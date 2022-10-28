@@ -177,6 +177,7 @@ input {
 // .font-bold {
 //    font-weight: bold;
 // }
+
 .font-uppercase{
    text-transform: uppercase;
 }
@@ -235,4 +236,8 @@ ion-card-content {
 
 ion-item {
    font-size: smaller;
+}
+
+.font-x-large {
+   font-size: x-large;
 }

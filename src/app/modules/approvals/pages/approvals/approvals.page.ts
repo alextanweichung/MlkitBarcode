@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/services/auth/auth.service';
+
+const subModuleCode: string = 'MATR';
 
 @Component({
   selector: 'app-approvals',
@@ -7,9 +10,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ApprovalsPage implements OnInit {
 
-  constructor() { }
+  showQuotationReview: boolean = false;
+  showQuotationApproval: boolean = false;
+
+  constructor(
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
+    this.authService.menuModel$.subscribe(obj => {
+      // let thisSubMod = obj.flatMap(r => r.items)
+    })
   }
 
 }

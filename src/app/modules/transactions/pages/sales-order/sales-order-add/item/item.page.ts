@@ -38,7 +38,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.salesOrderHeader = this.salesOrderService.salesOrderHeader
     this.itemInCart = this.salesOrderService.itemInCart;
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
-      this.toastService.presentToast('Something went wrong', '', 'top', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', '', 'bottom', 'danger', 1500);
       this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
     this.loadModuleControl();
@@ -82,14 +82,14 @@ export class ItemPage implements OnInit, ViewDidEnter {
       this.salesOrderService.getItemList(this.itemSearchText, this.salesOrderHeader.customerId, this.salesOrderHeader.locationId).subscribe(async response => {
         this.availableItem = response;
         console.log("🚀 ~ file: item.page.ts ~ line 84 ~ ItemPage ~ this.salesOrderService.getItemList ~ this.availableItem", this.availableItem)
-        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
         await this.hideLoading();
       }, async error => {
         console.log(error);
         await this.hideLoading();
       })
     } else {
-      this.toastService.presentToast('Error', 'Please key in 3 characters and above to search', 'top', 'danger', 1000);
+      this.toastService.presentToast('Error', 'Please key in 3 characters and above to search', 'bottom', 'danger', 1000);
     }
   }
 

@@ -31,11 +31,11 @@ export class ConfirmationPage implements OnInit {
     this.itemInCart = this.salesOrderService.itemInCart;
     this.recalculateTotals();
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'top', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1500);
       this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
-      this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'top', 'medium', 1500);
+      this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'bottom', 'medium', 1500);
     }
   }
 
@@ -73,7 +73,7 @@ export class ConfirmationPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1500);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1500);
     }
   }
 
@@ -137,7 +137,7 @@ export class ConfirmationPage implements OnInit {
       
       this.salesOrderService.setSalesOrderSummary(ss);
 
-      this.toastService.presentToast('Insert Complete', 'New sales order has been added', 'top', 'success', 1500);
+      this.toastService.presentToast('Insert Complete', 'New sales order has been added', 'bottom', 'success', 1500);
       this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
     }, error => {
       console.log(error);
