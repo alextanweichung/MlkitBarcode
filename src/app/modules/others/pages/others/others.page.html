@@ -12,40 +12,23 @@
     </ion-toolbar>
   </ion-header>
   <div class="ion-padding">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Inventory Level</ion-label>
-    </ion-list-header>
-    <ion-list class="list-custom" lines="full">
-      <ion-item button routerLink="check-balance">
-        <ion-label>
-          <h3>Check Balance</h3>
-        </ion-label>
-      </ion-item>
-    </ion-list>
+    
+    <ng-container *ngIf="showInventoryLevel">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>Inventory Level</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom" lines="full">
+        <ion-item button routerLink="check-balance">
+          <ion-label>
+            <h3>Check Balance</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-container>
 
     <hr class="hr-medium">
 
     <hr class="hr-medium">
-
-    <!-- <ion-list-header>
-      <ion-label color="dark">Picking</ion-label>
-      <ion-button>See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-    </ion-list-header>
-
-    <ion-list-header>
-      <ion-label color="dark">Packing</ion-label>
-      <ion-button>See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-    </ion-list-header>
-
-    <ion-list-header>
-      <ion-label color="dark">Ticketing</ion-label>
-      <ion-button>See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-    </ion-list-header>
-
-    <ion-list-header>
-      <ion-label color="dark">Stock Count</ion-label>
-      <ion-button>See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-    </ion-list-header> -->
 
   </div>
 

@@ -27,7 +27,7 @@ export class CheckBalanceService {
 
   //Load item list in background
   getItemList() {
-    return this.http.get<ItemList[]>(this.baseUrl + 'inventoryLevel/itemlist', { context: background_load() }).pipe(
+    return this.http.get<ItemList[]>(this.baseUrl + 'mobileInventoryLevel/itemlist', { context: background_load() }).pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -39,11 +39,11 @@ export class CheckBalanceService {
   // }
 
   getInventoryLevelByItem(itemId: number) {
-    return this.http.get<InventoryLevel[]>(this.baseUrl + "inventoryLevel/item/" + itemId);
+    return this.http.get<InventoryLevel[]>(this.baseUrl + "mobileInventoryLevel/item/" + itemId);
   }
 
   getInventoryLevelByVariation(itemId: number) {
-    return this.http.get<InventoryVariationLevel[]>(this.baseUrl + "inventoryLevel/variation/" + itemId);
+    return this.http.get<InventoryVariationLevel[]>(this.baseUrl + "mobileInventoryLevel/variation/" + itemId);
   }
   
 }

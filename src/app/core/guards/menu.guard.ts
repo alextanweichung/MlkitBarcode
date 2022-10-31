@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { MenuItem } from 'src/app/services/auth/menu-item';
+import { MenuItemRoot } from 'src/app/services/auth/menu-item';
 import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Injectable({
@@ -47,7 +47,7 @@ export class MenuGuard implements CanActivate {
     })
   }
 
-  checkRouterLinkAccess(menuItem: MenuItem[], stateUrl: string): boolean {
+  checkRouterLinkAccess(menuItem: MenuItemRoot[], stateUrl: string): boolean {
     let grantedAccess: boolean = false;
     //Check whether menuModel is available. If available, loop till the 3rd level to check whether granted routerLink is available
     if (menuItem) {

@@ -134,6 +134,10 @@ export class CustomerPage implements OnInit {
         description: r.description
       })
     })
+    
+    
+    console.log("🚀 ~ file: customer.page.ts ~ line 139 ~ CustomerPage ~ mapSearchDropdownList ~ this.customerSearchDropdownList", this.customerSearchDropdownList)
+    console.log("🚀 ~ file: customer.page.ts ~ line 138 ~ CustomerPage ~ mapSearchDropdownList ~ this.customerMasterList", this.customerMasterList)
   }
 
   async showLocationSearchDropdown() {

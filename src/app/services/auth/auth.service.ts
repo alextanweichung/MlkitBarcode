@@ -9,7 +9,7 @@ import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user
 import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { MenuItem } from './menu-item';
+import { MenuItem, MenuItemRoot } from './menu-item';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +32,7 @@ export class AuthService {
   currentUserToken$ = this.currentUserTokenSource.asObservable();
 
   // Create menuItemSubject to observe from value of HTTP Get for MenuHierarchy
-  private menuItemSubject = new ReplaySubject<MenuItem[]>(1);
+  private menuItemSubject = new ReplaySubject<MenuItemRoot[]>(1);
   menuModel$ = this.menuItemSubject.asObservable();
 
   // Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
@@ -119,6 +119,7 @@ export class AuthService {
   buildMenuModel() {
     this.getMenuHierachy().subscribe(response => {
       this.model = response;
+      console.log("🚀 ~ file: auth.service.ts ~ line 122 ~ AuthService ~ this.getMenuHierachy ~ this.model", this.model)
       // Manually add dashboard item and move it to the beginning of array
       // this.dashboardItem = { label: 'Dashboard', icon: 'pi pi-home', routerLink: ['/'], tabindex: "1" };
       // this.model.push(this.dashboardItem);
