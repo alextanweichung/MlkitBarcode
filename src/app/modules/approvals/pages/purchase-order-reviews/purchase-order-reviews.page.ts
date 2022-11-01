@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
-import { CommonService } from 'src/app/modules/transactions/services/common.service';
+import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
 import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
 

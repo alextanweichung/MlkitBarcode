@@ -30,7 +30,6 @@ export class PickItemPage implements OnInit {
 
   ngOnInit() {
     this.pickingSalesOrder = this.pickingService.selectedSalesOrder;
-    console.log("🚀 ~ file: item.page.ts ~ line 32 ~ ItemPage ~ ngOnInit ~ this.pickingSalesOrder", this.pickingSalesOrder)
     if (!this.pickingSalesOrder || this.pickingSalesOrder === undefined) {
       this.toastService.presentToast('Something went wrong', '', 'bottom', 'danger', 1500);
       this.navController.navigateBack('/transactions/picking/picking-sales-order');
@@ -63,7 +62,6 @@ export class PickItemPage implements OnInit {
       // document.body.style.background = "transparent";
       const result = await BarcodeScanner.startScan();
       if (result.hasContent) {
-        console.log("🚀 ~ file: pick-item.page.ts ~ line 68 ~ PickItemPage ~ startScanner ~ result.content", result.content)        
         // this.itemBarcode = result.content;
         // this.scanActive = false;
         // this.addItem(this.itemBarcode);

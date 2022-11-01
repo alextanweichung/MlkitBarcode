@@ -81,7 +81,6 @@ export class ItemPage implements OnInit, ViewDidEnter {
       // get item
       this.salesOrderService.getItemList(this.itemSearchText, this.salesOrderHeader.customerId, this.salesOrderHeader.locationId).subscribe(async response => {
         this.availableItem = response;
-        console.log("🚀 ~ file: item.page.ts ~ line 84 ~ ItemPage ~ this.salesOrderService.getItemList ~ this.availableItem", this.availableItem)
         this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
         await this.hideLoading();
       }, async error => {

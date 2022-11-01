@@ -37,4 +37,8 @@ export class CommonService {
     return today;
   }
 
+  syncAllItemByLocationCode() {
+    return this.http.get(this.baseUrl + "PosDownload/itemMaster/KLCC/2022-10-31");
+  }
+
 }

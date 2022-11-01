@@ -119,7 +119,6 @@ export class AuthService {
   buildMenuModel() {
     this.getMenuHierachy().subscribe(response => {
       this.model = response;
-      console.log("🚀 ~ file: auth.service.ts ~ line 122 ~ AuthService ~ this.getMenuHierachy ~ this.model", this.model)
       // Manually add dashboard item and move it to the beginning of array
       // this.dashboardItem = { label: 'Dashboard', icon: 'pi pi-home', routerLink: ['/'], tabindex: "1" };
       // this.model.push(this.dashboardItem);

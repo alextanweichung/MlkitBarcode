@@ -20,7 +20,6 @@ export class MenuGuard implements CanActivate {
     return new Observable<boolean>(obs => {
       if (state.url != '/') {
         let stateUrlWithoutParam = state.url.split('?')[0];
-        console.log("🚀 ~ file: menu.guard.ts ~ line 22 ~ MenuGuard ~ canActivate ~ stateUrlWithoutParam", stateUrlWithoutParam)
         //Check routerLinkAccess based on target Url
         this.authService.menuModel$.subscribe(obj => {
           //If user is admin, allow to access report designer
@@ -52,7 +51,6 @@ export class MenuGuard implements CanActivate {
     //Check whether menuModel is available. If available, loop till the 3rd level to check whether granted routerLink is available
     if (menuItem) {
       menuItem.forEach(moduleMenu => {
-        console.log("🚀 ~ file: menu.guard.ts ~ line 55 ~ MenuGuard ~ checkRouterLinkAccess ~ moduleMenu", moduleMenu)        
         // if (moduleMenu.items) {
         //   moduleMenu.items.forEach(subModuleItem => {
         //     if (subModuleItem.items) {

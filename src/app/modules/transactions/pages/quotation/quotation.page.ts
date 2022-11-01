@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { QuotationList } from '../../models/quotation';
-import { CommonService } from '../../services/common.service';
+import { CommonService } from '../../../../shared/services/common.service';
 import { QuotationService } from '../../services/quotation.service';
 import { FilterPage } from '../filter/filter.page';
 

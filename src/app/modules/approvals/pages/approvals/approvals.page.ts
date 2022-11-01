@@ -32,7 +32,6 @@ export class ApprovalsPage implements OnInit {
   ngOnInit() {
     this.authService.menuModel$.subscribe(obj => {
       let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
-      console.log("🚀 ~ file: approvals.page.ts ~ line 28 ~ ApprovalsPage ~ ngOnInit ~ pageItems", pageItems)
       if (pageItems) {
         this.showQuotationReview = pageItems.findIndex(r => r.title === quotationReviewCode) > -1;
         this.showQuotationApproval = pageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
