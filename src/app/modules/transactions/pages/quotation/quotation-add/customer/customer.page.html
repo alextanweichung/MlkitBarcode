@@ -6,23 +6,18 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content fullscreen>
-
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="font-x-large">Customer</ion-title>
+      <ion-label class="label-title">Customer</ion-label>
     </ion-toolbar>
   </ion-header>
-
   <div class="ion-padding"> 
     <ion-list class="list-custom" lines="none">
       <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
   </div>
-
 </ion-content>
-
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
   <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()">
     Next

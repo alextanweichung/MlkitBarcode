@@ -32,7 +32,6 @@ export class TransactionProcessingService {
   getProcessingDocumentByDateRange(dateStart: string, dateEnd: string) {
     return this.http.get<TransactionProcessingDoc[]>(this.baseUrl + this.apiObject + '/processing/' + dateStart + '/' + dateEnd).pipe(
       map((response: any) => {
-        console.log("🚀 ~ file: transaction-processing.service.ts ~ line 35 ~ TransactionProcessingService ~ getProcessingDocumentByDateRange ~ response", response)
         return response.map((item: any) => item)
       })
     );

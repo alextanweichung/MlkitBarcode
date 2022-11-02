@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
-import { CommonService } from '../../services/common.service';
+import { CommonService } from '../../../../shared/services/common.service';
 import { QuotationService } from '../../services/quotation.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 

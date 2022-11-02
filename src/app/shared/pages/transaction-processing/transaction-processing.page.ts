@@ -65,7 +65,6 @@ export class TransactionProcessingPage implements OnInit {
   }
 
   async openDetail(docId: number) {
-    console.log("🚀 ~ file: transaction-processing.page.ts ~ line 68 ~ TransactionProcessingPage ~ openDetail ~ docId", docId)
     let navigationExtras: NavigationExtras;
     if (this.parentType.toLowerCase() === 'quotation') {
       navigationExtras = {

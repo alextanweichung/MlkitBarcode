@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { PickingList } from '../../models/picking';
-import { CommonService } from '../../services/common.service';
+import { CommonService } from '../../../../shared/services/common.service';
 import { PickingService } from '../../services/picking.service';
 import { FilterPage } from '../filter/filter.page';
 

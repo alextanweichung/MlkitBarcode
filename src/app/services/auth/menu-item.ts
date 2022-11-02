@@ -6,3 +6,33 @@ export interface MenuItem {
    tabindex: string;
    fragment: string;
 }
+
+export interface MenuItemRoot {
+   moduleCode: string
+   label: string
+   icon: string
+   routerLink: any
+   tabindex: string
+   fragment: string
+   items: MenuInnerItem[]
+ }
+ 
+ export interface MenuInnerItem {
+   moduleCode: string
+   subModuleCode: string
+   label: string
+   icon?: string
+   faicon: any
+   items: MenuItemItem2[]
+ }
+ 
+ export interface MenuItemItem2 {
+   subModuleCode: string
+   label: string
+   icon?: string
+   faicon: any
+   routerLink?: string
+   title: string
+   id: number
+ }
+ 

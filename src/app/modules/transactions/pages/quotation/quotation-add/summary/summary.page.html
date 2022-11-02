@@ -3,20 +3,16 @@
     <ion-title>Summary</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content fullscreen>
-
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="font-x-large">Summary</ion-title>
+      <ion-label class="label-title">Summary</ion-label>
     </ion-toolbar>
   </ion-header>
-
   <div class="ion-padding">
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
-
     <ion-list class="list-custom" lines="full">
       <ion-item>
         <ion-label>
@@ -44,19 +40,15 @@
       </ion-item>
     </ion-list>
   </div>
-
 </ion-content>
-
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0">
-  <!-- <ion-item class="ion-no-padding" lines="none"> -->
-    <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col>
-          <ion-button class="ion-margin" expand="block" size="small" (click)="done()">
-            Done
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  <!-- </ion-item> -->
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col>
+        <ion-button class="ion-margin" expand="block" size="small" (click)="done()">
+          Done
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-footer>

@@ -38,7 +38,7 @@ export class CustomerPage implements OnInit {
     this.loadMasterList();
     this.loadModuleControl();
   }
-  
+
   locationMasterList: MasterListDetails[] = [];
   customerMasterList: MasterListDetails[] = [];
   currencyMasterList: MasterListDetails[] = [];
@@ -58,11 +58,11 @@ export class CustomerPage implements OnInit {
     }, error => {
       console.log(error);
     })
-  }  
+  }
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;      
+      this.moduleControl = obj;
       let transactionShowDetailHeader = this.moduleControl.find(r => r.ctrlName === "TransactionShowDetailHeader")?.ctrlValue;
       if (transactionShowDetailHeader) {
         this.transactionShowDetailHeader = transactionShowDetailHeader === '1' ? true : false;
@@ -112,13 +112,13 @@ export class CustomerPage implements OnInit {
     if (defaultTermPeriod) {
       this.objectForm.patchValue({ termPeriodId: defaultTermPeriod });
     }
-    
+
     let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     this.objectForm.patchValue({ salesAgentId: salesAgentId });
   }
 
   locationSearchDropdownList: SearchDropdownList[] = [];
-  customerSearchDropdownList: SearchDropdownList[] = [];  
+  customerSearchDropdownList: SearchDropdownList[] = [];
   mapSearchDropdownList() {
     this.locationMasterList.forEach(r => {
       this.locationSearchDropdownList.push({
@@ -184,7 +184,7 @@ export class CustomerPage implements OnInit {
     this.objectForm.patchValue({ exchangeRate: parseFloat(lookupValue.attribute1) });
   }
 
-  async cancelInsert() {    
+  async cancelInsert() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Are you sure to cancel?',
       cssClass: 'custom-action-sheet',
@@ -209,8 +209,7 @@ export class CustomerPage implements OnInit {
   }
 
   nextStep() {
-    if (this.objectForm.valid) {      
-      console.log("🚀 ~ file: customer.page.ts ~ line 193 ~ CustomerPage ~ nextStep ~ this.objectForm.value", this.objectForm.value)
+    if (this.objectForm.valid) {
       this.salesOrderService.setChoosenCustomer(this.objectForm.value);
       this.salesOrderService.removeItems();
       this.navController.navigateForward('/transactions/sales-order/sales-order-item');

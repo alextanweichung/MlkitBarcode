@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
-import { environment } from 'src/environments/environment';
 import { SQLiteService } from './sqlite.service';
 
 interface SQLiteDBConnectionCallback<T> { (myArguments: SQLiteDBConnection): T }
@@ -18,8 +17,10 @@ export class DatabaseService {
    * @returns any type you want to receive from the callback function.
    */
   async executeQuery<T>(callback: SQLiteDBConnectionCallback<T>, databaseName: string): Promise<T> {
+    console.log("🚀 ~ file: database.service.ts ~ line 21 ~ DatabaseService ~ databaseName", databaseName)
     try {
       let isConnection = await this.sqlite.isConnection(databaseName);
+      console.log("🚀 ~ file: database.service.ts ~ line 23 ~ DatabaseService ~ isConnection", JSON.stringify(isConnection));
       if (isConnection.result) {
         let db = await this.sqlite.retrieveConnection(databaseName);
         return await callback(db);

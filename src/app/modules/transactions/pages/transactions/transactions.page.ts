@@ -1,12 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { PickingList } from '../../models/picking';
 import { QuotationList } from '../../models/quotation';
 import { SalesOrderList } from '../../models/sales-order';
 import { PickingService } from '../../services/picking.service';
 import { QuotationService } from '../../services/quotation.service';
 import { SalesOrderService } from '../../services/sales-order.service';
+
+const pageCode: string = 'MATR';
+const quotationCode: string = 'MATRQU';
+const salesOrderCode: string = 'MATRSO';
 
 @Component({
   selector: 'app-transactions',
@@ -15,9 +20,11 @@ import { SalesOrderService } from '../../services/sales-order.service';
 })
 export class TransactionsPage implements OnInit {
 
+  showQuotation: boolean = false;
   quotation_loaded: boolean = false;
   quotations: QuotationList[] = [];
 
+  showSalesOrder: boolean = false;
   sales_order_loaded: boolean = false;
   salesOrders: SalesOrderList[] = [];
 
@@ -25,6 +32,7 @@ export class TransactionsPage implements OnInit {
   pickings: PickingList[] = [];
 
   constructor(
+    private authService: AuthService,
     private navController: NavController,
     private quotationService: QuotationService,
     private salesOrderService: SalesOrderService,
@@ -32,6 +40,13 @@ export class TransactionsPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.authService.menuModel$.subscribe(obj => {
+      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
+      if (pageItems) {
+        this.showQuotation = pageItems.findIndex(r => r.title === quotationCode) > -1;
+        this.showSalesOrder = pageItems.findIndex(r => r.title === salesOrderCode) > -1;
+      }
+    })
     this.loadAllRecentList();
   }
 

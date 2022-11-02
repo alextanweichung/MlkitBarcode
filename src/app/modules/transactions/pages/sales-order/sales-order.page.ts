@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList } from '../../models/sales-order';
-import { CommonService } from '../../services/common.service';
+import { CommonService } from '../../../../shared/services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
 

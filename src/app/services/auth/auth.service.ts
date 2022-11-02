@@ -9,7 +9,7 @@ import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user
 import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { MenuItem } from './menu-item';
+import { MenuItem, MenuItemRoot } from './menu-item';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +32,7 @@ export class AuthService {
   currentUserToken$ = this.currentUserTokenSource.asObservable();
 
   // Create menuItemSubject to observe from value of HTTP Get for MenuHierarchy
-  private menuItemSubject = new ReplaySubject<MenuItem[]>(1);
+  private menuItemSubject = new ReplaySubject<MenuItemRoot[]>(1);
   menuModel$ = this.menuItemSubject.asObservable();
 
   // Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
@@ -183,42 +183,16 @@ export class AuthService {
     date.setUTCSeconds(decoded.exp);
     return date;
   }
-
-  async logout(){
-    localStorage.removeItem('loginUser');
-    localStorage.removeItem('rpParameters');
-    this.currentUserSource.next(null);
-    this.currentUserTokenSource.next(null);
-    // this.menuItemSubject.next(null);
-    this.navController.navigateRoot('/signin');
-    this.isLoggedIn = false;
-    this.isAdmin = false;
-  }
-
-
-
-
-  // Sign up
-  async signUp(email: string, password: string) {
-
-    // Sample only - remove this after real authentication / session
-    let sample_user = {
-      email: email,
-      password: password
-    }
-
-    return sample_user;
-  }
-
+  
   // Sign out
   async signOut() {
 
     // ...
     localStorage.removeItem('loginUser');
-    localStorage.removeItem('rpParameters');
+    // localStorage.removeItem('rpParameters');
     this.currentUserSource.next(null);
     this.currentUserTokenSource.next(null);
-    // this.menuItemSubject.next(null);
+    this.menuItemSubject.next(null);
     this.isLoggedIn = false;
     this.isAdmin = false;
     // ...

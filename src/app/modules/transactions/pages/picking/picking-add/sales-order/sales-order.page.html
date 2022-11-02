@@ -6,47 +6,26 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content fullscreen>
-
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="font-x-large">Sales Order</ion-title>
+      <ion-label class="label-title">Sales Order</ion-label>
     </ion-toolbar>
-  </ion-header>
-
-  
+  </ion-header>  
   <div class="ion-padding"> 
     <ion-list class="list-custom" lines="full">
-
-      <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>      
-      <!-- <app-search-dropdown title="Location" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="onLocationSelectd($event)"></app-search-dropdown> -->
-
+      <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
-
-    <!-- <ion-button class="my-1" expand="block" size="small" (click)="loadSalesOrders()">Search</ion-button> -->
-    
     <ion-list-header class="ion-list-header-small">
       <ion-label>Available Sales Orders</ion-label>
-    </ion-list-header>
-    
+    </ion-list-header>    
     <ng-container *ngIf="pickingSalesOrders?.length === 0">
       <p>
-        <!-- <ion-text color="warning"><ion-icon name="warning"></ion-icon></ion-text> -->
         <ion-text color="tertiary">
           <h3>Nothing found!</h3>
         </ion-text>
       </p>
     </ng-container>
-
-    <!-- <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-
-      <ion-item button detail="false" class="pr-2 no-ripple" *ngFor="let item of pickingSalesOrders">
-
-      </ion-item>
-
-    </ion-list> -->
-
     <ion-card class="mx-0 my-1" *ngFor="let item of pickingSalesOrders" (click)="salesOrderSelected(item)">
       <ion-card-header class="px-2 pt-2 pb-0">
         <ion-card-subtitle>{{item.header.trxDate|date:'dd/MM/yyyy'}}</ion-card-subtitle>
@@ -56,13 +35,5 @@
 
       </ion-card-content>
     </ion-card>
-
   </div>
-
 </ion-content>
-
-<!-- <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-  <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()">
-    Next
-  </ion-button>
-</ion-footer> -->

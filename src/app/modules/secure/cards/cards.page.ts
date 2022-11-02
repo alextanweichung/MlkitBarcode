@@ -5,6 +5,9 @@ import { AlertController, IonRouterOutlet, LoadingController, ModalController } 
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AddPage } from '../../../modules/secure/cards/add/add.page';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { ConfigService } from 'src/app/services/config/config.service';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -27,12 +30,14 @@ export class CardsPage implements AfterContentChecked {
   card_details_visible: boolean = false;
 
   constructor(
+    private configService: ConfigService,
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
     private loadingController: LoadingController,
     private modalController: ModalController,
-    private routerOutlet: IonRouterOutlet
+    private routerOutlet: IonRouterOutlet,
+    private commonService: CommonService
   ) { }
 
   ngAfterContentChecked(): void {
@@ -52,6 +57,17 @@ export class CardsPage implements AfterContentChecked {
       spinner: 'crescent'
     });
     await loading.present();
+
+    this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+      console.log("🚀 ~ file: cards.page.ts ~ line 59 ~ CardsPage ~ this.commonService.syncAllItemByLocationCode ~ response", response)
+      console.log("🚀 ~ file: cards.page.ts ~ line 64 ~ CardsPage ~ this.commonService.syncAllItemByLocationCode ~ response['itemMaster']", response['itemMaster'])
+      let itemMaster: PDItemMaster[] = response['itemMaster'];
+      // console.log("🚀 ~ file: cards.page.ts ~ line 64 ~ CardsPage ~ this.commonService.syncAllItemByLocationCode ~ response['itemBarcode']", response['itemBarcode'])
+      // let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+      await this.configService.insertItemMaster(itemMaster);
+    }, error => {
+      console.log(error);
+    })
 
     // Fake timeout
     setTimeout(() => {

@@ -174,6 +174,7 @@ input {
 .font-half-size{
    font-size: 0.75rem;
 }
+
 // .font-bold {
 //    font-weight: bold;
 // }
@@ -240,4 +241,10 @@ ion-item {
 
 .font-x-large {
    font-size: x-large;
+}
+
+.label-title {
+   font-size: x-large;
+   padding-left: 1rem!important;
+   font-weight: 700;
 }

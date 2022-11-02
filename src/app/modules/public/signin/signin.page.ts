@@ -39,8 +39,8 @@ export class SigninPage implements OnInit {
     });
 
     // DEBUG: Prefill inputs
-    // this.signin_form.get('userEmail').setValue('aychia@idcp.my');
-    // this.signin_form.get('password').setValue('String1234');
+    this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+    this.signin_form.get('password').setValue('String1234');
   }
 
   // Sign in

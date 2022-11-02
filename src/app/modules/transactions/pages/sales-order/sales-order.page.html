@@ -14,22 +14,20 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="font-x-large">Sales Order</ion-title>
+      <ion-label class="label-title">Sales Order</ion-label>
     </ion-toolbar>
-    <!-- <ion-toolbar>
-      <ion-searchbar showCancelButton="focus" placeholder="Sales Order ..."></ion-searchbar>
-    </ion-toolbar> -->
   </ion-header>
   <div class="ion-padding">
-    <ng-container *ngIf="!content_loaded">      
-      <app-listing-skeleton [size]="5"></app-listing-skeleton>
+    <ng-container *ngIf="!content_loaded">
+      <p>
+        <ion-text color="tertiary">
+          <h3>Nothing found!</h3>
+        </ion-text>
+      </p>
     </ng-container>
     <ng-container *ngIf="content_loaded">      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button detail="false" (click)="goToDetail(object.salesOrderId)" *ngFor="let object of objects" >
-          <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
-            <ion-icon name="cafe"></ion-icon>
-          </ion-avatar> -->
           <ion-label>
             <h3>{{object.salesOrderNum}}</h3>
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
