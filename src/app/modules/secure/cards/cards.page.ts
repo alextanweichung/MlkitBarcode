@@ -59,12 +59,10 @@ export class CardsPage implements AfterContentChecked {
     await loading.present();
 
     this.commonService.syncAllItemByLocationCode().subscribe(async response => {
-      console.log("🚀 ~ file: cards.page.ts ~ line 59 ~ CardsPage ~ this.commonService.syncAllItemByLocationCode ~ response", response)
-      console.log("🚀 ~ file: cards.page.ts ~ line 64 ~ CardsPage ~ this.commonService.syncAllItemByLocationCode ~ response['itemMaster']", response['itemMaster'])
       let itemMaster: PDItemMaster[] = response['itemMaster'];
-      // console.log("🚀 ~ file: cards.page.ts ~ line 64 ~ CardsPage ~ this.commonService.syncAllItemByLocationCode ~ response['itemBarcode']", response['itemBarcode'])
-      // let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+      let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
       await this.configService.insertItemMaster(itemMaster);
+      await this.configService.insertItemBarcode(itemBarcode);
     }, error => {
       console.log(error);
     })

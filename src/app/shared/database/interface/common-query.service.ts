@@ -1,7 +1,9 @@
 import { formatDate } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { DBSQLiteValues, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { DatabaseService } from 'src/app/services/sqlite/database.service';
+import { SQLiteService } from 'src/app/services/sqlite/sqlite.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,9 @@ export class CommonQueryService<T> {
 
   constructor(
     @Inject(LOCALE_ID) private locale: string,
-    private _databaseService: DatabaseService
+    private _databaseService: DatabaseService,
+    private http: HttpClient,
+    private sqlite: SQLiteService
   ) { }
 
   getAllColumns(object: Object) {
@@ -117,12 +121,64 @@ export class CommonQueryService<T> {
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string =
         `
-        INSERT INTO ${table} (${sqlCols})
-        VALUES (${sqlParams})
-      `;
+          INSERT INTO ${table} (${sqlCols})
+          VALUES (${sqlParams})
+        `;
       let ret: any = await db.run(sqlcmd);
       return ret;
     }, database)
+  }
+
+  async bulkInsert(objects, table, database) {
+
+    const statements = [];
+
+    if (objects.length > 0) {
+
+      objects.forEach(i => {
+        let cols = this.getAllColsWithValue(i);
+        let sqlCols = '';
+        let sqltest = '';
+        let sqlParams = '';
+
+        for (const key of cols.keys()) {
+          switch (this.getColType(cols.get(key))) {
+            case "number":
+              sqlCols += ` ${key},`;
+              sqltest += '?,';
+              sqlParams += ` ${cols.get(key)},`;
+              break;
+            case "boolean":
+              sqlCols += ` ${key},`;
+              sqltest += '?,';
+              sqlParams += ` ${cols.get(key)},`;
+              break;
+            case "string":
+            case "Date":
+              sqlCols += ` ${key},`;
+              sqltest += '?,';
+              sqlParams += ` ${cols.get(key)},`;
+              break;
+          }
+        }
+
+        sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
+        sqltest = sqltest.substring(0, sqltest.length - 1).trimStart();
+        sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
+
+        statements.push({
+          statement: `INSERT INTO ${table} ` + `(` + sqlCols + `) VALUES (` + sqltest + `);`,
+          values: [
+            sqlParams.split(',')
+          ]
+        })
+      });
+
+      await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
+        let ret: any = await db.executeSet(statements, true);
+      }, database)
+
+    }
   }
 
   update(object, table, database) {
@@ -153,18 +209,21 @@ export class CommonQueryService<T> {
 
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string =
-        `
-        UPDATE ${table}
+        `UPDATE ${table}
         SET ${sql}
-        WHERE ${primaryKey}
-      `;
+        WHERE ${primaryKey}`;
       // let ret: any = await db.run(sqlcmd);
       // return ret;
     }, database)
   }
 
-  delete() {
-
+  deleteAll(table, database) {
+    return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
+      let sqlcmd: string =
+        `DELETE FROM ${table} `;
+      let ret: any = await db.run(sqlcmd);
+      return ret;
+    }, database)
   }
 
 }

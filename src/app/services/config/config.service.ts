@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { dbConfig } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
-import { PDItemMaster } from 'src/app/shared/models/pos-download';
+import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 
 export const getSysParams: string = `
@@ -57,9 +57,13 @@ export class ConfigService {
   }
 
   async insertItemMaster(objects: PDItemMaster[]) {
-    objects.forEach(async r => {
-      await this.commonQueryService.insert(r, "Item_Master", dbConfig.inbounddb);
-    })
+    await this.commonQueryService.deleteAll("Item_Master", dbConfig.inbounddb);
+    await this.commonQueryService.bulkInsert(objects, "Item_Master", dbConfig.inbounddb);
+  }
+
+  async insertItemBarcode(objects: PDItemBarcode[]) {
+    await this.commonQueryService.deleteAll("Item_Barcode", dbConfig.inbounddb);
+    await this.commonQueryService.bulkInsert(objects, "Item_Barcode", dbConfig.inbounddb);
   }
 
 }
