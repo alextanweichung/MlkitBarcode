@@ -6,6 +6,9 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { LoginRequest } from 'src/app/services/auth/login-user';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 
 @Component({
   selector: 'app-signin',
@@ -22,7 +25,8 @@ export class SigninPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    // private loadingController: LoadingController,
+    private commonService: CommonService,
+    private configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
     private navController: NavController
@@ -68,7 +72,16 @@ export class SigninPage implements OnInit {
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {        
         await this.navController.navigateRoot('/approvals');
-        // loading.dismiss();
+
+        let itemMasterCount = await (await this.configService.loadItemMaster()).length;
+        if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0) {
+          this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+            let itemMaster: PDItemMaster[] = response['itemMaster'];
+            let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+            await this.configService.insertItemMaster(itemMaster);
+            await this.configService.insertItemBarcode(itemBarcode);
+          })
+        }
       });
 
       // // Fake timeout

@@ -17,7 +17,7 @@ export class CommonQueryService<T> {
     private sqlite: SQLiteService
   ) { }
 
-  getAllColumns(object: Object) {
+  private getAllColumns(object: Object) {
     let ret: string[] = [];
     for (var prop in object) {
       ret.push(prop as string);
@@ -25,7 +25,7 @@ export class CommonQueryService<T> {
     return ret;
   }
 
-  getAllColsWithValue(object: Object) {
+  private getAllColsWithValue(object: Object) {
     let ret: Map<string, Object> = new Map<string, Object>();
     for (var prop in object) {
       if (this.getColType(object[prop]) === "Date") {
@@ -39,7 +39,7 @@ export class CommonQueryService<T> {
     return ret;
   }
 
-  getColType(col: Object) {
+  private getColType(col: Object) {
     if (typeof col === 'object') {
       if (Object.prototype.toString.call(col) === "[object Date]") {
         return "Date";
@@ -51,12 +51,12 @@ export class CommonQueryService<T> {
     }
   }
 
-  convertDateFormat(input: Date): Date {
+  private convertDateFormat(input: Date): Date {
     let output = new Date(input);
     return output;
   }
 
-  convertDateString(input: Date): string {
+  private convertDateString(input: Date): string {
     return formatDate(input, 'yyyy-MM-dd', this.locale);
   }
 
@@ -78,11 +78,7 @@ export class CommonQueryService<T> {
 
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string =
-        `
-        SELECT ${sql}
-        FROM ${table}
-        WHERE ${primaryKey}
-      `;
+        `SELECT ${sql} FROM ${table} WHERE ${primaryKey}`;
       let ret: DBSQLiteValues = await db.query(sqlcmd);
       if (ret.values.length > 0) {
         return ret.values[0] as Object
@@ -92,7 +88,6 @@ export class CommonQueryService<T> {
   }
 
   insert(object, table, database) {
-
     let cols = this.getAllColsWithValue(object);
     let sqlCols = '';
     let sqlParams = '';
@@ -120,21 +115,23 @@ export class CommonQueryService<T> {
 
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string =
-        `
-          INSERT INTO ${table} (${sqlCols})
-          VALUES (${sqlParams})
-        `;
+        `INSERT INTO ${table} (${sqlCols}) VALUES (${sqlParams})`;
       let ret: any = await db.run(sqlcmd);
       return ret;
     }, database)
   }
 
   async bulkInsert(objects, table, database) {
-
     const statements = [];
 
-    if (objects.length > 0) {
+    statements.push({
+      statement: `DROP TABLE IF EXISTS ${table}`,
+      values: []
+    })
 
+
+
+    if (objects.length > 0) {
       objects.forEach(i => {
         let cols = this.getAllColsWithValue(i);
         let sqlCols = '';
@@ -177,9 +174,22 @@ export class CommonQueryService<T> {
       await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let ret: any = await db.executeSet(statements, true);
       }, database)
-
     }
   }
+
+  selectAll(table, database) {
+    return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
+      let sqlcmd: string =
+        `SELECT * FROM ${table}`;
+      let ret: DBSQLiteValues = await db.query(sqlcmd);
+      if (ret.values.length > 0) {
+        return ret.values as Object
+      }
+      return null;
+    }, database)
+  }
+
+  /* #region  update */
 
   update(object, table, database) {
 
@@ -216,6 +226,8 @@ export class CommonQueryService<T> {
       // return ret;
     }, database)
   }
+
+  /* #endregion */
 
   deleteAll(table, database) {
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {

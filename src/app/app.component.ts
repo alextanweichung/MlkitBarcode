@@ -4,6 +4,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { Network } from '@capacitor/network';
 
 @Component({
   selector: 'app-root',

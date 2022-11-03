@@ -6,6 +6,7 @@ import { PickingList } from '../../models/picking';
 import { CommonService } from '../../../../shared/services/common.service';
 import { PickingService } from '../../services/picking.service';
 import { FilterPage } from '../filter/filter.page';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-picking',
@@ -22,6 +23,7 @@ export class PickingPage implements OnInit {
 
   constructor(
     private commonService: CommonService,
+    private configService: ConfigService,
     private pickingService: PickingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,

@@ -67,29 +67,31 @@
       <hr class="hr-small">
     </ng-container>
 
-    <ion-list-header *ngIf="false">
-      <ion-label color="dark">Picking</ion-label>
-      <ion-button *ngIf="picking_loaded" routerLink="picking">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-    </ion-list-header>
-    <ng-container *ngIf="!picking_loaded && false">
-      <p>
-        <ion-text color="tertiary">
-          <h3>Nothing found!</h3>
-        </ion-text>
-      </p>
+    <ng-container *ngIf="showPicking">
+      <ion-list-header>
+        <ion-label color="dark">Picking</ion-label>
+        <ion-button routerLink="picking">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+      </ion-list-header>
+      <ng-container *ngIf="!picking_loaded">
+        <p>
+          <ion-text color="tertiary">
+            <h3>Nothing found!</h3>
+          </ion-text>
+        </p>
+      </ng-container>
+      <ng-container *ngIf="picking_loaded">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" (click)="goToPickingDetail(object.pickingId)" *ngFor="let object of pickings">
+            <ion-label>
+              <h3>{{object.pickingNum}}</h3>
+              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+            </ion-label>
+            <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
+          </ion-item>
+        </ion-list>
+      </ng-container>
+      <hr class="hr-small">
     </ng-container>
-    <ng-container *ngIf="picking_loaded && false">
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button detail="false" (click)="goToPickingDetail(object.pickingId)" *ngFor="let object of pickings">
-          <ion-label>
-            <h3>{{object.pickingNum}}</h3>
-            <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
-          </ion-label>
-          <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
-        </ion-item>
-      </ion-list>
-    </ng-container>
-    <hr class="hr-small">
 
   </div>
 </ion-content>  

@@ -127,7 +127,11 @@ const routes: Routes = [
     path: 'others/check-balance',
     loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
   },
-
+  // others-otp-configuration
+  {
+    path: 'others/otp-configuration',
+    loadChildren: () => import('./modules/others/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
+  },
 
 
   // shared
@@ -163,6 +167,8 @@ const routes: Routes = [
     path: 'item-add-list',
     loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
   },
+
+
 
 ];
 @NgModule({

@@ -12,7 +12,13 @@
     </ion-toolbar>
   </ion-header>
   <div class="ion-padding">
-    
+
+    <!-- #region  -->
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>OTP Configuration</ion-label>
+      </ion-list-header>
+    <!-- #endregion -->
+
     <ng-container *ngIf="showInventoryLevel">
       <ion-list-header class="ion-list-header-small">
         <ion-label>Inventory Level</ion-label>
@@ -26,11 +32,9 @@
       </ion-list>
     </ng-container>
 
-    <hr class="hr-medium">
 
     <hr class="hr-medium">
 
   </div>
 
 </ion-content>
-  

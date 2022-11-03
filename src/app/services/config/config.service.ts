@@ -17,12 +17,13 @@ WHERE id = 1
 export class ConfigService {
 
   sys_parameter: Sys_Parameter;
+  item_Masters: PDItemMaster[] = [];
+  item_Barcodes: PDItemBarcode[] = [];
 
   constructor(
     private _databaseService: DatabaseService,
     private commonQueryService: CommonQueryService<Sys_Parameter>
-  ) {
-  }
+  ) { }
 
   async load() {
     this.sys_parameter = {
@@ -61,9 +62,21 @@ export class ConfigService {
     await this.commonQueryService.bulkInsert(objects, "Item_Master", dbConfig.inbounddb);
   }
 
+  async loadItemMaster(): Promise<PDItemMaster[]> {
+    let ret = await this.commonQueryService.selectAll("Item_Master", dbConfig.inbounddb) as PDItemMaster[];
+    this.item_Masters = ret;
+    return this.item_Masters;
+  }
+
   async insertItemBarcode(objects: PDItemBarcode[]) {
     await this.commonQueryService.deleteAll("Item_Barcode", dbConfig.inbounddb);
     await this.commonQueryService.bulkInsert(objects, "Item_Barcode", dbConfig.inbounddb);
+  }
+
+  async loadItemBarcode(): Promise<PDItemBarcode[]> {
+    let ret = await this.commonQueryService.selectAll("Item_Barcode", dbConfig.inbounddb) as PDItemBarcode[];
+    this.item_Barcodes = ret;
+    return this.item_Barcodes;
   }
 
 }
