@@ -3,9 +3,8 @@ import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { PickingList, PickingRoot } from '../models/picking';
-import { PickingSalesOrderRoot } from '../models/picking-sales-order';
+import { GoodsPicking, GoodsPickingDto, PickingList, PickingRoot, PickingSummary } from '../models/picking';
+import { PickingSalesOrderDetail, PickingSalesOrderRoot } from '../models/picking-sales-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -26,27 +25,46 @@ export class PickingService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
-  selectedCustomer: MasterListDetails;
-  setChoosenCustomer(customer: MasterListDetails) {
-    this.selectedCustomer = customer;
+  pickingDtoHeader: GoodsPicking;
+  setHeader(pickingDtoHeader: GoodsPicking) {
+    this.pickingDtoHeader = pickingDtoHeader;
   }
 
-  selectedSalesOrder: PickingSalesOrderRoot
-  setChoosenSalesOrder(pso: PickingSalesOrderRoot) {
-    this.selectedSalesOrder = pso;
+  selectedSalesOrders: PickingSalesOrderRoot[] = [];
+  setChoosenSalesOrders(psos: PickingSalesOrderRoot[]) {
+    this.selectedSalesOrders = psos;
+  }
+
+  selectedSalesOrderLines: PickingSalesOrderDetail[] = [];
+  setChooseSalesOrderLines(soLines: PickingSalesOrderDetail[]) {
+    this.selectedSalesOrderLines = soLines;
+  }
+
+  pickingSummary: PickingSummary;
+  setPickingSummary(pickingSummary: PickingSummary) {
+    this.pickingSummary = pickingSummary;
   }
 
   removeCustomer() {
-    this.selectedCustomer = null;
+    this.pickingDtoHeader = null;
   }
 
-  removeSalesOrder() {
-    this.selectedSalesOrder = null;
+  removeSalesOrders() {
+    this.selectedSalesOrders = [];
+  }
+
+  removeSalesOrderLines() {
+    this.selectedSalesOrderLines = [];
+  }
+
+  removePickingSummary() {
+    this.pickingSummary = null;
   }
 
   resetVariables() {
     this.removeCustomer();
-    this.removeSalesOrder();
+    this.removeSalesOrders();
+    this.removeSalesOrderLines();
   }
 
   getMasterList() {
@@ -57,8 +75,12 @@ export class PickingService {
     return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/staticLov");
   }
 
-  getSalesOrders(customerId: number) {
+  getSoByCustomer(customerId: number) {
     return this.http.get<PickingSalesOrderRoot[]>(this.baseUrl + "MobilePicking/fromSO/customer/" + customerId);
+  }
+
+  getSoByCustomerLocation(customerId: number, toLocationId: number){
+    return this.http.get<PickingSalesOrderRoot[]>(this.baseUrl + "MobilePicking/fromSo/customer/" + customerId + "/" + toLocationId);
   }
 
   getPickingList(startDate: Date, endDate: Date) {
@@ -71,6 +93,10 @@ export class PickingService {
 
   getPickingDetail(pickingId: number) {
     return this.http.get<PickingRoot>(this.baseUrl + "MobilePicking/" + pickingId);
+  }
+
+  insertPicking(object: GoodsPickingDto) {
+    return this.http.post(this.baseUrl + "MobilePicking", object, httpObserveHeader);
   }
 
 }

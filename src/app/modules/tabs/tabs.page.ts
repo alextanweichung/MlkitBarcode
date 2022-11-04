@@ -28,7 +28,7 @@ export class TabsPage {
           handler: () => {
             let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
             if (salesAgentId === 0 || salesAgentId === undefined) {
-              this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
+              this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
             } else {
               this.navController.navigateForward('/transactions/quotation/quotation-customer');
             }
@@ -40,9 +40,21 @@ export class TabsPage {
           handler: () => {
             let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
             if (salesAgentId === 0 || salesAgentId === undefined) {
-              this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
+              this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
             } else {
               this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
+            }
+          }
+        },
+        {
+          text: 'Add Picking',
+          icon: 'swap-vertical-outline',
+          handler: () => {
+            let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
+            if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
+              this.toastService.presentToast('Error', 'Warehouse Agent not set', 'bottom', 'danger', 1000);
+            } else {
+              this.navController.navigateForward('/transactions/picking/picking-sales-order');
             }
           }
         },

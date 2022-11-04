@@ -35,7 +35,7 @@ export class DetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.salesOrderId) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions')
     } else {
       this.loadMasterList();

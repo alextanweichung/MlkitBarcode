@@ -3,7 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { DBSQLiteValues, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { DatabaseService } from 'src/app/services/sqlite/database.service';
+import { create_item_barcode_table, create_item_master_table } from 'src/app/services/sqlite/migration.service';
 import { SQLiteService } from 'src/app/services/sqlite/sqlite.service';
+import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
+import { dbConfig, inboundDb_Tables } from '../config/db-config';
 
 @Injectable({
   providedIn: 'root'
@@ -96,16 +99,16 @@ export class CommonQueryService<T> {
       switch (this.getColType(cols.get(key))) {
         case "number":
           sqlCols += ` ${key},`;
-          sqlParams += ` ${cols.get(key)},`;
+          sqlParams += `${cols.get(key)},`;
           break;
         case "boolean":
           sqlCols += ` ${key},`;
-          sqlParams += ` ${cols.get(key)},`;
+          sqlParams += `${cols.get(key)},`;
           break;
         case "string":
         case "Date":
           sqlCols += ` ${key},`;
-          sqlParams += ` '${cols.get(key)}',`;
+          sqlParams += `'${cols.get(key)}',`;
           break;
       }
     }
@@ -123,14 +126,6 @@ export class CommonQueryService<T> {
 
   async bulkInsert(objects, table, database) {
     const statements = [];
-
-    statements.push({
-      statement: `DROP TABLE IF EXISTS ${table}`,
-      values: []
-    })
-
-
-
     if (objects.length > 0) {
       objects.forEach(i => {
         let cols = this.getAllColsWithValue(i);
@@ -143,22 +138,21 @@ export class CommonQueryService<T> {
             case "number":
               sqlCols += ` ${key},`;
               sqltest += '?,';
-              sqlParams += ` ${cols.get(key)},`;
+              sqlParams += `${cols.get(key)},`;
               break;
             case "boolean":
               sqlCols += ` ${key},`;
               sqltest += '?,';
-              sqlParams += ` ${cols.get(key)},`;
+              sqlParams += `${cols.get(key)},`;
               break;
             case "string":
             case "Date":
               sqlCols += ` ${key},`;
               sqltest += '?,';
-              sqlParams += ` ${cols.get(key)},`;
+              sqlParams += `${cols.get(key)},`;
               break;
           }
         }
-
         sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
         sqltest = sqltest.substring(0, sqltest.length - 1).trimStart();
         sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
@@ -204,11 +198,11 @@ export class CommonQueryService<T> {
         switch (this.getColType(cols.get(key))) {
           case "number":
           case "boolean":
-            sql += ` ${key} = ${cols.get(key)},`;
+            sql += `${key} = ${cols.get(key)},`;
             break;
           case "string":
           case "Date":
-            sql += ` ${key} = '${cols.get(key)}',`;
+            sql += `${key} = '${cols.get(key)}',`;
             break;
         }
       }
@@ -237,5 +231,81 @@ export class CommonQueryService<T> {
       return ret;
     }, database)
   }
+
+
+  /* #region  inbound */
+
+  async syncInboundData(table, objects) {
+    const statements = [];
+
+    // drop table
+    statements.push({
+      statement: `DROP TABLE IF EXISTS ${table}`,
+      values: []
+    })
+
+    // insert table
+    switch (table) {
+      case inboundDb_Tables.item_Master:
+        statements.push({
+          statement: create_item_master_table,
+          values: []
+        })
+        break;
+      case inboundDb_Tables.item_Barcode:
+        statements.push({
+          statement: create_item_barcode_table,
+          values: []
+        })
+        break;
+    }
+
+    if (objects.length > 0) {
+      objects.forEach(i => {
+        let cols = this.getAllColsWithValue(i);
+        let sqlCols = '';
+        let sqlQMarks = '';
+        let sqlParams = '';
+
+        for (const key of cols.keys()) {
+          switch (this.getColType(cols.get(key))) {
+            case "number":
+              sqlCols += ` ${key},`;
+              sqlQMarks += '?,';
+              sqlParams += `${cols.get(key)},`;
+              break;
+            case "boolean":
+              sqlCols += ` ${key},`;
+              sqlQMarks += '?,';
+              sqlParams += `${cols.get(key)},`;
+              break;
+            case "string":
+            case "Date":
+              sqlCols += ` ${key},`;
+              sqlQMarks += '?,';
+              sqlParams += `${cols.get(key)},`;
+              break;
+          }
+        }
+
+        sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
+        sqlQMarks = sqlQMarks.substring(0, sqlQMarks.length - 1).trimStart();
+        sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
+
+        statements.push({
+          statement: `INSERT INTO ${table} ` + `(` + sqlCols + `) VALUES (` + sqlQMarks + `);`,
+          values: [
+            sqlParams.split(',')
+          ]
+        })
+      });
+
+      await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
+        let ret: any = await db.executeSet(statements, true);
+      }, dbConfig.inbounddb)
+    }
+  }
+
+  /* #endregion */
 
 }

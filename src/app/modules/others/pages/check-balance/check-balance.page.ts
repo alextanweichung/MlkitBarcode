@@ -68,14 +68,14 @@ export class CheckBalancePage implements OnInit {
       } else {
         this.itemCode = null;
         this.itemInfo = null;
-        this.toastService.presentToast('Invalid item code.', '', 'bottom', 'danger', 1500);
+        this.toastService.presentToast('Invalid item code.', '', 'bottom', 'danger', 1000);
       }
     }
   }
 
   search() {
     if (!this.itemCode) {
-      this.toastService.presentToast('Please enter valid item.', '', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Please enter valid item.', '', 'bottom', 'danger', 1000);
       return;
     }
     let lookUpItem = this.itemList.find(e => e.itemCode.toUpperCase() == this.itemCode.toUpperCase());
@@ -84,7 +84,7 @@ export class CheckBalancePage implements OnInit {
       // if (this.selectedViewOptions === 'item') {
         this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevel = response;
-          this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
+          this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1000);
           this.computeLocationList();
           this.showEmpty = true;
           this.computeVariationXY();
@@ -95,7 +95,7 @@ export class CheckBalancePage implements OnInit {
       if (lookUpItem.variationTypeCode !== '0')
         this.checkBalanceService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevelVariation = response;
-          this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
+          this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1000);
           this.computeLocationList();
           this.showEmpty = true;
           this.computeVariationXY();
@@ -104,7 +104,7 @@ export class CheckBalancePage implements OnInit {
         })
       // }
     } else {
-      this.toastService.presentToast('Invalid Item Code', '', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Invalid Item Code', '', 'bottom', 'danger', 1000);
     }
   }
 
@@ -168,7 +168,7 @@ export class CheckBalancePage implements OnInit {
         if (!this.showEmpty) {
           this.inventoryLevel = this.inventoryLevel.filter(r => r.qty > 0);
         }
-        this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
+        this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1000);
       }, error => {
         console.log(error);
       })
@@ -239,7 +239,7 @@ export class CheckBalancePage implements OnInit {
           })
           this.inventoryLevelVariation = [...temp];
         }
-        this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1500);
+        this.toastService.presentToast('Search result has been populated.', '', 'bottom', 'success', 1000);
       }, error => {
         console.log(error);
       })

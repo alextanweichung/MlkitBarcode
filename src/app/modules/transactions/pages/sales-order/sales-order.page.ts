@@ -12,7 +12,7 @@ import { FilterPage } from '../filter/filter.page';
   templateUrl: './sales-order.page.html',
   styleUrls: ['./sales-order.page.scss'],
 })
-export class SalesOrderPage implements OnInit {
+export class PickingSalesOrderPage implements OnInit {
 
   content_loaded: boolean = false;
   objects: SalesOrderList[] = [];
@@ -46,6 +46,7 @@ export class SalesOrderPage implements OnInit {
       if (this.objects.length > 0) {
         this.content_loaded = true;
       }
+      // this.toastService.presentToast('Search Completed.', '', 'bottom', 'success', 1000);
     }, error => {
       console.log((error));
     })
@@ -58,7 +59,7 @@ export class SalesOrderPage implements OnInit {
   async addObject() {
     let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     if (salesAgentId === 0 || salesAgentId === undefined) {
-      this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
     } else {
       this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
     }

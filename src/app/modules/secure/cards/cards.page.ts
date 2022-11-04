@@ -5,9 +5,9 @@ import { AlertController, IonRouterOutlet, LoadingController, ModalController } 
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AddPage } from '../../../modules/secure/cards/add/add.page';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
-import { ConfigService } from 'src/app/services/config/config.service';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -61,8 +61,7 @@ export class CardsPage implements AfterContentChecked {
     this.commonService.syncAllItemByLocationCode().subscribe(async response => {
       let itemMaster: PDItemMaster[] = response['itemMaster'];
       let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-      await this.configService.insertItemMaster(itemMaster);
-      await this.configService.insertItemBarcode(itemBarcode);
+      await this.configService.syncInboundData(itemMaster, itemBarcode);
     }, error => {
       console.log(error);
     })

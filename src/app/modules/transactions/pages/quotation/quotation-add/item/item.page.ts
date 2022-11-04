@@ -38,7 +38,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
     this.customer = this.quotationService.selectedCustomer;
     this.itemInCart = this.quotationService.itemInCart;
     if (!this.customer || this.customer === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
     this.loadModuleControl();

@@ -33,11 +33,11 @@ export class ConfirmationPage implements OnInit {
     this.itemInCart = this.quotationService.itemInCart;
     this.recalculateTotals();
     if (!this.customer || this.customer === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
-      this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'bottom', 'medium', 1500);
+      this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'bottom', 'medium', 1000);
     }
     this.loadMasterList();
   }
@@ -139,7 +139,7 @@ export class ConfirmationPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
     }
   }
 
@@ -203,7 +203,7 @@ export class ConfirmationPage implements OnInit {
       
       this.quotationService.setQuotationSummary(qs);
 
-      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'bottom', 'success', 1500);
+      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'bottom', 'success', 1000);
       this.navController.navigateRoot('/transactions/quotation/quotation-summary');
     }, error => {
       console.log(error);

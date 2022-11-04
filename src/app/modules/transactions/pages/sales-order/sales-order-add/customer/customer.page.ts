@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -35,12 +36,31 @@ export class CustomerPage implements OnInit {
   }
 
   ngOnInit() {
+    this.loadCustomerList();
     this.loadMasterList();
     this.loadModuleControl();
   }
+  
+  customers: Customer[] = [];
+  selectedCustomer: Customer;
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  loadCustomerList() {
+    this.salesOrderService.getCustomerList().subscribe(response => {
+      this.customers = response;
+      this.customers = this.customers.filter(r => r.businessModelType === 'T');
+      this.customers.forEach(r => {
+        this.customerSearchDropdownList.push({
+          id: r.customerId,
+          code: r.customerCode,
+          description: r.name
+        })
+      })
+    }, error => {
+      console.log(error);
+    })
+  }
 
   locationMasterList: MasterListDetails[] = [];
-  customerMasterList: MasterListDetails[] = [];
   currencyMasterList: MasterListDetails[] = [];
   countryMasterList: MasterListDetails[] = [];
   termPeriodMasterList: MasterListDetails[] = [];
@@ -48,7 +68,6 @@ export class CustomerPage implements OnInit {
   loadMasterList() {
     this.salesOrderService.getMasterList().subscribe(response => {
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0 && y.attribute5 === 'T');
       this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.countryMasterList = response.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.termPeriodMasterList = response.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -92,11 +111,6 @@ export class CustomerPage implements OnInit {
       this.objectForm.patchValue({ locationId: defaultLocation });
     }
 
-    let defaultCustomer = this.customerMasterList.find(item => item.isPrimary)?.id;
-    if (defaultCustomer) {
-      this.objectForm.patchValue({ customerId: defaultCustomer });
-    }
-
     let defaultCurrency = this.currencyMasterList.find(item => item.isPrimary)
     if (defaultCurrency) {
       this.objectForm.patchValue({ currencyId: defaultCurrency.id });
@@ -118,17 +132,9 @@ export class CustomerPage implements OnInit {
   }
 
   locationSearchDropdownList: SearchDropdownList[] = [];
-  customerSearchDropdownList: SearchDropdownList[] = [];
   mapSearchDropdownList() {
     this.locationMasterList.forEach(r => {
       this.locationSearchDropdownList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-    this.customerMasterList.forEach(r => {
-      this.customerSearchDropdownList.push({
         id: r.id,
         code: r.code,
         description: r.description
@@ -164,13 +170,14 @@ export class CustomerPage implements OnInit {
     this.objectForm.patchValue({ locationId: event.id });
   }
 
-  customerChanged(event) {
+  onCustomerSelected(event) {
     if (event && event !== undefined) {
-      var lookupValue = this.customerMasterList?.find(e => e.id == event.id);
+      var lookupValue = this.customers.find(r => r.customerId === event.id);
+      this.selectedCustomer = lookupValue;
       // Auto map object type code
       this.objectForm.patchValue({ customerId: event.id });
-      this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
-      if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
+      this.objectForm.patchValue({ businessModelType: lookupValue.businessModelType });
+      if (lookupValue.businessModelType == "T" || lookupValue.businessModelType == "F") {
         this.objectForm.patchValue({ typeCode: 'S' });
       } else {
         this.objectForm.patchValue({ typeCode: 'T' });
@@ -214,7 +221,7 @@ export class CustomerPage implements OnInit {
       this.salesOrderService.removeItems();
       this.navController.navigateForward('/transactions/sales-order/sales-order-item');
     } else {
-      this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1000);
     }
   }
 

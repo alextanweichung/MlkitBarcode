@@ -1,0 +1,36 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Summary</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Summary</ion-label>
+    </ion-toolbar>
+  </ion-header>  
+  <div class="ion-padding">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom" lines="full">
+      <ion-item>
+        <ion-label position="stacked"><p>Picking Num</p></ion-label>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{pickingSummary.pickingNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked"><p>Trx Date</p></ion-label>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{pickingSummary.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked"><p>Location</p></ion-label>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{pickingSummary.locationId|idMapping:locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked"><p>Customer</p></ion-label>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{pickingSummary.customerId|idMapping:customerMasterList}}"></ion-input>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

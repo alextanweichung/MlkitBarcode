@@ -45,10 +45,10 @@ export class QuotationPage implements OnInit {
   loadObjects() {    
     this.quotationService.getQuotationList(this.startDate, this.endDate).subscribe(response => {
       this.objects = response;
-      console.log(this.objects);
       if (this.objects.length > 0) {
         this.content_loaded = true;
       }
+      // this.toastService.presentToast('Search Completed.', '', 'bottom', 'success', 1000);
     }, error => {
       console.log((error));
     })
@@ -61,7 +61,7 @@ export class QuotationPage implements OnInit {
   async addObject() {
     let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     if (salesAgentId === 0 || salesAgentId === undefined) {
-      this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
     } else {
       this.navController.navigateForward('/transactions/quotation/quotation-customer');
     }

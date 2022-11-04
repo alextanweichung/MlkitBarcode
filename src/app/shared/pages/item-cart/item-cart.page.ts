@@ -136,14 +136,14 @@ export class ItemCartPage implements OnInit, OnChanges {
     this.itemInCart.splice(this.itemInCart.findIndex(r => r.itemSku === itemSku), 1);
     this.combineItemWithVariations();
     this.onItemInCartEditCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1500);
+    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
   }
 
   removeItemById(itemId: number) {
     this.itemInCart = this.itemInCart.filter(r => r.itemId !== itemId);
     this.combineItemWithVariations();
     this.onItemInCartEditCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1500);
+    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
   }
 
 }

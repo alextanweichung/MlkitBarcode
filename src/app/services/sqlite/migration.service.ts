@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
 );
 `;
 
-export const item_Master_Table: string = `
+export const create_item_master_table: string = `
 CREATE TABLE IF NOT EXISTS Item_Master (
   id INTEGER,
   code VARCHAR(20),
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Item_Master (
   imgUrl VARCHAR(255)
 );`;
 
-export const item_Barcode_Table: string = `
+export const create_item_barcode_table: string = `
 CREATE TABLE IF NOT EXISTS Item_Barcode (
   id INTEGER,
   itemId INTEGER,
@@ -95,12 +95,12 @@ export class MigrationService {
     await db.open();
     console.log(`after db.open`);
     
-    console.log(`query ${item_Master_Table}`);
-    const ret: any = await db.execute(item_Master_Table);
+    console.log(`query ${create_item_master_table}`);
+    const ret: any = await db.execute(create_item_master_table);
     console.log(`ret: ${JSON.stringify(ret)}`);
     
-    console.log(`query ${item_Barcode_Table}`);
-    const ret2: any = await db.execute(item_Barcode_Table);
+    console.log(`query ${create_item_barcode_table}`);
+    const ret2: any = await db.execute(create_item_barcode_table);
     console.log(`ret: ${JSON.stringify(ret2)}`);
 
     await this.sqliteService.closeConnection(dbConfig.inbounddb);

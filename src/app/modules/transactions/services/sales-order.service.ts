@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
 import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
 
@@ -149,6 +150,10 @@ export class SalesOrderService {
         response.map((item: any) => item)
       )
     );
+  }
+
+  getCustomerList() {
+    return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer");
   }
 
   getItemList(keyword: string, customerId: number, locationId: number) {

@@ -35,7 +35,7 @@ export class DetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.quotationId) {
-      this.toastService.presentToast('Something went wrong!', 'Quotation Id not available', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong!', 'Quotation Id not available', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/quotation')
     } else {
       this.loadMasterList();

@@ -36,7 +36,7 @@ export class DetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.pickingId) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions')
     } else {
       this.loadMasterList();
@@ -66,6 +66,7 @@ export class DetailPage implements OnInit {
   loadDetail() {
     this.pickingService.getPickingDetail(this.pickingId).subscribe(response => {
       this.picking = response;
+      console.log("🚀 ~ file: detail.page.ts ~ line 69 ~ DetailPage ~ this.pickingService.getPickingDetail ~ this.picking", this.picking)
     }, error => {
       console.log(error);
     })

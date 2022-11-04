@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, NavController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { LoginRequest } from 'src/app/services/auth/login-user';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-signin',
@@ -73,14 +73,16 @@ export class SigninPage implements OnInit {
       (await this.authService.signIn(loginModel)).subscribe(async response => {        
         await this.navController.navigateRoot('/approvals');
 
-        let itemMasterCount = await (await this.configService.loadItemMaster()).length;
-        if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0) {
-          this.commonService.syncAllItemByLocationCode().subscribe(async response => {
-            let itemMaster: PDItemMaster[] = response['itemMaster'];
-            let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-            await this.configService.insertItemMaster(itemMaster);
-            await this.configService.insertItemBarcode(itemBarcode);
-          })
+        if (Capacitor.getPlatform() !== 'web') {
+          let itemMasterCount = (await this.configService.loadItemMaster())?.length;
+          let itemBarcodeCount = (await this.configService.loadItemBarcode())?.length;
+          if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0 || !itemBarcodeCount || itemBarcodeCount === undefined || itemBarcodeCount === 0) {
+            this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+              let itemMaster: PDItemMaster[] = response['itemMaster'];
+              let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+              await this.configService.syncInboundData(itemMaster, itemBarcode);
+            })
+          }
         }
       });
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { dbConfig } from 'src/app/shared/database/config/db-config';
+import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
@@ -57,20 +57,15 @@ export class ConfigService {
     await this.commonQueryService.insert(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
   }
 
-  async insertItemMaster(objects: PDItemMaster[]) {
-    await this.commonQueryService.deleteAll("Item_Master", dbConfig.inbounddb);
-    await this.commonQueryService.bulkInsert(objects, "Item_Master", dbConfig.inbounddb);
+  async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
+    await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
+    await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
   }
 
   async loadItemMaster(): Promise<PDItemMaster[]> {
     let ret = await this.commonQueryService.selectAll("Item_Master", dbConfig.inbounddb) as PDItemMaster[];
     this.item_Masters = ret;
     return this.item_Masters;
-  }
-
-  async insertItemBarcode(objects: PDItemBarcode[]) {
-    await this.commonQueryService.deleteAll("Item_Barcode", dbConfig.inbounddb);
-    await this.commonQueryService.bulkInsert(objects, "Item_Barcode", dbConfig.inbounddb);
   }
 
   async loadItemBarcode(): Promise<PDItemBarcode[]> {

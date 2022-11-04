@@ -13,10 +13,10 @@
     </ion-toolbar>
   </ion-header>
   <div class="ion-padding">
-    <form [formGroup]="objectForm">      
+    <form [formGroup]="objectForm">
       <ion-list class="list-custom" lines="full">        
         <app-search-dropdown *ngIf="transactionShowDetailHeader" title="Location" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="locationChanged($event)"></app-search-dropdown>        
-        <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="customerChanged($event)"></app-search-dropdown>
+        <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
         <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Currency</ion-label>
           <ion-select interface="action-sheet" placeholder="Select Currency" formControlName="currencyId" (ionChange)="currencyChanged($event)">

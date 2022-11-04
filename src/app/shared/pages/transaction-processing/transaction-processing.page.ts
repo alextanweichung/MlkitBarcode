@@ -56,7 +56,7 @@ export class TransactionProcessingPage implements OnInit {
   updateDoc(action: string, docId: number) {    
     this.transactionProcessingService.updateDocumentStatus(action, docId).subscribe(async response => {
       if (response.status == 204) {
-        this.toastService.presentToast("Doc review is completed.", "", "bottom", "success", 1500);
+        this.toastService.presentToast("Doc review is completed.", "", "bottom", "success", 1000);
         this.onObjectUpdated.emit(docId);
       }
     }, error => {

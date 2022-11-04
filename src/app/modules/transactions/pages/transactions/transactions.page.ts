@@ -125,14 +125,14 @@ export class TransactionsPage implements OnInit {
   /* #region  picking */
 
   loadRecentPicking() {
-    // this.pickingService.getRecentPickingList().subscribe(response => {
-    //   this.pickings = response;
-    //   if (this.pickings.length > 0) {
-    //     this.picking_loaded = true;
-    //   }
-    // }, error => {
-    //   console.log(error);
-    // })
+    this.pickingService.getRecentPickingList().subscribe(response => {
+      this.pickings = response;
+      if (this.pickings.length > 0) {
+        this.picking_loaded = true;
+      }
+    }, error => {
+      console.log(error);
+    })
   }
 
   async goToPickingDetail(pickingId: number) {

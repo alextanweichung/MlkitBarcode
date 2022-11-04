@@ -83,7 +83,7 @@ export class CustomerPage implements OnInit {
       this.quotationService.removeItems();
       this.navController.navigateForward('/transactions/quotation/quotation-item');
     } else {
-      this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1500);
+      this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1000);
     }
   }
 

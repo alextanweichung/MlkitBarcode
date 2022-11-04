@@ -1,0 +1,66 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Confirmation</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Confirmation</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">
+    <ion-grid class="ion-no-padding" *ngIf="pickingSalesOrderLines.length > 0">
+      <ion-row>
+        <ion-col size="12" class="py-0" *ngFor="let soLine of pickingSalesOrderLines">
+          <ion-card class="m-1">
+            <ion-card-header class="px-2 pt-2 pb-0">
+              <ion-card-title>
+                <ion-grid class="ion-no-padding">
+                  <ion-row>
+                    <ion-col>
+                      {{soLine.itemCode}}
+                    </ion-col>
+                    <ion-col class="ion-flex justify-content-end">
+                      <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPicked + soLine.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-title>
+              <ion-card-subtitle>{{soLine.description}}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content class="py-0">
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <span class="badge-green font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationXDescription"> {{soLine.itemVariationXDescription}}</span>
+                  <span class="badge-purple font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationYDescription"> {{soLine.itemVariationYDescription}}</span>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto">
+                    <ion-label class="font-smaller">SO Qty: {{soLine.qtyRequest|number:'1.0'}}</ion-label>
+                  </ion-col>
+                  <ion-col class="ion-margin-auto">
+                    <ion-label class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPickedCurrent)|number:'1.0'}}</ion-label>
+                  </ion-col>
+                </ion-row>
+                <ion-row *ngIf="soLine.rack">
+                  <ion-col class="ion-margin-auto">
+                    <ion-label class="font-smaller">Location: {{soLine.rack}} - {{soLine.subRack}}</ion-label>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+    <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()">
+      Confirm
+    </ion-button>
+</ion-footer>
