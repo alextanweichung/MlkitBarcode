@@ -13,7 +13,8 @@ export class SearchDropdownPage implements OnInit {
 
   @Input() title: string = "Search";
   @Input() showHeaderLabel: boolean = true;
-  @Input() optionValue: string = 'description';
+  @Input() showBoldHeader: boolean = false;
+  @Input() optionLabel: string = 'description';
   @Input() showCode: boolean = false;
   @Input() searchDropdownList: SearchDropdownList[];
   @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();

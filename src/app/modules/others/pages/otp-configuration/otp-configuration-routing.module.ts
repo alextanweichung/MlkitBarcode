@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: OtpConfigurationPage
+  },  {
+    path: 'otp-config-list',
+    loadChildren: () => import('./otp-config-list/otp-config-list.module').then( m => m.OtpConfigListPageModule)
   }
+
 ];
 
 @NgModule({

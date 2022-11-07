@@ -1,9 +1,39 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>otp-configuration</ion-title>
+    <ion-title>Generate OTP</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/others"></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
-<ion-content>
-
+  <ion-content fulscreen>
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-label class="label-title">Generate OTP</ion-label>
+      </ion-toolbar>
+    </ion-header>
+    <div class="ion-padding">
+      <ion-list class="list-custom" lines="full">
+        <app-search-dropdown title="Users" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>
+        <app-search-dropdown title="Validity" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="validitySerachDropdownList"></app-search-dropdown>
+        <app-search-dropdown title="App" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="appsSearchDropdownList"></app-search-dropdown>
+      </ion-list>
+      <ion-item lines="none" color="none">
+        <ion-checkbox #checkBox slot="end" [checked]="true"></ion-checkbox>
+        <ion-label>Default Expiry</ion-label>
+      </ion-item>
+      <ion-item *ngIf="!checkBox.checked" lines="none">
+        <ion-label>
+          <p>Expired on</p>
+        </ion-label>
+        <ion-input readonly slot="end" type="text" class="ion-text-right ion-no-padding-end" (click)="toggleDateTo()" [(ngModel)]="expiryDate"></ion-input>
+      </ion-item>
+      <ion-list class="list-custom" lines="none" *ngIf="!checkBox.checked">
+        <ion-datetime class="animate__animated animate__fadeIn" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onExpiryDateSelect($event)" *ngIf="expiryDateActive" [value]="date.toISOString()">
+        </ion-datetime>
+      </ion-list>
+    </div>
 </ion-content>
+<ion-footer>
+  <ion-button class="ion-margin" expand="block" (click)="generateOtp()">Generate</ion-button>
+</ion-footer>

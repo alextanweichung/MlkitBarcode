@@ -1,9 +1,9 @@
 <ion-item (click)="showModal()">
-  <ion-label *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
-  <ion-input [placeholder]="'Select ' + title" [value]="selected?.[optionValue]" readonly></ion-input>
+  <ion-label [ngStyle]="{'font-weight': showBoldHeader ? 'bold' : ''}" *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
+  <ion-input [placeholder]="'Select ' + title" [value]="selected?.[optionLabel]" readonly></ion-input>
 </ion-item>
 
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">  
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -12,7 +12,7 @@
           <ion-button (click)="cancel()">Close</ion-button>
         </ion-buttons>
       </ion-toolbar>
-      <ion-toolbar>    
+      <ion-toolbar>
         <ion-searchbar #searchBar class="p-0" showCancelButton="focus" animated="true" [placeholder]="'Search for ' + title " (ionChange)="searchItem($event)" (search)="searchItem($event)"></ion-searchbar>
       </ion-toolbar>
     </ion-header>
@@ -24,6 +24,6 @@
           </ion-item>
         </ion-list>
       </div>
-    </ion-content>      
+    </ion-content>
   </ng-template>
 </ion-modal>
