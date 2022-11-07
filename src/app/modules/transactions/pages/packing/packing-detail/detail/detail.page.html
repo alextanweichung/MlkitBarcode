@@ -40,13 +40,13 @@
       <ion-label>Details</ion-label>
     </ion-list-header>
 
-    <ion-accordion-group #accordianGroup1>
+    <ion-accordion-group #accordianGroup1 *ngIf="packing.header.isWithSo">
       <ion-accordion *ngFor="let salesOrder of packing.details;">
         <ion-item slot="header" color="light">
-          <!-- <ion-label>{{salesOrder.salesOrderNum}}</ion-label> -->
+          <ion-label>{{salesOrder.salesOrderNum}}</ion-label>
         </ion-item>
         <div class="main-card ion-no-padding" slot="content">
-          <!-- <ion-grid class="ion-no-padding" *ngIf="salesOrder.currentPickList.length > 0">
+          <ion-grid class="ion-no-padding" *ngIf="salesOrder.currentPickList.length > 0">
             <ion-row>
               <ion-col size="12" class="py-0" *ngFor="let soLine of salesOrder?.currentPickList">
                 <ion-card class="m-1">
@@ -56,7 +56,7 @@
                         <ion-row>
                           <ion-col>
                             {{soLine.itemCode}}
-                          </ion-col>                            
+                          </ion-col>
                         </ion-row>
                       </ion-grid>
                     </ion-card-title>
@@ -70,7 +70,7 @@
                       </ion-row>
                       <ion-row>
                         <ion-col class="ion-margin-auto">
-                          <ion-label class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPicked)|number:'1.0'}}</ion-label>
+                          <ion-label class="font-smaller">Packed Qty: {{(soLine.qtyPacked)|number:'1.0'}}</ion-label>
                         </ion-col>
                       </ion-row>
                     </ion-grid>
@@ -78,10 +78,46 @@
                 </ion-card>
               </ion-col>
             </ion-row>
-          </ion-grid> -->
+          </ion-grid>
         </div>
       </ion-accordion>
     </ion-accordion-group>
+
+    <div class="main-card ion-no-padding" slot="content" *ngIf="!packing.header.isWithSo">
+      <ion-grid class="ion-no-padding" *ngIf="packing.details.length > 0">
+        <ion-row>
+          <ion-col size="12" class="py-0" *ngFor="let soLine of packing.details">
+            <ion-card class="m-1">
+              <ion-card-header class="px-2 pt-2 pb-0">
+                <ion-card-title>
+                  <ion-grid class="ion-no-padding">
+                    <ion-row>
+                      <ion-col>
+                        {{soLine.itemCode}}
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </ion-card-title>
+                <ion-card-subtitle>{{soLine.description}}</ion-card-subtitle>
+              </ion-card-header>
+              <ion-card-content class="py-0">
+                <ion-grid class="ion-no-padding">
+                  <ion-row>
+                    <span class="badge-green font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationXDescription"> {{soLine.itemVariationXDescription}}</span>
+                    <span class="badge-purple font-bold px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationYDescription"> {{soLine.itemVariationYDescription}}</span>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="ion-margin-auto">
+                      <ion-label class="font-smaller">Packed Qty: {{(soLine.qtyPacked)|number:'1.0'}}</ion-label>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
 
   </div>
 </ion-content>

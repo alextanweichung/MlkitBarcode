@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { PackingList, PackingRoot } from '../models/packing';
+import { PackingList } from '../models/packing';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -41,7 +41,7 @@ export class PackingService {
   }
 
   getPackingDetail(packingId: number) {
-    return this.http.get<PackingRoot>(this.baseUrl + "MobilePacking/" + packingId);
+    return this.http.get<any>(this.baseUrl + "MobilePacking/" + packingId);
   }
   
 }

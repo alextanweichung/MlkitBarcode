@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
-import { PackingRoot } from 'src/app/modules/transactions/models/packing';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -16,7 +15,7 @@ export class DetailPage implements OnInit {
   parent: string = 'Packing'
 
   packingId: number;
-  packing: PackingRoot;
+  packing: any;
 
   constructor(
     private route: ActivatedRoute,
