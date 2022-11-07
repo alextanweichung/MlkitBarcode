@@ -14,9 +14,9 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-input #barcodeInput class="ion-text-center" debounce="500" type="text" [(ngModel)]="manualBarcodeInput" placeholder="Scan or input Barcode" (ionChange)="checkValidBarcode(manualBarcodeInput)"></ion-input>
-    <ion-accordion-group #accordianGroup1 *ngIf="pickingDtoHeader?.isWithSo">
-      <ion-accordion *ngFor="let salesOrder of pickingSalesOrders;">
+    <ion-input class="ion-text-center" debounce="500" type="text" [(ngModel)]="manualBarcodeInput" placeholder="Scan or input Barcode" (ionChange)="checkValidBarcode(manualBarcodeInput)"></ion-input>
+    <ion-accordion-group #accordianGroup1 *ngIf="packingDtoHeader?.isWithSo">
+      <ion-accordion *ngFor="let salesOrder of packingSalesOrders;">
         <ion-item slot="header" color="light" (click)="setSelectedSo(salesOrder)">
           <ion-label>{{salesOrder.header.salesOrderNum}}</ion-label>
         </ion-item>
@@ -33,7 +33,7 @@
                             {{soLine.itemCode}}
                           </ion-col>
                           <ion-col class="ion-flex justify-content-end">
-                            <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPicked + soLine.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
+                            <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPacked + soLine.qtyPackedCurrent)" color="success" name="checkmark-circle"></ion-icon>
                           </ion-col>
                         </ion-row>
                       </ion-grid>
@@ -51,7 +51,10 @@
                           <ion-label class="font-smaller">SO Qty: {{soLine.qtyRequest|number:'1.0'}}</ion-label>
                         </ion-col>
                         <ion-col class="ion-margin-auto">
-                          <ion-label class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPickedCurrent)|number:'1.0'}}</ion-label>
+                          <ion-label class="font-smaller">Picked Qty: {{soLine.qtyPicked|number:'1.0'}}</ion-label>
+                        </ion-col>
+                        <ion-col class="ion-margin-auto">
+                          <ion-label class="font-smaller">Packed Qty: {{(soLine.qtyPacked + soLine.qtyPackedCurrent)|number:'1.0'}}</ion-label>
                         </ion-col>
                       </ion-row>
                       <ion-row *ngIf="soLine.rack">
@@ -60,13 +63,16 @@
                         </ion-col>
                       </ion-row>
                       <ion-row>
+                        <ion-col class="ion-margin-auto">
+                          <ion-label class="font-bold">Carton x</ion-label>
+                        </ion-col>                        
                         <ion-col>
                           <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(soLine)">
                             <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                           </ion-button>
                         </ion-col>
                         <ion-col>
-                          <ion-input #inputNumWithSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPickedCurrent" (ionFocus)="backupQty(soLine, inputNumWithSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
+                          <ion-input #inputNumWithSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPackedCurrent" (ionFocus)="backupQty(soLine, inputNumWithSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
                         </ion-col>
                         <ion-col>
                           <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(soLine)">
@@ -84,10 +90,10 @@
       </ion-accordion>
     </ion-accordion-group>
 
-    <div class="main-card ion-no-padding" slot="content" *ngIf="!pickingDtoHeader?.isWithSo && pickingSalesOrders.length > 0">
-      <ion-grid class="ion-no-padding" *ngIf="pickingSalesOrders[0].details.length > 0">
+    <div class="main-card ion-no-padding" slot="content" *ngIf="!packingDtoHeader?.isWithSo && packingSalesOrders.length > 0">
+      <ion-grid class="ion-no-padding" *ngIf="packingSalesOrders[0].details.length > 0">
         <ion-row>
-          <ion-col size="12" class="py-0" *ngFor="let soLine of pickingSalesOrders[0]?.details">
+          <ion-col size="12" class="py-0" *ngFor="let soLine of packingSalesOrders[0]?.details">
             <ion-card class="m-1">
               <ion-card-header class="px-2 pt-2 pb-0">
                 <ion-card-title>
@@ -97,7 +103,7 @@
                         {{soLine.itemCode}}
                       </ion-col>
                       <ion-col class="ion-flex justify-content-end">
-                        <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPicked + soLine.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
+                        <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPacked + soLine.qtyPackedCurrent)" color="success" name="checkmark-circle"></ion-icon>
                       </ion-col>
                     </ion-row>
                   </ion-grid>
@@ -112,7 +118,7 @@
                   </ion-row>
                   <ion-row>
                     <ion-col class="ion-margin-auto">
-                      <ion-label class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPickedCurrent)|number:'1.0'}}</ion-label>
+                      <ion-label class="font-smaller">Packed Qty: {{(soLine.qtyPacked + soLine.qtyPackedCurrent)|number:'1.0'}}</ion-label>
                     </ion-col>
                   </ion-row>
                   <ion-row *ngIf="soLine.rack">
@@ -127,7 +133,7 @@
                       </ion-button>
                     </ion-col>
                     <ion-col>
-                      <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPickedCurrent" (ionFocus)="backupQty(soLine, inputNumWithoutSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
+                      <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPackedCurrent" (ionFocus)="backupQty(soLine, inputNumWithoutSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
                     </ion-col>
                     <ion-col>
                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(soLine)">
@@ -190,7 +196,7 @@
                           {{selectedSoDetail.itemCode}}
                         </ion-col> -->
                         <ion-col class="ion-flex justify-content-end">
-                          <ion-icon *ngIf="selectedSoDetail.qtyRequest === (selectedSoDetail.qtyPicked + selectedSoDetail.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
+                          <ion-icon *ngIf="selectedSoDetail.qtyRequest === (selectedSoDetail.qtyPacked + selectedSoDetail.qtyPackedCurrent)" color="success" name="checkmark-circle"></ion-icon>
                         </ion-col>
                       </ion-row>
                     </ion-grid>
@@ -208,7 +214,10 @@
                         <ion-label class="font-smaller">SO Qty: {{selectedSoDetail.qtyRequest|number:'1.0'}}</ion-label>
                       </ion-col>
                       <ion-col class="ion-margin-auto">
-                        <ion-label class="font-smaller">Picked Qty: {{(selectedSoDetail.qtyPicked + selectedSoDetail.qtyPickedCurrent)|number:'1.0'}}</ion-label>
+                        <ion-label class="font-smaller">Picked Qty: {{selectedSoDetail.qtyPicked|number:'1.0'}}</ion-label>
+                      </ion-col>
+                      <ion-col class="ion-margin-auto">
+                        <ion-label class="font-smaller">Packed Qty: {{(selectedSoDetail.qtyPacked + selectedSoDetail.qtyPackedCurrent)|number:'1.0'}}</ion-label>
                       </ion-col>
                     </ion-row>
                     <ion-row *ngIf="selectedSoDetail.rack">
@@ -223,7 +232,7 @@
                         </ion-button>
                       </ion-col>
                       <ion-col>
-                        <ion-input #inputNumModal autofocus class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="selectedSoDetail.qtyPickedCurrent" (ionFocus)="backupQty(selectedSoDetail, inputNumModal)" (ionBlur)="updateQty(selectedSoDetail)" (keypress)="eventHandler($event.keyCode, selectedSoDetail)"></ion-input>
+                        <ion-input #inputNumModal autofocus class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="selectedSoDetail.qtyPackedCurrent" (ionFocus)="backupQty(selectedSoDetail, inputNumModal)" (ionBlur)="updateQty(selectedSoDetail)" (keypress)="eventHandler($event.keyCode, selectedSoDetail)"></ion-input>
                       </ion-col>
                       <ion-col>
                         <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(selectedSoDetail)">

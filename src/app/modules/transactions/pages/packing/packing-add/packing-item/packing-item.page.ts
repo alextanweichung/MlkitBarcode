@@ -1,26 +1,26 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, IonAccordionGroup, IonInput, NavController } from '@ionic/angular';
-import { GoodsPicking } from 'src/app/modules/transactions/models/picking';
-import { PickingSalesOrderDetail, PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
-import { PickingService } from 'src/app/modules/transactions/services/picking.service';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { NavController, AlertController, IonAccordionGroup, IonInput } from '@ionic/angular';
+import { GoodsPacking } from 'src/app/modules/transactions/models/packing';
+import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
+import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-picking-item',
-  templateUrl: './picking-item.page.html',
-  styleUrls: ['./picking-item.page.scss'],
+  selector: 'app-packing-item',
+  templateUrl: './packing-item.page.html',
+  styleUrls: ['./packing-item.page.scss'],
 })
-export class PickingItemPage implements OnInit {
+export class PackingItemPage implements OnInit {
 
-  pickingDtoHeader: GoodsPicking;
-  pickingSalesOrders: PickingSalesOrderRoot[] = [];
+  packingDtoHeader: GoodsPacking;
+  packingSalesOrders: PackingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
   loadImage: boolean = true;
 
@@ -28,21 +28,21 @@ export class PickingItemPage implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
-    private pickingService: PickingService,
+    private packingService: PackingService,
     private navController: NavController,
     private alertController: AlertController,
     private toastService: ToastService,
   ) { }
 
   ngOnInit() {
-    this.pickingDtoHeader = this.pickingService.pickingDtoHeader;
-    if (this.pickingDtoHeader === undefined) {
+    this.packingDtoHeader = this.packingService.packingDtoHeader;
+    if (this.packingDtoHeader === undefined) {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/transactions/picking/picking-sales-order');
+      this.navController.navigateBack('/transactions/packing/packing-sales-order');
     }
-    this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
-    if (this.pickingSalesOrders && this.pickingSalesOrders.length > 0) {
-      this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
+    this.packingSalesOrders = this.packingService.selectedSalesOrders;
+    if (this.packingSalesOrders && this.packingSalesOrders.length > 0) {
+      this.packingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPackedCurrent = 0);
     }
     this.loadModuleControl();
   }
@@ -62,14 +62,14 @@ export class PickingItemPage implements OnInit {
   /* #region  manual amend qty */
 
   decreaseQty(soLine) {
-    if (soLine.qtyPickedCurrent - 1 < 0) {
-      soLine.qtyPickedCurrent = 0;
+    if (soLine.qtyPackedCurrent - 1 < 0) {
+      soLine.qtyPackedCurrent = 0;
     } else {
-      soLine.qtyPickedCurrent--;
+      soLine.qtyPackedCurrent--;
     }
   }
   
-	clonedDetails: { [s: string]: PickingSalesOrderDetail; } = {};
+	clonedDetails: { [s: string]: PackingSalesOrderDetail; } = {};
   backupQty(soLine, event) {
     event.getInputElement().then(r => {
       r.select();
@@ -78,10 +78,10 @@ export class PickingItemPage implements OnInit {
   }
 
   updateQty(soLine) {
-    if (this.pickingDtoHeader.isWithSo) {
-      if ((soLine.qtyPicked + soLine.qtyPickedCurrent) > soLine.qtyRequest) {
-        this.toastService.presentToast('Not allow to add item more than SO quantity.', '', 'bottom', 'medium', 1000);
-        soLine.qtyPickedCurrent = soLine.qtyRequest - soLine.qtyPicked;
+    if (this.packingDtoHeader.isWithSo) {
+      if ((soLine.qtyPacked + soLine.qtyPackedCurrent) > soLine.qtyPicked) {
+        this.toastService.presentToast('Not allow to add item more than PICKED quantity.', '', 'bottom', 'medium', 1000);
+        soLine.qtyPackedCurrent = soLine.qtyPicked - soLine.qtyPacked;
       }
     }
 		delete this.clonedDetails[soLine.itemSku];
@@ -97,14 +97,14 @@ export class PickingItemPage implements OnInit {
   }
 
   increaseQty(soLine) {
-    if (soLine.qtyPickedCurrent === undefined) {
-      soLine.qtyPickedCurrent = 0;
+    if (soLine.qtyPackedCurrent === undefined) {
+      soLine.qtyPackedCurrent = 0;
     }
-    if (this.pickingDtoHeader.isWithSo && (soLine.qtyPicked + soLine.qtyPickedCurrent + 1) <= soLine.qtyRequest) {
-      soLine.qtyPickedCurrent++;
+    if (this.packingDtoHeader.isWithSo && (soLine.qtyPacked + soLine.qtyPackedCurrent + 1) <= soLine.qtyPicked) {
+      soLine.qtyPackedCurrent++;
     }
-    if (!this.pickingDtoHeader.isWithSo) {
-      soLine.qtyPickedCurrent++;
+    if (!this.packingDtoHeader.isWithSo) {
+      soLine.qtyPackedCurrent++;
     }
   }
 
@@ -113,7 +113,7 @@ export class PickingItemPage implements OnInit {
   /* #region  sales order */
 
   @ViewChild('accordianGroup1', { static: false }) accordianGroup1: IonAccordionGroup; // use accordion value to determine if selectedSo 
-  selectedSo: PickingSalesOrderRoot;
+  selectedSo: PackingSalesOrderRoot;
   setSelectedSo(so) {
     this.selectedSo = so;
   }
@@ -123,57 +123,54 @@ export class PickingItemPage implements OnInit {
   /* #region  barcode & check so */
 
   manualBarcodeInput: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
-    if (barcode) {
-      this.manualBarcodeInput = '';
-      if (barcode && barcode.length > 12) {
-        barcode = barcode.substring(0, 12);
-      }
-      if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-        if (found) {
-          if (found.sku) {
-            this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
-            this.addItemToSo(found.sku);
-          }
-        } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
-        }
-      }
-      // either go online find or toast local db no item master/barcodes here
+  checkValidBarcode(barcode: string): string {
+    if (barcode && barcode.length > 12) {
+      barcode = barcode.substring(0, 12);
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
+    if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
+      let found = this.configService.item_Barcodes.find(r => r.barcode === barcode);
+      if (found) {
+        if (found.sku) {
+          this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
+          this.addItemToSo(found.sku);
+        }
+      } else {
+        this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
+        return;
+      }
+    }
+    this.manualBarcodeInput = '';
+    // either go online find or toast local db no item master/barcodes here
+    return;
   }
 
   async addItemToSo(sku: string) {    
-    if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {
         this.selectedSoDetail = itemExists;
-        this.selectedSoDetail.qtyPickedCurrent++;
+        this.selectedSoDetail.qtyPackedCurrent++;
         this.openModal();
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
     } 
   
-    if (!this.pickingDtoHeader.isWithSo) {
+    if (!this.packingDtoHeader.isWithSo) {
       let b = this.configService.item_Barcodes.find(r => r.sku === sku);
       let m = this.configService.item_Masters.find(r => r.id === b.itemId);
-      if (this.pickingSalesOrders && this.pickingSalesOrders.length === 0) {
-        this.pickingSalesOrders.push({
+      if (this.packingSalesOrders && this.packingSalesOrders.length === 0) {
+        this.packingSalesOrders.push({
           header: null,
           details: [],
           pickingHistory: []
         })
       }
-      if (this.pickingSalesOrders[0].details.findIndex(r => r.itemSku === sku) > -1) { // already in
-        this.selectedSoDetail = this.pickingSalesOrders[0].details.find(r => r.itemSku === sku);
-        this.selectedSoDetail.qtyPickedCurrent++;
+      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === sku) > -1) { // already in
+        this.selectedSoDetail = this.packingSalesOrders[0].details.find(r => r.itemSku === sku);
+        this.selectedSoDetail.qtyPackedCurrent++;
       } else {
-        let d: PickingSalesOrderDetail = {
+        let d: PackingSalesOrderDetail = {
           salesOrderId: null,
           itemId: m.id,
           description: m.itemDesc,
@@ -192,13 +189,11 @@ export class PickingItemPage implements OnInit {
           qtyCommit: 0,
           qtyBalance: 0,
           qtyPicked: 0,
-          qtyPickedCurrent: 1,
+          qtyPackedCurrent: 1,
           qtyPacked: 0
         }
-        await this.pickingSalesOrders[0].details.length > 0 ? this.pickingSalesOrders[0].details.unshift(d) : this.pickingSalesOrders[0].details.push(d);
-        // this.selectedSoDetail = this.pickingSalesOrders[0].details[0];
+        await this.packingSalesOrders[0].details.length > 0 ? this.packingSalesOrders[0].details.unshift(d) : this.packingSalesOrders[0].details.push(d);
       }
-      // this.openModal();
     }
   }
 
@@ -208,7 +203,7 @@ export class PickingItemPage implements OnInit {
 
   isModalOpen: boolean = false;
   @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
-  selectedSoDetail: PickingSalesOrderDetail;
+  selectedSoDetail: PackingSalesOrderDetail;
   openModal() {
     if (this.selectedSoDetail) {      
       this.isModalOpen = true;
@@ -228,7 +223,7 @@ export class PickingItemPage implements OnInit {
 
   scanActive: boolean = false;
   async startScanning() {
-    if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       const allowed = await this.checkPermission();
       if (allowed) {
         this.scanActive = true;
@@ -240,11 +235,11 @@ export class PickingItemPage implements OnInit {
           await this.checkValidBarcode(barcode);
         }
       }
-    } else if (this.pickingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
+    } else if (this.packingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
       this.toastService.presentToast('Please select 1 SO', '', 'bottom', 'medium', 1000);
     }
 
-    if (!this.pickingDtoHeader.isWithSo) {
+    if (!this.packingDtoHeader.isWithSo) {
       const allowed = await this.checkPermission();
       if (allowed) {
         this.scanActive = true;
@@ -297,13 +292,13 @@ export class PickingItemPage implements OnInit {
   /* #endregion */
 
   nextStep() {
-    let soLines: PickingSalesOrderDetail[] = this.pickingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPickedCurrent > 0);
-    this.pickingService.setChooseSalesOrderLines(soLines);
-    this.navController.navigateForward('/transactions/picking/picking-confirmation');
+    let soLines: PackingSalesOrderDetail[] = this.packingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPackedCurrent > 0);
+    this.packingService.setChooseSalesOrderLines(soLines);
+    this.navController.navigateForward('/transactions/packing/packing-confirmation');
   }
 
   previousStep() {
-    this.navController.navigateBack('/transactions/picking/picking-sales-order');
+    this.navController.navigateBack('/transactions/packing/packing-sales-order');
   }
 
 }

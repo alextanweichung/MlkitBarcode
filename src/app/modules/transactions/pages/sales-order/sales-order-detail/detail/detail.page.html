@@ -96,8 +96,8 @@
             <ion-row *ngFor="let v of getFlattenVariations(item.itemId)">
               <ion-col size="9" class="ion-margin-auto">
                 <p>
-                  <span class="badge-green font-bold px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationXId"> {{v.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                  <span class="badge-purple font-bold px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationYId"> {{v.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationXId"> {{v.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                  <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="v.itemVariationYId"> {{v.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
                 </p>
               </ion-col>
               <ion-col size="3" class="ion-margin-auto">

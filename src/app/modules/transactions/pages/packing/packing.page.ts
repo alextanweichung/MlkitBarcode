@@ -64,7 +64,7 @@ export class PackingPage implements OnInit {
     if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
       this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1000);
     } else {
-      // this.navController.navigateForward('/transactions/picking/picking-sales-order');
+      this.navController.navigateForward('/transactions/packing/packing-sales-order');
     }
   }
 

@@ -65,6 +65,7 @@ export class PickingService {
     this.removeCustomer();
     this.removeSalesOrders();
     this.removeSalesOrderLines();
+    this.removePickingSummary();
   }
 
   getMasterList() {

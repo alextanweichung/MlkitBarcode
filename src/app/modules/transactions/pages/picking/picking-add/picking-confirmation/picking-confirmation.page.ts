@@ -38,7 +38,6 @@ export class PickingConfirmationPage implements OnInit {
     }
     this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
     this.pickingSalesOrderLines = this.pickingService.selectedSalesOrderLines;
-    console.log("🚀 ~ file: picking-confirmation.page.ts ~ line 39 ~ PickingConfirmationPage ~ ngOnInit ~ this.pickingSalesOrderLines", this.pickingSalesOrderLines)
     this.loadModuleControl();
   }
 
@@ -96,7 +95,6 @@ export class PickingConfirmationPage implements OnInit {
       header: header,
       details: lines
     }
-    console.log("🚀 ~ file: picking-confirmation.page.ts ~ line 93 ~ PickingConfirmationPage ~ nextStep ~ object", object)
     this.pickingService.insertPicking(object).subscribe(response => {
       if (response.status === 201) {
         let ps: PickingSummary = {
