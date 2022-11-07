@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
-import { PickingRoot } from 'src/app/modules/transactions/models/picking';
-import { PickingService } from 'src/app/modules/transactions/services/picking.service';
+import { PackingRoot } from 'src/app/modules/transactions/models/packing';
+import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
@@ -13,21 +13,20 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 })
 export class DetailPage implements OnInit {
 
-  parent: string = 'Picking'
+  parent: string = 'Packing'
 
-  pickingId: number;
-  picking: PickingRoot;
-  // flattenSalesOrder: any;
+  packingId: number;
+  packing: PackingRoot;
 
   constructor(
     private route: ActivatedRoute,
     private navController: NavController,
     private modalController: ModalController,
     private toastService: ToastService,
-    private pickingService: PickingService
+    private packingService: PackingService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.pickingId = params['pickingId'];
+      this.packingId = params['packingId'];
       if (params['parent']) {
         this.parent = params['parent'];
       }
@@ -35,7 +34,7 @@ export class DetailPage implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.pickingId) {
+    if (!this.packingId) {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions')
     } else {
@@ -51,7 +50,7 @@ export class DetailPage implements OnInit {
   locationMasterList: MasterListDetails[] = [];
   warehouseAgentMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.pickingService.getMasterList().subscribe(response => {
+    this.packingService.getMasterList().subscribe(response => {
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUom').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -64,9 +63,9 @@ export class DetailPage implements OnInit {
   }
 
   loadDetail() {
-    this.pickingService.getPickingDetail(this.pickingId).subscribe(response => {
-      this.picking = response;
-      console.log("🚀 ~ file: detail.page.ts ~ line 69 ~ DetailPage ~ this.pickingService.getPickingDetail ~ this.picking", this.picking)
+    this.packingService.getPackingDetail(this.packingId).subscribe(response => {
+      this.packing = response;
+      console.log("🚀 ~ file: detail.page.ts ~ line 67 ~ DetailPage ~ this.pickingService.getPickingDetail ~ this.packing", this.packing)
     }, error => {
       console.log(error);
     })

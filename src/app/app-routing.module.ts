@@ -119,6 +119,10 @@ const routes: Routes = [
     path: 'transactions/packing',
     loadChildren: () => import('./modules/transactions/pages/packing/packing.module').then( m => m.PackingPageModule)
   },
+  {
+    path: 'transactions/packing/packing-detail',
+    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/detail/detail.module').then( m => m.DetailPageModule)
+  },
 
 
 
@@ -155,6 +159,10 @@ const routes: Routes = [
   {
     path: 'search-dropdown',
     loadChildren: () => import('./shared/pages/search-dropdown/search-dropdown.module').then(m => m.SearchDropdownPageModule)
+  },
+  {
+    path: 'search-multi-dropdown',
+    loadChildren: () => import('./shared/pages/search-multi-dropdown/search-multi-dropdown.module').then( m => m.SearchMultiDropdownPageModule)
   },
   {
     path: 'item-add-grid',

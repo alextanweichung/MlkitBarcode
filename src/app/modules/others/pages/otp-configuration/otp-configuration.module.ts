@@ -8,6 +8,7 @@ import { OtpConfigurationPageRoutingModule } from './otp-configuration-routing.m
 
 import { OtpConfigurationPage } from './otp-configuration.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     FormsModule,
     IonicModule,
     OtpConfigurationPageRoutingModule,
-    SearchDropdownPageModule
+    SearchDropdownPageModule,
+    SearchMultiDropdownPageModule
   ],
   declarations: [OtpConfigurationPage]
 })

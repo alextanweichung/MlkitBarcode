@@ -25,7 +25,7 @@
         </ion-text>
       </p>
     </ng-container>
-    <ng-container *ngIf="content_loaded">      
+    <ng-container *ngIf="content_loaded">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">        
         <ion-item button detail="false" (click)="goToDetail(object.pickingId)" *ngFor="let object of objects">
           <ion-label>
@@ -33,7 +33,7 @@
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
           </ion-label>
           <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
-        </ion-item>        
+        </ion-item>
       </ion-list>
     </ng-container>
   </div>

@@ -13,26 +13,26 @@
       <ion-label class="label-title">Detail</ion-label>
     </ion-toolbar>
   </ion-header>  
-  <div class="ion-padding" *ngIf="picking">
+  <div class="ion-padding" *ngIf="packing">
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
     <ion-list class="list-custom" lines="full">
       <ion-item>
-        <ion-label position="stacked"><p>Picking Num</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{picking.header.pickingNum}}"></ion-input>
+        <ion-label position="stacked"><p>packing Num</p></ion-label>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{packing.header.packingNum}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="stacked"><p>Trx Date</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{picking.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{packing.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="stacked"><p>Location</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{picking.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{packing.header.locationId|idMapping:locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="stacked"><p>Customer</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{picking.header.customerId|idMapping:customerMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{packing.header.customerId|idMapping:customerMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
     
@@ -41,9 +41,9 @@
     </ion-list-header>
 
     <ion-accordion-group #accordianGroup1>
-      <ion-accordion *ngFor="let salesOrder of picking.details;">
+      <ion-accordion *ngFor="let salesOrder of packing.details;">
         <ion-item slot="header" color="light">
-          <ion-label>{{salesOrder.salesOrderNum}}</ion-label>
+          <!-- <ion-label>{{salesOrder.salesOrderNum}}</ion-label> -->
         </ion-item>
         <div class="main-card ion-no-padding" slot="content">
           <!-- <ion-grid class="ion-no-padding" *ngIf="salesOrder.currentPickList.length > 0">
@@ -56,7 +56,7 @@
                         <ion-row>
                           <ion-col>
                             {{soLine.itemCode}}
-                          </ion-col>
+                          </ion-col>                            
                         </ion-row>
                       </ion-grid>
                     </ion-card-title>
