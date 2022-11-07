@@ -157,9 +157,9 @@ export class PickingSalesOrderPage implements OnInit {
   async isWithSoChanged(event) {
     if (event.detail.value === 'withSo') {
       this.objectForm.patchValue({ isWithSo: true });
-      await this.onCustomerSelected({ id: this.customerId });
+      // await this.onCustomerSelected({ id: this.customerId });
     } else {
-      this.availableSalesOrders = [];
+      // this.availableSalesOrders = [];
       this.selectedSOs = [];
       this.objectForm.patchValue({ isWithSo: false });
     }
@@ -242,6 +242,7 @@ export class PickingSalesOrderPage implements OnInit {
       this.toastService.presentToast('Select at least 1 SO', '', 'bottom', 'danger', 1000);
       return;
     }
+    console.log("🚀 ~ file: picking-sales-order.page.ts ~ line 246 ~ PickingSalesOrderPage ~ nextStep ~ this.objectForm.getRawValue()", this.objectForm.getRawValue())
     this.pickingService.setHeader(this.objectForm.getRawValue());
     this.pickingService.setChoosenSalesOrders(this.selectedSOs);
     this.navController.navigateForward('/transactions/picking/picking-item');

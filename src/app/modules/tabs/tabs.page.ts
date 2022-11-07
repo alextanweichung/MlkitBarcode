@@ -59,6 +59,18 @@ export class TabsPage {
           }
         },
         {
+          text: 'Add Packing',
+          icon: 'swap-vertical-outline',
+          handler: () => {
+            let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
+            if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
+              this.toastService.presentToast('Error', 'Warehouse Agent not set', 'bottom', 'danger', 1000);
+            } else {
+              this.navController.navigateForward('/transactions/packing/packing-sales-order');
+            }
+          }
+        },
+        {
           text: 'Cancel',
           icon: 'close',
           role: 'cancel'

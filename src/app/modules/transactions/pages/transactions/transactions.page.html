@@ -93,5 +93,31 @@
       <hr class="hr-small">
     </ng-container>
 
+    <ng-container *ngIf="showPacking">
+      <ion-list-header>
+        <ion-label color="dark">Packing</ion-label>
+        <ion-button routerLink="packing">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+      </ion-list-header>
+      <ng-container *ngIf="!packing_load">
+        <p>
+          <ion-text color="tertiary">
+            <h3>Nothing found!</h3>
+          </ion-text>
+        </p>
+      </ng-container>
+      <ng-container *ngIf="picking_loaded">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" (click)="goToPackingDetail(object.packingId)" *ngFor="let object of packings">
+            <ion-label>
+              <h3>{{object.packingNum}}</h3>
+              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+            </ion-label>
+            <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
+          </ion-item>
+        </ion-list>
+      </ng-container>
+      <hr class="hr-small">
+    </ng-container>
+
   </div>
 </ion-content>  
