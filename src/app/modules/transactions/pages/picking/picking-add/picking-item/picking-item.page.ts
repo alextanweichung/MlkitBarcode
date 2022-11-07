@@ -1,6 +1,6 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, IonAccordionGroup, IonInput, NavController } from '@ionic/angular';
+import { AlertController, IonAccordionGroup, IonInput, NavController, ViewDidEnter } from '@ionic/angular';
 import { GoodsPicking } from 'src/app/modules/transactions/models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
@@ -17,7 +17,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './picking-item.page.html',
   styleUrls: ['./picking-item.page.scss'],
 })
-export class PickingItemPage implements OnInit {
+export class PickingItemPage implements OnInit, ViewDidEnter {
 
   pickingDtoHeader: GoodsPicking;
   pickingSalesOrders: PickingSalesOrderRoot[] = [];
@@ -33,6 +33,10 @@ export class PickingItemPage implements OnInit {
     private alertController: AlertController,
     private toastService: ToastService,
   ) { }
+
+  ionViewDidEnter(): void {
+    this.barcodeInput.setFocus();
+  }
 
   ngOnInit() {
     this.pickingDtoHeader = this.pickingService.pickingDtoHeader;
@@ -116,6 +120,7 @@ export class PickingItemPage implements OnInit {
   selectedSo: PickingSalesOrderRoot;
   setSelectedSo(so) {
     this.selectedSo = so;
+    this.barcodeInput.setFocus();
   }
 
   /* #endregion */
@@ -153,7 +158,7 @@ export class PickingItemPage implements OnInit {
       if (itemExists) {
         this.selectedSoDetail = itemExists;
         this.selectedSoDetail.qtyPickedCurrent++;
-        this.openModal();
+        // this.openModal();
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
@@ -169,7 +174,7 @@ export class PickingItemPage implements OnInit {
           pickingHistory: []
         })
       }
-      if (this.pickingSalesOrders[0].details.findIndex(r => r.itemSku === sku) > -1) { // already in
+      if (this.pickingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
         this.selectedSoDetail = this.pickingSalesOrders[0].details.find(r => r.itemSku === sku);
         this.selectedSoDetail.qtyPickedCurrent++;
       } else {
@@ -206,21 +211,21 @@ export class PickingItemPage implements OnInit {
 
   /* #region  modal to input qty */
 
-  isModalOpen: boolean = false;
-  @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
+  // isModalOpen: boolean = false;
+  // @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
   selectedSoDetail: PickingSalesOrderDetail;
-  openModal() {
-    if (this.selectedSoDetail) {      
-      this.isModalOpen = true;
-    } else {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-    }
-  }
+  // openModal() {
+  //   if (this.selectedSoDetail) {      
+  //     this.isModalOpen = true;
+  //   } else {
+  //     this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+  //   }
+  // }
 
-  hideModal() {
-    this.selectedSoDetail = null;
-    this.isModalOpen = false;
-  }
+  // hideModal() {
+  //   this.selectedSoDetail = null;
+  //   this.isModalOpen = false;
+  // }
   
   /* #endregion */
 

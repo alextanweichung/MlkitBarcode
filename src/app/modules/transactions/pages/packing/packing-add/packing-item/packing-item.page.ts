@@ -116,6 +116,7 @@ export class PackingItemPage implements OnInit {
   selectedSo: PackingSalesOrderRoot;
   setSelectedSo(so) {
     this.selectedSo = so;
+    this.barcodeInput.setFocus();
   }
 
   /* #endregion */
@@ -153,7 +154,7 @@ export class PackingItemPage implements OnInit {
       if (itemExists) {
         this.selectedSoDetail = itemExists;
         this.selectedSoDetail.qtyPackedCurrent++;
-        this.openModal();
+        // this.openModal();
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
@@ -169,7 +170,7 @@ export class PackingItemPage implements OnInit {
           pickingHistory: []
         })
       }
-      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === sku) > -1) { // already in
+      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in
         this.selectedSoDetail = this.packingSalesOrders[0].details.find(r => r.itemSku === sku);
         this.selectedSoDetail.qtyPackedCurrent++;
       } else {
@@ -204,21 +205,22 @@ export class PackingItemPage implements OnInit {
 
   /* #region  modal to input qty */
 
-  isModalOpen: boolean = false;
-  @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
+  // isModalOpen: boolean = false;
+  // @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
   selectedSoDetail: PackingSalesOrderDetail;
-  openModal() {
-    if (this.selectedSoDetail) {      
-      this.isModalOpen = true;
-    } else {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-    }
-  }
+  // openModal() {
+  //   if (this.selectedSoDetail) {      
+  //     this.isModalOpen = true;
+  //   } else {
+  //     this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+  //   }
+  // }
 
-  hideModal() {
-    this.selectedSoDetail = null;
-    this.isModalOpen = false;
-  }
+  // hideModal() {
+  //   this.barcodeInput.setFocus();
+  //   this.selectedSoDetail = null;
+  //   this.isModalOpen = false;
+  // }
   
   /* #endregion */
 

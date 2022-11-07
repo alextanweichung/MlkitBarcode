@@ -166,7 +166,7 @@
 
 <div class="scan-box" [hidden]="!scanActive"></div>
 
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (didPresent)="inputNumModal.setFocus()">
+<!-- <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (didPresent)="inputNumModal.setFocus()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -186,9 +186,6 @@
                   <ion-card-title>
                     <ion-grid class="ion-no-padding">
                       <ion-row>
-                        <!-- <ion-col>
-                          {{selectedSoDetail.itemCode}}
-                        </ion-col> -->
                         <ion-col class="ion-flex justify-content-end">
                           <ion-icon *ngIf="selectedSoDetail.qtyRequest === (selectedSoDetail.qtyPicked + selectedSoDetail.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
                         </ion-col>
@@ -245,4 +242,4 @@
       </ion-button>
     </ion-footer>
   </ng-template>
-</ion-modal>
+</ion-modal> -->
