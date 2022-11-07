@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { GoodsPicking, GoodsPickingDto, PickingList, PickingRoot, PickingSummary } from '../models/picking';
+import { GoodsPicking, GoodsPickingDto, PickingList, PickingSummary } from '../models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from '../models/picking-sales-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -92,7 +92,7 @@ export class PickingService {
   }
 
   getPickingDetail(pickingId: number) {
-    return this.http.get<PickingRoot>(this.baseUrl + "MobilePicking/" + pickingId);
+    return this.http.get<any>(this.baseUrl + "MobilePicking/" + pickingId);
   }
 
   insertPicking(object: GoodsPickingDto) {

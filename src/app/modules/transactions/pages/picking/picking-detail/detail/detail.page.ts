@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
-import { PickingRoot } from 'src/app/modules/transactions/models/picking';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -16,7 +15,7 @@ export class DetailPage implements OnInit {
   parent: string = 'Picking'
 
   pickingId: number;
-  picking: PickingRoot;
+  picking: any;
   // flattenSalesOrder: any;
 
   constructor(
