@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { GoodsPacking, PackingList, PackingSummary } from '../models/packing';
+import { GoodsPacking, GoodspackingDto, PackingList, PackingSummary } from '../models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from '../models/packing-sales-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -94,6 +94,10 @@ export class PackingService {
 
   getPackingDetail(packingId: number) {
     return this.http.get<any>(this.baseUrl + "MobilePacking/" + packingId);
+  }
+
+  insertPacking(object: GoodspackingDto ) {
+    return this.http.post(this.baseUrl + "MobilePacking", object, httpObserveHeader);
   }
   
 }

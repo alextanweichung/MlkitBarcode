@@ -46,9 +46,9 @@
           <ion-label>{{salesOrder.salesOrderNum}}</ion-label>
         </ion-item>
         <div class="main-card ion-no-padding" slot="content">
-          <ion-grid class="ion-no-padding" *ngIf="salesOrder.currentPickList.length > 0">
+          <ion-grid class="ion-no-padding" *ngIf="salesOrder.currentPackList.length > 0">
             <ion-row>
-              <ion-col size="12" class="py-0" *ngFor="let soLine of salesOrder?.currentPickList">
+              <ion-col size="12" class="py-0" *ngFor="let soLine of salesOrder?.currentPackList">
                 <ion-card class="m-1">
                   <ion-card-header class="px-2 pt-2 pb-0">
                     <ion-card-title>

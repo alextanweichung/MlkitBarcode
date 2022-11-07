@@ -123,25 +123,28 @@ export class PackingItemPage implements OnInit {
   /* #region  barcode & check so */
 
   manualBarcodeInput: string;
-  checkValidBarcode(barcode: string): string {
-    if (barcode && barcode.length > 12) {
-      barcode = barcode.substring(0, 12);
-    }
-    if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-      let found = this.configService.item_Barcodes.find(r => r.barcode === barcode);
-      if (found) {
-        if (found.sku) {
-          this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
-          this.addItemToSo(found.sku);
-        }
-      } else {
-        this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
-        return;
+  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
+  async checkValidBarcode(barcode: string) {
+    if (barcode) {
+      this.manualBarcodeInput = '';
+      if (barcode && barcode.length > 12) {
+        barcode = barcode.substring(0, 12);
       }
+      if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
+        let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        if (found) {
+          if (found.sku) {
+            this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
+            this.addItemToSo(found.sku);
+          }
+        } else {
+          this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
+        }
+      }
+      // either go online find or toast local db no item master/barcodes here
     }
-    this.manualBarcodeInput = '';
-    // either go online find or toast local db no item master/barcodes here
-    return;
+    this.barcodeInput.value = '';
+    this.barcodeInput.setFocus();
   }
 
   async addItemToSo(sku: string) {    

@@ -16,6 +16,14 @@ const routes: Routes = [
     path: 'packing-item',
     loadChildren: () => import('./packing-add/packing-item/packing-item.module').then( m => m.PackingItemPageModule)
   },
+  {
+    path: 'packing-confirmation',
+    loadChildren: () => import('./packing-add/packing-confirmation/packing-confirmation.module').then( m => m.PackingConfirmationPageModule)
+  },
+  {
+    path: 'packing-summary',
+    loadChildren: () => import('./packing-add/packing-summary/packing-summary.module').then( m => m.PackingSummaryPageModule)
+  },
 ];
 
 @NgModule({
