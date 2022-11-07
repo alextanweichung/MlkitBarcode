@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { PackingList } from '../../models/packing';
 import { PickingList } from '../../models/picking';
 import { QuotationList } from '../../models/quotation';
 import { SalesOrderList } from '../../models/sales-order';
+import { PackingService } from '../../services/packing.service';
 import { PickingService } from '../../services/picking.service';
 import { QuotationService } from '../../services/quotation.service';
 import { SalesOrderService } from '../../services/sales-order.service';
@@ -13,6 +15,7 @@ const pageCode: string = 'MATR';
 const mobileQuotationCode: string = 'MATRQU';
 const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
+const mobilePackingCode: string = 'MATRPA';
 
 @Component({
   selector: 'app-transactions',
@@ -33,12 +36,17 @@ export class TransactionsPage implements OnInit {
   picking_loaded: boolean = false;
   pickings: PickingList[] = [];
 
+  showPacking: boolean = false;
+  packing_load: boolean = false;
+  packings: PackingList[] = [];
+
   constructor(
     private authService: AuthService,
     private navController: NavController,
     private quotationService: QuotationService,
     private salesOrderService: SalesOrderService,
-    private pickingService: PickingService
+    private pickingService: PickingService,
+    private packingService: PackingService,
   ) { }
 
   ngOnInit() {
@@ -48,6 +56,7 @@ export class TransactionsPage implements OnInit {
         this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
         this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
+        this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
       }
     })
     this.loadAllRecentList();
@@ -70,6 +79,9 @@ export class TransactionsPage implements OnInit {
 
     // picking
     this.loadRecentPicking();
+
+    // packing
+    this.loadRecentPacking();
   }
 
   /* #region  quotation */
@@ -143,6 +155,31 @@ export class TransactionsPage implements OnInit {
       }
     }
     this.navController.navigateForward('/transactions/picking/picking-detail', navigationExtras);
+  }
+
+  /* #endregion */
+
+  /* #region  packing */
+
+  loadRecentPacking() {
+    this.packingService.getRecentPackingList().subscribe(response => {
+      this.packings = response;
+      if (this.packings.length > 0) {
+        this.packing_load = true;
+      }
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  async goToPackingDetail(packingId: number) {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        packingId: packingId,
+        parent: "Transactions"
+      }
+    }
+    this.navController.navigateForward('/transactions/packing/packing-detail', navigationExtras);
   }
 
   /* #endregion */

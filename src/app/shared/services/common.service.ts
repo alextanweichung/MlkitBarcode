@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, QueryList } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
-
+  
   baseUrl: string;
   startDate: Date;
   endDate: Date
@@ -40,5 +40,18 @@ export class CommonService {
   syncAllItemByLocationCode() {
     return this.http.get(this.baseUrl + "PosDownload/itemMaster/KLCC/2022-10-31");
   }
+  
+  setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {
+    console.log("🚀 ~ file: common.service.ts ~ line 45 ~ CommonService ~ setInputNumberSelect ~ viewChildrenQueryList", viewChildrenQueryList)
+    setTimeout(() => {
+      const viewChildElement = viewChildrenQueryList.find(element => element.el.nativeElement.id === (objectType))
+      console.log("🚀 ~ file: common.service.ts ~ line 47 ~ CommonService ~ setTimeout ~ viewChildElement", viewChildElement)
+      console.log("🚀 ~ file: common.service.ts ~ line 47 ~ CommonService ~ setTimeout ~ objectType", objectType)
+      if (viewChildElement) {
+        viewChildElement.input.nativeElement.select();
+      }
+    }, 1);
+  }
+
 
 }

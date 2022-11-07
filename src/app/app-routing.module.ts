@@ -114,6 +114,11 @@ const routes: Routes = [
     path: 'transactions/picking/picking-detail',
     loadChildren: () => import('./modules/transactions/pages/picking/picking-detail/detail/detail.module').then(m => m.DetailPageModule)
   },
+  // transaction-packing
+  {
+    path: 'transactions/packing',
+    loadChildren: () => import('./modules/transactions/pages/packing/packing.module').then( m => m.PackingPageModule)
+  },
 
 
 
@@ -156,6 +161,10 @@ const routes: Routes = [
     loadChildren: () => import('./shared/pages/item-add-grid/item-add-grid.module').then(m => m.ItemAddGridPageModule)
   },
   {
+    path: 'item-add-list',
+    loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
+  },
+  {
     path: 'item-cart',
     loadChildren: () => import('./shared/pages/item-cart/item-cart.module').then(m => m.ItemCartPageModule)
   },
@@ -163,10 +172,7 @@ const routes: Routes = [
     path: 'transaction-processing',
     loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then(m => m.TransactionProcessingPageModule)
   },
-  {
-    path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
-  },
+
 
 
 

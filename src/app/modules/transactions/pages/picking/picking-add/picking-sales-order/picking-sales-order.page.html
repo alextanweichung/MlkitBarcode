@@ -39,14 +39,16 @@
           <h3>Nothing found!</h3>
         </ion-text>
       </p>
+    
+      <div *ngIf="objectForm.get('isWithSo').value">
+        <ion-item *ngFor="let item of availableSalesOrders" lines="full">
+          <ion-label>{{item.header.salesOrderNum}}</ion-label>
+          <ion-label>{{item.header.trxDate|date:'dd/MM/yyyy'}}</ion-label>
+          <ion-checkbox slot="end" (ionChange)="salesOrderChecked($event, item)"></ion-checkbox>
+        </ion-item>
+      </div>
       
     </form>
-    
-    <ion-item *ngFor="let item of availableSalesOrders" lines="full">
-      <ion-label>{{item.header.salesOrderNum}}</ion-label>
-      <ion-label>{{item.header.trxDate|date:'dd/MM/yyyy'}}</ion-label>
-      <ion-checkbox slot="end" (ionChange)="salesOrderChecked($event, item)"></ion-checkbox>
-    </ion-item>
 
   </div>
 </ion-content>

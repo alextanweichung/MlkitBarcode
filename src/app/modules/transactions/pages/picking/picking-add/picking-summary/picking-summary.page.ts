@@ -34,7 +34,7 @@ export class PickingSummaryPage implements OnInit {
 
   done() {
     this.pickingService.resetVariables();
-    this.navController.navigateRoot('/transactions/sales-order');
+    this.navController.navigateRoot('/transactions/picking');
   }
 
 }

@@ -1,22 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
-import { ToastService } from 'src/app/services/toast/toast.service';
-import { PickingList } from '../../models/picking';
-import { CommonService } from '../../../../shared/services/common.service';
-import { PickingService } from '../../services/picking.service';
-import { FilterPage } from '../filter/filter.page';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { PackingList } from '../../models/packing';
+import { PackingService } from '../../services/packing.service';
+import { FilterPage } from '../filter/filter.page';
 
 @Component({
-  selector: 'app-picking',
-  templateUrl: './picking.page.html',
-  styleUrls: ['./picking.page.scss'],
+  selector: 'app-packing',
+  templateUrl: './packing.page.html',
+  styleUrls: ['./packing.page.scss'],
 })
-export class PickingPage implements OnInit {
+export class PackingPage implements OnInit {
 
   content_loaded: boolean = false;
-  objects: PickingList[] = [];
+  objects: PackingList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -24,7 +24,7 @@ export class PickingPage implements OnInit {
   constructor(
     private commonService: CommonService,
     private configService: ConfigService,
-    private pickingService: PickingService,
+    private packingService: PackingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
@@ -44,7 +44,7 @@ export class PickingPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    this.pickingService.getPickingList(this.startDate, this.endDate).subscribe(response => {
+    this.packingService.getPackingList(this.startDate, this.endDate).subscribe(response => {
       this.objects = response;
       if (this.objects.length > 0) {
         this.content_loaded = true;
@@ -64,7 +64,7 @@ export class PickingPage implements OnInit {
     if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
       this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1000);
     } else {
-      this.navController.navigateForward('/transactions/picking/picking-sales-order');
+      // this.navController.navigateForward('/transactions/picking/picking-sales-order');
     }
   }
 
@@ -99,7 +99,7 @@ export class PickingPage implements OnInit {
       cssClass: 'custom-action-sheet',
       buttons: [
         {
-          text: 'Add Picking',
+          text: 'Add Packing',
           icon: 'document-outline',
           handler: () => {
             this.addObject();
@@ -114,13 +114,13 @@ export class PickingPage implements OnInit {
     await actionSheet.present();
   }
 
-  goToDetail(pickingId: number) {
+  goToDetail(packingId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        pickingId: pickingId
+        packingId: packingId
       }
     }
-    this.navController.navigateForward('/transactions/picking/picking-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/packing/packing-detail', navigationExtras);
   }
 
 }
