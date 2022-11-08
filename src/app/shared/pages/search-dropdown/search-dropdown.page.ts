@@ -51,6 +51,10 @@ export class SearchDropdownPage implements OnInit {
     this.hideModal(object);
   }
 
+  clearSelected() {
+    this.selected = null;
+  }
+
   isModalOpen: boolean = false;
   showModal() {
     this.tempDropdownList = this.searchDropdownList;

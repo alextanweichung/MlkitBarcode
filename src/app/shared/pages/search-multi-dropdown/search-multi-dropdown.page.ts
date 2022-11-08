@@ -57,6 +57,10 @@ export class SearchMultiDropdownPage implements OnInit {
     }
   }
 
+  clearSelected() {
+    this.selected = [];
+  }
+
   isModalOpen: boolean = false;
   showModal() {
     this.tempDropdownList = this.searchDropdownList;
