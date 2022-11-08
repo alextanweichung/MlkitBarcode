@@ -146,6 +146,10 @@ const routes: Routes = [
     path: 'others/stock-count',
     loadChildren: () => import('./modules/others/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
   },
+  {
+    path: 'others/stock-count/stock-count-detail',
+    loadChildren: () => import('./modules/others/pages/stock-count/stock-count-detail/stock-count-detail.module').then( m => m.StockCountDetailPageModule)
+  },
 
 
 

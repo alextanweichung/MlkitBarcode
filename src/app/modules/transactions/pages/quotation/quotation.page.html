@@ -25,15 +25,15 @@
         </ion-text>
       </p>
     </ng-container>
-    <ng-container *ngIf="content_loaded">      
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">        
+    <ng-container *ngIf="content_loaded">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects">
           <ion-label>
             <h3>{{object.quotationNum}}</h3>
             <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
           </ion-label>
           <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
-        </ion-item>        
+        </ion-item>
       </ion-list>
     </ng-container>
   </div>
