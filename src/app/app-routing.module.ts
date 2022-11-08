@@ -131,16 +131,22 @@ const routes: Routes = [
     path: 'others',
     loadChildren: () => import('./modules/others/pages/others/others.module').then(m => m.OthersPageModule)
   },
-  // others-check-balance
-  {
-    path: 'others/check-balance',
-    loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
-  },
   // others-otp-configuration
   {
     path: 'others/otp-configuration',
     loadChildren: () => import('./modules/others/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
   },
+  // others-check-balance
+  {
+    path: 'others/check-balance',
+    loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
+  },
+  // others-stock-count
+  {
+    path: 'others/stock-count',
+    loadChildren: () => import('./modules/others/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
+  },
+
 
 
   // shared

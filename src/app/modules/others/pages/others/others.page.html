@@ -12,8 +12,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="ion-padding">
-
-    <!-- #region  -->
+    <ng-container *ngIf="showOtpConfig">
       <ion-list-header class="ion-list-header-small">
         <ion-label>OTP Configuration</ion-label>
       </ion-list-header>
@@ -24,24 +23,23 @@
           </ion-label>
         </ion-item>
       </ion-list>
-    <!-- #endregion -->
-
-    <ng-container *ngIf="showInventoryLevel">
+    </ng-container>    
+    <ng-container *ngIf="showInventoryLevel || showStockCount">
       <ion-list-header class="ion-list-header-small">
-        <ion-label>Inventory Level</ion-label>
+        <ion-label>Inventory</ion-label>
       </ion-list-header>
       <ion-list class="list-custom" lines="full">
-        <ion-item button routerLink="check-balance">
+        <ion-item button routerLink="check-balance" *ngIf="showInventoryLevel">
           <ion-label>
             <h3>Check Balance</h3>
           </ion-label>
         </ion-item>
+        <ion-item button routerLink="stock-count" *ngIf="showStockCount">
+          <ion-label>
+            <h3>Stock Count</h3>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </ng-container>
-
-
-    <hr class="hr-medium">
-
   </div>
-
 </ion-content>
