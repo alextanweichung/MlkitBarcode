@@ -136,6 +136,10 @@ const routes: Routes = [
     path: 'others/otp-configuration',
     loadChildren: () => import('./modules/others/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
   },
+  {
+    path: 'others/otp-config-list',
+    loadChildren: () => import('./modules/others/pages/otp-configuration/otp-config-list/otp-config-list.module').then( m => m.OtpConfigListPageModule)
+  },
   // others-check-balance
   {
     path: 'others/check-balance',
@@ -189,7 +193,8 @@ const routes: Routes = [
   {
     path: 'transaction-processing',
     loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then(m => m.TransactionProcessingPageModule)
-  },  {
+  },
+  {
     path: 'calendar-input',
     loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then( m => m.CalendarInputPageModule)
   },
