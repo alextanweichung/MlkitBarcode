@@ -189,7 +189,11 @@ const routes: Routes = [
   {
     path: 'transaction-processing',
     loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then(m => m.TransactionProcessingPageModule)
+  },  {
+    path: 'calendar-input',
+    loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then( m => m.CalendarInputPageModule)
   },
+
 
 
 

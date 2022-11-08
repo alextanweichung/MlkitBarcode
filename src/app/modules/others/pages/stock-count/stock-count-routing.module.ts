@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: StockCountPage
+  },
+  {
+    path: 'stock-count-header',
+    loadChildren: () => import('./stock-count-add/stock-count-header/stock-count-header.module').then( m => m.StockCountHeaderPageModule)
   }
 ];
 

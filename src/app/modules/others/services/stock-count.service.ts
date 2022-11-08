@@ -34,5 +34,9 @@ export class StockCountService {
   getInventoryCount(inventoryCountId: number) {
     return this.http.get<StockCountRoot>(this.baseUrl + "MobileInventoryCount/" + inventoryCountId);
   }
+
+  getInventoryCountBatchByLocationId(locationId: number) {
+    return this.http.get(this.baseUrl + "MobileInventoryCount/batchlist/" + locationId);
+  }
   
 }

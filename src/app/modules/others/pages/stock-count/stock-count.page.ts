@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { StockCountList } from '../../models/stock-count';
@@ -22,7 +22,8 @@ export class StockCountPage implements OnInit {
     private stockCountService: StockCountService,
     private commonService: CommonService,
     private modalController: ModalController,
-    private navController: NavController
+    private navController: NavController,
+    private actionSheetController: ActionSheetController
   ) { }
 
   ngOnInit() {
@@ -38,7 +39,6 @@ export class StockCountPage implements OnInit {
   loadObjects() {
     this.stockCountService.getInventoryCountList().subscribe(response => {
       this.stockCountList = response;
-      console.log("🚀 ~ file: stock-count.page.ts ~ line 39 ~ StockCountPage ~ this.stockCountService.getInventoryCountList ~ this.stockCountList", this.stockCountList)
     }, error => {
       console.log(error);
     })
@@ -51,6 +51,32 @@ export class StockCountPage implements OnInit {
       }
     }
     this.navController.navigateForward('/others/stock-count/stock-count-detail', navigationExtras);
+  }
+
+  // Select action
+  async selectAction() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Choose an action',
+      cssClass: 'custom-action-sheet',
+      buttons: [
+        {
+          text: 'Add Stock Count',
+          icon: 'document-outline',
+          handler: () => {
+            this.addObject();
+          }
+        },
+        {
+          text: 'Cancel',
+          icon: 'close',
+          role: 'cancel'
+        }]
+    });
+    await actionSheet.present();
+  }
+
+  addObject() {
+    this.navController.navigateForward('/others/stock-count/stock-count-header');
   }
 
   async filter() {

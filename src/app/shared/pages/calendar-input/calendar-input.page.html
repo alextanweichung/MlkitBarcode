@@ -1,0 +1,8 @@
+<ion-item>
+  <ion-label [position]="labelPosition">
+    <div><p>{{title}}</p></div>
+  </ion-label>
+  <ion-input readonly type="text" [placeholder]="title" class="ion-no-padding-end" (click)="toggleDate()" [(ngModel)]="date_display"></ion-input>
+</ion-item>
+<ion-datetime class="animate__animated animate__fadeIn" *ngIf="date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onDateSelect($event)" [value]="date_value.toISOString()">
+</ion-datetime>
