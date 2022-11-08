@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { StockCountList, StockCountRoot } from '../models/stock-count';
+import { InventoryCountBatchList, StockCountList, StockCountRoot } from '../models/stock-count';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -36,7 +36,7 @@ export class StockCountService {
   }
 
   getInventoryCountBatchByLocationId(locationId: number) {
-    return this.http.get(this.baseUrl + "MobileInventoryCount/batchlist/" + locationId);
+    return this.http.get<InventoryCountBatchList[]>(this.baseUrl + "MobileInventoryCount/batchlist/" + locationId);
   }
   
 }

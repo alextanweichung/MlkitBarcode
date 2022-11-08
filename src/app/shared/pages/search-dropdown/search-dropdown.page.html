@@ -1,6 +1,6 @@
 <ion-item (click)="showModal()" lines="none">
   <ion-label [ngStyle]="{'font-weight': showBoldHeader ? 'bold' : ''}" *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
-  <ion-input [placeholder]="'Select ' + title" [value]="selected?.[optionLabel]" readonly></ion-input>
+  <ion-input [placeholder]="'Select ' + title" [value]="selected ? ((showCode ? selected?.code + ' ' : '') + selected?.[optionLabel]) : null" readonly></ion-input>
 </ion-item>
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
@@ -17,11 +17,14 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="none" *ngIf="tempDropdownList.length > 0">
           <ion-item button detail="false" *ngFor="let item of tempDropdownList" (click)="chooseThis(item)">
             <ion-label><b *ngIf="showCode">{{item?.code}} - </b>  {{item?.description}}</ion-label>
           </ion-item>
         </ion-list>
+          <div *ngIf="tempDropdownList.length === 0 && emptyMessage.length > 0">
+            {{emptyMessage}}
+          </div>          
       </div>
     </ion-content>
   </ng-template>

@@ -84,3 +84,16 @@ export interface StockCountItem {
   deactivated?: boolean
   qtyRequest: number
 }
+
+export interface InventoryCountBatchList {
+  inventoryCountBatchId: number
+  inventoryCountBatchNum: string
+  description: string
+  locationCode: string
+  locationDescription: string
+  type: string
+  startDate: string
+  endDate: string
+  deactivated: boolean
+  isCompleted: boolean
+}

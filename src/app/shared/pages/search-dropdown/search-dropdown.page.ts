@@ -17,6 +17,7 @@ export class SearchDropdownPage implements OnInit {
   @Input() optionLabel: string = 'description';
   @Input() showCode: boolean = false;
   @Input() searchDropdownList: SearchDropdownList[];
+  @Input() emptyMessage: string = 'No results found';
   @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
   selected: SearchDropdownList;
