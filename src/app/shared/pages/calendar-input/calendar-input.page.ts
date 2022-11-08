@@ -23,6 +23,7 @@ export class CalendarInputPage implements OnInit {
     if (!this.date_value) {
       this.date_value = this.defaultDate;
       this.date_display = format(parseISO(this.date_value.toISOString()), 'MMM d, yyyy');
+      this.onDateSelected.emit(this.date_value);
     }
   }
 
