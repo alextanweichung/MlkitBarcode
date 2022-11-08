@@ -11,6 +11,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 
 @Component({
   selector: 'app-picking-item',
@@ -145,28 +146,52 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
         }
+      } else {
+        this.pickingService.getItemInfoByBarcode(barcode).subscribe(response => {
+          if (response) {
+            this.addItemToSo(response.itemSku, response);
+          }          
+        }, error => {
+          console.log(error);
+        })
       }
-      // either go online find or toast local db no item master/barcodes here
     }
     this.barcodeInput.value = '';
     this.barcodeInput.setFocus();
   }
 
-  async addItemToSo(sku: string) {    
+  selectedSoDetail: PickingSalesOrderDetail;
+  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {    
     if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {
         this.selectedSoDetail = itemExists;
         this.selectedSoDetail.qtyPickedCurrent++;
-        // this.openModal();
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
     } 
   
     if (!this.pickingDtoHeader.isWithSo) {
-      let b = this.configService.item_Barcodes.find(r => r.sku === sku);
-      let m = this.configService.item_Masters.find(r => r.id === b.itemId);
+      let b: any;
+      let m: any;
+      if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
+        b = this.configService.item_Barcodes.find(r => r.sku === sku);
+        m = this.configService.item_Masters.find(r => r.id === b.itemId);
+      } else {
+        m = {
+          id: itemInfo.itemId,
+          code: itemInfo.itemCode,
+          itemDesc: itemInfo.description,
+          varCd: itemInfo.variationTypeCode
+        }
+        b = {
+          xId: itemInfo.itemVariationLineXId,
+          yId: itemInfo.itemVariationLineYId,
+          xDesc: itemInfo.itemVariationLineXDescription,
+          yDesc: itemInfo.itemVariationLineYDescription
+        }
+      }
       if (this.pickingSalesOrders && this.pickingSalesOrders.length === 0) {
         this.pickingSalesOrders.push({
           header: null,
@@ -201,32 +226,38 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
           qtyPacked: 0
         }
         await this.pickingSalesOrders[0].details.length > 0 ? this.pickingSalesOrders[0].details.unshift(d) : this.pickingSalesOrders[0].details.push(d);
-        // this.selectedSoDetail = this.pickingSalesOrders[0].details[0];
       }
-      // this.openModal();
     }
   }
 
-  /* #endregion */
+  async deleteSoLine(index) {
+    if (this.pickingSalesOrders[0]?.details[index]) {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Delete this item?',
+        message: 'This action cannot be undone.',
+        buttons: [
+          {
+            text: 'Delete item',
+            cssClass: 'danger',
+            handler: async () => {
+              this.pickingSalesOrders[0].details.splice(index, 1);
+              this.toastService.presentToast('Item removed.', '', 'bottom', 'success', 1000);
+            }
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'cancel'
+          }
+        ]
+      });  
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+    }
+  }
 
-  /* #region  modal to input qty */
-
-  // isModalOpen: boolean = false;
-  // @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
-  selectedSoDetail: PickingSalesOrderDetail;
-  // openModal() {
-  //   if (this.selectedSoDetail) {      
-  //     this.isModalOpen = true;
-  //   } else {
-  //     this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-  //   }
-  // }
-
-  // hideModal() {
-  //   this.selectedSoDetail = null;
-  //   this.isModalOpen = false;
-  // }
-  
   /* #endregion */
 
   /* #region  barcode scanner */

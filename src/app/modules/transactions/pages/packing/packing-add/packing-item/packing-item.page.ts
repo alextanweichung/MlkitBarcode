@@ -9,6 +9,7 @@ import { PackingService } from 'src/app/modules/transactions/services/packing.se
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 
@@ -141,28 +142,52 @@ export class PackingItemPage implements OnInit {
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
         }
+      } else {
+        this.packingService.getItemInfoByBarcode(barcode).subscribe(response => {
+          if (response) {
+            this.addItemToSo(response.itemSku, response);
+          }          
+        }, error => {
+          console.log(error);
+        })
       }
-      // either go online find or toast local db no item master/barcodes here
     }
     this.barcodeInput.value = '';
     this.barcodeInput.setFocus();
   }
 
-  async addItemToSo(sku: string) {    
+  selectedSoDetail: PackingSalesOrderDetail;
+  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {    
     if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {
         this.selectedSoDetail = itemExists;
         this.selectedSoDetail.qtyPackedCurrent++;
-        // this.openModal();
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
     } 
   
     if (!this.packingDtoHeader.isWithSo) {
-      let b = this.configService.item_Barcodes.find(r => r.sku === sku);
-      let m = this.configService.item_Masters.find(r => r.id === b.itemId);
+      let b: any;
+      let m: any;
+      if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
+        b = this.configService.item_Barcodes.find(r => r.sku === sku);
+        m = this.configService.item_Masters.find(r => r.id === b.itemId);
+      } else {
+        m = {
+          id: itemInfo.itemId,
+          code: itemInfo.itemCode,
+          itemDesc: itemInfo.description,
+          varCd: itemInfo.variationTypeCode
+        }
+        b = {
+          xId: itemInfo.itemVariationLineXId,
+          yId: itemInfo.itemVariationLineYId,
+          xDesc: itemInfo.itemVariationLineXDescription,
+          yDesc: itemInfo.itemVariationLineYDescription
+        }
+      }
       if (this.packingSalesOrders && this.packingSalesOrders.length === 0) {
         this.packingSalesOrders.push({
           header: null,
@@ -170,7 +195,7 @@ export class PackingItemPage implements OnInit {
           pickingHistory: []
         })
       }
-      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in
+      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
         this.selectedSoDetail = this.packingSalesOrders[0].details.find(r => r.itemSku === sku);
         this.selectedSoDetail.qtyPackedCurrent++;
       } else {
@@ -201,27 +226,34 @@ export class PackingItemPage implements OnInit {
     }
   }
 
-  /* #endregion */
+  async deleteSoLine(index) {
+    if (this.packingSalesOrders[0]?.details[index]) {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Delete this item?',
+        message: 'This action cannot be undone.',
+        buttons: [
+          {
+            text: 'Delete item',
+            cssClass: 'danger',
+            handler: async () => {
+              this.packingSalesOrders[0].details.splice(index, 1);
+              this.toastService.presentToast('Item removed.', '', 'bottom', 'success', 1000);
+            }
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'cancel'
+          }
+        ]
+      });  
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+    }
+  }
 
-  /* #region  modal to input qty */
-
-  // isModalOpen: boolean = false;
-  // @ViewChild('inputNumModal', { static: false }) inputNumModal: IonInput;
-  selectedSoDetail: PackingSalesOrderDetail;
-  // openModal() {
-  //   if (this.selectedSoDetail) {      
-  //     this.isModalOpen = true;
-  //   } else {
-  //     this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-  //   }
-  // }
-
-  // hideModal() {
-  //   this.barcodeInput.setFocus();
-  //   this.selectedSoDetail = null;
-  //   this.isModalOpen = false;
-  // }
-  
   /* #endregion */
 
   /* #region  barcode scanner */

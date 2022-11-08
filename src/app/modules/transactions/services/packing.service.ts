@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { GoodsPacking, GoodspackingDto, PackingList, PackingSummary } from '../models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from '../models/packing-sales-order';
@@ -98,6 +99,10 @@ export class PackingService {
 
   insertPacking(object: GoodspackingDto ) {
     return this.http.post(this.baseUrl + "MobilePacking", object, httpObserveHeader);
+  }
+
+  getItemInfoByBarcode(barcode: string) {
+    return this.http.get<ItemBarcodeModel>(this.baseUrl + "MobilePacking/item/" + barcode);
   }
   
 }

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { GoodsPicking, GoodsPickingDto, PickingList, PickingSummary } from '../models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from '../models/picking-sales-order';
@@ -98,6 +99,10 @@ export class PickingService {
 
   insertPicking(object: GoodsPickingDto) {
     return this.http.post(this.baseUrl + "MobilePicking", object, httpObserveHeader);
+  }
+
+  getItemInfoByBarcode(barcode: string) {
+    return this.http.get<ItemBarcodeModel>(this.baseUrl + "MobilePicking/item/" + barcode);
   }
 
 }
