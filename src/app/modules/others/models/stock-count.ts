@@ -1,16 +1,16 @@
 import { BarcodeTag } from "src/app/shared/models/item-barcode"
 
 export interface StockCountList {
-   inventoryCountId: number
-   inventoryCountNum: string
-   description: any
-   locationCode: string
-   locationDescription: string
-   batchNum: string
-   deactivated: boolean
- }
- 
- export interface StockCountRoot {
+  inventoryCountId: number
+  inventoryCountNum: string
+  description: any
+  locationCode: string
+  locationDescription: string
+  batchNum: string
+  deactivated: boolean
+}
+
+export interface StockCountRoot {
   header: StockCountHeader
   details: StockCountDetail[]
   barcodeTag: BarcodeTag[]
@@ -49,22 +49,24 @@ export interface StockCountDetail {
   inventoryCountId: number
   locationId: number
   itemId: number
+  itemCode: string
+  description: string
   itemVariationXId?: number
   itemVariationYId?: number
   itemSku: string
   itemBarcode: string
   itemBarcodeTagId: number
   qtyRequest: number
-  qtyApproved: any
-  qtyCommit: any
-  sequence: number
-  createdById: number
-  createdBy: string
-  createdAt: string
-  modifiedById: any
-  modifiedBy: any
-  modifiedAt: any
-  deactivated: boolean
+  qtyApproved?: any
+  qtyCommit?: any
+  sequence?: number
+  createdById?: number
+  createdBy?: string
+  createdAt?: string
+  modifiedById?: any
+  modifiedBy?: any
+  modifiedAt?: any
+  deactivated?: boolean
 }
 
 export interface StockCountItem {
@@ -96,4 +98,9 @@ export interface InventoryCountBatchList {
   endDate: string
   deactivated: boolean
   isCompleted: boolean
+}
+
+export interface InventoryCountBatchCriteria {
+  randomCountType: string
+  keyId: number[]
 }

@@ -172,14 +172,9 @@ export class StockCountHeaderPage implements OnInit {
   }
 
   nextStep() {
-    console.log("🚀 ~ file: stock-count-header.page.ts ~ line 98 ~ StockCountHeaderPage ~ nextStep ~ this.objectForm.getRawValue()", this.objectForm.getRawValue())
-    // if (this.selectedCustomer) {
-    //   this.quotationService.setChoosenCustomer(this.selectedCustomer);
-    //   this.quotationService.removeItems();
-    //   this.navController.navigateForward('/transactions/quotation/quotation-item');
-    // } else {
-    //   this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1000);
-    // }
+    this.stockCountService.setHeader(this.objectForm.getRawValue());
+    this.stockCountService.removeLines();
+    this.navController.navigateForward('/others/stock-count/stock-count-item');
   }
 
 }
