@@ -11,14 +11,13 @@
     <ion-toolbar>
       <ion-label class="label-title">Sales Order</ion-label>
     </ion-toolbar>
-  </ion-header>  
-  <div class="ion-padding"> 
+  </ion-header>
+  <div class="ion-padding">
     <form [formGroup]="objectForm">
       <ion-list class="list-custom" lines="full">
         <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
         <app-search-dropdown *ngIf="objectForm.get('businessModelType').value !== 'T' && objectForm.get('businessModelType').value !== null" title="Destination Location" [searchDropdownList]="selectedCustomerLocationSearchDropdownList" (onActionComplete)="onCustomerLocationSelected($event)"></app-search-dropdown>
       </ion-list>
-    
       <div class="pt-1">
         <ion-segment #segment value="withSo" (ionChange)="isWithSoChanged($event)">
           <ion-segment-button value="withSo">
@@ -29,27 +28,22 @@
           </ion-segment-button>
         </ion-segment>
       </div>
-
       <ion-list-header class="ion-list-header-small" *ngIf="objectForm.get('isWithSo').value">
         <ion-label>Available Sales Orders</ion-label>
       </ion-list-header>
-
       <p *ngIf="availableSalesOrders?.length === 0 && objectForm.get('isWithSo').value">
         <ion-text color="tertiary">
           <h3>Nothing found!</h3>
         </ion-text>
       </p>
-    
-      <div *ngIf="objectForm.get('isWithSo').value">
-        <ion-item *ngFor="let item of availableSalesOrders" lines="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectForm.get('isWithSo').value">
+        <ion-item *ngFor="let item of availableSalesOrders">
           <ion-label>{{item.header.salesOrderNum}}</ion-label>
           <ion-label>{{item.header.trxDate|date:'dd/MM/yyyy'}}</ion-label>
           <ion-checkbox slot="end" (ionChange)="salesOrderChecked($event, item)"></ion-checkbox>
         </ion-item>
-      </div>
-      
+      </ion-list>
     </form>
-
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
