@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { InventoryCountBatchList, StockCountList, StockCountRoot } from '../models/stock-count';
+import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -23,6 +24,29 @@ export class StockCountService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
+  stockCountHeader: StockCountHeader;
+  setHeader(stockCountHeader: StockCountHeader) {
+    this.stockCountHeader = stockCountHeader;
+  }
+  
+  stockCountLines: StockCountDetail[] = []
+  setLines(stockCountLines: StockCountDetail[]) {
+    this.stockCountLines = stockCountLines;
+  }
+
+  removeHeader() {
+    this.stockCountHeader = null
+  }
+
+  removeLines() {
+    this.stockCountLines = [];
+  }
+
+  resetVariables() {
+    this.removeHeader();
+    this.removeLines();
+  }
+
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileInventoryCount/masterList");
   }
@@ -37,6 +61,18 @@ export class StockCountService {
 
   getInventoryCountBatchByLocationId(locationId: number) {
     return this.http.get<InventoryCountBatchList[]>(this.baseUrl + "MobileInventoryCount/batchlist/" + locationId);
+  }
+  
+  getInventoryCountBatchCriteria(inventoryCountBatchId: number) {
+    return this.http.get<InventoryCountBatchCriteria>(this.baseUrl + "MobileInventoryCount/batchRandomList/" + inventoryCountBatchId);
+  }
+
+  getItemInfoByBarcode(barcode: string) {
+    return this.http.get<ItemBarcodeModel>(this.baseUrl + "MobileInventoryCount/itemByBarcode/" + barcode);
+  }
+
+  insertInventoryCount(inventoryCountRoot: StockCountRoot) {
+    return this.http.post(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
   }
   
 }

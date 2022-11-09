@@ -24,6 +24,7 @@ export class PackingItemPage implements OnInit {
   packingSalesOrders: PackingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
   loadImage: boolean = true;
+  packingQtyControl: string = "0";
 
   constructor(
     private authService: AuthService,
@@ -55,6 +56,11 @@ export class PackingItemPage implements OnInit {
       if (loadImage) {
         this.loadImage = loadImage === '1' ? true : false;
       }
+      let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
+      if (packingControl != undefined) {
+        this.packingQtyControl = packingControl.ctrlValue;
+        console.log("🚀 ~ file: packing-item.page.ts ~ line 62 ~ PackingItemPage ~ loadModuleControl ~ this.packingQtyControl", this.packingQtyControl)
+      }
     }, error => {
       console.log(error);
     })
@@ -69,23 +75,38 @@ export class PackingItemPage implements OnInit {
       soLine.qtyPackedCurrent--;
     }
   }
-  
-	clonedDetails: { [s: string]: PackingSalesOrderDetail; } = {};
+
+  clonedDetails: { [s: string]: PackingSalesOrderDetail; } = {};
   backupQty(soLine, event) {
     event.getInputElement().then(r => {
       r.select();
-    })    
+    })
     this.clonedDetails[soLine.itemSku] = { ...soLine };
   }
 
   updateQty(soLine) {
     if (this.packingDtoHeader.isWithSo) {
-      if ((soLine.qtyPacked + soLine.qtyPackedCurrent) > soLine.qtyPicked) {
-        this.toastService.presentToast('Not allow to add item more than PICKED quantity.', '', 'bottom', 'medium', 1000);
-        soLine.qtyPackedCurrent = soLine.qtyPicked - soLine.qtyPacked;
+      switch (this.packingQtyControl) {
+        // No control
+        case "0":
+          break;
+        // Not allow pack quantity more than SO quantity
+        case "1":
+          if (soLine.qtyRequest < (soLine.qtyPacked + soLine.qtyPackedCurrent)) {
+            soLine.qtyPackedCurrent = soLine.qtyRequest - soLine.qtyPacked;
+            this.toastService.presentToast('Item is already fully packed', '', 'bottom', 'medium', 1000);
+          }
+          break;
+        // Not allow pack quantity more than pick quantity
+        case "2":
+          if ((soLine.qtyPacked + soLine.qtyPackedCurrent) > soLine.qtyPicked) {
+            soLine.qtyPackedCurrent = soLine.qtyPicked - soLine.qtyPacked;
+            this.toastService.presentToast('Pack quantity cannot exceed pick quantity', '', 'bottom', 'medium', 1000);
+          }
+          break;
       }
     }
-		delete this.clonedDetails[soLine.itemSku];
+    delete this.clonedDetails[soLine.itemSku];
   }
 
   eventHandler(keyCode, soLine) {
@@ -94,15 +115,39 @@ export class PackingItemPage implements OnInit {
         Keyboard.hide();
       }
       this.updateQty(soLine);
-    }    
+    }
   }
 
   increaseQty(soLine) {
+    console.log("🚀 ~ file: packing-item.page.ts ~ line 122 ~ PackingItemPage ~ increaseQty ~ soLine", soLine)
     if (soLine.qtyPackedCurrent === undefined) {
       soLine.qtyPackedCurrent = 0;
     }
-    if (this.packingDtoHeader.isWithSo && (soLine.qtyPacked + soLine.qtyPackedCurrent + 1) <= soLine.qtyPicked) {
-      soLine.qtyPackedCurrent++;
+    if (this.packingDtoHeader.isWithSo) {
+      switch (this.packingQtyControl) {
+        // No control
+        case "0":
+          soLine.qtyPackedCurrent++;
+          break;
+        // Not allow pack quantity more than SO quantity
+        case "1":
+          if (soLine.qtyRequest < (soLine.qtyPacked + soLine.qtyPackedCurrent + 1)) {
+            soLine.qtyPackedCurrent = soLine.qtyRequest - soLine.qtyPacked;
+            this.toastService.presentToast('Item is already fully packed', '', 'bottom', 'medium', 1000);
+          } else {
+            soLine.qtyPackedCurrent++;
+          }
+          break;
+        // Not allow pack quantity more than pick quantity
+        case "2":
+          if ((soLine.qtyPacked + soLine.qtyPackedCurrent + 1) > soLine.qtyPicked) {
+            soLine.qtyPackedCurrent = soLine.qtyPicked - soLine.qtyPacked;
+            this.toastService.presentToast('Pack quantity cannot exceed pick quantity', '', 'bottom', 'medium', 1000);
+          } else {
+            soLine.qtyPackedCurrent++;
+          }
+          break;
+      }
     }
     if (!this.packingDtoHeader.isWithSo) {
       soLine.qtyPackedCurrent++;
@@ -146,7 +191,7 @@ export class PackingItemPage implements OnInit {
         this.packingService.getItemInfoByBarcode(barcode).subscribe(response => {
           if (response) {
             this.addItemToSo(response.itemSku, response);
-          }          
+          }
         }, error => {
           console.log(error);
         })
@@ -157,17 +202,17 @@ export class PackingItemPage implements OnInit {
   }
 
   selectedSoDetail: PackingSalesOrderDetail;
-  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {    
+  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
     if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {
         this.selectedSoDetail = itemExists;
-        this.selectedSoDetail.qtyPackedCurrent++;
+        this.updateQty(this.selectedSoDetail);
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
-    } 
-  
+    }
+
     if (!this.packingDtoHeader.isWithSo) {
       let b: any;
       let m: any;
@@ -247,7 +292,7 @@ export class PackingItemPage implements OnInit {
             cssClass: 'cancel'
           }
         ]
-      });  
+      });
       await alert.present();
     } else {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);

@@ -12,6 +12,10 @@ export interface ItemBarcodeModel {
   itemBarcode: string
   itemUomId: number
   itemUomDescription: string
+  brandId: number
+  groupId: number
+  catId: number
+  unitPrice: number
   deactivated: boolean
 }
 

@@ -1,15 +1,12 @@
 <ion-header collapse="fade" [translucent]="true">
   <ion-toolbar>
-    <ion-title>Detail</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button text="Back"></ion-back-button>
-    </ion-buttons>
+    <ion-title>Summary</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-label class="label-title">Detail</ion-label>
+      <ion-label class="label-title">Summary</ion-label>
       <ion-buttons slot="start">
         <ion-back-button text="Back"></ion-back-button>
       </ion-buttons>
@@ -19,31 +16,31 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full" *ngIf="inventoryCount">
+    <ion-list class="list-custom" lines="full" *ngIf="stockCountRoot">
       <ion-item>
         <ion-label>
           <p>Doc Number</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.inventoryCountNum}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.inventoryCountNum}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Trx Date</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Location</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.locationId|idMapping:locationMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
     <ion-list-header class="ion-list-header-small">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" *ngFor="let item of scannedItems" class="no-ripple ion-no-padding">
+      <ion-item button detail="false" *ngFor="let item of stockCountRoot.details" class="no-ripple ion-no-padding">
         <ion-grid class="p-2 ion-no-padding">
           <ion-row>
             <ion-col>
@@ -54,8 +51,8 @@
             <ion-col>
               <div>
                 {{item.itemCode}}
-                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationLineXDescription"> {{item.itemVariationLineXDescription}}</span>
-                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationLineYDescription"> {{item.itemVariationLineYDescription}}</span>
+                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
               </div>
             </ion-col>
           </ion-row>
@@ -70,3 +67,8 @@
     </ion-list>
   </div>
 </ion-content>
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0">
+  <ion-button class="ion-margin" expand="block" size="small" (click)="done()">
+    Done
+  </ion-button>
+</ion-footer>

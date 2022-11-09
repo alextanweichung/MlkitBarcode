@@ -46,10 +46,14 @@ export class SearchDropdownPage implements OnInit {
 
     this.searchBar.setFocus();
   }
-  
+
   chooseThis(object: SearchDropdownList) {
-    this.selected = object;
-    this.hideModal(object);
+    if (this.selected && this.selected.id === object.id) {
+      this.hideModal(this.selected, false);
+    } else {
+      this.selected = object;
+      this.hideModal(object, true);
+    }
   }
 
   clearSelected() {
@@ -62,8 +66,10 @@ export class SearchDropdownPage implements OnInit {
     this.isModalOpen = true;
   }
 
-  hideModal(object: SearchDropdownList) {
-    this.onActionComplete.emit(object);
+  hideModal(object: SearchDropdownList, triggerOutput: boolean = false) {
+    if (triggerOutput) {
+      this.onActionComplete.emit(object);
+    }
     this.isModalOpen = false;
   }
 
@@ -87,7 +93,7 @@ export class SearchDropdownPage implements OnInit {
   // Cancel
   cancel() {
     // Dismiss modal
-    this.hideModal(null);
+    this.hideModal(null, true);
   }
   
 }

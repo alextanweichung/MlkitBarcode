@@ -23,8 +23,8 @@
           <ion-item class="ion-no-padding" lines="none" *ngFor="let soLine of salesOrder?.details">
             <ion-grid class="ion-no-padding p-2">
               <ion-row>
-                <ion-col>
-                  <ion-label class="font-bold">{{soLine.itemCode}}</ion-label>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{soLine.itemCode}}</div>
                 </ion-col>
                 <ion-col class="ion-flex justify-content-end">
                   <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPacked + soLine.qtyPackedCurrent)" color="success" name="checkmark-circle"></ion-icon>
@@ -77,17 +77,17 @@
         </div>
       </ion-accordion>
     </ion-accordion-group>
-    <div class="main-card ion-no-padding" slot="content" *ngIf="!packingDtoHeader?.isWithSo && packingSalesOrders.length > 0">
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!packingDtoHeader?.isWithSo && packingSalesOrders.length > 0">
       <ion-item-sliding *ngFor="let soLine of packingSalesOrders[0]?.details; let i = index">
         <ion-item class="ion-no-padding" lines="none">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
-              <ion-col>
-                <ion-label class="font-bold">{{soLine.itemCode}}</ion-label>
+              <ion-col class="ion-margin-auto ion-flex">
+                <div class="font-bold">{{soLine.itemCode}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col class="ion-flex">
+              <ion-col class="ion-margin-auto ion-flex">
                 <div>{{soLine.description}}</div>
               </ion-col>
             </ion-row>
@@ -98,10 +98,10 @@
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col class="ion-margin-auto">
+              <ion-col class="ion-margin-auto ion-flex">
                 <div class="font-smaller">SO Qty: {{soLine.qtyRequest|number:'1.0'}}</div>
               </ion-col>
-              <ion-col class="ion-margin-auto">
+              <ion-col class="ion-margin-auto ion-flex">
                 <div class="font-smaller">Packed Qty: {{(soLine.qtyPacked + soLine.qtyPackedCurrent)|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
@@ -111,15 +111,15 @@
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
+              <ion-col class="ion-margin-auto ion-flex">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(soLine)">
                   <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                 </ion-button>
               </ion-col>
-              <ion-col>
+              <ion-col class="ion-margin-auto ion-flex">
                 <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPackedCurrent" (ionFocus)="backupQty(soLine, inputNumWithoutSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
               </ion-col>
-              <ion-col>
+              <ion-col class="ion-margin-auto ion-flex">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(soLine)">
                   <ion-icon slot="icon-only" name="add-circle"></ion-icon>
                 </ion-button>
@@ -130,8 +130,8 @@
         <ion-item-options>
           <ion-item-option color="danger" (click)="deleteSoLine(i)">Delete</ion-item-option>
         </ion-item-options>
-      </ion-item-sliding>      
-    </div>
+      </ion-item-sliding>
+    </ion-list>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">

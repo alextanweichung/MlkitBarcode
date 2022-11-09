@@ -16,7 +16,7 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label position="stacked"><p>Picking Num</p></ion-label>
         <ion-input readonly class="font-size-small ion-no-padding-end" value="{{picking.header.pickingNum}}"></ion-input>
@@ -42,19 +42,16 @@
         <ion-item slot="header" color="light">
           <ion-label>{{salesOrder.salesOrderNum}}</ion-label>
         </ion-item>
-        <div slot="content">
+        <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item class="ion-no-padding" lines="full" *ngFor="let soLine of salesOrder?.currentPickList">
             <ion-grid class="ion-no-padding p-2">
               <ion-row>
-                <ion-col>
-                  <ion-label class="font-bold">{{soLine.itemCode}}</ion-label>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{soLine.itemCode}}</div>
                 </ion-col>
-                <!-- <ion-col class="ion-flex justify-content-end">
-                  <ion-icon *ngIf="soLine.qtyRequest === soLine.qtyPicked" color="success" name="checkmark-circle"></ion-icon>
-                </ion-col> -->
               </ion-row>
               <ion-row>
-                <ion-col class="ion-flex">
+                <ion-col class="ion-margin-auto ion-flex">
                   <div>{{soLine.description}}</div>
                 </ion-col>
               </ion-row>
@@ -65,28 +62,25 @@
                 </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col class="ion-margin-auto">
+                <ion-col class="ion-margin-auto ion-flex">
                   <div>Picked Qty: {{soLine.qtyPicked|number:'1.0'}}</div>
                 </ion-col>
               </ion-row>
             </ion-grid>
           </ion-item>
-        </div>
+        </ion-list>
       </ion-accordion>
     </ion-accordion-group>
-    <div class="main-card ion-no-padding" slot="content" *ngIf="!picking.header.isWithSo">
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!picking.header.isWithSo">
       <ion-item class="ion-no-padding" lines="full" *ngFor="let soLine of picking?.details">
         <ion-grid class="ion-no-padding p-2">
           <ion-row>
-            <ion-col>
-              <ion-label class="font-bold">{{soLine.itemCode}}</ion-label>
+            <ion-col class="ion-margin-auto ion-flex">
+              <div class="font-bold">{{soLine.itemCode}}</div>
             </ion-col>
-            <!-- <ion-col class="ion-flex justify-content-end">
-              <ion-icon *ngIf="soLine.qtyRequest === soLine.qtyPicked" color="success" name="checkmark-circle"></ion-icon>
-            </ion-col> -->
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex">
+            <ion-col class="ion-margin-auto ion-flex">
               <div>{{soLine.description}}</div>
             </ion-col>
           </ion-row>
@@ -97,13 +91,12 @@
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-margin-auto">
+            <ion-col class="ion-margin-auto ion-flex">
               <div>Picked Qty: {{soLine.qtyPicked|number:'1.0'}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
       </ion-item>
-    </div>
-
+    </ion-list>
   </div>
 </ion-content>

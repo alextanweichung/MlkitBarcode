@@ -11,6 +11,14 @@ const routes: Routes = [
   {
     path: 'stock-count-header',
     loadChildren: () => import('./stock-count-add/stock-count-header/stock-count-header.module').then( m => m.StockCountHeaderPageModule)
+  },
+  {
+    path: 'stock-count-item',
+    loadChildren: () => import('./stock-count-add/stock-count-item/stock-count-item.module').then( m => m.StockCountItemPageModule)
+  },
+  {
+    path: 'stock-count-summary',
+    loadChildren: () => import('./stock-count-add/stock-count-summary/stock-count-summary.module').then( m => m.StockCountSummaryPageModule)
   }
 ];
 
