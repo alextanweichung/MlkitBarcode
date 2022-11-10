@@ -4,6 +4,24 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button id="info-trigger">
+        <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+      </ion-button>
+      <ion-popover trigger="info-trigger" triggerAction="click">
+        <ng-template>
+          <ion-content class="ion-padding">
+            <div>Count Type: {{inventoryCountBatchCriteria.randomCountType}}</div>
+            <div *ngIf="inventoryCountBatchCriteria.keyId.length > 0">
+              {{inventoryCountBatchCriteria.randomCountType}}: 
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Brand'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemBrandMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Group'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemGroupMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Category'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemCategoryMasterList}}</div></div>
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen [hidden]="scanActive">
@@ -14,7 +32,6 @@
   </ion-header>
   <div class="p-2">
     <ion-input #barcodeInput class="ion-text-center" debounce="500" type="text" [(ngModel)]="manualBarcodeInput" placeholder="Scan or input Barcode" (ionChange)="checkValidBarcode(manualBarcodeInput)"></ion-input>
-
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding *ngFor="let line of stockCountDetail; let i = index">        
         <ion-item button detail="false" class="no-ripple ion-no-padding">

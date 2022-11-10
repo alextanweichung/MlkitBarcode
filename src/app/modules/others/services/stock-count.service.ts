@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
+import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCount, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -49,6 +50,10 @@ export class StockCountService {
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileInventoryCount/masterList");
+  }
+
+  getInventoryCountByDate(startDate, endDate) {
+    return this.http.get<StockCount[]>(this.baseUrl + "MobileInventoryCount/listing/" + startDate + "/" + endDate);
   }
 
   getInventoryCountList() {

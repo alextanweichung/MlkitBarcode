@@ -38,6 +38,18 @@
         </ion-label>
         <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.locationId|idMapping:locationMasterList}}"></ion-input>
       </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Zone</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.zoneId|idMapping:zoneMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Rack</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.rackId|idMapping:rackMasterList}}"></ion-input>
+      </ion-item>
     </ion-list>
     <ion-list-header class="ion-list-header-small">
       <ion-label>Details</ion-label>

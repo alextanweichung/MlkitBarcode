@@ -1,5 +1,22 @@
 import { BarcodeTag } from "src/app/shared/models/item-barcode"
 
+export interface StockCount {
+  inventoryCountId: number
+  inventoryCountNum: string
+  trxDate: string
+  locationCode: string
+  locationDescription: string
+  description: any
+  inventoryCountBatchNum: string
+  inventoryCountBatchDescription: string
+  zoneCode?: string
+  zoneDescription?: string
+  rackCode?: string
+  rackDescription?: string
+  deactivated: boolean
+  createdById: number
+}
+
 export interface StockCountList {
   inventoryCountId: number
   inventoryCountNum: string

@@ -44,10 +44,17 @@ export class StockCountItemPage implements OnInit {
     this.loadModuleControl();
   }
 
+  itemBrandMasterList: MasterListDetails[] = [];
+  itemGroupMasterList: MasterListDetails[] = [];
+  itemCategoryMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.stockCountService.getMasterList().subscribe(response => {
+      console.log("🚀 ~ file: stock-count-item.page.ts ~ line 51 ~ StockCountItemPage ~ this.stockCountService.getMasterList ~ response", response)
+      this.itemBrandMasterList = response.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemGroupMasterList = response.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemCategoryMasterList = response.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
@@ -260,7 +267,7 @@ export class StockCountItemPage implements OnInit {
       if (result.hasContent) {
         let barcode = result.content;
         this.scanActive = false;
-        // await this.checkValidBarcode(barcode);
+        await this.checkValidBarcode(barcode);
       }
     }
   }

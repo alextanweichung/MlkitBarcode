@@ -37,9 +37,13 @@ export class StockCountDetailPage implements OnInit {
   }
 
   locationMasterList: MasterListDetails[] = [];
+  zoneMasterList: MasterListDetails[] = [];
+  rackMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.stockCountService.getMasterList().subscribe(response => {
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })
