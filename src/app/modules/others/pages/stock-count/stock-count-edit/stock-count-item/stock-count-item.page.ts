@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, IonInput, NavController } from '@ionic/angular';
-import { InventoryCountBatchCriteria, StockCountDetail, StockCountHeader, StockCountRoot } from 'src/app/modules/others/models/stock-count';
+import { InventoryCountBatchCriteria, StockCountDetail, StockCountHeader } from 'src/app/modules/others/models/stock-count';
 import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -19,29 +20,34 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 })
 export class StockCountItemPage implements OnInit {
 
+  inventoryCountId: number;
   stockCountHeader: StockCountHeader;
   stockCountDetail: StockCountDetail[] = [];
 
   constructor(
+    private route: ActivatedRoute,
     private authService: AuthService,
-    private stockCountService: StockCountService,
     private navController: NavController,
     private alertController: AlertController,
     private configService: ConfigService,
-    private toastService: ToastService
-  ) { }
+    private toastService: ToastService,
+    private stockCountService: StockCountService
+    
+  ) {
+    this.route.queryParams.subscribe(params => {
+      this.inventoryCountId = params['inventoryCountId'];
+    })
+  }
 
   ngOnInit() {
     this.stockCountHeader = this.stockCountService.stockCountHeader;
-    this.stockCountDetail = [];
-    if (this.stockCountHeader === undefined) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
-    } else {
-      this.loadInventoryCountBatchCriteria();
+    this.stockCountDetail = this.stockCountService.stockCountLines;
+    if (!this.stockCountHeader || this.stockCountHeader === undefined) {
+      this.navController.navigateBack('/others/stock-count');
     }
     this.loadMasterList();
     this.loadModuleControl();
+    this.loadInventoryCountBatchCriteria();
   }
 
   itemBrandMasterList: MasterListDetails[] = [];
@@ -176,7 +182,7 @@ export class StockCountItemPage implements OnInit {
     } else {
       let d: StockCountDetail = {
         inventoryCountLineId: 0,
-        inventoryCountId: 0,
+        inventoryCountId: this.stockCountHeader.inventoryCountId,
         locationId: this.stockCountHeader.locationId,
         itemId: m.id,
         itemCode: m.code,
@@ -306,18 +312,21 @@ export class StockCountItemPage implements OnInit {
   /* #endregion */
 
   previousStep() {
-    this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        inventoryCountId: this.inventoryCountId
+      }
+    }
+    this.navController.navigateBack('/others/stock-count/stock-count-edit/stock-count-header', navigationExtras);
   }
 
   nextStep() {
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 314 ~ StockCountItemPage ~ nextStep ~ this.stockCountHeader", this.stockCountHeader)
-    this.stockCountService.insertInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
-      if (response.status === 201) {
-        let object = response.body as StockCountRoot;
-        this.stockCountService.setHeader(object.header);
-        this.stockCountService.setLines(object.details);
-        this.toastService.presentToast('Stock Count added', '', 'bottom', 'success', 1000);
-        this.navController.navigateRoot('/others/stock-count/stock-count-add/stock-count-summary');
+    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 323 ~ StockCountItemPage ~ nextStep ~ this.stockCountHeader", this.stockCountHeader)
+    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 324 ~ StockCountItemPage ~ nextStep ~ this.stockCountDetail", this.stockCountDetail)
+    this.stockCountService.updateInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
+      if (response.status === 204) {
+        this.toastService.presentToast('Stock Count updated', '', 'bottom', 'success', 1000);
+        this.navController.navigateRoot('/others/stock-count/stock-count-edit/stock-count-summary');
       }
     }, error => {
       console.log(error);

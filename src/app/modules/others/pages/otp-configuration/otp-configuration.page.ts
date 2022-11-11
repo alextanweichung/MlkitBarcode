@@ -54,7 +54,6 @@ export class OtpConfigurationPage implements OnInit {
   loadUsers() {
     this.otpConfigService.getDescendantUser().subscribe(response => {
       this.users = response;
-      console.log("🚀 ~ file: otp-configuration.page.ts ~ line 40 ~ OtpConfigurationPage ~ this.otpConfigService.getDescendantUser ~ this.users", this.users)
     }, error => {
       console.log(error);
     })

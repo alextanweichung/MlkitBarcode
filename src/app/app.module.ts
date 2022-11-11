@@ -8,7 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
-import { Drivers, Storage  } from '@ionic/storage';
+import { Drivers, Storage } from '@ionic/storage';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InitializeAppService } from './services/sqlite/initialize.app.service';
@@ -19,9 +19,10 @@ import { DetailService } from './services/sqlite/detail.service';
 import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.interceptor';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { UtcCalendarDirective } from './shared/utilities/utc-calendar.directive';
 
 export function initializeFactory(init: InitializeAppService) {
-  return () => init.initializeApp();
+    return () => init.initializeApp();
 }
 
 // export function configFactory(configService: ConfigService) {
@@ -29,7 +30,10 @@ export function initializeFactory(init: InitializeAppService) {
 // }
 
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [
+        AppComponent,
+        UtcCalendarDirective
+    ],
     imports: [
         BrowserModule,
         IonicModule.forRoot({ mode: 'ios' }),

@@ -59,7 +59,6 @@ export class PackingItemPage implements OnInit {
       let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
       if (packingControl != undefined) {
         this.packingQtyControl = packingControl.ctrlValue;
-        console.log("🚀 ~ file: packing-item.page.ts ~ line 62 ~ PackingItemPage ~ loadModuleControl ~ this.packingQtyControl", this.packingQtyControl)
       }
     }, error => {
       console.log(error);
@@ -119,7 +118,6 @@ export class PackingItemPage implements OnInit {
   }
 
   increaseQty(soLine) {
-    console.log("🚀 ~ file: packing-item.page.ts ~ line 122 ~ PackingItemPage ~ increaseQty ~ soLine", soLine)
     if (soLine.qtyPackedCurrent === undefined) {
       soLine.qtyPackedCurrent = 0;
     }

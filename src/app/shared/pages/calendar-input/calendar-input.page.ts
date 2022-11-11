@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 
 @Component({
@@ -6,7 +6,7 @@ import { format, parseISO } from 'date-fns';
   templateUrl: './calendar-input.page.html',
   styleUrls: ['./calendar-input.page.scss'],
 })
-export class CalendarInputPage implements OnInit {
+export class CalendarInputPage implements OnInit, OnChanges {
 
   @Input() title: string = 'Date';
   @Input() defaultDate: Date = new Date();
@@ -17,9 +17,26 @@ export class CalendarInputPage implements OnInit {
   date_active: boolean = false;
   date_display: string;
   date_value_for_ion_calendar: Date;
-  date_value: Date;
+  @Input() date_value: Date;
 
   constructor() { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.date_value) {
+      console.log("🚀 ~ file: calendar-input.page.ts ~ line 27 ~ CalendarInputPage ~ ngOnChanges ~ this.date_value", this.date_value)
+      if (this.date_value) {
+        if (this.presentation === 'date-time') {
+          this.date_value = new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.date_value.getHours(), this.date_value.getMinutes(), 0);
+          this.date_value_for_ion_calendar = new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.date_value.getHours(), this.date_value.getMinutes(), 0);
+        } else {
+          this.date_value = new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), 0, 0, 0);
+          this.date_value_for_ion_calendar = new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), 0, 0, 0);
+        }
+        this.date_value_for_ion_calendar.setMinutes(this.date_value_for_ion_calendar.getMinutes() - this.date_value_for_ion_calendar.getTimezoneOffset());
+        this.date_display = this.presentation === 'date-time' ? format(this.date_value, 'dd/MM/yyyy hh:mm aa') : format(this.date_value, 'dd/MM/yyyy');
+      }
+    }
+  }
 
   ngOnInit() {
     if (!this.date_value) {
@@ -32,7 +49,7 @@ export class CalendarInputPage implements OnInit {
       }
       this.date_value_for_ion_calendar.setMinutes(this.date_value_for_ion_calendar.getMinutes() - this.date_value_for_ion_calendar.getTimezoneOffset());
       this.date_display = this.presentation === 'date-time' ? format(this.date_value, 'dd/MM/yyyy hh:mm aa') : format(this.date_value, 'dd/MM/yyyy');
-      this.onDateSelected.emit(this.date_value);
+      this.onDateSelected.emit(this.date_value_for_ion_calendar);
     }
   }
 
@@ -55,8 +72,7 @@ export class CalendarInputPage implements OnInit {
     }
     this.date_value_for_ion_calendar.setMinutes(this.date_value_for_ion_calendar.getMinutes() - this.date_value_for_ion_calendar.getTimezoneOffset());
     this.date_display = this.presentation === 'date-time' ? format(this.date_value, 'dd/MM/yyyy hh:mm aa') : format(this.date_value, 'dd/MM/yyyy');
-    console.log("🚀 ~ file: calendar-input.page.ts ~ line 59 ~ CalendarInputPage ~ onDateSelect ~ this.date_value", this.date_value)
-    this.onDateSelected.emit(this.date_value);
+    this.onDateSelected.emit(this.date_value_for_ion_calendar);
   }
 
   resetControl() {

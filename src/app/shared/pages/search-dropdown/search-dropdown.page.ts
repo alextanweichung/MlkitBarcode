@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { IonSearchbar, LoadingController, ModalController } from '@ionic/angular';
@@ -9,7 +9,7 @@ import { SearchDropdownList } from '../../models/search-dropdown-list';
   templateUrl: './search-dropdown.page.html',
   styleUrls: ['./search-dropdown.page.scss'],
 })
-export class SearchDropdownPage implements OnInit {
+export class SearchDropdownPage implements OnInit, OnChanges {
 
   @Input() title: string = "Search";
   @Input() showHeaderLabel: boolean = true;
@@ -20,6 +20,7 @@ export class SearchDropdownPage implements OnInit {
   @Input() emptyMessage: string = 'No results found';
   @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
+  @Input() selectedId: number;
   selected: SearchDropdownList;
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
@@ -27,6 +28,16 @@ export class SearchDropdownPage implements OnInit {
   constructor(
     private loadingController: LoadingController,
   ) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.selectedId) {
+      if (this.selectedId) {
+        this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
+      } else {
+        this.selected = null;
+      }
+    }
+  }
 
   ngOnInit() {
 
@@ -43,7 +54,6 @@ export class SearchDropdownPage implements OnInit {
     } else {
       this.tempDropdownList = this.searchDropdownList;
     }
-
     this.searchBar.setFocus();
   }
 
@@ -80,7 +90,6 @@ export class SearchDropdownPage implements OnInit {
       message: 'Loading...',
       spinner: 'circles',
     });
-
     loading.present();
   }
 

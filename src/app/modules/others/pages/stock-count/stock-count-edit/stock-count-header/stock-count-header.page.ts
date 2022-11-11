@@ -1,11 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController } from '@ionic/angular';
-import { InventoryCountBatchList } from 'src/app/modules/others/models/stock-count';
+import { InventoryCountBatchList, StockCountRoot } from 'src/app/modules/others/models/stock-count';
 import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-stock-count-header',
@@ -14,14 +17,23 @@ import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-
 })
 export class StockCountHeaderPage implements OnInit {
 
+  inventoryCountId: number;
   objectForm: FormGroup;
 
+  inventoryCount: StockCountRoot;
+
   constructor(
-    private stockCountService: StockCountService,
-    private actionSheetController: ActionSheetController,
+    private route: ActivatedRoute,
     private navController: NavController,
-    private formBuilder: FormBuilder
-  ) { 
+    private toastService: ToastService,
+    private commonService: CommonService,
+    private formBuilder: FormBuilder,
+    private stockCountService: StockCountService,
+    private actionSheetController: ActionSheetController
+  ) {
+    this.route.queryParams.subscribe(params => {
+      this.inventoryCountId = params['inventoryCountId'];
+    })
     this.newObjectForm();
   }
 
@@ -47,39 +59,28 @@ export class StockCountHeaderPage implements OnInit {
 
   ngOnInit() {
     this.loadMasterList();
+    if (this.inventoryCountId) {
+      this.loadObject();
+    }
   }
 
-  itemUomMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
-  rackMasterList: MasterListDetails[] = [];
   zoneMasterList: MasterListDetails[] = [];
+  rackMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.stockCountService.getMasterList().subscribe(response => {
-      this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUOM').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.mapSearchDropdownList();
     }, error => {
       console.log(error);
     })
   }
 
-  locationSearchDdl: SearchDropdownList[] = [];
   rackSearchDdl: SearchDropdownList[] = [];
   zoneSearchDdl: SearchDropdownList[] = [];
   mapSearchDropdownList() {
-    this.locationMasterList.forEach(r => {
-      this.locationSearchDdl.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
     this.rackMasterList.forEach(r => {
       this.rackSearchDdl.push({
         id: r.id,
@@ -100,39 +101,6 @@ export class StockCountHeaderPage implements OnInit {
     this.objectForm.patchValue({ trxDate: event });
   }
 
-  inventoryCountBatchList: InventoryCountBatchList[] = [];
-  inventoryCountBatchDdl: SearchDropdownList[] = [];
-  @ViewChild('inventoryCountBatchSdd', { static: false }) inventoryCountBatchSdd: SearchDropdownPage;
-  onLocationSelected(event: SearchDropdownList) {
-    this.objectForm.patchValue({ locationId: null });
-    this.inventoryCountBatchSdd.clearSelected();
-    if (event) {
-      this.objectForm.patchValue({ locationId: event.id });
-      this.inventoryCountBatchDdl = [];
-      this.stockCountService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
-        this.inventoryCountBatchList = response;
-        if (this.inventoryCountBatchList.length> 0) {
-          this.inventoryCountBatchList.forEach(r => {
-            this.inventoryCountBatchDdl.push({
-              id: r.inventoryCountBatchId,
-              code: r.inventoryCountBatchNum,
-              description: r.description
-            })
-          })
-        }
-      }, error => {
-        console.log(error);
-      })
-    }
-  }
-
-  onInventoryCountBatchChanged(event: SearchDropdownList) {
-    this.objectForm.patchValue({ inventoryCountBatchId: null });
-    if (event) {
-      this.objectForm.patchValue({ inventoryCountBatchId: event.id });
-    }
-  }
-
   onZoneChanged(event: SearchDropdownList) {
     this.objectForm.patchValue({ zoneId: null });
     if (event) {
@@ -147,7 +115,21 @@ export class StockCountHeaderPage implements OnInit {
     }
   }
 
-  async cancelInsert() {
+  loadObject() {
+    this.stockCountService.getInventoryCount(this.inventoryCountId).subscribe(response => {
+      this.inventoryCount = response;
+      this.inventoryCount.details.forEach(r => {
+        r.itemCode = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).itemCode;
+        r.description = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).description;
+      })
+      this.commonService.convertObjectAllDateType(this.inventoryCount.header);
+      this.objectForm.patchValue(this.inventoryCount.header);
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  async cancelEdit() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Are you sure to cancel?',
       cssClass: 'custom-action-sheet',
@@ -167,14 +149,19 @@ export class StockCountHeaderPage implements OnInit {
 
     if (role === 'confirm') {
       this.stockCountService.resetVariables();
-      this.navController.navigateBack('/others/stock-count');
+      let navigationExtras: NavigationExtras = {
+        queryParams: {
+          inventoryCountId: this.inventoryCountId
+        }
+      }
+      this.navController.navigateBack('/others/stock-count/stock-count-detail', navigationExtras);
     }
   }
 
   nextStep() {
     this.stockCountService.setHeader(this.objectForm.getRawValue());
-    this.stockCountService.removeLines();
-    this.navController.navigateForward('/others/stock-count/stock-count-add/stock-count-item');
+    this.stockCountService.setLines(this.inventoryCount.details);
+    this.navController.navigateForward('/others/stock-count/stock-count-edit/stock-count-item');
   }
 
 }

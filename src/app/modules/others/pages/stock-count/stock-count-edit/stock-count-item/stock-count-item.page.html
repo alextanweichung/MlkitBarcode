@@ -33,7 +33,7 @@
   <div class="p-2">
     <ion-input #barcodeInput class="ion-text-center" debounce="500" type="text" [(ngModel)]="manualBarcodeInput" placeholder="Scan or input Barcode" (ionChange)="checkValidBarcode(manualBarcodeInput)"></ion-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding *ngFor="let line of stockCountDetail; let i = index">        
+      <ion-item-sliding *ngFor="let line of stockCountDetail; let i = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">
           <ion-grid class="p-2 ion-no-padding">
             <ion-row>
@@ -54,7 +54,7 @@
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>              
+              <ion-col>
                 <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
                 <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
               </ion-col>

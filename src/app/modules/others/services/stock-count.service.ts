@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { format, parseISO } from 'date-fns';
 import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
@@ -33,6 +34,7 @@ export class StockCountService {
   stockCountLines: StockCountDetail[] = []
   setLines(stockCountLines: StockCountDetail[]) {
     this.stockCountLines = stockCountLines;
+    console.log("🚀 ~ file: stock-count.service.ts ~ line 37 ~ StockCountService ~ setLines ~ this.stockCountLines", this.stockCountLines)
   }
 
   removeHeader() {
@@ -78,6 +80,10 @@ export class StockCountService {
 
   insertInventoryCount(inventoryCountRoot: StockCountRoot) {
     return this.http.post(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
+  }
+
+  updateInventoryCount(inventoryCountRoot: StockCountRoot) {
+    return this.http.put(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
   }
   
 }

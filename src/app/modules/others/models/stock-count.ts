@@ -37,7 +37,7 @@ export interface StockCountHeader {
   inventoryCountId: number
   inventoryCountNum: string
   description: any
-  trxDate: string
+  trxDate: Date
   trxDateTime: string
   locationId: number
   inventoryCountBatchId: number

@@ -240,7 +240,6 @@ export class PackingSalesOrderPage implements OnInit {
     }
     this.packingService.setHeader(this.objectForm.getRawValue());
     this.packingService.setChoosenSalesOrders(this.selectedSOs);
-    console.log("🚀 ~ file: packing-sales-order.page.ts ~ line 245 ~ PackingSalesOrderPage ~ nextStep ~ this.selectedSOs", this.selectedSOs)
     this.navController.navigateForward('/transactions/packing/packing-item');
   }
 

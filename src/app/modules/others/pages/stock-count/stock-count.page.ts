@@ -79,7 +79,7 @@ export class StockCountPage implements OnInit {
   }
 
   addObject() {
-    this.navController.navigateForward('/others/stock-count/stock-count-header');
+    this.navController.navigateForward('/others/stock-count/stock-count-add/stock-count-header');
   }
 
   async filter() {

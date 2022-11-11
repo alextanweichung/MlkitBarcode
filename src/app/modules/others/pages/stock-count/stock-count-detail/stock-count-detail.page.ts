@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -74,6 +74,15 @@ export class StockCountDetailPage implements OnInit {
     }, error => {
       console.log(error);
     })
+  }
+
+  edit() {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        inventoryCountId: this.inventoryCountId
+      }
+    }
+    this.navController.navigateForward('/others/stock-count/stock-count-edit/stock-count-header', navigationExtras);
   }
 
 }

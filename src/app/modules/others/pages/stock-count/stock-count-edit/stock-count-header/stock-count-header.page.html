@@ -1,0 +1,37 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Edit Stock Count</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelEdit()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Edit Stock Count</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="ion-padding"> 
+    <ion-list class="list-custom" lines="none">
+      <app-calendar-input title="Trx Date" (onDateSelected)="onTrxDateSelected($event)" [date_value]="inventoryCount?.header?.trxDate"></app-calendar-input>
+      <!-- <app-search-dropdown title="Location" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="locationSearchDdl" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown> -->
+      <ion-item lines="none">
+        <ion-label class="font-bold" position="stacked">Location</ion-label>
+        <ion-input value="{{inventoryCount?.header?.locationId|idMapping:locationMasterList}}" readonly></ion-input>
+      </ion-item>
+      <!-- <app-search-dropdown #inventoryCountBatchSdd title="Inventory Count Batch" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="inventoryCountBatchDdl" (onActionComplete)="onInventoryCountBatchChanged($event)" emptyMessage="This Location do not have Inventory Count Batch"></app-search-dropdown> -->
+      <ion-item lines="none">
+        <ion-label class="font-bold" position="stacked">Inventory Count Batch</ion-label>
+        <ion-input [value]="inventoryCount?.header?.inventoryCountNum" readonly></ion-input>
+      </ion-item>
+      <app-search-dropdown #rackSsd title="Rack" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="rackSearchDdl" (onActionComplete)="onRackChanged($event)" [selectedId]="inventoryCount?.header?.rackId"></app-search-dropdown>
+      <app-search-dropdown #zoneSsd title="Zone" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="zoneSearchDdl" (onActionComplete)="onZoneChanged($event)" [selectedId]="inventoryCount?.header?.zoneId"></app-search-dropdown>
+    </ion-list>
+  </div>
+</ion-content>
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+  <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()">
+    Next
+  </ion-button>
+</ion-footer>
