@@ -181,11 +181,11 @@ const routes: Routes = [
   },
   {
     path: 'item-add-grid',
-    loadChildren: () => import('./shared/pages/item-add-grid/item-add-grid.module').then(m => m.ItemAddGridPageModule)
+    loadChildren: () => import('./shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module').then(m => m.ItemAddGridVariationMPageModule)
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
+    loadChildren: () => import('./shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module').then( m => m.ItemAddListWithVariationPageModule)
   },
   {
     path: 'item-cart',
@@ -198,7 +198,8 @@ const routes: Routes = [
   {
     path: 'calendar-input',
     loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then( m => m.CalendarInputPageModule)
-  },  {
+  },
+  {
     path: 'barcode-scan-input',
     loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then( m => m.BarcodeScanInputPageModule)
   },

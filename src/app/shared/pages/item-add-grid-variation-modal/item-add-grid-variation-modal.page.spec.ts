@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { ItemAddGridPage } from './item-add-grid.page';
+import { ItemAddGridVariationMPage } from './item-add-grid-variation-modal.page';
 
-describe('ItemAddGridPage', () => {
-  let component: ItemAddGridPage;
-  let fixture: ComponentFixture<ItemAddGridPage>;
+describe('ItemAddGridVariationMPage', () => {
+  let component: ItemAddGridVariationMPage;
+  let fixture: ComponentFixture<ItemAddGridVariationMPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemAddGridPage ],
+      declarations: [ ItemAddGridVariationMPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ItemAddGridPage);
+    fixture = TestBed.createComponent(ItemAddGridVariationMPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

@@ -163,6 +163,7 @@ export class PickingItemPage implements OnInit {
 
   selectedSoDetail: PickingSalesOrderDetail;
   async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
+    console.log("🚀 ~ file: picking-item.page.ts ~ line 166 ~ PickingItemPage ~ addItemToSo ~ itemInfo", itemInfo)
     if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {

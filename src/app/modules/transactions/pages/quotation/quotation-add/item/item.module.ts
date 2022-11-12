@@ -8,8 +8,8 @@ import { ItemPageRoutingModule } from './item-routing.module';
 
 import { ItemPage } from './item.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
-import { ItemAddGridPageModule } from 'src/app/shared/pages/item-add-grid/item-add-grid.module';
-import { ItemAddListPageModule } from 'src/app/shared/pages/item-add-list/item-add-list.module';
+import { ItemAddGridVariationMPageModule } from 'src/app/shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module';
+import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module';
 
 @NgModule({
   imports: [
@@ -18,8 +18,8 @@ import { ItemAddListPageModule } from 'src/app/shared/pages/item-add-list/item-a
     IonicModule,
     ItemPageRoutingModule,
     ListingSkeletonPageModule,
-    ItemAddGridPageModule,
-    ItemAddListPageModule
+    ItemAddGridVariationMPageModule,
+    ItemAddListWithVariationPageModule
   ],
   declarations: [ItemPage]
 })

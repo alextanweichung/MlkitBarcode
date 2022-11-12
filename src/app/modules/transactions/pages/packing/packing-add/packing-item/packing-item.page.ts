@@ -207,6 +207,7 @@ export class PackingItemPage implements OnInit {
 
   selectedSoDetail: PackingSalesOrderDetail;
   async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
+    console.log("🚀 ~ file: packing-item.page.ts ~ line 210 ~ PackingItemPage ~ addItemToSo ~ itemInfo", itemInfo)
     if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {
@@ -273,6 +274,7 @@ export class PackingItemPage implements OnInit {
         await this.packingSalesOrders[0].details.length > 0 ? this.packingSalesOrders[0].details.unshift(d) : this.packingSalesOrders[0].details.push(d);
       }
     }
+    console.log("🚀 ~ file: packing-item.page.ts ~ line 278 ~ PackingItemPage ~ addItemToSo ~ this.packingSalesOrders", this.packingSalesOrders)
   }
 
   async deleteSoLine(index) {

@@ -1,20 +1,19 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
 
 @Component({
-  selector: 'app-item-add-grid',
-  templateUrl: './item-add-grid.page.html',
-  styleUrls: ['./item-add-grid.page.scss'],
+  selector: 'app-item-add-list',
+  templateUrl: './item-add-list-variation-modal.page.html',
+  styleUrls: ['./item-add-list-variation-modal.page.scss'],
 })
-export class ItemAddGridPage implements OnInit, OnChanges {
+export class ItemAddListVariationModalPage implements OnInit, OnChanges {
 
   @Input() availableItem: Item[] = [];
-  @Input() availableImages: ItemImage[] = [];
   @Input() itemInCart: Item[] = [];
   itemToDisplay: ItemList[] = [];
-
+  
   @Output() onItemInCartEditCompleted: EventEmitter<Item[]> = new EventEmitter();
 
   constructor(
@@ -28,8 +27,8 @@ export class ItemAddGridPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    
   }
+
 
   distinctItem() {
     this.itemToDisplay = [];
@@ -47,15 +46,6 @@ export class ItemAddGridPage implements OnInit, OnChanges {
         })
       })
     }
-  }
-
-  matchImage(itemId: number) {
-    let defaultImageUrl = "assets/icon/favicon.png";
-    let lookup = this.availableImages.find(r => r.keyId === itemId)?.imageSource;
-    if (lookup) {
-      return "data:image/png;base64, " + lookup;
-    }
-    return defaultImageUrl;
   }
 
   decreaseQty(data: ItemList) {
@@ -141,5 +131,5 @@ export class ItemAddGridPage implements OnInit, OnChanges {
     this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
     this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
-
+  
 }
