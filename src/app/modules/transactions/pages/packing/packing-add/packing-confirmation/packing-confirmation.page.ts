@@ -57,7 +57,31 @@ export class PackingConfirmationPage implements OnInit {
     this.navController.navigateBack('/transactions/packing/packing-item');
   }
 
-  nextStep() {
+  async nextStep() {
+    if (this.packingSalesOrderLines.length > 0) {
+      const alert = await this.alertController.create({
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: async () => {
+              await this.insertPacking();
+            },
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
+    }
+  }
+
+  insertPacking() {    
     let object: GoodspackingDto;
     let lines: GoodsPackingLine[] = [];
     this.packingSalesOrderLines.forEach(r => {

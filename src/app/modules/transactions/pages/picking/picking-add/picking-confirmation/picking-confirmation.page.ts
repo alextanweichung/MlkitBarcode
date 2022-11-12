@@ -57,7 +57,31 @@ export class PickingConfirmationPage implements OnInit {
     this.navController.navigateBack('/transactions/picking/picking-item');
   }
 
-  nextStep() {
+  async nextStep() {
+    if (this.pickingSalesOrderLines.length > 0) {
+      const alert = await this.alertController.create({
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: async () => {
+              await this.insertPicking();
+            },
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
+    }
+  }
+
+  insertPicking() {
     let object: GoodsPickingDto;
     let lines: GoodsPickingLine[] = [];
     this.pickingSalesOrderLines.forEach(r => {
@@ -112,7 +136,6 @@ export class PickingConfirmationPage implements OnInit {
     }, error => {
       console.log(error);
     })
-
   }
 
 }
