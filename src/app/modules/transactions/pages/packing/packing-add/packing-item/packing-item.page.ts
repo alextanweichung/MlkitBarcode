@@ -11,12 +11,14 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-packing-item',
   templateUrl: './packing-item.page.html',
   styleUrls: ['./packing-item.page.scss'],
+  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobilePacking' }]
 })
 export class PackingItemPage implements OnInit {
 
@@ -160,18 +162,14 @@ export class PackingItemPage implements OnInit {
   selectedSo: PackingSalesOrderRoot;
   setSelectedSo(so) {
     this.selectedSo = so;
-    this.barcodeInput.setFocus();
   }
 
   /* #endregion */
 
   /* #region  barcode & check so */
 
-  manualBarcodeInput: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
+  async validateBarcode(barcode: string) {
     if (barcode) {
-      this.manualBarcodeInput = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -195,8 +193,16 @@ export class PackingItemPage implements OnInit {
         })
       }
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
+  }
+
+  onItemAdd(event: any) {
+    let sku = event.sku;
+    let itemInfo = event.itemInfo;
+    if (itemInfo) {
+      this.addItemToSo(sku, itemInfo)
+    } else {
+      this.addItemToSo(sku);
+    }
   }
 
   selectedSoDetail: PackingSalesOrderDetail;
@@ -312,7 +318,7 @@ export class PackingItemPage implements OnInit {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
-          await this.checkValidBarcode(barcode);
+          await this.validateBarcode(barcode);
         }
       }
     } else if (this.packingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
@@ -328,7 +334,7 @@ export class PackingItemPage implements OnInit {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
-          await this.checkValidBarcode(barcode);
+          await this.validateBarcode(barcode);
         }
       }
     }

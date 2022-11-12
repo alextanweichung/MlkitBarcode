@@ -13,9 +13,9 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-input #barcodeInput class="ion-text-center" debounce="500" type="text" [(ngModel)]="manualBarcodeInput" placeholder="Scan or input Barcode" (ionChange)="checkValidBarcode(manualBarcodeInput)"></ion-input>
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
     <ion-accordion-group #accordianGroup1 *ngIf="pickingDtoHeader?.isWithSo">
-      <ion-accordion *ngFor="let salesOrder of pickingSalesOrders;">
+      <ion-accordion *ngFor="let salesOrder of pickingSalesOrders">
         <ion-item slot="header" color="light" (click)="setSelectedSo(salesOrder)">
           <ion-label>{{salesOrder.header.salesOrderNum}}</ion-label>
         </ion-item>

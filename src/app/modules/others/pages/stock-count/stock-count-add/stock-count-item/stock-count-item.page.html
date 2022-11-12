@@ -31,7 +31,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-input #barcodeInput class="ion-text-center" debounce="500" type="text" [(ngModel)]="manualBarcodeInput" placeholder="Scan or input Barcode" (ionChange)="checkValidBarcode(manualBarcodeInput)"></ion-input>
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding *ngFor="let line of stockCountDetail; let i = index">        
         <ion-item button detail="false" class="no-ripple ion-no-padding">
@@ -66,7 +66,7 @@
                 </ion-button>
               </ion-col>
               <ion-col class="ion-flex">
-                <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
+                <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (ionFocus)="setFocus(inputNumWithoutSo)" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
               </ion-col>
               <ion-col class="ion-flex">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(line)">

@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { OtherSalesList } from '../../models/other-sales';
 import { PackingList } from '../../models/packing';
 import { PickingList } from '../../models/picking';
 import { QuotationList } from '../../models/quotation';
 import { SalesOrderList } from '../../models/sales-order';
+import { OtherSalesService } from '../../services/other-sales.service';
 import { PackingService } from '../../services/packing.service';
 import { PickingService } from '../../services/picking.service';
 import { QuotationService } from '../../services/quotation.service';
@@ -16,6 +18,7 @@ const mobileQuotationCode: string = 'MATRQU';
 const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
 const mobilePackingCode: string = 'MATRPA';
+const mobileOtherSalesCode: string = 'MATROS';
 
 @Component({
   selector: 'app-transactions',
@@ -40,6 +43,10 @@ export class TransactionsPage implements OnInit {
   packing_load: boolean = false;
   packings: PackingList[] = [];
 
+  showOtherSales: boolean = false;
+  other_sales_load: boolean = false;
+  other_sales: OtherSalesList[] = [];
+
   constructor(
     private authService: AuthService,
     private navController: NavController,
@@ -47,6 +54,7 @@ export class TransactionsPage implements OnInit {
     private salesOrderService: SalesOrderService,
     private pickingService: PickingService,
     private packingService: PackingService,
+    private otherSalesService: OtherSalesService
   ) { }
 
   ngOnInit() {
@@ -57,6 +65,7 @@ export class TransactionsPage implements OnInit {
         this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
         this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
+        this.showOtherSales = pageItems.findIndex(r => r.title === mobileOtherSalesCode) > -1;
       }
     })
     this.loadAllRecentList();
@@ -82,6 +91,9 @@ export class TransactionsPage implements OnInit {
 
     // packing
     this.loadRecentPacking();
+
+    // other-sales
+    this.loadRecentOtherSales();
   }
 
   /* #region  quotation */
@@ -180,6 +192,31 @@ export class TransactionsPage implements OnInit {
       }
     }
     this.navController.navigateForward('/transactions/packing/packing-detail', navigationExtras);
+  }
+
+  /* #endregion */
+
+  /* #region  other-sales */
+
+  loadRecentOtherSales() {
+    this.otherSalesService.getRecentOtherSalesList().subscribe(response => {
+      this.other_sales = response;
+      if (this.other_sales.length > 0) {
+        this.other_sales_load = true;
+      }
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  goToOtherSalesDetail(otherSalesId: number) {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        otherSalesId: otherSalesId,
+        parent: "Transactions"
+      }
+    }
+    this.navController.navigateForward('/transactions/other-sales/other-sales-detail', navigationExtras);
   }
 
   /* #endregion */

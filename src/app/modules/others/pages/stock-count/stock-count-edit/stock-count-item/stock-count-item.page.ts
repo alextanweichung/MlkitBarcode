@@ -90,11 +90,11 @@ export class StockCountItemPage implements OnInit {
     })
   }
 
-  manualBarcodeInput: string;
+  itemSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
+  async validateBarcode(barcode: string) {
     if (barcode) {
-      this.manualBarcodeInput = '';
+      this.itemSearchValue = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -120,6 +120,16 @@ export class StockCountItemPage implements OnInit {
     }
     this.barcodeInput.value = '';
     this.barcodeInput.setFocus();
+  }
+
+  onItemAdd(event: any) {
+    let sku = event.sku;
+    let itemInfo = event.itemInfo;
+    if (itemInfo) {
+      this.addItemToLine(sku, itemInfo)
+    } else {
+      this.addItemToLine(sku);
+    }
   }
 
   async addItemToLine(sku: string, itemInfo?: ItemBarcodeModel) {
@@ -199,7 +209,13 @@ export class StockCountItemPage implements OnInit {
     }
   }
 
-  /* #region  manual amend qty */
+  /* #region  manual amend qty */  
+
+  setFocus(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
 
   async decreaseQty(line: StockCountDetail, index: number) {
     if (line.qtyRequest - 1 < 0) {
@@ -269,7 +285,7 @@ export class StockCountItemPage implements OnInit {
       if (result.hasContent) {
         let barcode = result.content;
         this.scanActive = false;
-        await this.checkValidBarcode(barcode);
+        await this.validateBarcode(barcode);
       }
     }
   }
@@ -321,8 +337,6 @@ export class StockCountItemPage implements OnInit {
   }
 
   nextStep() {
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 323 ~ StockCountItemPage ~ nextStep ~ this.stockCountHeader", this.stockCountHeader)
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 324 ~ StockCountItemPage ~ nextStep ~ this.stockCountDetail", this.stockCountDetail)
     this.stockCountService.updateInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
       if (response.status === 204) {
         this.toastService.presentToast('Stock Count updated', '', 'bottom', 'success', 1000);

@@ -123,6 +123,11 @@ const routes: Routes = [
     path: 'transactions/packing/packing-detail',
     loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/detail/detail.module').then( m => m.DetailPageModule)
   },
+  // transaction-other-sales
+  {
+    path: 'transactions/other-sales',
+    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales.module').then( m => m.OtherSalesPageModule)
+  },
 
 
 
@@ -189,14 +194,14 @@ const routes: Routes = [
   {
     path: 'transaction-processing',
     loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then(m => m.TransactionProcessingPageModule)
-  },  {
+  },
+  {
     path: 'calendar-input',
     loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then( m => m.CalendarInputPageModule)
+  },  {
+    path: 'barcode-scan-input',
+    loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then( m => m.BarcodeScanInputPageModule)
   },
-
-
-
-
 
 
 ];

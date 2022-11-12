@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ItemPageRoutingModule } from './picking-item-routing.module';
 
 import { PickingItemPage } from './picking-item.page';
+import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ItemPageRoutingModule
+    ItemPageRoutingModule,
+    BarcodeScanInputPageModule
   ],
   declarations: [PickingItemPage]
 })

@@ -11,11 +11,13 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 
 @Component({
   selector: 'app-stock-count-item',
   templateUrl: './stock-count-item.page.html',
   styleUrls: ['./stock-count-item.page.scss'],
+  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
 export class StockCountItemPage implements OnInit {
 
@@ -84,11 +86,8 @@ export class StockCountItemPage implements OnInit {
     })
   }
 
-  manualBarcodeInput: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
+  async validateBarcode(barcode: string) {
     if (barcode) {
-      this.manualBarcodeInput = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -112,8 +111,16 @@ export class StockCountItemPage implements OnInit {
         })
       }
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
+  }
+
+  onItemAdd(event: any) {
+    let sku = event.sku;
+    let itemInfo = event.itemInfo;
+    if (itemInfo) {
+      this.addItemToLine(sku, itemInfo)
+    } else {
+      this.addItemToLine(sku);
+    }
   }
 
   async addItemToLine(sku: string, itemInfo?: ItemBarcodeModel) {
@@ -195,6 +202,12 @@ export class StockCountItemPage implements OnInit {
 
   /* #region  manual amend qty */
 
+  setFocus(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
   async decreaseQty(line: StockCountDetail, index: number) {
     if (line.qtyRequest - 1 < 0) {
       line.qtyRequest = 0;
@@ -263,7 +276,7 @@ export class StockCountItemPage implements OnInit {
       if (result.hasContent) {
         let barcode = result.content;
         this.scanActive = false;
-        await this.checkValidBarcode(barcode);
+        await this.validateBarcode(barcode);
       }
     }
   }

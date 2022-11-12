@@ -34,7 +34,6 @@ export class StockCountService {
   stockCountLines: StockCountDetail[] = []
   setLines(stockCountLines: StockCountDetail[]) {
     this.stockCountLines = stockCountLines;
-    console.log("🚀 ~ file: stock-count.service.ts ~ line 37 ~ StockCountService ~ setLines ~ this.stockCountLines", this.stockCountLines)
   }
 
   removeHeader() {

@@ -1,6 +1,6 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, IonAccordionGroup, IonInput, NavController, ViewDidEnter } from '@ionic/angular';
+import { AlertController, IonAccordionGroup, NavController } from '@ionic/angular';
 import { GoodsPicking } from 'src/app/modules/transactions/models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
@@ -12,13 +12,15 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
+import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 
 @Component({
   selector: 'app-picking-item',
   templateUrl: './picking-item.page.html',
   styleUrls: ['./picking-item.page.scss'],
+  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobilePicking' }]
 })
-export class PickingItemPage implements OnInit, ViewDidEnter {
+export class PickingItemPage implements OnInit {
 
   pickingDtoHeader: GoodsPicking;
   pickingSalesOrders: PickingSalesOrderRoot[] = [];
@@ -34,10 +36,6 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
     private alertController: AlertController,
     private toastService: ToastService,
   ) { }
-
-  ionViewDidEnter(): void {
-    this.barcodeInput.setFocus();
-  }
 
   ngOnInit() {
     this.pickingDtoHeader = this.pickingService.pickingDtoHeader;
@@ -73,12 +71,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       soLine.qtyPickedCurrent--;
     }
   }
-  
-	clonedDetails: { [s: string]: PickingSalesOrderDetail; } = {};
+
+  clonedDetails: { [s: string]: PickingSalesOrderDetail; } = {};
   backupQty(soLine, event) {
     event.getInputElement().then(r => {
       r.select();
-    })    
+    })
     this.clonedDetails[soLine.itemSku] = { ...soLine };
   }
 
@@ -89,7 +87,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         soLine.qtyPickedCurrent = soLine.qtyRequest - soLine.qtyPicked;
       }
     }
-		delete this.clonedDetails[soLine.itemSku];
+    delete this.clonedDetails[soLine.itemSku];
   }
 
   eventHandler(keyCode, soLine) {
@@ -98,9 +96,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         Keyboard.hide();
       }
       this.updateQty(soLine);
-    }    
+    }
   }
-
   increaseQty(soLine) {
     if (soLine.qtyPickedCurrent === undefined) {
       soLine.qtyPickedCurrent = 0;
@@ -121,18 +118,14 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
   selectedSo: PickingSalesOrderRoot;
   setSelectedSo(so) {
     this.selectedSo = so;
-    this.barcodeInput.setFocus();
   }
 
   /* #endregion */
 
   /* #region  barcode & check so */
 
-  manualBarcodeInput: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
+  async validateBarcode(barcode: string) {
     if (barcode) {
-      this.manualBarcodeInput = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -156,12 +149,20 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         })
       }
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
+  }
+
+  onItemAdd(event: any) {
+    let sku = event.sku;
+    let itemInfo = event.itemInfo;
+    if (itemInfo) {
+      this.addItemToSo(sku, itemInfo)
+    } else {
+      this.addItemToSo(sku);
+    }
   }
 
   selectedSoDetail: PickingSalesOrderDetail;
-  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {    
+  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
     if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
       if (itemExists) {
@@ -170,8 +171,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
-    } 
-  
+    }
+
     if (!this.pickingDtoHeader.isWithSo) {
       let b: any;
       let m: any;
@@ -251,7 +252,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             cssClass: 'cancel'
           }
         ]
-      });  
+      });
       await alert.present();
     } else {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
@@ -273,7 +274,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
-          await this.checkValidBarcode(barcode);
+          await this.validateBarcode(barcode);
         }
       }
     } else if (this.pickingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
@@ -289,7 +290,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
-          await this.checkValidBarcode(barcode);
+          await this.validateBarcode(barcode);
         }
       }
     }

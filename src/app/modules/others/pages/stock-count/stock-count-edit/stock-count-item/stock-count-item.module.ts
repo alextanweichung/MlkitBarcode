@@ -8,6 +8,7 @@ import { StockCountItemPageRoutingModule } from './stock-count-item-routing.modu
 
 import { StockCountItemPage } from './stock-count-item.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     StockCountItemPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    BarcodeScanInputPageModule
   ],
   declarations: [StockCountItemPage]
 })
