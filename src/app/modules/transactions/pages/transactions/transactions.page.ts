@@ -96,6 +96,12 @@ export class TransactionsPage implements OnInit {
     this.loadRecentOtherSales();
   }
 
+  /* #region  online offline */
+
+  transactionMode: string = "online";  
+
+  /* #endregion */
+
   /* #region  quotation */
 
   loadRecentQuotation() {

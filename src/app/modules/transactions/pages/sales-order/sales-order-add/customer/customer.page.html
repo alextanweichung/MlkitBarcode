@@ -12,7 +12,7 @@
       <ion-label class="label-title">Customer</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="ion-padding">
+  <div class="p-2">
     <form [formGroup]="objectForm">
       <ion-list class="list-custom" lines="full">        
         <app-search-dropdown *ngIf="transactionShowDetailHeader" title="Location" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="locationChanged($event)"></app-search-dropdown>        
@@ -53,7 +53,7 @@
   <ion-grid class="ion-no-padding">
     <ion-row>
       <ion-col>
-        <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()" [disabled]="!objectForm.valid">
+        <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid">
           Next
         </ion-button>
       </ion-col>

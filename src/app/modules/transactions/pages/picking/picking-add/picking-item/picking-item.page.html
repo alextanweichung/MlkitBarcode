@@ -37,11 +37,11 @@
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
-  <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
     Next
   </ion-button>
 </ion-footer>
-<ion-fab class="ion-fab-custom mb-3" vertical="bottom" horizontal="center" slot="fixed" (click)="startScanning()" [hidden]="scanActive">
+<ion-fab class="ion-fab-custom mb-5" vertical="bottom" horizontal="center" slot="fixed" (click)="startScanning()" [hidden]="scanActive">
   <ion-fab-button>
     <ion-icon name="camera"></ion-icon>
   </ion-fab-button>
@@ -123,7 +123,7 @@
       </div>
     </ion-content>
     <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-      <ion-button class="ion-margin" expand="block" size="small" (click)="hideModal()">
+      <ion-button class="ion-margin" expand="block" size="default" (click)="hideModal()">
         Done
       </ion-button>
     </ion-footer>

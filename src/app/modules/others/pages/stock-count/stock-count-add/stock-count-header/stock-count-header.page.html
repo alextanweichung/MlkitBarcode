@@ -12,7 +12,7 @@
       <ion-label class="label-title">New Stock Count</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="ion-padding"> 
+  <div class="p-2"> 
     <ion-list class="list-custom" lines="none">
       <app-calendar-input title="Trx Date" (onDateSelected)="onTrxDateSelected($event)"></app-calendar-input>
       <app-search-dropdown title="Location" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="locationSearchDdl" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
@@ -23,7 +23,7 @@
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-  <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()" [disabled]="!objectForm.valid">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid">
     Next
   </ion-button>
 </ion-footer>
