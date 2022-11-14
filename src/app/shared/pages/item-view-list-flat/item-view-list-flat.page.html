@@ -23,16 +23,16 @@
     </ion-row>
     <ion-row>
       <ion-col class="ion-margin-auto ion-flex">
-        <div class="font-smaller">SO Qty: {{line.qtyRequest|number:'1.0'}}</div>
+        <div class="font-smaller">SO Qty: {{line.qtyRequest??0|number:'1.0'}}</div>
       </ion-col>
       <ion-col class="ion-margin-auto ion-flex" *ngIf="isPicking">
-        <div class="font-smaller">Picked Qty: {{(line.qtyPicked + line.qtyPickedCurrent)|number:'1.0'}}</div>
+        <div class="font-smaller">Picked Qty: {{(line.qtyPicked??0 + line.qtyPickedCurrent??0)|number:'1.0'}}</div>
       </ion-col>
       <ion-col class="ion-margin-auto ion-flex" *ngIf="isPacking">
-        <div class="font-smaller">Picked Qty: {{line.qtyPicked|number:'1.0'}}</div>
+        <div class="font-smaller">Picked Qty: {{line.qtyPicked??0|number:'1.0'}}</div>
       </ion-col>
       <ion-col class="ion-margin-auto ion-flex" *ngIf="isPacking">
-        <div class="font-smaller">Packed Qty: {{(line.qtyPacked + line.qtyPackedCurrent)|number:'1.0'}}</div>
+        <div class="font-smaller">Packed Qty: {{(line.qtyPacked??0 + line.qtyPackedCurrent??0)|number:'1.0'}}</div>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="line.rack">

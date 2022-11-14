@@ -11,7 +11,6 @@ export class ItemViewListFlatPage implements OnInit {
   @Input() line: any;
   @Input() isPicking: boolean = false;
   @Input() isPacking: boolean = false;
-  @Input() qtyField: string;
   
   @Input() itemVariationXMasterList: MasterListDetails[] = [];
   @Input() itemVariationYMasterList: MasterListDetails[] = [];
