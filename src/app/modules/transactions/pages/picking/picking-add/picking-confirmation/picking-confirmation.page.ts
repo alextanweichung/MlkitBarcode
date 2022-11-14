@@ -6,6 +6,7 @@ import { PickingService } from 'src/app/modules/transactions/services/picking.se
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
@@ -39,6 +40,7 @@ export class PickingConfirmationPage implements OnInit {
     this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
     this.pickingSalesOrderLines = this.pickingService.selectedSalesOrderLines;
     this.loadModuleControl();
+    this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -48,6 +50,17 @@ export class PickingConfirmationPage implements OnInit {
       if (loadImage) {
         this.loadImage = loadImage === '1' ? true : false;
       }
+    }, error => {
+      console.log(error);
+    })
+  }
+  
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.pickingService.getMasterList().subscribe(response => {
+      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })

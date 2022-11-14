@@ -6,6 +6,7 @@ import { PackingService } from 'src/app/modules/transactions/services/packing.se
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
@@ -38,7 +39,8 @@ export class PackingConfirmationPage implements OnInit {
     }
     this.packingSalesOrders = this.packingService.selectedSalesOrders;
     this.packingSalesOrderLines = this.packingService.selectedSalesOrderLines;
-    this.loadModuleControl();  
+    this.loadModuleControl();
+    this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -48,6 +50,17 @@ export class PackingConfirmationPage implements OnInit {
       if (loadImage) {
         this.loadImage = loadImage === '1' ? true : false;
       }
+    }, error => {
+      console.log(error);
+    })
+  }
+  
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.packingService.getMasterList().subscribe(response => {
+      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })
@@ -81,7 +94,7 @@ export class PackingConfirmationPage implements OnInit {
     }
   }
 
-  insertPacking() {    
+  insertPacking() {
     let object: GoodspackingDto;
     let lines: GoodsPackingLine[] = [];
     this.packingSalesOrderLines.forEach(r => {
@@ -129,7 +142,7 @@ export class PackingConfirmationPage implements OnInit {
           locationId: response.body["header"]["locationId"],
           trxDate: response.body["header"]["trxDate"]
         }
-        
+
         this.packingService.setPackingSummary(ps);
 
         this.toastService.presentToast('Packing has been added', '', 'bottom', 'success', 1000);

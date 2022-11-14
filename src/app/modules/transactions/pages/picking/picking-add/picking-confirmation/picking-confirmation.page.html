@@ -14,50 +14,7 @@
   </ion-header>
   <div class="p-2">    
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="pickingSalesOrderLines.length > 0">
-      <ion-item class="ion-no-padding" lines="none" *ngFor="let soLine of pickingSalesOrderLines">
-        <ion-grid class="ion-no-padding p-2">
-          <ion-row>
-            <ion-col class="ion-margin-auto ion-flex">
-              <div class="font-bold">{{soLine.itemCode}}</div>
-            </ion-col>
-            <ion-col class="ion-flex justify-content-end">
-              <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPicked + soLine.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-margin-auto ion-flex">
-              <div>{{soLine.description}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col>
-              <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationXDescription"> {{soLine.itemVariationXDescription}}</span>
-              <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationYDescription"> {{soLine.itemVariationYDescription}}</span>
-            </ion-col>
-          </ion-row>
-          <ion-row *ngIf="soLine.rack">
-            <ion-col class="ion-margin-auto ion-flex">
-              <div class="font-smaller">Location: {{soLine.rack}} - {{soLine.subRack}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-margin-auto ion-flex">
-              <div class="font-smaller">SO Qty: {{soLine.qtyRequest|number:'1.0'}}</div>
-            </ion-col>
-            <ion-col class="ion-margin-auto ion-flex">
-              <div class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPickedCurrent)|number:'1.0'}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col>
-              
-            </ion-col>
-            <ion-col class="ion-margin-auto">
-              <div class="font-smaller">Current Picked Qty: {{soLine.qtyPickedCurrent|number:'1.0'}}</div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
+      <app-item-view-list-flat [line]="soLine" [isPicking]="true" qtyField="qtyPickedCurrent" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" *ngFor="let soLine of pickingSalesOrderLines; let i = index"></app-item-view-list-flat>
     </ion-list>
   </div>
 </ion-content>

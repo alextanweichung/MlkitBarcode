@@ -206,6 +206,10 @@ const routes: Routes = [
     path: 'item-add-list-flat',
     loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then( m => m.ItemAddListFlatPageModule)
   },
+  {
+    path: 'item-view-list-flat',
+    loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then( m => m.ItemViewListFlatPageModule)
+  },
 
 
 

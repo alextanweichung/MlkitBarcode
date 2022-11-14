@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { PackingConfirmationPageRoutingModule } from './packing-confirmation-routing.module';
 
 import { PackingConfirmationPage } from './packing-confirmation.page';
+import { ItemViewListFlatPageModule } from 'src/app/shared/pages/item-view-list-flat/item-view-list-flat.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    PackingConfirmationPageRoutingModule
+    PackingConfirmationPageRoutingModule,
+    ItemViewListFlatPageModule
   ],
   declarations: [PackingConfirmationPage]
 })

@@ -63,6 +63,7 @@ export class PickingItemPage implements OnInit {
       console.log(error);
     })
   }
+  
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {

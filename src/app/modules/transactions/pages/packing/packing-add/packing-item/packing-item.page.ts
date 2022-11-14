@@ -50,6 +50,7 @@ export class PackingItemPage implements OnInit {
       this.packingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPackedCurrent = 0);
     }
     this.loadModuleControl();
+    this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -115,91 +116,6 @@ export class PackingItemPage implements OnInit {
       }
     }
   }
-
-  // decreaseQty(soLine) {
-  //   if (soLine.qtyPackedCurrent - 1 < 0) {
-  //     soLine.qtyPackedCurrent = 0;
-  //   } else {
-  //     soLine.qtyPackedCurrent--;
-  //   }
-  // }
-
-  // clonedDetails: { [s: string]: PackingSalesOrderDetail; } = {};
-  // backupQty(soLine, event) {
-  //   event.getInputElement().then(r => {
-  //     r.select();
-  //   })
-  //   this.clonedDetails[soLine.itemSku] = { ...soLine };
-  // }
-
-  // updateQty(soLine) {
-  //   if (this.packingDtoHeader.isWithSo) {
-  //     switch (this.packingQtyControl) {
-  //       // No control
-  //       case "0":
-  //         break;
-  //       // Not allow pack quantity more than SO quantity
-  //       case "1":
-  //         if (soLine.qtyRequest < (soLine.qtyPacked + soLine.qtyPackedCurrent)) {
-  //           soLine.qtyPackedCurrent = soLine.qtyRequest - soLine.qtyPacked;
-  //           this.toastService.presentToast('Item is already fully packed', '', 'bottom', 'medium', 1000);
-  //         }
-  //         break;
-  //       // Not allow pack quantity more than pick quantity
-  //       case "2":
-  //         if ((soLine.qtyPacked + soLine.qtyPackedCurrent) > soLine.qtyPicked) {
-  //           soLine.qtyPackedCurrent = soLine.qtyPicked - soLine.qtyPacked;
-  //           this.toastService.presentToast('Pack quantity cannot exceed pick quantity', '', 'bottom', 'medium', 1000);
-  //         }
-  //         break;
-  //     }
-  //   }
-  //   delete this.clonedDetails[soLine.itemSku];
-  // }
-
-  // eventHandler(keyCode, soLine) {
-  //   if (keyCode === 13) {
-  //     if (Capacitor.getPlatform() !== 'web') {
-  //       Keyboard.hide();
-  //     }
-  //     this.updateQty(soLine);
-  //   }
-  // }
-
-  // increaseQty(soLine) {
-  //   if (soLine.qtyPackedCurrent === undefined) {
-  //     soLine.qtyPackedCurrent = 0;
-  //   }
-  //   if (this.packingDtoHeader.isWithSo) {
-  //     switch (this.packingQtyControl) {
-  //       // No control
-  //       case "0":
-  //         soLine.qtyPackedCurrent++;
-  //         break;
-  //       // Not allow pack quantity more than SO quantity
-  //       case "1":
-  //         if (soLine.qtyRequest < (soLine.qtyPacked + soLine.qtyPackedCurrent + 1)) {
-  //           soLine.qtyPackedCurrent = soLine.qtyRequest - soLine.qtyPacked;
-  //           this.toastService.presentToast('Item is already fully packed', '', 'bottom', 'medium', 1000);
-  //         } else {
-  //           soLine.qtyPackedCurrent++;
-  //         }
-  //         break;
-  //       // Not allow pack quantity more than pick quantity
-  //       case "2":
-  //         if ((soLine.qtyPacked + soLine.qtyPackedCurrent + 1) > soLine.qtyPicked) {
-  //           soLine.qtyPackedCurrent = soLine.qtyPicked - soLine.qtyPacked;
-  //           this.toastService.presentToast('Pack quantity cannot exceed pick quantity', '', 'bottom', 'medium', 1000);
-  //         } else {
-  //           soLine.qtyPackedCurrent++;
-  //         }
-  //         break;
-  //     }
-  //   }
-  //   if (!this.packingDtoHeader.isWithSo) {
-  //     soLine.qtyPackedCurrent++;
-  //   }
-  // }
 
   /* #endregion */
 
