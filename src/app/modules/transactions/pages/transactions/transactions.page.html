@@ -15,7 +15,7 @@
   </ion-refresher>
   <div class="p-2">
 
-    <ion-segment [(ngModel)]="transactionMode">
+    <ion-segment [(ngModel)]="transactionMode" (ionChange)="onTransactionModeChanged($event)">
       <ion-segment-button value="online">
         <ion-label>Online</ion-label>
       </ion-segment-button>

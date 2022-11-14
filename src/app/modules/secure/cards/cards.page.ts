@@ -53,7 +53,7 @@ export class CardsPage implements AfterContentChecked {
     // Loading overlay
     const loading = await this.loadingController.create({
       cssClass: 'default-loading',
-      message: '<p>Syncing card...</p><span>Please be patient.</span>',
+      message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
       spinner: 'crescent'
     });
     await loading.present();

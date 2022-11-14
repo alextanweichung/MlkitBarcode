@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
+import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { CommonService } from 'src/app/shared/services/common.service';
 import { OtherSalesList } from '../../models/other-sales';
 import { PackingList } from '../../models/packing';
 import { PickingList } from '../../models/picking';
@@ -54,7 +58,10 @@ export class TransactionsPage implements OnInit {
     private salesOrderService: SalesOrderService,
     private pickingService: PickingService,
     private packingService: PackingService,
-    private otherSalesService: OtherSalesService
+    private otherSalesService: OtherSalesService,
+    private loadingController: LoadingController,
+    private commonService: CommonService,
+    private configService: ConfigService
   ) { }
 
   ngOnInit() {
@@ -98,7 +105,39 @@ export class TransactionsPage implements OnInit {
 
   /* #region  online offline */
 
-  transactionMode: string = "online";  
+  transactionMode: string = "online";
+  onTransactionModeChanged(event) {
+    console.log("🚀 ~ file: transactions.page.ts ~ line 103 ~ TransactionsPage ~ onTransactionModeChanged ~ event", event)
+     if (event.detail.value === 'offline') {
+      this.sync();
+     }
+  }
+
+  async sync() {
+    // Loading overlay
+    if (Capacitor.getPlatform() !== 'web') {
+      const loading = await this.loadingController.create({
+        cssClass: 'default-loading',
+        message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
+        spinner: 'crescent'
+      });
+      await loading.present();
+
+      this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+        let itemMaster: PDItemMaster[] = response['itemMaster'];
+        let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+        await this.configService.syncInboundData(itemMaster, itemBarcode);
+        loading.dismiss();
+      }, error => {
+        console.log(error);
+      })
+
+      // Fake timeout
+      // setTimeout(() => {
+      //   loading.dismiss();
+      // }, 2000);
+    }
+  }
 
   /* #endregion */
 
