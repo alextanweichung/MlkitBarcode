@@ -21,111 +21,14 @@
         </ion-item>
         <div slot="content">
           <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <ion-item class="ion-no-padding" *ngFor="let soLine of salesOrder?.details">
-              <ion-grid class="ion-no-padding p-2">
-                <ion-row>
-                  <ion-col class="ion-margin-auto ion-flex">
-                    <div class="font-bold">{{soLine.itemCode}}</div>
-                  </ion-col>
-                  <ion-col class="ion-flex justify-content-end">
-                    <ion-icon *ngIf="soLine.qtyRequest === (soLine.qtyPicked + soLine.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col class="ion-flex">
-                    <div>{{soLine.description}}</div>
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col>
-                    <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationXDescription"> {{soLine.itemVariationXDescription}}</span>
-                    <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationYDescription"> {{soLine.itemVariationYDescription}}</span>
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col class="ion-margin-auto">
-                    <div class="font-smaller">SO Qty: {{soLine.qtyRequest|number:'1.0'}}</div>
-                  </ion-col>
-                  <ion-col class="ion-margin-auto">
-                    <div class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPickedCurrent)|number:'1.0'}}</div>
-                  </ion-col>
-                </ion-row>
-                <ion-row *ngIf="soLine.rack">
-                  <ion-col class="ion-margin-auto ion-flex">
-                    <div class="font-smaller">Location: {{soLine.rack}} - {{soLine.subRack}}</div>
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col class="ion-flex">
-                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(soLine)">
-                      <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                    </ion-button>
-                  </ion-col>
-                  <ion-col class="ion-flex">
-                    <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPickedCurrent" (ionFocus)="backupQty(soLine, inputNumWithoutSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
-                  </ion-col>
-                  <ion-col class="ion-flex">
-                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(soLine)">
-                      <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                    </ion-button>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
-            </ion-item>
+            <app-item-add-list-flat [line]="soLine" [isPicking]="true" qtyField="qtyPickedCurrent" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" *ngFor="let soLine of salesOrder?.details; let i = index" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
           </ion-list>
         </div>
       </ion-accordion>
     </ion-accordion-group>
     <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!pickingDtoHeader?.isWithSo && pickingSalesOrders.length > 0">
       <ion-item-sliding *ngFor="let soLine of pickingSalesOrders[0]?.details; let i = index">
-        <ion-item class="ion-no-padding" lines="none">
-          <ion-grid class="ion-no-padding p-2">
-            <ion-row>
-              <ion-col class="ion-margin-auto ion-flex">
-                <div class="font-bold">{{soLine.itemCode}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col class="ion-margin-auto ion-flex">
-                <div>{{soLine.description}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationXDescription"> {{soLine.itemVariationXDescription}}</span>
-                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="soLine.itemVariationYDescription"> {{soLine.itemVariationYDescription}}</span>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col class="ion-margin-auto ion-flex">
-                <div class="font-smaller">SO Qty: {{soLine.qtyRequest|number:'1.0'}}</div>
-              </ion-col>
-              <ion-col class="ion-margin-auto ion-flex">
-                <div class="font-smaller">Picked Qty: {{(soLine.qtyPicked + soLine.qtyPickedCurrent)|number:'1.0'}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row *ngIf="soLine.rack">
-              <ion-col class="ion-margin-auto ion-flex">
-                <div class="font-smaller">Location: {{soLine.rack}} - {{soLine.subRack}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col class="ion-margin-auto ion-flex">
-                <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(soLine)">
-                  <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                </ion-button>
-              </ion-col>
-              <ion-col class="ion-margin-auto ion-flex">
-                <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="soLine.qtyPickedCurrent" (ionFocus)="backupQty(soLine, inputNumWithoutSo)" (ionBlur)="updateQty(soLine)" (keypress)="eventHandler($event.keyCode, soLine)"></ion-input>
-              </ion-col>
-              <ion-col class="ion-margin-auto ion-flex">
-                <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(soLine)">
-                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-item>
+        <app-item-add-list-flat [line]="soLine" [isPicking]="true" qtyField="qtyPickedCurrent" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
         <ion-item-options>
           <ion-item-option color="danger" (click)="deleteSoLine(i)">Delete</ion-item-option>
         </ion-item-options>

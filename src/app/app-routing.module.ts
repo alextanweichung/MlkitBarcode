@@ -202,7 +202,11 @@ const routes: Routes = [
   {
     path: 'barcode-scan-input',
     loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then( m => m.BarcodeScanInputPageModule)
+  },  {
+    path: 'item-add-list-flat',
+    loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then( m => m.ItemAddListFlatPageModule)
   },
+
 
 
 ];

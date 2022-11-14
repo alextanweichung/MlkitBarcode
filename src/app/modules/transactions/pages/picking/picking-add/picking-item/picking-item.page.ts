@@ -13,6 +13,7 @@ import { Keyboard } from '@capacitor/keyboard';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-picking-item',
@@ -48,6 +49,7 @@ export class PickingItemPage implements OnInit {
       this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
     }
     this.loadModuleControl();
+    this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -61,55 +63,36 @@ export class PickingItemPage implements OnInit {
       console.log(error);
     })
   }
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.pickingService.getMasterList().subscribe(response => {
+      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    }, error => {
+      console.log(error);
+    })
+  }
 
   /* #region  manual amend qty */
 
-  decreaseQty(soLine) {
-    if (soLine.qtyPickedCurrent - 1 < 0) {
-      soLine.qtyPickedCurrent = 0;
-    } else {
-      soLine.qtyPickedCurrent--;
-    }
-  }
-
-  clonedDetails: { [s: string]: PickingSalesOrderDetail; } = {};
-  backupQty(soLine, event) {
-    event.getInputElement().then(r => {
-      r.select();
-    })
-    this.clonedDetails[soLine.itemSku] = { ...soLine };
-  }
-
-  updateQty(soLine) {
-    if (this.pickingDtoHeader.isWithSo) {
-      if ((soLine.qtyPicked + soLine.qtyPickedCurrent) > soLine.qtyRequest) {
-        this.toastService.presentToast('Not allow to add item more than SO quantity.', '', 'bottom', 'medium', 1000);
-        soLine.qtyPickedCurrent = soLine.qtyRequest - soLine.qtyPicked;
+  onQtyChanged(event, soLine: PickingSalesOrderDetail, index: number) {
+    if (Number.isInteger(event) && event >= 0) {
+      if (this.pickingDtoHeader.isWithSo) {
+        if (soLine.qtyPicked + event <= soLine.qtyRequest) {
+          soLine.qtyPickedCurrent = event;
+        } else {
+          soLine.qtyPickedCurrent = soLine.qtyRequest - soLine.qtyPicked;
+        }
+      } else {
+        soLine.qtyPickedCurrent = event;
+        if (soLine.qtyPickedCurrent === 0) {
+          this.deleteSoLine(index);
+        }
       }
     }
-    delete this.clonedDetails[soLine.itemSku];
   }
-
-  eventHandler(keyCode, soLine) {
-    if (keyCode === 13) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
-      }
-      this.updateQty(soLine);
-    }
-  }
-  increaseQty(soLine) {
-    if (soLine.qtyPickedCurrent === undefined) {
-      soLine.qtyPickedCurrent = 0;
-    }
-    if (this.pickingDtoHeader.isWithSo && (soLine.qtyPicked + soLine.qtyPickedCurrent + 1) <= soLine.qtyRequest) {
-      soLine.qtyPickedCurrent++;
-    }
-    if (!this.pickingDtoHeader.isWithSo) {
-      soLine.qtyPickedCurrent++;
-    }
-  }
-
+  
   /* #endregion */
 
   /* #region  sales order */
@@ -164,11 +147,18 @@ export class PickingItemPage implements OnInit {
   selectedSoDetail: PickingSalesOrderDetail;
   async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
     console.log("🚀 ~ file: picking-item.page.ts ~ line 166 ~ PickingItemPage ~ addItemToSo ~ itemInfo", itemInfo)
+    if (this.pickingDtoHeader.isWithSo && this.accordianGroup1.value === undefined) {
+      this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
+      return;
+    }
+
     if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
-      if (itemExists) {
-        this.selectedSoDetail = itemExists;
-        this.selectedSoDetail.qtyPickedCurrent++;
+      let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
+      console.log("🚀 ~ file: picking-item.page.ts ~ line 157 ~ PickingItemPage ~ addItemToSo ~ itemIndex", itemIndex)
+      if (itemIndex > -1) {
+        this.selectedSoDetail = this.selectedSo.details[itemIndex];
+        this.selectedSoDetail.qtyPickedCurrent += 1;
+        this.onQtyChanged(this.selectedSoDetail.qtyPickedCurrent, this.selectedSoDetail, itemIndex);
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
