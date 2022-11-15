@@ -131,5 +131,11 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
     this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
     this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
+
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
   
 }

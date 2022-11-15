@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { Capacitor } from '@capacitor/core';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -27,7 +28,7 @@ export class CardsPage implements AfterContentChecked {
     allowTouchMove: true
   }
 
-  card_details_visible: boolean = false;
+  show_item_image: boolean = false;
 
   constructor(
     private configService: ConfigService,
@@ -41,11 +42,11 @@ export class CardsPage implements AfterContentChecked {
   ) { }
 
   ngAfterContentChecked(): void {
-
     if (this.swiper) {
       this.swiper.updateSwiper({});
     }
-
+    this.show_item_image = this.configService.sys_parameter.loadImage;
+    console.log("🚀 ~ file: cards.page.ts ~ line 49 ~ CardsPage ~ ngAfterContentChecked ~ this.configService.sys_parameter.loadImage", this.configService.sys_parameter.loadImage)
   }
 
   // Sync
@@ -107,6 +108,15 @@ export class CardsPage implements AfterContentChecked {
     });
 
     await alert.present();
+  }
+
+  async toggleShowItemImage(event) {
+    if (Capacitor.getPlatform() !== 'web') {
+      let t = this.configService.sys_parameter;
+      t.loadImage = event.detail.checked;
+      await this.configService.update(t);
+      this.configService.load();
+    }
   }
 
   async signOut() {

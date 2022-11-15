@@ -100,7 +100,7 @@ export class TransactionsPage implements OnInit {
     this.loadRecentPacking();
 
     // other-sales
-    this.loadRecentOtherSales();
+    // this.loadRecentOtherSales();
   }
 
   /* #region  online offline */

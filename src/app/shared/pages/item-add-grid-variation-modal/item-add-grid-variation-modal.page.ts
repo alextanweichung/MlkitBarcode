@@ -142,4 +142,10 @@ export class ItemAddGridVariationMPage implements OnInit, OnChanges {
     this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
 
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
 }

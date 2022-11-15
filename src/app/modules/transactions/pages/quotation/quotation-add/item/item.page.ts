@@ -6,6 +6,7 @@ import { Customer } from 'src/app/modules/transactions/models/customer';
 import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 
@@ -23,6 +24,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
   loadImage: boolean = true;
 
   constructor(
+    private configService: ConfigService,
     private authService: AuthService,
     private quotationService: QuotationService,
     private navController: NavController,
@@ -41,7 +43,9 @@ export class ItemPage implements OnInit, ViewDidEnter {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
-    this.loadModuleControl();
+    this.loadImage = this.configService.sys_parameter.loadImage;
+    console.log("🚀 ~ file: item.page.ts ~ line 47 ~ ItemPage ~ ngOnInit ~ this.configService.sys_parameter.loadImage", this.configService.sys_parameter.loadImage)
+    // this.loadModuleControl();
   }
 
   loadModuleControl() {

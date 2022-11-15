@@ -20,7 +20,7 @@
 
   <div class="p-2">
 
-    <swiper class="swiper-cards" #swiper [config]="config">
+    <!-- <swiper class="swiper-cards" #swiper [config]="config">
       <ng-template swiperSlide>
         <div class="cc-template cc-template-color-1">
           <div class="cc-bankname">Bank of America</div>
@@ -77,7 +77,7 @@
         </div>
         <p class="cc-description">VISA 7654</p>
       </ng-template>
-    </swiper>
+    </swiper> -->
 
     <ion-list class="list-custom" lines="full">
       <ion-item button routerLink="/payments">
@@ -103,10 +103,10 @@
           <ion-icon color="primary" name="eye"></ion-icon>
         </ion-avatar>
         <ion-label>
-          <h3>Show card details</h3>
+          <h3>Show Item Images</h3>
           <p class="font-size-smallest">Hidden by default</p>
         </ion-label>
-        <ion-toggle slot="end" [(ngModel)]="card_details_visible"></ion-toggle>
+        <ion-toggle slot="end" [(ngModel)]="show_item_image" (ionChange)="toggleShowItemImage($event)"></ion-toggle>
       </ion-item>
 
       <ion-item detail="false">
