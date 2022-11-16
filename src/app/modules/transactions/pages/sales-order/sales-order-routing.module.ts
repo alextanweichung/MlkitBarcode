@@ -10,19 +10,19 @@ const routes: Routes = [
   },
   {
     path: 'sales-order-customer',
-    loadChildren: () => import('./sales-order-add/customer/customer.module').then( m => m.CustomerPageModule)
+    loadChildren: () => import('./sales-order-add/sales-order-header/sales-order-header.module').then( m => m.SalesOrderHeaderPageModule)
   },
   {
     path: 'sales-order-item',
-    loadChildren: () => import('./sales-order-add/item/item.module').then( m => m.ItemPageModule)
+    loadChildren: () => import('./sales-order-add/sales-order-item/sales-order-item.module').then( m => m.SalesOrderItemPageModule)
   },
   {
     path: 'sales-order-confirmation',
-    loadChildren: () => import('./sales-order-add/confirmation/confirmation.module').then( m => m.ConfirmationPageModule)
+    loadChildren: () => import('./sales-order-add/sales-order-confirmation/sales-order-confirmation.module').then( m => m.SalesOrderConfirmationPageModule)
   },
   {
     path: 'sales-order-summary',
-    loadChildren: () => import('./sales-order-add/summary/summary.module').then( m => m.SummaryPageModule)
+    loadChildren: () => import('./sales-order-add/sales-order-summary/sales-order-summary.module').then( m => m.SalesOrderSummaryPageModule)
   },
   {
     path: 'sales-order-detail',

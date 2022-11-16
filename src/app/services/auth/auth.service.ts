@@ -10,6 +10,7 @@ import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { MenuItem, MenuItemRoot } from './menu-item';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class AuthService {
   isAdmin: boolean = false;
   moduleControlConfig: ModuleControl[];
   model: MenuItem[];
+  precisionList: PrecisionList[];
   // dashboardItem: MenuItem;
 
   // 1 is the size of buffer
@@ -37,7 +39,11 @@ export class AuthService {
 
   // Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
   private moduleControlSubject = new ReplaySubject<ModuleControl[]>(1);
-  moduleControlConfig$ = this.moduleControlSubject.asObservable();  
+  moduleControlConfig$ = this.moduleControlSubject.asObservable();
+
+  // Create precisionListSubject to observe from value of HTTP Get for Precision Config
+  private precisionListSubject = new ReplaySubject<PrecisionList[]>(1);
+  precisionList$ = this.precisionListSubject.asObservable();
 
   constructor(
     private navController: NavController,
@@ -45,10 +51,10 @@ export class AuthService {
     private configService: ConfigService
   ) {
     let apiUrl = configService.sys_parameter.apiUrl;
-    this.baseUrl = apiUrl;    
+    this.baseUrl = apiUrl;
 
-    if (!this.isTokenExpired()){
-      this.buildAllObjects(); 
+    if (!this.isTokenExpired()) {
+      this.buildAllObjects();
     }
   }
 
@@ -112,7 +118,8 @@ export class AuthService {
   buildAllObjects() {
     this.buildMenuModel();
     // this.buildRestrictColumnsObject(); 
-    this.buildModuleControlObject();   
+    this.buildModuleControlObject();
+    this.buildPrecisionList();
     // this.buildMasterDefinedGroup();  
   }
 
@@ -130,23 +137,30 @@ export class AuthService {
       console.log(error);
     });
   }
-  
-  buildModuleControlObject(){
+
+  buildModuleControlObject() {
     this.getModuleControl().subscribe(response => {
       this.moduleControlConfig = response;
       this.setModuleControl(this.moduleControlConfig);
     });
   }
-  
-  getMenuHierachy(){
+
+  buildPrecisionList(){
+    this.getPrecisionList().subscribe(response => {
+      this.precisionList = response;
+      this.setPrecisionList(this.precisionList);
+    });
+  }
+
+  getMenuHierachy() {
     return this.http.get<MenuHierarchy[]>(this.baseUrl + 'account/menu').pipe(
-      map((response: any) =>       
-        response.map((item: any) => item)   
+      map((response: any) =>
+        response.map((item: any) => item)
       )
     )
   }
 
-  setMenuHierarchy(item: any){    
+  setMenuHierarchy(item: any) {
     this.menuItemSubject.next(item);
   }
 
@@ -158,16 +172,24 @@ export class AuthService {
     )
   }
 
+  getPrecisionList(){
+    return this.http.get<PrecisionList[]>(this.baseUrl + 'account/precision');
+  }
+
   setModuleControl(item: any) {
     this.moduleControlSubject.next(item);
   }
 
+  setPrecisionList(item: any){    
+    this.precisionListSubject.next(item);
+  }
+
   isTokenExpired(token?: string): boolean {
-    if(!token) token = this.getToken();
-    if(!token) return true;
+    if (!token) token = this.getToken();
+    if (!token) return true;
 
     const tokenExpiryDate = this.getTokenExpirationDate(token);
-    if(tokenExpiryDate === undefined) return true;
+    if (tokenExpiryDate === undefined) return true;
     return !(tokenExpiryDate.valueOf() > new Date().valueOf());
   }
 
@@ -179,11 +201,11 @@ export class AuthService {
     const decoded: JwtPayload = jwt_decode(token);
     if (decoded.exp === undefined) return null;
 
-    const date = new Date(0); 
+    const date = new Date(0);
     date.setUTCSeconds(decoded.exp);
     return date;
   }
-  
+
   // Sign out
   async signOut() {
 
@@ -193,6 +215,7 @@ export class AuthService {
     this.currentUserSource.next(null);
     this.currentUserTokenSource.next(null);
     this.menuItemSubject.next(null);
+    this.precisionListSubject.next(null);
     this.isLoggedIn = false;
     this.isAdmin = false;
     // ...

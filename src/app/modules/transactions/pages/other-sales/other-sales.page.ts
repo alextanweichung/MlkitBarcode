@@ -62,7 +62,7 @@ export class OtherSalesPage implements OnInit {
     // if (salesAgentId === 0 || salesAgentId === undefined) {
     //   this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
     // } else {
-      this.navController.navigateForward('/transactions/other-sales/other-sales-add/other-sales-header');
+      this.navController.navigateForward('/transactions/other-sales/other-sales-header');
     // }
   }
 

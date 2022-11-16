@@ -9,13 +9,14 @@ const routes: Routes = [
     component: OtherSalesPage
   },
   {
-    path: 'other-sales-add/other-sales-header',
+    path: 'other-sales-header',
     loadChildren: () => import('./other-sales-add/other-sales-header/other-sales-header.module').then( m => m.OtherSalesHeaderPageModule)
   },
   {
-    path: 'other-sales-detail',
-    loadChildren: () => import('./other-sales-detail/other-sales-detail.module').then( m => m.OtherSalesDetailPageModule)
+    path: 'other-sales-item',
+    loadChildren: () => import('./other-sales-add/other-sales-item/other-sales-item.module').then( m => m.OtherSalesItemPageModule)
   }
+
 ];
 
 @NgModule({

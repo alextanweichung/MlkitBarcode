@@ -180,6 +180,11 @@ export class CommonService {
     return trxLine.unitPriceExTax;
   }
 
+  computeAmtInclTax(amount: number, taxPct: number){
+    let amtInclTax = amount * (1 + (taxPct/100));
+    return amtInclTax;
+  }
+
   computeAmtExclTax(amount: number, taxPct: number) {
     let amtExclTax = amount / (100 + taxPct) * 100;
     return amtExclTax;

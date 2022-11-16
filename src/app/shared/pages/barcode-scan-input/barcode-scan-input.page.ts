@@ -91,6 +91,7 @@ export class BarcodeScanInputPage implements OnInit {
         }
       } else {
         this.barcodeScanInputService.getItemInfoByBarcode(barcode).subscribe(response => {
+          console.log("🚀 ~ file: barcode-scan-input.page.ts ~ line 94 ~ BarcodeScanInputPage ~ this.barcodeScanInputService.getItemInfoByBarcode ~ response", response)
           if (response) {
             let outputData: any = { sku: response.itemSku, itemInfo: response };
             this.onItemAdd.emit(outputData);

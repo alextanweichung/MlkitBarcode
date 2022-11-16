@@ -7,7 +7,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
-import { QuotationDto, QuotationLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
+import { QuotationDto, QuotationDtoLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -63,10 +63,10 @@ export class QuotationService {
   }
 
   flattenDtoDetail(quotation: QuotationRoot): QuotationDto {
-    let line: QuotationLine[] = [];
+    let line: QuotationDtoLine[] = [];
     quotation.details.forEach(r => {
       if (r.variationTypeCode === '0') {
-        let l: QuotationLine = {
+        let l: QuotationDtoLine = {
           quotationLineId: r.lineId,
           quotationId: r.headerId,
           itemId: r.itemId,
@@ -89,7 +89,7 @@ export class QuotationService {
       } else {
         r.variationDetails.forEach(v => {
           v.details.forEach(d => {
-            let l: QuotationLine = {
+            let l: QuotationDtoLine = {
               quotationLineId: r.lineId,
               quotationId: r.headerId,
               itemId: r.itemId,

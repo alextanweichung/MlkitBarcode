@@ -9,20 +9,20 @@ const routes: Routes = [
     component: QuotationPage
   },
   {
-    path: 'quotation-customer',
-    loadChildren: () => import('./quotation-add/customer/customer.module').then(m => m.CustomerPageModule)
+    path: 'quotation-header',
+    loadChildren: () => import('./quotation-add/quotation-header/quotation-header.module').then(m => m.QuotationHeaderPageModule)
   },
   {
     path: 'quotation-item',
-    loadChildren: () => import('./quotation-add/item/item.module').then(m => m.ItemPageModule)
+    loadChildren: () => import('./quotation-add/quotation-item/quotation-item.module').then(m => m.QuotationItemPageModule)
   },
   {
     path: 'quotation-confirmation',
-    loadChildren: () => import('./quotation-add/confirmation/confirmation.module').then(m => m.ConfirmationPageModule)
+    loadChildren: () => import('./quotation-add/quotation-confirmation/quotation-confirmation.module').then(m => m.QuotationConfirmationPageModule)
   },
   {
     path: 'quotation-summary',
-    loadChildren: () => import('./quotation-add/summary/summary.module').then(m => m.SummaryPageModule)
+    loadChildren: () => import('./quotation-add/quotation-summary/quotation-summary.module').then(m => m.QuotationSummaryPageModule)
   },
   {
     path: 'quotation-detail',
