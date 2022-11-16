@@ -147,7 +147,6 @@ export class OtpConfigurationPage implements OnInit {
   }
 
   onValidityChanged(event) {
-    console.log("🚀 ~ file: otp-configuration.page.ts ~ line 150 ~ OtpConfigurationPage ~ onValidityChanged ~ event", event)
     if (event) {
       this.selectedValidity = event.code;
       this.selectedApp = null;
