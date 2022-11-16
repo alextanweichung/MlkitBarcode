@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { QuotationDto, QuotationLine, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
+import { QuotationDto, QuotationDtoLine, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -74,7 +74,7 @@ export class DetailPage implements OnInit {
     return defaultImageUrl;
   }
 
-  getFlattenVariations(itemId: number): QuotationLine[] {
+  getFlattenVariations(itemId: number): QuotationDtoLine[] {
     return this.flattenQuotation.details.filter(r => r.itemId === itemId);
   }
 

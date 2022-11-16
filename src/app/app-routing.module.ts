@@ -128,6 +128,10 @@ const routes: Routes = [
     path: 'transactions/other-sales',
     loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales.module').then( m => m.OtherSalesPageModule)
   },
+  {
+    path: 'transactions/other-sales/other-sales-detail',
+    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales-detail/other-sales-detail.module').then( m => m.OtherSalesDetailPageModule)
+  },
 
 
 

@@ -113,8 +113,12 @@ export class CardsPage implements AfterContentChecked {
     if (Capacitor.getPlatform() !== 'web') {
       let t = this.configService.sys_parameter;
       t.loadImage = event.detail.checked;
-      await this.configService.update(t);
-      this.configService.load();
+      try {
+        await this.configService.update(t);
+        this.configService.load();
+      } catch (error) {
+        this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+      }
     }
   }
 

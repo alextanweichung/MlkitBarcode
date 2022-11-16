@@ -5,6 +5,7 @@ import { CommonQueryService } from 'src/app/shared/database/interface/common-que
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
+import { ToastService } from '../toast/toast.service';
 
 export const getSysParams: string = `
 SELECT * 
@@ -22,6 +23,7 @@ export class ConfigService {
   item_Barcodes: PDItemBarcode[] = [];
 
   constructor(
+    private toastService: ToastService,
     private _databaseService: DatabaseService,
     private commonQueryService: CommonQueryService<Sys_Parameter>
   ) { }

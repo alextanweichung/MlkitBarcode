@@ -136,9 +136,9 @@ export class StockCountItemPage implements OnInit {
         code: itemInfo.itemCode,
         itemDesc: itemInfo.description,
         varCd: itemInfo.variationTypeCode,
-        brandId: itemInfo.itemBrandId,
-        groupId: itemInfo.itemGroupId,
-        catId: itemInfo.itemCategoryId
+        brandId: itemInfo.brandId,
+        groupId: itemInfo.groupId,
+        catId: itemInfo.catId
       }
       b = {
         id: itemInfo.itemBarcodeTagId,

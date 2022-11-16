@@ -15,11 +15,11 @@ export interface QuotationList {
  }
  
 export interface QuotationDto {
-  header: Quotation
-  details: QuotationLine[]
+  header: QuotationDtoHeader
+  details: QuotationDtoLine[]
 }
 
-export interface Quotation {
+export interface QuotationDtoHeader {
   quotationId: number
   quotationNum: string
   trxDate: string
@@ -62,7 +62,7 @@ export interface Quotation {
   deactivated?: boolean
 }
 
-export interface QuotationLine {
+export interface QuotationDtoLine {
   quotationLineId?: number
   quotationId?: number
   itemId: number

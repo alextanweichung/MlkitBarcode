@@ -63,7 +63,7 @@ export class QuotationPage implements OnInit {
     if (salesAgentId === 0 || salesAgentId === undefined) {
       this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
     } else {
-      this.navController.navigateForward('/transactions/quotation/quotation-customer');
+      this.navController.navigateForward('/transactions/quotation/quotation-header');
     }
   }
 
