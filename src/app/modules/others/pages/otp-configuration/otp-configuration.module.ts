@@ -9,6 +9,7 @@ import { OtpConfigurationPageRoutingModule } from './otp-configuration-routing.m
 import { OtpConfigurationPage } from './otp-configuration.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
+import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi
     IonicModule,
     OtpConfigurationPageRoutingModule,
     SearchDropdownPageModule,
-    SearchMultiDropdownPageModule
+    SearchMultiDropdownPageModule,
+    CalendarInputPageModule
   ],
   declarations: [OtpConfigurationPage]
 })
