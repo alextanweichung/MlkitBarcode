@@ -97,7 +97,7 @@ export class ConfirmationPage implements OnInit {
 
   async insertSalesOrder() {
     // const result = await this.presentInsertConfirmation();
-    connectableObservableDescriptor.lo
+    // connectableObservableDescriptor.lo
     // if (result) {
     let trxLineArray: SalesOrderLine[] = [];
     this.salesOrderService.itemInCart.forEach(e => {
@@ -114,7 +114,7 @@ export class ConfirmationPage implements OnInit {
         extendedDescription: e.description,
         qtyRequest: e.qtyRequest,
         unitPrice: e.unitPrice,
-        unitPriceExTax: e.unitPrice, // todo : check with wayne
+        unitPriceExTax: e.unitPriceExTax, // todo : check with wayne
         sequence: 0,
         locationId: this.salesOrderHeader.locationId,
         deactivated: true
@@ -125,7 +125,7 @@ export class ConfirmationPage implements OnInit {
       header: {
         salesOrderId: 0,
         salesOrderNum: null,
-        trxDate: this.datePipe.transform(new Date, 'yyyy-MM-dd'),
+        trxDate: this.salesOrderHeader.trxDate,
         businessModelType: this.salesOrderHeader.businessModelType,
         typeCode: this.salesOrderHeader.typeCode,
         sourceType: 'M', // Mobile
@@ -136,10 +136,11 @@ export class ConfirmationPage implements OnInit {
         termPeriodId: this.salesOrderHeader.termPeriodId,
         countryId: this.salesOrderHeader.countryId,
         currencyId: this.salesOrderHeader.currencyId,
-        currencyRate: this.salesOrderHeader.exchangeRate
+        currencyRate: this.salesOrderHeader.currencyRate
       },
       details: trxLineArray,
     }
+    console.log("🚀 ~ file: confirmation.page.ts ~ line 144 ~ ConfirmationPage ~ this.salesOrderService.insertSalesOrder ~ trxDto", trxDto)
     this.salesOrderService.insertSalesOrder(trxDto).subscribe(response => {
       let details: any[] = response.body["details"];
       let totalQty: number = 0;

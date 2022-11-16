@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 
 @Injectable({

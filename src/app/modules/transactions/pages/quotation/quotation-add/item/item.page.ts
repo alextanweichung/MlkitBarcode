@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
@@ -9,17 +10,22 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-item',
   templateUrl: './item.page.html',
   styleUrls: ['./item.page.scss'],
+  providers: [DatePipe]
 })
 export class ItemPage implements OnInit, ViewDidEnter {
 
   private customer: Customer;
 
   moduleControl: ModuleControl[] = [];
+  useTax: boolean = false;
+  maxPrecision: number = 2;
+  maxPrecisionTax: number = 2;
 
   loadImage: boolean = true;
 
@@ -30,6 +36,8 @@ export class ItemPage implements OnInit, ViewDidEnter {
     private navController: NavController,
     private loadingController: LoadingController,
     private toastService: ToastService,
+    private commonService: CommonService,
+    private datePipe: DatePipe
   ) { }
 
   ionViewDidEnter(): void {
@@ -38,6 +46,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   ngOnInit() {
     this.customer = this.quotationService.selectedCustomer;
+    console.log("🚀 ~ file: item.page.ts ~ line 44 ~ ItemPage ~ ngOnInit ~ this.customer", this.customer)
     this.itemInCart = this.quotationService.itemInCart;
     if (!this.customer || this.customer === undefined) {
       this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1000);
@@ -49,10 +58,10 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;      
-      let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
-      if (loadImage) {
-        this.loadImage = loadImage === '1' ? true : false;
+      this.moduleControl = obj;
+      let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+      if (SystemWideActivateTaxControl != undefined) {
+        this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
     }, error => {
       console.log(error);
@@ -82,8 +91,9 @@ export class ItemPage implements OnInit, ViewDidEnter {
         })
       }
       // get item
-      this.quotationService.getItemList(this.itemSearchText, this.customer.customerId, this.customer.locationId).subscribe(async response => {
+      this.quotationService.getItemListWithTax(this.itemSearchText, this.datePipe.transform(new Date(), 'yyyy-MM-dd'), this.customer.customerId, this.customer.locationId).subscribe(async response => {
         this.availableItem = response;
+        console.log("🚀 ~ file: item.page.ts ~ line 96 ~ ItemPage ~ this.quotationService.getItemListWithTax ~ this.availableItem", this.availableItem)
         this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
         await this.hideLoading();
       }, async error => {
@@ -120,6 +130,9 @@ export class ItemPage implements OnInit, ViewDidEnter {
   /* #region  steps */
 
   async nextStep() {
+    this.itemInCart.forEach(r => {
+      r.unitPriceExTax = this.commonService.computeUnitPriceExTax(r, this.useTax, this.maxPrecision);
+    })
     await this.quotationService.setChoosenItems(this.itemInCart);
     this.navController.navigateForward('/transactions/quotation/quotation-confirmation');
   }

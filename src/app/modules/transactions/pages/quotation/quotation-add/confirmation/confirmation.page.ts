@@ -162,6 +162,7 @@ export class ConfirmationPage implements OnInit {
         extendedDescription: e.description,
         qtyRequest: e.qtyRequest,
         unitPrice: e.unitPrice,
+        unitPriceExTax: e.unitPriceExTax,
         sequence: 0,
         locationId: this.customer.locationId,
         deactivated: true

@@ -165,6 +165,10 @@ export class SalesOrderService {
       )
     );
   }
+  
+  getItemListWithTax(keyword: string, trxDate: string, customerId: number, locationId: number) {
+    return this.http.get<Item[]>(this.baseUrl + "MobileSalesOrder/item/itemListWithTax/" + keyword + "/" + trxDate + "/" + customerId + "/" + locationId, { context: background_load() });
+  }
 
   getItemImageFile(keyword: string) {
     return this.http.get<ItemImage[]>(this.baseUrl + "MobileSalesOrder/itemList/imageFile/" + keyword, { context: background_load() });

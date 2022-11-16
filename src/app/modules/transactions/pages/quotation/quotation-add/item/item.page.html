@@ -16,8 +16,8 @@
     <ion-searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionChange)="searchTextChanged()" (search)="searchItem()"></ion-searchbar>
     <ion-button class="my-1" expand="block" size="small" (click)="searchItem()">Search</ion-button>
   </div>
-  <app-item-add-grid *ngIf="loadImage" [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid>
-  <app-item-add-list *ngIf="!loadImage" [availableItem]="availableItem" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-list>  
+  <app-item-add-grid *ngIf="loadImage" [useTax]="useTax" [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid>
+  <app-item-add-list *ngIf="!loadImage" [useTax]="useTax" [availableItem]="availableItem" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-list>  
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
