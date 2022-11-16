@@ -46,7 +46,6 @@ export class CardsPage implements AfterContentChecked {
       this.swiper.updateSwiper({});
     }
     this.show_item_image = this.configService.sys_parameter.loadImage;
-    console.log("🚀 ~ file: cards.page.ts ~ line 49 ~ CardsPage ~ ngAfterContentChecked ~ this.configService.sys_parameter.loadImage", this.configService.sys_parameter.loadImage)
   }
 
   // Sync

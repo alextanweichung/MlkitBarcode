@@ -78,7 +78,9 @@ export class QuotationService {
           extendedDescription: r.extendedDescription,
           qtyRequest: r.qtyRequest,
           unitPrice: r.unitPrice,
+          unitPriceExTax: r.unitPriceExTax,
           subTotal: r.subTotal,
+          subTotalExTax: r.subTotalExTax,
           sequence: r.sequence,
           locationId: r.locationId,
           deactivated: r.deactivated
@@ -99,7 +101,9 @@ export class QuotationService {
               extendedDescription: r.extendedDescription,
               qtyRequest: d.qtyRequest,
               unitPrice: r.unitPrice,
+              unitPriceExTax: r.unitPriceExTax,
               subTotal: (d.qtyRequest ?? 0) * (r.unitPrice ?? 0),
+              subTotalExTax: (d.qtyRequest ?? 0) * (r.unitPriceExTax ?? 0),
               sequence: r.sequence,
               locationId: r.locationId,
               deactivated: r.deactivated
@@ -162,6 +166,10 @@ export class QuotationService {
         response.map((item: any) => item)
       )
     );
+  }
+  
+  getItemListWithTax(keyword: string, trxDate: string, customerId: number, locationId: number) {
+    return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemListWithTax/" + keyword + "/" + trxDate + "/" + customerId + "/" + locationId, { context: background_load() });
   }
 
   getItemImageFile(keyword: string) {

@@ -20,6 +20,9 @@ export class SummaryPage implements OnInit {
 
   ngOnInit() {
     this.salesOrderSummary = this.salesOrderService.salesOrderSummary;
+    if (this.salesOrderSummary) {
+      this.navController.navigateRoot('/transactions/sales-order');
+    }
     this.loadMasterList();
   }
 

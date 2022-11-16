@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
@@ -6,28 +7,37 @@ import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-item',
   templateUrl: './item.page.html',
   styleUrls: ['./item.page.scss'],
+  providers: [DatePipe]
 })
 export class ItemPage implements OnInit, ViewDidEnter {
 
   private salesOrderHeader: SalesOrderHeader
   
   moduleControl: ModuleControl[] = [];
+  useTax: boolean = false;
+  maxPrecision: number = 2;
+  maxPrecisionTax: number = 2;
 
   loadImage: boolean = true;
 
   constructor(
     private authService: AuthService,
+    private configService: ConfigService,
     private salesOrderService: SalesOrderService,
     private navController: NavController,
     private loadingController: LoadingController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private commonService: CommonService,
+    private datePipe: DatePipe
   ) { }
 
   ionViewDidEnter(): void {
@@ -36,20 +46,22 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   ngOnInit() {
     this.salesOrderHeader = this.salesOrderService.salesOrderHeader
+    console.log("🚀 ~ file: item.page.ts ~ line 42 ~ ItemPage ~ ngOnInit ~ this.salesOrderHeader", this.salesOrderHeader)
     this.itemInCart = this.salesOrderService.itemInCart;
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
       this.toastService.presentToast('Something went wrong', '', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
+    this.loadImage = this.configService.sys_parameter.loadImage;
     this.loadModuleControl();
   }
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;      
-      let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
-      if (loadImage) {
-        this.loadImage = loadImage === '1' ? true : false;
+      this.moduleControl = obj;
+      let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+      if (SystemWideActivateTaxControl != undefined) {
+        this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
     }, error => {
       console.log(error);
@@ -79,8 +91,9 @@ export class ItemPage implements OnInit, ViewDidEnter {
         })
       }
       // get item
-      this.salesOrderService.getItemList(this.itemSearchText, this.salesOrderHeader.customerId, this.salesOrderHeader.locationId).subscribe(async response => {
+      this.salesOrderService.getItemListWithTax(this.itemSearchText, this.datePipe.transform(this.salesOrderHeader.trxDate, 'yyyy-MM-dd'), this.salesOrderHeader.customerId, this.salesOrderHeader.locationId).subscribe(async response => {
         this.availableItem = response;
+        console.log("🚀 ~ file: item.page.ts ~ line 96 ~ ItemPage ~ this.salesOrderService.getItemListWithTax ~ this.availableItem", this.availableItem)
         this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
         await this.hideLoading();
       }, async error => {
@@ -119,6 +132,9 @@ export class ItemPage implements OnInit, ViewDidEnter {
   /* #region  steps */
 
   nextStep() {
+    this.itemInCart.forEach(r => {
+      r.unitPriceExTax = this.commonService.computeUnitPriceExTax(r, this.useTax, this.maxPrecision);
+    })
     this.salesOrderService.setChoosenItems(this.itemInCart);
     this.navController.navigateForward('/transactions/sales-order/sales-order-confirmation');
   }

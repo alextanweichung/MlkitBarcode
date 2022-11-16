@@ -46,7 +46,8 @@ export class StockCountItemPage implements OnInit {
       this.navController.navigateBack('/others/stock-count');
     }
     this.loadMasterList();
-    this.loadModuleControl();
+    // this.loadModuleControl();    
+    this.loadImage = this.configService.sys_parameter.loadImage;
     this.loadInventoryCountBatchCriteria();
   }
 
@@ -133,7 +134,6 @@ export class StockCountItemPage implements OnInit {
   }
 
   async addItemToLine(sku: string, itemInfo?: ItemBarcodeModel) {
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 136 ~ StockCountItemPage ~ addItemToLine ~ itemInfo", itemInfo)
     let b: any;
     let m: any;
     if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {

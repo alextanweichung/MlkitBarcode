@@ -14,17 +14,17 @@ export interface SalesOrderList {
   createdById: number
 }
 
-export interface SalesOrderHeader {
-  locationId: number
-  customerId: number
-  currencyId: number
-  exchangeRate: number
-  countryId: number
-  termPeriodId: number
-  salesAgentId: number
-  typeCode: string
-  businessModelType: string
-}
+// export interface SalesOrderHeader {
+//   locationId: number
+//   customerId: number
+//   currencyId: number
+//   exchangeRate: number
+//   countryId: number
+//   termPeriodId: number
+//   salesAgentId: number
+//   typeCode: string
+//   businessModelType: string
+// }
 
 export interface SalesOrderDto {
   header: SalesOrder
@@ -34,8 +34,8 @@ export interface SalesOrderDto {
 export interface SalesOrder {
   salesOrderId: number
   salesOrderNum: string
-  trxDate?: string
-  trxDateTime?: string
+  trxDate?: Date
+  trxDateTime?: Date
   typeCode?: string
   sourceType?: string
   customerId?: number
@@ -93,6 +93,7 @@ export interface SalesOrderLine {
   extendedDescription: string
   qtyRequest?: number
   unitPrice?: number
+  unitPriceExTax: number;
   subTotal?: number
   sequence?: number
   locationId?: number
@@ -114,7 +115,7 @@ export interface SalesOrderRoot {
 export interface SalesOrderHeader {
   salesOrderId: number
   salesOrderNum: string
-  trxDate: string
+  trxDate: Date
   trxDateTime: string
   typeCode: string
   sourceType: string

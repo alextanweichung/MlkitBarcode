@@ -67,9 +67,9 @@ export class WelcomePage implements OnInit, AfterContentChecked {
       let code = atob(this.activationCode);
       let config: Sys_Parameter = JSON.parse(code);
       await this.configService.insert(config);
+      // Navigate to /home
+      this.navController.navigateRoot('/signin');
     }
-    // Navigate to /home
-    this.navController.navigateRoot('/signin');
   }
 
   // async insertConfig(config: Config) {

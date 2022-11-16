@@ -39,7 +39,8 @@ export class PickingConfirmationPage implements OnInit {
     }
     this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
     this.pickingSalesOrderLines = this.pickingService.selectedSalesOrderLines;
-    this.loadModuleControl();
+    // this.loadModuleControl();    
+    this.loadImage = this.configService.sys_parameter.loadImage;
     this.loadMasterList();
   }
 

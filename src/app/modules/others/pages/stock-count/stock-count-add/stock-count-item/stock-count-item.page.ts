@@ -43,7 +43,8 @@ export class StockCountItemPage implements OnInit {
       this.loadInventoryCountBatchCriteria();
     }
     this.loadMasterList();
-    this.loadModuleControl();
+    // this.loadModuleControl();    
+    this.loadImage = this.configService.sys_parameter.loadImage;
   }
 
   itemBrandMasterList: MasterListDetails[] = [];
@@ -124,7 +125,6 @@ export class StockCountItemPage implements OnInit {
   }
 
   async addItemToLine(sku: string, itemInfo?: ItemBarcodeModel) {
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 127 ~ StockCountItemPage ~ addItemToLine ~ itemInfo", itemInfo)
     let b: any;
     let m: any;
     if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
@@ -324,7 +324,6 @@ export class StockCountItemPage implements OnInit {
   }
 
   nextStep() {
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 314 ~ StockCountItemPage ~ nextStep ~ this.stockCountHeader", this.stockCountHeader)
     this.stockCountService.insertInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
       if (response.status === 201) {
         let object = response.body as StockCountRoot;

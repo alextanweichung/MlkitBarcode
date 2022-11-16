@@ -55,7 +55,6 @@ export class OtherSalesHeaderPage implements OnInit {
   locationMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.otherSalesService.getMasterList().subscribe(response => {
-      console.log("🚀 ~ file: other-sales-header.page.ts ~ line 44 ~ OtherSalesHeaderPage ~ this.otherSalesService.getMasterList ~ response", response)
       this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.attribute5 != "T").filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);

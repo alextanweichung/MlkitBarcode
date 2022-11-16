@@ -10,6 +10,7 @@ import { ItemList } from '../../models/item-list';
 })
 export class ItemAddGridVariationMPage implements OnInit, OnChanges {
 
+  @Input() useTax: boolean = false;
   @Input() availableItem: Item[] = [];
   @Input() availableImages: ItemImage[] = [];
   @Input() itemInCart: Item[] = [];
@@ -42,7 +43,7 @@ export class ItemAddGridVariationMPage implements OnInit, OnChanges {
           itemCode: oneItem.itemCode,
           itemSku: oneItem.itemSku,
           description: oneItem.description,
-          unitPrice: oneItem.unitPrice,
+          unitPrice: this.useTax ? oneItem.unitPrice : oneItem.unitPriceExTax,
           variationTypeCode: oneItem.variationTypeCode
         })
       })

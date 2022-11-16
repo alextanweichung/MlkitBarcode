@@ -13,6 +13,9 @@ export interface Item {
    itemVariationLineXDescription: string
    itemVariationLineYDescription: string
    unitPrice: number
+   unitPriceExTax: number
+   taxCode: string
+   taxPct: number
    currencyId: number
    availableQty: number
    qtyRequest?: number

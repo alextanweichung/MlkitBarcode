@@ -96,12 +96,13 @@ export class CustomerPage implements OnInit {
       locationId: [null],
       customerId: [null, [Validators.required]],
       currencyId: [null],
-      exchangeRate: [null],
+      currencyRate: [null],
       countryId: [null],
       termPeriodId: [null],
       salesAgentId: [null],
       typeCode: [null],
-      businessModelType: [null]
+      businessModelType: [null],
+      trxDate: [new Date()]
     });
   }
 
@@ -114,7 +115,7 @@ export class CustomerPage implements OnInit {
     let defaultCurrency = this.currencyMasterList.find(item => item.isPrimary)
     if (defaultCurrency) {
       this.objectForm.patchValue({ currencyId: defaultCurrency.id });
-      this.objectForm.patchValue({ exchangeRate: parseFloat(defaultCurrency.attribute1) });
+      this.objectForm.patchValue({ currencyRate: parseFloat(defaultCurrency.attribute1) });
     }
 
     let defaultCountry = this.countryMasterList.find(item => item.isPrimary)?.id;

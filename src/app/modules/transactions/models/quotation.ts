@@ -75,7 +75,9 @@ export interface QuotationLine {
   extendedDescription: string
   qtyRequest?: number
   unitPrice?: number
+  unitPriceExTax?: number
   subTotal?: number
+  subTotalExTax?: number
   sequence?: number
   locationId?: number
   deactivated?: boolean

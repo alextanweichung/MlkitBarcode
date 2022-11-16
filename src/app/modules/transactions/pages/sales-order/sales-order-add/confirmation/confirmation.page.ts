@@ -5,7 +5,9 @@ import { connectableObservableDescriptor } from 'rxjs/internal/observable/Connec
 import { Item } from 'src/app/modules/transactions/models/item';
 import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
   selector: 'app-confirmation',
@@ -15,10 +17,14 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 })
 export class ConfirmationPage implements OnInit {
 
+  moduleControl: ModuleControl[] = [];
+  useTax: boolean;
+  
   private salesOrderHeader: SalesOrderHeader;
   itemInCart: Item[];
 
   constructor(
+    private authService: AuthService,
     private salesOrderService: SalesOrderService,
     private navController: NavController,
     private alertController: AlertController,
@@ -37,6 +43,18 @@ export class ConfirmationPage implements OnInit {
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
       this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'bottom', 'medium', 1000);
     }
+    this.loadModuleControl();
+  }
+
+  loadModuleControl() {
+    this.authService.moduleControlConfig$.subscribe(obj => {
+      let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+      if (SystemWideActivateTaxControl != undefined) {
+        this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+      }
+    }, error => {
+      console.log(error);
+    })
   }
 
   onItemInCartEditCompleted(event) {
@@ -79,7 +97,7 @@ export class ConfirmationPage implements OnInit {
 
   async insertSalesOrder() {
     // const result = await this.presentInsertConfirmation();
-    connectableObservableDescriptor.lo
+    // connectableObservableDescriptor.lo
     // if (result) {
     let trxLineArray: SalesOrderLine[] = [];
     this.salesOrderService.itemInCart.forEach(e => {
@@ -96,6 +114,7 @@ export class ConfirmationPage implements OnInit {
         extendedDescription: e.description,
         qtyRequest: e.qtyRequest,
         unitPrice: e.unitPrice,
+        unitPriceExTax: e.unitPriceExTax, // todo : check with wayne
         sequence: 0,
         locationId: this.salesOrderHeader.locationId,
         deactivated: true
@@ -106,7 +125,7 @@ export class ConfirmationPage implements OnInit {
       header: {
         salesOrderId: 0,
         salesOrderNum: null,
-        trxDate: this.datePipe.transform(new Date, 'yyyy-MM-dd'),
+        trxDate: this.salesOrderHeader.trxDate,
         businessModelType: this.salesOrderHeader.businessModelType,
         typeCode: this.salesOrderHeader.typeCode,
         sourceType: 'M', // Mobile
@@ -117,10 +136,11 @@ export class ConfirmationPage implements OnInit {
         termPeriodId: this.salesOrderHeader.termPeriodId,
         countryId: this.salesOrderHeader.countryId,
         currencyId: this.salesOrderHeader.currencyId,
-        currencyRate: this.salesOrderHeader.exchangeRate
+        currencyRate: this.salesOrderHeader.currencyRate
       },
       details: trxLineArray,
     }
+    console.log("🚀 ~ file: confirmation.page.ts ~ line 144 ~ ConfirmationPage ~ this.salesOrderService.insertSalesOrder ~ trxDto", trxDto)
     this.salesOrderService.insertSalesOrder(trxDto).subscribe(response => {
       let details: any[] = response.body["details"];
       let totalQty: number = 0;

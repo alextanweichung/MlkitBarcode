@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
-  
+
   baseUrl: string;
   startDate: Date;
   endDate: Date
@@ -40,7 +41,7 @@ export class CommonService {
   syncAllItemByLocationCode() {
     return this.http.get(this.baseUrl + "PosDownload/itemMaster/KLCC/2022-10-31");
   }
-  
+
   setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {
     setTimeout(() => {
       const viewChildElement = viewChildrenQueryList.find(element => element.el.nativeElement.id === (objectType))
@@ -51,13 +52,13 @@ export class CommonService {
   }
 
   //To add back timezone differences into UTC Date
-  convertUtcDate(inputDate: Date): Date{
+  convertUtcDate(inputDate: Date): Date {
     let outputDate = new Date(inputDate);
     outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
     return outputDate;
-  }  
+  }
 
-  convertObjectAllDateType(inputObject: any){
+  convertObjectAllDateType(inputObject: any) {
     if (inputObject.hasOwnProperty('trxDate')) {
       if (inputObject.trxDate != null) {
         inputObject.trxDate = this.convertUtcDate(inputObject.trxDate);
@@ -167,6 +168,76 @@ export class CommonService {
       })
     }
     return inputObject;
+  }
+
+  computeUnitPriceExTax(trxLine: any, useTax: boolean, roundingPrecision: number) {
+    if (useTax) {
+      trxLine.unitPriceExTax = this.computeAmtExclTax(trxLine.unitPrice, trxLine.taxPct);
+    } else {
+      trxLine.unitPriceExTax = trxLine.unitPrice;
+    }
+    trxLine.unitPriceExTax = this.roundToPrecision(trxLine.unitPriceExTax, roundingPrecision);
+    return trxLine.unitPriceExTax;
+  }
+
+  computeAmtExclTax(amount: number, taxPct: number) {
+    let amtExclTax = amount / (100 + taxPct) * 100;
+    return amtExclTax;
+  }
+
+  roundToPrecision(inputNumber: number, precision: number): number {
+    if (inputNumber) {
+      return Number(inputNumber.toFixed(precision));
+    } else {
+      return null;
+    }
+  }
+
+  computeDiscTaxAmount(trxLine: any, useTax: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
+    let totalDiscAmt = 0;
+    let unitPrice = trxLine.unitPrice;
+    let unitPriceExTax = trxLine.unitPriceExTax;
+    let discExpression = trxLine.discountExpression;
+    let quantity = trxLine.qtyRequest;
+    let subTotal = unitPrice * quantity;
+
+    //To split the expression with multi level discount, for eg. (10%/5%/3%)
+    if (discExpression != "" && discExpression != null) {
+      let splittedDisc = discExpression.split(/[+/]/g);
+      splittedDisc.forEach(x => {
+        if (x.includes('%')) {
+          let currentdiscPct = parseFloat(x) / 100;
+          //let currentDiscAmt = unitPrice * currentdiscPct;    
+          let currentDiscAmt = subTotal * currentdiscPct;
+          totalDiscAmt = totalDiscAmt + currentDiscAmt;
+          // unitPrice = unitPrice - currentDiscAmt;
+          subTotal = subTotal - currentDiscAmt;
+        } else {
+          totalDiscAmt = totalDiscAmt + parseFloat(x);
+          //unitPrice = unitPrice - parseFloat(x);
+          subTotal = subTotal - parseFloat(x);
+        }
+      })
+    }
+    //totalDiscAmt = this.commonService.roundToTwoDecimal(totalDiscAmt);
+    if (useTax) {
+      trxLine.discountAmt = totalDiscAmt;
+      trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
+    } else {
+      trxLine.discountAmt = totalDiscAmt;
+      trxLine.discountAmtExTax = totalDiscAmt;
+    }
+    trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+    trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+    trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+    trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;
+    trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+    trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+    trxLine.taxAmt = trxLine.subTotal - trxLine.subTotalExTax;
+    trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
+    trxLine.taxInclusive = isDisplayTaxInclusive;
+    //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
+    return trxLine;
   }
 
 }

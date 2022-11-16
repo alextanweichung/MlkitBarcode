@@ -63,7 +63,6 @@ export class DetailPage implements OnInit {
 
   loadDetail() {
     this.packingService.getPackingDetail(this.packingId).subscribe(response => {
-      console.log("🚀 ~ file: detail.page.ts ~ line 66 ~ DetailPage ~ this.packingService.getPackingDetail ~ response", response)
       this.packing = response;
     }, error => {
       console.log(error);

@@ -73,7 +73,6 @@ export class BarcodeScanInputPage implements OnInit {
   itemSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
   async validateBarcode(barcode: string) {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts ~ line 76 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
     if (barcode) {
       this.itemSearchValue = '';
       if (barcode && barcode.length > 12) {
