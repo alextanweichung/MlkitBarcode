@@ -107,7 +107,6 @@ export class TransactionsPage implements OnInit {
 
   transactionMode: string = "online";
   onTransactionModeChanged(event) {
-    console.log("🚀 ~ file: transactions.page.ts ~ line 103 ~ TransactionsPage ~ onTransactionModeChanged ~ event", event)
      if (event.detail.value === 'offline') {
       this.sync();
      }

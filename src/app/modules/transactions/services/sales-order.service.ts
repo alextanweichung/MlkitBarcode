@@ -78,6 +78,7 @@ export class SalesOrderService {
           extendedDescription: r.extendedDescription,
           qtyRequest: r.qtyRequest,
           unitPrice: r.unitPrice,
+          unitPriceExTax: r.unitPrice, // todo : check with wayne
           subTotal: r.subTotal,
           sequence: r.sequence,
           locationId: r.locationId,
@@ -99,6 +100,7 @@ export class SalesOrderService {
               extendedDescription: r.extendedDescription,
               qtyRequest: d.qtyRequest,
               unitPrice: r.unitPrice,
+              unitPriceExTax: r.unitPrice, // todo : check with wayne
               subTotal: (d.qtyRequest??0) * (r.unitPrice??0),
               sequence: r.sequence,
               locationId: r.locationId,

@@ -39,7 +39,6 @@ export class OtherSalesDetailPage implements OnInit {
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.otherSalesService.getMasterList().subscribe(response => {
-      console.log("🚀 ~ file: other-sales-detail.page.ts ~ line 40 ~ OtherSalesDetailPage ~ this.otherSalesService.getMasterList ~ response", response)
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -53,7 +52,6 @@ export class OtherSalesDetailPage implements OnInit {
   loadObject() {
     this.otherSalesService.getOtherSales(this.otherSalesId).subscribe(response => {
       this.otherSales = response;
-      console.log("🚀 ~ file: other-sales-detail.page.ts ~ line 51 ~ OtherSalesDetailPage ~ this.otherSalesService.getOtherSales ~ this.otherSales", this.otherSales)
     }, error => {
       console.log(error);
     })

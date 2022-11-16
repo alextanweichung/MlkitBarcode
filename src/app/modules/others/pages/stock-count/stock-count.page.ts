@@ -42,7 +42,6 @@ export class StockCountPage implements OnInit {
   loadObjects() {
     this.stockCountService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
       this.stockCounts = response;
-      console.log("🚀 ~ file: stock-count.page.ts ~ line 45 ~ StockCountPage ~ this.stockCountService.getInventoryCountByDate ~ this.stockCounts", this.stockCounts)
     }, error => {
       console.log(error);
     })

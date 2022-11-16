@@ -40,16 +40,17 @@ export class PackingConfirmationPage implements OnInit {
     this.packingSalesOrders = this.packingService.selectedSalesOrders;
     this.packingSalesOrderLines = this.packingService.selectedSalesOrderLines;
     this.loadModuleControl();
+    this.loadImage = this.configService.sys_parameter.loadImage;
     this.loadMasterList();
   }
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
-      if (loadImage) {
-        this.loadImage = loadImage === '1' ? true : false;
-      }
+      // let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
+      // if (loadImage) {
+      //   this.loadImage = loadImage === '1' ? true : false;
+      // }
     }, error => {
       console.log(error);
     })

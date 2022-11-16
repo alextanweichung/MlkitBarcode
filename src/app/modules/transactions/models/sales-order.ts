@@ -93,6 +93,7 @@ export interface SalesOrderLine {
   extendedDescription: string
   qtyRequest?: number
   unitPrice?: number
+  unitPriceExTax: number;
   subTotal?: number
   sequence?: number
   locationId?: number

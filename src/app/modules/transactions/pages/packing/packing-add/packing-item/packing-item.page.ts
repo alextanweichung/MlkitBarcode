@@ -56,10 +56,11 @@ export class PackingItemPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
-      if (loadImage) {
-        this.loadImage = loadImage === '1' ? true : false;
-      }
+      // let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
+      // if (loadImage) {
+      //   this.loadImage = loadImage === '1' ? true : false;
+      // }
+    this.loadImage = this.configService.sys_parameter.loadImage;
       let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
       if (packingControl != undefined) {
         this.packingQtyControl = packingControl.ctrlValue;
@@ -243,7 +244,6 @@ export class PackingItemPage implements OnInit {
         await this.packingSalesOrders[0].details.length > 0 ? this.packingSalesOrders[0].details.unshift(d) : this.packingSalesOrders[0].details.push(d);
       }
     }
-    console.log("🚀 ~ file: packing-item.page.ts ~ line 278 ~ PackingItemPage ~ addItemToSo ~ this.packingSalesOrders", this.packingSalesOrders)
   }
 
   async deleteSoLine(index) {

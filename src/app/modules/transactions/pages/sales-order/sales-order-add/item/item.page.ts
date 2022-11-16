@@ -6,6 +6,7 @@ import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 
@@ -24,6 +25,7 @@ export class ItemPage implements OnInit, ViewDidEnter {
 
   constructor(
     private authService: AuthService,
+    private configService: ConfigService,
     private salesOrderService: SalesOrderService,
     private navController: NavController,
     private loadingController: LoadingController,
@@ -41,12 +43,13 @@ export class ItemPage implements OnInit, ViewDidEnter {
       this.toastService.presentToast('Something went wrong', '', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
     }
-    this.loadModuleControl();
+    this.loadImage = this.configService.sys_parameter.loadImage;
+    // this.loadModuleControl();
   }
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;      
+      this.moduleControl = obj;
       let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
       if (loadImage) {
         this.loadImage = loadImage === '1' ? true : false;

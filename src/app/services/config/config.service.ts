@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
@@ -26,20 +27,23 @@ export class ConfigService {
   ) { }
 
   async load() {
-    this.sys_parameter = {
-      Sys_ParameterId: 1,
-      apiUrl: 'https://localhost:44351/api/',
-      // apiUrl: 'https://idcp-demo.com/api/',
-      imgUrl: null,
-      onlineMode: null,
-      firstTimeLogin: null,
-      lastDownloadAt: null,
-      lastUploadAt: null,
-      createdAt: null,
-      updatedAt: null,
-      loadImage: false
+    if (Capacitor.getPlatform() === 'web') {
+      this.sys_parameter = {
+        Sys_ParameterId: 1,
+        apiUrl: 'https://localhost:44351/api/',
+        // apiUrl: 'https://idcp-demo.com/api/',
+        imgUrl: null,
+        onlineMode: null,
+        firstTimeLogin: null,
+        lastDownloadAt: null,
+        lastUploadAt: null,
+        createdAt: null,
+        updatedAt: null,
+        loadImage: false
+      }
+    } else {
+      this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
     }
-    // this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
     // this.sys_parameter.apiUrl = "https://10.0.2.2:44351/api";
   }
 

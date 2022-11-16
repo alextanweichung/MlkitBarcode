@@ -44,7 +44,6 @@ export class ItemPage implements OnInit, ViewDidEnter {
       this.navController.navigateBack('/transactions/quotation/quotation-customer');
     }
     this.loadImage = this.configService.sys_parameter.loadImage;
-    console.log("🚀 ~ file: item.page.ts ~ line 47 ~ ItemPage ~ ngOnInit ~ this.configService.sys_parameter.loadImage", this.configService.sys_parameter.loadImage)
     // this.loadModuleControl();
   }
 
