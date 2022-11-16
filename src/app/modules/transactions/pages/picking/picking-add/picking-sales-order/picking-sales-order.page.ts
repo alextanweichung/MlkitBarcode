@@ -93,7 +93,6 @@ export class PickingSalesOrderPage implements OnInit {
     this.objectForm.patchValue({ customerId: this.customerId });
     if (this.customerId) {
       this.selectedCustomer = this.customerMasterList.find(r => r.id === this.customerId);
-      console.log("🚀 ~ file: picking-sales-order.page.ts ~ line 96 ~ PickingSalesOrderPage ~ onCustomerSelected ~ this.selectedCustomer", this.selectedCustomer)
 
       if (this.selectedCustomer) {
         this.objectForm.patchValue({ businessModelType: this.selectedCustomer.attribute5 });
@@ -242,7 +241,6 @@ export class PickingSalesOrderPage implements OnInit {
       this.toastService.presentToast('Select at least 1 SO', '', 'bottom', 'danger', 1000);
       return;
     }
-    console.log("🚀 ~ file: picking-sales-order.page.ts ~ line 246 ~ PickingSalesOrderPage ~ nextStep ~ this.objectForm.getRawValue()", this.objectForm.getRawValue())
     this.pickingService.setHeader(this.objectForm.getRawValue());
     this.pickingService.setChoosenSalesOrders(this.selectedSOs);
     this.navController.navigateForward('/transactions/picking/picking-item');

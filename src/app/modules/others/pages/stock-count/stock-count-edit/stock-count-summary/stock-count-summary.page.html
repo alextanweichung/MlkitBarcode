@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Summary</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Summary</ion-label>
+    </ion-toolbar>
+  </ion-header>  
+  <div class="p-2">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom" lines="full" *ngIf="stockCountHeader">
+      <ion-item>
+        <ion-label>
+          <p>Doc Number</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountHeader.inventoryCountNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Trx Date</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountHeader.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Location</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountHeader.locationId|idMapping:locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="stockCountHeader.zoneId">
+        <ion-label>
+          <p>Zone</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountHeader.zoneId|idMapping:zoneMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="stockCountHeader.rackId">
+        <ion-label>
+          <p>Rack</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountHeader.rackId|idMapping:rackMasterList}}"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Details</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" *ngFor="let item of stockCountDetail" class="no-ripple ion-no-padding">
+        <ion-grid class="p-2 ion-no-padding">
+          <ion-row>
+            <ion-col>
+              <div class="font-bold">{{item.itemBarcode}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>
+                {{item.itemCode}}
+                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+              </div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <p>{{item.description}}</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <ion-badge mode="ios" slot="end">{{item.qtyRequest|number:'1.0'}}</ion-badge>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
+    Done
+  </ion-button>
+</ion-footer>

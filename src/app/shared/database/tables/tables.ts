@@ -8,4 +8,5 @@ export interface Sys_Parameter {
    lastUploadAt?: Date
    createdAt: Date
    updatedAt: Date
+   loadImage: boolean
 }

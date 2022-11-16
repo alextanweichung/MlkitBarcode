@@ -1,6 +1,6 @@
 <ion-item (click)="showModal()" lines="none">
   <ion-label [ngStyle]="{'font-weight': showBoldHeader ? 'bold' : ''}" *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
-  <ion-input [placeholder]="'Select ' + title" [value]="selected ? ((showCode ? selected?.code + ' ' : '') + selected?.[optionLabel]) : null" readonly></ion-input>
+  <ion-input [placeholder]="'Select ' + title" [value]="selected ? ((showCode ? selected?.code + ' - ' : '') + selected?.[optionLabel]) : null" readonly></ion-input>
 </ion-item>
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>

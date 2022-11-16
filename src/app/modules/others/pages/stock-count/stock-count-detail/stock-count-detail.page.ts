@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -37,9 +37,13 @@ export class StockCountDetailPage implements OnInit {
   }
 
   locationMasterList: MasterListDetails[] = [];
+  zoneMasterList: MasterListDetails[] = [];
+  rackMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.stockCountService.getMasterList().subscribe(response => {
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })
@@ -70,6 +74,15 @@ export class StockCountDetailPage implements OnInit {
     }, error => {
       console.log(error);
     })
+  }
+
+  edit() {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        inventoryCountId: this.inventoryCountId
+      }
+    }
+    this.navController.navigateForward('/others/stock-count/stock-count-edit/stock-count-header', navigationExtras);
   }
 
 }

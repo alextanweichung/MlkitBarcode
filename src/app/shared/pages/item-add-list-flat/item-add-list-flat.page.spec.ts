@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { ItemAddGridPage } from './item-add-grid.page';
+import { ItemAddListFlatPage } from './item-add-list-flat.page';
 
-describe('ItemAddGridPage', () => {
-  let component: ItemAddGridPage;
-  let fixture: ComponentFixture<ItemAddGridPage>;
+describe('ItemAddListFlatPage', () => {
+  let component: ItemAddListFlatPage;
+  let fixture: ComponentFixture<ItemAddListFlatPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemAddGridPage ],
+      declarations: [ ItemAddListFlatPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ItemAddGridPage);
+    fixture = TestBed.createComponent(ItemAddListFlatPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

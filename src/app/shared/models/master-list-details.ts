@@ -9,6 +9,9 @@ export interface MasterListDetails {
    attribute4: string;
    attribute5: string;
    attribute6: string;
+   attribute7: string;
+   attribute8: string;
+   attribute9: string;
    attributeArray1: number[];
    parentId?: number;
    sequence?: number;

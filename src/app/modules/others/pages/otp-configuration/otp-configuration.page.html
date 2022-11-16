@@ -12,7 +12,7 @@
         <ion-label class="label-title">Generate OTP</ion-label>
       </ion-toolbar>
     </ion-header>
-    <div class="ion-padding">
+    <div class="p-2">
       <ion-list class="list-custom" lines="full">
         <app-search-dropdown title="Users" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>
         <app-search-dropdown title="Validity" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="validitySerachDropdownList"></app-search-dropdown>

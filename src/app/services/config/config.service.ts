@@ -28,15 +28,16 @@ export class ConfigService {
   async load() {
     this.sys_parameter = {
       Sys_ParameterId: 1,
-      // apiUrl: 'https://localhost:44351/api/',
-      apiUrl: 'https://idcp-demo.com/api/',
+      apiUrl: 'https://localhost:44351/api/',
+      // apiUrl: 'https://idcp-demo.com/api/',
       imgUrl: null,
       onlineMode: null,
       firstTimeLogin: null,
       lastDownloadAt: null,
       lastUploadAt: null,
       createdAt: null,
-      updatedAt: null
+      updatedAt: null,
+      loadImage: false
     }
     // this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
     // this.sys_parameter.apiUrl = "https://10.0.2.2:44351/api";
@@ -52,9 +53,14 @@ export class ConfigService {
       lastDownloadAt: new Date(),
       lastUploadAt: new Date(),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      loadImage: true
     }
     await this.commonQueryService.insert(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
+  }
+
+  async update(object: Sys_Parameter) {
+    await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);
   }
 
   async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {

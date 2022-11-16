@@ -123,6 +123,11 @@ const routes: Routes = [
     path: 'transactions/packing/packing-detail',
     loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/detail/detail.module').then( m => m.DetailPageModule)
   },
+  // transaction-other-sales
+  {
+    path: 'transactions/other-sales',
+    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales.module').then( m => m.OtherSalesPageModule)
+  },
 
 
 
@@ -180,11 +185,11 @@ const routes: Routes = [
   },
   {
     path: 'item-add-grid',
-    loadChildren: () => import('./shared/pages/item-add-grid/item-add-grid.module').then(m => m.ItemAddGridPageModule)
+    loadChildren: () => import('./shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module').then(m => m.ItemAddGridVariationMPageModule)
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/item-add-list/item-add-list.module').then( m => m.ItemAddListPageModule)
+    loadChildren: () => import('./shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module').then( m => m.ItemAddListWithVariationPageModule)
   },
   {
     path: 'item-cart',
@@ -198,9 +203,18 @@ const routes: Routes = [
     path: 'calendar-input',
     loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then( m => m.CalendarInputPageModule)
   },
-
-
-
+  {
+    path: 'barcode-scan-input',
+    loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then( m => m.BarcodeScanInputPageModule)
+  },
+  {
+    path: 'item-add-list-flat',
+    loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then( m => m.ItemAddListFlatPageModule)
+  },
+  {
+    path: 'item-view-list-flat',
+    loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then( m => m.ItemViewListFlatPageModule)
+  },
 
 
 

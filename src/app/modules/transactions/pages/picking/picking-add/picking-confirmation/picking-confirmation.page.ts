@@ -6,6 +6,7 @@ import { PickingService } from 'src/app/modules/transactions/services/picking.se
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
@@ -39,6 +40,7 @@ export class PickingConfirmationPage implements OnInit {
     this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
     this.pickingSalesOrderLines = this.pickingService.selectedSalesOrderLines;
     this.loadModuleControl();
+    this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -52,12 +54,47 @@ export class PickingConfirmationPage implements OnInit {
       console.log(error);
     })
   }
+  
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.pickingService.getMasterList().subscribe(response => {
+      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    }, error => {
+      console.log(error);
+    })
+  }
 
   previousStep() {
     this.navController.navigateBack('/transactions/picking/picking-item');
   }
 
-  nextStep() {
+  async nextStep() {
+    if (this.pickingSalesOrderLines.length > 0) {
+      const alert = await this.alertController.create({
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: async () => {
+              await this.insertPicking();
+            },
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
+    }
+  }
+
+  insertPicking() {
     let object: GoodsPickingDto;
     let lines: GoodsPickingLine[] = [];
     this.pickingSalesOrderLines.forEach(r => {
@@ -112,7 +149,6 @@ export class PickingConfirmationPage implements OnInit {
     }, error => {
       console.log(error);
     })
-
   }
 
 }

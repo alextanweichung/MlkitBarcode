@@ -81,7 +81,7 @@ export class CommonQueryService<T> {
 
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string =
-        `SELECT ${sql} FROM ${table} WHERE ${primaryKey}`;
+        `SELECT * FROM ${table} `;
       let ret: DBSQLiteValues = await db.query(sqlcmd);
       if (ret.values.length > 0) {
         return ret.values[0] as Object
@@ -186,7 +186,6 @@ export class CommonQueryService<T> {
   /* #region  update */
 
   update(object, table, database) {
-
     let cols = this.getAllColsWithValue(object);
     let sql = '';
     let primaryKey = '';
@@ -212,12 +211,9 @@ export class CommonQueryService<T> {
     primaryKey = primaryKey.trimStart();
 
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
-      let sqlcmd: string =
-        `UPDATE ${table}
-        SET ${sql}
-        WHERE ${primaryKey}`;
-      // let ret: any = await db.run(sqlcmd);
-      // return ret;
+      let sqlcmd: string = `UPDATE ${table} SET ${sql} WHERE ${primaryKey}`;
+      let ret: any = await db.run(sqlcmd);
+      return ret;
     }, database)
   }
 

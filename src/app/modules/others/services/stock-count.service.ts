@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { format, parseISO } from 'date-fns';
+import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
+import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCount, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -51,6 +53,10 @@ export class StockCountService {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileInventoryCount/masterList");
   }
 
+  getInventoryCountByDate(startDate, endDate) {
+    return this.http.get<StockCount[]>(this.baseUrl + "MobileInventoryCount/listing/" + startDate + "/" + endDate);
+  }
+
   getInventoryCountList() {
     return this.http.get<StockCountList[]>(this.baseUrl + "MobileInventoryCount/iclist");
   }
@@ -73,6 +79,10 @@ export class StockCountService {
 
   insertInventoryCount(inventoryCountRoot: StockCountRoot) {
     return this.http.post(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
+  }
+
+  updateInventoryCount(inventoryCountRoot: StockCountRoot) {
+    return this.http.put(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
   }
   
 }

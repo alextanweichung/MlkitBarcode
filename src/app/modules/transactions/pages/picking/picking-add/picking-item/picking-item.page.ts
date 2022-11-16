@@ -1,6 +1,6 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, IonAccordionGroup, IonInput, NavController, ViewDidEnter } from '@ionic/angular';
+import { AlertController, IonAccordionGroup, NavController } from '@ionic/angular';
 import { GoodsPicking } from 'src/app/modules/transactions/models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
@@ -12,13 +12,16 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
+import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-picking-item',
   templateUrl: './picking-item.page.html',
   styleUrls: ['./picking-item.page.scss'],
+  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobilePicking' }]
 })
-export class PickingItemPage implements OnInit, ViewDidEnter {
+export class PickingItemPage implements OnInit {
 
   pickingDtoHeader: GoodsPicking;
   pickingSalesOrders: PickingSalesOrderRoot[] = [];
@@ -35,10 +38,6 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
     private toastService: ToastService,
   ) { }
 
-  ionViewDidEnter(): void {
-    this.barcodeInput.setFocus();
-  }
-
   ngOnInit() {
     this.pickingDtoHeader = this.pickingService.pickingDtoHeader;
     if (this.pickingDtoHeader === undefined) {
@@ -50,6 +49,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
     }
     this.loadModuleControl();
+    this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -63,56 +63,37 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       console.log(error);
     })
   }
+  
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.pickingService.getMasterList().subscribe(response => {
+      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    }, error => {
+      console.log(error);
+    })
+  }
 
   /* #region  manual amend qty */
 
-  decreaseQty(soLine) {
-    if (soLine.qtyPickedCurrent - 1 < 0) {
-      soLine.qtyPickedCurrent = 0;
-    } else {
-      soLine.qtyPickedCurrent--;
+  onQtyChanged(event, soLine: PickingSalesOrderDetail, index: number) {
+    if (Number.isInteger(event) && event >= 0) {
+      if (this.pickingDtoHeader.isWithSo) {
+        if (soLine.qtyPicked + event <= soLine.qtyRequest) {
+          soLine.qtyPickedCurrent = event;
+        } else {
+          soLine.qtyPickedCurrent = soLine.qtyRequest - soLine.qtyPicked;
+        }
+      } else {
+        soLine.qtyPickedCurrent = event;
+        if (soLine.qtyPickedCurrent === 0) {
+          this.deleteSoLine(index);
+        }
+      }
     }
   }
   
-	clonedDetails: { [s: string]: PickingSalesOrderDetail; } = {};
-  backupQty(soLine, event) {
-    event.getInputElement().then(r => {
-      r.select();
-    })    
-    this.clonedDetails[soLine.itemSku] = { ...soLine };
-  }
-
-  updateQty(soLine) {
-    if (this.pickingDtoHeader.isWithSo) {
-      if ((soLine.qtyPicked + soLine.qtyPickedCurrent) > soLine.qtyRequest) {
-        this.toastService.presentToast('Not allow to add item more than SO quantity.', '', 'bottom', 'medium', 1000);
-        soLine.qtyPickedCurrent = soLine.qtyRequest - soLine.qtyPicked;
-      }
-    }
-		delete this.clonedDetails[soLine.itemSku];
-  }
-
-  eventHandler(keyCode, soLine) {
-    if (keyCode === 13) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
-      }
-      this.updateQty(soLine);
-    }    
-  }
-
-  increaseQty(soLine) {
-    if (soLine.qtyPickedCurrent === undefined) {
-      soLine.qtyPickedCurrent = 0;
-    }
-    if (this.pickingDtoHeader.isWithSo && (soLine.qtyPicked + soLine.qtyPickedCurrent + 1) <= soLine.qtyRequest) {
-      soLine.qtyPickedCurrent++;
-    }
-    if (!this.pickingDtoHeader.isWithSo) {
-      soLine.qtyPickedCurrent++;
-    }
-  }
-
   /* #endregion */
 
   /* #region  sales order */
@@ -121,18 +102,14 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
   selectedSo: PickingSalesOrderRoot;
   setSelectedSo(so) {
     this.selectedSo = so;
-    this.barcodeInput.setFocus();
   }
 
   /* #endregion */
 
   /* #region  barcode & check so */
 
-  manualBarcodeInput: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
+  async validateBarcode(barcode: string) {
     if (barcode) {
-      this.manualBarcodeInput = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -156,22 +133,38 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         })
       }
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
+  }
+
+  onItemAdd(event: any) {
+    let sku = event.sku;
+    let itemInfo = event.itemInfo;
+    if (itemInfo) {
+      this.addItemToSo(sku, itemInfo)
+    } else {
+      this.addItemToSo(sku);
+    }
   }
 
   selectedSoDetail: PickingSalesOrderDetail;
-  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {    
+  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
+    console.log("🚀 ~ file: picking-item.page.ts ~ line 166 ~ PickingItemPage ~ addItemToSo ~ itemInfo", itemInfo)
+    if (this.pickingDtoHeader.isWithSo && this.accordianGroup1.value === undefined) {
+      this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
+      return;
+    }
+
     if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      let itemExists = this.selectedSo.details.find(r => r.itemSku === sku);
-      if (itemExists) {
-        this.selectedSoDetail = itemExists;
-        this.selectedSoDetail.qtyPickedCurrent++;
+      let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
+      console.log("🚀 ~ file: picking-item.page.ts ~ line 157 ~ PickingItemPage ~ addItemToSo ~ itemIndex", itemIndex)
+      if (itemIndex > -1) {
+        this.selectedSoDetail = this.selectedSo.details[itemIndex];
+        this.selectedSoDetail.qtyPickedCurrent += 1;
+        this.onQtyChanged(this.selectedSoDetail.qtyPickedCurrent, this.selectedSoDetail, itemIndex);
       } else {
         this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
       }
-    } 
-  
+    }
+
     if (!this.pickingDtoHeader.isWithSo) {
       let b: any;
       let m: any;
@@ -251,7 +244,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             cssClass: 'cancel'
           }
         ]
-      });  
+      });
       await alert.present();
     } else {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
@@ -273,7 +266,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
-          await this.checkValidBarcode(barcode);
+          await this.validateBarcode(barcode);
         }
       }
     } else if (this.pickingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
@@ -289,7 +282,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
-          await this.checkValidBarcode(barcode);
+          await this.validateBarcode(barcode);
         }
       }
     }

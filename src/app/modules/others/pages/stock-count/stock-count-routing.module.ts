@@ -9,16 +9,28 @@ const routes: Routes = [
     component: StockCountPage
   },
   {
-    path: 'stock-count-header',
+    path: 'stock-count-add/stock-count-header',
     loadChildren: () => import('./stock-count-add/stock-count-header/stock-count-header.module').then( m => m.StockCountHeaderPageModule)
   },
   {
-    path: 'stock-count-item',
+    path: 'stock-count-add/stock-count-item',
     loadChildren: () => import('./stock-count-add/stock-count-item/stock-count-item.module').then( m => m.StockCountItemPageModule)
   },
   {
-    path: 'stock-count-summary',
+    path: 'stock-count-add/stock-count-summary',
     loadChildren: () => import('./stock-count-add/stock-count-summary/stock-count-summary.module').then( m => m.StockCountSummaryPageModule)
+  },
+  {
+    path: 'stock-count-edit/stock-count-header',
+    loadChildren: () => import('./stock-count-edit/stock-count-header/stock-count-header.module').then( m => m.StockCountHeaderPageModule)
+  },
+  {
+    path: 'stock-count-edit/stock-count-item',
+    loadChildren: () => import('./stock-count-edit/stock-count-item/stock-count-item.module').then( m => m.StockCountItemPageModule)
+  },
+  {
+    path: 'stock-count-edit/stock-count-summary',
+    loadChildren: () => import('./stock-count-edit/stock-count-summary/stock-count-summary.module').then( m => m.StockCountSummaryPageModule)
   }
 ];
 

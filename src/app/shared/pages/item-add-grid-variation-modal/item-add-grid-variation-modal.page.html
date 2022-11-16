@@ -17,7 +17,7 @@
                   </ion-button>
                 </ion-col>
                 <ion-col>
-                  <ion-input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0"></ion-input>
+                  <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" (ionFocus)="highlight(input)" placeholder="0"></ion-input>
                 </ion-col>
                 <ion-col>
                   <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(item)">
@@ -80,7 +80,7 @@
                         </ion-button>
                       </ion-col>
                       <ion-col class="ion-margin-auto">
-                        <ion-input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0"></ion-input>
+                        <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" (ionFocus)="highlight(input)" placeholder="0"></ion-input>
                       </ion-col>
                       <ion-col class="ion-margin-auto">
                         <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(item)">
@@ -97,7 +97,7 @@
       </div>
     </ion-content>
     <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-      <ion-button class="ion-margin" expand="block" size="small" (click)="addItemVariationToCart()">
+      <ion-button class="ion-margin" expand="block" size="default" (click)="addItemVariationToCart()">
         Add to cart
       </ion-button>
     </ion-footer>

@@ -4,7 +4,7 @@
     <ion-buttons slot="start">
       <ion-back-button text="Back" defaultHref="/others"></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="false">
+    <ion-buttons slot="primary">
       <ion-button (click)="filter()">
         <ion-icon slot="icon-only" name="filter"></ion-icon>
       </ion-button>
@@ -18,20 +18,25 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ng-container *ngIf="stockCountList.length === 0">
+    <ng-container *ngIf="stockCounts.length === 0">
       <p>
         <ion-text color="tertiary">
           <h3>Nothing found!</h3>
         </ion-text>
       </p>
     </ng-container>
-    <ng-container *ngIf="stockCountList.length > 0">
+    <ng-container *ngIf="stockCounts.length > 0">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button (click)="goToDetail(object.inventoryCountId)" *ngFor="let object of stockCountList">
+        <ion-item button (click)="goToDetail(object.inventoryCountId)" *ngFor="let object of stockCounts">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
               <ion-col>
                 <div class="font-bold">{{object.inventoryCountNum}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div>{{object.trxDate|date:'dd/MM/yyyy'}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -44,9 +49,12 @@
                 <div>{{object.locationCode}} - {{object.locationDescription}}</div>
               </ion-col>
             </ion-row>
-            <ion-row>
+            <ion-row *ngIf="object.zoneCode">
               <ion-col>
-                <div>{{object.batchNum}}</div>
+                <div>{{object.zoneCode}} - {{object.zoneDescription}}</div>
+              </ion-col>
+              <ion-col *ngIf="object.rackCode">
+                <div>{{object.rackCode}} - {{object.rackDescription}}</div>
               </ion-col>
             </ion-row>
           </ion-grid>

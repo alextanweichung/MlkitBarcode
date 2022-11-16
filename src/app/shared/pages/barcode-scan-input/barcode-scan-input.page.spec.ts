@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { ItemAddListPage } from './item-add-list.page';
+import { BarcodeScanInputPage } from './barcode-scan-input.page';
 
-describe('ItemAddListPage', () => {
-  let component: ItemAddListPage;
-  let fixture: ComponentFixture<ItemAddListPage>;
+describe('BarcodeScanInputPage', () => {
+  let component: BarcodeScanInputPage;
+  let fixture: ComponentFixture<BarcodeScanInputPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemAddListPage ],
+      declarations: [ BarcodeScanInputPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ItemAddListPage);
+    fixture = TestBed.createComponent(BarcodeScanInputPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

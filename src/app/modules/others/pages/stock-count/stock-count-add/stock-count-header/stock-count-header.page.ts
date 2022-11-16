@@ -166,7 +166,7 @@ export class StockCountHeaderPage implements OnInit {
     const { role } = await actionSheet.onWillDismiss();
 
     if (role === 'confirm') {
-      // this.quotationService.resetVariables();
+      this.stockCountService.resetVariables();
       this.navController.navigateBack('/others/stock-count');
     }
   }
@@ -174,7 +174,7 @@ export class StockCountHeaderPage implements OnInit {
   nextStep() {
     this.stockCountService.setHeader(this.objectForm.getRawValue());
     this.stockCountService.removeLines();
-    this.navController.navigateForward('/others/stock-count/stock-count-item');
+    this.navController.navigateForward('/others/stock-count/stock-count-add/stock-count-item');
   }
 
 }

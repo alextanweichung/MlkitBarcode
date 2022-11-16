@@ -11,11 +11,13 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 
 @Component({
   selector: 'app-stock-count-item',
   templateUrl: './stock-count-item.page.html',
   styleUrls: ['./stock-count-item.page.scss'],
+  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
 export class StockCountItemPage implements OnInit {
 
@@ -36,7 +38,7 @@ export class StockCountItemPage implements OnInit {
     this.stockCountDetail = [];
     if (this.stockCountHeader === undefined) {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/others/stock-count/stock-count-header');
+      this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
     } else {
       this.loadInventoryCountBatchCriteria();
     }
@@ -44,10 +46,16 @@ export class StockCountItemPage implements OnInit {
     this.loadModuleControl();
   }
 
+  itemBrandMasterList: MasterListDetails[] = [];
+  itemGroupMasterList: MasterListDetails[] = [];
+  itemCategoryMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.stockCountService.getMasterList().subscribe(response => {
+      this.itemBrandMasterList = response.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemGroupMasterList = response.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemCategoryMasterList = response.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
@@ -73,17 +81,13 @@ export class StockCountItemPage implements OnInit {
   loadInventoryCountBatchCriteria() {
     this.stockCountService.getInventoryCountBatchCriteria(this.stockCountHeader.inventoryCountBatchId).subscribe(response => {
       this.inventoryCountBatchCriteria = response;
-      console.log("🚀 ~ file: stock-count-item.page.ts ~ line 59 ~ StockCountItemPage ~ this.stockCountService.getInventoryCountBatchCriteria ~ this.inventoryCountBatchCriteria", this.inventoryCountBatchCriteria)
     }, error => {
       console.log(error);
     })
   }
 
-  manualBarcodeInput: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
-  async checkValidBarcode(barcode: string) {
+  async validateBarcode(barcode: string) {
     if (barcode) {
-      this.manualBarcodeInput = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -99,7 +103,6 @@ export class StockCountItemPage implements OnInit {
         }
       } else {
         this.stockCountService.getItemInfoByBarcode(barcode).subscribe(response => {
-          console.log("🚀 ~ file: stock-count-item.page.ts ~ line 46 ~ StockCountItemPage ~ this.stockCountService.getItemInfoByBarcode ~ response", response)
           if (response) {
             this.addItemToLine(response.itemSku, response);
           }
@@ -108,11 +111,20 @@ export class StockCountItemPage implements OnInit {
         })
       }
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
+  }
+
+  onItemAdd(event: any) {
+    let sku = event.sku;
+    let itemInfo = event.itemInfo;
+    if (itemInfo) {
+      this.addItemToLine(sku, itemInfo)
+    } else {
+      this.addItemToLine(sku);
+    }
   }
 
   async addItemToLine(sku: string, itemInfo?: ItemBarcodeModel) {
+    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 127 ~ StockCountItemPage ~ addItemToLine ~ itemInfo", itemInfo)
     let b: any;
     let m: any;
     if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
@@ -124,9 +136,9 @@ export class StockCountItemPage implements OnInit {
         code: itemInfo.itemCode,
         itemDesc: itemInfo.description,
         varCd: itemInfo.variationTypeCode,
-        brandId: itemInfo.brandId,
-        groupId: itemInfo.groupId,
-        catId: itemInfo.catId
+        brandId: itemInfo.itemBrandId,
+        groupId: itemInfo.itemGroupId,
+        catId: itemInfo.itemCategoryId
       }
       b = {
         id: itemInfo.itemBarcodeTagId,
@@ -187,10 +199,15 @@ export class StockCountItemPage implements OnInit {
       }      
       await this.stockCountDetail.length > 0 ? this.stockCountDetail.unshift(d) : this.stockCountDetail.push(d);
     }
-    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 170 ~ StockCountItemPage ~ addItemToLine ~ this.stockCountDetail", this.stockCountDetail)
   }
 
   /* #region  manual amend qty */
+
+  setFocus(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
 
   async decreaseQty(line: StockCountDetail, index: number) {
     if (line.qtyRequest - 1 < 0) {
@@ -260,7 +277,7 @@ export class StockCountItemPage implements OnInit {
       if (result.hasContent) {
         let barcode = result.content;
         this.scanActive = false;
-        // await this.checkValidBarcode(barcode);
+        await this.validateBarcode(barcode);
       }
     }
   }
@@ -303,18 +320,18 @@ export class StockCountItemPage implements OnInit {
   /* #endregion */
 
   previousStep() {
-    this.navController.navigateBack('/others/stock-count/stock-count-header');
+    this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
   }
 
   nextStep() {
+    console.log("🚀 ~ file: stock-count-item.page.ts ~ line 314 ~ StockCountItemPage ~ nextStep ~ this.stockCountHeader", this.stockCountHeader)
     this.stockCountService.insertInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
       if (response.status === 201) {
         let object = response.body as StockCountRoot;
-        console.log("🚀 ~ file: stock-count-item.page.ts ~ line 313 ~ StockCountItemPage ~ this.stockCountService.insertInventoryCount ~ object", object)
         this.stockCountService.setHeader(object.header);
         this.stockCountService.setLines(object.details);
         this.toastService.presentToast('Stock Count added', '', 'bottom', 'success', 1000);
-        this.navController.navigateRoot('/others/stock-count/stock-count-summary');
+        this.navController.navigateRoot('/others/stock-count/stock-count-add/stock-count-summary');
       }
     }, error => {
       console.log(error);

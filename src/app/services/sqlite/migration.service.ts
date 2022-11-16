@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
   lastDownloadAt DATETIME, 
   lastUploadAt DATETIME, 
   createdAt DATETIME NOT NULL, 
-  updatedAt DATETIME NOT NULL
-);
-`;
+  updatedAt DATETIME NOT NULL, 
+  loadImage TINYINT(1)
+); `;
 
 export const create_item_master_table: string = `
 CREATE TABLE IF NOT EXISTS Item_Master (
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS Item_Master (
   taxCd VARCHAR(20),
   taxPct DECIMAL(3,2),
   imgUrl VARCHAR(255)
-);`;
+); `;
 
 export const create_item_barcode_table: string = `
 CREATE TABLE IF NOT EXISTS Item_Barcode (

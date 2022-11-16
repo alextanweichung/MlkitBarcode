@@ -14,7 +14,7 @@
       <ion-label class="label-title">Sales Order</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="ion-padding">
+  <div class="p-2">
     <form [formGroup]="objectForm">
       <ion-list class="list-custom" lines="full">
         <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
@@ -49,7 +49,7 @@
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-  <ion-button class="ion-margin" expand="block" size="small" (click)="nextStep()">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
     Next
   </ion-button>
 </ion-footer>

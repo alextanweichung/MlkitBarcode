@@ -13,111 +13,156 @@
     <ion-refresher-content>
     </ion-refresher-content>
   </ion-refresher>
-  <div class="ion-padding">
-    
-    <ng-container *ngIf="showQuotation">
-      <ion-list-header>
-        <ion-label color="dark">Quotation</ion-label>
-        <ion-button routerLink="quotation">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!quotation_loaded">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="quotation_loaded">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToQuotationDetail(object.quotationId)" *ngFor="let object of quotations">
-            <ion-label>
-              <h3>{{object.quotationNum}}</h3>
-              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
-            </ion-label>
-            <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
-    
-    <ng-container *ngIf="showSalesOrder">
-      <ion-list-header>
-        <ion-label color="dark">Sales Order</ion-label>
-        <ion-button routerLink="sales-order">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!sales_order_loaded">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="sales_order_loaded">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders">
-            <ion-label>
-              <h3>{{object.salesOrderNum}}</h3>
-              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
-            </ion-label>
-            <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
+  <div class="p-2">
 
-    <ng-container *ngIf="showPicking">
-      <ion-list-header>
-        <ion-label color="dark">Picking</ion-label>
-        <ion-button routerLink="picking">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!picking_loaded">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="picking_loaded">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToPickingDetail(object.pickingId)" *ngFor="let object of pickings">
-            <ion-label>
-              <h3>{{object.pickingNum}}</h3>
-              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
-            </ion-label>
-            <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
+    <ion-segment [(ngModel)]="transactionMode" (ionChange)="onTransactionModeChanged($event)">
+      <ion-segment-button value="online">
+        <ion-label>Online</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="offline">
+        <ion-label>Offline</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-    <ng-container *ngIf="showPacking">
-      <ion-list-header>
-        <ion-label color="dark">Packing</ion-label>
-        <ion-button routerLink="packing">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!packing_load">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
+    <div *ngIf="transactionMode === 'online'">
+    
+      <ng-container *ngIf="showQuotation">
+        <ion-list-header>
+          <ion-label color="dark">Quotation</ion-label>
+          <ion-button routerLink="quotation">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        </ion-list-header>
+        <ng-container *ngIf="!quotation_loaded">
+          <p>
+            <ion-text color="tertiary">
+              <h3>Nothing found!</h3>
+            </ion-text>
+          </p>
+        </ng-container>
+        <ng-container *ngIf="quotation_loaded">
+          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button detail="false" (click)="goToQuotationDetail(object.quotationId)" *ngFor="let object of quotations">
+              <ion-label>
+                <h3>{{object.quotationNum}}</h3>
+                <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+              </ion-label>
+              <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+        <hr class="hr-small">
       </ng-container>
-      <ng-container *ngIf="picking_loaded">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToPackingDetail(object.packingId)" *ngFor="let object of packings">
-            <ion-label>
-              <h3>{{object.packingNum}}</h3>
-              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
-            </ion-label>
-            <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
-          </ion-item>
-        </ion-list>
+      
+      <ng-container *ngIf="showSalesOrder">
+        <ion-list-header>
+          <ion-label color="dark">Sales Order</ion-label>
+          <ion-button routerLink="sales-order">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        </ion-list-header>
+        <ng-container *ngIf="!sales_order_loaded">
+          <p>
+            <ion-text color="tertiary">
+              <h3>Nothing found!</h3>
+            </ion-text>
+          </p>
+        </ng-container>
+        <ng-container *ngIf="sales_order_loaded">
+          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders">
+              <ion-label>
+                <h3>{{object.salesOrderNum}}</h3>
+                <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+              </ion-label>
+              <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+        <hr class="hr-small">
       </ng-container>
-      <hr class="hr-small">
-    </ng-container>
+
+    </div>
+
+    <div *ngIf="transactionMode === 'offline'">
+
+      <ng-container *ngIf="showPicking">
+        <ion-list-header>
+          <ion-label color="dark">Picking</ion-label>
+          <ion-button routerLink="picking">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        </ion-list-header>
+        <ng-container *ngIf="!picking_loaded">
+          <p>
+            <ion-text color="tertiary">
+              <h3>Nothing found!</h3>
+            </ion-text>
+          </p>
+        </ng-container>
+        <ng-container *ngIf="picking_loaded">
+          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button detail="false" (click)="goToPickingDetail(object.pickingId)" *ngFor="let object of pickings">
+              <ion-label>
+                <h3>{{object.pickingNum}}</h3>
+                <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+              </ion-label>
+              <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+        <hr class="hr-small">
+      </ng-container>
+  
+      <ng-container *ngIf="showPacking">
+        <ion-list-header>
+          <ion-label color="dark">Packing</ion-label>
+          <ion-button routerLink="packing">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        </ion-list-header>
+        <ng-container *ngIf="!packing_load">
+          <p>
+            <ion-text color="tertiary">
+              <h3>Nothing found!</h3>
+            </ion-text>
+          </p>
+        </ng-container>
+        <ng-container *ngIf="picking_loaded">
+          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button detail="false" (click)="goToPackingDetail(object.packingId)" *ngFor="let object of packings">
+              <ion-label>
+                <h3>{{object.packingNum}}</h3>
+                <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+              </ion-label>
+              <ion-badge mode="ios" slot="end"> {{object.locationCode}}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+        <hr class="hr-small">
+      </ng-container>    
+  
+      <ng-container *ngIf="showOtherSales">
+        <ion-list-header>
+          <ion-label color="dark">Other Sales</ion-label>
+          <ion-button routerLink="other-sales">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        </ion-list-header>
+        <ng-container *ngIf="!other_sales_load">
+          <p>
+            <ion-text color="tertiary">
+              <h3>Nothing found!</h3>
+            </ion-text>
+          </p>
+        </ng-container>
+        <ng-container *ngIf="other_sales_load">
+          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button detail="false" (click)="goToOtherSalesDetail(object.otherSalesId)" *ngFor="let object of other_sales">
+              <ion-label>
+                <h3>{{object.otherSalesNum}}</h3>
+                <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+                <div class="font-smaller">Customer: {{object.customerName}}</div>
+                <div class="font-smaller">To Location: {{object.toLocationDesc}}</div>
+              </ion-label>
+              <ion-badge mode="ios" slot="end"> {{object.type}}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+        <hr class="hr-small">
+      </ng-container>
+
+    </div>
 
   </div>
 </ion-content>  
