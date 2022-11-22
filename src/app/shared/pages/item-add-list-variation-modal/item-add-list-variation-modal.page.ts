@@ -19,10 +19,10 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
   @Input() keyId: number;
   @Input() locationId: number;
   @Input() useTax: boolean = false;
-  @Input() availableItem: Item[] = [];
   @Input() itemInCart: Item[] = [];
+  availableItem: Item[] = [];
   itemToDisplay: ItemList[] = [];
-  
+
   @Output() onItemSelected: EventEmitter<Item[]> = new EventEmitter();
 
   constructor(
@@ -40,7 +40,7 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
 
   ngOnInit() {
 
-  }  
+  }
 
   /* #region  search item */
 
@@ -50,7 +50,7 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
     // this.availableImages = [];
   }
 
-  itemSearchText: string = 'dt010';
+  itemSearchText: string = 'dt0';
   // availableImages: ItemImage[] = [];
   async searchItem() {
     if (this.itemSearchText && this.itemSearchText.length > 2) {
@@ -95,7 +95,6 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
         })
       })
     }
-    console.log("🚀 ~ file: item-add-list-variation-modal.page.ts ~ line 98 ~ ItemAddListVariationModalPage ~ distinctItem ~ this.itemToDisplay", this.itemToDisplay)
   }
 
   decreaseQty(data: ItemList) {
@@ -116,12 +115,12 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
     data.qtyRequest = (data.qtyRequest ?? 0) + 1;
   }
 
+  // pass back non-variation item back
   addItemToCart(data: ItemList) {
-    // only for variationTypeCode === '0'
     // this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
-    let t = {...this.availableItem.find(r => r.itemSku === data.itemSku)};
+    let t = { ...this.availableItem.find(r => r.itemSku === data.itemSku) };
     t.qtyRequest = data.qtyRequest;
-    this.onItemSelected.emit([t]);
+    this.onItemSelected.emit([t]); // always pass back with interface Item
     this.itemToDisplay.forEach(r => r.qtyRequest = null); // clear qty
   }
 
@@ -129,6 +128,7 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
   itemToViewVariation: Item[] = [];
   showModal(itemId: number) {
     this.itemToViewVariation = this.availableItem.filter(r => r.itemId === itemId);
+    this.itemToViewVariation.forEach(r => r.qtyRequest = 0); // clear qty on modal pop
     this.isModalOpen = true;
   }
 
@@ -137,8 +137,10 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
     this.isModalOpen = false;
   }
 
+  /* #region  variation item */
+
+  // pass back variation item back
   increaseVariationQty(item: Item) {
-    // only for variationTypeCode !== '0'
     item.qtyRequest = (item.qtyRequest ?? 0) + 1;
   }
 
@@ -155,12 +157,14 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
     }
   }
 
-  async addItemVariationToCart() {    
+  async addItemVariationToCart() {
     // this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
     await this.onItemSelected.emit(this.itemToViewVariation.filter(r => r.qtyRequest > 0));
     this.hideModal();
   }
-  
+
+  /* #endregion */
+
   /* #region  misc */
 
   selectAll(event) {

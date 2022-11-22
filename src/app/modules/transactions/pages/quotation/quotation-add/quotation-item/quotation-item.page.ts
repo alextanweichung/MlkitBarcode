@@ -32,7 +32,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   loadImage: boolean = true;
 
   constructor(
-    private searchItemService: SearchItemService,
     private configService: ConfigService,
     private authService: AuthService,
     private quotationService: QuotationService,
@@ -79,46 +78,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     })
   }
 
-  /* #region  search item */
-
-  searchTextChanged() {
-    this.availableItem = [];
-    // this.availableImages = [];
-  }
-
-  itemSearchText: string = 'dt010';
-  availableItem: Item[] = [];
-  // availableImages: ItemImage[] = [];
-  async searchItem() {
-    if (this.itemSearchText && this.itemSearchText.length > 2) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
-      }
-      await this.showLoading();
-      // get images
-      // if (this.loadImage) {
-      //   this.quotationService.getItemImageFile(this.itemSearchText).subscribe(response => {
-      //     this.availableImages = response;
-      //   }, error => {
-      //     console.log(error);
-      //   })
-      // }
-      // get item
-      this.quotationService.getItemListWithTax(this.itemSearchText, this.datePipe.transform(new Date(), 'yyyy-MM-dd'), this.quotationHeader.customerId, this.quotationHeader.locationId).subscribe(async response => {
-        this.availableItem = response;
-        this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
-        await this.hideLoading();
-      }, async error => {
-        console.log(error);
-        await this.hideLoading();
-      })
-    } else {
-      this.toastService.presentToast('Error', 'Please key in 3 characters and above to search', 'bottom', 'danger', 1000);
-    }
-  }
-
-  /* #endregion */
-
   itemInCart: Item[] = [];
   async onItemSelected(event) {
     let items: Item[] = event;
@@ -131,7 +90,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     });
     this.itemInCart = [...this.itemInCart];
     await this.computeAllAmount();
-    console.log("🚀 ~ file: quotation-item.page.ts ~ line 136 ~ QuotationItemPage ~ onItemSelected ~ this.itemInCart", this.itemInCart)
   }
 
   onItemInCartEditCompleted(event) {
@@ -164,7 +122,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
 
   hideAddItemModal() {
     this.isModalOpen = false;
-    this.itemSearchText = null;
   }
 
   /* #endregion */
