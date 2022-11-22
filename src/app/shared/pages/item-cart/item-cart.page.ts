@@ -248,7 +248,6 @@ export class ItemCartPage implements OnInit, OnChanges {
   }
 
   computeDiscTaxAmount(trxLine: Item) {
-    console.log("🚀 ~ file: item-cart.page.ts ~ line 243 ~ ItemCartPage ~ computeDiscTaxAmount ~ trxLine", trxLine)
     trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.isItemPriceTaxInclusive, this.maxPrecision);
     // this.onEditComplete();
   }

@@ -50,6 +50,7 @@ export class QuotationConfirmationPage implements OnInit {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
       let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+      console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 53 ~ QuotationConfirmationPage ~ loadModuleControl ~ SystemWideActivateTaxControl", SystemWideActivateTaxControl)
       if (SystemWideActivateTaxControl != undefined) {
         this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
@@ -68,6 +69,7 @@ export class QuotationConfirmationPage implements OnInit {
   }
 
   onItemInCartEditCompleted(event) {
+    console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 72 ~ QuotationConfirmationPage ~ onItemInCartEditCompleted ~ event", event)
     this.itemInCart = event;
     this.recalculateTotals();
   }
@@ -115,10 +117,8 @@ export class QuotationConfirmationPage implements OnInit {
   }
 
   async insertQuotation() {
-    console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 83 ~ QuotationConfirmationPage ~ insertQuotation ~ this.quotationHeader", this.quotationHeader)
-    console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 83 ~ QuotationConfirmationPage ~ insertQuotation ~ this.itemInCart", this.itemInCart)
     let trxLineArray: QuotationDtoLine[] = [];
-    this.quotationService.itemInCart.forEach(e => {
+    this.itemInCart.forEach(e => {
       let objectLine: QuotationDtoLine = {
         quotationLineId: 0,
         quotationId: 0,
@@ -133,6 +133,16 @@ export class QuotationConfirmationPage implements OnInit {
         qtyRequest: e.qtyRequest,
         unitPrice: e.unitPrice,
         unitPriceExTax: e.unitPriceExTax,
+        discountGroupCode: e.discountGroupCode,
+        discountExpression: e.discountExpression,
+        discountAmt: e.discountAmt,
+        discountAmtExTax: e.discountAmtExTax,
+        taxId: e.taxId,
+        taxPct: e.taxPct,
+        taxAmt: e.taxAmt,
+        taxInclusive: this.quotationHeader.isItemPriceTaxInclusive,
+        subTotal: e.subTotal,
+        subTotalExTax: e.subTotalExTax,
         sequence: 0,
         locationId: this.quotationHeader.locationId,
         deactivated: true
@@ -154,12 +164,13 @@ export class QuotationConfirmationPage implements OnInit {
         termPeriodId: this.quotationHeader.termPeriodId,
         countryId: this.quotationHeader.countryId,
         currencyId: this.quotationHeader.currencyId,
-        currencyRate: this.quotationHeader.currencyRate
+        currencyRate: this.quotationHeader.currencyRate,
+        isHomeCurrency: this.quotationHeader.isHomeCurrency
       },
       details: trxLineArray,
-    }
+    }    
+    console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 168 ~ QuotationConfirmationPage ~ this.quotationService.insertQuotation ~ trxDto", trxDto)
     this.quotationService.insertQuotation(trxDto).subscribe(response => {
-      console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 132 ~ QuotationConfirmationPage ~ this.quotationService.insertQuotation ~ response", response)
       let details: any[] = response.body["details"];
       let totalQty: number = 0;
       details.forEach(e => {

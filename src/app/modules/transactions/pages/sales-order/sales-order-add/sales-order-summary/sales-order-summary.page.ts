@@ -20,6 +20,7 @@ export class SalesOrderSummaryPage implements OnInit {
 
   ngOnInit() {
     this.salesOrderSummary = this.salesOrderService.salesOrderSummary;
+    console.log("🚀 ~ file: sales-order-summary.page.ts ~ line 23 ~ SalesOrderSummaryPage ~ ngOnInit ~ this.salesOrderSummary", this.salesOrderSummary)
     if (this.salesOrderSummary) {
       this.navController.navigateRoot('/transactions/sales-order');
     }

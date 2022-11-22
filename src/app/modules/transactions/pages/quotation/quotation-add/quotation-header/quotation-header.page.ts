@@ -3,8 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 @Component({
@@ -22,6 +24,7 @@ export class QuotationHeaderPage implements OnInit {
   };
 
   constructor(
+    private authService: AuthService,
     private quotationService: QuotationService,
     private navController: NavController,
     private formBuilder: FormBuilder,
@@ -68,13 +71,25 @@ export class QuotationHeaderPage implements OnInit {
       sourceType: [null],
       businessModelType: [null],
       remark: [null],
-      isHomeCurrency: [null]
+      isHomeCurrency: [null],
+      maxPrecision: [null],
+      maxPrecisionTax: [null]
     });
   }
 
   ngOnInit() {
+    this.loadModuleControl();
     this.loadCustomerList();
     this.loadMasterList();
+  }
+  
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  loadModuleControl() {    
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+    })
   }
 
   customerMasterList: MasterListDetails[] = [];
@@ -156,8 +171,12 @@ export class QuotationHeaderPage implements OnInit {
         this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
         if (lookupValue.attribute2 == "Y") {
           this.objectForm.patchValue({ isHomeCurrency: true });
+          this.objectForm.patchValue({ maxPrecision: this.precisionSales.localMax });
+          this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.localMax });
         } else {
           this.objectForm.patchValue({ isHomeCurrency: false });
+          this.objectForm.patchValue({ maxPrecision: this.precisionSales.foreignMax });
+          this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.foreignMax });
         }
       }
     }

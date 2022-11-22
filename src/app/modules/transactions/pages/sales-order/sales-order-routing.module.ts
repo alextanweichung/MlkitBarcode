@@ -9,7 +9,7 @@ const routes: Routes = [
     component: PickingSalesOrderPage
   },
   {
-    path: 'sales-order-customer',
+    path: 'sales-order-header',
     loadChildren: () => import('./sales-order-add/sales-order-header/sales-order-header.module').then( m => m.SalesOrderHeaderPageModule)
   },
   {

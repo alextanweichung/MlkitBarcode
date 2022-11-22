@@ -78,6 +78,11 @@ export interface SalesOrder {
   masterUDGroup2?: number
   masterUDGroup3?: number
   remark?: string
+  isItemPriceTaxInclusive?: boolean
+  isDisplayTaxInclusive?: boolean
+  isHomeCurrency?: boolean
+  maxPrecision?: number
+  maxPrecisionTax?: number
 }
 
 export interface SalesOrderLine {
@@ -93,8 +98,17 @@ export interface SalesOrderLine {
   extendedDescription: string
   qtyRequest?: number
   unitPrice?: number
-  unitPriceExTax: number;
+  unitPriceExTax?: number
+  discountGroupCode?: string
+  discountExpression?: string
+  discountAmt?: number
+  discountAmtExTax?: number
+  taxId?: number
+  taxPct?: number
+  taxAmt?: number
+  taxInclusive?: boolean
   subTotal?: number
+  subTotalExTax?: number
   sequence?: number
   locationId?: number
   deactivated?: boolean
@@ -159,6 +173,11 @@ export interface SalesOrderHeader {
   masterUDGroup2: any
   masterUDGroup3: any
   remark: any
+  isItemPriceTaxInclusive?: boolean
+  isDisplayTaxInclusive?: boolean
+  isHomeCurrency?: boolean
+  maxPrecision?: number
+  maxPrecisionTax?: number
   sequence: number
   createdById: number
   createdBy: string

@@ -37,7 +37,7 @@ export class SalesOrderService {
   }
 
   setChoosenItems(item: Item[]) {
-    this.itemInCart = item;
+    this.itemInCart = JSON.parse(JSON.stringify(item));
   }
 
   setSalesOrderSummary(ss: SalesOrderSummary) {

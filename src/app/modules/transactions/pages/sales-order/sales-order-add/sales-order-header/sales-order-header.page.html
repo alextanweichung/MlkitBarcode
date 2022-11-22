@@ -19,7 +19,7 @@
         <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
         <ion-item *ngIf="transactionShowDetailHeader">
           <ion-label position="stacked">Currency</ion-label>
-          <ion-select interface="action-sheet" placeholder="Select Currency" formControlName="currencyId" (ionChange)="currencyChanged($event)">
+          <ion-select interface="action-sheet" placeholder="Select Currency" formControlName="currencyId" (ionChange)="onCurrencySelected($event)">
             <ion-select-option *ngFor="let item of currencyMasterList" [value]="item.id">{{item.description}}</ion-select-option>
           </ion-select>
         </ion-item>

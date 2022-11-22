@@ -1,7 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController } from '@ionic/angular';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 import { Item } from 'src/app/modules/transactions/models/item';
 import { SalesOrderDto, SalesOrderHeader, SalesOrderLine, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
@@ -17,11 +16,11 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 })
 export class SalesOrderConfirmationPage implements OnInit {
 
-  moduleControl: ModuleControl[] = [];
-  useTax: boolean;
-  
-  private salesOrderHeader: SalesOrderHeader;
+  salesOrderHeader: SalesOrderHeader;
   itemInCart: Item[];
+  
+  moduleControl: ModuleControl[] = [];
+  useTax: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -37,8 +36,7 @@ export class SalesOrderConfirmationPage implements OnInit {
     this.itemInCart = this.salesOrderService.itemInCart;
     this.recalculateTotals();
     if (this.salesOrderHeader === undefined || this.salesOrderHeader.customerId === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/transactions/sales-order/sales-order-customer');
+      this.navController.navigateBack('/transactions/sales-order/sales-order-header');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
       this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'bottom', 'medium', 1000);
@@ -48,6 +46,7 @@ export class SalesOrderConfirmationPage implements OnInit {
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
+      this.moduleControl = obj;
       let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
       if (SystemWideActivateTaxControl != undefined) {
         this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
@@ -63,11 +62,20 @@ export class SalesOrderConfirmationPage implements OnInit {
   }
 
   totalQuantity: number = 0;
-  totalAmount: number = 0;
+  subtotalBeforeTax: number = 0;
+  taxAmount: number = 0;
+  netTotal: number = 0;
   recalculateTotals() {
     if (this.itemInCart && this.itemInCart.length > 0) {
       this.totalQuantity = this.itemInCart.flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
-      this.totalAmount = this.itemInCart.flatMap(r => r.qtyRequest * r.unitPrice).reduce((a, c) => Number(a) + Number(c));
+      this.subtotalBeforeTax = this.itemInCart.flatMap(r => (r.qtyRequest * r.unitPriceExTax) - r.discountAmtExTax).reduce((a, c) => Number(a) + Number(c));
+      this.taxAmount = this.itemInCart.flatMap(r => r.taxAmt).reduce((a,c) => Number(a) + Number(c));
+      this.netTotal = this.itemInCart.flatMap(r => (r.qtyRequest * r.unitPrice) - r.discountAmt).reduce((a, c) => Number(a) + Number(c));
+    } else {
+      this.totalQuantity = null;
+      this.subtotalBeforeTax = null;
+      this.taxAmount = null;
+      this.netTotal = null;
     }
   }
 
@@ -96,9 +104,6 @@ export class SalesOrderConfirmationPage implements OnInit {
   }
 
   async insertSalesOrder() {
-    // const result = await this.presentInsertConfirmation();
-    // connectableObservableDescriptor.lo
-    // if (result) {
     let trxLineArray: SalesOrderLine[] = [];
     this.salesOrderService.itemInCart.forEach(e => {
       let objectLine: SalesOrderLine = {
@@ -114,7 +119,17 @@ export class SalesOrderConfirmationPage implements OnInit {
         extendedDescription: e.description,
         qtyRequest: e.qtyRequest,
         unitPrice: e.unitPrice,
-        unitPriceExTax: e.unitPriceExTax, // todo : check with wayne
+        unitPriceExTax: e.unitPriceExTax,
+        discountGroupCode: e.discountGroupCode,
+        discountExpression: e.discountExpression,
+        discountAmt: e.discountAmt,
+        discountAmtExTax: e.discountAmtExTax,
+        taxId: e.taxId,
+        taxPct: e.taxPct,
+        taxAmt: e.taxAmt,
+        taxInclusive: this.salesOrderHeader.isItemPriceTaxInclusive,
+        subTotal: e.subTotal,
+        subTotalExTax: e.subTotalExTax,
         sequence: 0,
         locationId: this.salesOrderHeader.locationId,
         deactivated: true
@@ -125,7 +140,7 @@ export class SalesOrderConfirmationPage implements OnInit {
       header: {
         salesOrderId: 0,
         salesOrderNum: null,
-        trxDate: this.salesOrderHeader.trxDate,
+        trxDate: new Date(),
         businessModelType: this.salesOrderHeader.businessModelType,
         typeCode: this.salesOrderHeader.typeCode,
         sourceType: 'M', // Mobile
@@ -136,12 +151,13 @@ export class SalesOrderConfirmationPage implements OnInit {
         termPeriodId: this.salesOrderHeader.termPeriodId,
         countryId: this.salesOrderHeader.countryId,
         currencyId: this.salesOrderHeader.currencyId,
-        currencyRate: this.salesOrderHeader.currencyRate
+        currencyRate: this.salesOrderHeader.currencyRate,
+        isHomeCurrency: this.salesOrderHeader.isHomeCurrency
       },
       details: trxLineArray,
     }
-    console.log("🚀 ~ file: confirmation.page.ts ~ line 144 ~ ConfirmationPage ~ this.salesOrderService.insertSalesOrder ~ trxDto", trxDto)
-    this.salesOrderService.insertSalesOrder(trxDto).subscribe(response => {
+    console.log("🚀 ~ file: sales-order-confirmation.page.ts ~ line 150 ~ SalesOrderConfirmationPage ~ this.salesOrderService.insertSalesOrder ~ trxDto", trxDto)
+    this.salesOrderService.insertSalesOrder(trxDto).subscribe(async response => {
       let details: any[] = response.body["details"];
       let totalQty: number = 0;
       details.forEach(e => {
@@ -153,10 +169,8 @@ export class SalesOrderConfirmationPage implements OnInit {
         customerId: this.salesOrderHeader.customerId,
         totalQuantity: totalQty,
         totalAmount: response.body["header"]["totalGrossAmt"]
-      }
-      
-      this.salesOrderService.setSalesOrderSummary(ss);
-
+      }      
+      await this.salesOrderService.setSalesOrderSummary(ss);
       this.toastService.presentToast('Insert Complete', 'New sales order has been added', 'bottom', 'success', 1000);
       this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
     }, error => {

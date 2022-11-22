@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <app-item-cart [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-cart>      
+      <app-item-cart [itemInCart]="itemInCart" [useTax]="useTax" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)" [maxPrecision]="salesOrderHeader.maxPrecision" [maxPrecisionTax]="salesOrderHeader.maxPrecisionTax" [isItemPriceTaxInclusive]="salesOrderHeader.isItemPriceTaxInclusive" [isDisplayTaxInclusive]="salesOrderHeader.isDisplayTaxInclusive"></app-item-cart>  
     </ion-list>
   </div>
 </ion-content>
@@ -28,8 +28,24 @@
       </ion-col>
       <ion-col class="ion-text-right">
         <ion-label style="color: black;">
-          Total Amount: {{totalAmount|number:'1.2'}}
-        </ion-label>          
+          Subtotal (Before Tax): {{subtotalBeforeTax|number:'1.2'}}
+        </ion-label>
+      </ion-col>
+    </ion-row>
+    <ion-row class="pt-2 pl-3 pr-3">
+      <ion-col></ion-col>
+      <ion-col class="ion-text-right">
+        <ion-label style="color: black;">
+          Tax Amount: {{taxAmount|number:'1.2'}}
+        </ion-label>
+      </ion-col>
+    </ion-row>
+    <ion-row class="pt-2 pl-3 pr-3">
+      <ion-col></ion-col>
+      <ion-col class="ion-text-right">
+        <ion-label style="color: black;">
+          Net Total: {{netTotal|number:'1.2'}}
+        </ion-label>
       </ion-col>
     </ion-row>
     <ion-row>

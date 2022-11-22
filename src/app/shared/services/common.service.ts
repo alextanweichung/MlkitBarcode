@@ -252,6 +252,7 @@ export class CommonService {
     trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
     trxLine.taxInclusive = isDisplayTaxInclusive;
     //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
+    console.log("🚀 ~ file: common.service.ts ~ line 257 ~ CommonService ~ computeDiscTaxAmount ~ trxLine", trxLine)
     return trxLine;
   }
 

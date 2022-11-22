@@ -131,8 +131,8 @@
           </ion-item> -->
           <ion-item>
             <ion-label><p>Unit Price</p></ion-label>
-            <ion-input *ngIf="isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="text" (ionFocus)="setSelect(unitPrice)" [(ngModel)]="selectedItemLine.unitPrice" (ionChange)="computeAllAmount()"></ion-input>
-            <ion-input *ngIf="!isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="text" (ionFocus)="setSelect(unitPrice)" [(ngModel)]="selectedItemLine.unitPriceExTax" (ionChange)="computeAllAmount()"></ion-input>
+            <ion-input *ngIf="isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="setSelect(unitPrice)" [(ngModel)]="selectedItemLine.unitPrice" (ionChange)="computeAllAmount()"></ion-input>
+            <ion-input *ngIf="!isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="setSelect(unitPrice)" [(ngModel)]="selectedItemLine.unitPriceExTax" (ionChange)="computeAllAmount()"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>

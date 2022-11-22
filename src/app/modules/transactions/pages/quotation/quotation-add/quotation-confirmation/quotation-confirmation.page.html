@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <app-item-cart [itemInCart]="itemInCart" [useTax]="useTax" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)" [isItemPriceTaxInclusive]="quotationHeader.isItemPriceTaxInclusive" [isDisplayTaxInclusive]="quotationHeader.isDisplayTaxInclusive"></app-item-cart>
+      <app-item-cart [itemInCart]="itemInCart" [useTax]="useTax" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)" [maxPrecision]="quotationHeader.maxPrecision" [maxPrecisionTax]="quotationHeader.maxPrecisionTax" [isItemPriceTaxInclusive]="quotationHeader.isItemPriceTaxInclusive" [isDisplayTaxInclusive]="quotationHeader.isDisplayTaxInclusive"></app-item-cart>
     </ion-list>
   </div>
 </ion-content>

@@ -58,6 +58,8 @@ export interface QuotationDtoHeader {
   businessModelType?: string
   remark?: string
   isHomeCurrency?: boolean
+  maxPrecision?: number
+  maxPrecisionTax?: number
 }
 
 export interface QuotationDtoLine {
@@ -74,6 +76,14 @@ export interface QuotationDtoLine {
   qtyRequest?: number
   unitPrice?: number
   unitPriceExTax?: number
+  discountGroupCode?: string
+  discountExpression?: string
+  discountAmt?: number
+  discountAmtExTax?: number
+  taxId?: number
+  taxPct?: number
+  taxAmt?: number
+  taxInclusive?: boolean
   subTotal?: number
   subTotalExTax?: number
   sequence?: number

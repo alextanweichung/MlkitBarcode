@@ -26,8 +26,8 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
-  maxPrecision: number = 2;
-  maxPrecisionTax: number = 2;
+  // maxPrecision: number = 2;
+  // maxPrecisionTax: number = 2;
 
   loadImage: boolean = true;
 
@@ -126,19 +126,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
 
   /* #endregion */
 
-  /* #region  steps */
-
-  async nextStep() {
-    await this.quotationService.setChoosenItems(this.itemInCart);
-    this.navController.navigateForward('/transactions/quotation/quotation-confirmation');
-  }
-
-  previousStep() {
-    this.navController.navigateBack('/transactions/quotation/quotation-header');
-  }
-
-  /* #endregion */
-
   /* #region  compute amount */
 
   async computeAllAmount() {
@@ -153,20 +140,20 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   }
 
   computeUnitPriceExTax(trxLine: Item) {
-    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.maxPrecision);
+    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.quotationHeader.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
     // this.onEditComplete();
   }
 
   computeUnitPrice(trxLine: Item) {
     trxLine.unitPriceExTax = trxLine.unitPrice;
-    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
+    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.quotationHeader.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
     // this.onEditComplete();
   }
 
   computeDiscTaxAmount(trxLine: Item) {
-    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.quotationHeader.isItemPriceTaxInclusive, this.maxPrecision);
+    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.quotationHeader.isItemPriceTaxInclusive, this.quotationHeader.maxPrecision);
     // this.onEditComplete();
   }
 
@@ -183,9 +170,22 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
       item.unitPrice = item.unitPrice;
       item.unitPriceExTax = item.unitPrice;
     }
-    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
-    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
+    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.quotationHeader.maxPrecision);
+    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.quotationHeader.maxPrecision);
     return item;
+  }
+
+  /* #endregion */
+
+  /* #region  steps */
+
+  async nextStep() {
+    await this.quotationService.setChoosenItems(this.itemInCart);
+    this.navController.navigateForward('/transactions/quotation/quotation-confirmation');
+  }
+
+  previousStep() {
+    this.navController.navigateBack('/transactions/quotation/quotation-header');
   }
 
   /* #endregion */

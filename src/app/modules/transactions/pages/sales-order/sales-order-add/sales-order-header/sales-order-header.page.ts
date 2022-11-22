@@ -7,6 +7,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 
@@ -60,6 +61,7 @@ export class SalesOrderHeaderPage implements OnInit {
     })
   }
 
+  customerMasterList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
   currencyMasterList: MasterListDetails[] = [];
   countryMasterList: MasterListDetails[] = [];
@@ -67,18 +69,20 @@ export class SalesOrderHeaderPage implements OnInit {
   salesAgentMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.salesOrderService.getMasterList().subscribe(response => {
+      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.countryMasterList = response.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.termPeriodMasterList = response.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.setDefaultValue();
       this.mapSearchDropdownList();
     }, error => {
       console.log(error);
     })
   }
 
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
@@ -89,47 +93,54 @@ export class SalesOrderHeaderPage implements OnInit {
     }, error => {
       console.log(error);
     })
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+    })
   }
 
   newForm() {
     this.objectForm = this.formBuilder.group({
-      locationId: [null],
+      salesOrderId: [0],
+      salesOrderNum: [null],
+      salesAgentId: [null],
+      trxDate: [null],
+      typeCode: [null],
       customerId: [null, [Validators.required]],
+      shipAddress: [null, [Validators.maxLength(500)]],
+      shipPostCode: [null],
+      shipPhone: [null],
+      shipEmail: [null, [Validators.email]],
+      shipFax: [null],
+      shipAreaId:[null],
+      shipMethodId:[null],
+      attention: [null],
+      termPeriodId: [null],
+      locationId: [null],
+      toLocationId: [null],
+      countryId: [null],
       currencyId: [null],
       currencyRate: [null],
-      countryId: [null],
-      termPeriodId: [null],
-      salesAgentId: [null],
-      typeCode: [null],
+      salesOrderUDField1: [null],
+      salesOrderUDField2: [null],
+      salesOrderUDField3: [null],
+      salesOrderUDOption1: [null],
+      salesOrderUDOption2: [null],
+      salesOrderUDOption3: [null],
+      deactivated: [null],
+      workFlowTransactionId: [null],
+      masterUDGroup1: [null],
+      masterUDGroup2: [null],
+      masterUDGroup3: [null],
+      isItemPriceTaxInclusive: [null],
+      isDisplayTaxInclusive: [null],
+      sourceType: [null],
       businessModelType: [null],
-      trxDate: [new Date()]
+      remark: [null],
+      isHomeCurrency: [null],
+      maxPrecision: [null],
+      maxPrecisionTax: [null]
     });
-  }
-
-  setDefaultValue() {
-    let defaultLocation = this.locationMasterList.find(item => item.isPrimary)?.id;
-    if (defaultLocation) {
-      this.objectForm.patchValue({ locationId: defaultLocation });
-    }
-
-    let defaultCurrency = this.currencyMasterList.find(item => item.isPrimary)
-    if (defaultCurrency) {
-      this.objectForm.patchValue({ currencyId: defaultCurrency.id });
-      this.objectForm.patchValue({ currencyRate: parseFloat(defaultCurrency.attribute1) });
-    }
-
-    let defaultCountry = this.countryMasterList.find(item => item.isPrimary)?.id;
-    if (defaultCountry) {
-      this.objectForm.patchValue({ countryId: defaultCountry });
-    }
-
-    let defaultTermPeriod = this.termPeriodMasterList.find(item => item.isPrimary)?.id;
-    if (defaultTermPeriod) {
-      this.objectForm.patchValue({ termPeriodId: defaultTermPeriod });
-    }
-
-    let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
-    this.objectForm.patchValue({ salesAgentId: salesAgentId });
   }
 
   locationSearchDropdownList: SearchDropdownList[] = [];
@@ -171,25 +182,63 @@ export class SalesOrderHeaderPage implements OnInit {
     this.objectForm.patchValue({ locationId: event.id });
   }
 
+  selectedCustomerLocationList: MasterListDetails[] = [];
   onCustomerSelected(event) {
-    if (event && event !== undefined) {
-      var lookupValue = this.customers.find(r => r.customerId === event.id);
-      this.selectedCustomer = lookupValue;
-      // Auto map object type code
-      this.objectForm.patchValue({ customerId: event.id });
-      this.objectForm.patchValue({ businessModelType: lookupValue.businessModelType });
-      if (lookupValue.businessModelType == "T" || lookupValue.businessModelType == "F") {
-        this.objectForm.patchValue({ typeCode: 'S' });
-      } else {
-        this.objectForm.patchValue({ typeCode: 'T' });
+    if (event) {
+      this.salesOrderService.removeItems();
+      var lookupValue = this.customerMasterList?.find(e => e.id == event.id);
+      if (lookupValue != undefined) {
+        this.objectForm.patchValue({ customerId: lookupValue.id });
+        this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
+        if (lookupValue.attributeArray1.length > 0) {
+          this.selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
+        } else {
+          this.selectedCustomerLocationList = [];
+        }
+        this.objectForm.patchValue({
+          salesAgentId: parseFloat(lookupValue.attribute1),
+          termPeriodId: parseFloat(lookupValue.attribute2),
+          countryId: parseFloat(lookupValue.attribute3),
+          currencyId: parseFloat(lookupValue.attribute4),
+          locationId: parseFloat(lookupValue.attribute6),
+          toLocationId: null,
+          isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
+          isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
+        });
+        this.onCurrencySelected({ id: lookupValue.attribute4 });
+        if (lookupValue.attribute5 == "T") {
+          this.objectForm.controls.toLocationId.clearValidators();
+          this.objectForm.controls.toLocationId.updateValueAndValidity();
+        }
+        if (lookupValue.attributeArray1.length == 1) {
+          this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
+        }
+        //Auto map object type code
+        if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
+          this.objectForm.patchValue({ typeCode: 'S' });
+        } else {
+          this.objectForm.patchValue({ typeCode: 'T' });
+        }
       }
     }
   }
 
-  currencyChanged(event) {
-    var lookupValue = this.currencyMasterList?.find(e => e.id == event.detail.value);
-    // Auto map object type code
-    this.objectForm.patchValue({ exchangeRate: parseFloat(lookupValue.attribute1) });
+  onCurrencySelected(event: any) {
+    if (event) {
+      var lookupValue = this.currencyMasterList?.find(e => e.id == event.id);
+      if (lookupValue != undefined) {
+        this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
+        if (lookupValue.attribute2 == "Y") {
+          this.objectForm.patchValue({ isHomeCurrency: true });
+          this.objectForm.patchValue({ maxPrecision: this.precisionSales.localMax });
+          this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.localMax });
+        } else {
+          this.objectForm.patchValue({ isHomeCurrency: false });
+          this.objectForm.patchValue({ maxPrecision: this.precisionSales.foreignMax });
+          this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.foreignMax });
+        }
+      }
+    }
   }
 
   async cancelInsert() {
@@ -217,9 +266,10 @@ export class SalesOrderHeaderPage implements OnInit {
   }
 
   nextStep() {
+    this.objectForm.getRawValue
+    console.log("🚀 ~ file: sales-order-header.page.ts ~ line 272 ~ SalesOrderHeaderPage ~ nextStep ~ this.objectForm.value", this.objectForm.value)
     if (this.objectForm.valid) {
       this.salesOrderService.setChoosenCustomer(this.objectForm.value);
-      this.salesOrderService.removeItems();
       this.navController.navigateForward('/transactions/sales-order/sales-order-item');
     } else {
       this.toastService.presentToast('Error', 'Please select customer to continue', 'bottom', 'danger', 1000);

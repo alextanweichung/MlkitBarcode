@@ -61,7 +61,7 @@ export class PickingSalesOrderPage implements OnInit {
     if (salesAgentId === 0 || salesAgentId === undefined) {
       this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
     } else {
-      this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
+      this.navController.navigateForward('/transactions/sales-order/sales-order-header');
     }
   }
 
