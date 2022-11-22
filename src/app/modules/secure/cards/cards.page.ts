@@ -58,7 +58,7 @@ export class CardsPage implements AfterContentChecked {
     });
     await loading.present();
 
-    this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+    this.commonService.syncInbound().subscribe(async response => {
       let itemMaster: PDItemMaster[] = response['itemMaster'];
       let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
       await this.configService.syncInboundData(itemMaster, itemBarcode);

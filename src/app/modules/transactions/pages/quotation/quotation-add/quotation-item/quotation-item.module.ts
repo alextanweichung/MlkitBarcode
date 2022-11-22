@@ -10,6 +10,7 @@ import { QuotationItemPage } from './quotation-item.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
 import { ItemAddGridVariationMPageModule } from 'src/app/shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module';
 import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module';
+import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/item-ad
     QuotationItemPageRoutingModule,
     ListingSkeletonPageModule,
     ItemAddGridVariationMPageModule,
-    ItemAddListWithVariationPageModule
+    ItemAddListWithVariationPageModule,
+    ItemCartPageModule
   ],
   declarations: [QuotationItemPage]
 })

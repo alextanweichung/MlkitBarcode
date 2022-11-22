@@ -7,7 +7,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
-import { QuotationDto, QuotationDtoLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
+import { QuotationDto, QuotationDtoHeader, QuotationDtoLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,7 +21,7 @@ export class QuotationService {
 
   baseUrl: string;
 
-  selectedCustomer: Customer;
+  quotationHeader: QuotationDtoHeader;
   itemInCart: Item[] = [];
   quotationSummary: QuotationSummary;
 
@@ -32,8 +32,8 @@ export class QuotationService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
-  setChoosenCustomer(customer: Customer) {
-    this.selectedCustomer = customer;
+  setHeader(quotationHeader: QuotationDtoHeader) {
+    this.quotationHeader = quotationHeader;
   }
 
   setChoosenItems(item: Item[]) {
@@ -45,7 +45,7 @@ export class QuotationService {
   }
 
   removeCustomer() {
-    this.selectedCustomer = null;
+    this.quotationHeader = null;
   }
 
   removeItems() {

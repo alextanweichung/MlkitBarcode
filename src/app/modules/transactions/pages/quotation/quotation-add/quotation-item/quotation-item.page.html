@@ -4,6 +4,9 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="showAddItemModal()">Add</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
@@ -12,15 +15,31 @@
       <ion-label class="label-title">Items</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="px-3">
-    <ion-searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionChange)="searchTextChanged()" (search)="searchItem()"></ion-searchbar>
-    <ion-button class="my-1" expand="block" size="small" (click)="searchItem()">Search</ion-button>
+  <div class="p-2">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <app-item-cart #itemCart [itemInCart]="itemInCart" [useTax]="useTax" [showDetails]="true" [discountGroupMasterList]="discountGroupMasterList" [isItemPriceTaxInclusive]="quotationHeader.isItemPriceTaxInclusive" [isDisplayTaxInclusive]="quotationHeader.isDisplayTaxInclusive" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-cart>
+    </ion-list>
   </div>
-  <app-item-add-grid *ngIf="loadImage" [useTax]="useTax" [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid>
-  <app-item-add-list *ngIf="!loadImage" [useTax]="useTax" [availableItem]="availableItem" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-list>  
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
     View Cart
   </ion-button>
 </ion-footer>
+
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Search Items</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideAddItemModal()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <!-- <app-item-add-grid *ngIf="loadImage" [useTax]="useTax" [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid> -->
+      <app-item-add-list *ngIf="!loadImage" [keyId]="quotationHeader.customerId" [locationId]="quotationHeader.locationId" [useTax]="useTax" [availableItem]="availableItem" (onItemSelected)="onItemSelected($event)"></app-item-add-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>

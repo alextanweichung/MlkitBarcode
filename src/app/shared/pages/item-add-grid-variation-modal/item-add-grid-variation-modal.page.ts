@@ -38,14 +38,14 @@ export class ItemAddGridVariationMPage implements OnInit, OnChanges {
       const itemIds = [...new Set(this.availableItem.map(r => r.itemId))];
       itemIds.forEach(r => {
         let oneItem = this.availableItem.find(rr => rr.itemId === r);
-        this.itemToDisplay.push({
-          itemId: r,
-          itemCode: oneItem.itemCode,
-          itemSku: oneItem.itemSku,
-          description: oneItem.description,
-          unitPrice: this.useTax ? oneItem.unitPrice : oneItem.unitPriceExTax,
-          variationTypeCode: oneItem.variationTypeCode
-        })
+        // this.itemToDisplay.push({
+        //   itemId: r,
+        //   itemCode: oneItem.itemCode,
+        //   itemSku: oneItem.itemSku,
+        //   description: oneItem.description,
+        //   unitPrice: this.useTax ? oneItem.unitPrice : oneItem.unitPriceExTax,
+        //   variationTypeCode: oneItem.variationTypeCode
+        // })
       })
     }
   }

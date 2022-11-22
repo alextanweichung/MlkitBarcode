@@ -1,65 +1,63 @@
 import { VariationDetail } from "src/app/shared/models/variation-detail"
 
 export interface QuotationList {
-   quotationId: number
-   quotationNum: string
-   trxDate: string
-   customerName: string
-   salesAgentName: string
-   countryDescription: string
-   currencyCode: string
-   grandTotal: number
-   qty: number
-   deactivated: boolean
-   createdById: number
- }
- 
+  quotationId: number
+  quotationNum: string
+  trxDate: string
+  customerName: string
+  salesAgentName: string
+  countryDescription: string
+  currencyCode: string
+  grandTotal: number
+  qty: number
+  deactivated: boolean
+  createdById: number
+}
+
 export interface QuotationDto {
   header: QuotationDtoHeader
   details: QuotationDtoLine[]
 }
 
 export interface QuotationDtoHeader {
-  quotationId: number
-  quotationNum: string
-  trxDate: string
-  businessModelType: string
-  typeCode: string
-  sourceType: string
-  customerId: number
-  salesAgentId: number
-  attention: any
-  locationId: number
-  termPeriodId: number
-  workFlowTransactionId?: number
-  countryId: number
-  currencyId: number
-  currencyRate: number
-  quotationUDField1?: any
-  quotationUDField2?: any
-  quotationUDField3?: any
-  quotationUDOption1?: any
-  quotationUDOption2?: any
-  quotationUDOption3?: any
-  totalGrossAmt?: number
-  totalDiscAmt?: number
-  totalTaxAmt?: number
-  grandTotal?: number
-  grandTotalExTax?: number
-  localTotalGrossAmt?: number
-  localTotalDiscAmt?: number
-  localTotalTaxAmt?: number
-  localGrandTotal?: number
-  localGrandTotalExTax?: number
-  printCount?: number
-  childType?: any
-  childId?: any
-  externalDocNum?: any
-  masterUDGroup1?: any
-  masterUDGroup2?: any
-  masterUDGroup3?: any
-  sequence?: number
+  quotationId?: number
+  quotationNum?: string
+  salesAgentId?: number
+  trxDate?: Date
+  typeCode?: string
+  customerId?: number
+  shipAddress?: string
+  shipPostCode?: string
+  shipPhone?: string
+  shipFax?: string
+  shipEmail?: string
+  shipAreaId?: number
+  attention?: string
+  locationId?: number
+  toLocationId?: number;
+  termPeriodId?: number
+  countryId?: number
+  currencyId?: number
+  currencyRate?: number
+  quotationUDField1?: string
+  quotationUDField2?: string
+  quotationUDField3?: string
+  quotationUDOption1?: number
+  quotationUDOption2?: number
+  quotationUDOption3?: number
   deactivated?: boolean
+  workFlowTransactionId?: number
+  createdBy?: string
+  createdAt?: Date
+  masterUDGroup1?: number
+  masterUDGroup2?: number
+  masterUDGroup3?: number
+  isItemPriceTaxInclusive?: boolean
+  isDisplayTaxInclusive?: boolean
+  sourceType?: string
+  businessModelType?: string
+  remark?: string
+  isHomeCurrency?: boolean
 }
 
 export interface QuotationDtoLine {
@@ -98,8 +96,8 @@ export interface QuotationRoot {
 export interface QuotationHeader {
   quotationId: number
   quotationNum: string
-  trxDate: string
-  trxDateTime: string
+  trxDate: Date
+  trxDateTime: Date
   typeCode: string
   sourceType: string
   customerId: number

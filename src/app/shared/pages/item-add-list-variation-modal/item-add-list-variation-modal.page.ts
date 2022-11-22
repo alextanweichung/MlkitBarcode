@@ -1,24 +1,35 @@
+import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { LoadingController } from '@ionic/angular';
 import { Item } from 'src/app/modules/transactions/models/item';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
+import { SearchItemService } from '../../services/search-item.service';
 
 @Component({
   selector: 'app-item-add-list',
   templateUrl: './item-add-list-variation-modal.page.html',
   styleUrls: ['./item-add-list-variation-modal.page.scss'],
+  providers: [DatePipe]
 })
 export class ItemAddListVariationModalPage implements OnInit, OnChanges {
 
+  @Input() keyId: number;
+  @Input() locationId: number;
   @Input() useTax: boolean = false;
   @Input() availableItem: Item[] = [];
   @Input() itemInCart: Item[] = [];
   itemToDisplay: ItemList[] = [];
   
-  @Output() onItemInCartEditCompleted: EventEmitter<Item[]> = new EventEmitter();
+  @Output() onItemSelected: EventEmitter<Item[]> = new EventEmitter();
 
   constructor(
-    private toastService: ToastService
+    private searchItemService: SearchItemService,
+    private toastService: ToastService,
+    private loadingController: LoadingController,
+    private datePipe: DatePipe
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -28,8 +39,40 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+
+  }  
+
+  /* #region  search item */
+
+  searchTextChanged() {
+    this.availableItem = [];
+    this.itemToDisplay = [];
+    // this.availableImages = [];
   }
 
+  itemSearchText: string = 'dt010';
+  // availableImages: ItemImage[] = [];
+  async searchItem() {
+    if (this.itemSearchText && this.itemSearchText.length > 2) {
+      if (Capacitor.getPlatform() !== 'web') {
+        Keyboard.hide();
+      }
+      await this.showLoading();
+      this.searchItemService.getItemListWithTax(this.itemSearchText, this.datePipe.transform(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(async response => {
+        this.availableItem = response;
+        this.distinctItem();
+        // this.toastService.presentToast('Search Complete', '', 'bottom', 'success', 1000);
+        await this.hideLoading();
+      }, async error => {
+        console.log(error);
+        await this.hideLoading();
+      })
+    } else {
+      // this.toastService.presentToast('Error', 'Please key in 3 characters and above to search', 'bottom', 'danger', 1000);
+    }
+  }
+
+  /* #endregion */
 
   distinctItem() {
     this.itemToDisplay = [];
@@ -42,16 +85,21 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
           itemCode: oneItem.itemCode,
           itemSku: oneItem.itemSku,
           description: oneItem.description,
-          unitPrice: this.useTax ? oneItem.unitPrice : oneItem.unitPriceExTax,
+          unitPrice: oneItem.unitPrice,
+          unitPriceExTax: oneItem.unitPriceExTax,
+          taxId: oneItem.taxId,
+          taxPct: oneItem.taxPct,
+          subTotal: null,
+          subTotalExTax: null,
           variationTypeCode: oneItem.variationTypeCode
         })
       })
     }
+    console.log("🚀 ~ file: item-add-list-variation-modal.page.ts ~ line 98 ~ ItemAddListVariationModalPage ~ distinctItem ~ this.itemToDisplay", this.itemToDisplay)
   }
 
   decreaseQty(data: ItemList) {
     // only for variationTypeCode === '0'
-    // this.ngZone.run(() => {
     if (isNaN(data.qtyRequest) || data.qtyRequest === 0) {
       data.qtyRequest = 0;
     } else {
@@ -61,28 +109,20 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
         data.qtyRequest = 0;
       }
     }
-    // })
   }
 
   increaseQty(data: ItemList) {
     // only for variationTypeCode === '0'
-    // this.ngZone.run(() => {
     data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-    // })
   }
 
   addItemToCart(data: ItemList) {
     // only for variationTypeCode === '0'
-    if (this.itemInCart.findIndex(r => r.itemId === data.itemId && r.variationTypeCode === '0') > -1) {
-      this.itemInCart.find(r => r.itemId === data.itemId && r.variationTypeCode === '0').qtyRequest += data.qtyRequest;
-    } else {
-      let d = this.availableItem.find(r => r.itemId === data.itemId && r.variationTypeCode === '0');
-      d.qtyRequest = data.qtyRequest;
-      this.itemInCart.push(JSON.parse(JSON.stringify(d)));
-    }    
-    data.qtyRequest = null;
-    this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
+    // this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
+    let t = {...this.availableItem.find(r => r.itemSku === data.itemSku)};
+    t.qtyRequest = data.qtyRequest;
+    this.onItemSelected.emit([t]);
+    this.itemToDisplay.forEach(r => r.qtyRequest = null); // clear qty
   }
 
   isModalOpen: boolean = false;
@@ -98,7 +138,7 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
   }
 
   increaseVariationQty(item: Item) {
-    // only for variationTypeCode !== '0'    
+    // only for variationTypeCode !== '0'
     item.qtyRequest = (item.qtyRequest ?? 0) + 1;
   }
 
@@ -115,28 +155,32 @@ export class ItemAddListVariationModalPage implements OnInit, OnChanges {
     }
   }
 
-  addItemVariationToCart() {
-    if (this.isModalOpen && this.itemToViewVariation.length > 0) {
-      this.itemToViewVariation.forEach(r => {
-        if (r.qtyRequest && r.qtyRequest > 0) {
-          if (this.itemInCart.findIndex(rr => rr.itemId === r.itemId && rr.itemSku === r.itemSku) > -1) {
-            this.itemInCart.find(rr => rr.itemId === r.itemId && rr.itemSku === r.itemSku).qtyRequest += r.qtyRequest;
-          } else {
-            this.itemInCart.push(JSON.parse(JSON.stringify(r)));
-          }
-        }
-      })
-    }
+  async addItemVariationToCart() {    
+    // this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
+    await this.onItemSelected.emit(this.itemToViewVariation.filter(r => r.qtyRequest > 0));
     this.hideModal();
-    this.availableItem.forEach(r => r.qtyRequest = null);
-    this.toastService.presentToast('Success', 'Item successfully added to cart.', 'bottom', 'success', 1000);
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
+  
+  /* #region  misc */
 
-  highlight(event) {
+  selectAll(event) {
     event.getInputElement().then(r => {
       r.select();
     })
   }
-  
+
+  async showLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Loading...',
+      spinner: 'circles',
+    });
+
+    loading.present();
+  }
+
+  async hideLoading() {
+    this.loadingController.dismiss();
+  }
+
+  /* #endregion */
 }

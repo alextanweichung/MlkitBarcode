@@ -38,7 +38,7 @@ export class CommonService {
     return today;
   }
 
-  syncAllItemByLocationCode() {
+  syncInbound() {
     return this.http.get(this.baseUrl + "PosDownload/itemMaster/KLCC/2022-10-31");
   }
 
@@ -180,8 +180,18 @@ export class CommonService {
     return trxLine.unitPriceExTax;
   }
 
-  computeAmtInclTax(amount: number, taxPct: number){
-    let amtInclTax = amount * (1 + (taxPct/100));
+  computeUnitPrice(trxLine: any, useTax: boolean, roundingPrecision: number) {
+    if (useTax) {
+      trxLine.unitPrice = this.computeAmtInclTax(trxLine.unitPriceExTax, trxLine.taxPct);
+    } else {
+      trxLine.unitPrice = trxLine.unitPriceExTax;
+    }
+    trxLine.unitPrice = this.roundToPrecision(trxLine.unitPrice, roundingPrecision);
+    return trxLine.unitPrice;
+  }
+
+  computeAmtInclTax(amount: number, taxPct: number) {
+    let amtInclTax = amount * (1 + (taxPct / 100));
     return amtInclTax;
   }
 

@@ -1,13 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController } from '@ionic/angular';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { Customer } from 'src/app/modules/transactions/models/customer';
 import { Item } from 'src/app/modules/transactions/models/item';
-import { QuotationDto, QuotationDtoLine, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
+import { QuotationDto, QuotationDtoHeader, QuotationDtoLine, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
   selector: 'app-quotation-confirmation',
@@ -17,10 +17,14 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 })
 export class QuotationConfirmationPage implements OnInit {
 
-  customer: Customer;
+  quotationHeader: QuotationDtoHeader;
   itemInCart: Item[];
+  
+  moduleControl: ModuleControl[] = [];
+  useTax: boolean = false;
 
   constructor(
+    private authService: AuthService,
     private quotationService: QuotationService,
     private navController: NavController,
     private alertController: AlertController,
@@ -29,80 +33,38 @@ export class QuotationConfirmationPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.customer = this.quotationService.selectedCustomer;
+    this.quotationHeader = this.quotationService.quotationHeader;
     this.itemInCart = this.quotationService.itemInCart;
     this.recalculateTotals();
-    if (!this.customer || this.customer === undefined) {
-      this.toastService.presentToast('Something went wrong', 'Please select a Customer', 'bottom', 'danger', 1000);
+    if (!this.quotationHeader || this.quotationHeader === undefined) {
       this.navController.navigateBack('/transactions/quotation/quotation-header');
     }
     if (!this.itemInCart || this.itemInCart === undefined || this.itemInCart.length === 0) {
       this.toastService.presentToast('Nothing in cart', 'Please select some Item', 'bottom', 'medium', 1000);
     }
+    this.loadModuleControl();
     this.loadMasterList();
   }
 
-  locationMasterList: MasterListDetails[] = [];
-  salesAgentMasterList: MasterListDetails[] = [];
-  termPeriodMasterList: MasterListDetails[] = [];
-  countryMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.quotationService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.termPeriodMasterList = response.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.countryMasterList = response.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.setDefaultValue();
+  loadModuleControl() {
+    this.authService.moduleControlConfig$.subscribe(obj => {
+      this.moduleControl = obj;
+      let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+      if (SystemWideActivateTaxControl != undefined) {
+        this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+      }
     }, error => {
       console.log(error);
     })
   }
 
-  defaultLocation: number;
-  defaultTermPeriod: number;
-  defaultCountry: number;
-  defaultCurrency: number;
-  defaultExchangeRate: number;
-  setDefaultValue() {
-    if (this.customer.locationId) {
-      this.defaultLocation = this.customer.locationId;
-    } else {
-      let defaultLocation = this.locationMasterList.find(item => item.isPrimary)?.id;
-      if (defaultLocation) {
-        this.defaultLocation = defaultLocation;
-      }
-    }
-
-    if (this.customer.termPeriodId) {
-      this.defaultTermPeriod = this.customer.termPeriodId;
-    } else {
-      let defaultTermPeriod = this.termPeriodMasterList.find(item => item.isPrimary)?.id;
-      if (defaultTermPeriod) {
-        this.defaultTermPeriod = defaultTermPeriod;
-      }
-    }
-
-    if (this.customer.countryId) {
-      this.defaultCountry = this.customer.countryId
-    } else {
-      let defaultCountry = this.countryMasterList.find(item => item.isPrimary)?.id;
-      if (defaultCountry) {
-        this.defaultCountry = defaultCountry;
-      }
-    }
-
-    if (this.customer.currencyId) {
-      this.defaultCurrency = this.customer.currencyId;
-    } else {
-      let defaultCurrency = this.currencyMasterList.find(item => item.isPrimary)?.id;
-      if (defaultCurrency) {
-        this.defaultCurrency = defaultCurrency;
-      }
-    }
-
-    this.defaultExchangeRate = parseFloat(this.currencyMasterList.find(r => r.id == this.defaultCurrency).attribute1);
+  customerMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.quotationService.getMasterList().subscribe(response => {
+      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    }, error => {
+      console.log(error);
+    })
   }
 
   onItemInCartEditCompleted(event) {
@@ -111,11 +73,20 @@ export class QuotationConfirmationPage implements OnInit {
   }
 
   totalQuantity: number = 0;
-  totalAmount: number = 0;
+  subtotalBeforeTax: number = 0;
+  taxAmount: number = 0;
+  netTotal: number = 0;
   recalculateTotals() {
     if (this.itemInCart && this.itemInCart.length > 0) {
       this.totalQuantity = this.itemInCart.flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
-      this.totalAmount = this.itemInCart.flatMap(r => r.qtyRequest * r.unitPrice).reduce((a, c) => Number(a) + Number(c));
+      this.subtotalBeforeTax = this.itemInCart.flatMap(r => (r.qtyRequest * r.unitPriceExTax) - r.discountAmtExTax).reduce((a, c) => Number(a) + Number(c));
+      this.taxAmount = this.itemInCart.flatMap(r => r.taxAmt).reduce((a,c) => Number(a) + Number(c));
+      this.netTotal = this.itemInCart.flatMap(r => (r.qtyRequest * r.unitPrice) - r.discountAmt).reduce((a, c) => Number(a) + Number(c));
+    } else {
+      this.totalQuantity = null;
+      this.subtotalBeforeTax = null;
+      this.taxAmount = null;
+      this.netTotal = null;
     }
   }
 
@@ -144,9 +115,8 @@ export class QuotationConfirmationPage implements OnInit {
   }
 
   async insertQuotation() {
-    // const result = await this.presentInsertConfirmation();
-    // connectableObservableDescriptor.lo
-    // if (result) {
+    console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 83 ~ QuotationConfirmationPage ~ insertQuotation ~ this.quotationHeader", this.quotationHeader)
+    console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 83 ~ QuotationConfirmationPage ~ insertQuotation ~ this.itemInCart", this.itemInCart)
     let trxLineArray: QuotationDtoLine[] = [];
     this.quotationService.itemInCart.forEach(e => {
       let objectLine: QuotationDtoLine = {
@@ -164,7 +134,7 @@ export class QuotationConfirmationPage implements OnInit {
         unitPrice: e.unitPrice,
         unitPriceExTax: e.unitPriceExTax,
         sequence: 0,
-        locationId: this.customer.locationId,
+        locationId: this.quotationHeader.locationId,
         deactivated: true
       }
       trxLineArray = [...trxLineArray, objectLine];
@@ -173,22 +143,23 @@ export class QuotationConfirmationPage implements OnInit {
       header: {
         quotationId: 0,
         quotationNum: null,
-        trxDate: this.datePipe.transform(new Date, 'yyyy-MM-dd'),
-        businessModelType: this.customer.businessModelType,
-        typeCode: (this.customer.businessModelType === 'T' || this.customer.businessModelType === 'F') ? 'S' : 'T', // Sales
+        trxDate: new Date(),
+        businessModelType: this.quotationHeader.businessModelType,
+        typeCode: (this.quotationHeader.businessModelType === 'T' || this.quotationHeader.businessModelType === 'F') ? 'S' : 'T', // Sales
         sourceType: 'M', // Mobile
-        locationId: this.defaultLocation,
-        customerId: this.customer.customerId,
+        locationId: this.quotationHeader.locationId,
+        customerId: this.quotationHeader.customerId,
         attention: null,
         salesAgentId: JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId,
-        termPeriodId: this.defaultTermPeriod,
-        countryId: this.defaultCountry,
-        currencyId: this.defaultCurrency,
-        currencyRate: this.defaultExchangeRate
+        termPeriodId: this.quotationHeader.termPeriodId,
+        countryId: this.quotationHeader.countryId,
+        currencyId: this.quotationHeader.currencyId,
+        currencyRate: this.quotationHeader.currencyRate
       },
       details: trxLineArray,
     }
     this.quotationService.insertQuotation(trxDto).subscribe(response => {
+      console.log("🚀 ~ file: quotation-confirmation.page.ts ~ line 132 ~ QuotationConfirmationPage ~ this.quotationService.insertQuotation ~ response", response)
       let details: any[] = response.body["details"];
       let totalQty: number = 0;
       details.forEach(e => {
@@ -197,7 +168,7 @@ export class QuotationConfirmationPage implements OnInit {
 
       let qs: QuotationSummary = {
         quotationNum: response.body["header"]["quotationNum"],
-        customerName: this.customer.name,
+        customerName: this.customerMasterList.find(r => r.id === this.quotationHeader.customerId).description,
         totalQuantity: totalQty,
         totalAmount: response.body["header"]["totalGrossAmt"]
       }

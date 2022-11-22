@@ -1,3 +1,8 @@
+
+<div class="p-2">
+  <ion-searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionChange)="searchTextChanged()" (search)="searchItem()"></ion-searchbar>
+  <ion-button class="my-1" expand="block" size="small" (click)="searchItem()">Search</ion-button>
+</div>
 <div class="main-card ion-no-padding">
   <ion-grid *ngIf="itemToDisplay.length > 0">
     <ion-row>
@@ -9,9 +14,6 @@
                 <ion-row>
                   <ion-col>
                     {{item.itemCode}}
-                  </ion-col>
-                  <ion-col class="ion-flex justify-content-end">
-                    {{item.unitPrice|number:'1.2'}}
                   </ion-col>
                 </ion-row>
               </ion-grid>
@@ -27,7 +29,7 @@
                   </ion-button>
                 </ion-col>
                 <ion-col>
-                  <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" (ionFocus)="highlight(input)" placeholder="0"></ion-input>
+                  <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" (ionFocus)="selectAll(input)" placeholder="0"></ion-input>
                 </ion-col>
                 <ion-col>
                   <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(item)">
@@ -90,7 +92,7 @@
                         </ion-button>
                       </ion-col>
                       <ion-col class="ion-margin-auto">
-                        <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" (ionFocus)="highlight(input)" placeholder="0"></ion-input>
+                        <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" (ionFocus)="selectAll(input)" placeholder="0"></ion-input>
                       </ion-col>
                       <ion-col class="ion-margin-auto">
                         <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(item)">
