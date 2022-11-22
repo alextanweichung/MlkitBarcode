@@ -89,7 +89,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/quotation/quotation-detail',
-    loadChildren: () => import('./modules/transactions/pages/quotation/quotation-detail/detail/detail.module').then(m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/quotation/quotation-detail/quotation-detail.module').then(m => m.QuotationDetailPageModule)
   },
   // transaction-sales-order
   {

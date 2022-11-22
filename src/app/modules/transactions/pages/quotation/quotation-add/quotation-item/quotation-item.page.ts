@@ -1,10 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
+import { Component, OnInit } from '@angular/core';
 import { LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
 import { Item } from 'src/app/modules/transactions/models/item';
-import { QuotationDtoHeader } from 'src/app/modules/transactions/models/quotation';
+// import { QuotationDtoHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -22,7 +20,7 @@ import { SearchItemService } from 'src/app/shared/services/search-item.service';
 })
 export class QuotationItemPage implements OnInit, ViewDidEnter {
 
-  quotationHeader: QuotationDtoHeader;
+  // quotationHeader: QuotationDtoHeader;
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
@@ -47,14 +45,14 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   }
 
   ngOnInit() {
-    this.quotationHeader = this.quotationService.quotationHeader;
-    this.itemInCart = this.quotationService.itemInCart;
-    if (!this.quotationHeader || this.quotationHeader === undefined) {
-      this.navController.navigateBack('/transactions/quotation/quotation-header');
-    }
-    this.loadImage = this.configService.sys_parameter.loadImage;
-    this.loadModuleControl();
-    this.loadMasterList();
+    // this.quotationHeader = this.quotationService.quotationHeader;
+    // this.itemInCart = this.quotationService.itemInCart;
+    // if (!this.quotationHeader || this.quotationHeader === undefined) {
+    //   this.navController.navigateBack('/transactions/quotation/quotation-header');
+    // }
+    // this.loadImage = this.configService.sys_parameter.loadImage;
+    // this.loadModuleControl();
+    // this.loadMasterList();
   }
 
   loadModuleControl() {
@@ -131,47 +129,47 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   async computeAllAmount() {
     await this.itemInCart.forEach(r => {
       // r = this.assignLineUnitPrice(r);
-      if (this.quotationHeader.isItemPriceTaxInclusive) {
-        this.computeUnitPriceExTax(r);
-      } else {
-        this.computeUnitPrice(r);
-      }
+      // if (this.quotationHeader.isItemPriceTaxInclusive) {
+      //   this.computeUnitPriceExTax(r);
+      // } else {
+      //   this.computeUnitPrice(r);
+      // }
     })
   }
 
   computeUnitPriceExTax(trxLine: Item) {
-    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.quotationHeader.maxPrecision);
+    // trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.quotationHeader.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
     // this.onEditComplete();
   }
 
   computeUnitPrice(trxLine: Item) {
     trxLine.unitPriceExTax = trxLine.unitPrice;
-    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.quotationHeader.maxPrecision);
+    // trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.quotationHeader.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
     // this.onEditComplete();
   }
 
   computeDiscTaxAmount(trxLine: Item) {
-    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.quotationHeader.isItemPriceTaxInclusive, this.quotationHeader.maxPrecision);
+    // trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.quotationHeader.isItemPriceTaxInclusive, this.quotationHeader.maxPrecision);
     // this.onEditComplete();
   }
 
   assignLineUnitPrice(item: Item) {
     if (this.useTax) {
-      if (this.quotationHeader.isItemPriceTaxInclusive) {
-        item.unitPrice = item.unitPrice;
-        item.unitPriceExTax = this.commonService.computeAmtExclTax(item.unitPrice, item.taxPct);
-      } else {
-        item.unitPrice = this.commonService.computeAmtInclTax(item.unitPrice, item.taxPct);
-        item.unitPriceExTax = item.unitPrice;
-      }
+      // if (this.quotationHeader.isItemPriceTaxInclusive) {
+      //   item.unitPrice = item.unitPrice;
+      //   item.unitPriceExTax = this.commonService.computeAmtExclTax(item.unitPrice, item.taxPct);
+      // } else {
+      //   item.unitPrice = this.commonService.computeAmtInclTax(item.unitPrice, item.taxPct);
+      //   item.unitPriceExTax = item.unitPrice;
+      // }
     } else {
       item.unitPrice = item.unitPrice;
       item.unitPriceExTax = item.unitPrice;
     }
-    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.quotationHeader.maxPrecision);
-    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.quotationHeader.maxPrecision);
+    // item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.quotationHeader.maxPrecision);
+    // item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.quotationHeader.maxPrecision);
     return item;
   }
 

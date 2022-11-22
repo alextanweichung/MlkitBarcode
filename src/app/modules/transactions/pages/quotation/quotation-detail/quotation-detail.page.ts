@@ -1,45 +1,40 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { QuotationDto, QuotationDtoLine, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
-import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
+import { QuotationRoot } from '../../../models/quotation';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: 'app-quotation-detail',
+  templateUrl: './quotation-detail.page.html',
+  styleUrls: ['./quotation-detail.page.scss'],
 })
-export class DetailPage implements OnInit {
+export class QuotationDetailPage implements OnInit {
 
-  parent: string = 'Quotations'
-
-  quotationId: number;
-  quotation: QuotationRoot;
-  flattenQuotation: QuotationDto;
+  objectId: number
+  object: QuotationRoot;
 
   constructor(
+    private quotationService: QuotationService,
     private route: ActivatedRoute,
-    private navController: NavController,
-    private toastService: ToastService,
-    private quotationService: QuotationService
+    private navController: NavController
   ) {
     this.route.queryParams.subscribe(params => {
-      this.quotationId = params['quotationId'];
-      if (params['parent']) {
-        this.parent = params['parent'];
+      this.objectId = params['objectId'];
+      if (!this.objectId) {
+        this.navController.navigateBack('/transactions/quotation');
       }
     })
   }
 
   ngOnInit() {
-    if (!this.quotationId) {
-      this.toastService.presentToast('Something went wrong!', 'Quotation Id not available', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/quotation')
+    if (!this.objectId) {
+      this.navController.navigateBack('/transactions/quotation')
     } else {
       this.loadMasterList();
-      this.loadDetail();
+      this.loadObject();
     }
   }
 
@@ -56,10 +51,9 @@ export class DetailPage implements OnInit {
     })
   }
 
-  loadDetail() {
-    this.quotationService.getQuotationDetail(this.quotationId).subscribe(response => {
-      this.quotation = response;
-      this.flattenQuotation = this.quotationService.flattenDtoDetail(this.quotation);
+  loadObject() {
+    this.quotationService.getObjectById(this.objectId).subscribe(response => {
+      this.object = response;
     }, error => {
       console.log(error);
     })
@@ -74,8 +68,8 @@ export class DetailPage implements OnInit {
     return defaultImageUrl;
   }
 
-  getFlattenVariations(itemId: number): QuotationDtoLine[] {
-    return this.flattenQuotation.details.filter(r => r.itemId === itemId);
+  filter(details: InnerVariationDetail[]) {
+    return details.filter(r => r.qtyRequest > 0);
   }
 
 }

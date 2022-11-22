@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { DetailPageRoutingModule } from './detail-routing.module';
+import { QuotationDetailPageRoutingModule } from './quotation-detail-routing.module';
 
-import { DetailPage } from './detail.page';
+import { QuotationDetailPage } from './quotation-detail.page';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
@@ -15,10 +15,10 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     CommonModule,
     FormsModule,
     IonicModule,
-    DetailPageRoutingModule,
+    QuotationDetailPageRoutingModule,
     SumModule,
     IdMappingModule
   ],
-  declarations: [DetailPage]
+  declarations: [QuotationDetailPage]
 })
-export class DetailPageModule {}
+export class QuotationDetailPageModule {}

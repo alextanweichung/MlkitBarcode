@@ -3,11 +3,12 @@ import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
-import { QuotationDto, QuotationDtoHeader, QuotationDtoLine, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
+import { QuotationHeader, QuotationList, QuotationRoot } from '../models/quotation';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,10 +22,6 @@ export class QuotationService {
 
   baseUrl: string;
 
-  quotationHeader: QuotationDtoHeader;
-  itemInCart: Item[] = [];
-  quotationSummary: QuotationSummary;
-
   constructor(
     private http: HttpClient,
     private configService: ConfigService
@@ -32,113 +29,50 @@ export class QuotationService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
-  setHeader(quotationHeader: QuotationDtoHeader) {
-    this.quotationHeader = quotationHeader;
+  /* #region  for insert */
+
+  header: QuotationHeader;
+  itemInCart: Item[] = [];
+  // quotationSummary: QuotationSummary;
+  setHeader(header: QuotationHeader) {
+    this.header = header;
   }
 
   setChoosenItems(item: Item[]) {
     this.itemInCart = JSON.parse(JSON.stringify(item));
   }
 
-  setQuotationSummary(qs: QuotationSummary) {
-    this.quotationSummary = qs;
+  setQuotationSummary(qs: any) {
+    // this.quotationSummary = qs;
   }
 
   removeCustomer() {
-    this.quotationHeader = null;
+    this.header = null;
   }
 
   removeItems() {
     this.itemInCart = [];
   }
 
-  removeQuotationSummary() {
-    this.quotationSummary = null;
+  removeSummary() {
+    // this.quotationSummary = null;
   }
 
   resetVariables() {
     this.removeCustomer();
     this.removeItems();
-    this.removeQuotationSummary();
+    this.removeSummary();
   }
 
-  flattenDtoDetail(quotation: QuotationRoot): QuotationDto {
-    let line: QuotationDtoLine[] = [];
-    quotation.details.forEach(r => {
-      if (r.variationTypeCode === '0') {
-        let l: QuotationDtoLine = {
-          quotationLineId: r.lineId,
-          quotationId: r.headerId,
-          itemId: r.itemId,
-          itemVariationXId: null,
-          itemVariationYId: null,
-          itemCode: r.itemCode,
-          itemSku: r.itemSku,
-          description: r.description,
-          extendedDescription: r.extendedDescription,
-          qtyRequest: r.qtyRequest,
-          unitPrice: r.unitPrice,
-          unitPriceExTax: r.unitPriceExTax,
-          subTotal: r.subTotal,
-          subTotalExTax: r.subTotalExTax,
-          sequence: r.sequence,
-          locationId: r.locationId,
-          deactivated: r.deactivated
-        }
-        line.push(l);
-      } else {
-        r.variationDetails.forEach(v => {
-          v.details.forEach(d => {
-            let l: QuotationDtoLine = {
-              quotationLineId: r.lineId,
-              quotationId: r.headerId,
-              itemId: r.itemId,
-              itemVariationXId: v.itemVariationXId,
-              itemVariationYId: d.itemVariationYId,
-              itemCode: r.itemCode,
-              itemSku: r.itemSku,
-              description: r.description,
-              extendedDescription: r.extendedDescription,
-              qtyRequest: d.qtyRequest,
-              unitPrice: r.unitPrice,
-              unitPriceExTax: r.unitPriceExTax,
-              subTotal: (d.qtyRequest ?? 0) * (r.unitPrice ?? 0),
-              subTotalExTax: (d.qtyRequest ?? 0) * (r.unitPriceExTax ?? 0),
-              sequence: r.sequence,
-              locationId: r.locationId,
-              deactivated: r.deactivated
-            }
-            if (l.qtyRequest && l.qtyRequest > 0) {
-              line.push(l);
-            }
-          })
-        })
-      }
-    })
-
-    let dto: QuotationDto = {
-      header: {
-        quotationId: quotation.header.quotationId,
-        quotationNum: quotation.header.quotationNum,
-        trxDate: quotation.header.trxDate,
-        businessModelType: quotation.header.businessModelType,
-        typeCode: quotation.header.typeCode,
-        sourceType: quotation.header.sourceType,
-        customerId: quotation.header.customerId,
-        salesAgentId: quotation.header.salesAgentId,
-        attention: quotation.header.attention,
-        locationId: quotation.header.locationId,
-        termPeriodId: quotation.header.termPeriodId,
-        workFlowTransactionId: quotation.header.workFlowTransactionId,
-        countryId: quotation.header.countryId,
-        currencyId: quotation.header.currencyId,
-        currencyRate: quotation.header.currencyRate
-      },
-      details: line
+  hasSalesAgent():boolean {
+    let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
+    if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
+      return false;
     }
-
-    return dto;
+    return true
   }
+
+  /* #endregion */
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/masterlist").pipe(
@@ -160,36 +94,44 @@ export class QuotationService {
     return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer");
   }
 
-  getItemList(keyword: string, customerId: number, locationId: number) {
-    return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemList/" + keyword + "/" + customerId + "/" + locationId, { context: background_load() }).pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
-  }
-  
-  getItemListWithTax(keyword: string, trxDate: string, customerId: number, locationId: number) {
-    return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemListWithTax/" + keyword + "/" + trxDate + "/" + customerId + "/" + locationId, { context: background_load() });
+  // getItemList(keyword: string, customerId: number, locationId: number) {
+  //   return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemList/" + keyword + "/" + customerId + "/" + locationId, { context: background_load() }).pipe(
+  //     map((response: any) =>
+  //       response.map((item: any) => item)
+  //     )
+  //   );
+  // }
+
+  // getItemListWithTax(keyword: string, trxDate: string, customerId: number, locationId: number) {
+  //   return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemListWithTax/" + keyword + "/" + trxDate + "/" + customerId + "/" + locationId, { context: background_load() });
+  // }
+
+  // getItemImageFile(keyword: string) {
+  //   return this.http.get<ItemImage[]>(this.baseUrl + "MobileQuotation/itemList/imageFile/" + keyword, { context: background_load() });
+  // }
+
+  // getObjectList(startDate: Date, endDate: Date) {
+  //   return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
+  // }
+
+  getObjectList() {
+    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/qtlist");
   }
 
-  getItemImageFile(keyword: string) {
-    return this.http.get<ItemImage[]>(this.baseUrl + "MobileQuotation/itemList/imageFile/" + keyword, { context: background_load() });
+  getObjectListByDate(startDate: string, endDate: string) {
+    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + startDate + "/" + endDate);
   }
 
-  getQuotationList(startDate: Date, endDate: Date) {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
-  }
-  
-  getRecentQuotationList() {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/recentListing");
+  getObjectById(objectId: number) {
+    return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + objectId);
   }
 
-  getQuotationDetail(quotationId: number) {
-    return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + quotationId);
-  }
+  // getQuotationDetail(objectId: number) {
+  //   return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + objectId);
+  // }
 
-  insertQuotation(quotationDto: QuotationDto) {
-    return this.http.post(this.baseUrl + "MobileQuotation", quotationDto, httpObserveHeader);
-  }
+  // insertQuotation(object: QuotationRoot) {
+  //   return this.http.post(this.baseUrl + "MobileQuotation", object, httpObserveHeader);
+  // }
 
 }

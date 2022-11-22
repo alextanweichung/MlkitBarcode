@@ -26,7 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'quotation-detail',
-    loadChildren: () => import('./quotation-detail/detail/detail.module').then( m => m.DetailPageModule)
+    loadChildren: () => import('./quotation-detail/quotation-detail.module').then( m => m.QuotationDetailPageModule)
   }
 ];
 
