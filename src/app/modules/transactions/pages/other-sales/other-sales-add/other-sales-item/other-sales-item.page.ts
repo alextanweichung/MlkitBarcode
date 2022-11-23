@@ -285,7 +285,7 @@ export class OtherSalesItemPage implements OnInit {
   }
 
   computeDiscTaxAmount(line: OtherSalesDetail) {
-    line = this.commonService.computeDiscTaxAmount(line, this.useTax, this.otherSalesHeader.isDisplayTaxInclusive, this.maxPrecision);
+    line = this.commonService.computeDiscTaxAmount(line, this.useTax, this.otherSalesHeader.isItemPriceTaxInclusive, this.otherSalesHeader.isDisplayTaxInclusive, this.maxPrecision);
     console.log("🚀 ~ file: other-sales-item.page.ts ~ line 275 ~ OtherSalesItemPage ~ computeDiscTaxAmount ~ line", line)
   }
 

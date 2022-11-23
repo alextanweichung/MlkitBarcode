@@ -154,7 +154,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
   }
 
   computeDiscTaxAmount(trxLine: Item) {
-    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.salesOrderHeader.isItemPriceTaxInclusive, this.maxPrecision);
+    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.salesOrderHeader.isItemPriceTaxInclusive, this.salesOrderHeader.isDisplayTaxInclusive, this.maxPrecision);
     // this.onEditComplete();
   }
 

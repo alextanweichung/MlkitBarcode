@@ -1,27 +1,29 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import { Item } from 'src/app/modules/transactions/models/item';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemList } from '../../models/item-list';
 import { MasterListDetails } from '../../models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { TransactionDetail } from '../../models/transaction-detail';
+import { InnerVariationDetail } from '../../models/variation-detail';
 
 @Component({
   selector: 'app-item-cart',
   templateUrl: './item-cart.page.html',
   styleUrls: ['./item-cart.page.scss'],
 })
-export class ItemCartPage implements OnInit, OnChanges {
+export class ItemCartPage implements OnInit {
 
-  @Input() itemInCart: Item[] = [];
+  @Input() itemInCart: TransactionDetail[] = [];
   @Input() useTax: boolean;
   @Input() maxPrecision: number = 2;
   @Input() maxPrecisionTax: number = 2;
   @Input() isDisplayTaxInclusive: boolean = true;
   @Input() discountGroupMasterList: MasterListDetails[] = [];
-  @Input() showDetails: boolean = false;
+  @Input() itemVariationXMasterList: MasterListDetails[] = [];
+  @Input() itemVariationYMasterList: MasterListDetails[] = [];
   @Input() isItemPriceTaxInclusive: boolean = false;
-  @Output() onItemInCartEditCompleted: EventEmitter<Item[]> = new EventEmitter();
+  @Output() onItemInCartEditCompleted: EventEmitter<TransactionDetail> = new EventEmitter();
+  @Output() onItemInCartDeleteCompleted: EventEmitter<TransactionDetail[]> = new EventEmitter();
 
   constructor(
     private alertController: AlertController,
@@ -29,87 +31,53 @@ export class ItemCartPage implements OnInit, OnChanges {
     private commonService: CommonService,
   ) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.itemInCart) {
-      this.combineItemWithVariations();
-    }
-  }
-
   ngOnInit() {
-
+    
   }
 
-  itemToDisplay: ItemList[] = [];
-  combineItemWithVariations() {
-    this.itemToDisplay = [];
-    if (this.itemInCart.length > 0) {
-      const itemIds = [...new Set(this.itemInCart.map(r => r.itemId))];
-      itemIds.forEach(r => {
-        let oneItem = this.itemInCart.find(rr => rr.itemId === r);
-        this.itemToDisplay.push({
-          itemId: r,
-          itemCode: oneItem.itemCode,
-          itemSku: oneItem.itemSku,
-          description: oneItem.description,
-          unitPrice: oneItem.unitPrice,
-          unitPriceExTax: oneItem.unitPriceExTax,
-          discountGroupCode: oneItem.discountGroupCode,
-          discountExpression: oneItem.discountExpression,
-          discountAmt: oneItem.discountAmt,
-          discountAmtExTax: oneItem.discountAmtExTax,
-          taxId: oneItem.taxId,
-          taxPct: oneItem.taxPct,
-          subTotal: oneItem.subTotal,
-          subTotalExTax: oneItem.subTotalExTax,
-          variationTypeCode: oneItem.variationTypeCode,
-          qtyRequest: oneItem.qtyRequest
-        })
-      })
+  /* #region  variation type 0 */
+
+  async decreaseQty(trxLine: TransactionDetail) {
+    if (trxLine.qtyRequest - 1 === 0) {
+      await this.presentDeleteItemAlert(trxLine);
+    } else {
+      trxLine.qtyRequest -= 1;
+      this.onItemInCartEditCompleted.emit(trxLine);
     }
   }
 
-  async decreaseQty(item) {
-    item.qtyRequest--;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
+  increaseQty(trxLine: TransactionDetail) {
+    trxLine.qtyRequest = (trxLine.qtyRequest ?? 0) + 1;
+    this.onItemInCartEditCompleted.emit(trxLine);
+  }
+
+  /* #endregion */
+
+  /* #region  variation type 1 and 2 */
+
+  async decreaseVariationQty(trxLine: TransactionDetail, data: InnerVariationDetail) {
+    if (data.qtyRequest - 1 === 0) {
+      await this.presentDeleteItemVariationAlert(trxLine, data);
+    } else {
+      data.qtyRequest -= 1;
+      this.onItemInCartEditCompleted.emit(trxLine);
     }
-    if (item.qtyRequest === 0) {
-      this.presentDeleteAlert(item.itemSku);
-    }
-    await this.computeAllAmount();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
 
-  async increaseQty(item) {
-    item.qtyRequest++;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
-    }
-    await this.computeAllAmount();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
+  increaseVariationQty(trxLine: TransactionDetail, data: InnerVariationDetail) {
+    data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+    this.onItemInCartEditCompleted.emit(trxLine);
   }
 
-  async resetQtyBackToOne(itemSku: string) {
-    this.itemInCart.find(r => r.itemSku === itemSku).qtyRequest = 1;
-    this.combineItemWithVariations();
-    await this.computeAllAmount();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
+  filter(data: InnerVariationDetail[]) {
+    return data.filter(r => r.qtyRequest > 0);
   }
 
-  async qtyChanged() {
-    await this.computeAllAmount();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
-  }
+  /* #endregion */
+  
+  /* #region  delete */
 
-  getVariationSum(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
-  }
-
-  getVariations(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId);
-  }
-
-  async presentDeleteAlert(itemSku: string) {
+  async presentDeleteItemAlert(item: TransactionDetail) {
     const alert = await this.alertController.create({
       header: 'Are you sure to delete?',
       buttons: [
@@ -117,65 +85,60 @@ export class ItemCartPage implements OnInit, OnChanges {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            this.resetQtyBackToOne(itemSku);
+            item.qtyRequest = 1;
           }
         },
         {
           text: 'OK',
           role: 'confirm',
           handler: () => {
-            this.removeItemBySku(itemSku);
+            this.removeItemById(item);
           },
         },
       ],
     });
-
     await alert.present();
   }
 
-  async presentDeleteItemAlert(itemId: number) {
+  async removeItemById(item: TransactionDetail) {
+    this.itemInCart = JSON.parse(JSON.stringify(this.itemInCart.filter(r => r.itemId !== item.itemId)));
+    this.onItemInCartDeleteCompleted.emit(this.itemInCart);
+    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
+  }  
+
+  async presentDeleteItemVariationAlert(trxLine: TransactionDetail, item: InnerVariationDetail) {
     const alert = await this.alertController.create({
       header: 'Are you sure to delete?',
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
+          handler: () => {
+            item.qtyRequest = 1;
+          }
         },
         {
           text: 'OK',
           role: 'confirm',
           handler: () => {
-            this.removeItemById(itemId);
+            item.qtyRequest = null;
+            this.onItemInCartEditCompleted.emit(trxLine);
           },
         },
       ],
     });
-
     await alert.present();
   }
 
-  async removeItemBySku(itemSku: string) {
-    this.itemInCart.splice(this.itemInCart.findIndex(r => r.itemSku === itemSku), 1);
-    this.combineItemWithVariations();
-    await this.computeAllAmount();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
-  }
-
-  async removeItemById(itemId: number) {
-    this.itemInCart = this.itemInCart.filter(r => r.itemId !== itemId);
-    this.combineItemWithVariations();
-    await this.computeAllAmount();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
-  }
+  /* #endregion */
 
   /* #region  modify line details */
 
-  selectedItemLine: ItemList;
-  showLineDetails(item: ItemList) {
-    this.selectedItemLine = item;
-    this.selectedItemLine = this.commonService.computeDiscTaxAmount(this.selectedItemLine, this.useTax, this.isItemPriceTaxInclusive, this.maxPrecision);
+  selectedItem: TransactionDetail;
+  async showLineDetails(trxLine: TransactionDetail) {
+    this.selectedItem = trxLine;
+    console.log("🚀 ~ file: item-cart.page.ts ~ line 140 ~ ItemCartPage ~ showLineDetails ~ this.selectedItem", this.selectedItem)
+    await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.isItemPriceTaxInclusive, this.isDisplayTaxInclusive, this.maxPrecision);
     this.showItemModal();
   }
 
@@ -184,90 +147,35 @@ export class ItemCartPage implements OnInit, OnChanges {
     this.isModalOpen = true;
   }
 
-  hideItemModal() {    
-    this.itemInCart.filter(r => r.itemId === this.selectedItemLine.itemId).forEach(r => {
-      r.unitPrice = this.selectedItemLine.unitPrice;
-      r.unitPriceExTax = this.selectedItemLine.unitPriceExTax;
-      r.discountGroupCode = this.selectedItemLine.discountGroupCode;
-      r.discountExpression = this.selectedItemLine.discountExpression;
-      r.discountAmt = this.selectedItemLine.discountAmt;
-      r.discountAmtExTax = this.selectedItemLine.discountAmtExTax;
-      r.taxAmt = this.selectedItemLine.taxAmt;
-      r.taxInclusive = this.selectedItemLine.taxInclusive;
-      r.subTotal = this.selectedItemLine.subTotal;
-      r.subTotalExTax = this.selectedItemLine.subTotalExTax;
-    })
+  hideItemModal() {
     this.isModalOpen = false;
   }
 
-  setSelect(input) {
+  highlight(input) {
     input.getInputElement().then(r => {
       r.select();
     })
   }
 
   async onDiscountGroupChanged() {
-    let lookupvalue = this.discountGroupMasterList.find(r => r.code === this.selectedItemLine.discountGroupCode);
+    let lookupvalue = this.discountGroupMasterList.find(r => r.code === this.selectedItem.discountGroupCode);
     if (lookupvalue) {
-      this.itemInCart.find(r => r.itemId === this.selectedItemLine.itemId).discountExpression = lookupvalue.attribute1 + "%";
-      this.selectedItemLine.discountExpression = lookupvalue.attribute1 + "%";
+      this.itemInCart.find(r => r.itemId === this.selectedItem.itemId).discountExpression = lookupvalue.attribute1 + "%";
+      this.selectedItem.discountExpression = lookupvalue.attribute1 + "%";
     } else {
-      this.itemInCart.find(r => r.itemId === this.selectedItemLine.itemId).discountExpression = null;
-      this.selectedItemLine.discountExpression = null;
+      this.itemInCart.find(r => r.itemId === this.selectedItem.itemId).discountExpression = null;
+      this.selectedItem.discountExpression = null;
     }
-    this.selectedItemLine = this.commonService.computeDiscTaxAmount(this.selectedItemLine, this.useTax, this.isItemPriceTaxInclusive, this.maxPrecision);
-    await this.computeAllAmount();
+    await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.isItemPriceTaxInclusive, this.isDisplayTaxInclusive, this.maxPrecision);
+    this.onItemInCartEditCompleted.emit(this.selectedItem);
   }
 
-  /* #endregion */
-
-  /* #region  tax handle here */
-
-  async computeAllAmount() {
-    await this.itemInCart.forEach(r => {
-      // r = this.assignLineUnitPrice(r);
-      if (this.isItemPriceTaxInclusive) {
-        this.computeUnitPriceExTax(r);
-      } else {
-        this.computeUnitPrice(r);
-      }
-    })
+  onModalItemEditComplete() {
+    this.onItemInCartEditCompleted.emit(this.selectedItem);
   }
 
-  computeUnitPriceExTax(trxLine: Item) {
-    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
-    // this.onEditComplete();
-  }
-
-  computeUnitPrice(trxLine: Item) {
-    trxLine.unitPriceExTax = trxLine.unitPrice;
-    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
-    // this.onEditComplete();
-  }
-
-  computeDiscTaxAmount(trxLine: Item) {
-    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.isItemPriceTaxInclusive, this.maxPrecision);
-    // this.onEditComplete();
-  }
-
-  assignLineUnitPrice(item: Item) {
-    if (this.useTax) {
-      if (this.isItemPriceTaxInclusive) {
-        item.unitPrice = item.unitPrice;
-        item.unitPriceExTax = this.commonService.computeAmtExclTax(item.unitPrice, item.taxPct);
-      } else {
-        item.unitPrice = this.commonService.computeAmtInclTax(item.unitPrice, item.taxPct);
-        item.unitPriceExTax = item.unitPrice;
-      }
-    } else {
-      item.unitPrice = item.unitPrice;
-      item.unitPriceExTax = item.unitPrice;
-    }
-    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
-    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
-    return item;
+  onItemEditComplete(trxLine) {
+    this.onItemInCartEditCompleted.emit(trxLine);
   }
 
   /* #endregion */

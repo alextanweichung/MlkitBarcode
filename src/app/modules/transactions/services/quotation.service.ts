@@ -5,10 +5,12 @@ import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
-import { QuotationHeader, QuotationList, QuotationRoot } from '../models/quotation';
+import { QuotationHeader, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -32,18 +34,18 @@ export class QuotationService {
   /* #region  for insert */
 
   header: QuotationHeader;
-  itemInCart: Item[] = [];
-  // quotationSummary: QuotationSummary;
+  itemInCart: TransactionDetail[] = [];
+  quotationSummary: QuotationSummary;
   setHeader(header: QuotationHeader) {
     this.header = header;
   }
 
-  setChoosenItems(item: Item[]) {
-    this.itemInCart = JSON.parse(JSON.stringify(item));
+  setChoosenItems(items: TransactionDetail[]) {
+    this.itemInCart = JSON.parse(JSON.stringify(items));
   }
 
-  setQuotationSummary(qs: any) {
-    // this.quotationSummary = qs;
+  setQuotationSummary(qs: QuotationSummary) {
+    this.quotationSummary = qs;
   }
 
   removeCustomer() {
@@ -55,7 +57,7 @@ export class QuotationService {
   }
 
   removeSummary() {
-    // this.quotationSummary = null;
+    this.quotationSummary = null;
   }
 
   resetVariables() {
@@ -64,7 +66,7 @@ export class QuotationService {
     this.removeSummary();
   }
 
-  hasSalesAgent():boolean {
+  hasSalesAgent(): boolean {
     let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
       return false;
@@ -94,25 +96,9 @@ export class QuotationService {
     return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer");
   }
 
-  // getItemList(keyword: string, customerId: number, locationId: number) {
-  //   return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemList/" + keyword + "/" + customerId + "/" + locationId, { context: background_load() }).pipe(
-  //     map((response: any) =>
-  //       response.map((item: any) => item)
-  //     )
-  //   );
-  // }
-
-  // getItemListWithTax(keyword: string, trxDate: string, customerId: number, locationId: number) {
-  //   return this.http.get<Item[]>(this.baseUrl + "MobileQuotation/item/itemListWithTax/" + keyword + "/" + trxDate + "/" + customerId + "/" + locationId, { context: background_load() });
-  // }
-
-  // getItemImageFile(keyword: string) {
-  //   return this.http.get<ItemImage[]>(this.baseUrl + "MobileQuotation/itemList/imageFile/" + keyword, { context: background_load() });
-  // }
-
-  // getObjectList(startDate: Date, endDate: Date) {
-  //   return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
-  // }
+  getFullItemList() {
+    return this.http.get<ItemList[]>(this.baseUrl + "MobileQuotation/item/itemList", { context: background_load() });
+  }
 
   getObjectList() {
     return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/qtlist");
@@ -126,12 +112,8 @@ export class QuotationService {
     return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + objectId);
   }
 
-  // getQuotationDetail(objectId: number) {
-  //   return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + objectId);
-  // }
-
-  // insertQuotation(object: QuotationRoot) {
-  //   return this.http.post(this.baseUrl + "MobileQuotation", object, httpObserveHeader);
-  // }
+  insertObject(object: QuotationRoot) {
+    return this.http.post(this.baseUrl + "MobileQuotation", object, httpObserveHeader);
+  }
 
 }

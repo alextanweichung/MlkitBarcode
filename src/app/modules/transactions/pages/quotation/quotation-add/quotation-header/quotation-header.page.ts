@@ -28,8 +28,7 @@ export class QuotationHeaderPage implements OnInit {
     private quotationService: QuotationService,
     private navController: NavController,
     private formBuilder: FormBuilder,
-    private actionSheetController: ActionSheetController,
-    private toastService: ToastService) {
+    private actionSheetController: ActionSheetController) {
     this.newForm();
   }
 
@@ -38,7 +37,7 @@ export class QuotationHeaderPage implements OnInit {
       quotationId: [0],
       quotationNum: [null],
       salesAgentId: [null],
-      trxDate: [null],
+      trxDate: [new Date()],
       typeCode: [null],
       customerId: [null, [Validators.required]],
       shipAddress: [null, [Validators.maxLength(500)]],
@@ -68,7 +67,7 @@ export class QuotationHeaderPage implements OnInit {
       masterUDGroup3: [null],
       isItemPriceTaxInclusive: [null],
       isDisplayTaxInclusive: [null],
-      sourceType: [null],
+      sourceType: ['M'],
       businessModelType: [null],
       remark: [null],
       isHomeCurrency: [null],
@@ -129,6 +128,7 @@ export class QuotationHeaderPage implements OnInit {
     if (event && event !== undefined) {
       var lookupValue = this.customerMasterList?.find(e => e.id === event.id);
       if (lookupValue != undefined) {
+        this.quotationService.removeItems();
         this.objectForm.patchValue({ customerId: lookupValue.id });
         this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
         if (lookupValue.attributeArray1.length > 0) {
@@ -204,9 +204,8 @@ export class QuotationHeaderPage implements OnInit {
     }
   }
 
-  nextStep() {
-    this.quotationService.setHeader(this.objectForm.value);
-    this.quotationService.removeItems();
+  async nextStep() {
+    await this.quotationService.setHeader(this.objectForm.value);
     this.navController.navigateForward('/transactions/quotation/quotation-item');    
   }
 

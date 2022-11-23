@@ -14,11 +14,18 @@ export interface QuotationList {
   createdById: number
 }
 
+export interface QuotationSummary {
+  quotationNum: string
+  customerName: string
+  totalQuantity: number
+  totalAmount: number
+}
+
 export interface QuotationRoot {
   header: QuotationHeader
   details: TransactionDetail[]
-  barcodeTag: any
-  otp: any
+  barcodeTag?: any
+  otp?: any
 }
 
 export interface QuotationHeader {
@@ -70,9 +77,13 @@ export interface QuotationHeader {
   masterUDGroup2: any
   masterUDGroup3: any
   remark: any
-  isItemPriceTaxInclusive: any
-  isDisplayTaxInclusive: any
+  isItemPriceTaxInclusive: boolean
+  isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean
+  /* #region  special to pass in precision */
+  maxPrecision: number
+  maxPrecisionTax: number
+  /* #endregion */
   sequence: number
   createdById: number
   createdBy: string

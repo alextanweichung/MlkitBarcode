@@ -208,13 +208,19 @@ export class CommonService {
     }
   }
 
-  computeDiscTaxAmount(trxLine: any, useTax: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
+  computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive:boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
     let totalDiscAmt = 0;
     let unitPrice = trxLine.unitPrice;
     let unitPriceExTax = trxLine.unitPriceExTax;
     let discExpression = trxLine.discountExpression;
     let quantity = trxLine.qtyRequest;
-    let subTotal = unitPrice * quantity;
+    let subTotal;
+
+    if(isItemPriceTaxInclusive){
+      subTotal = unitPrice * quantity;
+    }else{
+      subTotal = unitPriceExTax * quantity;
+    }
 
     //To split the expression with multi level discount, for eg. (10%/5%/3%)
     if (discExpression != "" && discExpression != null) {
@@ -223,36 +229,57 @@ export class CommonService {
         if (x.includes('%')) {
           let currentdiscPct = parseFloat(x) / 100;
           //let currentDiscAmt = unitPrice * currentdiscPct;    
-          let currentDiscAmt = subTotal * currentdiscPct;
+          let currentDiscAmt = subTotal * currentdiscPct;         
           totalDiscAmt = totalDiscAmt + currentDiscAmt;
-          // unitPrice = unitPrice - currentDiscAmt;
-          subTotal = subTotal - currentDiscAmt;
+         // unitPrice = unitPrice - currentDiscAmt;
+         subTotal = subTotal - currentDiscAmt;
         } else {
           totalDiscAmt = totalDiscAmt + parseFloat(x);
           //unitPrice = unitPrice - parseFloat(x);
           subTotal = subTotal - parseFloat(x);
         }
       })
-    }
-    //totalDiscAmt = this.commonService.roundToTwoDecimal(totalDiscAmt);
-    if (useTax) {
-      trxLine.discountAmt = totalDiscAmt;
-      trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
-    } else {
+    }    
+    if(useTax){
+      if(isItemPriceTaxInclusive){
+        trxLine.discountAmt = totalDiscAmt;
+        trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
+        trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+        trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+        trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+        trxLine.subTotalExTax = (quantity * this.computeAmtExclTax(unitPrice, trxLine.taxPct)) - trxLine.discountAmtExTax;
+        trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+        trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+        trxLine.taxAmt = trxLine.subTotal - trxLine.subTotalExTax;
+        trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
+        trxLine.taxInclusive = isDisplayTaxInclusive;
+      }else{
+        trxLine.discountAmt = this.computeAmtInclTax(totalDiscAmt, trxLine.taxPct);
+        trxLine.discountAmtExTax = totalDiscAmt;        
+        trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+        trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+        trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;      
+        trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+        trxLine.taxAmt = trxLine.subTotalExTax * trxLine.taxPct / 100;
+        trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
+        trxLine.taxInclusive = isDisplayTaxInclusive;
+        trxLine.subTotal = trxLine.subTotalExTax + trxLine.taxAmt;
+        trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+      }      
+    }else{
       trxLine.discountAmt = totalDiscAmt;
       trxLine.discountAmtExTax = totalDiscAmt;
+      trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+      trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+      trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+      trxLine.subTotalExTax = trxLine.subTotal
+      trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+      trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+      trxLine.taxAmt = null;
+      trxLine.taxInclusive = null;
     }
-    trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
-    trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-    trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
-    trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;
-    trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
-    trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
-    trxLine.taxAmt = trxLine.subTotal - trxLine.subTotalExTax;
-    trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
-    trxLine.taxInclusive = isDisplayTaxInclusive;
     //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
-    console.log("🚀 ~ file: common.service.ts ~ line 257 ~ CommonService ~ computeDiscTaxAmount ~ trxLine", trxLine)
+    console.log("🚀 ~ file: common.service.ts ~ line 284 ~ CommonService ~ computeDiscTaxAmount ~ trxLine", trxLine)
     return trxLine;
   }
 

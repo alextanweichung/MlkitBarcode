@@ -17,10 +17,6 @@ const routes: Routes = [
     loadChildren: () => import('./quotation-add/quotation-item/quotation-item.module').then(m => m.QuotationItemPageModule)
   },
   {
-    path: 'quotation-confirmation',
-    loadChildren: () => import('./quotation-add/quotation-confirmation/quotation-confirmation.module').then(m => m.QuotationConfirmationPageModule)
-  },
-  {
     path: 'quotation-summary',
     loadChildren: () => import('./quotation-add/quotation-summary/quotation-summary.module').then(m => m.QuotationSummaryPageModule)
   },

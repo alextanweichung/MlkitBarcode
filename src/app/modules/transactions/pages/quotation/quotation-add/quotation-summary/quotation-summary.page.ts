@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import { QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 // import { QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 
@@ -10,7 +11,7 @@ import { QuotationService } from 'src/app/modules/transactions/services/quotatio
 })
 export class QuotationSummaryPage implements OnInit {
 
-  // quotationSummary: QuotationSummary;
+  quotationSummary: QuotationSummary;
 
   constructor(
     private quotationService: QuotationService,
@@ -18,7 +19,7 @@ export class QuotationSummaryPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    // this.quotationSummary = this.quotationService.quotationSummary;
+    this.quotationSummary = this.quotationService.quotationSummary;
   }
 
   done() {

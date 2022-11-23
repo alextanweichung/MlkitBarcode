@@ -1,14 +1,15 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
-import { Item } from 'src/app/modules/transactions/models/item';
-// import { QuotationDtoHeader } from 'src/app/modules/transactions/models/quotation';
+import { AlertController, LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
+import { QuotationHeader, QuotationRoot, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
 
@@ -20,13 +21,10 @@ import { SearchItemService } from 'src/app/shared/services/search-item.service';
 })
 export class QuotationItemPage implements OnInit, ViewDidEnter {
 
-  // quotationHeader: QuotationDtoHeader;
+  objectHeader: QuotationHeader;
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
-  // maxPrecision: number = 2;
-  // maxPrecisionTax: number = 2;
-
   loadImage: boolean = true;
 
   constructor(
@@ -34,25 +32,28 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     private authService: AuthService,
     private quotationService: QuotationService,
     private navController: NavController,
-    private loadingController: LoadingController,
-    private toastService: ToastService,
     private commonService: CommonService,
-    private datePipe: DatePipe
-  ) { }
+    private toastService: ToastService,
+    private alertController: AlertController) 
+  { }
 
   ionViewDidEnter(): void {
-    this.itemInCart = this.quotationService.itemInCart;
+    this.itemInCart = this.quotationService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
   }
 
   ngOnInit() {
-    // this.quotationHeader = this.quotationService.quotationHeader;
-    // this.itemInCart = this.quotationService.itemInCart;
-    // if (!this.quotationHeader || this.quotationHeader === undefined) {
-    //   this.navController.navigateBack('/transactions/quotation/quotation-header');
-    // }
-    // this.loadImage = this.configService.sys_parameter.loadImage;
-    // this.loadModuleControl();
-    // this.loadMasterList();
+    this.objectHeader = this.quotationService.header;
+    if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+      this.navController.navigateBack('/transactions/quotation/quotation-header');
+    }
+    this.loadImage = this.configService.sys_parameter.loadImage;
+    this.componentsLoad();
+  }
+
+  componentsLoad() {
+    this.loadModuleControl();
+    this.loadMasterList();
+    this.loadFullItemList();
   }
 
   loadModuleControl() {
@@ -67,49 +68,72 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     })
   }
 
+  customerMasterList: MasterListDetails[] = [];
   discountGroupMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.quotationService.getMasterList().subscribe(response => {
+      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })
   }
 
-  itemInCart: Item[] = [];
-  async onItemSelected(event) {
-    let items: Item[] = event;
-    await items.forEach(r => {
-      if (this.itemInCart.findIndex(rr => rr.itemSku === r.itemSku) > -1) {
-        this.itemInCart.find(rr => rr.itemSku === r.itemSku).qtyRequest += r.qtyRequest;
+  fullItemList: ItemList[] = [];
+  loadFullItemList() {
+    this.quotationService.getFullItemList().subscribe(response => {
+      this.fullItemList = response;
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  itemInCart: TransactionDetail[] = [];
+  async onItemAdded(event: TransactionDetail) {
+    if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
+      if (event.variationTypeCode === '0') {
+        this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest
       } else {
-        this.itemInCart.push(r);
+        let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
+        vd.forEach(r => {
+          this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
+            if (rr.itemSku === r.itemSku) {
+              rr.qtyRequest += r.qtyRequest;
+            }
+          })
+        })
+        await this.computeDiscTaxAmount(this.itemInCart.find(r => r.itemId === event.itemId));
       }
-    });
-    this.itemInCart = [...this.itemInCart];
-    await this.computeAllAmount();
+    } else {
+      let trxLine = JSON.parse(JSON.stringify(event));
+      trxLine = this.assignLineUnitPrice(trxLine);
+      await this.computeAllAmount(trxLine);
+      this.itemInCart.push(trxLine);
+      await this.assignSequence();
+    }
   }
 
-  onItemInCartEditCompleted(event) {
-    this.itemInCart = event;
+  async onItemInCartEditCompleted(event: TransactionDetail) {
+    await this.computeAllAmount(event);
+    // await this.computeDiscTaxAmount(event);
   }
 
-  /* #region  misc */
-
-  async showLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Loading...',
-      spinner: 'circles',
-    });
-
-    loading.present();
+  async onItemInCartDeleteCompleted(event: TransactionDetail[]) {
+    this.itemInCart = JSON.parse(JSON.stringify(event));
+    await this.assignSequence();
   }
 
-  async hideLoading() {
-    this.loadingController.dismiss();
+  assignSequence() {
+    let index = 0;
+    this.itemInCart.forEach(r => {
+      r.sequence = index;
+      index++;
+    })
   }
-
-  /* #endregion */
 
   /* #region  add item modal */
 
@@ -122,64 +146,111 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     this.isModalOpen = false;
   }
 
-  /* #endregion */
+  /* #endregion */  
 
-  /* #region  compute amount */
+  /* #region  tax handle here */
 
-  async computeAllAmount() {
-    await this.itemInCart.forEach(r => {
-      // r = this.assignLineUnitPrice(r);
-      // if (this.quotationHeader.isItemPriceTaxInclusive) {
-      //   this.computeUnitPriceExTax(r);
-      // } else {
-      //   this.computeUnitPrice(r);
-      // }
-    })
-  }
-
-  computeUnitPriceExTax(trxLine: Item) {
-    // trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.quotationHeader.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
-    // this.onEditComplete();
-  }
-
-  computeUnitPrice(trxLine: Item) {
-    trxLine.unitPriceExTax = trxLine.unitPrice;
-    // trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.quotationHeader.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
-    // this.onEditComplete();
-  }
-
-  computeDiscTaxAmount(trxLine: Item) {
-    // trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.quotationHeader.isItemPriceTaxInclusive, this.quotationHeader.maxPrecision);
-    // this.onEditComplete();
-  }
-
-  assignLineUnitPrice(item: Item) {
-    if (this.useTax) {
-      // if (this.quotationHeader.isItemPriceTaxInclusive) {
-      //   item.unitPrice = item.unitPrice;
-      //   item.unitPriceExTax = this.commonService.computeAmtExclTax(item.unitPrice, item.taxPct);
-      // } else {
-      //   item.unitPrice = this.commonService.computeAmtInclTax(item.unitPrice, item.taxPct);
-      //   item.unitPriceExTax = item.unitPrice;
-      // }
+  async computeAllAmount(trxLine: TransactionDetail) {
+    if (this.objectHeader.isItemPriceTaxInclusive) {
+      this.computeUnitPriceExTax(trxLine);
     } else {
-      item.unitPrice = item.unitPrice;
-      item.unitPriceExTax = item.unitPrice;
+      this.computeUnitPrice(trxLine);
     }
-    // item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.quotationHeader.maxPrecision);
-    // item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.quotationHeader.maxPrecision);
-    return item;
+  }
+
+  getVariationSum(trxLine: TransactionDetail) {
+    if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
+      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
+    }
+  }
+
+  computeUnitPriceExTax(trxLine: TransactionDetail) {
+    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
+    this.computeDiscTaxAmount(trxLine);
+  }
+
+  computeUnitPrice(trxLine: TransactionDetail) {
+    trxLine.unitPriceExTax = trxLine.unitPrice;
+    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+    this.computeDiscTaxAmount(trxLine);
+  }
+
+  async computeDiscTaxAmount(trxLine: TransactionDetail) {
+    await this.getVariationSum(trxLine);
+    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+  }
+
+  assignLineUnitPrice(trxLine: TransactionDetail) {
+    if (this.useTax) {
+      if (this.objectHeader.isItemPriceTaxInclusive) {
+        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+        trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+      } else {
+        trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+        trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+      }
+    } else {
+      trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+      trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+    }
+    trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
+    trxLine.discountExpression = trxLine.itemPricing.discountExpression;
+    trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
+    trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+    return trxLine;
   }
 
   /* #endregion */
 
   /* #region  steps */
 
-  async nextStep() {
-    await this.quotationService.setChoosenItems(this.itemInCart);
-    this.navController.navigateForward('/transactions/quotation/quotation-confirmation');
+  async nextStep() {    
+    if (this.itemInCart.length > 0) {
+      const alert = await this.alertController.create({
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: async () => {
+              await this.insertQuotation();
+            },
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
+    }
+  }
+
+  insertQuotation() {
+    let trxDto: QuotationRoot = {
+      header: this.objectHeader,
+      details: this.itemInCart      
+    }
+    this.quotationService.insertObject(trxDto).subscribe(response => {
+      let details: any[] = response.body["details"];
+      let totalQty: number = 0;
+      details.forEach(e => {
+        totalQty += e.qtyRequest;
+      })
+      let qs: QuotationSummary = {
+        quotationNum: response.body["header"]["quotationNum"],
+        customerName: this.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
+        totalQuantity: totalQty,
+        totalAmount: response.body["header"]["totalGrossAmt"]
+      }
+      this.quotationService.setQuotationSummary(qs);
+      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'bottom', 'success', 1000);
+      this.navController.navigateRoot('/transactions/quotation/quotation-summary');
+    }, error => {
+      console.log(error);
+    });
   }
 
   previousStep() {

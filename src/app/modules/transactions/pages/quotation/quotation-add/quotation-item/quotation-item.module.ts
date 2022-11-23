@@ -11,6 +11,7 @@ import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton
 import { ItemAddGridVariationMPageModule } from 'src/app/shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module';
 import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module';
 import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.mod
     ListingSkeletonPageModule,
     ItemAddGridVariationMPageModule,
     ItemAddListWithVariationPageModule,
-    ItemCartPageModule
+    ItemCartPageModule,
+    SumModule
   ],
   declarations: [QuotationItemPage]
 })
