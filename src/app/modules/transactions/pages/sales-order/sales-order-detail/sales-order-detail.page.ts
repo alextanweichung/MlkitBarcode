@@ -1,23 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
-import { SalesOrderLine } from 'src/app/modules/transactions/models/sales-order';
+import { NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
+import { SalesOrderRoot } from '../../../models/sales-order';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: 'app-sales-order-detail',
+  templateUrl: './sales-order-detail.page.html',
+  styleUrls: ['./sales-order-detail.page.scss'],
 })
-export class DetailPage implements OnInit {
+export class SalesOrderDetailPage implements OnInit {
 
-  parent: string = 'Sales Order'
-
-  salesOrderId: number;
-  salesOrder: any;
-  flattenSalesOrder: any;
+  objectId: number
+  object: SalesOrderRoot;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,20 +24,19 @@ export class DetailPage implements OnInit {
     private salesOrderService: SalesOrderService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.salesOrderId = params['salesOrderId'];
-      if (params['parent']) {
-        this.parent = params['parent'];
+      this.objectId = params['objectId'];
+      if (!this.objectId) {
+        this.navController.navigateBack('/transactions/sales-order');
       }
     })
   }
 
   ngOnInit() {
-    if (!this.salesOrderId) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/transactions')
+    if (!this.objectId) {
+      this.navController.navigateBack('/transactions/sales-order')
     } else {
       this.loadMasterList();
-      this.loadDetail();
+      this.loadObject();
     }
   }
   
@@ -56,10 +53,9 @@ export class DetailPage implements OnInit {
     })
   }
 
-  loadDetail() {
-    this.salesOrderService.getSalesOrderDetail(this.salesOrderId).subscribe(response => {
-      this.salesOrder = response;
-      this.flattenSalesOrder = this.salesOrderService.unflattenDtoDetail(this.salesOrder);
+  loadObject() {
+    this.salesOrderService.getObjectById(this.objectId).subscribe(response => {
+      this.object = response;
     }, error => {
       console.log(error);
     })
@@ -74,7 +70,8 @@ export class DetailPage implements OnInit {
     return defaultImageUrl;
   }
 
-  getFlattenVariations(itemId: number): SalesOrderLine[] {
-    return this.flattenSalesOrder.details.filter(r => r.itemId === itemId);
+  filter(details: InnerVariationDetail[]) {
+    return details.filter(r => r.qtyRequest > 0);
   }
+
 }

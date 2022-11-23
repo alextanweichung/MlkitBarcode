@@ -98,7 +98,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/sales-order/sales-order-detail',
-    loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/detail/detail.module').then(m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/sales-order-detail.module').then(m => m.SalesOrderDetailPageModule)
   },
   // transactions-purchase-order
   {

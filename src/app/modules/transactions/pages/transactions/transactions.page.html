@@ -52,31 +52,31 @@
         <hr class="hr-small">
       </ng-container>
       
-      <!-- <ng-container *ngIf="showSalesOrder">
+      <ng-container *ngIf="showSalesOrder">
         <ion-list-header>
           <ion-label color="dark">Sales Order</ion-label>
           <ion-button routerLink="sales-order">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
         </ion-list-header>
-        <ng-container *ngIf="!sales_order_loaded">
+        <ng-container *ngIf="!salesOrders || salesOrders?.length === 0">
           <p>
             <ion-text color="tertiary">
               <h3>Nothing found!</h3>
             </ion-text>
           </p>
         </ng-container>
-        <ng-container *ngIf="sales_order_loaded">
+        <ng-container *ngIf="salesOrders?.length > 0">
           <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
             <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders">
               <ion-label>
                 <h3>{{object.salesOrderNum}}</h3>
-                <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+                <p>{{object.customerName}}</p>
+                <p>{{object.salesAgentName}}</p>
               </ion-label>
-              <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
             </ion-item>
           </ion-list>
         </ng-container>
         <hr class="hr-small">
-      </ng-container> -->
+      </ng-container>
 
     </div>
 

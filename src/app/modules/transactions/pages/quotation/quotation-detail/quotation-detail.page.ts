@@ -54,7 +54,6 @@ export class QuotationDetailPage implements OnInit {
   loadObject() {
     this.quotationService.getObjectById(this.objectId).subscribe(response => {
       this.object = response;
-      console.log("🚀 ~ file: quotation-detail.page.ts ~ line 57 ~ QuotationDetailPage ~ this.quotationService.getObjectById ~ this.object", this.object)
     }, error => {
       console.log(error);
     })

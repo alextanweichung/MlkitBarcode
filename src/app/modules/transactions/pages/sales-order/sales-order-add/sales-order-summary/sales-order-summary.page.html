@@ -24,7 +24,7 @@
         <ion-label>
           <p>Customer Name</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.customerId|idMapping:customerMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.customerName}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
@@ -42,13 +42,13 @@
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-    <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col>
-          <ion-button class="ion-margin" expand="block" size="default" (click)="done()">
-            Done
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col>
+        <ion-button class="ion-margin" expand="block" size="default" (click)="done()">
+          Done
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-footer>

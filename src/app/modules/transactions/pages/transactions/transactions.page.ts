@@ -156,21 +156,21 @@ export class TransactionsPage implements OnInit {
 
   /* #endregion */
 
-  /* #region  quotation */
+  /* #region  sales order */
 
   loadRecentSalesOrder() {
-    this.salesOrderService.getRecentSalesOrderList().subscribe(response => {
-      this.salesOrders = response;
+    this.salesOrderService.getObjectList().subscribe(response => {
+      this.salesOrders = response.slice(0, 3);
+      console.log("🚀 ~ file: transactions.page.ts ~ line 164 ~ TransactionsPage ~ this.salesOrderService.getObjectList ~ this.salesOrders", this.salesOrders)
     }, error => {
       console.log(error);
     })
   }
 
-  async goToSalesOrderDetail(salesOrderId: number) {
+  async goToSalesOrderDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        salesOrderId: salesOrderId,
-        parent: "Transactions"
+        objectId: objectId,
       }
     }
     this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);
