@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController } from '@ionic/angular';
-import { GoodsPacking, GoodspackingDto, GoodsPackingLine, PackingSummary } from 'src/app/modules/transactions/models/packing';
+import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingRoot, GoodsPackingSummary } from 'src/app/modules/transactions/models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -16,7 +16,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 })
 export class PackingConfirmationPage implements OnInit {
 
-  packingDtoHeader: GoodsPacking;
+  header: GoodsPackingHeader;
   packingSalesOrders: PackingSalesOrderRoot[] = [];
   packingSalesOrderLines: PackingSalesOrderDetail[] = [];
   moduleControl: ModuleControl[] = [];
@@ -32,8 +32,8 @@ export class PackingConfirmationPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.packingDtoHeader = this.packingService.packingDtoHeader;
-    if (this.packingDtoHeader === undefined) {
+    this.header = this.packingService.header;
+    if (this.header === undefined) {
       this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
       this.navController.navigateBack('/transactions/packing/packing-sales-order');
     }
@@ -96,7 +96,7 @@ export class PackingConfirmationPage implements OnInit {
   }
 
   insertPacking() {
-    let object: GoodspackingDto;
+    let object: GoodsPackingRoot;
     let lines: GoodsPackingLine[] = [];
     this.packingSalesOrderLines.forEach(r => {
       lines.push({
@@ -110,25 +110,25 @@ export class PackingConfirmationPage implements OnInit {
         itemBarcode: this.configService.item_Barcodes.find(rr => rr.sku === r.itemSku)?.barcode,
         itemUomId: r.itemUomId,
         qtyRequest: r.qtyPackedCurrent,
-        soRowIndex: this.packingDtoHeader.isWithSo ? (this.packingSalesOrders.flatMap(rr => rr.details).findIndex(rr => rr.salesOrderId === r.salesOrderId && rr.itemSku === r.itemSku)) : null,
+        soRowIndex: this.header.isWithSo ? (this.packingSalesOrders.flatMap(rr => rr.details).findIndex(rr => rr.salesOrderId === r.salesOrderId && rr.itemSku === r.itemSku)) : null,
         sequence: lines.length,
-        locationId: this.packingDtoHeader.locationId,
+        locationId: this.header.locationId,
         cartonNum: 1
       })
     })
-    let header: GoodsPacking = {
+    let header: GoodsPackingHeader = {
       packingId: 0,
       packingNum: '',
-      trxDate: this.packingDtoHeader.trxDate,
-      locationId: this.packingDtoHeader.locationId,
-      toLocationId: this.packingDtoHeader.toLocationId,
-      customerId: this.packingDtoHeader.customerId,
-      warehouseAgentId: this.packingDtoHeader.warehouseAgentId,
-      businessModelType: this.packingDtoHeader.businessModelType,
+      trxDate: this.header.trxDate,
+      locationId: this.header.locationId,
+      toLocationId: this.header.toLocationId,
+      customerId: this.header.customerId,
+      warehouseAgentId: this.header.warehouseAgentId,
+      businessModelType: this.header.businessModelType,
       sourceType: 'M',
-      isWithSo: this.packingDtoHeader.isWithSo,
-      remark: this.packingDtoHeader.remark,
-      typeCode: this.packingDtoHeader.typeCode,
+      isWithSo: this.header.isWithSo,
+      remark: this.header.remark,
+      typeCode: this.header.typeCode,
       totalCarton: 1
     }
     object = {
@@ -137,7 +137,7 @@ export class PackingConfirmationPage implements OnInit {
     }
     this.packingService.insertPacking(object).subscribe(response => {
       if (response.status === 201) {
-        let ps: PackingSummary = {
+        let ps: GoodsPackingSummary = {
           packingNum: response.body["header"]["packingNum"],
           customerId: response.body["header"]["customerId"],
           locationId: response.body["header"]["locationId"],

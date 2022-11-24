@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
-import { NavController, AlertController, IonAccordionGroup, IonInput } from '@ionic/angular';
-import { GoodsPacking } from 'src/app/modules/transactions/models/packing';
+import { NavController, AlertController, IonAccordionGroup } from '@ionic/angular';
+import { GoodsPackingHeader } from 'src/app/modules/transactions/models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -23,7 +21,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 })
 export class PackingItemPage implements OnInit {
 
-  packingDtoHeader: GoodsPacking;
+  header: GoodsPackingHeader;
   packingSalesOrders: PackingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
   loadImage: boolean = true;
@@ -40,9 +38,8 @@ export class PackingItemPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.packingDtoHeader = this.packingService.packingDtoHeader;
-    if (this.packingDtoHeader === undefined) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+    this.header = this.packingService.header;
+    if (this.header === undefined) {
       this.navController.navigateBack('/transactions/packing/packing-sales-order');
     }
     this.packingSalesOrders = this.packingService.selectedSalesOrders;
@@ -56,11 +53,7 @@ export class PackingItemPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      // let loadImage = this.moduleControl.find(r => r.ctrlName === "LoadImage")?.ctrlValue;
-      // if (loadImage) {
-      //   this.loadImage = loadImage === '1' ? true : false;
-      // }
-    this.loadImage = this.configService.sys_parameter.loadImage;
+      this.loadImage = this.configService.sys_parameter.loadImage;
       let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
       if (packingControl != undefined) {
         this.packingQtyControl = packingControl.ctrlValue;
@@ -85,7 +78,7 @@ export class PackingItemPage implements OnInit {
 
   onQtyChanged(event, soLine: PackingSalesOrderDetail, index: number) {
     if (Number.isInteger(event) && event >= 0) {
-      if (this.packingDtoHeader.isWithSo) {
+      if (this.header.isWithSo) {
         switch (this.packingQtyControl) {
           // No control
           case "0":
@@ -109,7 +102,7 @@ export class PackingItemPage implements OnInit {
             break;
         }
       }
-      if (!this.packingDtoHeader.isWithSo) {
+      if (!this.header.isWithSo) {
         soLine.qtyPackedCurrent = event;
         if (soLine.qtyPackedCurrent === 0) {
           this.deleteSoLine(index);
@@ -172,12 +165,12 @@ export class PackingItemPage implements OnInit {
   selectedSoDetail: PackingSalesOrderDetail;
   async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
     
-    if (this.packingDtoHeader.isWithSo && this.accordianGroup1.value === undefined) {
+    if (this.header.isWithSo && this.accordianGroup1.value === undefined) {
       this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
       return;
     }
 
-    if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    if (this.header.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
       if (itemIndex > -1) {
         this.selectedSoDetail = this.selectedSo.details[itemIndex];
@@ -188,7 +181,7 @@ export class PackingItemPage implements OnInit {
       }
     }
 
-    if (!this.packingDtoHeader.isWithSo) {
+    if (!this.header.isWithSo) {
       let b: any;
       let m: any;
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
@@ -280,7 +273,7 @@ export class PackingItemPage implements OnInit {
 
   scanActive: boolean = false;
   async startScanning() {
-    if (this.packingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    if (this.header.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       const allowed = await this.checkPermission();
       if (allowed) {
         this.scanActive = true;
@@ -292,11 +285,11 @@ export class PackingItemPage implements OnInit {
           await this.validateBarcode(barcode);
         }
       }
-    } else if (this.packingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
+    } else if (this.header.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
       this.toastService.presentToast('Please select 1 SO', '', 'bottom', 'medium', 1000);
     }
 
-    if (!this.packingDtoHeader.isWithSo) {
+    if (!this.header.isWithSo) {
       const allowed = await this.checkPermission();
       if (allowed) {
         this.scanActive = true;

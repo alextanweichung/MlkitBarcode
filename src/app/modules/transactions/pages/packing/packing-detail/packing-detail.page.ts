@@ -6,16 +6,14 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: 'app-packing-detail',
+  templateUrl: './packing-detail.page.html',
+  styleUrls: ['./packing-detail.page.scss'],
 })
-export class DetailPage implements OnInit {
+export class PackingDetailPage implements OnInit {
 
-  parent: string = 'Packing'
-
-  packingId: number;
-  packing: any;
+  objectId: number;
+  object: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,17 +23,16 @@ export class DetailPage implements OnInit {
     private packingService: PackingService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.packingId = params['packingId'];
-      if (params['parent']) {
-        this.parent = params['parent'];
+      this.objectId = params['objectId'];
+      if (!this.objectId) {
+        this.navController.navigateBack('/transactions/packing');
       }
     })
   }
 
   ngOnInit() {
-    if (!this.packingId) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/transactions')
+    if (!this.objectId) {
+      this.navController.navigateBack('/transactions/packing')
     } else {
       this.loadMasterList();
       this.loadDetail();
@@ -62,8 +59,9 @@ export class DetailPage implements OnInit {
   }
 
   loadDetail() {
-    this.packingService.getPackingDetail(this.packingId).subscribe(response => {
-      this.packing = response;
+    this.packingService.getObjectById(this.objectId).subscribe(response => {
+      this.object = response;
+      console.log("🚀 ~ file: packing-detail.page.ts ~ line 64 ~ PackingDetailPage ~ this.packingService.getObjectById ~ this.object", this.object)
     }, error => {
       console.log(error);
     })

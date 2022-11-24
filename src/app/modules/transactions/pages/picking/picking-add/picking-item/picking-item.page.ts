@@ -1,19 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController, IonAccordionGroup, NavController } from '@ionic/angular';
-import { GoodsPicking } from 'src/app/modules/transactions/models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { GoodsPickingHeader } from 'src/app/modules/transactions/models/picking';
 
 @Component({
   selector: 'app-picking-item',
@@ -23,7 +21,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 })
 export class PickingItemPage implements OnInit {
 
-  pickingDtoHeader: GoodsPicking;
+  header: GoodsPickingHeader;
   pickingSalesOrders: PickingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
   loadImage: boolean = true;
@@ -39,16 +37,14 @@ export class PickingItemPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.pickingDtoHeader = this.pickingService.pickingDtoHeader;
-    if (this.pickingDtoHeader === undefined) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+    this.header = this.pickingService.header;
+    if (this.header === undefined) {
       this.navController.navigateBack('/transactions/picking/picking-sales-order');
     }
     this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
     if (this.pickingSalesOrders && this.pickingSalesOrders.length > 0) {
       this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
     }
-    // this.loadModuleControl();
     this.loadImage = this.configService.sys_parameter.loadImage;
     this.loadMasterList();
   }
@@ -80,7 +76,7 @@ export class PickingItemPage implements OnInit {
 
   onQtyChanged(event, soLine: PickingSalesOrderDetail, index: number) {
     if (Number.isInteger(event) && event >= 0) {
-      if (this.pickingDtoHeader.isWithSo) {
+      if (this.header.isWithSo) {
         if (soLine.qtyPicked + event <= soLine.qtyRequest) {
           soLine.qtyPickedCurrent = event;
         } else {
@@ -128,7 +124,7 @@ export class PickingItemPage implements OnInit {
         this.pickingService.getItemInfoByBarcode(barcode).subscribe(response => {
           if (response) {
             this.addItemToSo(response.itemSku, response);
-          }          
+          }
         }, error => {
           console.log(error);
         })
@@ -148,78 +144,78 @@ export class PickingItemPage implements OnInit {
 
   selectedSoDetail: PickingSalesOrderDetail;
   async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
-    if (this.pickingDtoHeader.isWithSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
-      return;
-    }
+    // if (this.pickingDtoHeader.isWithSo && this.accordianGroup1.value === undefined) {
+    //   this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
+    //   return;
+    // }
 
-    if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
-      if (itemIndex > -1) {
-        this.selectedSoDetail = this.selectedSo.details[itemIndex];
-        this.selectedSoDetail.qtyPickedCurrent += 1;
-        this.onQtyChanged(this.selectedSoDetail.qtyPickedCurrent, this.selectedSoDetail, itemIndex);
-      } else {
-        this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
-      }
-    }
+    // if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    //   let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
+    //   if (itemIndex > -1) {
+    //     this.selectedSoDetail = this.selectedSo.details[itemIndex];
+    //     this.selectedSoDetail.qtyPickedCurrent += 1;
+    //     this.onQtyChanged(this.selectedSoDetail.qtyPickedCurrent, this.selectedSoDetail, itemIndex);
+    //   } else {
+    //     this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
+    //   }
+    // }
 
-    if (!this.pickingDtoHeader.isWithSo) {
-      let b: any;
-      let m: any;
-      if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
-        b = this.configService.item_Barcodes.find(r => r.sku === sku);
-        m = this.configService.item_Masters.find(r => r.id === b.itemId);
-      } else {
-        m = {
-          id: itemInfo.itemId,
-          code: itemInfo.itemCode,
-          itemDesc: itemInfo.description,
-          varCd: itemInfo.variationTypeCode
-        }
-        b = {
-          xId: itemInfo.itemVariationLineXId,
-          yId: itemInfo.itemVariationLineYId,
-          xDesc: itemInfo.itemVariationLineXDescription,
-          yDesc: itemInfo.itemVariationLineYDescription
-        }
-      }
-      if (this.pickingSalesOrders && this.pickingSalesOrders.length === 0) {
-        this.pickingSalesOrders.push({
-          header: null,
-          details: [],
-          pickingHistory: []
-        })
-      }
-      if (this.pickingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
-        this.selectedSoDetail = this.pickingSalesOrders[0].details.find(r => r.itemSku === sku);
-        this.selectedSoDetail.qtyPickedCurrent++;
-      } else {
-        let d: PickingSalesOrderDetail = {
-          salesOrderId: null,
-          itemId: m.id,
-          description: m.itemDesc,
-          itemVariationXId: b.xId,
-          itemVariationYId: b.yId,
-          itemSku: sku,
-          itemVariationTypeCode: m.varCd,
-          itemCode: m.code,
-          itemVariationXDescription: b.xDesc,
-          itemVariationYDescription: b.yDesc,
-          itemUomId: null,
-          itemUomDescription: null,
-          rack: null,
-          subRack: null,
-          qtyRequest: 0,
-          qtyCommit: 0,
-          qtyBalance: 0,
-          qtyPicked: 0,
-          qtyPickedCurrent: 1,
-          qtyPacked: 0
-        }
-        await this.pickingSalesOrders[0].details.length > 0 ? this.pickingSalesOrders[0].details.unshift(d) : this.pickingSalesOrders[0].details.push(d);
-      }
-    }
+    // if (!this.pickingDtoHeader.isWithSo) {
+    //   let b: any;
+    //   let m: any;
+    //   if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
+    //     b = this.configService.item_Barcodes.find(r => r.sku === sku);
+    //     m = this.configService.item_Masters.find(r => r.id === b.itemId);
+    //   } else {
+    //     m = {
+    //       id: itemInfo.itemId,
+    //       code: itemInfo.itemCode,
+    //       itemDesc: itemInfo.description,
+    //       varCd: itemInfo.variationTypeCode
+    //     }
+    //     b = {
+    //       xId: itemInfo.itemVariationLineXId,
+    //       yId: itemInfo.itemVariationLineYId,
+    //       xDesc: itemInfo.itemVariationLineXDescription,
+    //       yDesc: itemInfo.itemVariationLineYDescription
+    //     }
+    //   }
+    //   if (this.pickingSalesOrders && this.pickingSalesOrders.length === 0) {
+    //     this.pickingSalesOrders.push({
+    //       header: null,
+    //       details: [],
+    //       pickingHistory: []
+    //     })
+    //   }
+    //   if (this.pickingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
+    //     this.selectedSoDetail = this.pickingSalesOrders[0].details.find(r => r.itemSku === sku);
+    //     this.selectedSoDetail.qtyPickedCurrent++;
+    //   } else {
+    //     let d: PickingSalesOrderDetail = {
+    //       salesOrderId: null,
+    //       itemId: m.id,
+    //       description: m.itemDesc,
+    //       itemVariationXId: b.xId,
+    //       itemVariationYId: b.yId,
+    //       itemSku: sku,
+    //       itemVariationTypeCode: m.varCd,
+    //       itemCode: m.code,
+    //       itemVariationXDescription: b.xDesc,
+    //       itemVariationYDescription: b.yDesc,
+    //       itemUomId: null,
+    //       itemUomDescription: null,
+    //       rack: null,
+    //       subRack: null,
+    //       qtyRequest: 0,
+    //       qtyCommit: 0,
+    //       qtyBalance: 0,
+    //       qtyPicked: 0,
+    //       qtyPickedCurrent: 1,
+    //       qtyPacked: 0
+    //     }
+    //     await this.pickingSalesOrders[0].details.length > 0 ? this.pickingSalesOrders[0].details.unshift(d) : this.pickingSalesOrders[0].details.push(d);
+    //   }
+    // }
   }
 
   async deleteSoLine(index) {
@@ -256,35 +252,35 @@ export class PickingItemPage implements OnInit {
 
   scanActive: boolean = false;
   async startScanning() {
-    if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-        this.scanActive = true;
-        document.body.style.background = "transparent";
-        const result = await BarcodeScanner.startScan();
-        if (result.hasContent) {
-          let barcode = result.content;
-          this.scanActive = false;
-          await this.validateBarcode(barcode);
-        }
-      }
-    } else if (this.pickingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select 1 SO', '', 'bottom', 'medium', 1000);
-    }
+    // if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    //   const allowed = await this.checkPermission();
+    //   if (allowed) {
+    //     this.scanActive = true;
+    //     document.body.style.background = "transparent";
+    //     const result = await BarcodeScanner.startScan();
+    //     if (result.hasContent) {
+    //       let barcode = result.content;
+    //       this.scanActive = false;
+    //       await this.validateBarcode(barcode);
+    //     }
+    //   }
+    // } else if (this.pickingDtoHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
+    //   this.toastService.presentToast('Please select 1 SO', '', 'bottom', 'medium', 1000);
+    // }
 
-    if (!this.pickingDtoHeader.isWithSo) {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-        this.scanActive = true;
-        document.body.style.background = "transparent";
-        const result = await BarcodeScanner.startScan();
-        if (result.hasContent) {
-          let barcode = result.content;
-          this.scanActive = false;
-          await this.validateBarcode(barcode);
-        }
-      }
-    }
+    // if (!this.pickingDtoHeader.isWithSo) {
+    //   const allowed = await this.checkPermission();
+    //   if (allowed) {
+    //     this.scanActive = true;
+    //     document.body.style.background = "transparent";
+    //     const result = await BarcodeScanner.startScan();
+    //     if (result.hasContent) {
+    //       let barcode = result.content;
+    //       this.scanActive = false;
+    //       await this.validateBarcode(barcode);
+    //     }
+    //   }
+    // }
   }
 
   async checkPermission() {
@@ -326,7 +322,7 @@ export class PickingItemPage implements OnInit {
 
   nextStep() {
     let soLines: PickingSalesOrderDetail[] = this.pickingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPickedCurrent > 0);
-    this.pickingService.setChooseSalesOrderLines(soLines);
+    // this.pickingService.setChooseSalesOrderLines(soLines);
     this.navController.navigateForward('/transactions/picking/picking-confirmation');
   }
 

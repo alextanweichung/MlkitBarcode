@@ -8,7 +8,8 @@ import { MasterListDetails } from '../../models/master-list-details';
 })
 export class ItemViewListFlatPage implements OnInit {
 
-  @Input() line: any;
+  @Input() isWithSo: boolean = true;
+  @Input() data: any;
   @Input() isPicking: boolean = false;
   @Input() isPacking: boolean = false;
   
@@ -18,6 +19,7 @@ export class ItemViewListFlatPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
+
   }
 
 }

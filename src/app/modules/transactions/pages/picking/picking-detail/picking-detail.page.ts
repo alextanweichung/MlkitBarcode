@@ -6,17 +6,14 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: 'app-picking-detail',
+  templateUrl: './picking-detail.page.html',
+  styleUrls: ['./picking-detail.page.scss'],
 })
-export class DetailPage implements OnInit {
+export class PickingDetailPage implements OnInit {
 
-  parent: string = 'Picking'
-
-  pickingId: number;
-  picking: any;
-  // flattenSalesOrder: any;
+  objectId: number;
+  object: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,17 +23,16 @@ export class DetailPage implements OnInit {
     private pickingService: PickingService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.pickingId = params['pickingId'];
-      if (params['parent']) {
-        this.parent = params['parent'];
+      this.objectId = params['objectId'];
+      if (!this.objectId) {
+        this.navController.navigateBack('/transactions/picking');
       }
     })
   }
 
   ngOnInit() {
-    if (!this.pickingId) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
-      this.navController.navigateBack('/transactions')
+    if (!this.objectId) {
+      this.navController.navigateBack('/transactions/picking')
     } else {
       this.loadMasterList();
       this.loadDetail();
@@ -63,8 +59,9 @@ export class DetailPage implements OnInit {
   }
 
   loadDetail() {
-    this.pickingService.getPickingDetail(this.pickingId).subscribe(response => {
-      this.picking = response;
+    this.pickingService.getObjectById(this.objectId).subscribe(response => {
+      this.object = response;
+      console.log("🚀 ~ file: picking-detail.page.ts ~ line 65 ~ PickingDetailPage ~ this.pickingService.getObjectById ~ this.object", this.object)
     }, error => {
       console.log(error);
     })

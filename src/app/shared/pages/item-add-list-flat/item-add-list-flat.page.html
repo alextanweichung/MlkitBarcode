@@ -31,6 +31,11 @@
               <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
             </ion-col>
           </ion-row> -->
+          <ion-row *ngIf="line.rack || line.subRack">
+            <ion-col class="ion-margin-auto ion-flex">
+              <div class="font-smaller">Location: {{line.rack}} - {{line.subRack}}</div>
+            </ion-col>
+          </ion-row>
           <ion-row>
             <ion-col class="ion-margin-auto ion-flex">
               <div class="font-smaller" *ngIf="isPicking||isPacking">SO Qty: {{line.qtyRequest|number:'1.0'}}</div>
@@ -39,11 +44,6 @@
               <div class="font-smaller ml-1" *ngIf="isPacking">Packed Qty: {{(line.qtyPacked + line.qtyPackedCurrent)|number:'1.0'}}</div>
             </ion-col>
           </ion-row>
-          <!-- <ion-row *ngIf="line.rack">
-            <ion-col class="ion-margin-auto ion-flex">
-              <div class="font-smaller">Location: {{line.rack}} - {{line.subRack}}</div>
-            </ion-col>
-          </ion-row> -->
           <!-- <ion-row>
             <ion-col class="ion-margin-auto ion-flex">
               <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty()">

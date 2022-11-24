@@ -83,7 +83,6 @@ export class QuotationPage implements OnInit {
     await actionSheet.present();
   }
 
-
   /* #endregion */
 
   async filter() {

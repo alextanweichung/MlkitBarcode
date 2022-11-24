@@ -1,44 +1,220 @@
-<ion-item class="ion-no-padding" lines="none">
-  <ion-grid class="ion-no-padding p-2">
-    <ion-row>
-      <ion-col class="ion-margin-auto ion-flex">
-        <div class="font-bold">{{line.itemCode}}</div>
-      </ion-col>
-      <ion-col class="ion-flex justify-content-end">
-        <ion-icon *ngIf="line.qtyRequest === (line.qtyPicked + line.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col class="ion-margin-auto ion-flex">
-        <div>{{line.description}}</div>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationLineXId"> {{line.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
-        <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-        <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationLineYId"> {{line.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
-        <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col class="ion-margin-auto ion-flex">
-        <div class="font-smaller">SO Qty: {{line.qtyRequest??0|number:'1.0'}}</div>
-      </ion-col>
-      <ion-col class="ion-margin-auto ion-flex" *ngIf="isPicking">
-        <div class="font-smaller">Picked Qty: {{(line.qtyPicked??0 + line.qtyPickedCurrent??0)|number:'1.0'}}</div>
-      </ion-col>
-      <ion-col class="ion-margin-auto ion-flex" *ngIf="isPacking">
-        <div class="font-smaller">Picked Qty: {{line.qtyPicked??0|number:'1.0'}}</div>
-      </ion-col>
-      <ion-col class="ion-margin-auto ion-flex" *ngIf="isPacking">
-        <div class="font-smaller">Packed Qty: {{(line.qtyPacked??0 + line.qtyPackedCurrent??0)|number:'1.0'}}</div>
-      </ion-col>
-    </ion-row>
-    <ion-row *ngIf="line.rack">
-      <ion-col class="ion-margin-auto ion-flex">
-        <div class="font-smaller">Location: {{line.rack}} - {{line.subRack}}</div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-item>
+<div *ngIf="isWithSo">
+  <ion-accordion-group>
+    <ion-accordion *ngFor="let line of data;">
+      <ion-item slot="header" color="light">
+        <ion-label>{{line.salesOrderNum}}</ion-label>
+      </ion-item>
+      <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" style="font-size: smaller;" lines="full">
+        <div class="px-2 pt-2 font-bold" *ngIf="isPicking">Outstanding Pick List</div>
+        <div class="px-2 pt-2 font-bold" *ngIf="isPacking">Outstanding Pack List</div>
+        <div class="ion-flex p-2" *ngIf="isPicking">Other Picking:
+          <div class="ml-1" *ngFor="let ph of line.pickingHistory">
+            <span class="badge-green px-1"> {{ph.pickingNum}}</span>
+          </div>
+        </div>
+        <div class="ion-flex p-2" *ngIf="isPacking">Other Packing:
+          <div class="ml-1" *ngFor="let ph of line.packingHistory">
+            <span class="badge-green px-1"> {{ph.packingNum}}</span>
+          </div>
+        </div>
+        <div *ngIf="isPicking">
+          <ion-item class="ion-no-padding" lines="full" *ngFor="let opl of line.outstandingPickList">
+            <ion-grid class="ion-no-padding p-2">
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{opl.itemCode}}</div>
+                  <div class="ml-1">
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && opl.itemVariationLineXId"> {{opl.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && opl.itemVariationXId"> {{opl.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && opl.itemVariationLineYId"> {{opl.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && opl.itemVariationYId"> {{opl.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  </div>
+                </ion-col>
+                <ion-col class="ion-flex justify-content-end">
+                  <ion-icon *ngIf="opl.qtyRequest === (opl.qtyPickedSo + opl.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>
+                </ion-col>
+              </ion-row>
+              <ion-row *ngIf="opl.rack !== null || opl.subRack !== null">
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>Location</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{opl.rack}} - {{opl.subRack}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>SO Qty</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{opl.qtyRequest}}</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>Picked Qty</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{opl.qtyPickedCurrent + opl.qtyPickedSo}}</div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+          <div class="px-2 pt-2 font-bold">Current Picked List</div>
+          <ion-item class="ion-no-padding" lines="full" *ngFor="let cpl of line.currentPickList">
+            <ion-grid class="ion-no-padding p-2">
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{cpl.itemBarcode}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{cpl.itemCode}}</div>
+                  <div class="ml-1">
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && cpl.itemVariationLineXId"> {{cpl.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && cpl.itemVariationXId"> {{cpl.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && cpl.itemVariationLineYId"> {{cpl.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && cpl.itemVariationYId"> {{cpl.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>{{cpl.description}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>Qty</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{cpl.qtyPicked}}</div>
+                </ion-col>
+                <ion-col></ion-col>
+                <ion-col></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </div>
+        <div *ngIf="isPacking">
+          <ion-item class="ion-no-padding" lines="full" *ngFor="let opl of line.outstandingPackList">
+            <ion-grid class="ion-no-padding p-2">
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{opl.itemCode}}</div>
+                  <div class="ml-1">
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && opl.itemVariationLineXId"> {{opl.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && opl.itemVariationXId"> {{opl.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && opl.itemVariationLineYId"> {{opl.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && opl.itemVariationYId"> {{opl.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  </div>
+                </ion-col>
+                <ion-col class="ion-flex justify-content-end">
+                  <ion-icon *ngIf="opl.qtyRequest === (opl.qtyPackedSo + opl.qtyPackedCurrent)" color="success" name="checkmark-circle"></ion-icon>
+                </ion-col>
+              </ion-row>
+              <ion-row *ngIf="opl.rack !== null || opl.subRack !== null">
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>Location</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{opl.rack}} - {{opl.subRack}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>SO Qty</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{opl.qtyRequest}}</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>Packed Qty</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{opl.qtyPackedCurrent + opl.qtyPackedSo}}</div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+          <div class="px-2 pt-2 font-bold">Current Packed List</div>
+          <ion-item class="ion-no-padding" lines="full" *ngFor="let cpl of line.currentPackList">
+            <ion-grid class="ion-no-padding p-2">
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{cpl.itemBarcode}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div class="font-bold">{{cpl.itemCode}}</div>
+                  <div class="ml-1">
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && cpl.itemVariationLineXId"> {{cpl.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && cpl.itemVariationXId"> {{cpl.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && cpl.itemVariationLineYId"> {{cpl.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && cpl.itemVariationYId"> {{cpl.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>{{cpl.description}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-margin-auto ion-flex">
+                  <div>Qty</div>
+                </ion-col>
+                <ion-col class="ion-margin-auto">
+                  <div class="ion-text-center">{{cpl.qtyPacked}}</div>
+                </ion-col>
+                <ion-col></ion-col>
+                <ion-col></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </div>        
+      </ion-list>
+    </ion-accordion>
+  </ion-accordion-group>
+</div>
+
+<div *ngIf="!isWithSo">
+  <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" style="font-size: smaller;" lines="full">
+    <div class="px-2 pt-2 font-bold">Current Picked List</div>
+    <ion-item class="ion-no-padding" lines="full" *ngFor="let cpl of data">
+      <ion-grid class="ion-no-padding p-2">
+        <ion-row>
+          <ion-col class="ion-margin-auto ion-flex">
+            <div class="font-bold">{{cpl.itemBarcode}}</div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-margin-auto ion-flex">
+            <div class="font-bold">{{cpl.itemCode}}</div>
+            <div class="ml-1">
+              <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && cpl.itemVariationLineXId"> {{cpl.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
+              <span class="badge-green px-1 mr-1" *ngIf="itemVariationXMasterList.length > 0 && cpl.itemVariationXId"> {{cpl.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+              <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && cpl.itemVariationLineYId"> {{cpl.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
+              <span class="badge-purple px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && cpl.itemVariationYId"> {{cpl.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+            </div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-margin-auto ion-flex">
+            <div>{{cpl.description}}</div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-margin-auto ion-flex">
+            <div>Qty</div>
+          </ion-col>
+          <ion-col class="ion-margin-auto">
+            <div class="ion-text-center">{{cpl.qtyPicked}}</div>
+          </ion-col>
+          <ion-col></ion-col>
+          <ion-col></ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  </ion-list>
+</div>

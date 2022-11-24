@@ -112,7 +112,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/picking/picking-detail',
-    loadChildren: () => import('./modules/transactions/pages/picking/picking-detail/detail/detail.module').then(m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/picking/picking-detail/picking-detail.module').then(m => m.PickingDetailPageModule)
   },
   // transaction-packing
   {
@@ -121,7 +121,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/packing/packing-detail',
-    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/detail/detail.module').then( m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/packing-detail.module').then( m => m.PackingDetailPageModule)
   },
   // transaction-other-sales
   {

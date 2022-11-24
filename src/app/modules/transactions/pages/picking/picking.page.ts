@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PickingList } from '../../models/picking';
 import { CommonService } from '../../../../shared/services/common.service';
 import { PickingService } from '../../services/picking.service';
 import { FilterPage } from '../filter/filter.page';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { GoodsPickingList } from '../../models/picking';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-picking',
@@ -15,8 +16,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 })
 export class PickingPage implements OnInit {
 
-  content_loaded: boolean = false;
-  objects: PickingList[] = [];
+  objects: GoodsPickingList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -24,7 +24,7 @@ export class PickingPage implements OnInit {
   constructor(
     private commonService: CommonService,
     private configService: ConfigService,
-    private pickingService: PickingService,
+    private goodsPickingService: PickingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
@@ -44,12 +44,8 @@ export class PickingPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    this.pickingService.getPickingList(this.startDate, this.endDate).subscribe(response => {
+    this.goodsPickingService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
       this.objects = response;
-      if (this.objects.length > 0) {
-        this.content_loaded = true;
-      }
-      // this.toastService.presentToast('Search Completed.', '', 'bottom', 'success', 1000);
     }, error => {
       console.log((error));
     })
@@ -57,38 +53,13 @@ export class PickingPage implements OnInit {
 
   /* #endregion */
 
-  /* #region  add picking */
+  /* #region  add goods picking */
 
   async addObject() {
-    let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
-    if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
-      this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1000);
-    } else {
+    if (this.goodsPickingService.hasWarehouseAgent()) {
       this.navController.navigateForward('/transactions/picking/picking-sales-order');
-    }
-  }
-
-  /* #endregion */
-
-  async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      componentProps: {
-        startDate: this.startDate,
-        endDate: this.endDate
-      },
-      canDismiss: true
-    })
-
-    await modal.present();
-
-    let { data } = await modal.onWillDismiss();
-
-    if (data && data !== undefined) {
-      this.startDate = new Date(data.startDate);
-      this.endDate = new Date(data.endDate);
-
-      this.loadObjects();
+    } else {
+      this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1000);
     }
   }
 
@@ -114,10 +85,30 @@ export class PickingPage implements OnInit {
     await actionSheet.present();
   }
 
-  goToDetail(pickingId: number) {
+  /* #endregion */
+
+  async filter() {
+    const modal = await this.modalController.create({
+      component: FilterPage,
+      componentProps: {
+        startDate: this.startDate,
+        endDate: this.endDate
+      },
+      canDismiss: true
+    })
+    await modal.present();
+    let { data } = await modal.onWillDismiss();
+    if (data && data !== undefined) {
+      this.startDate = new Date(data.startDate);
+      this.endDate = new Date(data.endDate);
+      this.loadObjects();
+    }
+  }
+
+  goToDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        pickingId: pickingId
+        objectId: objectId
       }
     }
     this.navController.navigateForward('/transactions/picking/picking-detail', navigationExtras);

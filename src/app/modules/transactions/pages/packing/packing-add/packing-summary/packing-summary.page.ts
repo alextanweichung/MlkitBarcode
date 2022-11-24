@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { PackingSummary } from 'src/app/modules/transactions/models/packing';
+import { GoodsPackingSummary } from 'src/app/modules/transactions/models/packing';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
@@ -11,7 +11,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 })
 export class PackingSummaryPage implements OnInit {
 
-  packingSummary: PackingSummary;
+  objectSummary: GoodsPackingSummary;
 
   constructor(
     private packingService: PackingService,
@@ -19,7 +19,7 @@ export class PackingSummaryPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.packingSummary = this.packingService.packingSummary;
+    this.objectSummary = this.packingService.objectSummary;
     this.loadMasterList();
   }
 

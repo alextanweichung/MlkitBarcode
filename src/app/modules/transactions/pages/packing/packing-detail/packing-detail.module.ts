@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { DetailPageRoutingModule } from './detail-routing.module';
+import { PackingDetailPageRoutingModule } from './packing-detail-routing.module';
 
-import { DetailPage } from './detail.page';
+import { PackingDetailPage } from './packing-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { ItemViewListFlatPageModule } from 'src/app/shared/pages/item-view-list-flat/item-view-list-flat.module';
 
@@ -15,10 +15,10 @@ import { ItemViewListFlatPageModule } from 'src/app/shared/pages/item-view-list-
     CommonModule,
     FormsModule,
     IonicModule,
-    DetailPageRoutingModule,
+    PackingDetailPageRoutingModule,
     IdMappingModule,
     ItemViewListFlatPageModule
   ],
-  declarations: [DetailPage]
+  declarations: [PackingDetailPage]
 })
-export class DetailPageModule {}
+export class PackingDetailPageModule {}
