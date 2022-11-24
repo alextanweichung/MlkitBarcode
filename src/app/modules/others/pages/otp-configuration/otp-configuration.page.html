@@ -12,28 +12,25 @@
         <ion-label class="label-title">Generate OTP</ion-label>
       </ion-toolbar>
     </ion-header>
-    <div class="p-2">
-      <ion-list class="list-custom" lines="full">
-        <app-search-dropdown title="Users" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>
-        <app-search-dropdown title="Validity" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="validitySerachDropdownList"></app-search-dropdown>
-        <app-search-dropdown title="App" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="appsSearchDropdownList"></app-search-dropdown>
+    <div class="ion-padding">
+      <ion-list class="list-custom" lines="none">
+        <app-search-dropdown #usersDropdown title="Users" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>
+        <app-search-dropdown #validityDropdown title="Validity" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="false" optionLabel="description" [searchDropdownList]="validitySerachDropdownList" (onActionComplete)="onValidityChanged($event)" [hidden]="selectedUser==null"></app-search-dropdown>
+        <app-search-dropdown #appsDropdown [hidden]="selectedValidity !== 'SINGLE'" title="App" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-dropdown>
+        <app-search-multi-dropdown #appsMultiDropdown [hidden]="selectedValidity !== 'MULTIPLE'" title="App" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-multi-dropdown>
       </ion-list>
       <ion-item lines="none" color="none">
-        <ion-checkbox #checkBox slot="end" [checked]="true"></ion-checkbox>
+        <ion-checkbox #checkBox slot="end" (ionChange)="onCheckBoxChecked($event)" [(ngModel)]="checkboxValue"></ion-checkbox>
         <ion-label>Default Expiry</ion-label>
       </ion-item>
-      <ion-item *ngIf="!checkBox.checked" lines="none">
-        <ion-label>
-          <p>Expired on</p>
-        </ion-label>
-        <ion-input readonly slot="end" type="text" class="ion-text-right ion-no-padding-end" (click)="toggleDateTo()" [(ngModel)]="expiryDate"></ion-input>
-      </ion-item>
-      <ion-list class="list-custom" lines="none" *ngIf="!checkBox.checked">
-        <ion-datetime class="animate__animated animate__fadeIn" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onExpiryDateSelect($event)" *ngIf="expiryDateActive" [value]="date.toISOString()">
-        </ion-datetime>
-      </ion-list>
+        <app-calendar-input [hidden]="checkBox.checked" #calendar title="Expiry Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
     </div>
 </ion-content>
 <ion-footer>
-  <ion-button class="ion-margin" expand="block" (click)="generateOtp()">Generate</ion-button>
+  <ion-item class="ion-justify-content-center ion-align-items-end" lines="none" *ngIf="generatedOtpCode" color="none">
+    <ion-label>Copied OTP: {{generatedOtpCode}}</ion-label>
+  </ion-item>
+  <ion-toolbar class="ion-no-border">
+    <ion-button class="ion-margin" expand="block" (click)="generateOtp()">Generate</ion-button>
+  </ion-toolbar>
 </ion-footer>

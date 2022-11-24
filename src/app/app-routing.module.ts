@@ -145,6 +145,10 @@ const routes: Routes = [
     path: 'others/otp-configuration',
     loadChildren: () => import('./modules/others/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
   },
+  {
+    path: 'others/otp-config-list',
+    loadChildren: () => import('./modules/others/pages/otp-configuration/otp-config-list/otp-config-list.module').then( m => m.OtpConfigListPageModule)
+  },
   // others-check-balance
   {
     path: 'others/check-balance',
