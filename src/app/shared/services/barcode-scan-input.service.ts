@@ -25,7 +25,7 @@ export class BarcodeScanInputService {
   }
 
   getItemInfoByBarcode(barcode: string) {
-    return this.http.get<ItemBarcodeModel>(this.baseUrl + this.apiObject + "/item/" + barcode);
+    return this.http.get<ItemBarcodeModel>(this.baseUrl + this.apiObject + "/itemByBarcode/" + barcode);
   }
 
 }

@@ -1,93 +1,83 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import { Item } from 'src/app/modules/transactions/models/item';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemList } from '../../models/item-list';
+import { MasterListDetails } from '../../models/master-list-details';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { TransactionDetail } from '../../models/transaction-detail';
+import { InnerVariationDetail } from '../../models/variation-detail';
 
 @Component({
   selector: 'app-item-cart',
   templateUrl: './item-cart.page.html',
   styleUrls: ['./item-cart.page.scss'],
 })
-export class ItemCartPage implements OnInit, OnChanges {
+export class ItemCartPage implements OnInit {
 
-  @Input() itemInCart: Item[] = [];
-  @Output() onItemInCartEditCompleted: EventEmitter<Item[]> = new EventEmitter();
+  @Input() itemInCart: TransactionDetail[] = [];
+  @Input() useTax: boolean;
+  @Input() maxPrecision: number = 2;
+  @Input() maxPrecisionTax: number = 2;
+  @Input() isDisplayTaxInclusive: boolean = true;
+  @Input() discountGroupMasterList: MasterListDetails[] = [];
+  @Input() itemVariationXMasterList: MasterListDetails[] = [];
+  @Input() itemVariationYMasterList: MasterListDetails[] = [];
+  @Input() isItemPriceTaxInclusive: boolean = false;
+  @Output() onItemInCartEditCompleted: EventEmitter<TransactionDetail> = new EventEmitter();
+  @Output() onItemInCartDeleteCompleted: EventEmitter<TransactionDetail[]> = new EventEmitter();
 
   constructor(
     private alertController: AlertController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private commonService: CommonService,
   ) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.itemInCart) {
-      this.combineItemWithVariations();
-    }
-  }
-
   ngOnInit() {
-
+    
   }
 
-  itemToDisplay: ItemList[] = [];
-  combineItemWithVariations() {
-    this.itemToDisplay = [];
-    if (this.itemInCart.length > 0) {
-      const itemIds = [...new Set(this.itemInCart.map(r => r.itemId))];
-      itemIds.forEach(r => {
-        let oneItem = this.itemInCart.find(rr => rr.itemId === r);
-        this.itemToDisplay.push({
-          itemId: r,
-          itemCode: oneItem.itemCode,
-          itemSku: oneItem.itemSku,
-          description: oneItem.description,
-          unitPrice: oneItem.unitPrice,
-          variationTypeCode: oneItem.variationTypeCode,
-          qtyRequest: oneItem.qtyRequest
-        })
-      })
+  /* #region  variation type 0 */
+
+  async decreaseQty(trxLine: TransactionDetail) {
+    if (trxLine.qtyRequest - 1 === 0) {
+      await this.presentDeleteItemAlert(trxLine);
+    } else {
+      trxLine.qtyRequest -= 1;
+      this.onItemInCartEditCompleted.emit(trxLine);
     }
   }
 
-  decreaseQty(item) {
-    item.qtyRequest--;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
+  increaseQty(trxLine: TransactionDetail) {
+    trxLine.qtyRequest = (trxLine.qtyRequest ?? 0) + 1;
+    this.onItemInCartEditCompleted.emit(trxLine);
+  }
+
+  /* #endregion */
+
+  /* #region  variation type 1 and 2 */
+
+  async decreaseVariationQty(trxLine: TransactionDetail, data: InnerVariationDetail) {
+    if (data.qtyRequest - 1 === 0) {
+      await this.presentDeleteItemVariationAlert(trxLine, data);
+    } else {
+      data.qtyRequest -= 1;
+      this.onItemInCartEditCompleted.emit(trxLine);
     }
-    if (item.qtyRequest === 0) {
-      this.presentDeleteAlert(item.itemSku);
-    }
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
   }
 
-  increaseQty(item) {
-    item.qtyRequest++;
-    if (item.variationTypeCode === '0') {
-      this.itemInCart.find(r => r.itemId === item.itemId).qtyRequest = item.qtyRequest;
-    }
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
+  increaseVariationQty(trxLine: TransactionDetail, data: InnerVariationDetail) {
+    data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+    this.onItemInCartEditCompleted.emit(trxLine);
   }
 
-  resetQtyBackToOne(itemSku: string) {
-    this.itemInCart.find(r => r.itemSku === itemSku).qtyRequest = 1;
-    this.combineItemWithVariations();
-
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
+  filter(data: InnerVariationDetail[]) {
+    return data.filter(r => r.qtyRequest > 0);
   }
 
-  qtyChanged() {
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
-  }
+  /* #endregion */
+  
+  /* #region  delete */
 
-  getVariationSum(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
-  }
-
-  getVariations(item: ItemList) {
-    return this.itemInCart.filter(r => r.itemId === item.itemId);
-  }
-
-  async presentDeleteAlert(itemSku: string) {
+  async presentDeleteItemAlert(item: TransactionDetail) {
     const alert = await this.alertController.create({
       header: 'Are you sure to delete?',
       buttons: [
@@ -95,55 +85,98 @@ export class ItemCartPage implements OnInit, OnChanges {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            this.resetQtyBackToOne(itemSku);
+            item.qtyRequest = 1;
           }
         },
         {
           text: 'OK',
           role: 'confirm',
           handler: () => {
-            this.removeItemBySku(itemSku);
+            this.removeItemById(item);
           },
         },
       ],
     });
-
     await alert.present();
   }
 
-  async presentDeleteItemAlert(itemId: number) {
+  async removeItemById(item: TransactionDetail) {
+    this.itemInCart = JSON.parse(JSON.stringify(this.itemInCart.filter(r => r.itemId !== item.itemId)));
+    this.onItemInCartDeleteCompleted.emit(this.itemInCart);
+    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
+  }  
+
+  async presentDeleteItemVariationAlert(trxLine: TransactionDetail, item: InnerVariationDetail) {
     const alert = await this.alertController.create({
       header: 'Are you sure to delete?',
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
+          handler: () => {
+            item.qtyRequest = 1;
+          }
         },
         {
           text: 'OK',
           role: 'confirm',
           handler: () => {
-            this.removeItemById(itemId);
+            item.qtyRequest = null;
+            this.onItemInCartEditCompleted.emit(trxLine);
           },
         },
       ],
     });
-
     await alert.present();
   }
 
-  removeItemBySku(itemSku: string) {
-    this.itemInCart.splice(this.itemInCart.findIndex(r => r.itemSku === itemSku), 1);
-    this.combineItemWithVariations();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
+  /* #endregion */
+
+  /* #region  modify line details */
+
+  selectedItem: TransactionDetail;
+  async showLineDetails(trxLine: TransactionDetail) {
+    this.selectedItem = trxLine;
+    await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.isItemPriceTaxInclusive, this.isDisplayTaxInclusive, this.maxPrecision);
+    this.showItemModal();
   }
 
-  removeItemById(itemId: number) {
-    this.itemInCart = this.itemInCart.filter(r => r.itemId !== itemId);
-    this.combineItemWithVariations();
-    this.onItemInCartEditCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
+  isModalOpen: boolean = false;
+  showItemModal() {
+    this.isModalOpen = true;
   }
+
+  hideItemModal() {
+    this.isModalOpen = false;
+  }
+
+  highlight(input) {
+    input.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
+  async onDiscountGroupChanged() {
+    let lookupvalue = this.discountGroupMasterList.find(r => r.code === this.selectedItem.discountGroupCode);
+    if (lookupvalue) {
+      this.itemInCart.find(r => r.itemId === this.selectedItem.itemId).discountExpression = lookupvalue.attribute1 + "%";
+      this.selectedItem.discountExpression = lookupvalue.attribute1 + "%";
+    } else {
+      this.itemInCart.find(r => r.itemId === this.selectedItem.itemId).discountExpression = null;
+      this.selectedItem.discountExpression = null;
+    }
+    await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.isItemPriceTaxInclusive, this.isDisplayTaxInclusive, this.maxPrecision);
+    this.onItemInCartEditCompleted.emit(this.selectedItem);
+  }
+
+  onModalItemEditComplete() {
+    this.onItemInCartEditCompleted.emit(this.selectedItem);
+  }
+
+  onItemEditComplete(trxLine) {
+    this.onItemInCartEditCompleted.emit(trxLine);
+  }
+
+  /* #endregion */
 
 }

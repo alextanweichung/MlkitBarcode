@@ -13,6 +13,18 @@ export interface Item {
    itemVariationLineXDescription: string
    itemVariationLineYDescription: string
    unitPrice: number
+   unitPriceExTax: number
+   subTotal?: number
+   subTotalExTax?: number
+   discountGroupCode?: string
+   discountExpression?: string
+   discountAmt?: number
+   discountAmtExTax?: number
+   taxId: number
+   taxCode: string
+   taxPct: number
+   taxAmt?: number
+   taxInclusive?: boolean
    currencyId: number
    availableQty: number
    qtyRequest?: number

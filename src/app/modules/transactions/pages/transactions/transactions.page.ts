@@ -32,23 +32,18 @@ const mobileOtherSalesCode: string = 'MATROS';
 export class TransactionsPage implements OnInit {
 
   showQuotation: boolean = false;
-  quotation_loaded: boolean = false;
   quotations: QuotationList[] = [];
 
   showSalesOrder: boolean = false;
-  sales_order_loaded: boolean = false;
   salesOrders: SalesOrderList[] = [];
 
   showPicking: boolean = false;
-  picking_loaded: boolean = false;
   pickings: PickingList[] = [];
 
   showPacking: boolean = false;
-  packing_load: boolean = false;
   packings: PackingList[] = [];
 
   showOtherSales: boolean = false;
-  other_sales_load: boolean = false;
   other_sales: OtherSalesList[] = [];
 
   constructor(
@@ -107,7 +102,6 @@ export class TransactionsPage implements OnInit {
 
   transactionMode: string = "online";
   onTransactionModeChanged(event) {
-    console.log("🚀 ~ file: transactions.page.ts ~ line 103 ~ TransactionsPage ~ onTransactionModeChanged ~ event", event)
      if (event.detail.value === 'offline') {
       this.sync();
      }
@@ -123,7 +117,7 @@ export class TransactionsPage implements OnInit {
       });
       await loading.present();
 
-      this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+      this.commonService.syncInbound().subscribe(async response => {
         let itemMaster: PDItemMaster[] = response['itemMaster'];
         let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
@@ -144,21 +138,17 @@ export class TransactionsPage implements OnInit {
   /* #region  quotation */
 
   loadRecentQuotation() {
-    this.quotationService.getRecentQuotationList().subscribe(response => {
-      this.quotations = response;
-      if (this.quotations.length > 0) {
-        this.quotation_loaded = true;
-      }
+    this.quotationService.getObjectList().subscribe(response => {
+      this.quotations = response.slice(0, 3);
     }, error => {
       console.log(error);
     })
   }
 
-  async goToQuotationDetail(quotationId: number) {
+  async goToQuotationDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        quotationId: quotationId,
-        parent: "Transactions"
+        objectId: objectId
       }
     }
     this.navController.navigateForward('/transactions/quotation/quotation-detail', navigationExtras);
@@ -166,24 +156,20 @@ export class TransactionsPage implements OnInit {
 
   /* #endregion */
 
-  /* #region  quotation */
+  /* #region  sales order */
 
   loadRecentSalesOrder() {
-    this.salesOrderService.getRecentSalesOrderList().subscribe(response => {
-      this.salesOrders = response;
-      if (this.salesOrders.length > 0) {
-        this.sales_order_loaded = true;
-      }
+    this.salesOrderService.getObjectList().subscribe(response => {
+      this.salesOrders = response.slice(0, 3);
     }, error => {
       console.log(error);
     })
   }
 
-  async goToSalesOrderDetail(salesOrderId: number) {
+  async goToSalesOrderDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        salesOrderId: salesOrderId,
-        parent: "Transactions"
+        objectId: objectId,
       }
     }
     this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);
@@ -196,9 +182,6 @@ export class TransactionsPage implements OnInit {
   loadRecentPicking() {
     this.pickingService.getRecentPickingList().subscribe(response => {
       this.pickings = response;
-      if (this.pickings.length > 0) {
-        this.picking_loaded = true;
-      }
     }, error => {
       console.log(error);
     })
@@ -221,9 +204,6 @@ export class TransactionsPage implements OnInit {
   loadRecentPacking() {
     this.packingService.getRecentPackingList().subscribe(response => {
       this.packings = response;
-      if (this.packings.length > 0) {
-        this.packing_load = true;
-      }
     }, error => {
       console.log(error);
     })
@@ -246,9 +226,6 @@ export class TransactionsPage implements OnInit {
   loadRecentOtherSales() {
     this.otherSalesService.getRecentOtherSalesList().subscribe(response => {
       this.other_sales = response;
-      if (this.other_sales.length > 0) {
-        this.other_sales_load = true;
-      }
     }, error => {
       console.log(error);
     })

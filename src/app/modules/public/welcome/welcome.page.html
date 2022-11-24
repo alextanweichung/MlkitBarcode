@@ -16,13 +16,13 @@
       <p>You can describe this feature here with a sentence of multiple lines.</p>
       <ion-item>
         <ion-label color="tertiary" position="stacked">Activation Code</ion-label>
-        <ion-input [(ngModel)]="activationCode" autocomplete="off" placeholder="Activation Code"></ion-input>
+        <ion-textarea [(ngModel)]="activationCode" autocomplete="off" placeholder="Activation Code"></ion-textarea>
       </ion-item>
     </ng-template>
   </swiper>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp">
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
   <ion-button class="ion-margin" expand="block" (click)="nextSlide()" *ngIf="!last_slide">
     Next
   </ion-button>

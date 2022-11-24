@@ -2,21 +2,21 @@ export interface ItemBarcodeModel {
   itemId: number
   itemCode: string
   description: string
+  deactivated: boolean
   variationTypeCode: string
   itemVariationLineXId: number
   itemVariationLineYId: number
+  itemSku: string
   itemVariationLineXDescription: string
   itemVariationLineYDescription: string
-  itemSku: string
   itemBarcodeTagId: number
   itemBarcode: string
   itemUomId: number
-  itemUomDescription: string
-  itemBrandId: number
-  itemGroupId: number
-  itemCategoryId: number
+  itemUomDesc: string
+  brandId: number
+  groupId: number
+  catId: number
   unitPrice: number
-  deactivated: boolean
 }
 
 export interface BarcodeTag {

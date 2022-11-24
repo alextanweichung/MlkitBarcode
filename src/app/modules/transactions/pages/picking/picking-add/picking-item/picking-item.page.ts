@@ -48,7 +48,8 @@ export class PickingItemPage implements OnInit {
     if (this.pickingSalesOrders && this.pickingSalesOrders.length > 0) {
       this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
     }
-    this.loadModuleControl();
+    // this.loadModuleControl();
+    this.loadImage = this.configService.sys_parameter.loadImage;
     this.loadMasterList();
   }
 
@@ -147,7 +148,6 @@ export class PickingItemPage implements OnInit {
 
   selectedSoDetail: PickingSalesOrderDetail;
   async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
-    console.log("🚀 ~ file: picking-item.page.ts ~ line 166 ~ PickingItemPage ~ addItemToSo ~ itemInfo", itemInfo)
     if (this.pickingDtoHeader.isWithSo && this.accordianGroup1.value === undefined) {
       this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
       return;
@@ -155,7 +155,6 @@ export class PickingItemPage implements OnInit {
 
     if (this.pickingDtoHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
-      console.log("🚀 ~ file: picking-item.page.ts ~ line 157 ~ PickingItemPage ~ addItemToSo ~ itemIndex", itemIndex)
       if (itemIndex > -1) {
         this.selectedSoDetail = this.selectedSo.details[itemIndex];
         this.selectedSoDetail.qtyPickedCurrent += 1;

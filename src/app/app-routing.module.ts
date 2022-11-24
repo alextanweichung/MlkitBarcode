@@ -89,7 +89,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/quotation/quotation-detail',
-    loadChildren: () => import('./modules/transactions/pages/quotation/quotation-detail/detail/detail.module').then(m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/quotation/quotation-detail/quotation-detail.module').then(m => m.QuotationDetailPageModule)
   },
   // transaction-sales-order
   {
@@ -98,7 +98,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/sales-order/sales-order-detail',
-    loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/detail/detail.module').then(m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/sales-order-detail.module').then(m => m.SalesOrderDetailPageModule)
   },
   // transactions-purchase-order
   {
@@ -127,6 +127,10 @@ const routes: Routes = [
   {
     path: 'transactions/other-sales',
     loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales.module').then( m => m.OtherSalesPageModule)
+  },
+  {
+    path: 'transactions/other-sales/other-sales-detail',
+    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales-detail/other-sales-detail.module').then( m => m.OtherSalesDetailPageModule)
   },
 
 
@@ -202,7 +206,8 @@ const routes: Routes = [
   {
     path: 'barcode-scan-input',
     loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then( m => m.BarcodeScanInputPageModule)
-  },  {
+  },
+  {
     path: 'item-add-list-flat',
     loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then( m => m.ItemAddListFlatPageModule)
   },

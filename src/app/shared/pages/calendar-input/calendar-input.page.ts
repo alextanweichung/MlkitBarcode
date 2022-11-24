@@ -23,7 +23,6 @@ export class CalendarInputPage implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.date_value) {
-      console.log("🚀 ~ file: calendar-input.page.ts ~ line 27 ~ CalendarInputPage ~ ngOnChanges ~ this.date_value", this.date_value)
       if (this.date_value) {
         if (this.presentation === 'date-time') {
           this.date_value = new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.date_value.getHours(), this.date_value.getMinutes(), 0);

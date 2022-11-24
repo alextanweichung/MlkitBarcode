@@ -5,6 +5,7 @@ import { DBSQLiteValues, SQLiteDBConnection } from '@capacitor-community/sqlite'
 import { DatabaseService } from 'src/app/services/sqlite/database.service';
 import { create_item_barcode_table, create_item_master_table } from 'src/app/services/sqlite/migration.service';
 import { SQLiteService } from 'src/app/services/sqlite/sqlite.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { dbConfig, inboundDb_Tables } from '../config/db-config';
 
@@ -17,7 +18,8 @@ export class CommonQueryService<T> {
     @Inject(LOCALE_ID) private locale: string,
     private _databaseService: DatabaseService,
     private http: HttpClient,
-    private sqlite: SQLiteService
+    private sqlite: SQLiteService,
+    private toastService: ToastService,
   ) { }
 
   private getAllColumns(object: Object) {
@@ -227,7 +229,6 @@ export class CommonQueryService<T> {
       return ret;
     }, database)
   }
-
 
   /* #region  inbound */
 

@@ -6,6 +6,7 @@ SwiperCore.use([Pagination]);
 import { ConfigService } from 'src/app/services/config/config.service';
 import { NavController } from '@ionic/angular';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-welcome',
@@ -24,11 +25,12 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   swiperConfig: SwiperOptions = {
     slidesPerView: 1,
     spaceBetween: 50,
-    pagination: { clickable: false },
+    pagination: false,
     allowTouchMove: false // set true to allow swiping
   }
 
   constructor(
+    private toastService: ToastService,
     private configService: ConfigService,
     private navController: NavController
   ) { }
@@ -64,12 +66,21 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   // Go to main content
   async getStarted() {
     if (this.activationCode.length > 0) {
-      let code = atob(this.activationCode);
-      let config: Sys_Parameter = JSON.parse(code);
-      await this.configService.insert(config);
+      try {
+        let code = atob(this.activationCode);
+        let config: Sys_Parameter = JSON.parse(code);
+        await this.configService.insert(config).then(response => {
+          // Navigate to /home
+          this.navController.navigateRoot('/signin');
+        }).catch(error => {
+          this.toastService.presentToast(error.message, '', 'bottom', 'danger', 1000);
+        });
+      } catch (error) {
+        this.toastService.presentToast('Invalid activation code', '', 'bottom', 'medium', 1000);
+      }
+    } else {
+      this.toastService.presentToast('Please enter activation code', '', 'bottom', 'medium', 1000);
     }
-    // Navigate to /home
-    this.navController.navigateRoot('/signin');
   }
 
   // async insertConfig(config: Config) {

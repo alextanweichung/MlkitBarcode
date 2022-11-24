@@ -5,11 +5,13 @@ import { Injectable } from '@angular/core';
 import { MigrationService } from './migration.service';
 import { ConfigService } from '../config/config.service';
 import { Capacitor } from '@capacitor/core';
+import { ToastService } from '../toast/toast.service';
 
 @Injectable()
 export class InitializeAppService {
 
   constructor(
+    private toastService: ToastService,
     private sqliteService: SQLiteService,
     private configService: ConfigService,
     private migrationService: MigrationService) { }
@@ -25,7 +27,6 @@ export class InitializeAppService {
       } catch (error) {
         throw Error(`initializeAppError: ${error}`);
       }
-
     });
   }
 

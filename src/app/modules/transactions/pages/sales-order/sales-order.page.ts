@@ -6,6 +6,7 @@ import { SalesOrderList } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-sales-order',
@@ -14,7 +15,6 @@ import { FilterPage } from '../filter/filter.page';
 })
 export class PickingSalesOrderPage implements OnInit {
 
-  content_loaded: boolean = false;
   objects: SalesOrderList[] = [];
 
   startDate: Date;
@@ -41,12 +41,8 @@ export class PickingSalesOrderPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    this.salesOrderService.getSalesOrderList(this.startDate, this.endDate).subscribe(response => {
+    this.salesOrderService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
       this.objects = response;
-      if (this.objects.length > 0) {
-        this.content_loaded = true;
-      }
-      // this.toastService.presentToast('Search Completed.', '', 'bottom', 'success', 1000);
     }, error => {
       console.log((error));
     })
@@ -56,36 +52,11 @@ export class PickingSalesOrderPage implements OnInit {
 
   /* #region  add quotation */
 
-  async addObject() {
-    let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
-    if (salesAgentId === 0 || salesAgentId === undefined) {
-      this.toastService.presentToast('Error', 'Sales Agent not set', 'bottom', 'danger', 1000);
+  async addObject() {    
+    if (this.salesOrderService.hasSalesAgent()) {
+      this.navController.navigateForward('/transactions/sales-order/sales-order-header');
     } else {
-      this.navController.navigateForward('/transactions/sales-order/sales-order-customer');
-    }
-  }
-
-  /* #endregion */
-
-  async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      componentProps: {
-        startDate: this.startDate,
-        endDate: this.endDate
-      },
-      canDismiss: true
-    })
-
-    await modal.present();
-
-    let { data } = await modal.onWillDismiss();
-
-    if (data && data !== undefined) {
-      this.startDate = new Date(data.startDate);
-      this.endDate = new Date(data.endDate);
-
-      this.loadObjects();
+      this.toastService.presentToast('Invalid Sales Agent', '', 'bottom', 'dnager', 1000);
     }
   }
 
@@ -111,10 +82,30 @@ export class PickingSalesOrderPage implements OnInit {
     await actionSheet.present();
   }
 
-  goToDetail(salesOrderId: number) {
+  /* #endregion */
+
+  async filter() {
+    const modal = await this.modalController.create({
+      component: FilterPage,
+      componentProps: {
+        startDate: this.startDate,
+        endDate: this.endDate
+      },
+      canDismiss: true
+    })
+    await modal.present();
+    let { data } = await modal.onWillDismiss();
+    if (data && data !== undefined) {
+      this.startDate = new Date(data.startDate);
+      this.endDate = new Date(data.endDate);
+      this.loadObjects();
+    }
+  }
+
+  goToDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        salesOrderId: salesOrderId
+        objectId: objectId
       }
     }
     this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);

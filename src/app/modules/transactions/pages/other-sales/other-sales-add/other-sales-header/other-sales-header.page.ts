@@ -30,7 +30,7 @@ export class OtherSalesHeaderPage implements OnInit {
       otherSalesId: [0],
       otherSalesNum: [null],
       trxDate: [null, [Validators.required]],
-      typeCode: [null, [Validators.required]],
+      typeCode: ['S', [Validators.required]],
       salesAgentId: [null],
       customerId: [null, [Validators.required]],
       businessModelType: [null, [Validators.required]],
@@ -47,7 +47,6 @@ export class OtherSalesHeaderPage implements OnInit {
 
   ngOnInit() {
     this.loadMasterList();
-    this.loadStaticLov();
   }
 
   salesAgentMasterList: MasterListDetails[] = [];
@@ -55,21 +54,10 @@ export class OtherSalesHeaderPage implements OnInit {
   locationMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.otherSalesService.getMasterList().subscribe(response => {
-      console.log("🚀 ~ file: other-sales-header.page.ts ~ line 44 ~ OtherSalesHeaderPage ~ this.otherSalesService.getMasterList ~ response", response)
       this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.attribute5 != "T").filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.mapMasterListSearchDropdownList();
-    }, error => {
-      console.log(error);
-    })
-  }
-
-  otherSalesTypeMasterList: MasterListDetails[] = [];
-  loadStaticLov() {
-    this.otherSalesService.getStaticLov().subscribe(response => {
-      this.otherSalesTypeMasterList = response.filter(x => x.objectName == 'OtherSalesType').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.mapStaticLovSearchDropdownList();
     }, error => {
       console.log(error);
     })
@@ -95,26 +83,9 @@ export class OtherSalesHeaderPage implements OnInit {
     })
   }
 
-  otherSalesTypeSearchDropdownList: SearchDropdownList[] = [];
-  mapStaticLovSearchDropdownList() {
-    this.otherSalesTypeMasterList.forEach(r => {
-      this.otherSalesTypeSearchDropdownList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-  }
-
   onTrxDateSelected(event: Date) {
     if (event) {
       this.objectForm.patchValue({ trxDate: event });
-    }
-  }
-
-  onOtherSalesTypeChanged(event) {
-    if (event) {
-      this.objectForm.patchValue({ typeCode: event.code });
     }
   }
 
@@ -181,15 +152,15 @@ export class OtherSalesHeaderPage implements OnInit {
     const { role } = await actionSheet.onWillDismiss();
 
     if (role === 'confirm') {
-      // this.otherSalesService.resetVariables();
+      this.otherSalesService.resetVariables();
       this.navController.navigateBack('/transactions/other-sales');
     }
   }
 
   nextStep() {
-    // this.stockCountService.setHeader(this.objectForm.getRawValue());
-    // this.stockCountService.removeLines();
-    this.navController.navigateForward('/transactions/other-sales/other-sales-add/other-sales-item');
+    this.otherSalesService.setHeader(this.objectForm.value);
+    this.otherSalesService.removeDetails();
+    this.navController.navigateForward('/transactions/other-sales/other-sales-item');
   }
 
 }

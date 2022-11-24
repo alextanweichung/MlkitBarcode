@@ -29,6 +29,7 @@ export class CardsPage implements AfterContentChecked {
   }
 
   show_item_image: boolean = false;
+  use_offline_resources: boolean = false;
 
   constructor(
     private configService: ConfigService,
@@ -46,7 +47,6 @@ export class CardsPage implements AfterContentChecked {
       this.swiper.updateSwiper({});
     }
     this.show_item_image = this.configService.sys_parameter.loadImage;
-    console.log("🚀 ~ file: cards.page.ts ~ line 49 ~ CardsPage ~ ngAfterContentChecked ~ this.configService.sys_parameter.loadImage", this.configService.sys_parameter.loadImage)
   }
 
   // Sync
@@ -59,7 +59,7 @@ export class CardsPage implements AfterContentChecked {
     });
     await loading.present();
 
-    this.commonService.syncAllItemByLocationCode().subscribe(async response => {
+    this.commonService.syncInbound().subscribe(async response => {
       let itemMaster: PDItemMaster[] = response['itemMaster'];
       let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
       await this.configService.syncInboundData(itemMaster, itemBarcode);
@@ -114,8 +114,29 @@ export class CardsPage implements AfterContentChecked {
     if (Capacitor.getPlatform() !== 'web') {
       let t = this.configService.sys_parameter;
       t.loadImage = event.detail.checked;
-      await this.configService.update(t);
-      this.configService.load();
+      try {
+        await this.configService.update(t);
+        this.configService.load();
+      } catch (error) {
+        this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+      }
+    }
+  }
+
+  async toggleUseOnlineResources(event) {
+    if (Capacitor.getPlatform() !== 'web') {
+      let t = this.configService.sys_parameter;
+      t.onlineMode = event.detail.checked;
+      try {
+        await this.configService.update(t);
+        this.configService.load();
+        if (!t.onlineMode) {
+          await this.configService.loadItemBarcode()
+          await this.configService.loadItemMaster();
+        }
+      } catch (error) {
+        this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+      }
     }
   }
 

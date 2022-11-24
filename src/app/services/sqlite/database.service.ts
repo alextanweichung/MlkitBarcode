@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { ToastService } from '../toast/toast.service';
 import { SQLiteService } from './sqlite.service';
 
 interface SQLiteDBConnectionCallback<T> { (myArguments: SQLiteDBConnection): T }
 
 @Injectable()
 export class DatabaseService {
-  
 
-  constructor(private sqlite: SQLiteService) {
-  }
+  constructor(
+    private sqlite: SQLiteService
+  ) { }
 
   /**
    * this function will handle the sqlite isopen and isclosed automatically for you.
@@ -32,7 +33,7 @@ export class DatabaseService {
         return cb;
       }
     } catch (error) {
-      throw Error(`DatabaseServiceError: ${error}`);
+      throw Error(error.message);
     }
   }
 
