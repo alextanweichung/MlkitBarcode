@@ -32,10 +32,10 @@ export class ConfigService {
     if (Capacitor.getPlatform() === 'web') {
       this.sys_parameter = {
         Sys_ParameterId: 1,
-        apiUrl: 'https://localhost:44351/api/',
-        // apiUrl: 'https://idcp-demo.com/api/',
+        // apiUrl: 'https://localhost:44351/api/',
+        apiUrl: 'https://idcp-demo.com/api/',
         imgUrl: null,
-        onlineMode: null,
+        onlineMode: true,
         firstTimeLogin: null,
         lastDownloadAt: null,
         lastUploadAt: null,

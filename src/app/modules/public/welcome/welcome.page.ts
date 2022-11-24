@@ -73,7 +73,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
           // Navigate to /home
           this.navController.navigateRoot('/signin');
         }).catch(error => {
-          console.log("🚀 ~ file: welcome.page.ts ~ line 76 ~ WelcomePage ~ awaitthis.configService.insert ~ error", error)
           this.toastService.presentToast(error.message, '', 'bottom', 'danger', 1000);
         });
       } catch (error) {

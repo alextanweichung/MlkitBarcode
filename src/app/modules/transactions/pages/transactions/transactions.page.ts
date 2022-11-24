@@ -161,7 +161,6 @@ export class TransactionsPage implements OnInit {
   loadRecentSalesOrder() {
     this.salesOrderService.getObjectList().subscribe(response => {
       this.salesOrders = response.slice(0, 3);
-      console.log("🚀 ~ file: transactions.page.ts ~ line 164 ~ TransactionsPage ~ this.salesOrderService.getObjectList ~ this.salesOrders", this.salesOrders)
     }, error => {
       console.log(error);
     })

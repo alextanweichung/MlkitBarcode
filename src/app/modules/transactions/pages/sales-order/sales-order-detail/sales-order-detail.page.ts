@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { SalesOrderRoot } from '../../../models/sales-order';
 
@@ -18,9 +20,9 @@ export class SalesOrderDetailPage implements OnInit {
   object: SalesOrderRoot;
 
   constructor(
+    private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
-    private toastService: ToastService,
     private salesOrderService: SalesOrderService
   ) {
     this.route.queryParams.subscribe(params => {
@@ -35,11 +37,21 @@ export class SalesOrderDetailPage implements OnInit {
     if (!this.objectId) {
       this.navController.navigateBack('/transactions/sales-order')
     } else {
+      this.loadModuleControl();
       this.loadMasterList();
       this.loadObject();
     }
+  }  
+
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  loadModuleControl() {
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+    })
   }
-  
+
   locationMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];

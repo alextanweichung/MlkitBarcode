@@ -3,11 +3,6 @@
     <ion-title>
       Settings
     </ion-title>
-    <!-- <ion-buttons slot="primary">
-      <ion-button (click)="addCard()">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
-    </ion-buttons> -->
   </ion-toolbar>
 </ion-header>
 
@@ -107,6 +102,17 @@
           <p class="font-size-smallest">Hidden by default</p>
         </ion-label>
         <ion-toggle slot="end" [(ngModel)]="show_item_image" (ionChange)="toggleShowItemImage($event)"></ion-toggle>
+      </ion-item>
+
+      <ion-item button detail="false">
+        <ion-avatar slot="start" class="ion-avatar-default-icon">
+          <ion-icon color="primary" name="eye"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>Use Online Resource</h3>
+          <p class="font-size-smallest">...</p>
+        </ion-label>
+        <ion-toggle slot="end" [(ngModel)]="use_offline_resources" (ionChange)="toggleUseOnlineResources($event)"></ion-toggle>
       </ion-item>
 
       <ion-item detail="false">

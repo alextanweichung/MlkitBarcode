@@ -29,6 +29,7 @@ export class CardsPage implements AfterContentChecked {
   }
 
   show_item_image: boolean = false;
+  use_offline_resources: boolean = false;
 
   constructor(
     private configService: ConfigService,
@@ -116,6 +117,23 @@ export class CardsPage implements AfterContentChecked {
       try {
         await this.configService.update(t);
         this.configService.load();
+      } catch (error) {
+        this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+      }
+    }
+  }
+
+  async toggleUseOnlineResources(event) {
+    if (Capacitor.getPlatform() !== 'web') {
+      let t = this.configService.sys_parameter;
+      t.onlineMode = event.detail.checked;
+      try {
+        await this.configService.update(t);
+        this.configService.load();
+        if (!t.onlineMode) {
+          await this.configService.loadItemBarcode()
+          await this.configService.loadItemMaster();
+        }
       } catch (error) {
         this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
       }

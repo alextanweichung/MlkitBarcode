@@ -61,9 +61,9 @@
             <ion-col size="9">
               <div>{{item.itemCode}} - {{item.description}}</div>
             </ion-col>
-            <ion-col size="3">
-              <div class="ion-text-right" *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
-              <div class="ion-text-right" *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
+            <ion-col size="3">              
+              <div class="ion-text-right" *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat) }}</div>
+              <div class="ion-text-right" *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat) }}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -117,7 +117,7 @@
               <div>Tax Amount ({{item.taxPct+'%'}})</div>
             </ion-col>
             <ion-col size="3">
-              <div class="ion-text-right">{{item.taxAmt}}</div>
+              <div class="ion-text-right">{{item.taxAmt|number: (object?.header?.isHomeCurrency ? precisionTax.localFormat : precisionTax.foreignFormat) }}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -125,7 +125,7 @@
               <div>Subtotal (Before Tax)</div>
             </ion-col>
             <ion-col size="3">
-              <div class="ion-text-right">{{item.subTotalExTax}}</div>
+              <div class="ion-text-right">{{item.subTotalExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat) }}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -133,7 +133,7 @@
               <div>Subtotal</div>
             </ion-col>
             <ion-col size="3">
-              <div class="ion-text-right">{{item.subTotal}}</div>
+              <div class="ion-text-right">{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat) }}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

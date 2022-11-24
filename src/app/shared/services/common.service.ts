@@ -279,7 +279,6 @@ export class CommonService {
       trxLine.taxInclusive = null;
     }
     //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
-    console.log("🚀 ~ file: common.service.ts ~ line 284 ~ CommonService ~ computeDiscTaxAmount ~ trxLine", trxLine)
     return trxLine;
   }
 

@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { QuotationRoot } from '../../../models/quotation';
 
@@ -17,6 +19,7 @@ export class QuotationDetailPage implements OnInit {
   object: QuotationRoot;
 
   constructor(
+    private authService: AuthService,
     private quotationService: QuotationService,
     private route: ActivatedRoute,
     private navController: NavController
@@ -33,9 +36,19 @@ export class QuotationDetailPage implements OnInit {
     if (!this.objectId) {
       this.navController.navigateBack('/transactions/quotation')
     } else {
+      this.loadModuleControl();
       this.loadMasterList();
       this.loadObject();
     }
+  }
+
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  loadModuleControl() {
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+    })
   }
 
   locationMasterList: MasterListDetails[] = [];

@@ -137,7 +137,6 @@ export class ItemCartPage implements OnInit {
   selectedItem: TransactionDetail;
   async showLineDetails(trxLine: TransactionDetail) {
     this.selectedItem = trxLine;
-    console.log("🚀 ~ file: item-cart.page.ts ~ line 140 ~ ItemCartPage ~ showLineDetails ~ this.selectedItem", this.selectedItem)
     await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.isItemPriceTaxInclusive, this.isDisplayTaxInclusive, this.maxPrecision);
     this.showItemModal();
   }

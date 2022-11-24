@@ -1,15 +1,15 @@
-import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { LoadingController } from '@ionic/angular';
 import { format } from 'date-fns';
-import { Item } from 'src/app/modules/transactions/models/item';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
 import { MasterListDetails } from '../../models/master-list-details';
+import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
-import { InnerVariationDetail } from '../../models/variation-detail';
+import { VariationDetail, InnerVariationDetail } from '../../models/variation-detail';
 import { SearchItemService } from '../../services/search-item.service';
 
 @Component({
@@ -30,14 +30,19 @@ export class ItemAddListVariationModalPage implements OnInit {
 
   @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
 
+  onlineMode: boolean;
+
   constructor(
+    private configService: ConfigService,
     private searchItemService: SearchItemService,
     private loadingController: LoadingController,
     private toastService: ToastService,
   ) { }
 
   ngOnInit() {
-
+    this.onlineMode = this.configService.sys_parameter.onlineMode;
+    this.configService.loadItemMaster();
+    this.configService.loadItemBarcode();
   }
 
   /* #region  search item */
@@ -53,14 +58,104 @@ export class ItemAddListVariationModalPage implements OnInit {
         Keyboard.hide();
       }
       await this.showLoading();
-      this.searchItemService.getItemInfoByKeyword(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(async response => {
-        this.availableItems = response;
-        console.log("🚀 ~ file: item-add-list-variation-modal.page.ts ~ line 67 ~ ItemAddListVariationModalPage ~ searchItem ~ this.availableItems", this.availableItems)
-        await this.hideLoading();
-      }, async error => {
-        console.log(error);
-        await this.hideLoading();
-      })
+      if (this.onlineMode) {
+        this.searchItemService.getItemInfoByKeyword(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(async response => {
+          this.availableItems = response;
+          await this.hideLoading();
+        }, async error => {
+          console.log(error);
+          await this.hideLoading();
+        })
+      } else {
+        this.availableItems = [];
+        if (this.configService.item_Masters.length === 0 || this.configService.item_Barcodes.length === 0) {
+          await this.hideLoading();
+          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'bottom', 'danger', 1000);
+        } else {          
+          let found = this.configService.item_Masters.filter(r => r.code.toLowerCase().includes(this.itemSearchText.toLowerCase()));
+          if (found) {
+            found.forEach(async r => {
+              if (r.varCd === '0') {
+                this.availableItems.push({
+                  itemId: r.id,
+                  itemCode: r.code,
+                  description: r.itemDesc,
+                  variationTypeCode: r.varCd,
+                  unitPrice: r.price,
+                  discountGroupCode: r.discCd,
+                  discountExpression: r.discPct + '%',
+                  taxId: r.taxId,
+                  taxCode: r.taxCd,
+                  taxPct: r.taxPct,
+                  qtyRequest: null,
+                  itemPricing: {
+                    itemId: r.id,
+                    unitPrice: r.price,
+                    discountGroupCode: r.discCd,
+                    discountExpression: r.discPct + '%',
+                    discountPercent: r.discPct
+                  }
+                })
+              } else {
+                let variations = this.configService.item_Barcodes.filter(v => v.itemId === r.id);
+                await variations.sort((a,b) => {
+                  if (a.xSeq === b.xSeq) {
+                    if (a.ySeq && b.ySeq) {
+                      return a.ySeq - b.ySeq
+                    }
+                  } else {
+                    return a.xSeq - b.ySeq
+                  }
+                })
+                const distinctXId = [...new Set(variations.map(x => x.xId))];
+                let vd: VariationDetail[] = [];
+                distinctXId.forEach(x => {
+                  let ivd: InnerVariationDetail[] = [];
+                  let belong = variations.filter(xx => xx.xId === x);
+                  belong.forEach(y => {
+                    ivd.push({
+                      sequence: y.ySeq,
+                      itemBarcode: y.barcode,
+                      itemBarcodeTagId: y.id,
+                      itemSku: y.sku,
+                      itemVariationYId: y.yId,
+                      qtyRequest: null
+                    })
+                  })
+                  vd.push({
+                    itemVariationXId: x,
+                    details: ivd
+                  })
+                })
+                this.availableItems.push({
+                  itemId: r.id,
+                  itemCode: r.code,
+                  description: r.itemDesc,
+                  variationTypeCode: r.varCd,
+                  unitPrice: r.price,
+                  discountGroupCode: r.discCd,
+                  discountExpression: r.discPct + '%',
+                  taxId: r.taxId,
+                  taxCode: r.taxCd,
+                  taxPct: r.taxPct,
+                  qtyRequest: null,
+                  itemPricing: {
+                    itemId: r.id,
+                    unitPrice: r.price,
+                    discountGroupCode: r.discCd,
+                    discountExpression: r.discPct + '%',
+                    discountPercent: r.discPct
+                  },
+                  variationDetails: vd
+                })
+              }
+            })
+            await this.hideLoading();
+          } else {
+            this.toastService.presentToast('Item not found', '', ' bottom', 'medium', 1000);
+          }
+        }
+      }
     } else {
       this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'bottom', 'medium', 1000);
     }

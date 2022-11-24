@@ -46,7 +46,6 @@ export class OtherSalesItemPage implements OnInit {
 
   ngOnInit() {
     this.otherSalesHeader = this.otherSalesService.otherSalesHeader;
-    console.log("🚀 ~ file: other-sales-item.page.ts ~ line 42 ~ OtherSalesItemPage ~ ngOnInit ~ this.otherSalesHeader", this.otherSalesHeader)
     if (!this.otherSalesHeader) {
       this.navController.navigateBack("/transactions/other-sales/other-sales-header");
     }
@@ -177,7 +176,6 @@ export class OtherSalesItemPage implements OnInit {
       // itemTrx.unitPriceExTax = this.commonService.roundToPrecision(itemTrx.unitPriceExTax, this.maxPrecision);  
       await this.otherSalesDetails.unshift(d);
     }
-    console.log("🚀 ~ file: other-sales-item.page.ts ~ line 158 ~ OtherSalesItemPage ~ addItemToDetails ~ this.otherSalesDetails", this.otherSalesDetails)
   }
 
   async deleteLine(index) {
@@ -286,7 +284,6 @@ export class OtherSalesItemPage implements OnInit {
 
   computeDiscTaxAmount(line: OtherSalesDetail) {
     line = this.commonService.computeDiscTaxAmount(line, this.useTax, this.otherSalesHeader.isItemPriceTaxInclusive, this.otherSalesHeader.isDisplayTaxInclusive, this.maxPrecision);
-    console.log("🚀 ~ file: other-sales-item.page.ts ~ line 275 ~ OtherSalesItemPage ~ computeDiscTaxAmount ~ line", line)
   }
 
   setSelect(event) {

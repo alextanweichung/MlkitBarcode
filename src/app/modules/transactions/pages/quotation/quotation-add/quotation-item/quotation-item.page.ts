@@ -9,6 +9,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
@@ -55,7 +56,9 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     this.loadMasterList();
     this.loadFullItemList();
   }
-
+  
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
@@ -65,6 +68,10 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
       }
     }, error => {
       console.log(error);
+    })
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
     })
   }
 
@@ -160,7 +167,7 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
 
   getVariationSum(trxLine: TransactionDetail) {
     if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
-      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
+      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
     }
   }
 

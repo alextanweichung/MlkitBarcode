@@ -29,7 +29,7 @@
       </ion-col>
       <ion-col class="ion-text-right">
         <ion-label style="color: black;">
-          Subtotal (Before Tax): {{itemInCart|sum:'subTotalExTax'|number:'1.2'}}
+          Subtotal (Before Tax): {{itemInCart|sum:'subTotalExTax'|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat) }}
         </ion-label>
       </ion-col>
     </ion-row>
@@ -37,7 +37,7 @@
       <ion-col></ion-col>
       <ion-col class="ion-text-right">
         <ion-label style="color: black;">
-          Tax Amount: {{itemInCart|sum:'taxAmt'|number:'1.2'}}
+          Tax Amount: {{itemInCart|sum:'taxAmt'|number: (objectHeader?.isHomeCurrency ? precisionTax.localFormat : precisionTax.foreignFormat) }}
         </ion-label>
       </ion-col>
     </ion-row>
@@ -45,7 +45,7 @@
       <ion-col></ion-col>
       <ion-col class="ion-text-right">
         <ion-label style="color: black;">
-          Net Total: {{itemInCart|sum:'subTotal'|number:'1.2'}}
+          Net Total: {{itemInCart|sum:'subTotal'|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat) }}
         </ion-label>
       </ion-col>
     </ion-row>
