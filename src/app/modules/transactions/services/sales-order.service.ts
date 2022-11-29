@@ -5,6 +5,7 @@ import { background_load } from 'src/app/core/interceptors/error-handler.interce
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { Customer } from '../models/customer';
 import { SalesOrderHeader, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
@@ -91,6 +92,10 @@ export class SalesOrderService {
 
   getCustomerList() {
     return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer");
+  }
+  
+  getPromotion(trxDate: string) {
+    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate);
   }
 
   getFullItemList() {

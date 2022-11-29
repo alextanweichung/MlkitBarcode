@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
+import { format } from 'date-fns';
 import { SalesOrderHeader, SalesOrderRoot, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -9,8 +10,11 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
 
 @Component({
@@ -31,6 +35,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
     private authService: AuthService,
     private configService: ConfigService,
     private salesOrderService: SalesOrderService,
+    private promotionEngineService: PromotionEngineService,
     private navController: NavController,
     private commonService: CommonService,
     private toastService: ToastService,
@@ -53,8 +58,11 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
     this.loadModuleControl();
     this.loadMasterList();
     this.loadFullItemList();
+    this.loadPromotion();
   }
-
+  
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
@@ -64,6 +72,10 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
       }
     }, error => {
       console.log(error);
+    })
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
     })
   }
 
@@ -80,6 +92,18 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
     }, error => {
       console.log(error);
     })
+  }
+
+  promotionMaster: PromotionMaster[] = [];
+  loadPromotion() {
+    let trxDate = this.objectHeader.trxDate;
+    if (trxDate) {
+      this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd')).subscribe(response => {
+        this.promotionMaster = response;
+      }, error => {
+        console.log(error);
+      })
+    }
   }
 
   fullItemList: ItemList[] = [];
@@ -105,13 +129,18 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
             }
           })
         })
-        await this.computeDiscTaxAmount(this.itemInCart.find(r => r.itemId === event.itemId));
+        await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
       }
     } else {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignLineUnitPrice(trxLine);
-      await this.computeAllAmount(trxLine);
+      if (this.objectHeader.isItemPriceTaxInclusive) {
+        await this.computeUnitPriceExTax(trxLine);
+      } else {
+        await this.computeUnitPrice(trxLine);
+      }
       this.itemInCart.push(trxLine);
+      await this.computeAllAmount(this.itemInCart[0]);
       await this.assignSequence();
     }
   }
@@ -148,11 +177,14 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
 
   /* #region  tax handle here */
 
+  promotionEngineApplicable: boolean = true;
+  configSalesActivatePromotionEngine: boolean;
+  disablePromotionCheckBox: boolean = false;
   async computeAllAmount(trxLine: TransactionDetail) {
-    if (this.objectHeader.isItemPriceTaxInclusive) {
-      this.computeUnitPriceExTax(trxLine);
-    } else {
-      this.computeUnitPrice(trxLine);
+    await this.computeDiscTaxAmount(trxLine);
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
+      console.log('run promotion engine');
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
     }
   }
 

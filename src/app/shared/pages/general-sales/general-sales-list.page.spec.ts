@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { ItemAddListVariationModalPage } from './item-add-list-variation-modal.page';
+import { GeneralSalesListPage } from './general-sales-list.page';
 
-describe('ItemAddListVariationModalPage', () => {
-  let component: ItemAddListVariationModalPage;
-  let fixture: ComponentFixture<ItemAddListVariationModalPage>;
+describe('GeneralSalesListPage', () => {
+  let component: GeneralSalesListPage;
+  let fixture: ComponentFixture<GeneralSalesListPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemAddListVariationModalPage ],
+      declarations: [ GeneralSalesListPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ItemAddListVariationModalPage);
+    fixture = TestBed.createComponent(GeneralSalesListPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

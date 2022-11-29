@@ -5,6 +5,7 @@ import { MasterListDetails } from '../../models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
+import { PrecisionList } from '../../models/precision-list';
 
 @Component({
   selector: 'app-item-cart',
@@ -13,6 +14,8 @@ import { InnerVariationDetail } from '../../models/variation-detail';
 })
 export class ItemCartPage implements OnInit {
 
+  @Input() isHomeCurrency: boolean;
+  @Input() precisionSales: PrecisionList
   @Input() itemInCart: TransactionDetail[] = [];
   @Input() useTax: boolean;
   @Input() maxPrecision: number = 2;

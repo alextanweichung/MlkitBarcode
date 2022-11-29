@@ -7,6 +7,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { Customer } from '../models/customer';
 import { Item, ItemImage } from '../models/item';
@@ -94,6 +95,10 @@ export class QuotationService {
 
   getCustomerList() {
     return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer");
+  }
+  
+  getPromotion(trxDate: string) {
+    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileQuotation/promotion/' + trxDate);
   }
 
   getFullItemList() {

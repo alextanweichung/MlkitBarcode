@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ItemAddListVariationModalPage } from './item-add-list-variation-modal.page';
 
+import { GeneralSalesGridPage } from './general-sales-grid.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: ItemAddListVariationModalPage
+    component: GeneralSalesGridPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ItemAddListVariationModalPageRoutingModule {}
+export class GeneralSalesGridPageRoutingModule {}

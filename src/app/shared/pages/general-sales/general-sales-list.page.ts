@@ -7,18 +7,16 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
 import { MasterListDetails } from '../../models/master-list-details';
-import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { VariationDetail, InnerVariationDetail } from '../../models/variation-detail';
 import { SearchItemService } from '../../services/search-item.service';
 
 @Component({
-  selector: 'app-item-add-list',
-  templateUrl: './item-add-list-variation-modal.page.html',
-  styleUrls: ['./item-add-list-variation-modal.page.scss']
+  selector: 'app-general-sales-list',
+  templateUrl: './general-sales-list.page.html',
+  styleUrls: ['./general-sales-list.page.scss']
 })
-// this is for quotation and sales-order only so far
-export class ItemAddListVariationModalPage implements OnInit {
+export class GeneralSalesListPage implements OnInit {
 
   @Input() fullItemList: ItemList[] = [];
   @Input() keyId: number;
@@ -41,8 +39,10 @@ export class ItemAddListVariationModalPage implements OnInit {
 
   ngOnInit() {
     this.onlineMode = this.configService.sys_parameter.onlineMode;
-    this.configService.loadItemMaster();
-    this.configService.loadItemBarcode();
+    if (Capacitor.getPlatform() !== 'web') {
+      this.configService.loadItemMaster();
+      this.configService.loadItemBarcode();
+    }
   }
 
   /* #region  search item */

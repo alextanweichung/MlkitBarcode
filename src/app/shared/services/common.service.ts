@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
 import { Item } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { TransactionDetail } from '../models/transaction-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -280,6 +281,16 @@ export class CommonService {
     }
     //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
     return trxLine;
+  }
+
+  reversePromoImpact(receiptLine: TransactionDetail) {
+    if (receiptLine.promoEventId != null) {
+      receiptLine.promoEventId = null;
+      receiptLine.isPromoImpactApplied = null;
+      receiptLine.discountGroupCode = receiptLine.oriDiscountGroupCode;
+      receiptLine.discountExpression = receiptLine.oriDiscountExpression;
+    }
+    return receiptLine;
   }
 
 }

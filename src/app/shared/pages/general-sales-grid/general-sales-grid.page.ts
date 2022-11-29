@@ -4,11 +4,11 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
 
 @Component({
-  selector: 'app-item-add-grid',
-  templateUrl: './item-add-grid-variation-modal.page.html',
-  styleUrls: ['./item-add-grid-variation-modal.page.scss'],
+  selector: 'app-general-sales-grid',
+  templateUrl: './general-sales-grid.page.html',
+  styleUrls: ['./general-sales-grid.page.scss'],
 })
-export class ItemAddGridVariationMPage implements OnInit, OnChanges {
+export class GeneralSalesGridPage implements OnInit, OnChanges {
 
   @Input() useTax: boolean = false;
   @Input() availableItem: Item[] = [];

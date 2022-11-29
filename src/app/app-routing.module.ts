@@ -189,11 +189,11 @@ const routes: Routes = [
   },
   {
     path: 'item-add-grid',
-    loadChildren: () => import('./shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module').then(m => m.ItemAddGridVariationMPageModule)
+    loadChildren: () => import('./shared/pages/general-sales-grid/general-sales-grid.module').then(m => m.GeneralSalesGridPageModule)
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module').then( m => m.ItemAddListWithVariationPageModule)
+    loadChildren: () => import('./shared/pages/general-sales/general-sales-list.module').then( m => m.ItemAddListWithVariationPageModule)
   },
   {
     path: 'item-cart',

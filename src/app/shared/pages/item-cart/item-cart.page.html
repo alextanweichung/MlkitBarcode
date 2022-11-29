@@ -7,10 +7,10 @@
             <p>{{item.itemCode}}</p>
           </ion-col>
           <ion-col class="ion-margin-auto" *ngIf="isDisplayTaxInclusive">
-            <p class="ion-text-right">{{item.unitPrice|number:'1.2'}}</p>
+            <p class="ion-text-right">{{item.unitPrice|number:(isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</p>
           </ion-col>
           <ion-col class="ion-margin-auto" *ngIf="!isDisplayTaxInclusive">
-            <p class="ion-text-right">{{item.unitPriceExTax|number:'1.2'}}</p>
+            <p class="ion-text-right">{{item.unitPriceExTax|number:(isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</p>
           </ion-col>
           <ion-col size="1" class="ion-margin-auto">
             <ion-button fill="clear" color="primary" size="small" (click)="showLineDetails(item)">

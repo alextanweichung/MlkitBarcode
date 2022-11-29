@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import {  } from './item-add-list-variation-modal-routing.module';
+import {  } from './general-sales-list.routing.module';
 
-import { ItemAddListVariationModalPage } from './item-add-list-variation-modal.page';
+import { GeneralSalesListPage } from './general-sales-list.page';
 import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
 
 @NgModule({
@@ -17,8 +17,8 @@ import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
     IdMappingModule
   ],
   exports: [
-    ItemAddListVariationModalPage
+    GeneralSalesListPage
   ],
-  declarations: [ItemAddListVariationModalPage]
+  declarations: [GeneralSalesListPage]
 })
 export class ItemAddListWithVariationPageModule {}

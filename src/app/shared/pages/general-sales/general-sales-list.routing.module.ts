@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { GeneralSalesListPage } from './general-sales-list.page';
 
-import { ItemAddGridVariationMPage } from './item-add-grid-variation-modal.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: ItemAddGridVariationMPage
+    component: GeneralSalesListPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ItemAddGridVariationMPageRoutingModule {}
+export class GeneralSalesListPageRoutingModule {}
