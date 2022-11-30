@@ -58,7 +58,7 @@ export class QuotationPage implements OnInit {
     if (this.quotationService.hasSalesAgent()) {
       this.navController.navigateForward('/transactions/quotation/quotation-header');
     } else {
-      this.toastService.presentToast('Invalid Sales Agent', '', 'bottom', 'dnager', 1000);
+      this.toastService.presentToast('Invalid Sales Agent', '', 'middle', 'dnager', 1000);
     }
   }
 

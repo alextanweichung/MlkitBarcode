@@ -73,13 +73,13 @@ export class WelcomePage implements OnInit, AfterContentChecked {
           // Navigate to /home
           this.navController.navigateRoot('/signin');
         }).catch(error => {
-          this.toastService.presentToast(error.message, '', 'bottom', 'danger', 1000);
+          this.toastService.presentToast(error.message, '', 'middle', 'danger', 1000);
         });
       } catch (error) {
-        this.toastService.presentToast('Invalid activation code', '', 'bottom', 'medium', 1000);
+        this.toastService.presentToast('Invalid activation code', '', 'middle', 'medium', 1000);
       }
     } else {
-      this.toastService.presentToast('Please enter activation code', '', 'bottom', 'medium', 1000);
+      this.toastService.presentToast('Please enter activation code', '', 'middle', 'medium', 1000);
     }
   }
 

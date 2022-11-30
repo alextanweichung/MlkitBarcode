@@ -58,7 +58,7 @@ export class PackingPage implements OnInit {
     if (this.goodsPackingService.hasWarehouseAgent()) {
       this.navController.navigateForward('/transactions/packing/packing-sales-order');
     } else {
-      this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Warehouse Agent not set.', '', 'middle', 'danger', 1000);
     }
   }
 

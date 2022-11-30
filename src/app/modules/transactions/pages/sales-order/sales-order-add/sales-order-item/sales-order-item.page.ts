@@ -254,7 +254,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
     }
   }  
 
@@ -276,7 +276,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
         totalAmount: response.body["header"]["totalGrossAmt"]
       }
       this.salesOrderService.setSalesOrderSummary(qs);
-      this.toastService.presentToast('Insert Complete', 'New Sales Order has been added', 'bottom', 'success', 1000);
+      this.toastService.presentToast('Insert Complete', 'New Sales Order has been added', 'middle', 'success', 1000);
       this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
     }, error => {
       console.log(error);

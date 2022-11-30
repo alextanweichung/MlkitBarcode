@@ -70,7 +70,7 @@ export class GeneralSalesListPage implements OnInit {
         this.availableItems = [];
         if (this.configService.item_Masters.length === 0 || this.configService.item_Barcodes.length === 0) {
           await this.hideLoading();
-          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'bottom', 'danger', 1000);
+          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'middle', 'danger', 1000);
         } else {          
           let found = this.configService.item_Masters.filter(r => r.code.toLowerCase().includes(this.itemSearchText.toLowerCase()));
           if (found) {
@@ -157,7 +157,7 @@ export class GeneralSalesListPage implements OnInit {
         }
       }
     } else {
-      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'bottom', 'medium', 1000);
+      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'middle', 'medium', 1000);
     }
   }
 

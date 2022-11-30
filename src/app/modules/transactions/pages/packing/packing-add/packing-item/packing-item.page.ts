@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, AlertController, IonAccordionGroup } from '@ionic/angular';
-import { GoodsPackingHeader } from 'src/app/modules/transactions/models/packing';
+import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingRoot, GoodsPackingSummary } from 'src/app/modules/transactions/models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -10,6 +10,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 
@@ -21,7 +22,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 })
 export class PackingItemPage implements OnInit {
 
-  header: GoodsPackingHeader;
+  objectHeader: GoodsPackingHeader;
   packingSalesOrders: PackingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
   loadImage: boolean = true;
@@ -38,8 +39,8 @@ export class PackingItemPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.header = this.packingService.header;
-    if (this.header === undefined) {
+    this.objectHeader = this.packingService.header;
+    if (this.objectHeader === undefined) {
       this.navController.navigateBack('/transactions/packing/packing-sales-order');
     }
     this.packingSalesOrders = this.packingService.selectedSalesOrders;
@@ -78,7 +79,7 @@ export class PackingItemPage implements OnInit {
 
   onQtyChanged(event, soLine: PackingSalesOrderDetail, index: number) {
     if (Number.isInteger(event) && event >= 0) {
-      if (this.header.isWithSo) {
+      if (this.objectHeader.isWithSo) {
         switch (this.packingQtyControl) {
           // No control
           case "0":
@@ -102,7 +103,7 @@ export class PackingItemPage implements OnInit {
             break;
         }
       }
-      if (!this.header.isWithSo) {
+      if (!this.objectHeader.isWithSo) {
         soLine.qtyPackedCurrent = event;
         if (soLine.qtyPackedCurrent === 0) {
           this.deleteSoLine(index);
@@ -131,76 +132,62 @@ export class PackingItemPage implements OnInit {
         barcode = barcode.substring(0, 12);
       }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-        if (found) {
-          if (found.sku) {
-            this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
-            this.addItemToSo(found.sku);
+        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        if (found_barcode) {
+          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
+          let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+          let outputData: TransactionDetail = {
+            itemId: found_item_master.id,
+            itemCode: found_item_master.code,
+            description: found_item_master.itemDesc,
+            variationTypeCode: found_item_master.varCd,
+            discountGroupCode: found_item_master.discCd,
+            discountExpression: found_item_master.discPct+'%',
+            taxId: found_item_master.taxId,
+            taxCode: found_item_master.taxCd,
+            taxPct: found_item_master.taxPct,
+            qtyRequest: null,
+            itemPricing: {
+              itemId: found_item_master.id,
+              unitPrice: found_item_master.price,
+              discountGroupCode: found_item_master.discCd,
+              discountExpression: found_item_master.discPct+'%',
+              discountPercent: found_item_master.discPct
+            },
+            itemVariationXId: found_barcode.xId,
+            itemVariationYId: found_barcode.yId,
+            itemSku: found_barcode.sku,
+            itemBarcode: found_barcode.barcode
           }
+          this.addItemToSo(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
-      } else {
-        this.packingService.getItemInfoByBarcode(barcode).subscribe(response => {
-          if (response) {
-            this.addItemToSo(response.itemSku, response);
-          }
-        }, error => {
-          console.log(error);
-        })
       }
     }
   }
 
-  onItemAdd(event: any) {
-    let sku = event.sku;
-    let itemInfo = event.itemInfo;
-    if (itemInfo) {
-      this.addItemToSo(sku, itemInfo)
-    } else {
-      this.addItemToSo(sku);
-    }
+  onItemAdd(event: TransactionDetail) {
+    this.addItemToSo(event);
   }
 
   selectedSoDetail: PackingSalesOrderDetail;
-  async addItemToSo(sku: string, itemInfo?: ItemBarcodeModel) {
-    
-    if (this.header.isWithSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select SO', '', 'bottom', 'medium', 1000);
+  async addItemToSo(trxLine: TransactionDetail) {    
+    if (this.objectHeader.isWithSo && this.accordianGroup1.value === undefined) {
+      this.toastService.presentToast('Please select SO', '', 'middle', 'medium', 1000);
       return;
     }
-
-    if (this.header.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === sku);
+    if (this.objectHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+      let itemIndex = this.selectedSo.details.findIndex(r => r.itemSku === trxLine.itemSku);
       if (itemIndex > -1) {
         this.selectedSoDetail = this.selectedSo.details[itemIndex];
         this.selectedSo.details[itemIndex].qtyPackedCurrent += 1;
         this.onQtyChanged(this.selectedSo.details[itemIndex].qtyPackedCurrent, this.selectedSoDetail, itemIndex);
       } else {
-        this.toastService.presentToast('Item not found in this SO', '', 'bottom', 'medium', 1000);
+        this.toastService.presentToast('Item not found in this SO', '', 'middle', 'medium', 1000);
       }
     }
-
-    if (!this.header.isWithSo) {
-      let b: any;
-      let m: any;
-      if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
-        b = this.configService.item_Barcodes.find(r => r.sku === sku);
-        m = this.configService.item_Masters.find(r => r.id === b.itemId);
-      } else {
-        m = {
-          id: itemInfo.itemId,
-          code: itemInfo.itemCode,
-          itemDesc: itemInfo.description,
-          varCd: itemInfo.variationTypeCode
-        }
-        b = {
-          xId: itemInfo.itemVariationLineXId,
-          yId: itemInfo.itemVariationLineYId,
-          xDesc: itemInfo.itemVariationLineXDescription,
-          yDesc: itemInfo.itemVariationLineYDescription
-        }
-      }
+    if (!this.objectHeader.isWithSo) {
       if (this.packingSalesOrders && this.packingSalesOrders.length === 0) {
         this.packingSalesOrders.push({
           header: null,
@@ -208,21 +195,21 @@ export class PackingItemPage implements OnInit {
           pickingHistory: []
         })
       }
-      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
-        this.selectedSoDetail = this.packingSalesOrders[0].details.find(r => r.itemSku === sku);
+      if (this.packingSalesOrders[0].details.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+        this.selectedSoDetail = this.packingSalesOrders[0].details.find(r => r.itemSku === trxLine.itemSku);
         this.selectedSoDetail.qtyPackedCurrent++;
       } else {
         let d: PackingSalesOrderDetail = {
           salesOrderId: null,
-          itemId: m.id,
-          description: m.itemDesc,
-          itemVariationXId: b.xId,
-          itemVariationYId: b.yId,
-          itemSku: sku,
-          itemVariationTypeCode: m.varCd,
-          itemCode: m.code,
-          itemVariationXDescription: b.xDesc,
-          itemVariationYDescription: b.yDesc,
+          itemId: trxLine.itemId,
+          description: trxLine.description,
+          itemVariationXId: trxLine.itemVariationXId,
+          itemVariationYId: trxLine.itemVariationYId,
+          itemSku: trxLine.itemSku,
+          itemVariationTypeCode: trxLine.variationTypeCode,
+          itemCode: trxLine.itemCode,
+          itemVariationXDescription: trxLine.itemVariationXId ? this.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
+          itemVariationYDescription: trxLine.itemVariationYId ? this.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
           itemUomId: null,
           itemUomDescription: null,
           rack: null,
@@ -251,7 +238,7 @@ export class PackingItemPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.packingSalesOrders[0].details.splice(index, 1);
-              this.toastService.presentToast('Item removed.', '', 'bottom', 'success', 1000);
+              this.toastService.presentToast('Item removed.', '', 'middle', 'success', 1000);
             }
           },
           {
@@ -263,7 +250,7 @@ export class PackingItemPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
     }
   }
 
@@ -273,7 +260,7 @@ export class PackingItemPage implements OnInit {
 
   scanActive: boolean = false;
   async startScanning() {
-    if (this.header.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
+    if (this.objectHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
       const allowed = await this.checkPermission();
       if (allowed) {
         this.scanActive = true;
@@ -285,11 +272,11 @@ export class PackingItemPage implements OnInit {
           await this.validateBarcode(barcode);
         }
       }
-    } else if (this.header.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select 1 SO', '', 'bottom', 'medium', 1000);
+    } else if (this.objectHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
+      this.toastService.presentToast('Please select 1 SO', '', 'middle', 'medium', 1000);
     }
 
-    if (!this.header.isWithSo) {
+    if (!this.objectHeader.isWithSo) {
       const allowed = await this.checkPermission();
       if (allowed) {
         this.scanActive = true;
@@ -341,11 +328,88 @@ export class PackingItemPage implements OnInit {
 
   /* #endregion */
 
-  nextStep() {
+  async nextStep() {
     let soLines: PackingSalesOrderDetail[] = this.packingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPackedCurrent > 0);
-    this.packingService.setChooseSalesOrderLines(soLines);
-    this.navController.navigateForward('/transactions/packing/packing-confirmation');
+    if (soLines.length > 0) {
+      const alert = await this.alertController.create({
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: async () => {
+              await this.insertPacking(soLines);
+            },
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+    }
   }
+
+  insertPacking(soLines: any) {
+    let object: GoodsPackingRoot;
+    let lines: GoodsPackingLine[] = [];
+    soLines.forEach(r => {
+      lines.push({
+        packingLineId: 0,
+        packingId: 0,
+        salesOrderId: r.salesOrderId,
+        itemId: r.itemId,
+        itemVariationXId: r.itemVariationXId,
+        itemVariationYId: r.itemVariationYId,
+        itemSku: r.itemSku,
+        itemBarcode: this.configService.item_Barcodes.find(rr => rr.sku === r.itemSku)?.barcode,
+        itemUomId: r.itemUomId,
+        qtyRequest: r.qtyPackedCurrent,
+        soRowIndex: this.objectHeader.isWithSo ? (this.packingSalesOrders.flatMap(rr => rr.details).findIndex(rr => rr.salesOrderId === r.salesOrderId && rr.itemSku === r.itemSku)) : null,
+        sequence: lines.length,
+        locationId: this.objectHeader.locationId,
+        cartonNum: 1
+      })
+    })
+    let header: GoodsPackingHeader = {
+      packingId: 0,
+      packingNum: '',
+      trxDate: this.objectHeader.trxDate,
+      locationId: this.objectHeader.locationId,
+      toLocationId: this.objectHeader.toLocationId,
+      customerId: this.objectHeader.customerId,
+      warehouseAgentId: this.objectHeader.warehouseAgentId,
+      businessModelType: this.objectHeader.businessModelType,
+      sourceType: 'M',
+      isWithSo: this.objectHeader.isWithSo,
+      remark: this.objectHeader.remark,
+      typeCode: this.objectHeader.typeCode,
+      totalCarton: 1
+    }
+    object = {
+      header: header,
+      details: lines
+    }
+    this.packingService.insertPacking(object).subscribe(response => {
+      if (response.status === 201) {
+        let ps: GoodsPackingSummary = {
+          packingNum: response.body["header"]["packingNum"],
+          customerId: response.body["header"]["customerId"],
+          locationId: response.body["header"]["locationId"],
+          trxDate: response.body["header"]["trxDate"]
+        }
+        this.packingService.setPackingSummary(ps);
+        this.toastService.presentToast('Packing has been added', '', 'middle', 'success', 1000);
+        this.navController.navigateForward('/transactions/packing/packing-summary');
+      }
+    }, error => {
+      console.log(error);
+    })
+  }
+
 
   previousStep() {
     this.navController.navigateBack('/transactions/packing/packing-sales-order');

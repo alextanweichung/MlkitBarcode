@@ -261,7 +261,7 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
     }
   }
 
@@ -283,7 +283,7 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
         totalAmount: response.body["header"]["totalGrossAmt"]
       }
       this.quotationService.setQuotationSummary(qs);
-      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'bottom', 'success', 1000);
+      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'middle', 'success', 1000);
       this.navController.navigateRoot('/transactions/quotation/quotation-summary');
     }, error => {
       console.log(error);

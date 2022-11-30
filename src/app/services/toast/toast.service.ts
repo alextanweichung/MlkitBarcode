@@ -13,7 +13,6 @@ export class ToastService {
   async presentToast(header: string, message: string, position: any, color: string, duration: number, icon?: string) {
 
     if (!icon) {
-
       switch (color) {
         case 'success':
           icon = 'checkmark-outline';
@@ -33,7 +32,8 @@ export class ToastService {
       duration: duration,
       position: position,
       color: color,
-      icon: icon
+      icon: icon,
+      cssClass: 'customToast'
     });
     await toast.present();
   }

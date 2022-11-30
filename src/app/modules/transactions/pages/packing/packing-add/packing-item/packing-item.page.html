@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2">
     <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
-    <ion-accordion-group #accordianGroup1 *ngIf="packingDtoHeader?.isWithSo">
+    <ion-accordion-group #accordianGroup1 *ngIf="objectHeader?.isWithSo">
       <ion-accordion *ngFor="let salesOrder of packingSalesOrders;">
         <ion-item slot="header" color="light" (click)="setSelectedSo(salesOrder)">
           <ion-label>{{salesOrder.header.salesOrderNum}}</ion-label>
@@ -26,7 +26,7 @@
         </div>
       </ion-accordion>
     </ion-accordion-group>
-    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!packingDtoHeader?.isWithSo && packingSalesOrders.length > 0">
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!objectHeader?.isWithSo && packingSalesOrders.length > 0">
       <ion-item-sliding *ngFor="let soLine of packingSalesOrders[0]?.details; let i = index">
         <app-item-add-list-flat [line]="soLine" [isPacking]="true" qtyField="qtyPackedCurrent" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
         <ion-item-options>
@@ -38,7 +38,7 @@
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-    Next
+    Insert
   </ion-button>
 </ion-footer>
 <ion-fab class="ion-fab-custom mb-3" vertical="bottom" horizontal="center" slot="fixed" (click)="startScanning()" [hidden]="scanActive">

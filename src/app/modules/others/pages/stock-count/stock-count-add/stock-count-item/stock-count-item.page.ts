@@ -37,7 +37,7 @@ export class StockCountItemPage implements OnInit {
     this.stockCountHeader = this.stockCountService.stockCountHeader;
     this.stockCountDetail = [];
     if (this.stockCountHeader === undefined) {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
       this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
     } else {
       this.loadInventoryCountBatchCriteria();
@@ -96,11 +96,11 @@ export class StockCountItemPage implements OnInit {
         let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found) {
           if (found.sku) {
-            this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
+            this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
             this.addItemToLine(found.sku);
           }
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
       } else {
         this.stockCountService.getItemInfoByBarcode(barcode).subscribe(response => {
@@ -156,7 +156,7 @@ export class StockCountItemPage implements OnInit {
       case "Brand":
         if (m) {
           if (!this.inventoryCountBatchCriteria.keyId.includes(m.brandId)) {
-            this.toastService.presentToast('Item Brand not match', '', 'bottom', 'danger', 1000);
+            this.toastService.presentToast('Item Brand not match', '', 'middle', 'danger', 1000);
             return;
           }
         }
@@ -164,7 +164,7 @@ export class StockCountItemPage implements OnInit {
       case "Group":
         if (m) {
           if (!this.inventoryCountBatchCriteria.keyId.includes(m.groupId)) {
-            this.toastService.presentToast('Item Group not match', '', 'bottom', 'danger', 1000);
+            this.toastService.presentToast('Item Group not match', '', 'middle', 'danger', 1000);
             return;
           }
         }
@@ -172,7 +172,7 @@ export class StockCountItemPage implements OnInit {
       case "Category":
         if (m) {
           if (!this.inventoryCountBatchCriteria.keyId.includes(m.catId)) {
-            this.toastService.presentToast('Item Category not match', '', 'bottom', 'danger', 1000);
+            this.toastService.presentToast('Item Category not match', '', 'middle', 'danger', 1000);
             return;
           }
         }
@@ -244,7 +244,7 @@ export class StockCountItemPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.stockCountDetail.splice(index, 1);
-              this.toastService.presentToast('Line removed.', '', 'bottom', 'success', 1000);
+              this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
             }
           },
           {
@@ -259,7 +259,7 @@ export class StockCountItemPage implements OnInit {
       });  
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
     }
   }
 
@@ -329,7 +329,7 @@ export class StockCountItemPage implements OnInit {
         let object = response.body as StockCountRoot;
         this.stockCountService.setHeader(object.header);
         this.stockCountService.setLines(object.details);
-        this.toastService.presentToast('Stock Count added', '', 'bottom', 'success', 1000);
+        this.toastService.presentToast('Stock Count added', '', 'middle', 'success', 1000);
         this.navController.navigateRoot('/others/stock-count/stock-count-add/stock-count-summary');
       }
     }, error => {

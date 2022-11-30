@@ -119,21 +119,21 @@
       <hr class="hr-small">
     </ng-container>
 
-    <!-- <ng-container *ngIf="showOtherSales">
+    <ng-container *ngIf="showConsignmentSales">
       <ion-list-header>
-        <ion-label color="dark">Other Sales</ion-label>
-        <ion-button routerLink="other-sales">See All <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        <ion-label color="dark">Consignment Sales</ion-label>
+        <ion-button routerLink="consignment-sales">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
       </ion-list-header>
-      <ng-container *ngIf="!other_sales_load">
+      <ng-container *ngIf="!consignment_sales || consignment_sales?.length === 0">
         <p>
           <ion-text color="tertiary">
             <h3>Nothing found!</h3>
           </ion-text>
         </p>
       </ng-container>
-      <ng-container *ngIf="other_sales_load">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToOtherSalesDetail(object.otherSalesId)" *ngFor="let object of other_sales">
+      <ng-container *ngIf="consignment_sales?.length > 0">
+        <!-- <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" (click)="goToConsignmentSalesDetail(object.otherSalesId)" *ngFor="let object of consignment_sales">
             <ion-label>
               <h3>{{object.otherSalesNum}}</h3>
               <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
@@ -142,10 +142,10 @@
             </ion-label>
             <ion-badge mode="ios" slot="end"> {{object.type}}</ion-badge>
           </ion-item>
-        </ion-list>
+        </ion-list> -->
       </ng-container>
       <hr class="hr-small">
-    </ng-container> -->
+    </ng-container>
     
   </div>
 </ion-content>  

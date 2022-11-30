@@ -171,12 +171,12 @@ export class PickingSalesOrderPage implements OnInit {
     if (customerId) {
       this.pickingService.getSoByCustomer(customerId).subscribe(response => {
         this.availableSalesOrders = response;
-        this.toastService.presentToast('Search Completed', '', 'bottom', 'success', 1000);
+        this.toastService.presentToast('Search Completed', '', 'middle', 'success', 1000);
       }, error => {
         console.log(error);
       })
     } else {
-      this.toastService.presentToast('Customer cannot be null', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Customer cannot be null', '', 'middle', 'danger', 1000);
     }
   }
 
@@ -186,12 +186,12 @@ export class PickingSalesOrderPage implements OnInit {
     if (customerId && locationId) {
       this.pickingService.getSoByCustomerLocation(customerId, locationId).subscribe(response => {
         this.availableSalesOrders = response;
-        this.toastService.presentToast('Search Completed', '', 'bottom', 'success', 1000);
+        this.toastService.presentToast('Search Completed', '', 'middle', 'success', 1000);
       }, error => {
         console.log(error);
       })
     } else {
-      this.toastService.presentToast('Customer & Location cannot be null', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Customer & Location cannot be null', '', 'middle', 'danger', 1000);
     }
   }
 
@@ -234,11 +234,11 @@ export class PickingSalesOrderPage implements OnInit {
 
   nextStep() {
     if (!this.objectForm.valid) {
-      this.toastService.presentToast('Something went wrong.', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong.', '', 'middle', 'danger', 1000);
       return;
     }
     if (this.objectForm.controls.isWithSo.value && this.selectedSOs.length === 0) {
-      this.toastService.presentToast('Select at least 1 SO', '', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Select at least 1 SO', '', 'middle', 'danger', 1000);
       return;
     }
     this.pickingService.setHeader(this.objectForm.getRawValue());

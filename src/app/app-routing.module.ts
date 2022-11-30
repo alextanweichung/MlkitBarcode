@@ -123,14 +123,14 @@ const routes: Routes = [
     path: 'transactions/packing/packing-detail',
     loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/packing-detail.module').then( m => m.PackingDetailPageModule)
   },
-  // transaction-other-sales
+  // transaction-consignment-sales
   {
-    path: 'transactions/other-sales',
-    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales.module').then( m => m.OtherSalesPageModule)
+    path: 'transactions/consignment-sales',
+    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales.module').then( m => m.ConsignmentSalesPageModule)
   },
   {
-    path: 'transactions/other-sales/other-sales-detail',
-    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales-detail/other-sales-detail.module').then( m => m.OtherSalesDetailPageModule)
+    path: 'transactions/consignment-sales/consignment-sales-detail',
+    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales-detail/consignment-sales-detail.module').then( m => m.ConsignmentSalesDetailPageModule)
   },
 
 

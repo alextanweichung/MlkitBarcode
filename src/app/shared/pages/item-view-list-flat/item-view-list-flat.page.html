@@ -58,7 +58,8 @@
               </ion-row>
             </ion-grid>
           </ion-item>
-          <div class="px-2 pt-2 font-bold">Current Picked List</div>
+          <div class="px-2 pt-2 font-bold" *ngIf="isPicking">Current Picked List</div>
+          <div class="px-2 pt-2 font-bold" *ngIf="isPacking">Current Packed List</div>
           <ion-item class="ion-no-padding" lines="full" *ngFor="let cpl of line.currentPickList">
             <ion-grid class="ion-no-padding p-2">
               <ion-row>
@@ -180,7 +181,8 @@
 
 <div *ngIf="!isWithSo">
   <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" style="font-size: smaller;" lines="full">
-    <div class="px-2 pt-2 font-bold">Current Picked List</div>
+    <div class="px-2 pt-2 font-bold" *ngIf="isPicking">Current Picked List</div>
+    <div class="px-2 pt-2 font-bold" *ngIf="isPacking">Current Packed List</div>
     <ion-item class="ion-no-padding" lines="full" *ngFor="let cpl of data">
       <ion-grid class="ion-no-padding p-2">
         <ion-row>
@@ -209,7 +211,8 @@
             <div>Qty</div>
           </ion-col>
           <ion-col class="ion-margin-auto">
-            <div class="ion-text-center">{{cpl.qtyPicked}}</div>
+            <div class="ion-text-center" *ngIf="isPicking">{{cpl.qtyPicked}}</div>
+            <div class="ion-text-center" *ngIf="isPacking">{{cpl.qtyPacked}}</div>
           </ion-col>
           <ion-col></ion-col>
           <ion-col></ion-col>
