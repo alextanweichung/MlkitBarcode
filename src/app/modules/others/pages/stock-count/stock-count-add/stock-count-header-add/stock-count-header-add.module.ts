@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { StockCountHeaderPageRoutingModule } from './stock-count-header-routing.module';
+import { StockCountHeaderAddPageRoutingModule } from './stock-count-header-add-routing.module';
 
-import { StockCountHeaderPage } from './stock-count-header.page';
+import { StockCountHeaderAddPage } from './stock-count-header-add.page';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
@@ -15,10 +15,10 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     CommonModule,
     FormsModule,
     IonicModule,
-    StockCountHeaderPageRoutingModule,
+    StockCountHeaderAddPageRoutingModule,
     CalendarInputPageModule,
     SearchDropdownPageModule
   ],
-  declarations: [StockCountHeaderPage]
+  declarations: [StockCountHeaderAddPage]
 })
-export class StockCountHeaderPageModule {}
+export class StockCountHeaderAddPageModule {}

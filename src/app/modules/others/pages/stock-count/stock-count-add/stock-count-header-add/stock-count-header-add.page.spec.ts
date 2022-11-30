@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { StockCountHeaderPage } from './stock-count-header.page';
+import { StockCountHeaderAddPage } from './stock-count-header-add.page';
 
-describe('StockCountHeaderPage', () => {
-  let component: StockCountHeaderPage;
-  let fixture: ComponentFixture<StockCountHeaderPage>;
+describe('StockCountHeaderAddPage', () => {
+  let component: StockCountHeaderAddPage;
+  let fixture: ComponentFixture<StockCountHeaderAddPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ StockCountHeaderPage ],
+      declarations: [ StockCountHeaderAddPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(StockCountHeaderPage);
+    fixture = TestBed.createComponent(StockCountHeaderAddPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

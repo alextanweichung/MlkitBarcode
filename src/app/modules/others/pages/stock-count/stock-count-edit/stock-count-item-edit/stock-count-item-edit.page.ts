@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, IonInput, NavController } from '@ionic/angular';
-import { InventoryCountBatchCriteria, StockCountDetail, StockCountHeader, StockCountRoot } from 'src/app/modules/others/models/stock-count';
+import { InventoryCountBatchCriteria, StockCountDetail, StockCountHeader } from 'src/app/modules/others/models/stock-count';
 import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -11,40 +12,43 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 
 @Component({
-  selector: 'app-stock-count-item',
-  templateUrl: './stock-count-item.page.html',
-  styleUrls: ['./stock-count-item.page.scss'],
-  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
+  selector: 'app-stock-count-item-edit',
+  templateUrl: './stock-count-item-edit.page.html',
+  styleUrls: ['./stock-count-item-edit.page.scss'],
 })
-export class StockCountItemPage implements OnInit {
+export class StockCountItemEditPage implements OnInit {
 
+  inventoryCountId: number;
   stockCountHeader: StockCountHeader;
   stockCountDetail: StockCountDetail[] = [];
 
   constructor(
+    private route: ActivatedRoute,
     private authService: AuthService,
-    private stockCountService: StockCountService,
     private navController: NavController,
     private alertController: AlertController,
     private configService: ConfigService,
-    private toastService: ToastService
-  ) { }
+    private toastService: ToastService,
+    private stockCountService: StockCountService
+    
+  ) {
+    this.route.queryParams.subscribe(params => {
+      this.inventoryCountId = params['inventoryCountId'];
+    })
+  }
 
   ngOnInit() {
     this.stockCountHeader = this.stockCountService.stockCountHeader;
-    this.stockCountDetail = [];
-    if (this.stockCountHeader === undefined) {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
-      this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
-    } else {
-      this.loadInventoryCountBatchCriteria();
+    this.stockCountDetail = this.stockCountService.stockCountLines;
+    if (!this.stockCountHeader || this.stockCountHeader === undefined) {
+      this.navController.navigateBack('/others/stock-count');
     }
     this.loadMasterList();
     // this.loadModuleControl();    
     this.loadImage = this.configService.sys_parameter.loadImage;
+    this.loadInventoryCountBatchCriteria();
   }
 
   itemBrandMasterList: MasterListDetails[] = [];
@@ -87,8 +91,11 @@ export class StockCountItemPage implements OnInit {
     })
   }
 
+  itemSearchValue: string;
+  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
   async validateBarcode(barcode: string) {
     if (barcode) {
+      this.itemSearchValue = '';
       if (barcode && barcode.length > 12) {
         barcode = barcode.substring(0, 12);
       }
@@ -112,6 +119,8 @@ export class StockCountItemPage implements OnInit {
         })
       }
     }
+    this.barcodeInput.value = '';
+    this.barcodeInput.setFocus();
   }
 
   onItemAdd(event: any) {
@@ -184,7 +193,7 @@ export class StockCountItemPage implements OnInit {
     } else {
       let d: StockCountDetail = {
         inventoryCountLineId: 0,
-        inventoryCountId: 0,
+        inventoryCountId: this.stockCountHeader.inventoryCountId,
         locationId: this.stockCountHeader.locationId,
         itemId: m.id,
         itemCode: m.code,
@@ -201,7 +210,7 @@ export class StockCountItemPage implements OnInit {
     }
   }
 
-  /* #region  manual amend qty */
+  /* #region  manual amend qty */  
 
   setFocus(event) {
     event.getInputElement().then(r => {
@@ -320,17 +329,19 @@ export class StockCountItemPage implements OnInit {
   /* #endregion */
 
   previousStep() {
-    this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        inventoryCountId: this.inventoryCountId
+      }
+    }
+    this.navController.navigateBack('/others/stock-count/stock-count-edit/stock-count-header', navigationExtras);
   }
 
   nextStep() {
-    this.stockCountService.insertInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
-      if (response.status === 201) {
-        let object = response.body as StockCountRoot;
-        this.stockCountService.setHeader(object.header);
-        this.stockCountService.setLines(object.details);
-        this.toastService.presentToast('Stock Count added', '', 'middle', 'success', 1000);
-        this.navController.navigateRoot('/others/stock-count/stock-count-add/stock-count-summary');
+    this.stockCountService.updateInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
+      if (response.status === 204) {
+        this.toastService.presentToast('Stock Count updated', '', 'middle', 'success', 1000);
+        this.navController.navigateRoot('/others/stock-count/stock-count-edit/stock-count-summary');
       }
     }, error => {
       console.log(error);

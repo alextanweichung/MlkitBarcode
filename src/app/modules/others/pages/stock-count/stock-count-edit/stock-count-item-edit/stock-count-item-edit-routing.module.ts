@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { StockCountHeaderPage } from './stock-count-header.page';
+import { StockCountItemEditPage } from './stock-count-item-edit.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: StockCountHeaderPage
+    component: StockCountItemEditPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class StockCountHeaderPageRoutingModule {}
+export class StockCountItemEditPageRoutingModule {}

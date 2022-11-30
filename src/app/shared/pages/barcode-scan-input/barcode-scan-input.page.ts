@@ -23,8 +23,7 @@ export class BarcodeScanInputPage implements OnInit {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-    private toastService: ToastService,
-    private barcodeScanInputService: BarcodeScanInputService
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {

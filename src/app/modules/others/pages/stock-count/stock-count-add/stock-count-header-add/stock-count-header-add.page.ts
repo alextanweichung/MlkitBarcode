@@ -8,11 +8,11 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 
 @Component({
-  selector: 'app-stock-count-header',
-  templateUrl: './stock-count-header.page.html',
-  styleUrls: ['./stock-count-header.page.scss'],
+  selector: 'app-stock-count-header-add',
+  templateUrl: './stock-count-header-add.page.html',
+  styleUrls: ['./stock-count-header-add.page.scss'],
 })
-export class StockCountHeaderPage implements OnInit {
+export class StockCountHeaderAddPage implements OnInit {
 
   objectForm: FormGroup;
 

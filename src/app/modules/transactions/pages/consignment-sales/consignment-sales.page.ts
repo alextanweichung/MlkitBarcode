@@ -109,10 +109,10 @@ export class ConsignmentSalesPage implements OnInit {
     await actionSheet.present();
   }
 
-  goToDetail(otherSalesId: number) {
+  goToDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        otherSalesId: otherSalesId
+        objectId: objectId
       }
     }
     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);

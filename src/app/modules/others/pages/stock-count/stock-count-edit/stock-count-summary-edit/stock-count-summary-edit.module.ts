@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { StockCountSummaryPageRoutingModule } from './stock-count-summary-routing.module';
+import { StockCountSummaryEditPageRoutingModule } from './stock-count-summary-edit-routing.module';
 
-import { StockCountSummaryPage } from './stock-count-summary.page';
+import { StockCountSummaryEditPage } from './stock-count-summary-edit.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
 @NgModule({
@@ -14,9 +14,9 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     CommonModule,
     FormsModule,
     IonicModule,
-    StockCountSummaryPageRoutingModule,
+    StockCountSummaryEditPageRoutingModule,
     IdMappingModule
   ],
-  declarations: [StockCountSummaryPage]
+  declarations: [StockCountSummaryEditPage]
 })
-export class StockCountSummaryPageModule {}
+export class StockCountSummaryEditPageModule {}

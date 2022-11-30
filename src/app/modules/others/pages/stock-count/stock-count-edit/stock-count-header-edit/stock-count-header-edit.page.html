@@ -15,12 +15,10 @@
   <div class="p-2"> 
     <ion-list class="list-custom" lines="none">
       <app-calendar-input title="Trx Date" (onDateSelected)="onTrxDateSelected($event)" [date_value]="inventoryCount?.header?.trxDate"></app-calendar-input>
-      <!-- <app-search-dropdown title="Location" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="locationSearchDdl" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown> -->
       <ion-item lines="none">
         <ion-label class="font-bold" position="stacked">Location</ion-label>
         <ion-input value="{{inventoryCount?.header?.locationId|idMapping:locationMasterList}}" readonly></ion-input>
       </ion-item>
-      <!-- <app-search-dropdown #inventoryCountBatchSdd title="Inventory Count Batch" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="inventoryCountBatchDdl" (onActionComplete)="onInventoryCountBatchChanged($event)" emptyMessage="This Location do not have Inventory Count Batch"></app-search-dropdown> -->
       <ion-item lines="none">
         <ion-label class="font-bold" position="stacked">Inventory Count Batch</ion-label>
         <ion-input [value]="inventoryCount?.header?.inventoryCountNum" readonly></ion-input>

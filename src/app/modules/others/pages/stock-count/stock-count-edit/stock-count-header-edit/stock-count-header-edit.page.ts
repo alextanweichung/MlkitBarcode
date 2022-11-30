@@ -1,21 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController } from '@ionic/angular';
-import { InventoryCountBatchList, StockCountRoot } from 'src/app/modules/others/models/stock-count';
+import { StockCountRoot } from 'src/app/modules/others/models/stock-count';
 import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-stock-count-header',
-  templateUrl: './stock-count-header.page.html',
-  styleUrls: ['./stock-count-header.page.scss'],
+  selector: 'app-stock-count-header-edit',
+  templateUrl: './stock-count-header-edit.page.html',
+  styleUrls: ['./stock-count-header-edit.page.scss'],
 })
-export class StockCountHeaderPage implements OnInit {
+export class StockCountHeaderEditPage implements OnInit {
 
   inventoryCountId: number;
   objectForm: FormGroup;
@@ -68,11 +67,11 @@ export class StockCountHeaderPage implements OnInit {
   zoneMasterList: MasterListDetails[] = [];
   rackMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.stockCountService.getMasterList().subscribe(response => {
+    this.stockCountService.getMasterList().subscribe(async response => {
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.mapSearchDropdownList();
+      await this.mapSearchDropdownList();
     }, error => {
       console.log(error);
     })
@@ -81,20 +80,24 @@ export class StockCountHeaderPage implements OnInit {
   rackSearchDdl: SearchDropdownList[] = [];
   zoneSearchDdl: SearchDropdownList[] = [];
   mapSearchDropdownList() {
+    let rack: SearchDropdownList[] = [];
+    let zone: SearchDropdownList[] = [];
     this.rackMasterList.forEach(r => {
-      this.rackSearchDdl.push({
+      rack.push({
         id: r.id,
         code: r.code,
         description: r.description
       })
     })
+    this.rackSearchDdl = [...rack];
     this.zoneMasterList.forEach(r => {
-      this.zoneSearchDdl.push({
+      zone.push({
         id: r.id,
         code: r.code,
         description: r.description
       })
     })
+    this.zoneSearchDdl = [...zone]
   }
 
   onTrxDateSelected(event: Date) {

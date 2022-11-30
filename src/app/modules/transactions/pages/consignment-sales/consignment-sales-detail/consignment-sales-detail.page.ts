@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { ConsignmentSalesRoot } from '../../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../../services/consignment-sales.service';
 
@@ -17,6 +19,7 @@ export class ConsignmentSalesDetailPage implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private authService: AuthService,
     private consignmentSalesService: ConsignmentSalesService,
     private navController: NavController
   ) {
@@ -26,10 +29,24 @@ export class ConsignmentSalesDetailPage implements OnInit {
   }
 
   ngOnInit() {
+    this.loadModuleControl();
     this.loadMasterList();
     if (this.objectId) {
       this.loadObject();
     }
+  }
+  
+  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  maxPrecision: number = 2;
+  maxPrecisionTax: number = 2;
+  loadModuleControl() {    
+    this.authService.precisionList$.subscribe(precision => {
+      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+      this.maxPrecision = this.precisionSales.localMax;
+      this.maxPrecisionTax = this.precisionTax.localMax;
+    })
   }
 
   customerMasterList: MasterListDetails[] = [];
@@ -52,6 +69,7 @@ export class ConsignmentSalesDetailPage implements OnInit {
   loadObject() {
     this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
       this.object = response;
+      console.log("🚀 ~ file: consignment-sales-detail.page.ts:55 ~ ConsignmentSalesDetailPage ~ this.consignmentSalesService.getObjectById ~ this.object", this.object)
     }, error => {
       console.log(error);
     })
