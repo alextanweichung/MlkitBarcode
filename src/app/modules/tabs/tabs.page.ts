@@ -71,6 +71,13 @@ export class TabsPage {
           }
         },
         {
+          text: 'Add Consignment',
+          icon: 'swap-vertical-outline',
+          handler: () => {
+            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header');
+          }
+        },
+        {
           text: 'Cancel',
           icon: 'close',
           role: 'cancel'

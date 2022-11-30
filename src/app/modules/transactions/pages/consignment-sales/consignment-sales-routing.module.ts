@@ -15,7 +15,11 @@ const routes: Routes = [
   {
     path: 'consignment-sales-item',
     loadChildren: () => import('./consignment-sales-add/consignment-sales-item/consignment-sales-item.module').then( m => m.ConsignmentSalesItemPageModule)
+  },  {
+    path: 'consignment-sales-summary',
+    loadChildren: () => import('./consignment-sales-add/consignment-sales-summary/consignment-sales-summary.module').then( m => m.ConsignmentSalesSummaryPageModule)
   }
+
 
 ];
 

@@ -50,11 +50,11 @@ export class ConsignmentSalesDetailPage implements OnInit {
   }
 
   loadObject() {
-    // this.otherSalesService.getOtherSales(this.otherSalesId).subscribe(response => {
-    //   this.otherSales = response;
-    // }, error => {
-    //   console.log(error);
-    // })
+    this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
+      this.object = response;
+    }, error => {
+      console.log(error);
+    })
   }
 
 }

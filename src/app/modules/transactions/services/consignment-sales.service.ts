@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { ConsignmentSalesHeader } from '../models/consignment-sales';
+import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesRoot, ConsignmentSalesSummary } from '../models/consignment-sales';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -29,22 +29,22 @@ export class ConsignmentSalesService {
     console.log("🚀 ~ file: consignment-sales.service.ts ~ line 29 ~ ConsignmentSalesService ~ setHeader ~ this.header", this.header)
   }
 
-  // otherSalesDetails: OtherSalesDetail[] = [];
-  // setDetails(details: OtherSalesDetail[]) {
-  //   this.otherSalesDetails = details;
-  // }
+  summary: ConsignmentSalesSummary;
+  setSummary(summary: ConsignmentSalesSummary) {
+    this.summary = summary;
+  }
 
   removeHeader() {
     this.header = null;
   }
 
-  removeDetails() {
-    // this.otherSalesDetails = [];
+  removeSummary() {
+    this.summary = null;
   }
 
   resetVariables() {
     this.removeHeader();
-    this.removeDetails();
+    this.removeSummary();
   }
 
   getMasterList() {
@@ -56,7 +56,19 @@ export class ConsignmentSalesService {
   }
 
   getObjectList() {
-    return this.http.get(this.baseUrl + "MobileConsignmentSales/cslist");
+    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileConsignmentSales/cslist");
+  }
+
+  getObjectListByDate(startDate: string, endDate: string) {
+    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileConsignmentSales/listing/" + startDate + "/" + endDate);
+  }  
+
+  getObjectById(objectId: number) {
+    return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileConsignmentSales/" + objectId);
+  }
+
+  insertObject(object: ConsignmentSalesRoot) {
+    return this.http.post(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
   }
 
 }

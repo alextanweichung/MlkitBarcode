@@ -63,7 +63,6 @@ export class TransactionsPage implements OnInit {
     this.authService.menuModel$.subscribe(obj => {
       let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
       if (pageItems) {
-        console.log("🚀 ~ file: transactions.page.ts ~ line 66 ~ TransactionsPage ~ ngOnInit ~ pageItems", pageItems)
         this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
         this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
@@ -229,8 +228,7 @@ export class TransactionsPage implements OnInit {
 
   loadRecentConsignmentSales() {
     this.consignmentSalesService.getObjectList().subscribe(response => {
-      console.log("🚀 ~ file: transactions.page.ts ~ line 221 ~ TransactionsPage ~ this.otherSalesService.getObjectList ~ response", response)
-      // this.consignment_sales = response.slice(0, 3);
+      this.consignment_sales = response.slice(0, 3);
     }, error => {
       console.log(error);
     })

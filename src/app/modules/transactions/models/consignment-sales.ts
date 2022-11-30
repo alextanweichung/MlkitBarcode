@@ -27,6 +27,16 @@ export interface ConsignmentSalesHeader {
   currencyRate?: number
   salesAgentId?: number
   remark: string
+  isHomeCurrency: boolean
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
+  maxPrecision: number
+  maxPrecisionTax: number
+}
+
+export interface ConsignmentSalesSummary {
+  consignmentSalesNum: string
+  customerId: number
+  toLocationId: number
+  trxDate: Date
 }

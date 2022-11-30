@@ -3,7 +3,7 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, NavController } from '@ionic/angular';
-import { ConsignmentSalesHeader } from 'src/app/modules/transactions/models/consignment-sales';
+import { ConsignmentSalesHeader, ConsignmentSalesRoot, ConsignmentSalesSummary } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -47,14 +47,15 @@ export class ConsignmentSalesItemPage implements OnInit {
 
   ngOnInit() {
     this.objectHeader = this.consignmentSalesService.header;
+    console.log("🚀 ~ file: consignment-sales-item.page.ts:50 ~ ConsignmentSalesItemPage ~ ngOnInit ~ this.objectHeader", JSON.stringify(this.objectHeader))
     if (!this.objectHeader) {
       this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
     }
     this.loadMasterList();
     this.loadModuleControl();
   }
-  
-  loadModuleControl() {    
+
+  loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
       let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
@@ -62,7 +63,7 @@ export class ConsignmentSalesItemPage implements OnInit {
         this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
     })
-    this.authService.precisionList$.subscribe(precision =>{
+    this.authService.precisionList$.subscribe(precision => {
       this.precisionSales = precision.find(x => x.precisionCode == "SALES");
       this.precisionTax = precision.find(x => x.precisionCode == "TAX");
       this.maxPrecision = this.precisionSales.localMax;
@@ -91,80 +92,63 @@ export class ConsignmentSalesItemPage implements OnInit {
         barcode = barcode.substring(0, 12);
       }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-        if (found) {
-          if (found.sku) {
-            this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
-            this.addItemToDetails(found.sku);
+        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        if (found_barcode) {
+          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
+          let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+          let outputData: TransactionDetail = {
+            itemId: found_item_master.id,
+            itemCode: found_item_master.code,
+            description: found_item_master.itemDesc,
+            variationTypeCode: found_item_master.varCd,
+            discountGroupCode: found_item_master.discCd,
+            discountExpression: found_item_master.discPct + '%',
+            taxId: found_item_master.taxId,
+            taxCode: found_item_master.taxCd,
+            taxPct: found_item_master.taxPct,
+            qtyRequest: null,
+            itemPricing: {
+              itemId: found_item_master.id,
+              unitPrice: found_item_master.price,
+              discountGroupCode: found_item_master.discCd,
+              discountExpression: found_item_master.discPct + '%',
+              discountPercent: found_item_master.discPct
+            },
+            itemVariationXId: found_barcode.xId,
+            itemVariationYId: found_barcode.yId,
+            itemSku: found_barcode.sku,
+            itemBarcode: found_barcode.barcode
           }
+          this.addItemToDetails(outputData);
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
       } else {
-        // this.pickingService.getItemInfoByBarcode(barcode).subscribe(response => {
-        //   if (response) {
-        //     this.addItemToSo(response.itemSku, response);
-        //   }
-        // }, error => {
-        //   console.log(error);
-        // })
+
       }
     }
   }
 
-  onItemAdd(event: any) {
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:116 ~ ConsignmentSalesItemPage ~ onItemAdd ~ event", event)
-    // let sku = event.sku;
-    // let itemInfo = event.itemInfo;
-    // if (itemInfo) {
-    //   this.addItemToDetails(sku, itemInfo)
-    // } else {
-    //   this.addItemToDetails(sku);
-    // }
+  onItemAdd(event: TransactionDetail) {
+    this.addItemToDetails(event);
   }
 
-  async addItemToDetails(sku: string, itemInfo?: ItemBarcodeModel) {
-    // change online offline here?
-    let b: any;
-    let m: any;
-    if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
-      b = this.configService.item_Barcodes.find(r => r.sku === sku);
-      m = this.configService.item_Masters.find(r => r.id === b.itemId);
-    } else {
-      m = {
-        id: itemInfo.itemId,
-        code: itemInfo.itemCode,
-        itemDesc: itemInfo.description,
-        varCd: itemInfo.variationTypeCode,
-        price: itemInfo.unitPrice
-      }
-      b = {
-        barcode: itemInfo.itemBarcode,
-        xId: itemInfo.itemVariationLineXId,
-        yId: itemInfo.itemVariationLineYId,
-        xDesc: itemInfo.itemVariationLineXDescription,
-        yDesc: itemInfo.itemVariationLineYDescription
-      }
-    }
-    if (this.objectDetail.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
+  async addItemToDetails(trxLine: TransactionDetail) {
+    if (this.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
       this.objectDetail[0].qtyRequest++;
     } else {
-      let d: TransactionDetail = {
-        lineId: 0,
-        headerId: 0,
-        locationId: this.objectHeader.toLocationId,
-        itemId: m.id,
-        itemCode: m.code,
-        description: m.itemDesc,
-        itemVariationXId: b.xId,
-        itemVariationYId: b.yId,
-        itemSku: sku,
-        itemBarcode: b.barcode,
-        variationTypeCode: m.varCd,
-        qtyRequest: 1,
-        unitPrice: m.price
-      }
-      await this.objectDetail.unshift(d);
+      trxLine.qtyRequest = 1;
+      trxLine.locationId = this.objectHeader.toLocationId;
+      trxLine = this.assignLineUnitPrice(trxLine);
+      // if (this.objectHeader.isItemPriceTaxInclusive) {
+      //   await this.computeUnitPriceExTax(trxLine);
+      // } else {
+      //   await this.computeUnitPrice(trxLine);
+      // }
+      await this.objectDetail.unshift(trxLine);
+      console.log("🚀 ~ file: consignment-sales-item.page.ts:149 ~ ConsignmentSalesItemPage ~ addItemToDetails ~ trxLine", JSON.stringify(trxLine))
+      await this.computeAllAmount(this.objectDetail[0]);
+      console.log("🚀 ~ file: consignment-sales-item.page.ts:150 ~ ConsignmentSalesItemPage ~ addItemToDetails ~ this.objectDetail", JSON.stringify(this.objectDetail));
     }
   }
 
@@ -268,15 +252,7 @@ export class ConsignmentSalesItemPage implements OnInit {
     this.computeAllAmount(line);
   }
 
-  computeAllAmount(line: TransactionDetail) {
-    this.computeDiscTaxAmount(line);
-  }
-
-  computeDiscTaxAmount(line: TransactionDetail) {
-    line = this.commonService.computeDiscTaxAmount(line, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.maxPrecision);
-  }
-
-  setSelect(event) {
+  highlight(event) {
     event.getInputElement().then(r => {
       r.select();
     })
@@ -290,14 +266,120 @@ export class ConsignmentSalesItemPage implements OnInit {
     }
   }
 
-  nextStep() {
-    // let soLines: PickingSalesOrderDetail[] = this.pickingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPickedCurrent > 0);
-    // this.pickingService.setChooseSalesOrderLines(soLines);
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-confirmation');
+  /* #region  price, tax, discount handle here */
+
+  promotionEngineApplicable: boolean = true;
+  configSalesActivatePromotionEngine: boolean;
+  disablePromotionCheckBox: boolean = false;
+  async computeAllAmount(trxLine: TransactionDetail) {
+    await this.computeDiscTaxAmount(trxLine);
+  }
+
+  computeUnitPriceExTax(trxLine: TransactionDetail) {
+    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
+    this.computeDiscTaxAmount(trxLine);
+  }
+
+  computeUnitPrice(trxLine: TransactionDetail) {
+    trxLine.unitPriceExTax = trxLine.unitPrice;
+    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+    this.computeDiscTaxAmount(trxLine);
+  }
+
+  async computeDiscTaxAmount(trxLine: TransactionDetail) {
+    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+  }
+
+  assignLineUnitPrice(trxLine: TransactionDetail) {
+    if (this.useTax) {
+      if (this.objectHeader.isItemPriceTaxInclusive) {
+        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+        trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+      } else {
+        trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+        trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+      }
+    } else {
+      trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+      trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+    }
+    trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
+    trxLine.discountExpression = trxLine.itemPricing.discountExpression;
+    trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
+    trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+    console.log("🚀 ~ file: consignment-sales-item.page.ts:310 ~ ConsignmentSalesItemPage ~ assignLineUnitPrice ~ trxLine", JSON.stringify(trxLine))
+    return trxLine;
+  }
+
+  /* #endregion */
+
+  /* #region  modal to edit line detail */  
+
+  selectedItem: TransactionDetail;
+  async showLineDetails(trxLine: TransactionDetail) {
+    this.selectedItem = trxLine;
+    await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.maxPrecision);
+    this.showItemModal();
+  }
+
+  isModalOpen: boolean = false;
+  showItemModal() {
+    this.isModalOpen = true;
+  }
+
+  hideItemModal() {
+    this.isModalOpen = false;
+  }
+
+  /* #endregion */
+
+  async nextStep() {
+    if (this.objectDetail.length > 0) {
+      const alert = await this.alertController.create({
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: async () => {
+              await this.insertConsignmentSales();
+            },
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+    }
+  }
+
+  insertConsignmentSales() {    
+    let trxDto: ConsignmentSalesRoot = {
+      header: this.objectHeader,
+      details: this.objectDetail      
+    }
+    this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
+      let css: ConsignmentSalesSummary = {
+        consignmentSalesNum: response.body["header"]["consignmentSalesNum"],
+        customerId: response.body["header"]["customerId"],
+        toLocationId: response.body["header"]["toLocationId"],
+        trxDate: response.body["header"]["trxDate"]
+      }
+      this.consignmentSalesService.setSummary(css);
+      this.toastService.presentToast('Insert Complete', 'New Consignment Sales has been added', 'middle', 'success', 1000);
+      this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-summary');
+    }, error => {
+      console.log(error);
+    });
   }
 
   previousStep() {
     this.navController.navigateBack('/transactions/consignment-sales/consignment-sales-header');
   }
+
 
 }

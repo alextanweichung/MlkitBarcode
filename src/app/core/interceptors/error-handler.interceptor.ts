@@ -84,6 +84,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                      //const navigationExtras: NavigationExtras = {state: {error: error.error}}
                      //this.router.navigateByUrl('/error', navigationExtras);
                      this.toastService.presentToast('Error', 'Internal server error 500', 'middle', 'danger', 2000);
+                     console.log("🚀 ~ file: error-handler.interceptor.ts:105 ~ ErrorHandlerInterceptor ~ intercept ~ error", JSON.stringify(error))
                      // this.messageService.add({ severity: 'error', summary: 'Internal server error 500', detail: error.error.message });
                      break;
                   default:

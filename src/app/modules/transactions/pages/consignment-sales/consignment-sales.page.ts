@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentSalesList } from '../../models/consignment-sales';
@@ -14,7 +15,6 @@ import { FilterPage } from '../filter/filter.page';
 })
 export class ConsignmentSalesPage implements OnInit {
 
-  content_loaded: boolean = false;
   objects: ConsignmentSalesList[] = [];
 
   startDate: Date;
@@ -42,15 +42,11 @@ export class ConsignmentSalesPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    // this.otherSalesService.getOtherSalesListByDate(this.startDate, this.endDate).subscribe(response => {
-    //   this.objects = response;
-    //   if (this.objects.length > 0) {
-    //     this.content_loaded = true;
-    //   }
-    //   // this.toastService.presentToast('Search Completed.', '', 'middle', 'success', 1000);
-    // }, error => {
-    //   console.log((error));
-    // })
+    this.consignmentSalesService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+      this.objects = response;
+    }, error => {
+      console.log((error));
+    })
   }
 
   /* #endregion */
