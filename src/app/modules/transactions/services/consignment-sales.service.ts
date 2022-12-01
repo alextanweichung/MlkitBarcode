@@ -71,4 +71,8 @@ export class ConsignmentSalesService {
     return this.http.post(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
   }
 
+  updateObject(object: ConsignmentSalesRoot) {
+    return this.http.put(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
+  }
+
 }

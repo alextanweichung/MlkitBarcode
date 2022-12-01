@@ -72,6 +72,7 @@ export class BarcodeScanInputPage implements OnInit {
   itemSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
   async validateBarcode(barcode: string) {
+    console.log("🚀 ~ file: barcode-scan-input.page.ts:75 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
     if (barcode) {
       this.itemSearchValue = '';
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
@@ -102,6 +103,7 @@ export class BarcodeScanInputPage implements OnInit {
             itemSku: found_barcode.sku,
             itemBarcode: found_barcode.barcode
           }
+          console.log("🚀 ~ file: barcode-scan-input.page.ts:107 ~ BarcodeScanInputPage ~ validateBarcode ~ outputData", JSON.stringify(outputData))
           this.onItemAdd.emit(outputData);
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);

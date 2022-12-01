@@ -74,7 +74,7 @@ export class TabsPage {
           text: 'Add Consignment',
           icon: 'swap-vertical-outline',
           handler: () => {
-            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header');
+            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
           }
         },
         {

@@ -58,7 +58,7 @@ export class ConsignmentSalesPage implements OnInit {
     // if (salesAgentId === 0 || salesAgentId === undefined) {
     //   this.toastService.presentToast('Error', 'Sales Agent not set', 'middle', 'danger', 1000);
     // } else {
-      this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header');
+      this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
     // }
   }
 

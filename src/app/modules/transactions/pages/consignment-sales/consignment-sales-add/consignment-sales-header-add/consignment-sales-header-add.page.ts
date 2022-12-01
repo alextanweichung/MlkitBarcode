@@ -188,7 +188,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   nextStep() {
     this.consignmentSalesService.setHeader(this.objectForm.value);
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item');
+    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
   }
 
 }

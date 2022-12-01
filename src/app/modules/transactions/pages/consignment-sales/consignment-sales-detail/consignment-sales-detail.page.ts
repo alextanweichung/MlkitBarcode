@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
@@ -12,7 +12,7 @@ import { ConsignmentSalesService } from '../../../services/consignment-sales.ser
   templateUrl: './consignment-sales-detail.page.html',
   styleUrls: ['./consignment-sales-detail.page.scss'],
 })
-export class ConsignmentSalesDetailPage implements OnInit {
+export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
   object: ConsignmentSalesRoot;
@@ -26,6 +26,12 @@ export class ConsignmentSalesDetailPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
+  }
+
+  ionViewWillEnter(): void {
+    if (this.objectId) {
+      this.loadObject();
+    }
   }
 
   ngOnInit() {
@@ -69,10 +75,18 @@ export class ConsignmentSalesDetailPage implements OnInit {
   loadObject() {
     this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
       this.object = response;
-      console.log("🚀 ~ file: consignment-sales-detail.page.ts:55 ~ ConsignmentSalesDetailPage ~ this.consignmentSalesService.getObjectById ~ this.object", this.object)
     }, error => {
       console.log(error);
     })
+  }
+
+  edit() {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.objectId
+      }
+    }
+    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
   }
 
 }
