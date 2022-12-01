@@ -8,11 +8,11 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 @Component({
-  selector: 'app-consignment-sales-header',
-  templateUrl: './consignment-sales-header.page.html',
-  styleUrls: ['./consignment-sales-header.page.scss'],
+  selector: 'app-consignment-sales-header-add',
+  templateUrl: './consignment-sales-header-add.page.html',
+  styleUrls: ['./consignment-sales-header-add.page.scss'],
 })
-export class ConsignmentSalesHeaderPage implements OnInit {
+export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   objectForm: FormGroup;
 

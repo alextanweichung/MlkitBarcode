@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ConsignmentSalesItemPageRoutingModule } from './consignment-sales-item-routing.module';
+import { ConsignmentSalesItemAddPageRoutingModule } from './consignment-sales-item-add-routing.module';
 
-import { ConsignmentSalesItemPage } from './consignment-sales-item.page';
+import { ConsignmentSalesItemAddPage } from './consignment-sales-item-add.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
@@ -16,11 +16,11 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     CommonModule,
     FormsModule,
     IonicModule,
-    ConsignmentSalesItemPageRoutingModule,
+    ConsignmentSalesItemAddPageRoutingModule,
     BarcodeScanInputPageModule,
     ItemAddListFlatPageModule,
     IdMappingModule
   ],
-  declarations: [ConsignmentSalesItemPage]
+  declarations: [ConsignmentSalesItemAddPage]
 })
-export class ConsignmentSalesItemPageModule {}
+export class ConsignmentSalesItemAddPageModule {}

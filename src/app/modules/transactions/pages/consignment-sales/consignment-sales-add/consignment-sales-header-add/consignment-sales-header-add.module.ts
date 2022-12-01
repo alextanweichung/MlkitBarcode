@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ConsignmentSalesHeaderPageRoutingModule } from './consignment-sales-header-routing.module';
+import { ConsignmentSalesHeaderAddPageRoutingModule } from './consignment-sales-header-add-routing.module';
 
-import { ConsignmentSalesHeaderPage } from './consignment-sales-header.page';
+import { ConsignmentSalesHeaderAddPage } from './consignment-sales-header-add.page';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
@@ -15,10 +15,10 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     CommonModule,
     FormsModule,
     IonicModule,
-    ConsignmentSalesHeaderPageRoutingModule,
+    ConsignmentSalesHeaderAddPageRoutingModule,
     CalendarInputPageModule,
     SearchDropdownPageModule
   ],
-  declarations: [ConsignmentSalesHeaderPage]
+  declarations: [ConsignmentSalesHeaderAddPage]
 })
-export class ConsignmentSalesHeaderPageModule {}
+export class ConsignmentSalesHeaderAddPageModule {}

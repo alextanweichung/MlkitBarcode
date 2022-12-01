@@ -8,7 +8,6 @@ import { ConsignmentSalesService } from 'src/app/modules/transactions/services/c
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
@@ -17,12 +16,12 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-consignment-sales-item',
-  templateUrl: './consignment-sales-item.page.html',
-  styleUrls: ['./consignment-sales-item.page.scss'],
+  selector: 'app-consignment-sales-item-add',
+  templateUrl: './consignment-sales-item-add.page.html',
+  styleUrls: ['./consignment-sales-item-add.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobileConsignmentSales' }]
 })
-export class ConsignmentSalesItemPage implements OnInit {
+export class ConsignmentSalesItemAddPage implements OnInit {
 
   objectHeader: ConsignmentSalesHeader;
   objectDetail: TransactionDetail[] = [];
