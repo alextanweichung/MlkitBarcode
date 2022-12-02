@@ -364,6 +364,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   async nextStep() {
     if (this.object.details.length > 0) {
       const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
         header: 'Are you sure to proceed?',
         buttons: [
           {
@@ -372,6 +373,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
           },
           {
             text: 'OK',
+            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.updateObject();

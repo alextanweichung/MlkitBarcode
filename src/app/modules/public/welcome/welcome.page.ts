@@ -36,9 +36,7 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit() {
-    if (this.configService.sys_parameter) {
-      this.navController.navigateRoot('/signin');
-    }
+    
   }
 
   ngAfterContentChecked(): void {

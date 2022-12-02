@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, IonInput, NavController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { InventoryCountBatchCriteria, StockCountDetail, StockCountHeader, StockCountRoot } from 'src/app/modules/others/models/stock-count';
 import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -304,14 +304,43 @@ export class StockCountItemAddPage implements OnInit {
     this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
   }
 
-  nextStep() {
+  async nextStep() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'Are you sure to proceed?',
+      buttons: [
+        {
+          text: 'Confirm',
+          cssClass: 'success',
+          handler: async () => {
+            this.insertObject();
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel',
+          handler: async () => {
+
+          }
+        }
+      ]
+    });  
+    await alert.present();
+  }
+
+  insertObject() {
     this.stockCountService.insertInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
       if (response.status === 201) {
         let object = response.body as StockCountRoot;
-        this.stockCountService.setHeader(object.header);
-        this.stockCountService.setLines(object.details);
+        this.stockCountService.resetVariables();
         this.toastService.presentToast('Stock Count added', '', 'middle', 'success', 1000);
-        this.navController.navigateRoot('/others/stock-count/stock-count-add/stock-count-summary');
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: object.header.inventoryCountId
+          }
+        }
+        this.navController.navigateForward('/others/stock-count/stock-count-detail', navigationExtras);
       }
     }, error => {
       console.log(error);

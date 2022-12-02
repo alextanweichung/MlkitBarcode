@@ -309,6 +309,7 @@ export class PickingItemPage implements OnInit {
     let soLines: PickingSalesOrderDetail[] = this.pickingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPickedCurrent > 0);
     if (soLines.length > 0) {
       const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
         header: 'Are you sure to proceed?',
         buttons: [
           {
@@ -318,6 +319,7 @@ export class PickingItemPage implements OnInit {
           {
             text: 'OK',
             role: 'confirm',
+            cssClass: 'success',
             handler: async () => {
               await this.insertPicking(soLines);
             },

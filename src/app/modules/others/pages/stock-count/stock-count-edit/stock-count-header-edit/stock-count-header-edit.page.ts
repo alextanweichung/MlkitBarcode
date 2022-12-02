@@ -16,7 +16,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 })
 export class StockCountHeaderEditPage implements OnInit {
 
-  inventoryCountId: number;
+  objectId: number;
   objectForm: FormGroup;
 
   inventoryCount: StockCountRoot;
@@ -31,7 +31,7 @@ export class StockCountHeaderEditPage implements OnInit {
     private actionSheetController: ActionSheetController
   ) {
     this.route.queryParams.subscribe(params => {
-      this.inventoryCountId = params['inventoryCountId'];
+      this.objectId = params['objectId'];
     })
     this.newObjectForm();
   }
@@ -58,7 +58,7 @@ export class StockCountHeaderEditPage implements OnInit {
 
   ngOnInit() {
     this.loadMasterList();
-    if (this.inventoryCountId) {
+    if (this.objectId) {
       this.loadObject();
     }
   }
@@ -119,7 +119,7 @@ export class StockCountHeaderEditPage implements OnInit {
   }
 
   loadObject() {
-    this.stockCountService.getInventoryCount(this.inventoryCountId).subscribe(response => {
+    this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
       this.inventoryCount = response;
       this.inventoryCount.details.forEach(r => {
         r.itemCode = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).itemCode;
@@ -154,7 +154,7 @@ export class StockCountHeaderEditPage implements OnInit {
       this.stockCountService.resetVariables();
       let navigationExtras: NavigationExtras = {
         queryParams: {
-          inventoryCountId: this.inventoryCountId
+          objectId: this.objectId
         }
       }
       this.navController.navigateBack('/others/stock-count/stock-count-detail', navigationExtras);

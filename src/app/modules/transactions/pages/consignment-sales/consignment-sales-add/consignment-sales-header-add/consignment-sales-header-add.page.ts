@@ -189,21 +189,21 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
   }
 
   nextStep() {
-    this.consignmentSalesService.getObjectByAttr(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.customerId.value, this.objectForm.controls.toLocationId.value).subscribe(response => {
-      if (response.length > 0) { // todo : remove this as in future same criteria will only have 1 record or none.        
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            objectId: response[0].header.consignmentSalesId
-          }
-        }
-        this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
-      } else {
+    // this.consignmentSalesService.getObjectByAttr(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.customerId.value, this.objectForm.controls.toLocationId.value).subscribe(response => {
+    //   if (response.length > 0) { // todo : remove this as in future same criteria will only have 1 record or none.        
+    //     let navigationExtras: NavigationExtras = {
+    //       queryParams: {
+    //         objectId: response[0].header.consignmentSalesId
+    //       }
+    //     }
+    //     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
+    //   } else {
         this.consignmentSalesService.setHeader(this.objectForm.value);
         this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
-      }
-    }, error => {
-      console.log(error);
-    })
+    //   }
+    // }, error => {
+    //   console.log(error);
+    // })
   }
 
 }

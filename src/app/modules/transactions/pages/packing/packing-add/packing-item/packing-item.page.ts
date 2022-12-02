@@ -331,6 +331,7 @@ export class PackingItemPage implements OnInit {
     let soLines: PackingSalesOrderDetail[] = this.packingSalesOrders.flatMap(r => r.details).filter(r => r.qtyPackedCurrent > 0);
     if (soLines.length > 0) {
       const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
         header: 'Are you sure to proceed?',
         buttons: [
           {
@@ -340,6 +341,7 @@ export class PackingItemPage implements OnInit {
           {
             text: 'OK',
             role: 'confirm',
+            cssClass: 'success',
             handler: async () => {
               await this.insertPacking(soLines);
             },

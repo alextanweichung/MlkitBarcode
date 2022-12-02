@@ -82,6 +82,7 @@ export class ItemCartPage implements OnInit {
 
   async presentDeleteItemAlert(item: TransactionDetail) {
     const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
       header: 'Are you sure to delete?',
       buttons: [
         {
@@ -94,6 +95,7 @@ export class ItemCartPage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'danger',
           handler: () => {
             this.removeItemById(item);
           },
@@ -111,6 +113,7 @@ export class ItemCartPage implements OnInit {
 
   async presentDeleteItemVariationAlert(trxLine: TransactionDetail, item: InnerVariationDetail) {
     const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
       header: 'Are you sure to delete?',
       buttons: [
         {
@@ -123,6 +126,7 @@ export class ItemCartPage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'danger',
           handler: () => {
             item.qtyRequest = null;
             this.onItemInCartEditCompleted.emit(trxLine);

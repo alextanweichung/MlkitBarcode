@@ -50,10 +50,10 @@ export class BarcodeScanInputPage implements OnInit {
     })
   }
 
-  async handleKeyDown(e: any, key: string) {
+  handleKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
       let barcode = this.manipulateBarcodeCheckDigit(key);
-      await this.validateBarcode(barcode);
+      this.validateBarcode(barcode);
       e.preventDefault();
     }
   }
@@ -107,13 +107,13 @@ export class BarcodeScanInputPage implements OnInit {
           }
           this.onItemAdd.emit(outputData);
         } else {
+          console.log("🚀 ~ file: barcode-scan-input.page.ts:111 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
           this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
       } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'middle', 'medium', 1000);
       }
     }
-    this.barcodeInput.value = '';
     this.barcodeInput.setFocus();
   }
 

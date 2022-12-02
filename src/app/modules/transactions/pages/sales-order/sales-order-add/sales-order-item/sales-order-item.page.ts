@@ -237,6 +237,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
   async nextStep() {   
     if (this.itemInCart.length > 0) {
       const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
         header: 'Are you sure to proceed?',
         buttons: [
           {
@@ -246,6 +247,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
           {
             text: 'OK',
             role: 'confirm',
+            cssClass: 'success',
             handler: async () => {
               await this.insertSalesOrder();
             },

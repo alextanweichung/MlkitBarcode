@@ -34,6 +34,7 @@ export class TransactionProcessingPage implements OnInit {
 
   async presentConfirmAlert(action: string, docId: number, docNum: string) {    
     const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
       header: 'Are you sure to ' + action + ' ' + docNum + '?',
       buttons: [
         {
@@ -43,6 +44,7 @@ export class TransactionProcessingPage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'success',
           handler: () => {
             this.updateDoc(action, docId);
           },

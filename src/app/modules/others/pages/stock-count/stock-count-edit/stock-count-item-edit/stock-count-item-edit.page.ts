@@ -9,7 +9,6 @@ import { StockCountService } from 'src/app/modules/others/services/stock-count.s
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -21,9 +20,9 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 })
 export class StockCountItemEditPage implements OnInit {
 
-  inventoryCountId: number;
-  stockCountHeader: StockCountHeader;
-  stockCountDetail: StockCountDetail[] = [];
+  objectId: number;
+  objectHeader: StockCountHeader;
+  objectDetail: StockCountDetail[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -36,14 +35,14 @@ export class StockCountItemEditPage implements OnInit {
     
   ) {
     this.route.queryParams.subscribe(params => {
-      this.inventoryCountId = params['inventoryCountId'];
+      this.objectId = params['objectId'];
     })
   }
 
   ngOnInit() {
-    this.stockCountHeader = this.stockCountService.stockCountHeader;
-    this.stockCountDetail = this.stockCountService.stockCountLines;
-    if (!this.stockCountHeader || this.stockCountHeader === undefined) {
+    this.objectHeader = this.stockCountService.stockCountHeader;
+    this.objectDetail = this.stockCountService.stockCountLines;
+    if (!this.objectHeader || this.objectHeader === undefined) {
       this.navController.navigateBack('/others/stock-count');
     }
     this.loadMasterList();
@@ -85,7 +84,7 @@ export class StockCountItemEditPage implements OnInit {
 
   inventoryCountBatchCriteria: InventoryCountBatchCriteria
   loadInventoryCountBatchCriteria() {
-    this.stockCountService.getInventoryCountBatchCriteria(this.stockCountHeader.inventoryCountBatchId).subscribe(response => {
+    this.stockCountService.getInventoryCountBatchCriteria(this.objectHeader.inventoryCountBatchId).subscribe(response => {
       this.inventoryCountBatchCriteria = response;
     }, error => {
       console.log(error);
@@ -137,8 +136,6 @@ export class StockCountItemEditPage implements OnInit {
         }
       }
     }
-    this.barcodeInput.value = '';
-    this.barcodeInput.setFocus();
   }
 
   onItemAdd(event: TransactionDetail) {
@@ -169,13 +166,13 @@ export class StockCountItemEditPage implements OnInit {
         break;
     }
 
-    if (this.stockCountDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
-      this.stockCountDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+    if (this.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+      this.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
     } else {
       let d: StockCountDetail = {
         inventoryCountLineId: 0,
         inventoryCountId: 0,
-        locationId: this.stockCountHeader.locationId,
+        locationId: this.objectHeader.locationId,
         itemId: trxLine.itemId,
         itemCode: trxLine.itemCode,
         description: trxLine.description,
@@ -185,9 +182,9 @@ export class StockCountItemEditPage implements OnInit {
         itemBarcode: trxLine.itemBarcode,
         itemBarcodeTagId: trxLine.itemBarcodeTagId,
         qtyRequest: 1,
-        sequence: this.stockCountDetail.length
+        sequence: this.objectDetail.length
       }      
-      await this.stockCountDetail.length > 0 ? this.stockCountDetail.unshift(d) : this.stockCountDetail.push(d);
+      await this.objectDetail.length > 0 ? this.objectDetail.unshift(d) : this.objectDetail.push(d);
     }
   }
 
@@ -222,8 +219,8 @@ export class StockCountItemEditPage implements OnInit {
     line.qtyRequest++;
   }
 
-  async deleteLine(index) {    
-    if (this.stockCountDetail[index]) {
+  async deleteLine(index) {
+    if (this.objectDetail[index]) {
       const alert = await this.alertController.create({
         cssClass: 'custom-alert',
         header: 'Delete this item?',
@@ -233,7 +230,7 @@ export class StockCountItemEditPage implements OnInit {
             text: 'Delete item',
             cssClass: 'danger',
             handler: async () => {
-              this.stockCountDetail.splice(index, 1);
+              this.objectDetail.splice(index, 1);
               this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
             }
           },
@@ -242,7 +239,7 @@ export class StockCountItemEditPage implements OnInit {
             role: 'cancel',
             cssClass: 'cancel',
             handler: async () => {
-              this.stockCountDetail[index].qtyRequest === 0 ? this.stockCountDetail[index].qtyRequest++ : 1;
+              this.objectDetail[index].qtyRequest === 0 ? this.objectDetail[index].qtyRequest++ : 1;
             }
           }
         ]
@@ -312,17 +309,48 @@ export class StockCountItemEditPage implements OnInit {
   previousStep() {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        inventoryCountId: this.inventoryCountId
+        objectId: this.objectId
       }
     }
     this.navController.navigateBack('/others/stock-count/stock-count-edit/stock-count-header', navigationExtras);
   }
 
-  nextStep() {
-    this.stockCountService.updateInventoryCount({header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: []}).subscribe(response => {
+  async nextStep() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'Are you sure to proceed?',
+      buttons: [
+        {
+          text: 'Confirm',
+          cssClass: 'success',
+          handler: async () => {
+            this.updateObject();
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel',
+          handler: async () => {
+
+          }
+        }
+      ]
+    });  
+    await alert.present();
+  }
+
+  updateObject() {    
+    this.stockCountService.updateInventoryCount({header: this.objectHeader, details: this.objectDetail, barcodeTag: []}).subscribe(response => {
       if (response.status === 204) {
+        this.stockCountService.resetVariables();
         this.toastService.presentToast('Stock Count updated', '', 'middle', 'success', 1000);
-        this.navController.navigateRoot('/others/stock-count/stock-count-edit/stock-count-summary');
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: this.objectHeader.inventoryCountId
+          }
+        }
+        this.navController.navigateForward('/others/stock-count/stock-count-detail', navigationExtras);
       }
     }, error => {
       console.log(error);

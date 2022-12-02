@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
-import { Platform } from '@ionic/angular';
+import { NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Network } from '@capacitor/network';
+import { ConfigService } from './services/config/config.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,9 @@ export class AppComponent {
 
   constructor(
     private platform: Platform,
-    private router: Router
+    private router: Router,
+    private configService: ConfigService,
+    private navController: NavController
   ) {
     this.initializeApp();
   }
@@ -27,6 +30,12 @@ export class AppComponent {
 
     // Wait until platform is ready
     this.platform.ready().then(async () => {
+
+      if (this.configService.sys_parameter) {
+        this.navController.navigateRoot('/signin');
+      } else {
+        this.navController.navigateRoot('/welcome');
+      }
 
       // If we're on a mobile platform (iOS / Android), not web
       if (Capacitor.getPlatform() !== 'web') {

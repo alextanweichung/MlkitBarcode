@@ -8,6 +8,7 @@ import { StockCountDetailPageRoutingModule } from './stock-count-detail-routing.
 
 import { StockCountDetailPage } from './stock-count-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     StockCountDetailPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    SumModule
   ],
   declarations: [StockCountDetailPage]
 })
