@@ -15,7 +15,7 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   parent: string = 'Purchase Order'
 
-  purchaseOrderId: number;
+  objectId: number;
   purchaseOrder: any;
   flattenPurchaseOrder: any;
 
@@ -26,7 +26,7 @@ export class PurchaseOrderDetailPage implements OnInit {
     private purchaseOrderService: PurchaseOrderService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.purchaseOrderId = params['purchaseOrderId'];
+      this.objectId = params['objectId'];
       if (params['parent']) {
         this.parent = params['parent'];
       }
@@ -34,7 +34,7 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.purchaseOrderId) {
+    if (!this.objectId) {
       this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
       this.navController.navigateBack('/transactions')
     } else {
@@ -57,7 +57,7 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   loadDetail() {
-    this.purchaseOrderService.getPurchaseOrderDetail(this.purchaseOrderId).subscribe(response => {
+    this.purchaseOrderService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
       this.purchaseOrder = response;
       this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.purchaseOrder);
     }, error => {
