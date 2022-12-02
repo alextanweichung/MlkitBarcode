@@ -54,7 +54,7 @@ export class PackingItemPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      this.loadImage = this.configService.sys_parameter.loadImage;
+      this.loadImage = false; // this.configService.sys_parameter.loadImage;
       let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
       if (packingControl != undefined) {
         this.packingQtyControl = packingControl.ctrlValue;
@@ -134,7 +134,6 @@ export class PackingItemPage implements OnInit {
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
-          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,

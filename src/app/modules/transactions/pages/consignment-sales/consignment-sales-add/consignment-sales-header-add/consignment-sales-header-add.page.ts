@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController } from '@ionic/angular';
+import { format } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -187,8 +189,21 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
   }
 
   nextStep() {
-    this.consignmentSalesService.setHeader(this.objectForm.value);
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
+    this.consignmentSalesService.getObjectByAttr(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.customerId.value, this.objectForm.controls.toLocationId.value).subscribe(response => {
+      if (response.length > 0) { // todo : remove this as in future same criteria will only have 1 record or none.        
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: response[0].header.consignmentSalesId
+          }
+        }
+        this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
+      } else {
+        this.consignmentSalesService.setHeader(this.objectForm.value);
+        this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
+      }
+    }, error => {
+      console.log(error);
+    })
   }
 
 }

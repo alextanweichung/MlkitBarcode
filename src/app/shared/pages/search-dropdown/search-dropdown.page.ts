@@ -102,7 +102,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   // Cancel
   cancel() {
     // Dismiss modal
-    this.hideModal(null, true);
+    this.hideModal(null);
   }
   
 }

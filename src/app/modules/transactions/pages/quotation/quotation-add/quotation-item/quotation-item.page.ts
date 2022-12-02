@@ -51,7 +51,7 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
       this.navController.navigateBack('/transactions/quotation/quotation-header');
     }
-    this.loadImage = this.configService.sys_parameter.loadImage;
+    this.loadImage = false; // this.configService.sys_parameter.loadImage;
     this.componentsLoad();
   }
 

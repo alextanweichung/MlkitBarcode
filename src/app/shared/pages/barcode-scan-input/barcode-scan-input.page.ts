@@ -72,13 +72,11 @@ export class BarcodeScanInputPage implements OnInit {
   itemSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
   async validateBarcode(barcode: string) {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:75 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
     if (barcode) {
       this.itemSearchValue = '';
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
-          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,
@@ -101,9 +99,12 @@ export class BarcodeScanInputPage implements OnInit {
             itemVariationXId: found_barcode.xId,
             itemVariationYId: found_barcode.yId,
             itemSku: found_barcode.sku,
-            itemBarcode: found_barcode.barcode
+            itemBarcode: found_barcode.barcode,
+            itemBrandId: found_item_master.brandId,
+            itemGroupId: found_item_master.groupId,
+            itemCategoryId: found_item_master.catId,
+            itemBarcodeTagId: found_barcode.id
           }
-          console.log("🚀 ~ file: barcode-scan-input.page.ts:107 ~ BarcodeScanInputPage ~ validateBarcode ~ outputData", JSON.stringify(outputData))
           this.onItemAdd.emit(outputData);
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);

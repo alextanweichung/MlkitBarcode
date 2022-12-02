@@ -45,7 +45,7 @@ export class PickingItemPage implements OnInit {
     if (this.pickingSalesOrders && this.pickingSalesOrders.length > 0) {
       this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
     }
-    this.loadImage = this.configService.sys_parameter.loadImage;
+    this.loadImage = false; // this.configService.sys_parameter.loadImage;
     this.loadMasterList();
   }
 
@@ -113,7 +113,6 @@ export class PickingItemPage implements OnInit {
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
-          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,

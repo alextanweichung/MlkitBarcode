@@ -92,7 +92,6 @@ export class ConsignmentSalesItemAddPage implements OnInit {
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
-          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,
@@ -117,7 +116,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
             itemSku: found_barcode.sku,
             itemBarcode: found_barcode.barcode
           }
-          this.addItemToDetails(outputData);
+          this.addItemToLine(outputData);
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
@@ -128,16 +127,16 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   }
 
   onItemAdd(event: TransactionDetail) {
-    this.addItemToDetails(event);
+    this.addItemToLine(event);
   }
 
-  async addItemToDetails(trxLine: TransactionDetail) {
+  async addItemToLine(trxLine: TransactionDetail) {
     if (this.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
       this.objectDetail[0].qtyRequest++;
     } else {
       this.objectDetail.forEach(r => r.sequence += 1);
       trxLine.qtyRequest = 1;
-      trxLine.locationId = this.objectHeader.toLocationId;      
+      trxLine.locationId = this.objectHeader.toLocationId;
       trxLine.sequence = 0;
       trxLine = this.assignLineUnitPrice(trxLine);
       await this.objectDetail.unshift(trxLine);

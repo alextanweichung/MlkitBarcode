@@ -11,6 +11,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 
 @Component({
@@ -44,7 +45,7 @@ export class StockCountItemAddPage implements OnInit {
     }
     this.loadMasterList();
     // this.loadModuleControl();    
-    this.loadImage = this.configService.sys_parameter.loadImage;
+    this.loadImage = false; // this.configService.sys_parameter.loadImage;
   }
 
   itemBrandMasterList: MasterListDetails[] = [];
@@ -93,107 +94,87 @@ export class StockCountItemAddPage implements OnInit {
         barcode = barcode.substring(0, 12);
       }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-        if (found) {
-          if (found.sku) {
-            this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
-            this.addItemToLine(found.sku);
+        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        if (found_barcode) {
+          let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+          let outputData: TransactionDetail = {
+            itemId: found_item_master.id,
+            itemCode: found_item_master.code,
+            description: found_item_master.itemDesc,
+            variationTypeCode: found_item_master.varCd,
+            discountGroupCode: found_item_master.discCd,
+            discountExpression: found_item_master.discPct + '%',
+            taxId: found_item_master.taxId,
+            taxCode: found_item_master.taxCd,
+            taxPct: found_item_master.taxPct,
+            qtyRequest: null,
+            itemPricing: {
+              itemId: found_item_master.id,
+              unitPrice: found_item_master.price,
+              discountGroupCode: found_item_master.discCd,
+              discountExpression: found_item_master.discPct + '%',
+              discountPercent: found_item_master.discPct
+            },
+            itemVariationXId: found_barcode.xId,
+            itemVariationYId: found_barcode.yId,
+            itemSku: found_barcode.sku,
+            itemBarcode: found_barcode.barcode,
+            itemBrandId: found_item_master.brandId,
+            itemGroupId: found_item_master.groupId,
+            itemCategoryId: found_item_master.catId,
+            itemBarcodeTagId: found_barcode.id
           }
+          this.addItemToLine(outputData);
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
-      } else {
-        this.stockCountService.getItemInfoByBarcode(barcode).subscribe(response => {
-          if (response) {
-            this.addItemToLine(response.itemSku, response);
-          }
-        }, error => {
-          console.log(error);
-        })
       }
     }
   }
 
-  onItemAdd(event: any) {
-    let sku = event.sku;
-    let itemInfo = event.itemInfo;
-    if (itemInfo) {
-      this.addItemToLine(sku, itemInfo)
-    } else {
-      this.addItemToLine(sku);
-    }
+  onItemAdd(event: TransactionDetail) {
+    this.addItemToLine(event);
   }
 
-  async addItemToLine(sku: string, itemInfo?: ItemBarcodeModel) {
-    let b: any;
-    let m: any;
-    if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0 && this.configService.item_Masters && this.configService.item_Barcodes.length > 0) {
-      b = this.configService.item_Barcodes.find(r => r.sku === sku);
-      m = this.configService.item_Masters.find(r => r.id === b.itemId);
-    } else {
-      m = {
-        id: itemInfo.itemId,
-        code: itemInfo.itemCode,
-        itemDesc: itemInfo.description,
-        varCd: itemInfo.variationTypeCode,
-        brandId: itemInfo.brandId,
-        groupId: itemInfo.groupId,
-        catId: itemInfo.catId
-      }
-      b = {
-        id: itemInfo.itemBarcodeTagId,
-        barcode: itemInfo.itemBarcode,        
-        xId: itemInfo.itemVariationLineXId,
-        yId: itemInfo.itemVariationLineYId,
-        xDesc: itemInfo.itemVariationLineXDescription,
-        yDesc: itemInfo.itemVariationLineYDescription
-      }
-    }
-
+  async addItemToLine(trxLine: TransactionDetail) {
     switch (this.inventoryCountBatchCriteria.randomCountType) {
       case "Item":
         break;
       case "Brand":
-        if (m) {
-          if (!this.inventoryCountBatchCriteria.keyId.includes(m.brandId)) {
-            this.toastService.presentToast('Item Brand not match', '', 'middle', 'danger', 1000);
-            return;
-          }
+        if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemBrandId)) {
+          this.toastService.presentToast('Item Brand not match', '', 'middle', 'danger', 1000);
+          return;
         }
         break;
       case "Group":
-        if (m) {
-          if (!this.inventoryCountBatchCriteria.keyId.includes(m.groupId)) {
-            this.toastService.presentToast('Item Group not match', '', 'middle', 'danger', 1000);
-            return;
-          }
+        if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemGroupId)) {
+          this.toastService.presentToast('Item Group not match', '', 'middle', 'danger', 1000);
+          return;
         }
         break;
       case "Category":
-        if (m) {
-          if (!this.inventoryCountBatchCriteria.keyId.includes(m.catId)) {
-            this.toastService.presentToast('Item Category not match', '', 'middle', 'danger', 1000);
-            return;
-          }
+        if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemCategoryId)) {
+          this.toastService.presentToast('Item Category not match', '', 'middle', 'danger', 1000);
+          return;
         }
         break;
     }
 
-    if (this.stockCountDetail.findIndex(r => r.itemSku === sku) === 0) { // already in and first one
-      this.stockCountDetail.find(r => r.itemSku === sku).qtyRequest++;
+    if (this.stockCountDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+      this.stockCountDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
     } else {
       let d: StockCountDetail = {
         inventoryCountLineId: 0,
         inventoryCountId: 0,
         locationId: this.stockCountHeader.locationId,
-        itemId: m.id,
-        itemCode: m.code,
-        description: m.itemDesc,
-        itemVariationXId: b.xId,
-        itemVariationYId: b.yId,
-        itemSku: sku,
-        itemBarcode: b.barcode,
-        itemBarcodeTagId: b.id,
+        itemId: trxLine.itemId,
+        itemCode: trxLine.itemCode,
+        description: trxLine.description,
+        itemVariationXId: trxLine.itemVariationXId,
+        itemVariationYId: trxLine.itemVariationYId,
+        itemSku: trxLine.itemSku,
+        itemBarcode: trxLine.itemBarcode,
+        itemBarcodeTagId: trxLine.itemBarcodeTagId,
         qtyRequest: 1,
         sequence: this.stockCountDetail.length
       }      

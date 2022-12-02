@@ -122,7 +122,6 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
-          this.toastService.presentToast('Barcode found!', barcode, 'middle', 'success', 1000);
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,
