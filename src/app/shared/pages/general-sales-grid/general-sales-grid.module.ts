@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { GeneralSalesGridPageRoutingModule } from './general-sales-grid-routing.module';
 
 import { GeneralSalesGridPage } from './general-sales-grid.page';
+import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    GeneralSalesGridPageRoutingModule
+    GeneralSalesGridPageRoutingModule,
+    IdMappingModule
   ],
   exports: [
     GeneralSalesGridPage

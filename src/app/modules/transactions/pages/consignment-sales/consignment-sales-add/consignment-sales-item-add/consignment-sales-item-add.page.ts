@@ -369,7 +369,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   }
 
   previousStep() {
-    this.navController.navigateBack('/transactions/consignment-sales/consignment-sales-header');
+    this.navController.navigateBack('/transactions/consignment-sales/consignment-sales-header-add');
   }
 
 

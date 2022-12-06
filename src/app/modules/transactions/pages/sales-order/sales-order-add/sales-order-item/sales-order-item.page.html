@@ -70,7 +70,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <!-- <app-item-add-grid *ngIf="loadImage" [useTax]="useTax" [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid> -->
+      <app-general-sales-grid *ngIf="loadImage" [fullItemList]="fullItemList" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" (onItemAdded)="onItemAdded($event)"></app-general-sales-grid>
       <app-general-sales-list *ngIf="!loadImage" [fullItemList]="fullItemList" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" (onItemAdded)="onItemAdded($event)"></app-general-sales-list>
     </ion-content>
   </ng-template>

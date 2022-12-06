@@ -179,6 +179,7 @@ export class GeneralSalesListPage implements OnInit {
   
   async addItemToCart(data: TransactionDetail) {
     await this.onItemAdded.emit(data);
+    this.toastService.presentToast('Item added to cart', '', 'middle', 'success', 1000);
     // clear qty
     data.qtyRequest = null;
   }
@@ -213,6 +214,7 @@ export class GeneralSalesListPage implements OnInit {
 
   async addItemVariationToCart() {
     await this.onItemAdded.emit(this.selectedItem);
+    this.toastService.presentToast('Item added to cart', '', 'middle', 'success', 1000);
     // clear qty
     this.selectedItem.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest = 0);
     this.hideModal();
