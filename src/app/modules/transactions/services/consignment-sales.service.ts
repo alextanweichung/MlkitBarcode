@@ -48,35 +48,35 @@ export class ConsignmentSalesService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/masterList");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileOtherSales/masterList");
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/staticlov");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileOtherSales/staticlov");
   }
 
   getObjectList() {
-    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileConsignmentSales/cslist");
+    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileOtherSales/cslist");
   }
 
   getObjectListByDate(startDate: string, endDate: string) {
-    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileConsignmentSales/listing/" + startDate + "/" + endDate);
+    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileOtherSales/listing/" + startDate + "/" + endDate);
   }  
 
   getObjectById(objectId: number) {
-    return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileConsignmentSales/" + objectId);
+    return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileOtherSales/" + objectId);
   }
 
   getObjectByAttr(trxDate: string, customerId: number, toLocationId: number) {
-    return this.http.get<ConsignmentSalesRoot[]>(this.baseUrl + "MobileConsignmentSales/" + trxDate + "/" + customerId + "/" + toLocationId);
+    return this.http.get<ConsignmentSalesRoot[]>(this.baseUrl + "MobileOtherSales/" + trxDate + "/" + customerId + "/" + toLocationId);
   }
 
   insertObject(object: ConsignmentSalesRoot) {
-    return this.http.post(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
+    return this.http.post(this.baseUrl + "MobileOtherSales", object, httpObserveHeader);
   }
 
   updateObject(object: ConsignmentSalesRoot) {
-    return this.http.put(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
+    return this.http.put(this.baseUrl + "MobileOtherSales", object, httpObserveHeader);
   }
 
 }

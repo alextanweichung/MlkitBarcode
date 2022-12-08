@@ -133,9 +133,9 @@
       </ng-container>
       <ng-container *ngIf="consignment_sales?.length > 0">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToConsignmentSalesDetail(object.consignmentSalesId)" *ngFor="let object of consignment_sales">
+          <ion-item button detail="false" (click)="goToConsignmentSalesDetail(object.otherSalesId)" *ngFor="let object of consignment_sales">
             <ion-label>
-              <h3>{{object.consignmentSalesNum}}</h3>
+              <h3>{{object.otherSalesNum}}</h3>
               <p>{{object.customerName}}</p>
               <p>{{object.toLocationDesc}}</p>
             </ion-label>

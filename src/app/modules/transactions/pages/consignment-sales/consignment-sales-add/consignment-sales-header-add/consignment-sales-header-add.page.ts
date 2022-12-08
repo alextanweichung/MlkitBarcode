@@ -30,8 +30,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
-      consignmentSalesId: [0],
-      consignmentSalesNum: [null],
+      otherSalesId: [0],
+      otherSalesNum: [null],
       trxDate: [null, [Validators.required]],
       customerId: [null, [Validators.required]],
       locationId: [null],
@@ -45,6 +45,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
       maxPrecision: [null],
       maxPrecisionTax: [null],
       sourceType: ['M'],
+      typeCode: ['S'],
+      businessModelType: [null, [Validators.required]]
     })
   }
 
@@ -109,6 +111,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
       let lookupValue = this.customerMasterList.find(r => r.id === event.id);
       if (lookupValue) {
         this.objectForm.patchValue({ customerId: lookupValue.id });
+        this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
         let selectedCustomerLocationList: MasterListDetails[] = [];
         if (lookupValue.attributeArray1.length > 0) {
           selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
@@ -193,7 +196,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     //   if (response.length > 0) { // todo : remove this as in future same criteria will only have 1 record or none.        
     //     let navigationExtras: NavigationExtras = {
     //       queryParams: {
-    //         objectId: response[0].header.consignmentSalesId
+    //         objectId: response[0].header.otherSalesId
     //       }
     //     }
     //     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);

@@ -104,7 +104,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     } else {
       this.object.details.forEach(r => r.sequence += 1);
       trxLine.lineId = 0;
-      trxLine.headerId = this.object.header.consignmentSalesId;
+      trxLine.headerId = this.object.header.otherSalesId;
       trxLine.qtyRequest = 1;
       trxLine.locationId = this.object.header.toLocationId;
       trxLine.sequence = 0;
@@ -229,7 +229,6 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   }
 
   computeUnitPrice(trxLine: TransactionDetail) {
-    trxLine.unitPriceExTax = trxLine.unitPrice;
     trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
   }

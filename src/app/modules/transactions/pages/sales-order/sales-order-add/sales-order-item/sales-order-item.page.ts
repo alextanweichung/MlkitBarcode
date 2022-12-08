@@ -200,7 +200,6 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
   }
 
   computeUnitPrice(trxLine: TransactionDetail) {
-    trxLine.unitPriceExTax = trxLine.unitPrice;
     trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
   }

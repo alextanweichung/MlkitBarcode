@@ -1,8 +1,8 @@
 import { TransactionDetail } from "src/app/shared/models/transaction-detail"
 
 export interface ConsignmentSalesList {
-  consignmentSalesId: number
-  consignmentSalesNum: string
+  otherSalesId: number
+  otherSalesNum: string
   trxDate: Date
   customerName: string
   locationDesc: string
@@ -16,8 +16,8 @@ export interface ConsignmentSalesRoot {
 }
 
 export interface ConsignmentSalesHeader {
-  consignmentSalesId: number
-  consignmentSalesNum: string
+  otherSalesId: number
+  otherSalesNum: string
   trxDate: Date
   trxDateTime: Date
   customerId?: number
@@ -27,6 +27,8 @@ export interface ConsignmentSalesHeader {
   currencyRate?: number
   salesAgentId?: number
   remark: string
+  typeCode: string
+  businessModelType: string
   isHomeCurrency: boolean
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
@@ -35,7 +37,7 @@ export interface ConsignmentSalesHeader {
 }
 
 export interface ConsignmentSalesSummary {
-  consignmentSalesNum: string
+  otherSalesNum: string
   customerId: number
   toLocationId: number
   trxDate: Date

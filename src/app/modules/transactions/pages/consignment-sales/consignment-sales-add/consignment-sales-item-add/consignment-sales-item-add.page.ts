@@ -273,8 +273,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   }
 
   computeUnitPrice(trxLine: TransactionDetail) {
-    trxLine.unitPriceExTax = trxLine.unitPrice;
-    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
     this.computeDiscTaxAmount(trxLine);
   }
 
@@ -355,7 +354,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     }
     this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
       let css: ConsignmentSalesSummary = {
-        consignmentSalesNum: response.body["header"]["consignmentSalesNum"],
+        otherSalesNum: response.body["header"]["otherSalesNum"],
         customerId: response.body["header"]["customerId"],
         toLocationId: response.body["header"]["toLocationId"],
         trxDate: response.body["header"]["trxDate"]
