@@ -363,7 +363,6 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   async nextStep() {
     if (this.object.details.length > 0) {
       const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
         header: 'Are you sure to proceed?',
         buttons: [
           {
@@ -372,7 +371,6 @@ export class ConsignmentSalesItemEditPage implements OnInit {
           },
           {
             text: 'OK',
-            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.updateObject();
@@ -395,7 +393,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
             objectId: this.objectId
           }
         }
-        this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
+        this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
       } else {
         this.toastService.presentToast('Update Fail', '', 'middle', 'danger', 1000);
       }

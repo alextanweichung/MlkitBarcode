@@ -40,7 +40,7 @@ export class CommonService {
   }
 
   syncInbound() {
-    return this.http.get(this.baseUrl + "PosDownload/itemMaster/KLCC/2022-10-31");
+    return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
   }
 
   setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {

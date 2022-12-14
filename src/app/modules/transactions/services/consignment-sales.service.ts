@@ -67,8 +67,8 @@ export class ConsignmentSalesService {
     return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileOtherSales/" + objectId);
   }
 
-  getObjectByAttr(trxDate: string, customerId: number, toLocationId: number) {
-    return this.http.get<ConsignmentSalesRoot[]>(this.baseUrl + "MobileOtherSales/" + trxDate + "/" + customerId + "/" + toLocationId);
+  getExistingObject(trxDate: string, toLocationId: number) {
+    return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileOtherSales/existing/" + trxDate + "/" + toLocationId);
   }
 
   insertObject(object: ConsignmentSalesRoot) {
