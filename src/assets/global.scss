@@ -838,6 +838,15 @@ ion-alert.sc-ion-alert-ios-h {
   color: var(--ion-color-tertiary);
 }
 
+.alert-button.sc-ion-alert-ios.success {
+  color: var(--ion-color-white);
+  font-weight: 500;
+  border: none;
+  background: var(--ion-color-success);
+  margin: 0px 16px;
+  border-radius: 3px;
+}
+
 .alert-button.sc-ion-alert-ios.danger {
   color: var(--ion-color-white);
   font-weight: 500;

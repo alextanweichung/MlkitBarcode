@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { StockCountItem, StockCountRoot } from '../../../models/stock-count';
@@ -11,9 +11,9 @@ import { StockCountService } from '../../../services/stock-count.service';
   templateUrl: './stock-count-detail.page.html',
   styleUrls: ['./stock-count-detail.page.scss'],
 })
-export class StockCountDetailPage implements OnInit {
+export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
-  inventoryCountId: number;
+  objectId: number;
 
   inventoryCount: StockCountRoot;
   scannedItems: StockCountItem[] = [];
@@ -21,19 +21,21 @@ export class StockCountDetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private navController: NavController,
-    private toastService: ToastService,
     private stockCountService: StockCountService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.inventoryCountId = params['inventoryCountId'];
+      this.objectId = params['objectId'];
     })
   }
 
-  ngOnInit() {
-    this.loadMasterList();
-    if (this.inventoryCountId) {
+  ionViewWillEnter(): void {
+    if (this.objectId) {
       this.loadObject();
     }
+  }
+  
+  ngOnInit() {
+    this.loadMasterList();
   }
 
   locationMasterList: MasterListDetails[] = [];
@@ -50,8 +52,10 @@ export class StockCountDetailPage implements OnInit {
   }
 
   loadObject() {
-    this.stockCountService.getInventoryCount(this.inventoryCountId).subscribe(response => {
+    this.scannedItems = [];
+    this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
       this.inventoryCount = response;
+      console.log("🚀 ~ file: stock-count-detail.page.ts:62 ~ StockCountDetailPage ~ this.stockCountService.getInventoryCount ~ this.inventoryCount", JSON.stringify(this.inventoryCount))
       this.inventoryCount.details.forEach(r => {
         let barcodeTag = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku);
         this.scannedItems.push({
@@ -71,6 +75,7 @@ export class StockCountDetailPage implements OnInit {
           qtyRequest: r.qtyRequest
         })
       })
+      console.log("🚀 ~ file: stock-count-detail.page.ts:86 ~ StockCountDetailPage ~ this.stockCountService.getInventoryCount ~ this.scannedItems", JSON.stringify(this.scannedItems))
     }, error => {
       console.log(error);
     })
@@ -79,7 +84,7 @@ export class StockCountDetailPage implements OnInit {
   edit() {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        inventoryCountId: this.inventoryCountId
+        objectId: this.objectId
       }
     }
     this.navController.navigateForward('/others/stock-count/stock-count-edit/stock-count-header', navigationExtras);

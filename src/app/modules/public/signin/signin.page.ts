@@ -54,7 +54,7 @@ export class SigninPage implements OnInit {
 
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
-      this.toastService.presentToast('Error', 'Please input email and password', 'bottom', 'danger', 2000);
+      this.toastService.presentToast('Error', 'Please input email and password', 'middle', 'danger', 2000);
 
     } else {
 
@@ -85,7 +85,7 @@ export class SigninPage implements OnInit {
               })
             }
           } catch (error) {
-            this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+            this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
           }
         }
       });

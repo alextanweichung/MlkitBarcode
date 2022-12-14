@@ -1,0 +1,49 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Detail</ion-label>
+    </ion-toolbar>
+  </ion-header>  
+  <div class="ion-padding" *ngIf="object">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item>
+        <ion-label>
+          <div>Picking Num</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.pickingNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Trx Date</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item><ion-item>
+        <ion-label>
+          <div>Location</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.locationId|idMapping:locationMasterList}}"></ion-input>
+      </ion-item><ion-item>
+        <ion-label>
+          <div>Customer</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Detail Line</ion-label>
+    </ion-list-header>
+    <app-item-view-list-flat [data]="object.details" [isWithSo]="object.header.isWithSo" [isPicking]="true" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList"></app-item-view-list-flat>
+  </div>
+
+</ion-content>

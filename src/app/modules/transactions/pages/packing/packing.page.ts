@@ -4,7 +4,7 @@ import { ActionSheetController, ModalController, NavController } from '@ionic/an
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PackingList } from '../../models/packing';
+import { GoodsPackingList } from '../../models/packing';
 import { PackingService } from '../../services/packing.service';
 import { FilterPage } from '../filter/filter.page';
 
@@ -15,8 +15,7 @@ import { FilterPage } from '../filter/filter.page';
 })
 export class PackingPage implements OnInit {
 
-  content_loaded: boolean = false;
-  objects: PackingList[] = [];
+  objects: GoodsPackingList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -24,7 +23,7 @@ export class PackingPage implements OnInit {
   constructor(
     private commonService: CommonService,
     private configService: ConfigService,
-    private packingService: PackingService,
+    private goodsPackingService: PackingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
@@ -44,12 +43,8 @@ export class PackingPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    this.packingService.getPackingList(this.startDate, this.endDate).subscribe(response => {
+    this.goodsPackingService.getObjectListByDate(this.startDate, this.endDate).subscribe(response => {
       this.objects = response;
-      if (this.objects.length > 0) {
-        this.content_loaded = true;
-      }
-      // this.toastService.presentToast('Search Completed.', '', 'bottom', 'success', 1000);
     }, error => {
       console.log((error));
     })
@@ -57,38 +52,13 @@ export class PackingPage implements OnInit {
 
   /* #endregion */
 
-  /* #region  add picking */
+  /* #region  add packing */
 
   async addObject() {
-    let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
-    if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
-      this.toastService.presentToast('Warehouse Agent not set.', '', 'bottom', 'danger', 1000);
-    } else {
+    if (this.goodsPackingService.hasWarehouseAgent()) {
       this.navController.navigateForward('/transactions/packing/packing-sales-order');
-    }
-  }
-
-  /* #endregion */
-
-  async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      componentProps: {
-        startDate: this.startDate,
-        endDate: this.endDate
-      },
-      canDismiss: true
-    })
-
-    await modal.present();
-
-    let { data } = await modal.onWillDismiss();
-
-    if (data && data !== undefined) {
-      this.startDate = new Date(data.startDate);
-      this.endDate = new Date(data.endDate);
-
-      this.loadObjects();
+    } else {
+      this.toastService.presentToast('Warehouse Agent not set.', '', 'middle', 'danger', 1000);
     }
   }
 
@@ -114,10 +84,30 @@ export class PackingPage implements OnInit {
     await actionSheet.present();
   }
 
-  goToDetail(packingId: number) {
+  /* #endregion */
+
+  async filter() {
+    const modal = await this.modalController.create({
+      component: FilterPage,
+      componentProps: {
+        startDate: this.startDate,
+        endDate: this.endDate
+      },
+      canDismiss: true
+    })
+    await modal.present();
+    let { data } = await modal.onWillDismiss();
+    if (data && data !== undefined) {
+      this.startDate = new Date(data.startDate);
+      this.endDate = new Date(data.endDate);
+      this.loadObjects();
+    }
+  }
+
+  goToDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        packingId: packingId
+        objectId: objectId
       }
     }
     this.navController.navigateForward('/transactions/packing/packing-detail', navigationExtras);

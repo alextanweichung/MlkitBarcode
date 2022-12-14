@@ -34,6 +34,7 @@ export class TransactionProcessingPage implements OnInit {
 
   async presentConfirmAlert(action: string, docId: number, docNum: string) {    
     const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
       header: 'Are you sure to ' + action + ' ' + docNum + '?',
       buttons: [
         {
@@ -43,6 +44,7 @@ export class TransactionProcessingPage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'success',
           handler: () => {
             this.updateDoc(action, docId);
           },
@@ -69,7 +71,7 @@ export class TransactionProcessingPage implements OnInit {
     if (this.parentType.toLowerCase() === 'quotation') {
       navigationExtras = {
         queryParams: {
-          quotationId: docId,
+          objectId: docId,
           parent: this.processType
         }
       }
@@ -77,7 +79,7 @@ export class TransactionProcessingPage implements OnInit {
     if (this.parentType.toLowerCase() === 'sales-order') {
       navigationExtras = {
         queryParams: {
-          salesOrderId: docId,
+          objectId: docId,
           parent: this.processType
         }
       }
@@ -85,7 +87,7 @@ export class TransactionProcessingPage implements OnInit {
     if (this.parentType.toLowerCase() === 'purchase-order') {
       navigationExtras = {
         queryParams: {
-          purchaseOrderId: docId,
+          objectId: docId,
           parent: this.processType
         }
       }

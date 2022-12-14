@@ -1,1 +1,2 @@
-<ion-input #barcodeInput class="ion-text-center" type="text" [(ngModel)]="itemSearchValue" placeholder="Scan or input Barcode" (keydown)="handleKeyDown($event, itemSearchValue)"></ion-input>
+<!-- <ion-input #barcodeInput class="ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or input Barcode" (keydown)="handleKeyDown($event, itemSearchValue)"></ion-input> -->
+<input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan item barcode" (keydown)="handleKeyDown($event, itemSearchValue)">

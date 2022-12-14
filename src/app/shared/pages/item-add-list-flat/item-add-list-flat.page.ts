@@ -29,6 +29,7 @@ export class ItemAddListFlatPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    
   }
   
   decreaseQty() {

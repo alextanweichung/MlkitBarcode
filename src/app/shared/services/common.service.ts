@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
 import { Item } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { TransactionDetail } from '../models/transaction-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -208,7 +209,7 @@ export class CommonService {
     }
   }
 
-  computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive:boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
+  computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
     let totalDiscAmt = 0;
     let unitPrice = trxLine.unitPrice;
     let unitPriceExTax = trxLine.unitPriceExTax;
@@ -216,9 +217,9 @@ export class CommonService {
     let quantity = trxLine.qtyRequest;
     let subTotal;
 
-    if(isItemPriceTaxInclusive){
+    if (isItemPriceTaxInclusive) {
       subTotal = unitPrice * quantity;
-    }else{
+    } else {
       subTotal = unitPriceExTax * quantity;
     }
 
@@ -229,19 +230,19 @@ export class CommonService {
         if (x.includes('%')) {
           let currentdiscPct = parseFloat(x) / 100;
           //let currentDiscAmt = unitPrice * currentdiscPct;    
-          let currentDiscAmt = subTotal * currentdiscPct;         
+          let currentDiscAmt = subTotal * currentdiscPct;
           totalDiscAmt = totalDiscAmt + currentDiscAmt;
-         // unitPrice = unitPrice - currentDiscAmt;
-         subTotal = subTotal - currentDiscAmt;
+          // unitPrice = unitPrice - currentDiscAmt;
+          subTotal = subTotal - currentDiscAmt;
         } else {
           totalDiscAmt = totalDiscAmt + parseFloat(x);
           //unitPrice = unitPrice - parseFloat(x);
           subTotal = subTotal - parseFloat(x);
         }
       })
-    }    
-    if(useTax){
-      if(isItemPriceTaxInclusive){
+    }
+    if (useTax) {
+      if (isItemPriceTaxInclusive) {
         trxLine.discountAmt = totalDiscAmt;
         trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
         trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
@@ -253,20 +254,20 @@ export class CommonService {
         trxLine.taxAmt = trxLine.subTotal - trxLine.subTotalExTax;
         trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
         trxLine.taxInclusive = isDisplayTaxInclusive;
-      }else{
+      } else {
         trxLine.discountAmt = this.computeAmtInclTax(totalDiscAmt, trxLine.taxPct);
-        trxLine.discountAmtExTax = totalDiscAmt;        
+        trxLine.discountAmtExTax = totalDiscAmt;
         trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
         trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-        trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;      
+        trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;
         trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
         trxLine.taxAmt = trxLine.subTotalExTax * trxLine.taxPct / 100;
         trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
         trxLine.taxInclusive = isDisplayTaxInclusive;
         trxLine.subTotal = trxLine.subTotalExTax + trxLine.taxAmt;
         trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
-      }      
-    }else{
+      }
+    } else {
       trxLine.discountAmt = totalDiscAmt;
       trxLine.discountAmtExTax = totalDiscAmt;
       trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
@@ -280,6 +281,16 @@ export class CommonService {
     }
     //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
     return trxLine;
+  }
+
+  reversePromoImpact(receiptLine: TransactionDetail) {
+    if (receiptLine.promoEventId != null) {
+      receiptLine.promoEventId = null;
+      receiptLine.isPromoImpactApplied = null;
+      receiptLine.discountGroupCode = receiptLine.oriDiscountGroupCode;
+      receiptLine.discountExpression = receiptLine.oriDiscountExpression;
+    }
+    return receiptLine;
   }
 
 }

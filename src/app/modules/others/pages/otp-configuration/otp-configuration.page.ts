@@ -189,16 +189,16 @@ export class OtpConfigurationPage implements OnInit {
         if (response.status == 201) {
           this.generatedOtpCode = response.body['header'].otpCode;
           await this.presentAlert();
-          this.toastService.presentToast('Success', 'New OTP has been created.', 'bottom', 'success', 1000);
+          this.toastService.presentToast('Success', 'New OTP has been created.', 'middle', 'success', 1000);
           this.resetOtpInputFields();
         }
       }, error => {
         console.log(error);
-        this.toastService.presentToast('Error', 'Please insert all fields.', 'bottom', 'danger', 1000);
+        this.toastService.presentToast('Error', 'Please insert all fields.', 'middle', 'danger', 1000);
       })
     }
     else {
-      this.toastService.presentToast('Error', 'Please insert all fields.', 'bottom', 'danger', 1000);
+      this.toastService.presentToast('Error', 'Please insert all fields.', 'middle', 'danger', 1000);
     }
   }
 

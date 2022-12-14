@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { GoodsPicking, GoodsPickingDto, PickingList, PickingSummary } from '../models/picking';
-import { PickingSalesOrderDetail, PickingSalesOrderRoot } from '../models/picking-sales-order';
+import { GoodsPickingHeader, GoodsPickingList, GoodsPickingRoot, PickingSummary } from '../models/picking';
+import { PickingSalesOrderDetail, PickingSalesOrderRoot } from '../models/picking-sales-order'
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -26,9 +25,9 @@ export class PickingService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
-  pickingDtoHeader: GoodsPicking;
-  setHeader(pickingDtoHeader: GoodsPicking) {
-    this.pickingDtoHeader = pickingDtoHeader;
+  header: GoodsPickingHeader;
+  setHeader(header: GoodsPickingHeader) {
+    this.header = header;
   }
 
   selectedSalesOrders: PickingSalesOrderRoot[] = [];
@@ -41,13 +40,13 @@ export class PickingService {
     this.selectedSalesOrderLines = soLines;
   }
 
-  pickingSummary: PickingSummary;
-  setPickingSummary(pickingSummary: PickingSummary) {
-    this.pickingSummary = pickingSummary;
+  objectSummary: PickingSummary;
+  setPickingSummary(objectSummary: PickingSummary) {
+    this.objectSummary = objectSummary;
   }
 
   removeCustomer() {
-    this.pickingDtoHeader = null;
+    this.header = null;
   }
 
   removeSalesOrders() {
@@ -59,7 +58,7 @@ export class PickingService {
   }
 
   removePickingSummary() {
-    this.pickingSummary = null;
+    this.objectSummary = null;
   }
 
   resetVariables() {
@@ -67,6 +66,14 @@ export class PickingService {
     this.removeSalesOrders();
     this.removeSalesOrderLines();
     this.removePickingSummary();
+  }
+
+  hasWarehouseAgent(): boolean {
+    let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
+    if (warehouseAgentId === undefined || warehouseAgentId === null || warehouseAgentId === 0) {
+      return false;
+    }
+    return true
   }
 
   getMasterList() {
@@ -77,6 +84,18 @@ export class PickingService {
     return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/staticLov");
   }
 
+  getObjectList() {
+    return this.http.get<GoodsPickingList[]>(this.baseUrl + "MobilePicking/gpList");
+  }
+
+  getObjectListByDate(startDate: string, endDate: string) {
+    return this.http.get<GoodsPickingList[]>(this.baseUrl + "MobilePicking/listing/" + startDate + "/" + endDate);
+  }
+
+  getObjectById(objectId: number) {
+    return this.http.get<any>(this.baseUrl + "MobilePicking/" + objectId);
+  }
+
   getSoByCustomer(customerId: number) {
     return this.http.get<PickingSalesOrderRoot[]>(this.baseUrl + "MobilePicking/fromSO/customer/" + customerId);
   }
@@ -85,19 +104,7 @@ export class PickingService {
     return this.http.get<PickingSalesOrderRoot[]>(this.baseUrl + "MobilePicking/fromSo/customer/" + customerId + "/" + toLocationId);
   }
 
-  getPickingList(startDate: Date, endDate: Date) {
-    return this.http.get<PickingList[]>(this.baseUrl + "MobilePicking/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
-  }
-
-  getRecentPickingList() {
-    return this.http.get<PickingList[]>(this.baseUrl + "MobilePicking/recentListing");
-  }
-
-  getPickingDetail(pickingId: number) {
-    return this.http.get<any>(this.baseUrl + "MobilePicking/" + pickingId);
-  }
-
-  insertPicking(object: GoodsPickingDto) {
+  insertPicking(object: GoodsPickingRoot) {
     return this.http.post(this.baseUrl + "MobilePicking", object, httpObserveHeader);
   }
 

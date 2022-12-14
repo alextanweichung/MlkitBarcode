@@ -5,6 +5,7 @@ import { MasterListDetails } from '../../models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
+import { PrecisionList } from '../../models/precision-list';
 
 @Component({
   selector: 'app-item-cart',
@@ -13,6 +14,8 @@ import { InnerVariationDetail } from '../../models/variation-detail';
 })
 export class ItemCartPage implements OnInit {
 
+  @Input() isHomeCurrency: boolean;
+  @Input() precisionSales: PrecisionList
   @Input() itemInCart: TransactionDetail[] = [];
   @Input() useTax: boolean;
   @Input() maxPrecision: number = 2;
@@ -79,6 +82,7 @@ export class ItemCartPage implements OnInit {
 
   async presentDeleteItemAlert(item: TransactionDetail) {
     const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
       header: 'Are you sure to delete?',
       buttons: [
         {
@@ -91,6 +95,7 @@ export class ItemCartPage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'danger',
           handler: () => {
             this.removeItemById(item);
           },
@@ -103,11 +108,12 @@ export class ItemCartPage implements OnInit {
   async removeItemById(item: TransactionDetail) {
     this.itemInCart = JSON.parse(JSON.stringify(this.itemInCart.filter(r => r.itemId !== item.itemId)));
     this.onItemInCartDeleteCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'bottom', 'success', 1000);
+    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'middle', 'success', 1000);
   }  
 
   async presentDeleteItemVariationAlert(trxLine: TransactionDetail, item: InnerVariationDetail) {
     const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
       header: 'Are you sure to delete?',
       buttons: [
         {
@@ -120,6 +126,7 @@ export class ItemCartPage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'danger',
           handler: () => {
             item.qtyRequest = null;
             this.onItemInCartEditCompleted.emit(trxLine);

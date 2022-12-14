@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
-import { Item } from 'src/app/modules/transactions/models/item';
+import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
 
@@ -24,7 +24,7 @@ export class SearchItemService {
   ) {
     this.apiObject = apiObject;
     this.baseUrl = configService.sys_parameter.apiUrl;
-  }  
+  }
 
   getItemInfo(itemId: number, trxDate: string, keyId: number, locationId: number) {
     return this.http.get<TransactionDetail>(this.baseUrl + this.apiObject + "/item/" + itemId + "/" + trxDate + "/" + keyId + "/" + locationId, { context: background_load() });
@@ -33,5 +33,9 @@ export class SearchItemService {
   getItemInfoByKeyword(keyword: string, trxDate: string, keyId: number, locationId: number) {
     return this.http.get<TransactionDetail[]>(this.baseUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId);
   }
-  
+
+  getItemImageFile(keyword: string) {
+    return this.http.get<ItemImage[]>(this.baseUrl + this.apiObject + "/itemList/imageFile/" + keyword, { context: background_load() });
+  }
+
 }

@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { GoodsPacking, GoodspackingDto, PackingList, PackingSummary } from '../models/packing';
+import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingList, GoodsPackingRoot, GoodsPackingSummary } from '../models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from '../models/packing-sales-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -26,9 +26,9 @@ export class PackingService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
-  packingDtoHeader: GoodsPacking;
-  setHeader(packingDtoHeader: GoodsPacking) {
-    this.packingDtoHeader = packingDtoHeader;
+  header: GoodsPackingHeader;
+  setHeader(header: GoodsPackingHeader) {
+    this.header = header;
   }
 
   selectedSalesOrders: PackingSalesOrderRoot[] = [];
@@ -41,13 +41,13 @@ export class PackingService {
     this.selectedSalesOrderLines = soLines;
   }
 
-  packingSummary: PackingSummary;
-  setPackingSummary(packingSummary: PackingSummary) {
-    this.packingSummary = packingSummary;
+  objectSummary: GoodsPackingSummary;
+  setPackingSummary(objectSummary: GoodsPackingSummary) {
+    this.objectSummary = objectSummary;
   }
 
   removeCustomer() {
-    this.packingDtoHeader = null;
+    this.header = null;
   }
 
   removeSalesOrders() {
@@ -59,7 +59,7 @@ export class PackingService {
   }
 
   removePackingSummary() {
-    this.packingSummary = null;
+    this.objectSummary = null;
   }
 
   resetVariables() {
@@ -67,6 +67,14 @@ export class PackingService {
     this.removeSalesOrders();
     this.removeSalesOrderLines();
     this.removePackingSummary();
+  }
+
+  hasWarehouseAgent(): boolean {
+    let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
+    if (warehouseAgentId === undefined || warehouseAgentId === null || warehouseAgentId === 0) {
+      return false;
+    }
+    return true
   }
 
   getMasterList() {
@@ -77,6 +85,18 @@ export class PackingService {
     return this.http.get<MasterList[]>(this.baseUrl + "MobilePacking/staticLov");
   }
 
+  getObjectList() {
+    return this.http.get<GoodsPackingList[]>(this.baseUrl + "MobilePacking/gpList");
+  }
+
+  getObjectListByDate(startDate: Date, endDate: Date) {
+    return this.http.get<GoodsPackingList[]>(this.baseUrl + "MobilePacking/listing/" + format(startDate, 'yyyy-MM-dd') + "/" + format(endDate, 'yyyy-MM-dd'));
+  }
+
+  getObjectById(objectId: number) {
+    return this.http.get<any>(this.baseUrl + "MobilePacking/" + objectId);
+  }
+
   getSoByCustomer(customerId: number) {
     return this.http.get<PackingSalesOrderRoot[]>(this.baseUrl + "MobilePacking/fromSO/customer/" + customerId);
   }
@@ -85,19 +105,7 @@ export class PackingService {
     return this.http.get<PackingSalesOrderRoot[]>(this.baseUrl + "MobilePacking/fromSo/customer/" + customerId + "/" + toLocationId);
   }
 
-  getPackingList(startDate: Date, endDate: Date) {
-    return this.http.get<PackingList[]>(this.baseUrl + "MobilePacking/listing/" + format(parseISO(startDate.toISOString()), 'yyyy-MM-dd') + "/" + format(parseISO(endDate.toISOString()), 'yyyy-MM-dd'));
-  }
-
-  getRecentPackingList() {
-    return this.http.get<PackingList[]>(this.baseUrl + "MobilePacking/recentListing");
-  }
-
-  getPackingDetail(packingId: number) {
-    return this.http.get<any>(this.baseUrl + "MobilePacking/" + packingId);
-  }
-
-  insertPacking(object: GoodspackingDto ) {
+  insertPacking(object: GoodsPackingRoot) {
     return this.http.post(this.baseUrl + "MobilePacking", object, httpObserveHeader);
   }
 

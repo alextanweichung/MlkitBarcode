@@ -30,7 +30,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.selectedId) {
+    if (changes.selectedId || changes.searchDropdownList) {
       if (this.selectedId) {
         this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
       } else {
@@ -40,7 +40,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-
+    this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
   }  
 
   async searchItem(event) {
@@ -102,7 +102,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   // Cancel
   cancel() {
     // Dismiss modal
-    this.hideModal(null, true);
+    this.hideModal(null);
   }
   
 }

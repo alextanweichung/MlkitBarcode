@@ -7,8 +7,8 @@ import { IonicModule } from '@ionic/angular';
 import { SalesOrderItemPageRoutingModule } from './sales-order-item-routing.module';
 
 import { SalesOrderItemPage } from './sales-order-item.page';
-import { ItemAddGridVariationMPageModule } from 'src/app/shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module';
-import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module';
+import { GeneralSalesGridPageModule } from 'src/app/shared/pages/general-sales-grid/general-sales-grid.module';
+import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/general-sales/general-sales-list.module';
 import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
@@ -18,7 +18,7 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     FormsModule,
     IonicModule,
     SalesOrderItemPageRoutingModule,
-    ItemAddGridVariationMPageModule,
+    GeneralSalesGridPageModule,
     ItemAddListWithVariationPageModule,
     ItemCartPageModule,
     SumModule

@@ -112,7 +112,7 @@ const routes: Routes = [
   },
   {
     path: 'transactions/picking/picking-detail',
-    loadChildren: () => import('./modules/transactions/pages/picking/picking-detail/detail/detail.module').then(m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/picking/picking-detail/picking-detail.module').then(m => m.PickingDetailPageModule)
   },
   // transaction-packing
   {
@@ -121,16 +121,16 @@ const routes: Routes = [
   },
   {
     path: 'transactions/packing/packing-detail',
-    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/detail/detail.module').then( m => m.DetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/packing-detail.module').then( m => m.PackingDetailPageModule)
   },
-  // transaction-other-sales
+  // transaction-consignment-sales
   {
-    path: 'transactions/other-sales',
-    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales.module').then( m => m.OtherSalesPageModule)
+    path: 'transactions/consignment-sales',
+    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales.module').then( m => m.ConsignmentSalesPageModule)
   },
   {
-    path: 'transactions/other-sales/other-sales-detail',
-    loadChildren: () => import('./modules/transactions/pages/other-sales/other-sales-detail/other-sales-detail.module').then( m => m.OtherSalesDetailPageModule)
+    path: 'transactions/consignment-sales/consignment-sales-detail',
+    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales-detail/consignment-sales-detail.module').then( m => m.ConsignmentSalesDetailPageModule)
   },
 
 
@@ -189,11 +189,11 @@ const routes: Routes = [
   },
   {
     path: 'item-add-grid',
-    loadChildren: () => import('./shared/pages/item-add-grid-variation-modal/item-add-grid-variation-modal.module').then(m => m.ItemAddGridVariationMPageModule)
+    loadChildren: () => import('./shared/pages/general-sales-grid/general-sales-grid.module').then(m => m.GeneralSalesGridPageModule)
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/item-add-list-variation-modal/item-add-list-variation-modal.module').then( m => m.ItemAddListWithVariationPageModule)
+    loadChildren: () => import('./shared/pages/general-sales/general-sales-list.module').then( m => m.ItemAddListWithVariationPageModule)
   },
   {
     path: 'item-cart',

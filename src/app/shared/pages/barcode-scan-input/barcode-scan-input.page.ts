@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from '../../models/module-control';
+import { TransactionDetail } from '../../models/transaction-detail';
 import { BarcodeScanInputService } from '../../services/barcode-scan-input.service';
 
 @Component({
@@ -22,8 +23,7 @@ export class BarcodeScanInputPage implements OnInit {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-    private toastService: ToastService,
-    private barcodeScanInputService: BarcodeScanInputService
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -37,7 +37,6 @@ export class BarcodeScanInputPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-
       let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
       if (ignoreCheckdigit != undefined) {
         this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
@@ -75,32 +74,46 @@ export class BarcodeScanInputPage implements OnInit {
   async validateBarcode(barcode: string) {
     if (barcode) {
       this.itemSearchValue = '';
-      if (barcode && barcode.length > 12) {
-        barcode = barcode.substring(0, 12);
-      }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-        if (found) {
-          if (found.sku) {
-            this.toastService.presentToast('Barcode found!', barcode, 'bottom', 'success', 1000);
-            let outputData: any = { sku: found.sku, itemInfo: null };
-            this.onItemAdd.emit(outputData);
+        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        if (found_barcode) {
+          let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+          let outputData: TransactionDetail = {
+            itemId: found_item_master.id,
+            itemCode: found_item_master.code,
+            description: found_item_master.itemDesc,
+            variationTypeCode: found_item_master.varCd,
+            discountGroupCode: found_item_master.discCd,
+            discountExpression: found_item_master.discPct+'%',
+            taxId: found_item_master.taxId,
+            taxCode: found_item_master.taxCd,
+            taxPct: found_item_master.taxPct,
+            qtyRequest: null,
+            itemPricing: {
+              itemId: found_item_master.id,
+              unitPrice: found_item_master.price,
+              discountGroupCode: found_item_master.discCd,
+              discountExpression: found_item_master.discPct+'%',
+              discountPercent: found_item_master.discPct
+            },
+            itemVariationXId: found_barcode.xId,
+            itemVariationYId: found_barcode.yId,
+            itemSku: found_barcode.sku,
+            itemBarcode: found_barcode.barcode,
+            itemBrandId: found_item_master.brandId,
+            itemGroupId: found_item_master.groupId,
+            itemCategoryId: found_item_master.catId,
+            itemBarcodeTagId: found_barcode.id
           }
+          this.onItemAdd.emit(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'bottom', 'danger', 1000);
+          console.log("🚀 ~ file: barcode-scan-input.page.ts:111 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
+          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
         }
       } else {
-        this.barcodeScanInputService.getItemInfoByBarcode(barcode).subscribe(response => {
-          if (response) {
-            let outputData: any = { sku: response.itemSku, itemInfo: response };
-            this.onItemAdd.emit(outputData);
-          }
-        }, error => {
-          console.log(error);
-        })
+        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'middle', 'medium', 1000);
       }
     }
-    this.barcodeInput.value = '';
     this.barcodeInput.setFocus();
   }
 

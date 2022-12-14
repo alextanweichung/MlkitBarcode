@@ -56,7 +56,7 @@ export class PickingSalesOrderPage implements OnInit {
     if (this.salesOrderService.hasSalesAgent()) {
       this.navController.navigateForward('/transactions/sales-order/sales-order-header');
     } else {
-      this.toastService.presentToast('Invalid Sales Agent', '', 'bottom', 'dnager', 1000);
+      this.toastService.presentToast('Invalid Sales Agent', '', 'middle', 'dnager', 1000);
     }
   }
 

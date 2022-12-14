@@ -96,7 +96,7 @@ export class CardsPage implements AfterContentChecked {
           text: 'Delete card',
           cssClass: 'danger',
           handler: async () => {
-            this.toastService.presentToast('Success', 'Card successfully deleted', 'bottom', 'success', 2000);
+            this.toastService.presentToast('Success', 'Card successfully deleted', 'middle', 'success', 2000);
           }
         },
         {
@@ -118,7 +118,7 @@ export class CardsPage implements AfterContentChecked {
         await this.configService.update(t);
         this.configService.load();
       } catch (error) {
-        this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+        this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
       }
     }
   }
@@ -135,7 +135,7 @@ export class CardsPage implements AfterContentChecked {
           await this.configService.loadItemMaster();
         }
       } catch (error) {
-        this.toastService.presentToast(error.message, '', 'bottom', 'medium', 1000);
+        this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
       }
     }
   }

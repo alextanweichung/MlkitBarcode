@@ -19,7 +19,7 @@ export class PickingSummaryPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.pickingSummary = this.pickingService.pickingSummary;
+    this.pickingSummary = this.pickingService.objectSummary;
     this.loadMasterList();
   }
 

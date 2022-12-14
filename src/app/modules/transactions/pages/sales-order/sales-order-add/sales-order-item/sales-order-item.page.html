@@ -16,7 +16,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-item-cart [itemInCart]="itemInCart" [useTax]="useTax" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [discountGroupMasterList]="discountGroupMasterList" [maxPrecision]="objectHeader.maxPrecision" [maxPrecisionTax]="objectHeader.maxPrecisionTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [isDisplayTaxInclusive]="objectHeader.isDisplayTaxInclusive" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)" (onItemInCartDeleteCompleted)="onItemInCartDeleteCompleted($event)"></app-item-cart>
+    <app-item-cart [itemInCart]="itemInCart" [useTax]="useTax" [isHomeCurrency]="objectHeader.isHomeCurrency" [precisionSales]="precisionSales" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [discountGroupMasterList]="discountGroupMasterList" [maxPrecision]="objectHeader.maxPrecision" [maxPrecisionTax]="objectHeader.maxPrecisionTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [isDisplayTaxInclusive]="objectHeader.isDisplayTaxInclusive" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)" (onItemInCartDeleteCompleted)="onItemInCartDeleteCompleted($event)"></app-item-cart>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
@@ -70,8 +70,8 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <!-- <app-item-add-grid *ngIf="loadImage" [useTax]="useTax" [availableItem]="availableItem" [availableImages]="availableImages" [itemInCart]="itemInCart" (onItemInCartEditCompleted)="onItemInCartEditCompleted($event)"></app-item-add-grid> -->
-      <app-item-add-list *ngIf="!loadImage" [fullItemList]="fullItemList" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" (onItemAdded)="onItemAdded($event)"></app-item-add-list>
+      <app-general-sales-grid *ngIf="loadImage" [fullItemList]="fullItemList" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" (onItemAdded)="onItemAdded($event)"></app-general-sales-grid>
+      <app-general-sales-list *ngIf="!loadImage" [fullItemList]="fullItemList" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" (onItemAdded)="onItemAdded($event)"></app-general-sales-list>
     </ion-content>
   </ng-template>
 </ion-modal>

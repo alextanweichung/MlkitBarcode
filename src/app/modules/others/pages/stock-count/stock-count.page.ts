@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { StockCount, StockCountList } from '../../models/stock-count';
+import { StockCount } from '../../models/stock-count';
 import { StockCountService } from '../../services/stock-count.service';
 
 @Component({
@@ -13,7 +12,7 @@ import { StockCountService } from '../../services/stock-count.service';
   templateUrl: './stock-count.page.html',
   styleUrls: ['./stock-count.page.scss'],
 })
-export class StockCountPage implements OnInit {
+export class StockCountPage implements OnInit, ViewWillEnter {
 
   startDate: Date;
   endDate: Date;
@@ -28,6 +27,16 @@ export class StockCountPage implements OnInit {
     private navController: NavController,
     private actionSheetController: ActionSheetController
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+  }
 
   ngOnInit() {
     if (!this.startDate) {
@@ -47,10 +56,10 @@ export class StockCountPage implements OnInit {
     })
   }
 
-  goToDetail(inventoryCountId: number) {
+  goToDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        inventoryCountId: inventoryCountId
+        objectId: objectId
       }
     }
     this.navController.navigateForward('/others/stock-count/stock-count-detail', navigationExtras);

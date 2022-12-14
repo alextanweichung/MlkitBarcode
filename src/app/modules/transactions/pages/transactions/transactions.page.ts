@@ -6,12 +6,12 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { OtherSalesList } from '../../models/other-sales';
-import { PackingList } from '../../models/packing';
-import { PickingList } from '../../models/picking';
+import { ConsignmentSalesList } from '../../models/consignment-sales';
+import { GoodsPackingList } from '../../models/packing';
+import { GoodsPickingList } from '../../models/picking';
 import { QuotationList } from '../../models/quotation';
 import { SalesOrderList } from '../../models/sales-order';
-import { OtherSalesService } from '../../services/other-sales.service';
+import { ConsignmentSalesService } from '../../services/consignment-sales.service';
 import { PackingService } from '../../services/packing.service';
 import { PickingService } from '../../services/picking.service';
 import { QuotationService } from '../../services/quotation.service';
@@ -22,7 +22,7 @@ const mobileQuotationCode: string = 'MATRQU';
 const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
 const mobilePackingCode: string = 'MATRPA';
-const mobileOtherSalesCode: string = 'MATROS';
+const mobileConsignmentSalesCode: string = 'MATRCS';
 
 @Component({
   selector: 'app-transactions',
@@ -38,13 +38,13 @@ export class TransactionsPage implements OnInit {
   salesOrders: SalesOrderList[] = [];
 
   showPicking: boolean = false;
-  pickings: PickingList[] = [];
+  pickings: GoodsPickingList[] = [];
 
   showPacking: boolean = false;
-  packings: PackingList[] = [];
+  packings: GoodsPackingList[] = [];
 
-  showOtherSales: boolean = false;
-  other_sales: OtherSalesList[] = [];
+  showConsignmentSales: boolean = false;
+  consignment_sales: ConsignmentSalesList[] = [];
 
   constructor(
     private authService: AuthService,
@@ -53,7 +53,7 @@ export class TransactionsPage implements OnInit {
     private salesOrderService: SalesOrderService,
     private pickingService: PickingService,
     private packingService: PackingService,
-    private otherSalesService: OtherSalesService,
+    private consignmentSalesService: ConsignmentSalesService,
     private loadingController: LoadingController,
     private commonService: CommonService,
     private configService: ConfigService
@@ -67,7 +67,7 @@ export class TransactionsPage implements OnInit {
         this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
         this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
-        this.showOtherSales = pageItems.findIndex(r => r.title === mobileOtherSalesCode) > -1;
+        this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
       }
     })
     this.loadAllRecentList();
@@ -83,29 +83,39 @@ export class TransactionsPage implements OnInit {
 
   loadAllRecentList() {
     // quotation
-    this.loadRecentQuotation();
+    if (this.showQuotation) {
+      this.loadRecentQuotation();
+    }
 
     // sales order
-    this.loadRecentSalesOrder();
+    if (this.showSalesOrder) {
+      this.loadRecentSalesOrder();
+    }
 
     // picking
-    this.loadRecentPicking();
+    if (this.showPicking) {
+      this.loadRecentPicking();
+    }
 
     // packing
-    this.loadRecentPacking();
+    if (this.showPacking) {
+      this.loadRecentPacking();
+    }
 
-    // other-sales
-    // this.loadRecentOtherSales();
+    // consignment-sales
+    if (this.showConsignmentSales) {
+      this.loadRecentConsignmentSales();
+    }
   }
 
   /* #region  online offline */
 
-  transactionMode: string = "online";
-  onTransactionModeChanged(event) {
-     if (event.detail.value === 'offline') {
-      this.sync();
-     }
-  }
+  // transactionMode: string = "online";
+  // onTransactionModeChanged(event) {
+  //    if (event.detail.value === 'offline') {
+  //     this.sync();
+  //    }
+  // }
 
   async sync() {
     // Loading overlay
@@ -125,11 +135,6 @@ export class TransactionsPage implements OnInit {
       }, error => {
         console.log(error);
       })
-
-      // Fake timeout
-      // setTimeout(() => {
-      //   loading.dismiss();
-      // }, 2000);
     }
   }
 
@@ -180,18 +185,17 @@ export class TransactionsPage implements OnInit {
   /* #region  picking */
 
   loadRecentPicking() {
-    this.pickingService.getRecentPickingList().subscribe(response => {
-      this.pickings = response;
+    this.pickingService.getObjectList().subscribe(response => {
+      this.pickings = response.slice(0, 3);
     }, error => {
       console.log(error);
     })
   }
 
-  async goToPickingDetail(pickingId: number) {
+  async goToPickingDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        pickingId: pickingId,
-        parent: "Transactions"
+        objectId: objectId,
       }
     }
     this.navController.navigateForward('/transactions/picking/picking-detail', navigationExtras);
@@ -202,18 +206,17 @@ export class TransactionsPage implements OnInit {
   /* #region  packing */
 
   loadRecentPacking() {
-    this.packingService.getRecentPackingList().subscribe(response => {
-      this.packings = response;
+    this.packingService.getObjectList().subscribe(response => {
+      this.packings = response.slice(0, 3);
     }, error => {
       console.log(error);
     })
   }
 
-  async goToPackingDetail(packingId: number) {
+  async goToPackingDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        packingId: packingId,
-        parent: "Transactions"
+        objectId: objectId,
       }
     }
     this.navController.navigateForward('/transactions/packing/packing-detail', navigationExtras);
@@ -223,22 +226,21 @@ export class TransactionsPage implements OnInit {
 
   /* #region  other-sales */
 
-  loadRecentOtherSales() {
-    this.otherSalesService.getRecentOtherSalesList().subscribe(response => {
-      this.other_sales = response;
+  loadRecentConsignmentSales() {
+    this.consignmentSalesService.getObjectList().subscribe(response => {
+      this.consignment_sales = response.slice(0, 3);
     }, error => {
       console.log(error);
     })
   }
 
-  goToOtherSalesDetail(otherSalesId: number) {
+  goToConsignmentSalesDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        otherSalesId: otherSalesId,
-        parent: "Transactions"
+        objectId: objectId
       }
     }
-    this.navController.navigateForward('/transactions/other-sales/other-sales-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
   }
 
   /* #endregion */

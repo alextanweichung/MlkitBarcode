@@ -18,14 +18,14 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ng-container *ngIf="!content_loaded">
+    <ng-container *ngIf="!objects || objects?.length === 0">
       <p>
         <ion-text color="tertiary">
           <h3>Nothing found!</h3>
         </ion-text>
       </p>
     </ng-container>
-    <ng-container *ngIf="content_loaded">      
+    <ng-container *ngIf="objects?.length > 0">      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">        
         <ion-item button detail="false" (click)="goToDetail(object.packingId)" *ngFor="let object of objects">
           <ion-label>

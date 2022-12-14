@@ -1,0 +1,163 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/transactions/consignment-sales"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="edit()">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Detail</ion-label>
+      <ion-buttons slot="start">
+        <ion-back-button text="Back"></ion-back-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom" lines="full" *ngIf="object">
+      <ion-item>
+        <ion-label>
+          <p>Doc Number</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.otherSalesNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Trx Date</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Customer</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="object.header.toLocationId">
+        <ion-label>
+          <p>To Location</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.toLocationId|idMapping:locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="object.header.salesAgentId">
+        <ion-label>
+          <p>Sales Agent</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.salesAgentId|idMapping:salesAgentMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Total Quantity</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object?.details|sum:'qtyRequest'|number:'1.0'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <p>Grand Total</p>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object?.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Details</ion-label>
+    </ion-list-header>
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="no-ripple pt-2" *ngFor="let line of object?.details; let i = index">
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col class="ion-margin-auto">
+              <div class="font-bold">{{line.itemBarcode}}</div>                      
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-grid class="ion-no-padding p-0">
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="font-bold">{{line.itemCode}}</div>
+                    <span class="badge-green px-1 mx-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto">
+                    <div>
+                      {{line.description}}
+                    </div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">                    
+                    <div class="py-1">Qty: </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div>{{line.qtyRequest}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="py-1">Unit Price: </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div *ngIf="object.header.isDisplayTaxInclusive">{{line.unitPrice|number:(object.header.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                    <div *ngIf="!object.header.isDisplayTaxInclusive">{{line.unitPriceExTax|number:(object.header.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="py-1">Disc Code: </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div>{{line.discountGroupCode}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="py-1">Disc Expression: </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div>{{line.discountExpression}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="py-1">Disc Amount: </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div>{{line.discountAmt}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="py-1">Subtotal (Before Tax): </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div>{{line.subTotalExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-margin-auto ion-flex">
+                    <div class="py-1">Subtotal: </div>
+                  </ion-col>
+                  <ion-col size="3" class="ion-margin-auto ion-flex">
+                    <div>{{line.subTotal|number:  (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
