@@ -40,8 +40,8 @@
             </ion-select>
           </ion-item>
           <ion-item>
-            <ion-label position="fixed">Show 0</ion-label>
-            <ion-checkbox item-right checked="true" [(ngModel)]="showEmpty" (ionChange)="advancedFilter()"></ion-checkbox>
+            <ion-label position="fixed">Hide 0 Balance</ion-label>
+            <ion-checkbox item-right checked="true" [(ngModel)]="hideEmpty" (ionChange)="advancedFilter()"></ion-checkbox>
           </ion-item>
           <ion-item *ngIf="selectedViewOptions === 'variation' && inventoryLevelVariation.length > 0 && itemVariationX.length > 1">
             <ion-label position="fixed">Variation X</ion-label>

@@ -1,17 +1,17 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
-import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
+import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
 
-export const getSysParams: string = `
-SELECT * 
+export const getSysParams: string = 
+`SELECT * 
 FROM Sys_Parameter
-WHERE id = 1
-`;
+WHERE id = 1`;
 
 @Injectable({
   providedIn: 'root'
@@ -23,10 +23,20 @@ export class ConfigService {
   item_Barcodes: PDItemBarcode[] = [];
 
   constructor(
+    private http: HttpClient,
     private toastService: ToastService,
     private _databaseService: DatabaseService,
     private commonQueryService: CommonQueryService<Sys_Parameter>
   ) { }
+  
+  getApiUrl(activationCode: string) {
+    return this.http.get<FireStoreReturn>("https://firestore.googleapis.com/v1/projects/idcp-34e86/databases/(default)/documents/urlList/" + activationCode, {
+      headers:
+      {
+        skip: "true"
+      }
+    });
+  }
 
   async load() {
     if (Capacitor.getPlatform() === 'web') {
@@ -36,17 +46,12 @@ export class ConfigService {
         apiUrl: 'https://idcp-demo.com/api/',
         imgUrl: null,
         onlineMode: true,
-        firstTimeLogin: null,
         lastDownloadAt: null,
-        lastUploadAt: null,
-        createdAt: null,
-        updatedAt: null,
         loadImage: false
       }
     } else {
       this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
     }
-    // this.sys_parameter.apiUrl = "https://10.0.2.2:44351/api";
   }
 
   async insert(object: Sys_Parameter) {
@@ -55,11 +60,7 @@ export class ConfigService {
       apiUrl: object.apiUrl,
       imgUrl: object.imgUrl,
       onlineMode: true,
-      firstTimeLogin: true,
-      lastDownloadAt: new Date(),
-      lastUploadAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      lastDownloadAt: null,
       loadImage: true
     }
     await this.commonQueryService.insert(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
@@ -72,6 +73,13 @@ export class ConfigService {
   async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
+    try {
+      let obj = this.sys_parameter;
+      obj.lastDownloadAt = new Date;
+      await this.update(obj);
+    } catch (e) {
+      console.log(JSON.stringify(e));
+    }
   }
 
   async loadItemMaster(): Promise<PDItemMaster[]> {

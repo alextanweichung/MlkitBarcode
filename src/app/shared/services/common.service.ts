@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
-import { Item } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
 
@@ -40,7 +39,7 @@ export class CommonService {
   }
 
   syncInbound() {
-    return this.http.get(this.baseUrl + "PosDownload/itemMaster/KLCC/2022-10-31");
+    return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
   }
 
   setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {

@@ -28,6 +28,13 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       private spinner: NgxSpinnerService
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+      if (request.headers.get('skip')) {
+         const authReq = request.clone({
+            headers: request.headers.set('Access-Control-Allow-Origin', '*')
+         });
+         return next.handle(authReq);
+      }
+      
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
       const authReq = request.clone({
          headers: request.headers.set('Authorization', authToken)

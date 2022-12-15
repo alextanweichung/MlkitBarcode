@@ -72,7 +72,6 @@ export class SigninPage implements OnInit {
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {        
         await this.navController.navigateRoot('/approvals');
-
         if (Capacitor.getPlatform() !== 'web') {
           try {
             let itemMasterCount = (await this.configService.loadItemMaster())?.length;

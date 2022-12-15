@@ -36,7 +36,7 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit() {
-    
+
   }
 
   ngAfterContentChecked(): void {
@@ -65,19 +65,31 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   async getStarted() {
     if (this.activationCode.length > 0) {
       try {
-        let code = atob(this.activationCode);
-        let config: Sys_Parameter = JSON.parse(code);
-        await this.configService.insert(config).then(response => {
-          // Navigate to /home
-          this.navController.navigateRoot('/signin');
-        }).catch(error => {
-          this.toastService.presentToast(error.message, '', 'middle', 'danger', 1000);
-        });
+        // let code = atob(this.activationCode);
+        // let config: Sys_Parameter = JSON.parse(code);
+        // this.configService.getApiUrl(this.activationCode).subscribe(async response => {
+        //   console.log("🚀 ~ file: welcome.page.ts:85 ~ WelcomePage ~ this.configService.getApiUrl ~ response", JSON.stringify(response))
+        //   if (response) {
+            let config: Sys_Parameter = {
+              Sys_ParameterId: 1,
+              apiUrl: 'https://idcp-demo.com/api/', // response.fields.url.stringValue,
+              onlineMode: true,
+              loadImage: false
+            }
+            await this.configService.insert(config).then(response => {
+              this.navController.navigateRoot('/signin');
+            }).catch(error => {
+              this.toastService.presentToast(error.message, '', 'top', 'danger', 1000);
+            });
+        //   }
+        // }, error => {
+        //   console.log(JSON.stringify(error));
+        // })
       } catch (error) {
-        this.toastService.presentToast('Invalid activation code', '', 'middle', 'medium', 1000);
+        this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
       }
     } else {
-      this.toastService.presentToast('Please enter activation code', '', 'middle', 'medium', 1000);
+      this.toastService.presentToast('Please enter activation code', '', 'top', 'danger', 1000);
     }
   }
 
