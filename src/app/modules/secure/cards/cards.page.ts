@@ -1,9 +1,8 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterContentChecked, Component, ViewChild } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
-import { AlertController, IonRouterOutlet, LoadingController, ModalController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { AddPage } from '../../../modules/secure/cards/add/add.page';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -29,7 +28,8 @@ export class CardsPage implements AfterContentChecked {
   }
 
   show_item_image: boolean = false;
-  use_offline_resources: boolean = false;
+  online_mode: boolean = false;
+  last_sync_datetime: Date;
 
   constructor(
     private configService: ConfigService,
@@ -37,8 +37,6 @@ export class CardsPage implements AfterContentChecked {
     private alertController: AlertController,
     private toastService: ToastService,
     private loadingController: LoadingController,
-    private modalController: ModalController,
-    private routerOutlet: IonRouterOutlet,
     private commonService: CommonService
   ) { }
 
@@ -47,6 +45,8 @@ export class CardsPage implements AfterContentChecked {
       this.swiper.updateSwiper({});
     }
     this.show_item_image = this.configService.sys_parameter.loadImage;
+    this.online_mode = this.configService.sys_parameter.onlineMode;
+    this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
   }
 
   // Sync
@@ -71,43 +71,6 @@ export class CardsPage implements AfterContentChecked {
     setTimeout(() => {
       loading.dismiss();
     }, 2000);
-  }
-
-  // Add card
-  async addCard() {
-
-    // Open filter modal
-    const modal = await this.modalController.create({
-      component: AddPage,
-      swipeToClose: true,
-      presentingElement: this.routerOutlet.nativeEl
-    });
-    return await modal.present();
-  }
-
-  // Delete card
-  async deleteCard() {
-    const alert = await this.alertController.create({
-      cssClass: 'custom-alert',
-      header: 'Delete this card permanently?',
-      message: 'This action cannot be undone.',
-      buttons: [
-        {
-          text: 'Delete card',
-          cssClass: 'danger',
-          handler: async () => {
-            this.toastService.presentToast('Success', 'Card successfully deleted', 'middle', 'success', 2000);
-          }
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'cancel'
-        }
-      ]
-    });
-
-    await alert.present();
   }
 
   async toggleShowItemImage(event) {

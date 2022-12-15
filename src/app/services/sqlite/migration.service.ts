@@ -9,11 +9,7 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
   apiUrl VARCHAR(255), 
   imgUrl VARCHAR(255), 
   onlineMode TINYINT(1), 
-  firstTimeLogin TINYINT(1), 
   lastDownloadAt DATETIME, 
-  lastUploadAt DATETIME, 
-  createdAt DATETIME NOT NULL, 
-  updatedAt DATETIME NOT NULL, 
   loadImage TINYINT(1)
 ); `;
 

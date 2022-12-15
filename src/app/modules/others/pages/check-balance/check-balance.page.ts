@@ -86,7 +86,7 @@ export class CheckBalancePage implements OnInit {
           this.inventoryLevel = response;
           this.toastService.presentToast('Search result has been populated.', '', 'middle', 'success', 1000);
           this.computeLocationList();
-          this.showEmpty = true;
+          this.hideEmpty = false;
           this.computeVariationXY();
         }, error => {
           console.log(error);
@@ -97,7 +97,7 @@ export class CheckBalancePage implements OnInit {
           this.inventoryLevelVariation = response;
           this.toastService.presentToast('Search result has been populated.', '', 'middle', 'success', 1000);
           this.computeLocationList();
-          this.showEmpty = true;
+          this.hideEmpty = false;
           this.computeVariationXY();
         }, error => {
           console.log(error);
@@ -157,7 +157,7 @@ export class CheckBalancePage implements OnInit {
     }
   }
 
-  showEmpty: boolean = true;
+  hideEmpty: boolean = true;
   advancedFilter() {
     if (this.selectedViewOptions === 'item') {
       this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
@@ -165,8 +165,8 @@ export class CheckBalancePage implements OnInit {
         if (this.selectedLocation !== 'all') {
           this.inventoryLevel = this.inventoryLevel.filter(r => r.locationCode === this.selectedLocation);
         }
-        if (!this.showEmpty) {
-          this.inventoryLevel = this.inventoryLevel.filter(r => r.qty > 0);
+        if (this.hideEmpty) {
+          this.inventoryLevel = this.inventoryLevel.filter(r => r.qty !== 0);
         }
         this.toastService.presentToast('Search result has been populated.', '', 'middle', 'success', 1000);
       }, error => {
@@ -181,7 +181,7 @@ export class CheckBalancePage implements OnInit {
           this.inventoryLevelVariation = this.inventoryLevelVariation.filter(r => r.locationCode === this.selectedLocation);
         }
         // show 0 filter
-        if (!this.showEmpty) {
+        if (this.hideEmpty) {
           let locationIds = [];
           let temp = this.inventoryLevelVariation;
           for (let index = 0; index < this.inventoryLevelVariation.length; index++) {
@@ -191,7 +191,7 @@ export class CheckBalancePage implements OnInit {
                 total += rrr.qty
               })
             })
-            if (total === 0) {
+            if (total !== 0) {
               locationIds.push(this.inventoryLevelVariation[index].locationId);
             }
           }

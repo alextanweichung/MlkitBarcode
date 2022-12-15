@@ -94,9 +94,9 @@
 
     <ion-list class="list-custom" lines="full">
       <ion-item button detail="false">
-        <ion-avatar slot="start" class="ion-avatar-default-icon">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
           <ion-icon color="primary" name="eye"></ion-icon>
-        </ion-avatar>
+        </ion-avatar> -->
         <ion-label>
           <h3>Show Item Images</h3>
           <p class="font-size-smallest">Hidden by default</p>
@@ -105,23 +105,24 @@
       </ion-item>
 
       <ion-item button detail="false">
-        <ion-avatar slot="start" class="ion-avatar-default-icon">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
           <ion-icon color="primary" name="eye"></ion-icon>
-        </ion-avatar>
+        </ion-avatar> -->
         <ion-label>
           <h3>Use Online Resource</h3>
-          <p class="font-size-smallest">...</p>
+          <p class="font-size-smallest" *ngIf="online_mode">Item search from online resource</p>
+          <p class="font-size-smallest" *ngIf="!online_mode">Item search from offline resource</p>
         </ion-label>
-        <ion-toggle slot="end" [(ngModel)]="use_offline_resources" (ionChange)="toggleUseOnlineResources($event)"></ion-toggle>
+        <ion-toggle slot="end" [(ngModel)]="online_mode" (ionChange)="toggleUseOnlineResources($event)"></ion-toggle>
       </ion-item>
 
       <ion-item detail="false">
-        <ion-avatar slot="start" class="ion-avatar-default-icon">
+        <!-- <ion-avatar slot="start" class="ion-avatar-default-icon">
           <ion-icon color="primary" name="sync"></ion-icon>
-        </ion-avatar>
+        </ion-avatar> -->
         <ion-label>
           <h3>Manual sync</h3>
-          <p class="font-size-smallest">Sync backend</p>
+          <p class="font-size-smallest">Last sync: {{last_sync_datetime|date:'yyyy-MM-dd hh:mm:ss'}}</p>
         </ion-label>
         <ion-button slot="end" (click)="sync()">
           Sync now

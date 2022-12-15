@@ -1,12 +1,23 @@
 export interface Sys_Parameter {
    Sys_ParameterId: number
    apiUrl: string
-   imgUrl: string
+   imgUrl?: string
    onlineMode: boolean
-   firstTimeLogin: boolean
    lastDownloadAt?: Date
-   lastUploadAt?: Date
-   createdAt: Date
-   updatedAt: Date
    loadImage: boolean
+}
+
+export interface FireStoreReturn {
+   name: string
+   fields: FireStoreField
+   createTime: Date
+   updateTime: Date
+}
+
+export interface FireStoreField {
+   url: FireStoreUrl
+}
+
+export interface FireStoreUrl {
+   stringValue: string
 }

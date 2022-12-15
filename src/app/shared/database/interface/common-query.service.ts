@@ -62,7 +62,7 @@ export class CommonQueryService<T> {
   }
 
   private convertDateString(input: Date): string {
-    return formatDate(input, 'yyyy-MM-dd', this.locale);
+    return formatDate(input, 'yyyy-MM-dd hh:mm:ss', this.locale);
   }
 
   load(object, table, database) {
