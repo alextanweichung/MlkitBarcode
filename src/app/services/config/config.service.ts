@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
@@ -33,7 +33,8 @@ export class ConfigService {
     return this.http.get<FireStoreReturn>("https://firestore.googleapis.com/v1/projects/idcp-34e86/databases/(default)/documents/urlList/" + activationCode, {
       headers:
       {
-        skip: "true"
+        skip: "true",
+        "Access-Control-Allow-Origin": "*"
       }
     });
   }

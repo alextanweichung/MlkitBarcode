@@ -193,7 +193,7 @@ const routes: Routes = [
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/general-sales/general-sales-list.module').then( m => m.ItemAddListWithVariationPageModule)
+    loadChildren: () => import('./shared/pages/general-sales-list/general-sales-list.module').then( m => m.GeneralSalesListPageModule)
   },
   {
     path: 'item-cart',
@@ -219,6 +219,11 @@ const routes: Routes = [
     path: 'item-view-list-flat',
     loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then( m => m.ItemViewListFlatPageModule)
   },
+  {
+    path: 'item-catalog',
+    loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then( m => m.ItemCatalogPageModule)
+  },
+
 
 
 

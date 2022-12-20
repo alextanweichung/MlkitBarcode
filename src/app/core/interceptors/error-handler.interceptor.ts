@@ -29,10 +29,11 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {
-         const authReq = request.clone({
-            headers: request.headers.set('Access-Control-Allow-Origin', '*')
-         });
-         return next.handle(authReq);
+         // const authReq = request.clone({
+         //    headers: request.headers.set('Access-Control-Allow-Origin', '*')
+         // });
+         console.log("🚀 ~ file: error-handler.interceptor.ts:35 ~ ErrorHandlerInterceptor ~ intercept ~ request", JSON.stringify(request))
+         return next.handle(request);
       }
       
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
@@ -91,7 +92,6 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                      //const navigationExtras: NavigationExtras = {state: {error: error.error}}
                      //this.router.navigateByUrl('/error', navigationExtras);
                      this.toastService.presentToast('Error', 'Internal server error 500', 'middle', 'danger', 2000);
-                     console.log("🚀 ~ file: error-handler.interceptor.ts:105 ~ ErrorHandlerInterceptor ~ intercept ~ error", JSON.stringify(error))
                      // this.messageService.add({ severity: 'error', summary: 'Internal server error 500', detail: error.error.message });
                      break;
                   default:

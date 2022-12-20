@@ -8,7 +8,7 @@ import { SalesOrderItemPageRoutingModule } from './sales-order-item-routing.modu
 
 import { SalesOrderItemPage } from './sales-order-item.page';
 import { GeneralSalesGridPageModule } from 'src/app/shared/pages/general-sales-grid/general-sales-grid.module';
-import { ItemAddListWithVariationPageModule } from 'src/app/shared/pages/general-sales/general-sales-list.module';
+import { GeneralSalesListPageModule } from 'src/app/shared/pages/general-sales-list/general-sales-list.module';
 import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
@@ -19,7 +19,7 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IonicModule,
     SalesOrderItemPageRoutingModule,
     GeneralSalesGridPageModule,
-    ItemAddListWithVariationPageModule,
+    GeneralSalesListPageModule,
     ItemCartPageModule,
     SumModule
   ],

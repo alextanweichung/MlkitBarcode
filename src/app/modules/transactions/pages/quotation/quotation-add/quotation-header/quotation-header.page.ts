@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, NavController } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { CreditInfo } from 'src/app/shared/models/credit-info';
+import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
@@ -28,7 +29,8 @@ export class QuotationHeaderPage implements OnInit {
     private quotationService: QuotationService,
     private navController: NavController,
     private formBuilder: FormBuilder,
-    private actionSheetController: ActionSheetController) {
+    private actionSheetController: ActionSheetController) 
+  {
     this.newForm();
   }
 
@@ -82,10 +84,40 @@ export class QuotationHeaderPage implements OnInit {
     this.loadMasterList();
   }
   
+  moduleControl: ModuleControl[];
+  allowDocumentWithEmptyLine: string = "N";
+  configSalesActivatePromotionEngine: boolean;
+  workflowEnablePrintAfterApproved: boolean;
+  disableTradeTransactionGenerateGL: boolean;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {    
-    this.authService.precisionList$.subscribe(precision =>{
+  loadModuleControl() {
+    this.authService.moduleControlConfig$.subscribe(obj => {
+      this.moduleControl = obj;
+      let config = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
+      if (config != undefined) {
+        this.allowDocumentWithEmptyLine = config.ctrlValue.toUpperCase();
+      }
+      let config2 = this.moduleControl.find(x => x.ctrlName === "WorkflowEnablePrintAfterApproved")?.ctrlValue;
+      if (config2 && config2.toUpperCase() == "Y") {
+        this.workflowEnablePrintAfterApproved = true;
+      } else {
+        this.workflowEnablePrintAfterApproved = false;
+      }
+      let config3 = this.moduleControl.find(x => x.ctrlName === "DisableTradeTransactionGenerateGL")?.ctrlValue;
+      if (config3 && config3.toUpperCase() == "Y") {
+        this.disableTradeTransactionGenerateGL = true;
+      } else {
+        this.disableTradeTransactionGenerateGL = false;
+      }
+      let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
+      if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
+        this.configSalesActivatePromotionEngine = true;
+      } else {
+        this.configSalesActivatePromotionEngine = false;
+      }
+    })
+    this.authService.precisionList$.subscribe(precision => {
       this.precisionSales = precision.find(x => x.precisionCode == "SALES");
       this.precisionTax = precision.find(x => x.precisionCode == "TAX");
     })
@@ -94,11 +126,14 @@ export class QuotationHeaderPage implements OnInit {
   customerMasterList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
   currencyMasterList: MasterListDetails[] = [];
+  shipMethodMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.quotationService.getMasterList().subscribe(response => {
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.setDefaultValue();
     }, error => {
       console.log(error);
     })
@@ -123,7 +158,16 @@ export class QuotationHeaderPage implements OnInit {
     })
   }
 
+  setDefaultValue() {    
+    let defaultShipMethod = this.shipMethodMasterList.find(r => r.isPrimary);
+    if (defaultShipMethod) {
+      this.objectForm.patchValue({ shipMethodId: defaultShipMethod.id });
+    }
+  }
+
   selectedCustomerLocationList: MasterListDetails[] = [];
+  creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [] };
+  availableAddress: ShippingInfo[] = [];
   onCustomerSelected(event) {
     if (event && event !== undefined) {
       var lookupValue = this.customerMasterList?.find(e => e.id === event.id);
@@ -148,8 +192,11 @@ export class QuotationHeaderPage implements OnInit {
         });
         this.onCurrencySelected(lookupValue.attribute4);
         if (lookupValue.attribute5 == "T") {
+          this.availableAddress = this.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);
           this.objectForm.controls.toLocationId.clearValidators();
           this.objectForm.controls.toLocationId.updateValueAndValidity();
+        } else {          
+          this.availableAddress = [];
         }
         if (lookupValue.attributeArray1.length == 1) {
           this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
@@ -160,6 +207,13 @@ export class QuotationHeaderPage implements OnInit {
         } else {
           this.objectForm.patchValue({ typeCode: 'T' });
         }
+      }
+      if (!this.disableTradeTransactionGenerateGL) {
+        this.quotationService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
+          if (response) {
+            this.creditInfo = response;
+          }
+        })
       }
     }
   }

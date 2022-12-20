@@ -21,4 +21,4 @@ import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
   ],
   declarations: [GeneralSalesListPage]
 })
-export class ItemAddListWithVariationPageModule {}
+export class GeneralSalesListPageModule {}

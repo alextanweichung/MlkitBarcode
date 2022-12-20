@@ -35,7 +35,6 @@ export class SigninPage implements OnInit {
   }
 
   ngOnInit() {
-
     // Setup form
     this.signin_form = this.formBuilder.group({
       userEmail: ['', Validators.compose([Validators.email, Validators.required])],
@@ -49,26 +48,11 @@ export class SigninPage implements OnInit {
 
   // Sign in
   async signIn() {
-
     this.submit_attempt = true;
-
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.toastService.presentToast('Error', 'Please input email and password', 'middle', 'danger', 2000);
-
-    } else {
-
-      // Proceed with loading overlay
-      // const loading = await this.loadingController.create({
-      //   cssClass: 'default-loading',
-      //   message: '<p>Signing in...</p><span>Please be patient.</span>',
-      //   spinner: 'crescent'
-      // });
-      // await loading.present();
-
-      // TODO: Add your sign in logic
-      // ...
-      
+    } else {      
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {        
         await this.navController.navigateRoot('/approvals');
@@ -88,13 +72,6 @@ export class SigninPage implements OnInit {
           }
         }
       });
-
-      // // Fake timeout
-      // setTimeout(async () => {
-
-      //   // Sign in success
-      // }, 2000);
-
     }
   }
 
