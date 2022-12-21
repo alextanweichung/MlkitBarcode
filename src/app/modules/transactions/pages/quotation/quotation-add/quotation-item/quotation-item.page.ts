@@ -155,15 +155,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
   }
 
-  async onItemInCartEditCompleted(event: TransactionDetail) {
-    await this.computeAllAmount(event);
-  }
-
-  async onItemInCartDeleteCompleted(event: TransactionDetail[]) {
-    this.itemInCart = JSON.parse(JSON.stringify(event));
-    await this.assignSequence();
-  }
-
   assignSequence() {
     let index = 0;
     this.itemInCart.forEach(r => {
@@ -240,7 +231,7 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
 
   async nextStep() {
     this.quotationService.setChoosenItems(this.itemInCart);
-    this.navController.navigateRoot('/transactions/quotation/quotation-cart');
+    this.navController.navigateForward('/transactions/quotation/quotation-cart');
   }
 
   previousStep() {

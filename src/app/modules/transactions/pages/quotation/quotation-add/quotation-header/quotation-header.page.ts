@@ -180,15 +180,15 @@ export class QuotationHeaderPage implements OnInit {
         } else {
           this.selectedCustomerLocationList = [];
         }
-        this.objectForm.patchValue({ 
-          salesAgentId: parseFloat(lookupValue.attribute1), 
-          termPeriodId: parseFloat(lookupValue.attribute2), 
-          countryId: parseFloat(lookupValue.attribute3), 
-          currencyId: parseFloat(lookupValue.attribute4), 
-          locationId: parseFloat(lookupValue.attribute6), 
-          toLocationId: null, 
-          isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false, 
-          isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false 
+        this.objectForm.patchValue({
+          salesAgentId: parseFloat(lookupValue.attribute1),
+          termPeriodId: parseFloat(lookupValue.attribute2),
+          countryId: parseFloat(lookupValue.attribute3),
+          currencyId: parseFloat(lookupValue.attribute4),
+          locationId: parseFloat(lookupValue.attribute6),
+          toLocationId: null,
+          isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
+          isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
         });
         this.onCurrencySelected(lookupValue.attribute4);
         if (lookupValue.attribute5 == "T") {

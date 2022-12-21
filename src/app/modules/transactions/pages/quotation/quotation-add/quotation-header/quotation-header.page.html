@@ -16,7 +16,6 @@
     <ion-list class="list-custom" lines="none">
       <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
-
     <div *ngIf="objectForm.controls.customerId.value">
       <ion-list-header class="ion-list-header-small">
         <ion-label>Credit Control</ion-label>
@@ -45,7 +44,6 @@
           </ion-label>
         </ion-item>
       </ion-list>
-
       <div *ngIf="creditInfo?.isCheckCreditLimit">
         <ion-list-header class="ion-list-header-small">
           <ion-label>Credit Limit Info</ion-label>
@@ -95,7 +93,6 @@
           </ion-item>
         </ion-list>
       </div>
-
     </div>
   </div>
 </ion-content>

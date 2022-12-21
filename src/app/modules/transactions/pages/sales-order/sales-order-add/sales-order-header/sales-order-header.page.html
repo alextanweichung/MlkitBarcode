@@ -16,6 +16,83 @@
     <ion-list class="list-custom" lines="none">
       <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
+    <div *ngIf="objectForm.controls.customerId.value">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>Credit Control</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom" lines="full" *ngIf="creditInfo?.isCheckCreditLimit">
+        <ion-item>
+          <ion-icon slot="start" name="ellipse" [ngClass]="{'color-success': (creditInfo?.availableLimit > 0), 'color-danger': (creditInfo?.availableLimit <= 0)}"></ion-icon>
+          <ion-label>
+            Available Limit
+          </ion-label>
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.availableLimit|number:'1.2-2'}}
+          </ion-label>
+        </ion-item>
+        <ion-item *ngIf="creditInfo?.overdueAmount > 0">
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.overdueAmount|number:'1.2-2'}}
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <ion-list class="list-custom" lines="full" *ngIf="!creditInfo?.isCheckCreditLimit">
+        <ion-item>
+          <ion-icon slot="start" name="ellipse" class="color-success"></ion-icon>
+          <ion-label>
+            Credit Limit Control Not Enforced
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div><div *ngIf="creditInfo?.isCheckCreditLimit">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>Credit Limit Info</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom" lines="full">
+        <ion-item>
+          <ion-label>
+            Credit Limit
+          </ion-label>
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.creditLimit|number:'1.2-2'}}
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            Credit Terms
+          </ion-label>
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.creditTerms}}
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            Utilized Limit
+          </ion-label>
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.utilizedLimit|number:'1.2-2'}}
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" name="folder-open-outline"></ion-icon>
+          <ion-label>
+            Pending Order
+          </ion-label>
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.pendingOrderAmount|number:'1.2-2'}}
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" name="cash-outline"></ion-icon>
+          <ion-label>
+            Outstanding Amount
+          </ion-label>
+          <ion-label slot="end" class="font-size-small ion-text-right ion-no-padding-end">
+            {{creditInfo?.outstandingAmount|number:'1.2-2'}}
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
