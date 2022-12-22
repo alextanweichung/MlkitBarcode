@@ -62,7 +62,7 @@ export class StockCountPage implements OnInit, ViewWillEnter {
         objectId: objectId
       }
     }
-    this.navController.navigateForward('/others/stock-count/stock-count-detail', navigationExtras);
+    this.navController.navigateForward('/transactions/stock-count/stock-count-detail', navigationExtras);
   }
 
   // Select action
@@ -88,7 +88,7 @@ export class StockCountPage implements OnInit, ViewWillEnter {
   }
 
   addObject() {
-    this.navController.navigateForward('/others/stock-count/stock-count-add/stock-count-header');
+    this.navController.navigateForward('/transactions/stock-count/stock-count-add/stock-count-header');
   }
 
   async filter() {

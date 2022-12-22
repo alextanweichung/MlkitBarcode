@@ -33,8 +33,7 @@ export class ConfigService {
     return this.http.get<FireStoreReturn>("https://firestore.googleapis.com/v1/projects/idcp-34e86/databases/(default)/documents/urlList/" + activationCode, {
       headers:
       {
-        skip: "true",
-        "Access-Control-Allow-Origin": "*"
+        skip: "true"
       }
     });
   }
@@ -43,8 +42,8 @@ export class ConfigService {
     if (Capacitor.getPlatform() === 'web') {
       this.sys_parameter = {
         Sys_ParameterId: 1,
-        apiUrl: 'https://localhost:44351/api/',
-        // apiUrl: 'https://idcp-demo.com/api/',
+        // apiUrl: 'https://localhost:44351/api/',
+        apiUrl: 'https://idcp-demo.com/api/',
         imgUrl: null,
         onlineMode: true,
         lastDownloadAt: null,

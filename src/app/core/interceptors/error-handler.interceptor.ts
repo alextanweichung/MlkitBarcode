@@ -29,11 +29,10 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {
-         // const authReq = request.clone({
-         //    headers: request.headers.set('Access-Control-Allow-Origin', '*')
-         // });
-         console.log("🚀 ~ file: error-handler.interceptor.ts:35 ~ ErrorHandlerInterceptor ~ intercept ~ request", JSON.stringify(request))
-         return next.handle(request);
+         const authReq = request.clone({
+            headers: request.headers.delete('skip')
+         });
+         return next.handle(authReq);
       }
       
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token

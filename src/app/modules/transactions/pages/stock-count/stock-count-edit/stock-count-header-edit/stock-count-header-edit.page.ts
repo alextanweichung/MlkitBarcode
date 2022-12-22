@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController } from '@ionic/angular';
-import { StockCountRoot } from 'src/app/modules/others/models/stock-count';
-import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
+import { StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
+import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
@@ -157,14 +157,14 @@ export class StockCountHeaderEditPage implements OnInit {
           objectId: this.objectId
         }
       }
-      this.navController.navigateBack('/others/stock-count/stock-count-detail', navigationExtras);
+      this.navController.navigateBack('/transactions/stock-count/stock-count-detail', navigationExtras);
     }
   }
 
   nextStep() {
     this.stockCountService.setHeader(this.objectForm.getRawValue());
     this.stockCountService.setLines(this.inventoryCount.details);
-    this.navController.navigateForward('/others/stock-count/stock-count-edit/stock-count-item');
+    this.navController.navigateForward('/transactions/stock-count/stock-count-edit/stock-count-item');
   }
 
 }

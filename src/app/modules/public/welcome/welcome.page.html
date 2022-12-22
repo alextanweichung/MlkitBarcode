@@ -1,16 +1,16 @@
-<ion-content>
+<ion-content fullscreen>
   <swiper class="swiper-welcome" #swiper [config]="swiperConfig" (slideChange)="swiperSlideChanged($event)" (reachEnd)="onLastSlide()">
     <ng-template swiperSlide>
       <ion-img src="../../../../assets/idcp/logo-idcp.svg" class="animate__animated animate__fadeInDown" alt="iDCP Logo"></ion-img>
       <h3 class="animate__animated animate__fadeInUp">iDCP Mobile</h3>
-      <p class="animate__animated animate__fadeInUp">Initial Setup. Press next to inset activation code.</p>
+      <p class="animate__animated animate__fadeInUp">Initial Setup. Press next to insert activation code.</p>
     </ng-template>
     <ng-template swiperSlide>
       <ion-img src="../../../../assets/idcp/logo-idcp.svg" class="animate__animated animate__fadeInDown" alt="iDCP Logo"></ion-img>
       <h3>Apps Activation</h3>
       <ion-item>
-        <ion-label color="tertiary" position="stacked">Activation Code</ion-label>
-        <ion-textarea [(ngModel)]="activationCode" autocomplete="off" placeholder="Activation Code"></ion-textarea>
+        <!-- <ion-label color="tertiary" position="stacked">Activation Code</ion-label> -->
+        <ion-text [(ngModel)]="activationCode" autocomplete="off" placeholder="Activation Code"></ion-text>
       </ion-item>
     </ng-template>
   </swiper>

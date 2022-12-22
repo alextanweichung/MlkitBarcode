@@ -67,12 +67,12 @@ export class WelcomePage implements OnInit, AfterContentChecked {
       try {
         // let code = atob(this.activationCode);
         // let config: Sys_Parameter = JSON.parse(code);
-        // this.configService.getApiUrl(this.activationCode).subscribe(async response => {
-        //   console.log("🚀 ~ file: welcome.page.ts:85 ~ WelcomePage ~ this.configService.getApiUrl ~ response", JSON.stringify(response))
-        //   if (response) {
+        this.configService.getApiUrl(this.activationCode).subscribe(async response => {
+          console.log("🚀 ~ file: welcome.page.ts:85 ~ WelcomePage ~ this.configService.getApiUrl ~ response", JSON.stringify(response))
+          if (response) {
             let config: Sys_Parameter = {
               Sys_ParameterId: 1,
-              apiUrl: 'https://idcp-demo.com/api/', // response.fields.url.stringValue,
+              apiUrl: response.fields.url.stringValue, // 'https://idcp-demo.com/api/',
               onlineMode: true,
               loadImage: false
             }
@@ -81,10 +81,10 @@ export class WelcomePage implements OnInit, AfterContentChecked {
             }).catch(error => {
               this.toastService.presentToast(error.message, '', 'top', 'danger', 1000);
             });
-        //   }
-        // }, error => {
-        //   console.log(JSON.stringify(error));
-        // })
+          }
+        }, error => {
+          console.log(JSON.stringify(error));
+        })
       } catch (error) {
         this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
       }

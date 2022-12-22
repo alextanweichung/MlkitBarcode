@@ -23,6 +23,7 @@ const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
 const mobilePackingCode: string = 'MATRPA';
 const mobileConsignmentSalesCode: string = 'MATRCS';
+const inventoryCountCode: string = 'MATRST';
 
 @Component({
   selector: 'app-transactions',
@@ -46,6 +47,8 @@ export class TransactionsPage implements OnInit {
   showConsignmentSales: boolean = false;
   consignment_sales: ConsignmentSalesList[] = [];
 
+  showStockCount: boolean = false;
+
   constructor(
     private authService: AuthService,
     private navController: NavController,
@@ -68,6 +71,7 @@ export class TransactionsPage implements OnInit {
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
         this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
         this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
+        this.showStockCount = pageItems.findIndex(r => r.title === inventoryCountCode) > -1;
       }
     })
     this.loadAllRecentList();

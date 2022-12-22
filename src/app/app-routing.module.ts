@@ -132,6 +132,16 @@ const routes: Routes = [
     path: 'transactions/consignment-sales/consignment-sales-detail',
     loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales-detail/consignment-sales-detail.module').then( m => m.ConsignmentSalesDetailPageModule)
   },
+  // transaction-stock-count
+  {
+    path: 'transactions/stock-count',
+    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
+  },
+  {
+    path: 'transactions/stock-count/stock-count-detail',
+    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then( m => m.StockCountDetailPageModule)
+  },
+
 
 
 
@@ -154,16 +164,6 @@ const routes: Routes = [
     path: 'others/check-balance',
     loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
   },
-  // others-stock-count
-  {
-    path: 'others/stock-count',
-    loadChildren: () => import('./modules/others/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
-  },
-  {
-    path: 'others/stock-count/stock-count-detail',
-    loadChildren: () => import('./modules/others/pages/stock-count/stock-count-detail/stock-count-detail.module').then( m => m.StockCountDetailPageModule)
-  },
-
 
 
   // shared

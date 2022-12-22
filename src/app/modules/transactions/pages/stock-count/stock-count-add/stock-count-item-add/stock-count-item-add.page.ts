@@ -4,8 +4,8 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, NavController } from '@ionic/angular';
-import { InventoryCountBatchCriteria, StockCountDetail, StockCountHeader, StockCountRoot } from 'src/app/modules/others/models/stock-count';
-import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
+import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
+import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -39,7 +39,7 @@ export class StockCountItemAddPage implements OnInit {
     this.stockCountDetail = [];
     if (this.stockCountHeader === undefined) {
       this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
-      this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
+      this.navController.navigateBack('/transactions/stock-count/stock-count-add/stock-count-header');
     } else {
       this.loadInventoryCountBatchCriteria();
     }
@@ -301,7 +301,7 @@ export class StockCountItemAddPage implements OnInit {
   /* #endregion */
 
   previousStep() {
-    this.navController.navigateBack('/others/stock-count/stock-count-add/stock-count-header');
+    this.navController.navigateBack('/transactions/stock-count/stock-count-add/stock-count-header');
   }
 
   async nextStep() {
@@ -340,7 +340,7 @@ export class StockCountItemAddPage implements OnInit {
             objectId: object.header.inventoryCountId
           }
         }
-        this.navController.navigateForward('/others/stock-count/stock-count-detail', navigationExtras);
+        this.navController.navigateForward('/transactions/stock-count/stock-count-detail', navigationExtras);
       }
     }, error => {
       console.log(error);

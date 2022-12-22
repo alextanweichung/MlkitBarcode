@@ -144,6 +144,13 @@
       </ng-container>
       <hr class="hr-small">
     </ng-container>
+
+    <ng-container *ngIf="showStockCount">
+      <ion-list-header>
+        <ion-label color="dark">Stock Count</ion-label>
+        <ion-button routerLink="stock-count">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+      </ion-list-header>
+    </ng-container>
     
   </div>
 </ion-content>  

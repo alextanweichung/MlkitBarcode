@@ -4,7 +4,6 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 const pageCode: string = 'MAOT';
 const otpConfigCode: string = 'MAOTOTP';
 const inventoryLevelCode: string = 'MAOTIL'
-const inventoryCountCode: string = 'MAOTIC';
 
 @Component({
   selector: 'app-others',
@@ -15,7 +14,6 @@ export class OthersPage implements OnInit {
 
   showOtpConfig: boolean = false;
   showInventoryLevel: boolean = false;
-  showStockCount: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -27,7 +25,6 @@ export class OthersPage implements OnInit {
       if (pageItems) {
         this.showOtpConfig = pageItems.findIndex(r => r.title === otpConfigCode) > -1;
         this.showInventoryLevel = pageItems.findIndex(r => r.title === inventoryLevelCode) > -1;
-        this.showStockCount = pageItems.findIndex(r => r.title === inventoryCountCode) > -1;
       }
     })
   }

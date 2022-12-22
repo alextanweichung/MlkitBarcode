@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, NavController } from '@ionic/angular';
-import { InventoryCountBatchList } from 'src/app/modules/others/models/stock-count';
-import { StockCountService } from 'src/app/modules/others/services/stock-count.service';
+import { InventoryCountBatchList } from 'src/app/modules/transactions/models/stock-count';
+import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
@@ -167,14 +167,14 @@ export class StockCountHeaderAddPage implements OnInit {
 
     if (role === 'confirm') {
       this.stockCountService.resetVariables();
-      this.navController.navigateBack('/others/stock-count');
+      this.navController.navigateBack('/transactions/stock-count');
     }
   }
 
   nextStep() {
     this.stockCountService.setHeader(this.objectForm.getRawValue());
     this.stockCountService.removeLines();
-    this.navController.navigateForward('/others/stock-count/stock-count-add/stock-count-item');
+    this.navController.navigateForward('/transactions/stock-count/stock-count-add/stock-count-item');
   }
 
 }
