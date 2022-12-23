@@ -1,5 +1,5 @@
-<ion-grid class="ion-no-padding">
 
+<ion-grid class="ion-no-padding">
   <ion-row>
     <ion-col size="9" class="ion-flex ion-margin-auto">
       <ion-searchbar #searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionChange)="searchTextChanged()" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
@@ -8,7 +8,6 @@
       <ion-button expand="block" size="small" (click)="searchItem()">Search</ion-button>
     </ion-col>
   </ion-row>
-
 </ion-grid>
 
 <div class="main-card">
@@ -100,7 +99,7 @@
     </ion-row>
 
   </ion-grid>
-</div>
+</div>    
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>

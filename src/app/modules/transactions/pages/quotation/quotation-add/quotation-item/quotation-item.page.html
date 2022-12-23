@@ -1,6 +1,6 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Item Catalog</ion-title>
+    <ion-title>Item Catalogue</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
@@ -12,16 +12,9 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Item Catalog</ion-label>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
   <div class="p-2">
-
     <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage"></app-item-catalog>
-    
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

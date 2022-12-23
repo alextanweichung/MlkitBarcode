@@ -69,7 +69,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       if (Capacitor.getPlatform() !== 'web') {
         Keyboard.hide();
       }
-      if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
+      // if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
         // online mode
         this.searchItemService.getItemInfoByKeyword(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
           this.availableItems = response;
@@ -78,9 +78,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           )
           this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
         })
-      } else {
-        // offline mode, search item from local item master and item barcode
-      }
+        if (this.showImage) {
+          this.loadImages();
+        }
+      // } else {
+      //   // offline mode, search item from local item master and item barcode
+      // }
     } else {
       this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
     }
