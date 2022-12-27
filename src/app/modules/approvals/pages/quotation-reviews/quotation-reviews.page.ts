@@ -5,6 +5,7 @@ import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.pag
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
 import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-quotation-pending-review',
@@ -19,11 +20,12 @@ export class QuotationReviewsPage implements OnInit {
 
   startDate: Date;
   endDate: Date;
-  
+
   constructor(
     private commonService: CommonService,
     private transactionProcessingService: TransactionProcessingService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -37,12 +39,16 @@ export class QuotationReviewsPage implements OnInit {
   }
 
   loadObjects() {
-    this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
-      this.pendingObjects = response.filter(r => !r.isComplete);
-      this.completedObjects = response.filter(r => r.isComplete);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
+        this.pendingObjects = response.filter(r => !r.isComplete);
+        this.completedObjects = response.filter(r => r.isComplete);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading', '', 'top', 'danger', 1000);
+    }
   }
 
   onObjectUpdated(event) {

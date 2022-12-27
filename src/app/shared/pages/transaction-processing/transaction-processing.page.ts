@@ -32,7 +32,7 @@ export class TransactionProcessingPage implements OnInit {
 
   }
 
-  async presentConfirmAlert(action: string, docId: number, docNum: string) {    
+  async presentConfirmAlert(action: string, docId: number, docNum: string) {
     const alert = await this.alertController.create({
       cssClass: 'custom-alert',
       header: 'Are you sure to ' + action + ' ' + docNum + '?',
@@ -55,15 +55,19 @@ export class TransactionProcessingPage implements OnInit {
     await alert.present();
   }
 
-  updateDoc(action: string, docId: number) {    
-    this.transactionProcessingService.updateDocumentStatus(action, docId).subscribe(async response => {
-      if (response.status == 204) {
-        this.toastService.presentToast("Doc review is completed.", "", "bottom", "success", 1000);
-        this.onObjectUpdated.emit(docId);
-      }
-    }, error => {
-      console.log(error);
-    })
+  updateDoc(action: string, docId: number) {
+    try {
+      this.transactionProcessingService.updateDocumentStatus(action, docId).subscribe(async response => {
+        if (response.status == 204) {
+          this.toastService.presentToast("Doc review is completed.", "", "bottom", "success", 1000);
+          this.onObjectUpdated.emit(docId);
+        }
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+    }
   }
 
   async openDetail(docId: number) {

@@ -11,10 +11,23 @@
       <ion-button (click)="toggleShowImage()">List</ion-button>
     </ion-buttons>
   </ion-toolbar>
+
+  <ion-grid class="px-2 ion-no-padding">
+    <ion-row>
+      <ion-col size="9" class="ion-flex ion-margin-auto">
+        <ion-searchbar #searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item"></ion-searchbar>
+      </ion-col>
+      <ion-col size="3" class="ion-flex ion-margin-auto justify-content-center">
+        <ion-button expand="block" size="small">Search</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  
 </ion-header>
+
 <ion-content>
   <div class="p-2">
-    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage"></app-item-catalog>
+    <app-item-catalog #itemCatalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

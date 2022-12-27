@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { QuotationHeader, QuotationRoot, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
@@ -14,6 +14,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { ItemCartPage } from 'src/app/shared/pages/item-cart/item-cart.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
@@ -31,6 +32,8 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
   loadImage: boolean = true;
+
+  @ViewChild('itemCatalog', { static: false }) itemCatalog: ItemCartPage;
 
   constructor(
     private configService: ConfigService,
