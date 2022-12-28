@@ -6,11 +6,9 @@ import { OtpDTO, Otp, OtpLine } from '../../models/otp';
 import { OtpService } from '../../services/otp.service';
 import { App } from 'src/app/shared/models/app';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { format, parseISO } from 'date-fns';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { AlertController } from '@ionic/angular';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
-import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.page';
 
@@ -98,13 +96,6 @@ export class OtpConfigurationPage implements OnInit {
 
     this.otpConfigService.getAllApps().subscribe(response => {
       this.allApps = response;
-      this.allApps.forEach(r => {
-        this.appsSearchDropdownList.push({
-          id: r.appId,
-          code: r.appCode,
-          description: r.description
-        })
-      })
     }, error => {
       console.log(error);
     })
@@ -138,6 +129,13 @@ export class OtpConfigurationPage implements OnInit {
       this.selectedUser = event.id;
       this.otpConfigService.getUserApps(event.id).subscribe((response: App[]) => {
         this.apps = response;
+        this.apps.forEach(r => {
+          this.appsSearchDropdownList.push({
+            id: r.appId,
+            code: r.appCode,
+            description: r.appName
+          })
+        })
       }, error => {
         console.log(error);
       });
