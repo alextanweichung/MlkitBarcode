@@ -3,13 +3,23 @@ import { ActionSheetButton, ActionSheetController, NavController } from '@ionic/
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 
-const pageCode: string = 'MATR';
+const transactionPageCode: string = 'MATR';
 const mobileQuotationCode: string = 'MATRQU';
 const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
 const mobilePackingCode: string = 'MATRPA';
 const mobileConsignmentSalesCode: string = 'MATRCS';
 const inventoryCountCode: string = 'MATRST';
+const mobileInventoryLevelCode: string = 'MATRIL';
+
+const managementPageCode: string = 'MAAP';
+const quotationReviewCode: string = 'MAQURV';
+const quotationApprovalCode: string = 'MAQUAP';
+const salesOrderReviewCode: string = 'MASORV';
+const salesOrderApprovalCode: string = 'MASOAP';
+const purchaseOrderReviewCode: string = 'MAPORV';
+const purchaseOrderApprovalCode: string = 'MAPOAP';
+const otpConfigCode: string = 'MAMAOTP';
 
 @Component({
   selector: 'app-tabs',
@@ -18,12 +28,22 @@ const inventoryCountCode: string = 'MATRST';
 })
 export class TabsPage {
 
-  // showQuotation: boolean = false;
-  // showSalesOrder: boolean = false;
-  // showPicking: boolean = false;
-  // showPacking: boolean = false;
-  // showConsignmentSales: boolean = false;
-  // showStockCount: boolean = false;
+  showQuotation: boolean = false;
+  showSalesOrder: boolean = false;
+  showPicking: boolean = false;
+  showPacking: boolean = false;
+  showConsignmentSales: boolean = false;
+  showStockCount: boolean = false;
+  showInventoryLevel: boolean = false;
+
+  showQuotationReview: boolean = false;
+  showQuotationApproval: boolean = false;
+  showSalesOrderReview: boolean = false;
+  showSalesOrderApproval: boolean = false;
+  showPurchaseOrderReview: boolean = false;
+  showPurchaseOrderApproval: boolean = false;  
+  showOtpConfig: boolean = false;
+
 
   constructor(
     private authService: AuthService,
@@ -31,17 +51,31 @@ export class TabsPage {
     private toastService: ToastService,
     private navController: NavController
   ) {
-    // this.authService.menuModel$.subscribe(obj => {
-    //   let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
-    //   if (pageItems) {
-    //     this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
-    //     this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
-    //     this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
-    //     this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
-    //     this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
-    //     this.showStockCount = pageItems.findIndex(r => r.title === inventoryCountCode) > -1;
-    //   }
-    // })
+    this.authService.menuModel$.subscribe(obj => {
+
+      let transactionPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
+      if (transactionPageItems) {
+        this.showQuotation = transactionPageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
+        this.showSalesOrder = transactionPageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
+        this.showPicking = transactionPageItems.findIndex(r => r.title === mobilePickingCode) > -1;
+        this.showPacking = transactionPageItems.findIndex(r => r.title === mobilePackingCode) > -1;
+        this.showConsignmentSales = transactionPageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
+        this.showStockCount = transactionPageItems.findIndex(r => r.title === inventoryCountCode) > -1;
+        this.showInventoryLevel = transactionPageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
+      }
+
+      let managementPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
+      if (managementPageItems) {
+        this.showQuotationReview = managementPageItems.findIndex(r => r.title === quotationReviewCode) > -1;
+        this.showQuotationApproval = managementPageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
+        this.showSalesOrderReview = managementPageItems.findIndex(r => r.title === salesOrderReviewCode) > -1;
+        this.showSalesOrderApproval = managementPageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
+        this.showPurchaseOrderReview = managementPageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
+        this.showPurchaseOrderApproval = managementPageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
+        this.showOtpConfig = managementPageItems.findIndex(r => r.title === otpConfigCode) > -1;
+      }
+
+    })
   }
 
   // Select action

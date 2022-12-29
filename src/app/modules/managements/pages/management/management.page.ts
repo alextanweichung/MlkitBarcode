@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
-const pageCode: string = 'MAAP';
+const managementPageCode: string = 'MAAP';
 const quotationReviewCode: string = 'MAQURV';
 const quotationApprovalCode: string = 'MAQUAP';
 const salesOrderReviewCode: string = 'MASORV';
@@ -34,7 +34,7 @@ export class ManagementPage implements OnInit {
 
   ngOnInit() {
     this.authService.menuModel$.subscribe(obj => {
-      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
+      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
       if (pageItems) {
         this.showQuotationReview = pageItems.findIndex(r => r.title === quotationReviewCode) > -1;
         this.showQuotationApproval = pageItems.findIndex(r => r.title === quotationApprovalCode) > -1;

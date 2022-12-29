@@ -7,12 +7,12 @@
       <ion-label>Home</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="transactions">
+    <ion-tab-button tab="transactions" [disabled]="!(showQuotation || showSalesOrder || showPicking || showPacking || showConsignmentSales || showStockCount || showInventoryLevel)">
       <ion-icon name="pie-chart"></ion-icon>
       <ion-label>Transaction</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="managements">
+    <ion-tab-button tab="managements" [disabled]="!(showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseOrderReview || showPurchaseOrderApproval || showOtpConfig)">
       <ion-icon name="clipboard-outline"></ion-icon>
       <ion-label>Management</ion-label>
     </ion-tab-button>

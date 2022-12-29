@@ -16,7 +16,7 @@ import { PickingService } from '../../services/picking.service';
 import { QuotationService } from '../../services/quotation.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 
-const pageCode: string = 'MATR';
+const transactionPageCode: string = 'MATR';
 const mobileQuotationCode: string = 'MATRQU';
 const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
@@ -66,7 +66,7 @@ export class TransactionsPage implements OnInit {
 
   ngOnInit() {
     this.authService.menuModel$.subscribe(obj => {
-      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
+      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
       if (pageItems) {
         this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
         this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
