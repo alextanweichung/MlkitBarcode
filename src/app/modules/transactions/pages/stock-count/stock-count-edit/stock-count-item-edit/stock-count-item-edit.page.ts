@@ -132,7 +132,7 @@ export class StockCountItemEditPage implements OnInit {
           }
           this.addItemToLine(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       }
     }
@@ -148,19 +148,19 @@ export class StockCountItemEditPage implements OnInit {
         break;
       case "Brand":
         if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemBrandId)) {
-          this.toastService.presentToast('Item Brand not match', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Item Brand not match', '', 'top', 'danger', 1000);
           return;
         }
         break;
       case "Group":
         if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemGroupId)) {
-          this.toastService.presentToast('Item Group not match', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Item Group not match', '', 'top', 'danger', 1000);
           return;
         }
         break;
       case "Category":
         if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemCategoryId)) {
-          this.toastService.presentToast('Item Category not match', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Item Category not match', '', 'top', 'danger', 1000);
           return;
         }
         break;
@@ -231,7 +231,7 @@ export class StockCountItemEditPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.objectDetail.splice(index, 1);
-              this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -246,7 +246,7 @@ export class StockCountItemEditPage implements OnInit {
       });  
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -344,7 +344,7 @@ export class StockCountItemEditPage implements OnInit {
     this.stockCountService.updateInventoryCount({header: this.objectHeader, details: this.objectDetail, barcodeTag: []}).subscribe(response => {
       if (response.status === 204) {
         this.stockCountService.resetVariables();
-        this.toastService.presentToast('Stock Count updated', '', 'middle', 'success', 1000);
+        this.toastService.presentToast('Stock Count updated', '', 'top', 'success', 1000);
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectHeader.inventoryCountId

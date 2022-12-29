@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 const pageCode: string = 'MAOT';
-const otpConfigCode: string = 'MAOTOTP';
-const inventoryLevelCode: string = 'MAOTIL'
 
 @Component({
   selector: 'app-others',
@@ -12,21 +10,12 @@ const inventoryLevelCode: string = 'MAOTIL'
 })
 export class OthersPage implements OnInit {
 
-  showOtpConfig: boolean = false;
-  showInventoryLevel: boolean = false;
-
   constructor(
     private authService: AuthService
   ) { }
 
   ngOnInit() {
-    this.authService.menuModel$.subscribe(obj => {
-      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
-      if (pageItems) {
-        this.showOtpConfig = pageItems.findIndex(r => r.title === otpConfigCode) > -1;
-        this.showInventoryLevel = pageItems.findIndex(r => r.title === inventoryLevelCode) > -1;
-      }
-    })
+
   }
 
 }

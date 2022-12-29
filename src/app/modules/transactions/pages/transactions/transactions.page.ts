@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { Capacitor } from '@capacitor/core';
 import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentSalesList } from '../../models/consignment-sales';
 import { GoodsPackingList } from '../../models/packing';
@@ -24,7 +22,8 @@ const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
 const mobilePackingCode: string = 'MATRPA';
 const mobileConsignmentSalesCode: string = 'MATRCS';
-const inventoryCountCode: string = 'MATRST';
+const mobileInventoryCountCode: string = 'MATRST';
+const mobileInventoryLevelCode: string = 'MATRIL';
 
 @Component({
   selector: 'app-transactions',
@@ -49,6 +48,7 @@ export class TransactionsPage implements OnInit {
   consignment_sales: ConsignmentSalesList[] = [];
 
   showStockCount: boolean = false;
+  showInventoryLevel: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -73,19 +73,12 @@ export class TransactionsPage implements OnInit {
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
         this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
         this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
-        this.showStockCount = pageItems.findIndex(r => r.title === inventoryCountCode) > -1;
+        this.showStockCount = pageItems.findIndex(r => r.title === mobileInventoryCountCode) > -1;
+        this.showInventoryLevel = pageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
       }
     })
-    this.loadAllRecentList();
+    // this.loadAllRecentList();
   }
-
-  handleRefresh(event) {
-    setTimeout(() => {
-      this.loadAllRecentList();
-      // Any calls to load data go here
-      event.target.complete();
-    }, 2000);
-  };
 
   loadAllRecentList() {
     // quotation
@@ -113,38 +106,6 @@ export class TransactionsPage implements OnInit {
       this.loadRecentConsignmentSales();
     }
   }
-
-  /* #region  online offline */
-
-  // transactionMode: string = "online";
-  // onTransactionModeChanged(event) {
-  //    if (event.detail.value === 'offline') {
-  //     this.sync();
-  //    }
-  // }
-
-  async sync() {
-    // Loading overlay
-    if (Capacitor.getPlatform() !== 'web') {
-      const loading = await this.loadingController.create({
-        cssClass: 'default-loading',
-        message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
-        spinner: 'crescent'
-      });
-      await loading.present();
-
-      this.commonService.syncInbound().subscribe(async response => {
-        let itemMaster: PDItemMaster[] = response['itemMaster'];
-        let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-        await this.configService.syncInboundData(itemMaster, itemBarcode);
-        loading.dismiss();
-      }, error => {
-        console.log(error);
-      })
-    }
-  }
-
-  /* #endregion */
 
   /* #region  quotation */
 

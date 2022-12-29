@@ -118,7 +118,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
           }
           this.addItemToLine(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       } else {
 
@@ -156,7 +156,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.objectDetail.splice(index, 1);
-              this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -168,7 +168,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -343,7 +343,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 
@@ -360,7 +360,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
         trxDate: response.body["header"]["trxDate"]
       }
       this.consignmentSalesService.setSummary(css);
-      this.toastService.presentToast('Insert Complete', 'New Consignment Sales has been added', 'middle', 'success', 1000);
+      this.toastService.presentToast('Insert Complete', 'New Consignment Sales has been added', 'top', 'success', 1000);
       this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-summary');
     }, error => {
       console.log(error);

@@ -139,7 +139,7 @@ export class PickingItemPage implements OnInit {
           }
           this.addItemToSo(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       }
     }
@@ -152,7 +152,7 @@ export class PickingItemPage implements OnInit {
   selectedSoDetail: PickingSalesOrderDetail;
   async addItemToSo(trxLine: TransactionDetail) {
     if (this.objectHeader.isWithSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select SO', '', 'middle', 'medium', 1000);
+      this.toastService.presentToast('Please select SO', '', 'top', 'medium', 1000);
       return;
     }
     if (this.objectHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
@@ -162,7 +162,7 @@ export class PickingItemPage implements OnInit {
         this.selectedSoDetail.qtyPickedCurrent += 1;
         this.onQtyChanged(this.selectedSoDetail.qtyPickedCurrent, this.selectedSoDetail, itemIndex);
       } else {
-        this.toastService.presentToast('Item not found in this SO', '', 'middle', 'medium', 1000);
+        this.toastService.presentToast('Item not found in this SO', '', 'top', 'medium', 1000);
       }
     }
     if (!this.objectHeader.isWithSo) {
@@ -216,7 +216,7 @@ export class PickingItemPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.pickingSalesOrders[0].details.splice(index, 1);
-              this.toastService.presentToast('Item removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Item removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -228,7 +228,7 @@ export class PickingItemPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -251,7 +251,7 @@ export class PickingItemPage implements OnInit {
         }
       }
     } else if (this.objectHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select 1 SO', '', 'middle', 'medium', 1000);
+      this.toastService.presentToast('Please select 1 SO', '', 'top', 'medium', 1000);
     }
     if (!this.objectHeader.isWithSo) {
       const allowed = await this.checkPermission();
@@ -328,7 +328,7 @@ export class PickingItemPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 
@@ -379,7 +379,7 @@ export class PickingItemPage implements OnInit {
           trxDate: response.body["header"]["trxDate"]
         }        
         this.pickingService.setPickingSummary(ps);
-        this.toastService.presentToast('Picking has been added', '', 'middle', 'success', 1000);
+        this.toastService.presentToast('Picking has been added', '', 'top', 'success', 1000);
         this.navController.navigateForward('/transactions/picking/picking-summary');
       }
     }, error => {

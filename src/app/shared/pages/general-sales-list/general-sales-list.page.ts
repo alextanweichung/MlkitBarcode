@@ -70,7 +70,7 @@ export class GeneralSalesListPage implements OnInit {
         this.availableItems = [];
         if (this.configService.item_Masters.length === 0 || this.configService.item_Barcodes.length === 0) {
           await this.hideLoading();
-          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'top', 'danger', 1000);
         } else {          
           let found = this.configService.item_Masters.filter(r => r.code.toLowerCase().includes(this.itemSearchText.toLowerCase()));
           if (found) {
@@ -157,7 +157,7 @@ export class GeneralSalesListPage implements OnInit {
         }
       }
     } else {
-      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'middle', 'medium', 1000);
+      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'medium', 1000);
     }
   }
 
@@ -179,7 +179,7 @@ export class GeneralSalesListPage implements OnInit {
   
   async addItemToCart(data: TransactionDetail) {
     await this.onItemAdded.emit(data);
-    this.toastService.presentToast('Item added to cart', '', 'middle', 'success', 1000);
+    this.toastService.presentToast('Item added to cart', '', 'top', 'success', 1000);
     // clear qty
     data.qtyRequest = null;
   }
@@ -214,7 +214,7 @@ export class GeneralSalesListPage implements OnInit {
 
   async addItemVariationToCart() {
     await this.onItemAdded.emit(this.selectedItem);
-    this.toastService.presentToast('Item added to cart', '', 'middle', 'success', 1000);
+    this.toastService.presentToast('Item added to cart', '', 'top', 'success', 1000);
     // clear qty
     this.selectedItem.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest = 0);
     this.hideModal();

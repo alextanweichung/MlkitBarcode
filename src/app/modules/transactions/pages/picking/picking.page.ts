@@ -59,7 +59,7 @@ export class PickingPage implements OnInit {
     if (this.goodsPickingService.hasWarehouseAgent()) {
       this.navController.navigateForward('/transactions/picking/picking-sales-order');
     } else {
-      this.toastService.presentToast('Warehouse Agent not set.', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1000);
     }
   }
 

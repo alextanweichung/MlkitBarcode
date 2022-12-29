@@ -51,11 +51,11 @@ export class SigninPage implements OnInit {
     this.submit_attempt = true;
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
-      this.toastService.presentToast('Error', 'Please input email and password', 'middle', 'danger', 2000);
+      this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
     } else {      
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {        
-        await this.navController.navigateRoot('/approvals');
+        await this.navController.navigateRoot('/home');
         if (Capacitor.getPlatform() !== 'web') {
           try {
             let itemMasterCount = (await this.configService.loadItemMaster())?.length;
@@ -68,7 +68,7 @@ export class SigninPage implements OnInit {
               })
             }
           } catch (error) {
-            this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
+            this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
           }
         }
       });

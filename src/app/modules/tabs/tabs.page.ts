@@ -55,7 +55,7 @@ export class TabsPage {
   //       handler: () => {
   //         let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
   //         if (salesAgentId === 0 || salesAgentId === undefined) {
-  //           this.toastService.presentToast('Error', 'Sales Agent not set', 'middle', 'danger', 1000);
+  //           this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1000);
   //         } else {
   //           this.navController.navigateForward('/transactions/quotation/quotation-header');
   //         }
@@ -69,7 +69,7 @@ export class TabsPage {
   //       handler: () => {
   //         let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
   //         if (salesAgentId === 0 || salesAgentId === undefined) {
-  //           this.toastService.presentToast('Error', 'Sales Agent not set', 'middle', 'danger', 1000);
+  //           this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1000);
   //         } else {
   //           this.navController.navigateForward('/transactions/sales-order/sales-order-header');
   //         }
@@ -83,7 +83,7 @@ export class TabsPage {
   //       handler: () => {
   //         let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
   //         if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
-  //           this.toastService.presentToast('Error', 'Warehouse Agent not set', 'middle', 'danger', 1000);
+  //           this.toastService.presentToast('Error', 'Warehouse Agent not set', 'top', 'danger', 1000);
   //         } else {
   //           this.navController.navigateForward('/transactions/picking/picking-sales-order');
   //         }
@@ -97,7 +97,7 @@ export class TabsPage {
   //       handler: () => {
   //         let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
   //         if (warehouseAgentId === 0 || warehouseAgentId === undefined) {
-  //           this.toastService.presentToast('Error', 'Warehouse Agent not set', 'middle', 'danger', 1000);
+  //           this.toastService.presentToast('Error', 'Warehouse Agent not set', 'top', 'danger', 1000);
   //         } else {
   //           this.navController.navigateForward('/transactions/packing/packing-sales-order');
   //         }

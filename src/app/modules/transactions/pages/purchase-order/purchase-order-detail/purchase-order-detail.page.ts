@@ -35,7 +35,7 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.objectId) {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
       this.navController.navigateBack('/transactions')
     } else {
       this.loadMasterList();

@@ -2,16 +2,16 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { IonicModule } from "@ionic/angular";
-import { ApprovalsPageRoutingModule } from "./approvals-routing.module";
-import { ApprovalsPage } from "./approvals.page";
+import { ManagementPageRoutingModule } from "./management-routing.module";
+import { ManagementPage } from "./management.page";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ApprovalsPageRoutingModule
+    ManagementPageRoutingModule
   ],
-  declarations: [ApprovalsPage]
+  declarations: [ManagementPage]
 })
-export class ApprovalsPageModule {}
+export class ManagementPageModule {}

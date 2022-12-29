@@ -17,8 +17,8 @@ const routes: Routes = [
         loadChildren: () => import('../secure/home/home.module').then(m => m.HomePageModule)
       },
       {
-        path: 'approvals',
-        loadChildren: () => import('../approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule)
+        path: 'managements',
+        loadChildren: () => import('../managements/pages/management/management.module').then(m => m.ManagementPageModule)
       },
       {
         path: 'transactions',

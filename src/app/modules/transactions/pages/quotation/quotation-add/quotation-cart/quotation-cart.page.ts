@@ -324,7 +324,7 @@ export class QuotationCartPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 

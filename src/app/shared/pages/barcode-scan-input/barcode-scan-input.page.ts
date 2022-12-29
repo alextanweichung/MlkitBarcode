@@ -108,10 +108,10 @@ export class BarcodeScanInputPage implements OnInit {
           this.onItemAdd.emit(outputData);
         } else {
           console.log("🚀 ~ file: barcode-scan-input.page.ts:111 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       } else {
-        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'middle', 'medium', 1000);
+        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'medium', 1000);
       }
     }
     this.barcodeInput.setFocus();

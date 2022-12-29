@@ -8,13 +8,14 @@ const salesOrderReviewCode: string = 'MASORV';
 const salesOrderApprovalCode: string = 'MASOAP';
 const purchaseOrderReviewCode: string = 'MAPORV';
 const purchaseOrderApprovalCode: string = 'MAPOAP';
+const otpConfigCode: string = 'MAMAOTP';
 
 @Component({
-  selector: 'app-approvals',
-  templateUrl: './approvals.page.html',
-  styleUrls: ['./approvals.page.scss'],
+  selector: 'app-management',
+  templateUrl: './management.page.html',
+  styleUrls: ['./management.page.scss'],
 })
-export class ApprovalsPage implements OnInit {
+export class ManagementPage implements OnInit {
 
   showQuotationReview: boolean = false;
   showQuotationApproval: boolean = false;
@@ -24,6 +25,8 @@ export class ApprovalsPage implements OnInit {
 
   showPurchaseOrderReview: boolean = false;
   showPurchaseOrderApproval: boolean = false;
+  
+  showOtpConfig: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -39,6 +42,7 @@ export class ApprovalsPage implements OnInit {
         this.showSalesOrderApproval = pageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
         this.showPurchaseOrderReview = pageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
         this.showPurchaseOrderApproval = pageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
+        this.showOtpConfig = pageItems.findIndex(r => r.title === otpConfigCode) > -1;
       }
     })
   }

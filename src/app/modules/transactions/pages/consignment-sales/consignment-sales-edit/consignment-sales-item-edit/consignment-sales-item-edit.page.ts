@@ -47,7 +47,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     if (this.objectId) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('Something went wrong!', 'Invalid ObjectId', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', 'Invalid ObjectId', 'top', 'danger', 1000);
     }
   }
 
@@ -148,7 +148,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
           }
           this.addItemToDetails(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       } else {
 
@@ -168,7 +168,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.object.details.splice(index, 1);
-              this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -180,7 +180,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -380,14 +380,14 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 
   updateObject() {
     this.consignmentSalesService.updateObject(this.object).subscribe(response => {
       if (response.status === 204) {
-        this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'middle', 'success', 1000);
+        this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'top', 'success', 1000);
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectId
@@ -395,7 +395,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
         }
         this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
       } else {
-        this.toastService.presentToast('Update Fail', '', 'middle', 'danger', 1000);
+        this.toastService.presentToast('Update Fail', '', 'top', 'danger', 1000);
       }
     }, error => {
       console.log(error);

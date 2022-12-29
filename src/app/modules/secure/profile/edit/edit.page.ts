@@ -74,13 +74,13 @@ export class EditPage implements OnInit {
       // Save form ...
 
       // Display success message and go back
-      this.toastService.presentToast('Success', 'Profile saved', 'middle', 'success', 2000);
+      this.toastService.presentToast('Success', 'Profile saved', 'top', 'success', 2000);
       this.navController.back();
 
     } else {
 
       // Display error message
-      this.toastService.presentToast('Error', 'Please fill in all required fields', 'middle', 'danger', 2000);
+      this.toastService.presentToast('Error', 'Please fill in all required fields', 'top', 'danger', 2000);
     }
   }
 
