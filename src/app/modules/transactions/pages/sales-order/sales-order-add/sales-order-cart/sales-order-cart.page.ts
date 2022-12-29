@@ -41,6 +41,7 @@ export class SalesOrderCartPage implements OnInit {
     this.itemInCart = this.salesOrderService.itemInCart;
     this.loadModuleControl();
     this.loadMasterList();
+    this.loadRestrictColumms();
   }
 
   availableAddress: ShippingInfo[] = [];
@@ -102,6 +103,30 @@ export class SalesOrderCartPage implements OnInit {
       this.loadAvailableAddresses();
     }, error => {
       console.log(error);
+    })
+  }
+
+  // restrictFields: any = {};
+  restrictTrxFields: any = {};
+  loadRestrictColumms() {
+    let restrictedObject = {};
+    let restrictedTrx = {};
+    this.authService.restrictedColumn$.subscribe(obj => {
+      // let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
+      // apiData.forEach(element => {
+      //   Object.keys(this.objectForm.controls).forEach(ctrl => {
+      //     if (element.toUpperCase() === ctrl.toUpperCase()) {
+      //       restrictedObject[ctrl] = true;
+      //     }
+      //   });
+      // });
+      // this.restrictFields = restrictedObject;
+
+      let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
+      trxDataColumns.forEach(element => {
+        restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
+      });
+      this.restrictTrxFields = restrictedTrx;
     })
   }
 
@@ -275,7 +300,7 @@ export class SalesOrderCartPage implements OnInit {
   /* #region  step */
 
   previousStep() {
-    this.navController.navigateBack('/transactions/quotation/quotation-item');
+    this.navController.navigateBack('/transactions/sales-order/sales-order-item');
   }
 
   async nextStep() {

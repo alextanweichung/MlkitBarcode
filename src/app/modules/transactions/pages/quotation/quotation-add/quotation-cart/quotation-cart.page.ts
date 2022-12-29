@@ -41,6 +41,7 @@ export class QuotationCartPage implements OnInit {
     this.itemInCart = this.quotationService.itemInCart;
     this.loadModuleControl();
     this.loadMasterList();
+    this.loadRestrictColumms();
   }
 
   availableAddress: ShippingInfo[] = [];
@@ -104,6 +105,31 @@ export class QuotationCartPage implements OnInit {
       console.log(error);
     })
   }
+
+  // restrictFields: any = {};
+  restrictTrxFields: any = {};
+  loadRestrictColumms() {
+    let restrictedObject = {};
+    let restrictedTrx = {};
+    this.authService.restrictedColumn$.subscribe(obj => {
+      // let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
+      // apiData.forEach(element => {
+      //   Object.keys(this.objectForm.controls).forEach(ctrl => {
+      //     if (element.toUpperCase() === ctrl.toUpperCase()) {
+      //       restrictedObject[ctrl] = true;
+      //     }
+      //   });
+      // });
+      // this.restrictFields = restrictedObject;
+
+      let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
+      trxDataColumns.forEach(element => {
+        restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
+      });
+      this.restrictTrxFields = restrictedTrx;
+    })
+  }
+
 
   /* #region  modal to edit each item */
 

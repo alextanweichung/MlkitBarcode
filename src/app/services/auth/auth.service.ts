@@ -11,6 +11,7 @@ import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { MenuItem, MenuItemRoot } from './menu-item';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { RestrictedColumn } from 'src/app/shared/models/restricted-column';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class AuthService {
   isDebug: string = 'False';
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
+  restrictedColumn: RestrictedColumn[];
   moduleControlConfig: ModuleControl[];
   model: MenuItem[];
   precisionList: PrecisionList[];
@@ -36,6 +38,10 @@ export class AuthService {
   // Create menuItemSubject to observe from value of HTTP Get for MenuHierarchy
   private menuItemSubject = new ReplaySubject<MenuItemRoot[]>(1);
   menuModel$ = this.menuItemSubject.asObservable();
+
+  //Create restrictedColumnSubject to observe from value of HTTP Get for RestrictedColumn
+  private restrictedColumnSubject = new ReplaySubject<any[]>(1);
+  restrictedColumn$ = this.restrictedColumnSubject.asObservable();
 
   // Create moduleControlSubject to observe from value of HTTP Get for frontEndModuleControl
   private moduleControlSubject = new ReplaySubject<ModuleControl[]>(1);
@@ -117,7 +123,7 @@ export class AuthService {
 
   buildAllObjects() {
     this.buildMenuModel();
-    // this.buildRestrictColumnsObject(); 
+    this.buildRestrictColumnsObject();
     this.buildModuleControlObject();
     this.buildPrecisionList();
     // this.buildMasterDefinedGroup();  
@@ -138,6 +144,13 @@ export class AuthService {
     });
   }
 
+  buildRestrictColumnsObject() {
+    this.getRestrictedColumn().subscribe(response => {
+      this.restrictedColumn = response;
+      this.setRestrictedColumn(this.restrictedColumn);
+    });
+  }
+
   buildModuleControlObject() {
     this.getModuleControl().subscribe(response => {
       this.moduleControlConfig = response;
@@ -145,7 +158,7 @@ export class AuthService {
     });
   }
 
-  buildPrecisionList(){
+  buildPrecisionList() {
     this.getPrecisionList().subscribe(response => {
       this.precisionList = response;
       this.setPrecisionList(this.precisionList);
@@ -164,6 +177,18 @@ export class AuthService {
     this.menuItemSubject.next(item);
   }
 
+  getRestrictedColumn() {
+    return this.http.get<RestrictedColumn[]>(this.baseUrl + 'account/restrictedColumns').pipe(
+      map((response: any) =>
+        response.map((item: any) => item)
+      )
+    )
+  }
+
+  setRestrictedColumn(item: any) {
+    this.restrictedColumnSubject.next(item);
+  }
+
   getModuleControl() {
     return this.http.get<ModuleControl[]>(this.baseUrl + 'account/frontEndModuleControl').pipe(
       map((response: any) =>
@@ -172,7 +197,7 @@ export class AuthService {
     )
   }
 
-  getPrecisionList(){
+  getPrecisionList() {
     return this.http.get<PrecisionList[]>(this.baseUrl + 'account/precision');
   }
 
@@ -180,7 +205,7 @@ export class AuthService {
     this.moduleControlSubject.next(item);
   }
 
-  setPrecisionList(item: any){    
+  setPrecisionList(item: any) {
     this.precisionListSubject.next(item);
   }
 

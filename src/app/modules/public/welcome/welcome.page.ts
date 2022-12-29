@@ -60,22 +60,26 @@ export class WelcomePage implements OnInit, AfterContentChecked {
     this.last_slide = true;
   }
 
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
   activationCode: string = '';
   // Go to main content
   async getStarted() {
     if (this.activationCode.length > 0) {
       try {
-        // let code = atob(this.activationCode);
-        // let config: Sys_Parameter = JSON.parse(code);
         this.configService.getApiUrl(this.activationCode).subscribe(async response => {
-          console.log("🚀 ~ file: welcome.page.ts:85 ~ WelcomePage ~ this.configService.getApiUrl ~ response", JSON.stringify(response))
           if (response) {
             let config: Sys_Parameter = {
               Sys_ParameterId: 1,
-              apiUrl: response.fields.url.stringValue, // 'https://idcp-demo.com/api/',
+              apiUrl: response.fields.url.stringValue,
               onlineMode: true,
               loadImage: false
             }
+            this.toastService.presentToast('Activated Successfully', '', 'top', 'success', 1000);
             await this.configService.insert(config).then(response => {
               this.navController.navigateRoot('/signin');
             }).catch(error => {
@@ -83,19 +87,15 @@ export class WelcomePage implements OnInit, AfterContentChecked {
             });
           }
         }, error => {
-          console.log(JSON.stringify(error));
+          this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
+          
         })
       } catch (error) {
-        this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
+
       }
     } else {
       this.toastService.presentToast('Please enter activation code', '', 'top', 'danger', 1000);
     }
   }
-
-  // async insertConfig(config: Config) {
-  //   console.log(`inserting config`);
-  //   await this.configService.insertConfig(config);
-  // }
 
 }

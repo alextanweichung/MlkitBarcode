@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentSalesList } from '../../models/consignment-sales';
@@ -59,7 +60,8 @@ export class TransactionsPage implements OnInit {
     private consignmentSalesService: ConsignmentSalesService,
     private loadingController: LoadingController,
     private commonService: CommonService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -147,11 +149,15 @@ export class TransactionsPage implements OnInit {
   /* #region  quotation */
 
   loadRecentQuotation() {
-    this.quotationService.getObjectList().subscribe(response => {
-      this.quotations = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getObjectList().subscribe(response => {
+        this.quotations = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading quotation', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToQuotationDetail(objectId: number) {
@@ -168,11 +174,15 @@ export class TransactionsPage implements OnInit {
   /* #region  sales order */
 
   loadRecentSalesOrder() {
-    this.salesOrderService.getObjectList().subscribe(response => {
-      this.salesOrders = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.salesOrderService.getObjectList().subscribe(response => {
+        this.salesOrders = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading sales order', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToSalesOrderDetail(objectId: number) {
@@ -189,11 +199,15 @@ export class TransactionsPage implements OnInit {
   /* #region  picking */
 
   loadRecentPicking() {
-    this.pickingService.getObjectList().subscribe(response => {
-      this.pickings = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.pickingService.getObjectList().subscribe(response => {
+        this.pickings = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading picking', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToPickingDetail(objectId: number) {
@@ -210,11 +224,15 @@ export class TransactionsPage implements OnInit {
   /* #region  packing */
 
   loadRecentPacking() {
-    this.packingService.getObjectList().subscribe(response => {
-      this.packings = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.packingService.getObjectList().subscribe(response => {
+        this.packings = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading packing', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToPackingDetail(objectId: number) {
@@ -231,11 +249,15 @@ export class TransactionsPage implements OnInit {
   /* #region  other-sales */
 
   loadRecentConsignmentSales() {
-    this.consignmentSalesService.getObjectList().subscribe(response => {
-      this.consignment_sales = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.consignmentSalesService.getObjectList().subscribe(response => {
+        this.consignment_sales = response.slice(0, 3);
+      }, error => {
+        console.log(error);
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading consignment sales', '', 'top', 'danger', 1000);
+    }
   }
 
   goToConsignmentSalesDetail(objectId: number) {

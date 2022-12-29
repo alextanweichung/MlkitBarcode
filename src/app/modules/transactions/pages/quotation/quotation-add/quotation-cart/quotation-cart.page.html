@@ -151,18 +151,18 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Unit Price</p></ion-label>
-            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)"></ion-input>
-            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)"></ion-input>
+            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [readonly]='restrictTrxFields["unitPrice"]'></ion-input>
+            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [readonly]='restrictTrxFields["unitPriceExTax"]'></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
-            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)">
+            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]='restrictTrxFields["discountGroupCode"]'>
               <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Expression</p></ion-label>
-            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression"></ion-input>
+            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression" [readonly]='restrictTrxFields["discountExpression"]'></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Amount</p></ion-label>

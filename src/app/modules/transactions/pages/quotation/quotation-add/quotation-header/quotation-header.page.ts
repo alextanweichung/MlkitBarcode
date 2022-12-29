@@ -4,6 +4,7 @@ import { ActionSheetController, NavController } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -27,9 +28,11 @@ export class QuotationHeaderPage implements OnInit {
   constructor(
     private authService: AuthService,
     private quotationService: QuotationService,
+    private toastService: ToastService,
     private navController: NavController,
     private formBuilder: FormBuilder,
-    private actionSheetController: ActionSheetController) 
+    private actionSheetController: ActionSheetController
+  ) 
   {
     this.newForm();
   }
@@ -128,15 +131,19 @@ export class QuotationHeaderPage implements OnInit {
   currencyMasterList: MasterListDetails[] = [];
   shipMethodMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.quotationService.getMasterList().subscribe(response => {
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.setDefaultValue();
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getMasterList().subscribe(response => {
+        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.setDefaultValue();
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading master list', '', 'top', 'dagner', 1000);
+    }
   }
 
   customers: Customer[] = [];
@@ -158,7 +165,7 @@ export class QuotationHeaderPage implements OnInit {
     })
   }
 
-  setDefaultValue() {    
+  setDefaultValue() {
     let defaultShipMethod = this.shipMethodMasterList.find(r => r.isPrimary);
     if (defaultShipMethod) {
       this.objectForm.patchValue({ shipMethodId: defaultShipMethod.id });

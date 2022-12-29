@@ -69,32 +69,32 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                         throw modalStateErrors.flat();
 
                      } else {                        
-                        this.toastService.presentToast('Error', 'Bad request error', 'middle', 'danger', 2000);
+                        this.toastService.presentToast('Bad request error', error.status + ':' + error.statusText, 'top', 'danger', 2000);
                         // this.messageService.add({ severity: 'error', summary: 'Bad request error', detail: error.status + ':' + error.statusText });
                      }
                      break;
                   case 401:
                      if (error.error.description) {
-                        this.toastService.presentToast('Error', 'Unauthorised', 'middle', 'danger', 2000);
+                        this.toastService.presentToast('Unauthorised', error.error.description, 'top', 'danger', 2000);
                         // this.messageService.add({ severity: 'error', summary: 'Unauthorised', detail: error.error.description });
                      } else {
-                        this.toastService.presentToast('Error', 'Unauthorised', 'middle', 'danger', 2000);
+                        this.toastService.presentToast('Unauthorised', error.status + ':' + error.statusText, 'top', 'danger', 2000);
                         // this.messageService.add({ severity: 'error', summary: 'Unauthorised', detail: error.status + ':' + error.statusText });
                      }
                      break;
                   case 404:
                      //this.router.navigateByUrl('/not-found');
-                     this.toastService.presentToast('Error', 'No result', 'middle', 'danger', 2000);
+                     this.toastService.presentToast('No result', 'Resources not found.', 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'custom', summary: 'No result', detail: "Resources not found." });
                      break;
                   case 500:
                      //const navigationExtras: NavigationExtras = {state: {error: error.error}}
                      //this.router.navigateByUrl('/error', navigationExtras);
-                     this.toastService.presentToast('Error', 'Internal server error 500', 'middle', 'danger', 2000);
+                     this.toastService.presentToast('Error', error.error.message, 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'error', summary: 'Internal server error 500', detail: error.error.message });
                      break;
                   default:
-                     this.toastService.presentToast('Error', 'Something went wrong', 'middle', 'danger', 2000);
+                     this.toastService.presentToast('Error', 'Something went wrong', 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'error', summary: 'Something went wrong' });
                      console.log(error);
                      break;

@@ -43,11 +43,15 @@ export class QuotationPage implements OnInit {
   /* #region  crud */
 
   loadObjects() {
-    this.quotationService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
-      this.objects = response;
-    }, error => {
-      console.log((error));
-    })
+    try {
+      this.quotationService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+        this.objects = response;
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+    }
   }
 
   /* #endregion */

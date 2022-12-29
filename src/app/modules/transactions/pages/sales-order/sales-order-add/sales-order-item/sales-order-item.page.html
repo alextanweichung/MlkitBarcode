@@ -13,15 +13,8 @@
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <!-- <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Item Catalog</ion-label>
-    </ion-toolbar>
-  </ion-header> -->
   <div class="p-2">
-
-    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage"></app-item-catalog>
-
+    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="true"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
@@ -29,7 +22,7 @@
     <ion-row>
       <ion-col>
         <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-          Confirm
+          View Cart ({{itemInCart.length|number:'1.0'}})
         </ion-button>
       </ion-col>
     </ion-row>

@@ -8,13 +8,17 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'approvals',
-        loadChildren: () => import('../approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule)
-      },
-      {
         path: '',
         redirectTo: 'approvals',
         pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        loadChildren: () => import('../secure/home/home.module').then(m => m.HomePageModule)
+      },
+      {
+        path: 'approvals',
+        loadChildren: () => import('../approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule)
       },
       {
         path: 'transactions',

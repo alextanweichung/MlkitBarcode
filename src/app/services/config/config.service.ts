@@ -37,7 +37,7 @@ export class ConfigService {
       }
     });
   }
-
+  
   async load() {
     if (Capacitor.getPlatform() === 'web') {
       this.sys_parameter = {

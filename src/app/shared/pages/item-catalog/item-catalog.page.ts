@@ -3,10 +3,12 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { format } from 'date-fns';
 import { ItemImage } from 'src/app/modules/transactions/models/item';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterList } from '../../models/master-list';
 import { MasterListDetails } from '../../models/master-list-details';
+import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
@@ -26,14 +28,17 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   @Input() isItemPriceTaxInclusive: boolean;
   @Input() maxPrecision: number;
   @Input() showImage: boolean = false;
+  @Input() isSalesOrder: boolean = false;
 
   brandMasterList: MasterListDetails[] = [];
   groupMasterList: MasterListDetails[] = [];
   categoryMasterList: MasterListDetails[] = [];
+  salesOrderQuantityControl: string;
 
   @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
 
   constructor(
+    private authService: AuthService,
     private searchItemService: SearchItemService,
     private commonService: CommonService,
     private configService: ConfigService,
@@ -41,17 +46,32 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.showImage) {
-      if (this.showImage) {
-        this.loadImages();
-      }
-    }
+    // if (changes.showImage) {
+    //   if (this.showImage) {
+    //     this.loadImages();
+    //   }
+    // }
   }
 
   ngOnInit() {
     this.brandMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.groupMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.categoryMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    if (this.isSalesOrder) {
+      this.loadModuleControl();
+    }
+  }
+
+  moduleControl: ModuleControl[] = [];
+  loadModuleControl() {
+    this.authService.moduleControlConfig$.subscribe(obj => {
+      this.moduleControl = obj;
+      let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
+      if (salesOrderQuantityControl) {
+        this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
+        console.log("🚀 ~ file: item-catalog.page.ts:72 ~ ItemCatalogPage ~ loadModuleControl ~ this.salesOrderQuantityControl", this.salesOrderQuantityControl)
+      }
+    })
   }
 
   /* #region  search item */
@@ -65,22 +85,22 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   searchItem() {
-    if (this.itemSearchText && this.itemSearchText.trim().length > 2) {
+    let searchText = this.itemSearchText;
+    this.itemSearchText = '';
+    if (searchText && searchText.trim().length > 2) {
       if (Capacitor.getPlatform() !== 'web') {
         Keyboard.hide();
       }
       // if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
         // online mode
-        this.searchItemService.getItemInfoByKeyword(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
+        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
           this.availableItems = response;
           this.availableItems.forEach(r =>
             this.assignLineUnitPrice(r)
           )
           this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
         })
-        if (this.showImage) {
-          this.loadImages();
-        }
+        this.loadImages(searchText);
       // } else {
       //   // offline mode, search item from local item master and item barcode
       // }
@@ -90,8 +110,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     this.onBrowseModeChanged();
   }
 
-  loadImages() {
-    this.searchItemService.getItemImageFile(this.itemSearchText).subscribe(response => {
+  loadImages(searchText) {
+    this.searchItemService.getItemImageFile(searchText).subscribe(response => {
       this.availableImages = response;
     }, error => {
       console.log(error);
@@ -159,7 +179,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   increaseQty(data: TransactionDetail) {
-    data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+    data.qtyRequest = (data.qtyRequest ?? 0) + 1;    
   }
 
   addToCart(data: TransactionDetail) {

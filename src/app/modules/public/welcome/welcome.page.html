@@ -8,9 +8,8 @@
     <ng-template swiperSlide>
       <ion-img src="../../../../assets/idcp/logo-idcp.svg" class="animate__animated animate__fadeInDown" alt="iDCP Logo"></ion-img>
       <h3>Apps Activation</h3>
-      <ion-item>
-        <!-- <ion-label color="tertiary" position="stacked">Activation Code</ion-label> -->
-        <ion-input [(ngModel)]="activationCode" autocomplete="off" placeholder="Activation Code"></ion-input>
+      <ion-item lines="none">
+        <ion-input class="ion-flex text-align-center" #inoput [(ngModel)]="activationCode" autocomplete="off" placeholder="Enter 6-digit Code" oninput="this.value = this.value.toUpperCase()" (ionFocus)="highlight(inoput)" [maxlength]="6"></ion-input>
       </ion-item>
     </ng-template>
   </swiper>
