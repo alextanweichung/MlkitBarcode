@@ -33,7 +33,7 @@ export class AppComponent {
     this.platform.ready().then(async () => {
 
       if (this.configService.sys_parameter) {
-        // this.navController.navigateRoot('/signin');
+        this.navController.navigateRoot('/signin');
       } else {
         this.navController.navigateRoot('/welcome');
       }

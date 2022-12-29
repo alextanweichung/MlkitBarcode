@@ -6,16 +6,17 @@
       <p class="animate__animated animate__fadeInUp">Initial Setup. Press next to insert activation code.</p>
     </ng-template>
     <ng-template swiperSlide>
-      <ion-img src="../../../../assets/idcp/logo-idcp.svg" class="animate__animated animate__fadeInDown" alt="iDCP Logo"></ion-img>
+      <ion-img *ngIf="showImage" src="../../../../assets/idcp/logo-idcp.svg" class="animate__animated animate__fadeInDown" alt="iDCP Logo"></ion-img>
       <h3>Apps Activation</h3>
       <ion-item lines="none">
-        <ion-input class="ion-flex text-align-center" #inoput [(ngModel)]="activationCode" autocomplete="off" placeholder="Enter 6-digit Code" oninput="this.value = this.value.toUpperCase()" (ionFocus)="highlight(inoput)" [maxlength]="6"></ion-input>
+        <!-- <ion-input class="ion-flex text-align-center" #inoput [(ngModel)]="activationCode" autocomplete="off" placeholder="Enter 6-digit Code" (ionChange)="uppercase(activationCode)" (ionFocus)="highlight(inoput)" [maxlength]="6"></ion-input> -->
+        <input class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="activationCode" placeholder="Enter 6-digit Code" oninput="this.value = this.value.toUpperCase()" maxlength="6">
       </ion-item>
     </ng-template>
   </swiper>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0">
   <ion-button class="ion-margin" expand="block" (click)="nextSlide()" *ngIf="!last_slide">
     Next
   </ion-button>

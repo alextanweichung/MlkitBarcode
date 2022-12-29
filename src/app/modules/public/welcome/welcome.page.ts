@@ -7,6 +7,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { NavController } from '@ionic/angular';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-welcome',
@@ -18,6 +19,7 @@ export class WelcomePage implements OnInit, AfterContentChecked {
 
   language: string = '';
   last_slide: boolean = false;
+  showImage: boolean = true;
 
   @ViewChild('swiper') swiper: SwiperComponent;
 
@@ -36,7 +38,13 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit() {
+    Keyboard.addListener('keyboardWillShow', () => {
+      this.showImage = false;
+    })
 
+    Keyboard.addListener('keyboardWillHide', () => {
+      this.showImage = true;
+    })
   }
 
   ngAfterContentChecked(): void {
@@ -58,6 +66,10 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   // Last slide trigger
   onLastSlide() {
     this.last_slide = true;
+  }
+
+  uppercase(code: string) {
+    this.activationCode = code.toUpperCase();
   }
 
   highlight(event) {
