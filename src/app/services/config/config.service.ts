@@ -72,7 +72,9 @@ export class ConfigService {
 
   async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
+    console.log('done sync item master')
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
+    console.log('done sync item barcode')
     try {
       let obj = this.sys_parameter;
       obj.lastDownloadAt = new Date;

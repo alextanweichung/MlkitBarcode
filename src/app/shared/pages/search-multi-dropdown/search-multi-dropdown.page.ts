@@ -1,6 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
 import { IonSearchbar, LoadingController } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
 
@@ -30,19 +28,24 @@ export class SearchMultiDropdownPage implements OnInit {
   ngOnInit() {
   }
 
-  async searchItem(event) {
-    if (event.detail.value) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
+  searchText: string = '';
+  async keypress(event) {
+    if (event.keyCode === 13) {
+      if (this.searchText.length > 0) {
+        await this.showLoading();
+        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
+        await this.hideLoading();
+      } else {
+        this.tempDropdownList = this.searchDropdownList;
       }
-      await this.showLoading();
-      this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(event.detail.value.toLowerCase()) || r.description.toLowerCase().includes(event.detail.value.toLowerCase()));
-      await this.hideLoading();
     } else {
       this.tempDropdownList = this.searchDropdownList;
     }
+    // this.searchBar.setFocus();
+  }
 
-    this.searchBar.setFocus();
+  resetFilter() {
+    this.tempDropdownList = this.searchDropdownList;
   }
   
   itemChecked(event, object: SearchDropdownList) {

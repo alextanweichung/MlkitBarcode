@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -29,7 +29,8 @@ export class SigninPage implements OnInit {
     private configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
-    private navController: NavController
+    private navController: NavController,
+    private loadingController: LoadingController
   ) { 
     this.currentVersion = environment.version;
   }
@@ -48,16 +49,25 @@ export class SigninPage implements OnInit {
 
   // Sign in
   async signIn() {
-    this.submit_attempt = true;
+    this.submit_attempt = true;  
+    // Loading overlay
+    const loading = await this.loadingController.create({
+      cssClass: 'default-loading',
+      message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
+      spinner: 'crescent'
+    });
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
-    } else {      
+    } else {
       let loginModel: LoginRequest = this.signin_form.value;
-      (await this.authService.signIn(loginModel)).subscribe(async response => {        
-        await this.navController.navigateRoot('/home');
+      (await this.authService.signIn(loginModel)).subscribe(async response => {
+        await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           try {
+
+            await loading.present();
+
             let itemMasterCount = (await this.configService.loadItemMaster())?.length;
             let itemBarcodeCount = (await this.configService.loadItemBarcode())?.length;
             if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0 || !itemBarcodeCount || itemBarcodeCount === undefined || itemBarcodeCount === 0) {
@@ -67,7 +77,14 @@ export class SigninPage implements OnInit {
                 await this.configService.syncInboundData(itemMaster, itemBarcode);
               })
             }
+
+            // Fake timeout
+            setTimeout(() => {
+              loading.dismiss();
+            }, 2000);
+            
           } catch (error) {
+            loading.dismiss();
             this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
           }
         }

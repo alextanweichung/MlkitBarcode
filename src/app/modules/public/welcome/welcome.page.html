@@ -10,7 +10,7 @@
       <h3>Apps Activation</h3>
       <ion-item lines="none">
         <!-- <ion-input class="ion-flex text-align-center" #inoput [(ngModel)]="activationCode" autocomplete="off" placeholder="Enter 6-digit Code" (ionChange)="uppercase(activationCode)" (ionFocus)="highlight(inoput)" [maxlength]="6"></ion-input> -->
-        <input class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="activationCode" placeholder="Enter 6-digit Code" oninput="this.value = this.value.toUpperCase()" maxlength="6">
+        <input class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" (keypress)="onKeyPress($event)" [(ngModel)]="activationCode" placeholder="Enter 6-digit Code" oninput="this.value = this.value.toUpperCase()" maxlength="6">
       </ion-item>
     </ng-template>
   </swiper>

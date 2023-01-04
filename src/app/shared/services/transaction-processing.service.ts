@@ -25,7 +25,7 @@ export class TransactionProcessingService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }  
 
-  getDocumentCount(){
+  getDocumentCount() {
     return this.http.get<TransactionProcessingCount>(this.baseUrl + this.apiObject + '/count');
   }
 

@@ -38,6 +38,16 @@ const routes: Routes = [
 
 
 
+  // dashboard  
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./modules/dashboard/pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
+  },
+
+
+
+
+
   
   // management
   {
