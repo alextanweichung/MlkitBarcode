@@ -191,7 +191,7 @@ export class CheckBalancePage implements OnInit {
                 total += rrr.qty
               })
             })
-            if (total !== 0) {
+            if (total === 0) {
               locationIds.push(this.inventoryLevelVariation[index].locationId);
             }
           }
@@ -199,6 +199,7 @@ export class CheckBalancePage implements OnInit {
             temp.splice(temp.findIndex(rr => rr.locationId === r), 1);
           })
           this.inventoryLevelVariation = [...temp];
+          console.log("🚀 ~ file: check-balance.page.ts:202 ~ CheckBalancePage ~ this.checkBalanceService.getInventoryLevelByVariation ~ this.inventoryLevelVariation", this.inventoryLevelVariation)
         }
         // variation x, y filter
         if (this.selectedVariationX !== 'all') {

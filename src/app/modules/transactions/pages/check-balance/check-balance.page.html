@@ -17,7 +17,7 @@
       <app-search-dropdown title="Item" [showHeaderLabel]="false" [showCode]="true" optionValue="code" [searchDropdownList]="itemSearchDropdownList" (onActionComplete)="onItemChanged($event)"></app-search-dropdown>
       <ion-item *ngIf="itemInfo">
         <ion-label position="fixed">View By</ion-label>
-        <ion-segment [(ngModel)]="selectedViewOptions" [disabled]="itemInfo?.variationTypeCode !== '1' && itemInfo?.variationTypeCode !== '2'">
+        <ion-segment [(ngModel)]="selectedViewOptions" [disabled]="itemInfo?.variationTypeCode !== '1' && itemInfo?.variationTypeCode !== '2'" (ionChange)="advancedFilter()">
           <ion-segment-button value="item">
             <ion-label>Item</ion-label>
           </ion-segment-button>
