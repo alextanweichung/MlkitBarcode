@@ -56,6 +56,10 @@ export class PickingItemPage implements OnInit {
       if (loadImage) {
         this.loadImage = loadImage === '1' ? true : false;
       }
+      let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
+      if (ignoreCheckdigit != undefined) {
+        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+      }
     }, error => {
       console.log(error);
     })
@@ -107,9 +111,6 @@ export class PickingItemPage implements OnInit {
 
   async validateBarcode(barcode: string) {
     if (barcode) {
-      if (barcode && barcode.length > 12) {
-        barcode = barcode.substring(0, 12);
-      }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
@@ -247,6 +248,7 @@ export class PickingItemPage implements OnInit {
         if (result.hasContent) {
           let barcode = result.content;
           this.scanActive = false;
+          barcode = this.manipulateBarcodeCheckDigit(barcode);
           await this.validateBarcode(barcode);
         }
       }
@@ -266,6 +268,18 @@ export class PickingItemPage implements OnInit {
         }
       }
     }
+  }
+
+  systemWideEAN13IgnoreCheckDigit: boolean = false;
+  manipulateBarcodeCheckDigit(itemBarcode: string) {
+    if (itemBarcode) {
+      if (this.systemWideEAN13IgnoreCheckDigit) {
+        if (itemBarcode.length == 13) {
+          itemBarcode = itemBarcode.substring(0, itemBarcode.length - 1);
+        }
+      }
+    }
+    return itemBarcode;
   }
 
   async checkPermission() {
