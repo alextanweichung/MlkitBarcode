@@ -75,9 +75,11 @@ export class SigninPage implements OnInit {
                 let itemMaster: PDItemMaster[] = response['itemMaster'];
                 let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
                 await this.configService.syncInboundData(itemMaster, itemBarcode);
+                await this.configService.loadItemMaster();
+                await this.configService.loadItemBarcode();
               })
             }
-
+            
             // Fake timeout
             setTimeout(() => {
               loading.dismiss();

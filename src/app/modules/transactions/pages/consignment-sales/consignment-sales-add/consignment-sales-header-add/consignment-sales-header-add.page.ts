@@ -30,8 +30,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
-      otherSalesId: [0],
-      otherSalesNum: [null],
+      consignmentSalesId: [0],
+      consignmentSalesNum: [null],
       trxDate: [null, [Validators.required]],
       customerId: [null],
       locationId: [null],
@@ -119,10 +119,10 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
       if (lookupValue) {
         this.objectForm.patchValue({ customerId: lookupValue.id });
         this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
-        // let selectedCustomerLocationList: MasterListDetails[] = [];
-        // if (lookupValue.attributeArray1.length > 0) {
-        //   selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
-        // }
+        let selectedCustomerLocationList: MasterListDetails[] = [];
+        if (lookupValue.attributeArray1.length > 0) {
+          selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
+        }
         this.objectForm.patchValue({
           salesAgentId: parseFloat(lookupValue.attribute1),
           currencyId: parseFloat(lookupValue.attribute4),
@@ -135,17 +135,17 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
           this.objectForm.controls.toLocationId.clearValidators();
           this.objectForm.controls.toLocationId.updateValueAndValidity();
         }
-        // if (lookupValue.attributeArray1.length == 1) {
-        //   this.objectForm.patchValue({ toLocationId: selectedCustomerLocationList[0].id });
-        // }
+        if (lookupValue.attributeArray1.length == 1) {
+          this.objectForm.patchValue({ toLocationId: selectedCustomerLocationList[0].id });
+        }
         this.locationSearchDropdownList = [];
-        // selectedCustomerLocationList.forEach(r => {
-        //   this.locationSearchDropdownList.push({
-        //     id: r.id,
-        //     code: r.code,
-        //     description: r.description
-        //   })
-        // })
+        selectedCustomerLocationList.forEach(r => {
+          this.locationSearchDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+          })
+        })
       }
     }
   }
@@ -203,7 +203,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
       if (response) { // todo : remove this as in future same criteria will only have 1 record or none.        
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: response.header.otherSalesId
+            objectId: response.header.consignmentSalesId
           }
         }
         this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);

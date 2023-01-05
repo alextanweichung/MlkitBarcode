@@ -314,11 +314,11 @@ export class PickingItemPage implements OnInit {
         buttons: [
           {
             text: 'Cancel',
-            role: 'cancel'
+            role: 'cancel',
+            cssClass: 'cancel',
           },
           {
-            text: 'OK',
-            role: 'confirm',
+            text: 'Confirm',
             cssClass: 'success',
             handler: async () => {
               await this.insertPicking(soLines);

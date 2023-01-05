@@ -104,7 +104,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     } else {
       this.object.details.forEach(r => r.sequence += 1);
       trxLine.lineId = 0;
-      trxLine.headerId = this.object.header.otherSalesId;
+      trxLine.headerId = this.object.header.consignmentSalesId;
       trxLine.qtyRequest = 1;
       trxLine.locationId = this.object.header.toLocationId;
       trxLine.sequence = 0;
@@ -364,17 +364,20 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     if (this.object.details.length > 0) {
       const alert = await this.alertController.create({
         header: 'Are you sure to proceed?',
+        cssClass: 'custom-alert',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
             text: 'OK',
+            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.updateObject();
             },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
           },
         ],
       });
@@ -385,6 +388,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   }
 
   updateObject() {
+    console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:390 ~ ConsignmentSalesItemEditPage ~ this.consignmentSalesService.updateObject ~ this.object", JSON.stringify(this.object))
     this.consignmentSalesService.updateObject(this.object).subscribe(response => {
       if (response.status === 204) {
         this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'top', 'success', 1000);

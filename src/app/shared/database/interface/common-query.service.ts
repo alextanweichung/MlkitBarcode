@@ -319,12 +319,18 @@ export class CommonQueryService<T> {
           sqlParams.split(',')
         )
       });
+      statements.push({
+        statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
+        values: []
+      })
       console.log("🚀 ~ file: common-query.service.ts:300 ~ CommonQueryService<T> ~ syncInboundData ~ statements", JSON.stringify(statements))
-      console.log(new Date());
+      let timestart = new Date();
       await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let ret: any = await db.executeSet(statements, true);
       }, dbConfig.inbounddb)
       console.log(new Date());
+      let timeend = new Date();
+      this.toastService.presentToast(`table ${table}`, (timeend.getTime() - timestart.getTime()).toString(), 'top', 'success', 1000);
     }
   }
 

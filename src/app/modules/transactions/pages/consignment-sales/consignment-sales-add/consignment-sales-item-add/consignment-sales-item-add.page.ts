@@ -327,17 +327,20 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     if (this.objectDetail.length > 0) {
       const alert = await this.alertController.create({
         header: 'Are you sure to proceed?',
+        cssClass: 'custom-alert',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
             text: 'OK',
+            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.insertConsignmentSales();
             },
+          },
+          {
+            text: 'Cancel',
+            cssClass: 'cancel',
+            role: 'cancel'
           },
         ],
       });
@@ -354,7 +357,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     }
     this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
       let css: ConsignmentSalesSummary = {
-        otherSalesNum: response.body["header"]["otherSalesNum"],
+        consignmentSalesNum: response.body["header"]["consignmentSalesNum"],
         customerId: response.body["header"]["customerId"],
         toLocationId: response.body["header"]["toLocationId"],
         trxDate: response.body["header"]["trxDate"]

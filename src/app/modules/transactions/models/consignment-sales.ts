@@ -1,8 +1,8 @@
 import { TransactionDetail } from "src/app/shared/models/transaction-detail"
 
 export interface ConsignmentSalesList {
-  otherSalesId: number
-  otherSalesNum: string
+  consignmentSalesId: number
+  consignmentSalesNum: string
   trxDate: Date
   customerName: string
   locationDesc: string
@@ -16,8 +16,8 @@ export interface ConsignmentSalesRoot {
 }
 
 export interface ConsignmentSalesHeader {
-  otherSalesId: number
-  otherSalesNum: string
+  consignmentSalesId: number
+  consignmentSalesNum: string
   trxDate: Date
   trxDateTime: Date
   customerId?: number
@@ -37,7 +37,7 @@ export interface ConsignmentSalesHeader {
 }
 
 export interface ConsignmentSalesSummary {
-  otherSalesNum: string
+  consignmentSalesNum: string
   customerId: number
   toLocationId: number
   trxDate: Date

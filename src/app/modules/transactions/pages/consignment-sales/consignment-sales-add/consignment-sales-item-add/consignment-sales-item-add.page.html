@@ -28,7 +28,7 @@
               <ion-col class="ion-margin-auto" *ngIf="!objectHeader.isDisplayTaxInclusive">
                 <p class="ion-text-right">{{line.unitPriceExTax|number:(objectHeader.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</p>
               </ion-col>
-              <ion-col size="1" class="ion-margin-auto">
+              <ion-col size="2" class="ion-margin-auto">
                 <ion-button fill="clear" color="primary" size="small" (click)="showLineDetails(line)">
                   <ion-icon slot="icon-only" name="create"></ion-icon>
                 </ion-button>
