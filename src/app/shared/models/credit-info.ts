@@ -10,6 +10,7 @@ export interface CreditInfo {
    overdueAmount: number;
    pending: CreditInfoDetails[];
    outstanding: CreditInfoDetails[];
+   overdue: CreditInfoDetails[];
 }
 
 export interface CreditInfoDetails {
@@ -19,4 +20,6 @@ export interface CreditInfoDetails {
    docType: string;
    amount: number;
    routerLink: string;
+   overdueDate?: Date;
+   overdueDay?: number;
 }

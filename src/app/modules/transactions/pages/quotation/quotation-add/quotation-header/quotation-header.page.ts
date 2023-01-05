@@ -5,7 +5,7 @@ import { Customer } from 'src/app/modules/transactions/models/customer';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { CreditInfo } from 'src/app/shared/models/credit-info';
+import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info';
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
@@ -173,7 +173,7 @@ export class QuotationHeaderPage implements OnInit {
   }
 
   selectedCustomerLocationList: MasterListDetails[] = [];
-  creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [] };
+  creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
   availableAddress: ShippingInfo[] = [];
   onCustomerSelected(event) {
     if (event && event !== undefined) {
@@ -241,6 +241,20 @@ export class QuotationHeaderPage implements OnInit {
         }
       }
     }
+  }
+  
+  displayModal: boolean = false;
+  creditInfoType: string = '';
+  tableValue: CreditInfoDetails[] = [];
+  displayDetails(tableValue: CreditInfoDetails[], infoType: string){
+    this.displayModal = true;
+    this.creditInfoType = infoType;
+    this.tableValue = [];
+    this.tableValue = [...tableValue];
+  }
+
+  hideItemModal() {
+    this.displayModal = false;
   }
 
   async cancelInsert() {
