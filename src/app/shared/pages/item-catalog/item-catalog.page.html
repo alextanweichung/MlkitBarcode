@@ -2,7 +2,7 @@
 <ion-grid class="ion-no-padding">
   <ion-row>
     <ion-col size="9" class="ion-flex ion-margin-auto">
-      <ion-searchbar #searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionChange)="searchTextChanged()" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
+      <ion-searchbar #searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
     </ion-col>
     <ion-col size="3" class="ion-flex ion-margin-auto justify-content-center">
       <ion-button expand="block" size="default" (click)="searchItem()">Search</ion-button>
