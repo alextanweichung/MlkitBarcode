@@ -7,7 +7,6 @@ import { TransactionDetail } from '../models/transaction-detail';
   providedIn: 'root'
 })
 export class CommonService {
-
   baseUrl: string;
   startDate: Date;
   endDate: Date
@@ -168,6 +167,10 @@ export class CommonService {
       })
     }
     return inputObject;
+  }
+  
+  toFirstCharLowerCase(str: string){
+    return str.charAt(0).toLowerCase() + str.slice(1);
   }
 
   computeUnitPriceExTax(trxLine: any, useTax: boolean, roundingPrecision: number) {

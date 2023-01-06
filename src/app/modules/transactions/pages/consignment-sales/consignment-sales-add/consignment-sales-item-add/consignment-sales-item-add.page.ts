@@ -29,6 +29,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   moduleControl: ModuleControl[] = [];
   allowModifyItemInfo: boolean = true;
   useTax: boolean = true;
+  systemWideEAN13IgnoreCheckDigit: boolean = false;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   maxPrecision: number = 2;
@@ -59,6 +60,10 @@ export class ConsignmentSalesItemAddPage implements OnInit {
       let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
       if (SystemWideActivateTaxControl != undefined) {
         this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+      }
+      let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
+      if (ignoreCheckdigit != undefined) {
+        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
     })
     this.authService.precisionList$.subscribe(precision => {
@@ -118,7 +123,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
           }
           this.addItemToLine(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       } else {
 
@@ -156,7 +161,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.objectDetail.splice(index, 1);
-              this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -168,7 +173,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -177,53 +182,17 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   /* #region  barcode scanner */
 
   scanActive: boolean = false;
-  async startScanning() {
-    const allowed = await this.checkPermission();
-    if (allowed) {
-      this.scanActive = true;
+  onCameraStatusChanged(event) {
+    this.scanActive = event;
+    if (this.scanActive) {
       document.body.style.background = "transparent";
-      const result = await BarcodeScanner.startScan();
-      if (result.hasContent) {
-        let barcode = result.content;
-        this.scanActive = false;
-        await this.validateBarcode(barcode);
-      }
     }
   }
 
-  async checkPermission() {
-    return new Promise(async (resolve) => {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        resolve(true);
-      } else if (status.denied) {
-        const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
-          buttons: [
-            {
-              text: "No",
-              role: "cancel"
-            },
-            {
-              text: "Open Settings",
-              handler: () => {
-                BarcodeScanner.openAppSettings();
-                resolve(false);
-              }
-            }
-          ]
-        })
-        await alert.present();
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  stopScanner() {
-    BarcodeScanner.stopScan();
-    this.scanActive = false;
+  async onDoneScanning(event) {
+    if (event) {
+      await this.validateBarcode(event);
+    }
   }
 
   /* #endregion */
@@ -327,23 +296,26 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     if (this.objectDetail.length > 0) {
       const alert = await this.alertController.create({
         header: 'Are you sure to proceed?',
+        cssClass: 'custom-alert',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
             text: 'OK',
+            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.insertConsignmentSales();
             },
           },
+          {
+            text: 'Cancel',
+            cssClass: 'cancel',
+            role: 'cancel'
+          },
         ],
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 
@@ -354,13 +326,13 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     }
     this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
       let css: ConsignmentSalesSummary = {
-        otherSalesNum: response.body["header"]["otherSalesNum"],
+        consignmentSalesNum: response.body["header"]["consignmentSalesNum"],
         customerId: response.body["header"]["customerId"],
         toLocationId: response.body["header"]["toLocationId"],
         trxDate: response.body["header"]["trxDate"]
       }
       this.consignmentSalesService.setSummary(css);
-      this.toastService.presentToast('Insert Complete', 'New Consignment Sales has been added', 'middle', 'success', 1000);
+      this.toastService.presentToast('Insert Complete', 'New Consignment Sales has been added', 'top', 'success', 1000);
       this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-summary');
     }, error => {
       console.log(error);

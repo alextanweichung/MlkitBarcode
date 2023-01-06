@@ -9,6 +9,7 @@ import { ItemPageRoutingModule } from './picking-item-routing.module';
 import { PickingItemPage } from './picking-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
+import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-fl
     IonicModule,
     ItemPageRoutingModule,
     BarcodeScanInputPageModule,
-    ItemAddListFlatPageModule
+    ItemAddListFlatPageModule,
+    CameraScanInputPageModule
   ],
   declarations: [PickingItemPage]
 })

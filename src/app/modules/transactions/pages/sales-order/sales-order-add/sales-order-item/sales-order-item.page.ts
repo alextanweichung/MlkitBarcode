@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
+import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
@@ -60,7 +61,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
     this.loadFullItemList();
     this.loadPromotion();
   }
-  
+
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
@@ -70,21 +71,29 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
       if (SystemWideActivateTaxControl != undefined) {
         this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
+      let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
+      if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
+        this.configSalesActivatePromotionEngine = true;
+      } else {
+        this.configSalesActivatePromotionEngine = false;
+      }
     }, error => {
       console.log(error);
     })
-    this.authService.precisionList$.subscribe(precision =>{
+    this.authService.precisionList$.subscribe(precision => {
       this.precisionSales = precision.find(x => x.precisionCode == "SALES");
       this.precisionTax = precision.find(x => x.precisionCode == "TAX");
     })
   }
 
+  fullMasterList: MasterList[] = [];
   customerMasterList: MasterListDetails[] = [];
   discountGroupMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.salesOrderService.getMasterList().subscribe(response => {
+      this.fullMasterList = response;
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -143,15 +152,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
       await this.computeAllAmount(this.itemInCart[0]);
       await this.assignSequence();
     }
-  }
-
-  async onItemInCartEditCompleted(event: TransactionDetail) {
-    await this.computeAllAmount(event);
-  }
-
-  async onItemInCartDeleteCompleted(event: TransactionDetail[]) {
-    this.itemInCart = JSON.parse(JSON.stringify(event));
-    await this.assignSequence();
+    this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
   }
 
   assignSequence() {
@@ -162,15 +163,11 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
     })
   }
 
-  /* #region  add item modal */
+  /* #region  toggle show image */
 
-  isModalOpen: boolean = false;
-  showAddItemModal() {
-    this.isModalOpen = true;
-  }
-
-  hideAddItemModal() {
-    this.isModalOpen = false;
+  showImage: boolean = false;
+  toggleShowImage() {
+    this.showImage = !this.showImage;
   }
 
   /* #endregion */
@@ -183,14 +180,13 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
   async computeAllAmount(trxLine: TransactionDetail) {
     await this.computeDiscTaxAmount(trxLine);
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
-      console.log('run promotion engine');
       this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
     }
   }
 
   getVariationSum(trxLine: TransactionDetail) {
     if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
-      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).reduce((a, c) => Number(a) + Number(c));
+      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
     }
   }
 
@@ -233,55 +229,9 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
 
   /* #region  steps */
 
-  async nextStep() {   
-    if (this.itemInCart.length > 0) {
-      const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to proceed?',
-        buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
-            text: 'OK',
-            role: 'confirm',
-            cssClass: 'success',
-            handler: async () => {
-              await this.insertSalesOrder();
-            },
-          },
-        ],
-      });
-      await alert.present();
-    } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
-    }
-  }  
-
-  insertSalesOrder() {
-    let trxDto: SalesOrderRoot = {
-      header: this.objectHeader,
-      details: this.itemInCart      
-    }
-    this.salesOrderService.insertObject(trxDto).subscribe(response => {
-      let details: any[] = response.body["details"];
-      let totalQty: number = 0;
-      details.forEach(e => {
-        totalQty += e.qtyRequest;
-      })
-      let qs: SalesOrderSummary = {
-        salesOrderNum: response.body["header"]["salesOrderNum"],
-        customerName: this.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
-        totalQuantity: totalQty,
-        totalAmount: response.body["header"]["totalGrossAmt"]
-      }
-      this.salesOrderService.setSalesOrderSummary(qs);
-      this.toastService.presentToast('Insert Complete', 'New Sales Order has been added', 'middle', 'success', 1000);
-      this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
-    }, error => {
-      console.log(error);
-    });
+  async nextStep() {
+    this.salesOrderService.setChoosenItems(this.itemInCart);
+    this.navController.navigateForward('/transactions/sales-order/sales-order-cart');
   }
 
   previousStep() {

@@ -74,3 +74,14 @@ app-welcome .swiper-pagination-bullet-active {
 app-welcome ion-footer {
   background: transparent;
 }
+
+input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+}
+
+input[type=text]:focus {
+  border: none;
+  outline: none;
+}

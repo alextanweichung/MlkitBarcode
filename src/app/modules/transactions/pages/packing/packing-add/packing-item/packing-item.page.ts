@@ -25,7 +25,7 @@ export class PackingItemPage implements OnInit {
   objectHeader: GoodsPackingHeader;
   packingSalesOrders: PackingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
-  loadImage: boolean = true;
+  systemWideEAN13IgnoreCheckDigit: boolean = false;
   packingQtyControl: string = "0";
 
   constructor(
@@ -54,10 +54,13 @@ export class PackingItemPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      this.loadImage = false; // this.configService.sys_parameter.loadImage;
       let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
       if (packingControl != undefined) {
         this.packingQtyControl = packingControl.ctrlValue;
+      }
+      let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
+      if (ignoreCheckdigit != undefined) {
+        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
     }, error => {
       console.log(error);
@@ -128,9 +131,6 @@ export class PackingItemPage implements OnInit {
 
   async validateBarcode(barcode: string) {
     if (barcode) {
-      if (barcode && barcode.length > 12) {
-        barcode = barcode.substring(0, 12);
-      }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
@@ -160,7 +160,7 @@ export class PackingItemPage implements OnInit {
           }
           this.addItemToSo(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       }
     }
@@ -173,7 +173,7 @@ export class PackingItemPage implements OnInit {
   selectedSoDetail: PackingSalesOrderDetail;
   async addItemToSo(trxLine: TransactionDetail) {    
     if (this.objectHeader.isWithSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select SO', '', 'middle', 'medium', 1000);
+      this.toastService.presentToast('Please select SO', '', 'top', 'medium', 1000);
       return;
     }
     if (this.objectHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
@@ -183,7 +183,7 @@ export class PackingItemPage implements OnInit {
         this.selectedSo.details[itemIndex].qtyPackedCurrent += 1;
         this.onQtyChanged(this.selectedSo.details[itemIndex].qtyPackedCurrent, this.selectedSoDetail, itemIndex);
       } else {
-        this.toastService.presentToast('Item not found in this SO', '', 'middle', 'medium', 1000);
+        this.toastService.presentToast('Item not found in this SO', '', 'top', 'medium', 1000);
       }
     }
     if (!this.objectHeader.isWithSo) {
@@ -237,7 +237,7 @@ export class PackingItemPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.packingSalesOrders[0].details.splice(index, 1);
-              this.toastService.presentToast('Item removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Item removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -249,7 +249,7 @@ export class PackingItemPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -258,71 +258,17 @@ export class PackingItemPage implements OnInit {
   /* #region  barcode scanner */
 
   scanActive: boolean = false;
-  async startScanning() {
-    if (this.objectHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-        this.scanActive = true;
-        document.body.style.background = "transparent";
-        const result = await BarcodeScanner.startScan();
-        if (result.hasContent) {
-          let barcode = result.content;
-          this.scanActive = false;
-          await this.validateBarcode(barcode);
-        }
-      }
-    } else if (this.objectHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select 1 SO', '', 'middle', 'medium', 1000);
-    }
-
-    if (!this.objectHeader.isWithSo) {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-        this.scanActive = true;
-        document.body.style.background = "transparent";
-        const result = await BarcodeScanner.startScan();
-        if (result.hasContent) {
-          let barcode = result.content;
-          this.scanActive = false;
-          await this.validateBarcode(barcode);
-        }
-      }
+  onCameraStatusChanged(event) {
+    this.scanActive = event;
+    if (this.scanActive) {
+      document.body.style.background = "transparent";
     }
   }
 
-  async checkPermission() {
-    return new Promise(async (resolve) => {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        resolve(true);
-      } else if (status.denied) {
-        const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
-          buttons: [
-            {
-              text: "No",
-              role: "cancel"
-            },
-            {
-              text: "Open Settings",
-              handler: () => {
-                BarcodeScanner.openAppSettings();
-                resolve(false);
-              }
-            }
-          ]
-        })
-        await alert.present();
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  stopScanner() {
-    BarcodeScanner.stopScan();
-    this.scanActive = false;
+  async onDoneScanning(event) {
+    if (event) {
+      await this.validateBarcode(event);
+    }
   }
 
   /* #endregion */
@@ -335,22 +281,22 @@ export class PackingItemPage implements OnInit {
         header: 'Are you sure to proceed?',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
-            text: 'OK',
-            role: 'confirm',
+            text: 'Confirm',
             cssClass: 'success',
             handler: async () => {
               await this.insertPacking(soLines);
             },
           },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'cancel',
+          },
         ],
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 
@@ -403,7 +349,7 @@ export class PackingItemPage implements OnInit {
           trxDate: response.body["header"]["trxDate"]
         }
         this.packingService.setPackingSummary(ps);
-        this.toastService.presentToast('Packing has been added', '', 'middle', 'success', 1000);
+        this.toastService.presentToast('Packing has been added', '', 'top', 'success', 1000);
         this.navController.navigateForward('/transactions/packing/packing-summary');
       }
     }, error => {

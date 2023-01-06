@@ -56,7 +56,7 @@ export class ConsignmentSalesPage implements OnInit {
   async addObject() {
     // let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     // if (salesAgentId === 0 || salesAgentId === undefined) {
-    //   this.toastService.presentToast('Error', 'Sales Agent not set', 'middle', 'danger', 1000);
+    //   this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1000);
     // } else {
       this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
     // }

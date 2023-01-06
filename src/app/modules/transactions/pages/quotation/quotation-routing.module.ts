@@ -17,6 +17,10 @@ const routes: Routes = [
     loadChildren: () => import('./quotation-add/quotation-item/quotation-item.module').then(m => m.QuotationItemPageModule)
   },
   {
+    path: 'quotation-cart',
+    loadChildren: () => import('./quotation-add/quotation-cart/quotation-cart.module').then( m => m.QuotationCartPageModule)
+  },
+  {
     path: 'quotation-summary',
     loadChildren: () => import('./quotation-add/quotation-summary/quotation-summary.module').then(m => m.QuotationSummaryPageModule)
   },
@@ -24,6 +28,7 @@ const routes: Routes = [
     path: 'quotation-detail',
     loadChildren: () => import('./quotation-detail/quotation-detail.module').then( m => m.QuotationDetailPageModule)
   }
+
 ];
 
 @NgModule({

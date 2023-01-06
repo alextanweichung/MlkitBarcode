@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -29,13 +29,13 @@ export class SigninPage implements OnInit {
     private configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
-    private navController: NavController
+    private navController: NavController,
+    private loadingController: LoadingController
   ) { 
     this.currentVersion = environment.version;
   }
 
   ngOnInit() {
-
     // Setup form
     this.signin_form = this.formBuilder.group({
       userEmail: ['', Validators.compose([Validators.email, Validators.required])],
@@ -49,31 +49,25 @@ export class SigninPage implements OnInit {
 
   // Sign in
   async signIn() {
-
-    this.submit_attempt = true;
-
+    this.submit_attempt = true;  
+    // Loading overlay
+    const loading = await this.loadingController.create({
+      cssClass: 'default-loading',
+      message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
+      spinner: 'crescent'
+    });
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
-      this.toastService.presentToast('Error', 'Please input email and password', 'middle', 'danger', 2000);
-
+      this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
     } else {
-
-      // Proceed with loading overlay
-      // const loading = await this.loadingController.create({
-      //   cssClass: 'default-loading',
-      //   message: '<p>Signing in...</p><span>Please be patient.</span>',
-      //   spinner: 'crescent'
-      // });
-      // await loading.present();
-
-      // TODO: Add your sign in logic
-      // ...
-      
       let loginModel: LoginRequest = this.signin_form.value;
-      (await this.authService.signIn(loginModel)).subscribe(async response => {        
-        await this.navController.navigateRoot('/approvals');
+      (await this.authService.signIn(loginModel)).subscribe(async response => {
+        await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           try {
+
+            await loading.present();
+
             let itemMasterCount = (await this.configService.loadItemMaster())?.length;
             let itemBarcodeCount = (await this.configService.loadItemBarcode())?.length;
             if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0 || !itemBarcodeCount || itemBarcodeCount === undefined || itemBarcodeCount === 0) {
@@ -81,20 +75,22 @@ export class SigninPage implements OnInit {
                 let itemMaster: PDItemMaster[] = response['itemMaster'];
                 let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
                 await this.configService.syncInboundData(itemMaster, itemBarcode);
+                await this.configService.loadItemMaster();
+                await this.configService.loadItemBarcode();
               })
             }
+            
+            // Fake timeout
+            setTimeout(() => {
+              loading.dismiss();
+            }, 2000);
+            
           } catch (error) {
-            this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
+            loading.dismiss();
+            this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
           }
         }
       });
-
-      // // Fake timeout
-      // setTimeout(async () => {
-
-      //   // Sign in success
-      // }, 2000);
-
     }
   }
 

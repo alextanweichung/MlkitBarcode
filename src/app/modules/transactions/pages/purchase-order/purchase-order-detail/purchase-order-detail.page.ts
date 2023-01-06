@@ -35,7 +35,7 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.objectId) {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
       this.navController.navigateBack('/transactions')
     } else {
       this.loadMasterList();
@@ -47,22 +47,30 @@ export class PurchaseOrderDetailPage implements OnInit {
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.purchaseOrderService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.purchaseOrderService.getMasterList().subscribe(response => {
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
+    }
   }
 
   loadDetail() {
-    this.purchaseOrderService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
-      this.purchaseOrder = response;
-      this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.purchaseOrder);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.purchaseOrderService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
+        this.purchaseOrder = response;
+        this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.purchaseOrder);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+    }
   }
 
   getFlattenVariations(itemId: number): PurchaseOrderLine[] {

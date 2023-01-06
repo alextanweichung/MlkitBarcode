@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
@@ -116,6 +117,10 @@ export class SalesOrderService {
 
   insertObject(object: SalesOrderRoot) {
     return this.http.post(this.baseUrl + "MobileSalesOrder", object, httpObserveHeader);
+  }
+
+  getCreditInfo(customerId: number) {
+    return this.http.get<CreditInfo>(this.baseUrl + 'MobileSalesOrder/creditInfo/' + customerId);
   }
 
 }

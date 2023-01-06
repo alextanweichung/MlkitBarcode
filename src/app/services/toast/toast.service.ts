@@ -18,6 +18,7 @@ export class ToastService {
           icon = 'checkmark-outline';
           break;
         case 'medium':
+        case 'warning':
           icon = 'information-circle-outline';
           break;
         case 'danger':
@@ -33,7 +34,7 @@ export class ToastService {
       position: position,
       color: color,
       icon: icon,
-      cssClass: 'customToast'
+      // cssClass: 'customToast'
     });
     await toast.present();
   }

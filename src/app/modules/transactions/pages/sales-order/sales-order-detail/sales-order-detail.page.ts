@@ -23,7 +23,8 @@ export class SalesOrderDetailPage implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
-    private salesOrderService: SalesOrderService
+    private salesOrderService: SalesOrderService,
+    private toastService: ToastService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -46,31 +47,43 @@ export class SalesOrderDetailPage implements OnInit {
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
-    this.authService.precisionList$.subscribe(precision =>{
-      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-    })
+    try {
+      this.authService.precisionList$.subscribe(precision => {
+        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
+    }
   }
 
   locationMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.salesOrderService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.salesOrderService.getMasterList().subscribe(response => {
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
+    }
   }
 
   loadObject() {
-    this.salesOrderService.getObjectById(this.objectId).subscribe(response => {
-      this.object = response;
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.salesOrderService.getObjectById(this.objectId).subscribe(response => {
+        this.object = response;
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+    }
   }
 
   matchImage(itemId: number) {

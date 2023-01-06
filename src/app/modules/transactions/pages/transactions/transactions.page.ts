@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { Capacitor } from '@capacitor/core';
 import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentSalesList } from '../../models/consignment-sales';
 import { GoodsPackingList } from '../../models/packing';
@@ -17,12 +16,14 @@ import { PickingService } from '../../services/picking.service';
 import { QuotationService } from '../../services/quotation.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 
-const pageCode: string = 'MATR';
+const transactionPageCode: string = 'MATR';
 const mobileQuotationCode: string = 'MATRQU';
 const mobileSalesOrderCode: string = 'MATRSO';
 const mobilePickingCode: string = 'MATRPI';
 const mobilePackingCode: string = 'MATRPA';
 const mobileConsignmentSalesCode: string = 'MATRCS';
+const mobileInventoryCountCode: string = 'MATRST';
+const mobileInventoryLevelCode: string = 'MATRIL';
 
 @Component({
   selector: 'app-transactions',
@@ -46,6 +47,9 @@ export class TransactionsPage implements OnInit {
   showConsignmentSales: boolean = false;
   consignment_sales: ConsignmentSalesList[] = [];
 
+  showStockCount: boolean = false;
+  showInventoryLevel: boolean = false;
+
   constructor(
     private authService: AuthService,
     private navController: NavController,
@@ -56,30 +60,25 @@ export class TransactionsPage implements OnInit {
     private consignmentSalesService: ConsignmentSalesService,
     private loadingController: LoadingController,
     private commonService: CommonService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
     this.authService.menuModel$.subscribe(obj => {
-      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === pageCode);
+      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
       if (pageItems) {
         this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
         this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
         this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
         this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
         this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
+        this.showStockCount = pageItems.findIndex(r => r.title === mobileInventoryCountCode) > -1;
+        this.showInventoryLevel = pageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
       }
     })
-    this.loadAllRecentList();
+    // this.loadAllRecentList();
   }
-
-  handleRefresh(event) {
-    setTimeout(() => {
-      this.loadAllRecentList();
-      // Any calls to load data go here
-      event.target.complete();
-    }, 2000);
-  };
 
   loadAllRecentList() {
     // quotation
@@ -108,46 +107,18 @@ export class TransactionsPage implements OnInit {
     }
   }
 
-  /* #region  online offline */
-
-  // transactionMode: string = "online";
-  // onTransactionModeChanged(event) {
-  //    if (event.detail.value === 'offline') {
-  //     this.sync();
-  //    }
-  // }
-
-  async sync() {
-    // Loading overlay
-    if (Capacitor.getPlatform() !== 'web') {
-      const loading = await this.loadingController.create({
-        cssClass: 'default-loading',
-        message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
-        spinner: 'crescent'
-      });
-      await loading.present();
-
-      this.commonService.syncInbound().subscribe(async response => {
-        let itemMaster: PDItemMaster[] = response['itemMaster'];
-        let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-        await this.configService.syncInboundData(itemMaster, itemBarcode);
-        loading.dismiss();
-      }, error => {
-        console.log(error);
-      })
-    }
-  }
-
-  /* #endregion */
-
   /* #region  quotation */
 
   loadRecentQuotation() {
-    this.quotationService.getObjectList().subscribe(response => {
-      this.quotations = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getObjectList().subscribe(response => {
+        this.quotations = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading quotation', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToQuotationDetail(objectId: number) {
@@ -164,11 +135,15 @@ export class TransactionsPage implements OnInit {
   /* #region  sales order */
 
   loadRecentSalesOrder() {
-    this.salesOrderService.getObjectList().subscribe(response => {
-      this.salesOrders = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.salesOrderService.getObjectList().subscribe(response => {
+        this.salesOrders = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading sales order', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToSalesOrderDetail(objectId: number) {
@@ -185,11 +160,15 @@ export class TransactionsPage implements OnInit {
   /* #region  picking */
 
   loadRecentPicking() {
-    this.pickingService.getObjectList().subscribe(response => {
-      this.pickings = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.pickingService.getObjectList().subscribe(response => {
+        this.pickings = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading picking', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToPickingDetail(objectId: number) {
@@ -206,11 +185,15 @@ export class TransactionsPage implements OnInit {
   /* #region  packing */
 
   loadRecentPacking() {
-    this.packingService.getObjectList().subscribe(response => {
-      this.packings = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.packingService.getObjectList().subscribe(response => {
+        this.packings = response.slice(0, 3);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading packing', '', 'top', 'danger', 1000);
+    }
   }
 
   async goToPackingDetail(objectId: number) {
@@ -227,11 +210,15 @@ export class TransactionsPage implements OnInit {
   /* #region  other-sales */
 
   loadRecentConsignmentSales() {
-    this.consignmentSalesService.getObjectList().subscribe(response => {
-      this.consignment_sales = response.slice(0, 3);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.consignmentSalesService.getObjectList().subscribe(response => {
+        this.consignment_sales = response.slice(0, 3);
+      }, error => {
+        console.log(error);
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading consignment sales', '', 'top', 'danger', 1000);
+    }
   }
 
   goToConsignmentSalesDetail(objectId: number) {

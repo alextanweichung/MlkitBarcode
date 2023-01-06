@@ -4,8 +4,8 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 import { NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Network } from '@capacitor/network';
 import { ConfigService } from './services/config/config.service';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +42,7 @@ export class AppComponent {
         this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)
         await StatusBar.setStyle({ style: Style.Dark });
+        await BarcodeScanner.checkPermission({ force: true });
       }
 
       // ...

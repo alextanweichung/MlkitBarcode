@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
@@ -37,7 +37,7 @@ export class ConfigService {
       }
     });
   }
-
+  
   async load() {
     if (Capacitor.getPlatform() === 'web') {
       this.sys_parameter = {
@@ -72,7 +72,9 @@ export class ConfigService {
 
   async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
+    console.log('done sync item master')
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
+    console.log('done sync item barcode')
     try {
       let obj = this.sys_parameter;
       obj.lastDownloadAt = new Date;

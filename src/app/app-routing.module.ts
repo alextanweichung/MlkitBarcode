@@ -37,42 +37,61 @@ const routes: Routes = [
 
 
 
-  // approval
+
+  // dashboard  
   {
-    path: 'approvals',
-    loadChildren: () => import('./modules/approvals/pages/approvals/approvals.module').then(m => m.ApprovalsPageModule),
-    // runGuardsAndResolvers: 'always',
-    // canActivate: [AuthGuard, MenuGuard]
+    path: 'dashboard',
+    loadChildren: () => import('./modules/dashboard/pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
   },
-  // approval-quotation
+
+
+
+
+
+  
+  // management
   {
-    path: 'approvals/quotation-reviews',
-    loadChildren: () => import('./modules/approvals/pages/quotation-reviews/quotation-reviews.module').then(m => m.QuotationReviewsPageModule),
-    // runGuardsAndResolvers: 'always',
-    // canActivate: [AuthGuard, MenuGuard]
+    path: 'managements',
+    loadChildren: () => import('./modules/managements/pages/management/management.module').then(m => m.ManagementPageModule)
   },
+  // management-quotation
   {
-    path: 'approvals/quotation-approvals',
-    loadChildren: () => import('./modules/approvals/pages/quotation-approvals/quotation-approvals.module').then(m => m.QuotationApprovalsPageModule)
-  },
-  // approval-sales-order
-  {
-    path: 'approvals/sales-order-reviews',
-    loadChildren: () => import('./modules/approvals/pages/sales-order-reviews/sales-order-reviews.module').then(m => m.SalesOrderReviewsPageModule)
-  },
-  {
-    path: 'approvals/sales-order-approvals',
-    loadChildren: () => import('./modules/approvals/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
-  },
-  // approval-purchase-order  
-  {
-    path: 'approvals/purchase-order-reviews',
-    loadChildren: () => import('./modules/approvals/pages/purchase-order-reviews/purchase-order-reviews.module').then( m => m.PurchaseOrderReviewsPageModule)
+    path: 'managements/quotation-reviews',
+    loadChildren: () => import('./modules/managements/pages/quotation-reviews/quotation-reviews.module').then(m => m.QuotationReviewsPageModule)
   },
   {
-    path: 'approvals/purchase-order-approvals',
-    loadChildren: () => import('./modules/approvals/pages/purchase-order-approvals/purchase-order-approvals.module').then( m => m.PurchaseOrderApprovalsPageModule)
+    path: 'managements/quotation-approvals',
+    loadChildren: () => import('./modules/managements/pages/quotation-approvals/quotation-approvals.module').then(m => m.QuotationApprovalsPageModule)
   },
+  // management-sales-order
+  {
+    path: 'managements/sales-order-reviews',
+    loadChildren: () => import('./modules/managements/pages/sales-order-reviews/sales-order-reviews.module').then(m => m.SalesOrderReviewsPageModule)
+  },
+  {
+    path: 'managements/sales-order-approvals',
+    loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
+  },
+  // management-purchase-order  
+  {
+    path: 'managements/purchase-order-reviews',
+    loadChildren: () => import('./modules/managements/pages/purchase-order-reviews/purchase-order-reviews.module').then( m => m.PurchaseOrderReviewsPageModule)
+  },
+  {
+    path: 'managements/purchase-order-approvals',
+    loadChildren: () => import('./modules/managements/pages/purchase-order-approvals/purchase-order-approvals.module').then( m => m.PurchaseOrderApprovalsPageModule)
+  },
+  // management-otp-configuration
+  {
+    path: 'managements/otp-configuration',
+    loadChildren: () => import('./modules/managements/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
+  },
+  {
+    path: 'managements/otp-config-list',
+    loadChildren: () => import('./modules/managements/pages/otp-configuration/otp-config-list/otp-config-list.module').then( m => m.OtpConfigListPageModule)
+  },
+
+
 
 
 
@@ -132,6 +151,22 @@ const routes: Routes = [
     path: 'transactions/consignment-sales/consignment-sales-detail',
     loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales-detail/consignment-sales-detail.module').then( m => m.ConsignmentSalesDetailPageModule)
   },
+  // transaction-stock-count
+  {
+    path: 'transactions/stock-count',
+    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
+  },
+  {
+    path: 'transactions/stock-count/stock-count-detail',
+    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then( m => m.StockCountDetailPageModule)
+  },
+  // transaction-check-balance
+  {
+    path: 'transactions/check-balance',
+    loadChildren: () => import('./modules/transactions/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
+  },
+
+
 
 
 
@@ -140,29 +175,9 @@ const routes: Routes = [
     path: 'others',
     loadChildren: () => import('./modules/others/pages/others/others.module').then(m => m.OthersPageModule)
   },
-  // others-otp-configuration
-  {
-    path: 'others/otp-configuration',
-    loadChildren: () => import('./modules/others/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
-  },
-  {
-    path: 'others/otp-config-list',
-    loadChildren: () => import('./modules/others/pages/otp-configuration/otp-config-list/otp-config-list.module').then( m => m.OtpConfigListPageModule)
-  },
-  // others-check-balance
-  {
-    path: 'others/check-balance',
-    loadChildren: () => import('./modules/others/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
-  },
-  // others-stock-count
-  {
-    path: 'others/stock-count',
-    loadChildren: () => import('./modules/others/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
-  },
-  {
-    path: 'others/stock-count/stock-count-detail',
-    loadChildren: () => import('./modules/others/pages/stock-count/stock-count-detail/stock-count-detail.module').then( m => m.StockCountDetailPageModule)
-  },
+
+
+
 
 
 
@@ -193,7 +208,7 @@ const routes: Routes = [
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/general-sales/general-sales-list.module').then( m => m.ItemAddListWithVariationPageModule)
+    loadChildren: () => import('./shared/pages/general-sales-list/general-sales-list.module').then( m => m.GeneralSalesListPageModule)
   },
   {
     path: 'item-cart',
@@ -219,6 +234,15 @@ const routes: Routes = [
     path: 'item-view-list-flat',
     loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then( m => m.ItemViewListFlatPageModule)
   },
+  {
+    path: 'item-catalog',
+    loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then( m => m.ItemCatalogPageModule)
+  },  {
+    path: 'camera-scan-input',
+    loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
+  },
+
+
 
 
 

@@ -17,8 +17,8 @@ const routes: Routes = [
     loadChildren: () => import('./sales-order-add/sales-order-item/sales-order-item.module').then( m => m.SalesOrderItemPageModule)
   },
   {
-    path: 'sales-order-confirmation',
-    loadChildren: () => import('./sales-order-add/sales-order-confirmation/sales-order-confirmation.module').then( m => m.SalesOrderConfirmationPageModule)
+    path: 'sales-order-cart',
+    loadChildren: () => import('./sales-order-add/sales-order-cart/sales-order-cart.module').then( m => m.SalesOrderCartPageModule)
   },
   {
     path: 'sales-order-summary',
@@ -27,7 +27,8 @@ const routes: Routes = [
   {
     path: 'sales-order-detail',
     loadChildren: () => import('./sales-order-detail/sales-order-detail.module').then( m => m.SalesOrderDetailPageModule)
-  },
+  }
+
 ];
 
 @NgModule({

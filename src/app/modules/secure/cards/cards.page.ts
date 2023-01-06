@@ -81,7 +81,7 @@ export class CardsPage implements AfterContentChecked {
         await this.configService.update(t);
         this.configService.load();
       } catch (error) {
-        this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
+        this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }
   }
@@ -98,7 +98,7 @@ export class CardsPage implements AfterContentChecked {
           await this.configService.loadItemMaster();
         }
       } catch (error) {
-        this.toastService.presentToast(error.message, '', 'middle', 'medium', 1000);
+        this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }
   }

@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
@@ -21,6 +22,7 @@ export class QuotationDetailPage implements OnInit {
   constructor(
     private authService: AuthService,
     private quotationService: QuotationService,
+    private toastService: ToastService,
     private route: ActivatedRoute,
     private navController: NavController
   ) {
@@ -45,31 +47,43 @@ export class QuotationDetailPage implements OnInit {
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
-    this.authService.precisionList$.subscribe(precision =>{
-      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-    })
+    try {
+      this.authService.precisionList$.subscribe(precision => {
+        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
+    }
   }
 
   locationMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.quotationService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getMasterList().subscribe(response => {
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
+    }
   }
 
   loadObject() {
-    this.quotationService.getObjectById(this.objectId).subscribe(response => {
-      this.object = response;
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getObjectById(this.objectId).subscribe(response => {
+        this.object = response;
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+    }
   }
 
   matchImage(itemId: number) {

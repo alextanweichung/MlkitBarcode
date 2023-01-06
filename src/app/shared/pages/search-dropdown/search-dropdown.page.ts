@@ -41,20 +41,26 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 
   ngOnInit() {
     this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
-  }  
+  }
 
-  async searchItem(event) {
-    if (event.detail.value) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
+  searchText: string = '';
+  async keypress(event) {
+    if (event.keyCode === 13) {
+      if (this.searchText.length > 0) {
+        await this.showLoading();
+        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
+        await this.hideLoading();
+      } else {
+        this.tempDropdownList = this.searchDropdownList;
       }
-      await this.showLoading();
-      this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(event.detail.value.toLowerCase()) || r.description.toLowerCase().includes(event.detail.value.toLowerCase()));
-      await this.hideLoading();
     } else {
       this.tempDropdownList = this.searchDropdownList;
     }
-    this.searchBar.setFocus();
+    // this.searchBar.setFocus();
+  }
+
+  resetFilter() {
+    this.tempDropdownList = this.searchDropdownList;
   }
 
   chooseThis(object: SearchDropdownList) {
@@ -104,5 +110,5 @@ export class SearchDropdownPage implements OnInit, OnChanges {
     // Dismiss modal
     this.hideModal(null);
   }
-  
+
 }

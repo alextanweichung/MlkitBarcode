@@ -6,7 +6,6 @@ import { DatabaseService } from 'src/app/services/sqlite/database.service';
 import { create_item_barcode_table, create_item_master_table } from 'src/app/services/sqlite/migration.service';
 import { SQLiteService } from 'src/app/services/sqlite/sqlite.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { dbConfig, inboundDb_Tables } from '../config/db-config';
 
 @Injectable({
@@ -23,9 +22,9 @@ export class CommonQueryService<T> {
   ) { }
 
   private getAllColumns(object: Object) {
-    let ret: string[] = [];
+    let ret: Map<string, Object> = new Map<string, Object>();
     for (var prop in object) {
-      ret.push(prop as string);
+      ret.set(prop, object[prop]);
     }
     return ret;
   }
@@ -118,6 +117,7 @@ export class CommonQueryService<T> {
     sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
     sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
 
+    
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string =
         `INSERT INTO ${table} (${sqlCols}) VALUES (${sqlParams})`;
@@ -258,48 +258,79 @@ export class CommonQueryService<T> {
     }
 
     if (objects.length > 0) {
+      let cols = this.getAllColumns(objects[0]);
+      let sqlCols = '';
+      let sqlQMarks = '';
+
+      for (const key of cols.keys()) {
+        switch (this.getColType(cols.get(key))) {
+          case "number":
+            sqlCols += ` ${key},`;
+            sqlQMarks += '?,';
+            break;
+          case "boolean":
+            sqlCols += ` ${key},`;
+            sqlQMarks += '?,';
+            break;
+          case "string":
+          case "Date":
+            sqlCols += ` ${key},`;
+            sqlQMarks += '?,';
+            break;
+          default:
+            sqlCols += ` ${key},`;
+            sqlQMarks += '?,';
+            break;
+        }
+      }
+
+      sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
+      sqlQMarks = sqlQMarks.substring(0, sqlQMarks.length - 1).trimStart();
+
+      statements.push({
+        statement: `INSERT INTO ${table} ` + `(` + sqlCols + `) VALUES (` + sqlQMarks + `);`,
+        values: []
+      })
+      
       objects.forEach(i => {
         let cols = this.getAllColsWithValue(i);
-        let sqlCols = '';
-        let sqlQMarks = '';
         let sqlParams = '';
 
         for (const key of cols.keys()) {
           switch (this.getColType(cols.get(key))) {
             case "number":
-              sqlCols += ` ${key},`;
-              sqlQMarks += '?,';
               sqlParams += `${cols.get(key)},`;
               break;
             case "boolean":
-              sqlCols += ` ${key},`;
-              sqlQMarks += '?,';
               sqlParams += `${cols.get(key)},`;
               break;
             case "string":
             case "Date":
-              sqlCols += ` ${key},`;
-              sqlQMarks += '?,';
               sqlParams += `${cols.get(key)},`;
+              break;
+            default:
+              sqlParams += `,`;
               break;
           }
         }
-
-        sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
-        sqlQMarks = sqlQMarks.substring(0, sqlQMarks.length - 1).trimStart();
         sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
 
-        statements.push({
-          statement: `INSERT INTO ${table} ` + `(` + sqlCols + `) VALUES (` + sqlQMarks + `);`,
-          values: [
-            sqlParams.split(',')
-          ]
-        })
+        statements[2].values.push(
+          sqlParams.split(',')
+        )
       });
-
+      statements.push({
+        statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
+        values: []
+      })
+      console.log("🚀 ~ file: common-query.service.ts:300 ~ CommonQueryService<T> ~ syncInboundData ~ statements", JSON.stringify(statements))
+      let timestart = new Date();
       await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let ret: any = await db.executeSet(statements, true);
       }, dbConfig.inbounddb)
+      console.log(new Date());
+      let timeend = new Date();
+      this.toastService.presentToast(`table ${table}`, (timeend.getTime() - timestart.getTime()).toString(), 'top', 'success', 1000);
     }
   }
 

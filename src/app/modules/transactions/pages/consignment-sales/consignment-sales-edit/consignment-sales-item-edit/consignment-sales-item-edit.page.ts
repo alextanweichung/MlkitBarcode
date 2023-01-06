@@ -47,12 +47,13 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     if (this.objectId) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('Something went wrong!', 'Invalid ObjectId', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', 'Invalid ObjectId', 'top', 'danger', 1000);
     }
   }
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = true;
+  systemWideEAN13IgnoreCheckDigit: boolean = false;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   maxPrecision: number = 2;
@@ -63,6 +64,10 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
       if (SystemWideActivateTaxControl != undefined) {
         this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+      }
+      let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
+      if (ignoreCheckdigit != undefined) {
+        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
     })
     this.authService.precisionList$.subscribe(precision => {
@@ -104,7 +109,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     } else {
       this.object.details.forEach(r => r.sequence += 1);
       trxLine.lineId = 0;
-      trxLine.headerId = this.object.header.otherSalesId;
+      trxLine.headerId = this.object.header.consignmentSalesId;
       trxLine.qtyRequest = 1;
       trxLine.locationId = this.object.header.toLocationId;
       trxLine.sequence = 0;
@@ -116,9 +121,6 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   async validateBarcode(barcode: string) {
     if (barcode) {
-      if (barcode && barcode.length > 12) {
-        barcode = barcode.substring(0, 12);
-      }
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
@@ -148,7 +150,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
           }
           this.addItemToDetails(outputData);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       } else {
 
@@ -168,7 +170,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
             cssClass: 'danger',
             handler: async () => {
               this.object.details.splice(index, 1);
-              this.toastService.presentToast('Line removed.', '', 'middle', 'success', 1000);
+              this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
             }
           },
           {
@@ -180,7 +182,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Something went wrong!', '', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
   }
 
@@ -262,54 +264,19 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   /* #region  barcode scanner */
 
   scanActive: boolean = false;
-  async startScanning() {
-    const allowed = await this.checkPermission();
-    if (allowed) {
-      this.scanActive = true;
+  onCameraStatusChanged(event) {
+    this.scanActive = event;
+    if (this.scanActive) {
       document.body.style.background = "transparent";
-      const result = await BarcodeScanner.startScan();
-      if (result.hasContent) {
-        let barcode = result.content;
-        this.scanActive = false;
-        await this.validateBarcode(barcode);
-      }
     }
   }
 
-  async checkPermission() {
-    return new Promise(async (resolve) => {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        resolve(true);
-      } else if (status.denied) {
-        const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
-          buttons: [
-            {
-              text: "No",
-              role: "cancel"
-            },
-            {
-              text: "Open Settings",
-              handler: () => {
-                BarcodeScanner.openAppSettings();
-                resolve(false);
-              }
-            }
-          ]
-        })
-        await alert.present();
-      } else {
-        resolve(false);
-      }
-    });
+  async onDoneScanning(event) {
+    if (event) {
+      await this.validateBarcode(event);
+    }
   }
 
-  stopScanner() {
-    BarcodeScanner.stopScan();
-    this.scanActive = false;
-  }
 
   /* #endregion */
 
@@ -364,30 +331,34 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     if (this.object.details.length > 0) {
       const alert = await this.alertController.create({
         header: 'Are you sure to proceed?',
+        cssClass: 'custom-alert',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
             text: 'OK',
+            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.updateObject();
             },
           },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
         ],
       });
       await alert.present();
     } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
     }
   }
 
   updateObject() {
+    console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:390 ~ ConsignmentSalesItemEditPage ~ this.consignmentSalesService.updateObject ~ this.object", JSON.stringify(this.object))
     this.consignmentSalesService.updateObject(this.object).subscribe(response => {
       if (response.status === 204) {
-        this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'middle', 'success', 1000);
+        this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'top', 'success', 1000);
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectId
@@ -395,7 +366,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
         }
         this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
       } else {
-        this.toastService.presentToast('Update Fail', '', 'middle', 'danger', 1000);
+        this.toastService.presentToast('Update Fail', '', 'top', 'danger', 1000);
       }
     }, error => {
       console.log(error);

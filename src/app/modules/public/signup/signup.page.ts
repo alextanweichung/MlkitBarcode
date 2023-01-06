@@ -42,11 +42,11 @@ export class SignupPage implements OnInit {
 
     // If email or password empty
     if (this.signup_form.value.email == '' || this.signup_form.value.password == '' || this.signup_form.value.password_repeat == '') {
-      this.toastService.presentToast('Error', 'Please fill in all fields', 'middle', 'danger', 4000);
+      this.toastService.presentToast('Error', 'Please fill in all fields', 'top', 'danger', 4000);
 
       // If passwords do not match
     } else if (this.signup_form.value.password != this.signup_form.value.password_repeat) {
-      this.toastService.presentToast('Error', 'Passwords must match', 'middle', 'danger', 4000);
+      this.toastService.presentToast('Error', 'Passwords must match', 'top', 'danger', 4000);
 
     } else {
 
@@ -62,7 +62,7 @@ export class SignupPage implements OnInit {
       // ...
 
       // Success messages + routing
-      this.toastService.presentToast('Welcome!', 'Lorem ipsum', 'middle', 'success', 2000);
+      this.toastService.presentToast('Welcome!', 'Lorem ipsum', 'top', 'success', 2000);
       await this.router.navigate(['/home']);
       loading.dismiss();
     }
