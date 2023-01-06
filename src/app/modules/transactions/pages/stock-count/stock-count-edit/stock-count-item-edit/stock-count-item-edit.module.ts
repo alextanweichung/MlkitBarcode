@@ -9,6 +9,7 @@ import { StockCountItemEditPageRoutingModule } from './stock-count-item-edit-rou
 import { StockCountItemEditPage } from './stock-count-item-edit.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
+import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
     IonicModule,
     StockCountItemEditPageRoutingModule,
     IdMappingModule,
-    BarcodeScanInputPageModule
+    BarcodeScanInputPageModule,
+    CameraScanInputPageModule
   ],
   declarations: [StockCountItemEditPage]
 })

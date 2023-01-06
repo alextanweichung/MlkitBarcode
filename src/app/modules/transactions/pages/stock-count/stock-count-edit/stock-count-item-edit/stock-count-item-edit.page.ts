@@ -47,8 +47,7 @@ export class StockCountItemEditPage implements OnInit {
       this.navController.navigateBack('/transactions/stock-count');
     }
     this.loadMasterList();
-    // this.loadModuleControl();    
-    this.loadImage = false; // this.configService.sys_parameter.loadImage;
+    this.loadModuleControl();
     this.loadInventoryCountBatchCriteria();
   }
 
@@ -70,7 +69,6 @@ export class StockCountItemEditPage implements OnInit {
   }
 
   moduleControl: ModuleControl[] = [];
-  loadImage: boolean = true;
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
@@ -252,65 +250,17 @@ export class StockCountItemEditPage implements OnInit {
   /* #region  barcode scanner */
 
   scanActive: boolean = false;
-  async startScanning() {
-    const allowed = await this.checkPermission();
-    if (allowed) {
-      this.scanActive = true;
+  onCameraStatusChanged(event) {
+    this.scanActive = event;
+    if (this.scanActive) {
       document.body.style.background = "transparent";
-      const result = await BarcodeScanner.startScan();
-      if (result.hasContent) {
-        let barcode = result.content;
-        this.scanActive = false;
-        barcode = this.manipulateBarcodeCheckDigit(barcode);
-        await this.validateBarcode(barcode);
-      }
     }
   }
 
-  manipulateBarcodeCheckDigit(itemBarcode: string) {
-    if (itemBarcode) {
-      if (this.systemWideEAN13IgnoreCheckDigit) {
-        if (itemBarcode.length == 13) {
-          itemBarcode = itemBarcode.substring(0, itemBarcode.length - 1);
-        }
-      }
+  async onDoneScanning(event) {
+    if (event) {
+      await this.validateBarcode(event);
     }
-    return itemBarcode;
-  }
-
-  async checkPermission() {
-    return new Promise(async (resolve) => {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        resolve(true);
-      } else if (status.denied) {
-        const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
-          buttons: [
-            {
-              text: "No",
-              role: "cancel"
-            },
-            {
-              text: "Open Settings",
-              handler: () => {
-                BarcodeScanner.openAppSettings();
-                resolve(false);
-              }
-            }
-          ]
-        })
-        await alert.present();
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  stopScanner() {
-    BarcodeScanner.stopScan();
-    this.scanActive = false;
   }
 
   /* #endregion */
