@@ -25,7 +25,7 @@ export class PackingItemPage implements OnInit {
   objectHeader: GoodsPackingHeader;
   packingSalesOrders: PackingSalesOrderRoot[] = [];
   moduleControl: ModuleControl[] = [];
-  loadImage: boolean = true;
+  systemWideEAN13IgnoreCheckDigit: boolean = false;
   packingQtyControl: string = "0";
 
   constructor(
@@ -54,7 +54,6 @@ export class PackingItemPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      this.loadImage = false; // this.configService.sys_parameter.loadImage;
       let packingControl = this.moduleControl.find(x => x.ctrlName === "PackingQtyControl");
       if (packingControl != undefined) {
         this.packingQtyControl = packingControl.ctrlValue;
@@ -259,84 +258,17 @@ export class PackingItemPage implements OnInit {
   /* #region  barcode scanner */
 
   scanActive: boolean = false;
-  async startScanning() {
-    if (this.objectHeader.isWithSo && this.selectedSo && this.accordianGroup1.value !== undefined) {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-        this.scanActive = true;
-        document.body.style.background = "transparent";
-        const result = await BarcodeScanner.startScan();
-        if (result.hasContent) {
-          let barcode = result.content;
-          this.scanActive = false;
-          barcode = this.manipulateBarcodeCheckDigit(barcode);
-          await this.validateBarcode(barcode);
-        }
-      }
-    } else if (this.objectHeader.isWithSo && !this.selectedSo && this.accordianGroup1.value === undefined) {
-      this.toastService.presentToast('Please select 1 SO', '', 'top', 'medium', 1000);
-    }
-
-    if (!this.objectHeader.isWithSo) {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-        this.scanActive = true;
-        document.body.style.background = "transparent";
-        const result = await BarcodeScanner.startScan();
-        if (result.hasContent) {
-          let barcode = result.content;
-          this.scanActive = false;
-          await this.validateBarcode(barcode);
-        }
-      }
+  onCameraStatusChanged(event) {
+    this.scanActive = event;
+    if (this.scanActive) {
+      document.body.style.background = "transparent";
     }
   }
 
-  systemWideEAN13IgnoreCheckDigit: boolean = false;
-  manipulateBarcodeCheckDigit(itemBarcode: string) {
-    if (itemBarcode) {
-      if (this.systemWideEAN13IgnoreCheckDigit) {
-        if (itemBarcode.length == 13) {
-          itemBarcode = itemBarcode.substring(0, itemBarcode.length - 1);
-        }
-      }
+  async onDoneScanning(event) {
+    if (event) {
+      await this.validateBarcode(event);
     }
-    return itemBarcode;
-  }
-
-  async checkPermission() {
-    return new Promise(async (resolve) => {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        resolve(true);
-      } else if (status.denied) {
-        const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
-          buttons: [
-            {
-              text: "No",
-              role: "cancel"
-            },
-            {
-              text: "Open Settings",
-              handler: () => {
-                BarcodeScanner.openAppSettings();
-                resolve(false);
-              }
-            }
-          ]
-        })
-        await alert.present();
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  stopScanner() {
-    BarcodeScanner.stopScan();
-    this.scanActive = false;
   }
 
   /* #endregion */
@@ -349,16 +281,16 @@ export class PackingItemPage implements OnInit {
         header: 'Are you sure to proceed?',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel',
-            cssClass: 'cancel',
-          },
-          {
             text: 'Confirm',
             cssClass: 'success',
             handler: async () => {
               await this.insertPacking(soLines);
             },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'cancel',
           },
         ],
       });

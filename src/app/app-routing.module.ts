@@ -237,7 +237,11 @@ const routes: Routes = [
   {
     path: 'item-catalog',
     loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then( m => m.ItemCatalogPageModule)
+  },  {
+    path: 'camera-scan-input',
+    loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
   },
+
 
 
 
