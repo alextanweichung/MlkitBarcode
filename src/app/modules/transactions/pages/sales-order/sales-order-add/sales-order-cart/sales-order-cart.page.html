@@ -228,7 +228,7 @@
         <ion-list class="list-custom" lines="full">
           <ion-item>
             <ion-label><p>Remark</p></ion-label>
-            <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.remark" placeholder="Enter remark"></ion-input>
+            <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.remark" placeholder="Enter remark" [autoGrow]="true"></ion-textarea>
           </ion-item>
           <ion-item>
             <ion-label><p>Ship Method</p></ion-label>
@@ -257,15 +257,15 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Phone</p></ion-label>
-            <ion-input class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.shipPhone" placeholder="Enter ship phone"></ion-input>
+            <ion-input class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.shipPhone" inputmode="numeric" placeholder="Enter ship phone"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Email</p></ion-label>
-            <ion-input class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.shipEmail" placeholder="Enter ship email"></ion-input>
+            <ion-input class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.shipEmail" inputmode="email" placeholder="Enter ship email"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Fax</p></ion-label>
-            <ion-input class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.shipFax" placeholder="Enter ship fax"></ion-input>
+            <ion-input class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.shipFax" inputmode="numeric" placeholder="Enter ship fax"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Area</p></ion-label>
