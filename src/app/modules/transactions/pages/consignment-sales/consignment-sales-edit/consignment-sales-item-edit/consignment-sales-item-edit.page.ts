@@ -53,6 +53,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = true;
+  systemWideEAN13IgnoreCheckDigit: boolean = false;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   maxPrecision: number = 2;
@@ -263,68 +264,19 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   /* #region  barcode scanner */
 
   scanActive: boolean = false;
-  async startScanning() {
-    const allowed = await this.checkPermission();
-    if (allowed) {
-      this.scanActive = true;
+  onCameraStatusChanged(event) {
+    this.scanActive = event;
+    if (this.scanActive) {
       document.body.style.background = "transparent";
-      const result = await BarcodeScanner.startScan();
-      if (result.hasContent) {
-        let barcode = result.content;
-        this.scanActive = false;
-        barcode = this.manipulateBarcodeCheckDigit(barcode);
-        await this.validateBarcode(barcode);
-      }
     }
   }
 
-  systemWideEAN13IgnoreCheckDigit: boolean = false;
-  manipulateBarcodeCheckDigit(itemBarcode: string) {
-    if (itemBarcode) {
-      if (this.systemWideEAN13IgnoreCheckDigit) {
-        if (itemBarcode.length == 13) {
-          itemBarcode = itemBarcode.substring(0, itemBarcode.length - 1);
-        }
-      }
+  async onDoneScanning(event) {
+    if (event) {
+      await this.validateBarcode(event);
     }
-    return itemBarcode;
   }
 
-
-  async checkPermission() {
-    return new Promise(async (resolve) => {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        resolve(true);
-      } else if (status.denied) {
-        const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
-          buttons: [
-            {
-              text: "No",
-              role: "cancel"
-            },
-            {
-              text: "Open Settings",
-              handler: () => {
-                BarcodeScanner.openAppSettings();
-                resolve(false);
-              }
-            }
-          ]
-        })
-        await alert.present();
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  stopScanner() {
-    BarcodeScanner.stopScan();
-    this.scanActive = false;
-  }
 
   /* #endregion */
 
