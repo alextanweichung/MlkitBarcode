@@ -122,18 +122,18 @@
       <div class="p-2">
         <table id="qtyMatrix">
           <tr>
-            <th class="p-1 font-half-size ion-text-left">#</th>
-            <th class="p-1 font-half-size">Document Date</th>
-            <th class="p-1 font-half-size" *ngIf="creditInfoType == 'Overdue Amount'">O/D Day</th>
-            <th class="p-1 font-half-size">Document Number</th>
-            <th class="p-1 font-half-size ion-text-right">Amount</th>
+            <th style="flex: 0 0 5%" class="p-1 font-half-size ion-text-left">#</th>
+            <th style="flex: 0 0 20%" class="p-1 font-half-size">Document Date</th>
+            <th style="flex: 0 0 25%" [ngStyle]="{'flex': creditInfoType == 'Overdue Amount' ? '0 0 15%' : '0 0 25%'}" class="p-1 font-half-size" *ngIf="creditInfoType == 'Overdue Amount'">O/D Day</th>
+            <th style="flex: 0 0 20%"class="p-1 font-half-size">Document Number</th>
+            <th style="flex: 0 0 20%" class="p-1 font-half-size ion-text-right">Amount</th>
           </tr>
           <tr *ngFor="let rowData of tableValue; let rowIndex = index">
-            <td>{{rowIndex+1}}</td>
-            <th class="p-1 font-half-size">{{rowData.trxDate | date:'dd/MM/yyyy'}}</th>
-            <td class="p-1 font-half-size" *ngIf="creditInfoType == 'Overdue Amount'">{{rowData.overdueDay | number:'1.0'}}</td>
-            <td class="p-1 font-half-size">{{rowData.docNum}}</td>
-            <td class="p-1 font-half-size ion-text-right">{{rowData.amount | number:'1.2'}}</td>
+            <td style="flex: 0 0 5%" class="p-1 font-half-size">{{rowIndex+1}}</td>
+            <td style="flex: 0 0 20%" class="p-1 font-half-size">{{rowData.trxDate | date:'dd/MM/yyyy'}}</td>
+            <td style="flex: 0 0 25%" [ngStyle]="{'flex': creditInfoType == 'Overdue Amount' ? '0 0 15%' : '0 0 25%'}" class="p-1 font-half-size" *ngIf="creditInfoType == 'Overdue Amount'">{{rowData.overdueDay | number:'1.0'}}</td>
+            <td style="flex: 0 0 20%" class="p-1 font-half-size">{{rowData.docNum}}</td>
+            <td style="flex: 0 0 20%" class="p-1 font-half-size ion-text-right">{{rowData.amount | number:'1.2'}}</td>
           </tr>
         </table>
       </div>
