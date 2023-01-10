@@ -80,7 +80,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   }
 
   onKeyPress(event) {
-    console.log("🚀 ~ file: welcome.page.ts:83 ~ WelcomePage ~ onKeyPress ~ event", JSON.stringify(event))
     if (event.keyCode === 13) {
       this.getStarted();
       event.preventDefault();

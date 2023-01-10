@@ -64,8 +64,6 @@ export class OtpConfigListPage implements OnInit {
   }
 
   loadOtps() {
-    console.log("🚀 ~ file: otp-config-list.page.ts ~ line 73 ~ OtpConfigListPage ~ this.otpConfigService.getOtps ~ this.selectedStatus", this.selectedStatus)
-    console.log("🚀 ~ file: otp-config-list.page.ts ~ line 72 ~ OtpConfigListPage ~ this.otpConfigService.getOtps ~ selectedValidity", this.selectedValidity)
     this.otpConfigService.getOtps().subscribe(response => {
       this.otps = response;
       if (this.selectedValidity) {
@@ -74,7 +72,6 @@ export class OtpConfigListPage implements OnInit {
       if (this.selectedStatus) {
         this.otps = this.otps.filter(r => r.status == this.selectedStatus);
       }
-      console.log("🚀 ~ file: otp-config-list.page.ts ~ line 69 ~ OtpConfigListPage ~ this.otpConfigService.getOtps ~ otps", this.otps)
     }, error => {
       console.log(error);
     })
@@ -102,7 +99,6 @@ export class OtpConfigListPage implements OnInit {
     }, error => {
       console.log(error);
     })
-    console.log("🚀 ~ file: otp-config-list.page.ts ~ line 103 ~ OtpConfigListPage ~ this.otpConfigService.getOtpLines ~ this.otpLines", this.otpLines)
   }
 
 }

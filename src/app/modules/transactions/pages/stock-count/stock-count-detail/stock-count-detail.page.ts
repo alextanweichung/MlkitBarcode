@@ -55,7 +55,6 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
     this.scannedItems = [];
     this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
       this.inventoryCount = response;
-      console.log("🚀 ~ file: stock-count-detail.page.ts:62 ~ StockCountDetailPage ~ this.stockCountService.getInventoryCount ~ this.inventoryCount", JSON.stringify(this.inventoryCount))
       this.inventoryCount.details.forEach(r => {
         let barcodeTag = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku);
         this.scannedItems.push({
@@ -75,7 +74,6 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
           qtyRequest: r.qtyRequest
         })
       })
-      console.log("🚀 ~ file: stock-count-detail.page.ts:86 ~ StockCountDetailPage ~ this.stockCountService.getInventoryCount ~ this.scannedItems", JSON.stringify(this.scannedItems))
     }, error => {
       console.log(error);
     })

@@ -26,7 +26,6 @@ export class ConsignmentSalesService {
   header: ConsignmentSalesHeader;
   setHeader(header: ConsignmentSalesHeader) {
     this.header = header;
-    console.log("🚀 ~ file: consignment-sales.service.ts ~ line 29 ~ ConsignmentSalesService ~ setHeader ~ this.header", this.header)
   }
 
   summary: ConsignmentSalesSummary;

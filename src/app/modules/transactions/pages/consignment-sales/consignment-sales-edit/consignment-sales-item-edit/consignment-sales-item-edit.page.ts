@@ -355,7 +355,6 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   }
 
   updateObject() {
-    console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:390 ~ ConsignmentSalesItemEditPage ~ this.consignmentSalesService.updateObject ~ this.object", JSON.stringify(this.object))
     this.consignmentSalesService.updateObject(this.object).subscribe(response => {
       if (response.status === 204) {
         this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'top', 'success', 1000);

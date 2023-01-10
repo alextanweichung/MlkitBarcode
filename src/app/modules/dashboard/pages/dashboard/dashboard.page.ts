@@ -73,7 +73,6 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   loadAnnouncements() {
     this.dashboardService.getDashboard().subscribe(response => {
       this.dashboardData = response;
-      console.log("🚀 ~ file: dashboard.page.ts:68 ~ DashboardPage ~ this.dashboardService.getDashboard ~ this.dashboardData", this.dashboardData)
     }, error => {
       console.log(error);
     })

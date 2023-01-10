@@ -1,8 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
+import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
 import { format } from 'date-fns';
-import { QuotationHeader, QuotationRoot, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
+import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -18,6 +18,7 @@ import { ItemCartPage } from 'src/app/shared/pages/item-cart/item-cart.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
+import {v4 as uuidv4} from 'uuid';
 
 @Component({
   selector: 'app-quotation-item',
@@ -131,7 +132,7 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   async onItemAdded(event: TransactionDetail) {
     if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
       if (event.variationTypeCode === '0') {
-        this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest
+        this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
       } else {
         let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
         vd.forEach(r => {
@@ -141,15 +142,28 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
             }
           })
         })
-        await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
       }
+      await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
     } else {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignLineUnitPrice(trxLine);
+
       if (this.objectHeader.isItemPriceTaxInclusive) {
         await this.computeUnitPriceExTax(trxLine);
       } else {
         await this.computeUnitPrice(trxLine);
+      }
+
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+        trxLine.uuid = uuidv4();
+        let discPct = Number(trxLine.discountExpression?.replace("%", ""));
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+        } else {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+        }
+        trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
+        trxLine.oriDiscountExpression = trxLine.discountExpression;
       }
       this.itemInCart.push(trxLine);
       await this.computeAllAmount(this.itemInCart[0]);

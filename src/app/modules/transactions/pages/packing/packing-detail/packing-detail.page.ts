@@ -61,7 +61,6 @@ export class PackingDetailPage implements OnInit {
   loadDetail() {
     this.packingService.getObjectById(this.objectId).subscribe(response => {
       this.object = response;
-      console.log("🚀 ~ file: packing-detail.page.ts ~ line 64 ~ PackingDetailPage ~ this.packingService.getObjectById ~ this.object", this.object)
     }, error => {
       console.log(error);
     })

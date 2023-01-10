@@ -69,7 +69,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
       if (salesOrderQuantityControl) {
         this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
-        console.log("🚀 ~ file: item-catalog.page.ts:72 ~ ItemCatalogPage ~ loadModuleControl ~ this.salesOrderQuantityControl", this.salesOrderQuantityControl)
       }
     })
   }

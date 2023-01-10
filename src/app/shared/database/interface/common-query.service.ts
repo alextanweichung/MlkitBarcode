@@ -323,7 +323,6 @@ export class CommonQueryService<T> {
         statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
         values: []
       })
-      console.log("🚀 ~ file: common-query.service.ts:300 ~ CommonQueryService<T> ~ syncInboundData ~ statements", JSON.stringify(statements))
       let timestart = new Date();
       await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let ret: any = await db.executeSet(statements, true);

@@ -20,6 +20,7 @@ export class PromotionEngineService {
     //Look for PWP Discount Code
     let pwp: MasterListDetails = discountGroupList.find(x => x.attribute2 == "W");
 
+    let totalBillAmount = salesBillLine.reduce((sum, current) => sum + current.subTotal, 0);
     //Reset all PWP calculation, Or member/employee discount scheme
     salesBillLine.forEach(line => {
       line = this.commonService.reversePromoImpact(line);
@@ -56,19 +57,29 @@ export class PromotionEngineService {
       let onlyImpactSalesBillLine: TransactionDetail[] = [];
       if (eventItemType == "S") {
         onlyImpactSalesBillLine = affectedSalesBillLine.filter(line => impactItemList.includes(line.itemId));
-        affectedSalesBillLine = affectedSalesBillLine.filter(line => eventItemList.includes(line.itemId));
+        if (itemRuleTypeCheck != "A") {
+          affectedSalesBillLine = affectedSalesBillLine.filter(line => eventItemList.includes(line.itemId));
+        }
       } else {
         onlyImpactSalesBillLine = affectedSalesBillLine.filter(line => impactItemList.includes(line.itemId));
         //Filter affectedSalesBill, maintain those not in impactItemList only
         if (impactItemList.length > 0) {
-          affectedSalesBillLine = affectedSalesBillLine.filter(line => !impactItemList.includes(line.itemId));
+          if (itemRuleTypeCheck != "A") {
+            affectedSalesBillLine = affectedSalesBillLine.filter(line => !impactItemList.includes(line.itemId));
+          }
         }
       }
 
       if (isValidateEligibleAmount) {
         let currentItemListAmount = affectedSalesBillLine.reduce((sum, current) => sum + current.subTotal, 0);
-        if (currentItemListAmount < eligibleAmt) {
-          eligibleAmtCheck = false;
+        if (itemRuleTypeCheck == "A") {
+          if (totalBillAmount < eligibleAmt) {
+            eligibleAmtCheck = false;
+          }
+        } else {
+          if (currentItemListAmount < eligibleAmt) {
+            eligibleAmtCheck = false;
+          }
         }
       }
 
@@ -192,6 +203,7 @@ export class PromotionEngineService {
                 case 1:
                   //#region "Second Loop - Condition Array"
                   let i: number = 0;
+                  let pwpApplied: boolean = false;
                   for (let eventLineImpact of eventLineImpactArray) {
                     let rowNumber: number = eventLineImpact.rowSequence;
                     let currentLineQty: number = sortedAffectedSalesBillLine.reduce((sum, current) => sum + current.qtyRequest, 0);
@@ -223,7 +235,7 @@ export class PromotionEngineService {
                     //Create a copy in order to use by 'Set Total Amount'
                     let duplicateSortedAffectedSalesBillLine: TransactionDetail[] = JSON.parse(JSON.stringify(sortedAffectedSalesBillLine));
                     if (debugFlag) {
-                      console.log("[Setting of Total Qty] Row number | Entitlement Qty | No. Entitlement: " + rowNumber + " | " + totalEntitlementQty + " | " + numberOfEntitlement)
+                      console.log("[Setting of Total Qty] Current Line Qty | Row number | Entitlement Qty | No. Entitlement: " + currentLineQty + " | " + rowNumber + " | " + totalEntitlementQty + " | " + numberOfEntitlement)
                     }
                     //#region "Third Loop - Affected SalesBillLine"
                     for (let line of sortedAffectedSalesBillLine) {
@@ -369,13 +381,19 @@ export class PromotionEngineService {
                       let totalDiscApplied: number = 0;
                       let totalDiscToApply: number = this.commonService.roundToPrecision((cumulatedAmt - (lineImpactValue * numberOfEntitlement)), roundingPrecision);
                       let lastLineIndex = numberOfEntitlement * rowNumber;
+                      let unaffectedQty: number = 0;
+                      if (numberOfEntitlement == 0 && currentLineQty > totalEntitlementQty) {
+                        unaffectedQty = currentLineQty - totalEntitlementQty;
+
+                      }
                       if (debugFlag) {
                         console.log("[Setting of Total Amount] Discount to apply: " + totalDiscToApply);
+                        console.log("[Setting of Total Amount] Unaffected Qty: " + unaffectedQty);
                       }
                       duplicateSortedAffectedSalesBillLine.forEach((line, index) => {
+                        //Look for SalesBillLine to apply discount
+                        let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
                         if (cumulatedQty2 != totalEntitlementQty && line.qtyRequest != 0) {
-                          //Look for SalesBillLine to apply discount
-                          let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
                           let unitPrice = isItemPriceTaxInclusive ? line.unitPrice : line.unitPriceExTax;
                           //If qtyRequest is less than or equals to remainingQty2, take the entire qtyRequest
                           if (line.qtyRequest <= remainingQty2) {
@@ -394,6 +412,7 @@ export class PromotionEngineService {
                             if (promoDisc < 0) {
                               promoDisc = 0;
                             }
+                            pwpApplied = true;
                             impactedLine = this.replacePromoDiscAmt(impactedLine, promoDisc, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp);
 
                             //Set qtyRequest to 0, to exclude from further calculation, as entire list already got the correct impact
@@ -414,10 +433,18 @@ export class PromotionEngineService {
                             if (promoDisc < 0) {
                               promoDisc = 0;
                             }
+                            pwpApplied = true;
                             impactedLine = this.replacePromoDiscAmt(impactedLine, promoDisc, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp);
                             //Set qtyRequest to qty not yet go through promotion impact, for next loop calculation
                             line.qtyRequest = line.qtyRequest - remainingQty2;
                             remainingQty2 = 0;
+                          }
+                        } else {
+                          let unitPrice = isItemPriceTaxInclusive ? line.unitPrice : line.unitPriceExTax;
+                          let lineDiscAmount: number = unitPrice - line.discountedUnitPrice
+                          if (lineDiscAmount > 0 && unaffectedQty > 0 && pwpApplied && impactedLine.qtyRequest > 1) {
+                            let additionalDisc = lineDiscAmount * unaffectedQty;
+                            impactedLine = this.replacePromoDiscAmt(impactedLine, additionalDisc, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp);
                           }
                         }
                       })
@@ -470,7 +497,7 @@ export class PromotionEngineService {
                       //To handle normal row item impact
                     } else {
                       if (debugFlag) {
-                        console.log("Max Row is normal number")
+                        console.log("Max Row is normal number");
                       }
                       let modRemainder: number = currentLineQty % maxRowNum;
                       numberOfEntitlement = (currentLineQty - modRemainder) / maxRowNum;
@@ -484,6 +511,29 @@ export class PromotionEngineService {
                       duplicateEventLineArray.splice(currentIndex + 1, eventLineArray.length - currentIndex - 1);
                       //Sorting of promotion line impact (all) by rowSequence (Desc)
                       duplicateEventLineArray.sort((a, b) => (a.rowSequence < b.rowSequence ? 1 : -1));
+                      if (isRepeat) {
+                        let repeatEventLineArray: PromotionLine[] = [];
+                        let repeatNumber: number = Math.floor(currentLineQty / maxRowNum);
+                        if (modRemainder > 0 && repeatNumber >= 1) {
+                          numberOfEntitlement = 1;
+                          repeatEventLineArray = [...repeatEventLineArray, ...duplicateEventLineArray];
+                          if (repeatNumber > 1) {
+                            for (let i = 1; i < repeatNumber; i++) {
+                              repeatEventLineArray = [...repeatEventLineArray, ...duplicateEventLineArray];
+                            }
+                          }
+                          let copyEventArray: PromotionLine[] = JSON.parse(JSON.stringify(duplicateEventLineArray));
+                          let remainingData: PromotionLine[] = copyEventArray.splice(copyEventArray.length - modRemainder, modRemainder);
+                          if (remainingData.length == 1 && remainingData[0].impactCode == 'L00') {
+                            // Do nothing if the first line is for no impact
+                          } else {
+                            repeatEventLineArray = [...repeatEventLineArray, ...remainingData];
+                            totalEntitlementQty += modRemainder;
+                            remainingQty = totalEntitlementQty;
+                          }
+                          duplicateEventLineArray = repeatEventLineArray;
+                        }
+                      }
                     }
                     //#region "Third Loop - Duplicate Event Array"
                     if (debugFlag) {
@@ -498,7 +548,7 @@ export class PromotionEngineService {
                         //No impact
                         case "L00":
                           for (let i = 0; i < numberOfEntitlement; i++) {
-                            discountArray.push(0);
+                            discountArray.push(-1);
                           }
                           break;
                         //Set Row Disc Amount
@@ -550,12 +600,14 @@ export class PromotionEngineService {
                           break;
                       }
                     }
-                    if (debugFlag) {
-                      console.log("[Setting of Row Impact ] Discount array: ")
-                      console.log(discountArray)
-                    }
                     //#endregion "Third Loop - Duplicate Event Array"                    
                     if (discountArray.length > 0) {
+                      //Sorting of discount array (Desc)
+                      discountArray.sort((a, b) => (a < b ? 1 : -1));
+                      if (debugFlag) {
+                        console.log("[Setting of Row Impact ] Discount array: ")
+                        console.log(discountArray)
+                      }
                       //#region "Third Loop - Affected SalesBillLine - Set Row Impact"
                       for (let line of sortedAffectedSalesBillLine) {
                         if (cumulatedQty != totalEntitlementQty && line.qtyRequest != 0) {
@@ -563,23 +615,9 @@ export class PromotionEngineService {
                           let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
                           let unitPrice = isItemPriceTaxInclusive ? line.unitPrice : line.unitPriceExTax;
                           if (line.qtyRequest <= remainingQty) {
-                            let promoDisc: number = 0;
                             cumulatedQty += line.qtyRequest;
                             remainingQty = remainingQty - line.qtyRequest;
-                            for (let i = 0; i < line.qtyRequest; i++) {
-                              if (discountArray.length > 0) {
-                                let discountValue = discountArray.shift();
-                                if (discountArrayType == "A") {
-                                  promoDisc += discountValue;
-                                } else if (discountArrayType == "P") {
-                                  if (discountArrayOperation == "R") {
-                                    promoDisc += unitPrice * discountValue / 100;
-                                  } else if (discountArrayOperation == "A") {
-                                    promoDisc += line.discountedUnitPrice * discountValue / 100;
-                                  }
-                                }
-                              }
-                            }
+                            let promoDisc: number = this.computeDiscAmtFromDiscArray(line, discountArray, discountArrayOperation, discountArrayType, line.qtyRequest, isItemPriceTaxInclusive);
                             line.qtyRequest = 0;
                             if (debugFlag) {
                               console.log("[Setting of Row Impact ] Current discount: " + promoDisc);
@@ -601,24 +639,10 @@ export class PromotionEngineService {
                             }
 
                           } else if (line.qtyRequest > remainingQty) {
-                            let promoDisc: number = 0;
                             cumulatedQty += remainingQty;
                             //Set qtyRequest to qty not yet go through promotion impact, for next loop calculation
                             line.qtyRequest = line.qtyRequest - remainingQty;
-                            for (let i = 0; i < remainingQty; i++) {
-                              if (discountArray.length > 0) {
-                                let discountValue = discountArray.shift();
-                                if (discountArrayType == "A") {
-                                  promoDisc += discountValue;
-                                } else if (discountArrayType == "P") {
-                                  if (discountArrayOperation == "R") {
-                                    promoDisc += unitPrice * discountValue / 100;
-                                  } else if (discountArrayOperation == "A") {
-                                    promoDisc += line.discountedUnitPrice * discountValue / 100;
-                                  }
-                                }
-                              }
-                            }
+                            let promoDisc: number = this.computeDiscAmtFromDiscArray(line, discountArray, discountArrayOperation, discountArrayType, remainingQty, isItemPriceTaxInclusive);
                             remainingQty = 0;
                             if (debugFlag) {
                               console.log("[Setting of Row Impact ] Current discount: " + promoDisc);
@@ -755,6 +779,9 @@ export class PromotionEngineService {
                       switch (lineImpactCode) {
                         //No impact
                         case "L00":
+                          for (let i = 0; i < numberOfEntitlement; i++) {
+                            discountArray.push(-1);
+                          }
                           break;
                         //Set Row Disc Amount
                         case "L01":
@@ -806,11 +833,14 @@ export class PromotionEngineService {
                       }
                       discountArray.reverse();
                     }
-                    if (debugFlag) {
-                      console.log("[Setting of Row Impact ] Discount array: ")
-                      console.log(discountArray)
-                    }
+
                     if (discountArray.length > 0) {
+                      //Sorting of discount array (Desc)
+                      discountArray.sort((a, b) => (a < b ? 1 : -1));
+                      if (debugFlag) {
+                        console.log("[Setting of Row Impact ] Discount array: ")
+                        console.log(discountArray)
+                      }
                       //#region "Third Loop - Affected SalesBillLine - Set Row Impact"
                       for (let line of onlyImpactSalesBillLine) {
                         let unitPrice = isItemPriceTaxInclusive ? line.unitPrice : line.unitPriceExTax;
@@ -818,23 +848,9 @@ export class PromotionEngineService {
                           //Look for SalesBillLine to apply discount
                           let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
                           if (line.qtyRequest <= remainingQty) {
-                            let promoDisc: number = 0;
                             cumulatedQty += line.qtyRequest;
                             remainingQty = remainingQty - line.qtyRequest;
-                            for (let i = 0; i < line.qtyRequest; i++) {
-                              if (discountArray.length > 0) {
-                                let discountValue = discountArray.shift();
-                                if (discountArrayType == "A") {
-                                  promoDisc += discountValue;
-                                } else if (discountArrayType == "P") {
-                                  if (discountArrayOperation == "R") {
-                                    promoDisc += unitPrice * discountValue / 100;
-                                  } else if (discountArrayOperation == "A") {
-                                    promoDisc += line.discountedUnitPrice * discountValue / 100;
-                                  }
-                                }
-                              }
-                            }
+                            let promoDisc: number = this.computeDiscAmtFromDiscArray(line, discountArray, discountArrayOperation, discountArrayType, line.qtyRequest, isItemPriceTaxInclusive);
                             line.qtyRequest = 0;
                             if (debugFlag) {
                               console.log("[Setting of Row Impact ] Current discount: " + promoDisc);
@@ -849,24 +865,17 @@ export class PromotionEngineService {
                               }
                             }
                           } else if (line.qtyRequest > remainingQty) {
-                            let promoDisc: number = 0;
+                            let unaffectedQty: number = line.qtyRequest - remainingQty;
+                            if (unaffectedQty > 0) {
+                              for (let i = 0; i < unaffectedQty; i++) {
+                                discountArray.push(-1);
+                              }
+                              discountArray.sort((a, b) => (a < b ? 1 : -1));
+                            }
                             cumulatedQty += remainingQty;
                             //Set qtyRequest to qty not yet go through promotion impact, for next loop calculation
                             line.qtyRequest = line.qtyRequest - remainingQty;
-                            for (let i = 0; i < remainingQty; i++) {
-                              if (discountArray.length > 0) {
-                                let discountValue = discountArray.shift();
-                                if (discountArrayType == "A") {
-                                  promoDisc += discountValue;
-                                } else if (discountArrayType == "P") {
-                                  if (discountArrayOperation == "R") {
-                                    promoDisc += unitPrice * discountValue / 100;
-                                  } else if (discountArrayOperation == "A") {
-                                    promoDisc += line.discountedUnitPrice * discountValue / 100;
-                                  }
-                                }
-                              }
-                            }
+                            let promoDisc: number = this.computeDiscAmtFromDiscArray(line, discountArray, discountArrayOperation, discountArrayType, (remainingQty + unaffectedQty), isItemPriceTaxInclusive);
                             remainingQty = 0;
                             if (debugFlag) {
                               console.log("[Setting of Row Impact ] Current discount: " + promoDisc);
@@ -938,6 +947,56 @@ export class PromotionEngineService {
     //#endregion "First Loop - Promotion Event"
   }
 
+  computeDiscAmtFromDiscArray(line: TransactionDetail, discountArray: number[], discountArrayOperation: string, discountArrayType: string, loopCount: number, isItemPriceTaxInclusive: boolean) {
+    let unitPrice = isItemPriceTaxInclusive ? line.unitPrice : line.unitPriceExTax;
+    let promoDisc: number = 0;
+    for (let i = 0; i < loopCount; i++) {
+      if (discountArray.length > 0) {
+        let discountValue = discountArray.shift();
+        if (discountArrayType == "A") {
+          if (discountArrayOperation == "R") {
+            if (discountValue != -1) {
+              promoDisc += discountValue;
+            } else {
+              if (loopCount == 1) {
+                promoDisc = 0;
+              } else {
+                promoDisc += unitPrice - line.discountedUnitPrice;
+              }
+            }
+          } else if (discountArrayOperation == "A") {
+            if (discountValue != -1) {
+              promoDisc += discountValue;
+            } else {
+              promoDisc += 0;
+            }
+          }
+        } else if (discountArrayType == "P") {
+          if (discountArrayOperation == "R") {
+            //-1 represent getting of original discount
+            if (discountValue != -1) {
+              promoDisc += unitPrice * discountValue / 100;
+            } else {
+              if (loopCount == 1) {
+                promoDisc = 0;
+              } else {
+                promoDisc += unitPrice - line.discountedUnitPrice;
+              }
+            }
+          } else if (discountArrayOperation == "A") {
+            //-1 represent getting of original discount
+            if (discountValue != -1) {
+              promoDisc += line.discountedUnitPrice * discountValue / 100;
+            } else {
+              promoDisc += 0;
+            }
+          }
+        }
+      }
+    }
+    return promoDisc;
+  }
+
   assignPromoIdToSalesBillLine(salesBillLine: TransactionDetail, promoObject: PromotionMaster) {
     salesBillLine.promoEventId = promoObject.promoEventId;
     //salesBillLine.promoDesc = promoObject.description;
@@ -946,7 +1005,6 @@ export class PromotionEngineService {
 
   //20221110 To double check on this
   addPromoDiscAmt(salesBillLine: TransactionDetail, newDiscExpr: number, promoObject: PromotionMaster, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number, pwp: MasterListDetails) {
-    console.log(newDiscExpr)
     if (salesBillLine.discountGroupCode == pwp.code) {
       let split = salesBillLine.discountExpression.split("/")
       let currentDisc: number = parseFloat(split[1]);
@@ -973,7 +1031,6 @@ export class PromotionEngineService {
   }
 
   replacePromoDiscAmt(salesBillLine: TransactionDetail, newDiscExpr: number, promoObject: PromotionMaster, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number, pwp: MasterListDetails) {
-    console.log(newDiscExpr)
     if (salesBillLine.discountGroupCode == pwp.code) {
       let currentDisc: number = parseFloat(salesBillLine.discountExpression);
       currentDisc = this.commonService.roundToPrecision((currentDisc + newDiscExpr), roundingPrecision);

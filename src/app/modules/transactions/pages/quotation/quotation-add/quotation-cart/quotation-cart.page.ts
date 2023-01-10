@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController } from '@ionic/angular';
+import { format } from 'date-fns';
 import { QuotationHeader, QuotationRoot, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -42,6 +43,7 @@ export class QuotationCartPage implements OnInit {
     this.loadModuleControl();
     this.loadMasterList();
     this.loadRestrictColumms();
+    this.loadPromotion();
   }
 
   availableAddress: ShippingInfo[] = [];
@@ -130,7 +132,17 @@ export class QuotationCartPage implements OnInit {
     })
   }
 
-
+  loadPromotion() {
+    let trxDate = this.objectHeader.trxDate;
+    if (trxDate) {
+      this.quotationService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd')).subscribe(response => {
+        this.promotionMaster = response;
+      }, error => {
+        console.log(error);
+      })
+    }
+  }
+  
   /* #region  modal to edit each item */
 
   isModalOpen: boolean = false;
@@ -226,19 +238,19 @@ export class QuotationCartPage implements OnInit {
       header: 'Are you sure to delete?',
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-
-          }
-        },
-        {
           text: 'OK',
           role: 'confirm',
           cssClass: 'danger',
           handler: () => {
             this.removeItemById(data);
           },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+
+          }
         },
       ],
     });
@@ -290,7 +302,6 @@ export class QuotationCartPage implements OnInit {
       this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
     }
     this.computeDiscTaxAmount(trxLine);
-    // if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
     }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController } from '@ionic/angular';
+import { format } from 'date-fns';
 import { SalesOrderHeader, SalesOrderRoot, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -41,6 +42,7 @@ export class SalesOrderCartPage implements OnInit {
     this.itemInCart = this.salesOrderService.itemInCart;
     this.loadModuleControl();
     this.loadMasterList();
+    this.loadPromotion();
     this.loadRestrictColumms();
   }
 
@@ -128,6 +130,17 @@ export class SalesOrderCartPage implements OnInit {
       });
       this.restrictTrxFields = restrictedTrx;
     })
+  }
+
+  loadPromotion() {
+    let trxDate = this.objectHeader.trxDate;
+    if (trxDate) {
+      this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd')).subscribe(response => {
+        this.promotionMaster = response;
+      }, error => {
+        console.log(error);
+      })
+    }
   }
 
   /* #region  modal to edit each item */
@@ -225,19 +238,19 @@ export class SalesOrderCartPage implements OnInit {
       header: 'Are you sure to delete?',
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-
-          }
-        },
-        {
           text: 'OK',
           role: 'confirm',
           cssClass: 'danger',
           handler: () => {
             this.removeItemById(data);
           },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+
+          }
         },
       ],
     });
