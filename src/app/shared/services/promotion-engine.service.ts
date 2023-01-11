@@ -863,7 +863,7 @@ export class PromotionEngineService {
                               } else if (discountArrayOperation == "A") {
                                 impactedLine = this.addPromoDiscAmt(impactedLine, this.commonService.roundToPrecision(promoDisc, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp)
                               }
-                            }
+                            } 
                           } else if (line.qtyRequest > remainingQty) {
                             let unaffectedQty: number = line.qtyRequest - remainingQty;
                             if (unaffectedQty > 0) {

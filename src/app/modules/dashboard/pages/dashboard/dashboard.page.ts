@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ViewDidEnter } from '@ionic/angular';
+import { NavigationExtras } from '@angular/router';
+import { NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { AnnouncementFile, Dashboard } from '../../models/dashboard';
@@ -41,7 +42,8 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private navController: NavController
   ) { }
 
   ionViewDidEnter(): void {
@@ -90,6 +92,18 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     }, error => {
       console.log(error);
     })
+  }
+
+  goToManagement(page: string, mode: string) {
+    if (page && mode) {
+      this.navController.navigateRoot(`/managements/${page}-${mode}`);
+    }
+  }
+
+  goToTransaction(page: string) {
+    if (page) {
+      this.navController.navigateRoot(`/transactions/${page}`);
+    }
   }
 
 }

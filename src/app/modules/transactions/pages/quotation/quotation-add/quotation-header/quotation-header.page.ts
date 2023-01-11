@@ -150,9 +150,10 @@ export class QuotationHeaderPage implements OnInit {
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
   loadCustomerList() {
-    this.quotationService.getCustomerList().subscribe(response => {
+    this.quotationService.getCustomerList().subscribe(async response => {
       this.customers = response;
       this.customers = this.customers.filter(r => r.businessModelType === 'T');
+      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
       this.customers.forEach(r => {
         this.customerSearchDropdownList.push({
           id: r.customerId,

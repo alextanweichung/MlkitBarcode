@@ -134,7 +134,8 @@ export class SalesOrderHeaderPage implements OnInit {
     this.salesOrderService.getMasterList().subscribe(response => {
       this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.setDefaultValue();
     }, error => {
       console.log(error);
@@ -145,9 +146,10 @@ export class SalesOrderHeaderPage implements OnInit {
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
   loadCustomerList() {
-    this.salesOrderService.getCustomerList().subscribe(response => {
+    this.salesOrderService.getCustomerList().subscribe(async response => {
       this.customers = response;
       this.customers = this.customers.filter(r => r.businessModelType === 'T');
+      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
       this.customers.forEach(r => {
         this.customerSearchDropdownList.push({
           id: r.customerId,
@@ -207,7 +209,7 @@ export class SalesOrderHeaderPage implements OnInit {
         if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
           this.objectForm.patchValue({ typeCode: 'S' });
         } else {
-          this.objectForm.patchValue({ typeCode: 'T' });
+          this.objectForm.patchValue({ typeCode: 'T' }); 
         }
       }
       if (!this.disableTradeTransactionGenerateGL) {

@@ -19,7 +19,7 @@ export class TransactionProcessingPage implements OnInit {
   @Input() completedObjects: TransactionProcessingDoc[] = [];
   @Output() onObjectUpdated: EventEmitter<number> = new EventEmitter();
 
-  selectedSegment: string = 'pending';
+  @Input() selectedSegment: string = 'pending';
 
   constructor(
     private transactionProcessingService: TransactionProcessingService,
