@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
-import { NavController, ViewDidEnter } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { AnnouncementFile, Dashboard } from '../../models/dashboard';
+import { AnnouncementFile, Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 
 const managementPageCode: string = 'MAAP';
@@ -22,6 +25,7 @@ const mobileSalesOrderCode: string = 'MATRSO';
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
+  providers: [File, FileOpener, AndroidPermissions]
 })
 export class DashboardPage implements OnInit, ViewDidEnter {
 
@@ -43,7 +47,11 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     private authService: AuthService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
-    private navController: NavController
+    private navController: NavController,
+    private loadingController: LoadingController,
+    private opener: FileOpener,
+    private file: File,
+    private androidPermissions: AndroidPermissions
   ) { }
 
   ionViewDidEnter(): void {
@@ -103,6 +111,76 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   goToTransaction(page: string) {
     if (page) {
       this.navController.navigateRoot(`/transactions/${page}`);
+    }
+  }
+
+  isModalOpen: boolean = false;
+  selectedAnnouncement: Memo;
+  showModal(memo: Memo) {
+    this.selectedAnnouncement = memo;
+    this.isModalOpen = true;
+  }
+
+  hideModal() {
+    this.isModalOpen = false;
+    this.selectedAnnouncement = null;
+  }
+
+  async downloadPdf(memoDetail: MemoDetail) {
+    const loading = await this.loadingController.create({
+      cssClass: 'default-loading',
+      message: '<p>Downloading...</p><span>Please be patient.</span>',
+      spinner: 'crescent'
+    });
+    if (memoDetail) {
+      let filename = memoDetail.filesName + memoDetail.filesType;
+      try {
+        this.dashboardService.downloadFiles(memoDetail.filesId).subscribe(response => {
+          if (Capacitor.getPlatform() === 'android') {
+            this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+              async result => {
+                console.log('has permission?', result.hasPermission)
+                if (!result.hasPermission) {
+                  this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+                    async result => {
+                      await loading.present();
+                      this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
+                        this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                        loading.dismiss();
+                      }).catch((Error) => {
+                        loading.dismiss();
+                      });
+                    }
+                  );
+                } else {
+                  await loading.present();
+                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
+                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                    loading.dismiss();
+                  }).catch((Error) => {
+                    loading.dismiss();
+                  });
+                }
+              }
+            )
+          } else if (Capacitor.getPlatform() === 'ios') {
+
+          } else {
+            const url = window.URL.createObjectURL(response);
+            const link = window.document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", filename);
+            window.document.body.appendChild(link);
+            link.click();
+            link.remove();
+          }
+        }, error => {
+          loading.dismiss();
+          console.log(error);
+        })
+      } catch(error) {
+        loading.dismiss();
+      }
     }
   }
 

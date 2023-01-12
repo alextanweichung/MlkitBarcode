@@ -8,6 +8,7 @@ import { DashboardPageRoutingModule } from './dashboard-routing.module';
 
 import { DashboardPage } from './dashboard.page';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { SanitizeHtmlModule } from 'src/app/shared/pipes/sanitize-html/sanitize-html.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     FormsModule,
     IonicModule,
     DashboardPageRoutingModule,
-    SumModule
+    SumModule,
+    SanitizeHtmlModule
   ],
   declarations: [DashboardPage]
 })

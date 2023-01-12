@@ -19,7 +19,7 @@
       <ion-label color="dark">Announcement</ion-label>
     </ion-list-header>
     <ion-list class="list-custom" lines="none">
-      <ion-item *ngFor="let memo of dashboardData?.memo">
+      <ion-item *ngFor="let memo of dashboardData?.memo" (click)="showModal(memo)">
         <h6>{{memo?.header?.subject}}</h6>
       </ion-item>
     </ion-list>
@@ -106,3 +106,45 @@
   </div>
 
 </ion-content>
+
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Detail</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideModal()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content *ngIf="selectedAnnouncement">
+      <div class="p-2">
+        <ion-list-header class="ion-list-header-small">
+          <ion-label>Subject</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom" lines="full">
+          <ion-item>
+            <ion-textarea [autoGrow]="true" [readonly]="true" [(ngModel)]="selectedAnnouncement.header.subject"></ion-textarea>
+          </ion-item>
+        </ion-list>
+        <ion-list-header class="ion-list-header-small">
+          <ion-label>Body</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom" lines="full">
+          <ion-item>
+            <span [innerHTML]="selectedAnnouncement.header.body | sanitizeHtml"></span>
+          </ion-item>
+        </ion-list>
+        <ion-list-header class="ion-list-header-small">
+          <ion-label>Attachment</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom" lines="full">
+          <ion-item *ngFor="let a of selectedAnnouncement?.details" (click)="downloadPdf(a)">
+            <ion-label>{{a.filesName}}</ion-label>
+            <ion-icon slot="end" name="download-outline"></ion-icon>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
