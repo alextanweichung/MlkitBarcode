@@ -170,10 +170,10 @@ const routes: Routes = [
 
 
 
-  // others
+  // reports
   {
-    path: 'others',
-    loadChildren: () => import('./modules/others/pages/others/others.module').then(m => m.OthersPageModule)
+    path: 'reports',
+    loadChildren: () => import('./modules/reports/pages/reports/reports.module').then(m => m.ReportsPageModule)
   },
 
 
@@ -237,7 +237,8 @@ const routes: Routes = [
   {
     path: 'item-catalog',
     loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then( m => m.ItemCatalogPageModule)
-  },  {
+  },
+  {
     path: 'camera-scan-input',
     loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
   },

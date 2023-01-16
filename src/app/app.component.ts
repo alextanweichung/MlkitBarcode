@@ -6,6 +6,8 @@ import { NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ConfigService } from './services/config/config.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { NotificationsService } from './shared/services/notifications.service';
+import OneSignal from 'onesignal-cordova-plugin';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +22,8 @@ export class AppComponent {
     private platform: Platform,
     private router: Router,
     private configService: ConfigService,
-    private navController: NavController
+    private navController: NavController,
+    private pushNotications: NotificationsService
   ) {
     this.initializeApp();
   }
@@ -39,6 +42,8 @@ export class AppComponent {
 
       // If we're on a mobile platform (iOS / Android), not web
       if (Capacitor.getPlatform() !== 'web') {
+        // this.pushNotications.initPush();
+        OneSignalInit();
         this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)
         await StatusBar.setStyle({ style: Style.Dark });
@@ -58,3 +63,22 @@ export class AppComponent {
     });
   }
 }
+
+
+function OneSignalInit() {
+  // Uncomment to set OneSignal device logging to VERBOSE  
+  // OneSignal.setLogLevel(6, 0);
+
+  // NOTE: Update the setAppId value below with your OneSignal AppId.
+  OneSignal.setAppId("18607f67-a6dc-44cb-ac02-91770a58a695");
+  OneSignal.setNotificationOpenedHandler(function(jsonData) {
+      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+  });
+
+  // Prompts the user for notification permissions.
+  //    * Since this shows a generic native prompt, we recommend instead using an In-App Message to prompt for notification permission (See step 7) to better communicate to your users what notifications they will get.
+  OneSignal.promptForPushNotificationsWithUserResponse(function(accepted) {
+      console.log("User accepted notifications: " + accepted);
+  });
+}
+

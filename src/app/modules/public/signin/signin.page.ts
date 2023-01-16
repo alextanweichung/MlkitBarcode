@@ -9,6 +9,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
+import OneSignal from 'onesignal-cordova-plugin';
 
 @Component({
   selector: 'app-signin',
@@ -49,7 +50,15 @@ export class SigninPage implements OnInit {
 
   // Sign in
   async signIn() {
-    this.submit_attempt = true;  
+    this.submit_attempt = true;
+    if (Capacitor.getPlatform() !== 'web') {
+      OneSignal.getDeviceState(function (stateChanges) {
+        console.log("🚀 ~ file: signin.page.ts:57 ~ SigninPage ~ player_Id", stateChanges.userId)
+        localStorage.setItem('player_Id', stateChanges.userId);
+      });
+    } else {
+      localStorage.setItem('player_Id', '6ce7134e-5a4b-426f-b89b-54de14e05eba');
+    }
     // Loading overlay
     const loading = await this.loadingController.create({
       cssClass: 'default-loading',
@@ -65,9 +74,7 @@ export class SigninPage implements OnInit {
         await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           try {
-
             await loading.present();
-
             let itemMasterCount = (await this.configService.loadItemMaster())?.length;
             let itemBarcodeCount = (await this.configService.loadItemBarcode())?.length;
             if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0 || !itemBarcodeCount || itemBarcodeCount === undefined || itemBarcodeCount === 0) {

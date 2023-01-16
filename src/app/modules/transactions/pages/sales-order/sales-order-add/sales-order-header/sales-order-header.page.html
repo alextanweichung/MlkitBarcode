@@ -112,7 +112,11 @@
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{creditInfoType}}</ion-title>
+        <ion-title>
+          <div class="ion-text-wrap">
+            {{creditInfoType}}
+          </div>
+        </ion-title>
         <ion-buttons slot="start">
           <ion-button (click)="hideItemModal()">Done</ion-button>
         </ion-buttons>

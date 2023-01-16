@@ -1,0 +1,37 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Reports
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Reports</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">    
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Debtor Latest Outstanding</ion-label>
+    </ion-list-header>
+    
+    <table id="qtyMatrix">
+      <tr>
+        <th class="p-1 font-half-size">Debtor Name</th>
+        <th class="p-1 font-half-size">Salesman Name</th>
+        <th class="p-1 font-half-size">Currency</th>
+        <th class="p-1 font-half-size">Outstanding</th>
+        <!-- <th class="p-1 font-half-size">Generate Statement</th> -->
+      </tr>
+      <tr *ngFor="let rowData of debtorOutstandings; let rowIndex = index">
+        <td class="p-1 font-half-size">{{rowData.customerName}}</td>
+        <td class="p-1 font-half-size">{{rowData.customerName}}</td>
+        <td class="p-1 font-half-size">{{rowData.currencyCode}}</td>  
+        <td class="p-1 font-half-size ion-text-right">{{rowData.balance|number:'1.2-2'}}</td>
+        <!-- <td class="p-1 font-half-size">Generate</td> -->
+      </tr>
+    </table>
+
+  </div>
+</ion-content>

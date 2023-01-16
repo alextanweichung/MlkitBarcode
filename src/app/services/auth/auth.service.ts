@@ -13,6 +13,11 @@ import { MenuItem, MenuItemRoot } from './menu-item';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { RestrictedColumn } from 'src/app/shared/models/restricted-column';
 
+//Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
+const httpObserveHeader = {
+  observe: 'response' as 'response'
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -77,9 +82,20 @@ export class AuthService {
           this.setDebugMode(loginUser.token);
           this.isLoggedIn = true;
           this.checkAdminRights(loginUser.token);
+          this.updatePlayerId(loginUser);
         }
       })
     )
+  }
+
+  updatePlayerId(loginUser: LoginUser) {
+    let user = this.getDecodedToken(loginUser.token);
+    if (loginUser.playerId !== localStorage.getItem("player_Id")) {
+      this.http.put(this.baseUrl + "user/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
+      }, error => {
+        console.log(error);
+      });
+    }
   }
 
   refreshToken(tokenRequest: TokenRequest) {
