@@ -45,7 +45,7 @@ export class AppComponent {
         // this.pushNotications.initPush();
         OneSignalInit();
         this.platform.backButton.unsubscribe();
-        // Set StatusBar style (dark / light)
+        // Set StatusBar style (dark / light)p
         await StatusBar.setStyle({ style: Style.Dark });
         await BarcodeScanner.checkPermission({ force: true });
       }

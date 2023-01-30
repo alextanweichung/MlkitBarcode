@@ -24,6 +24,7 @@ const mobilePackingCode: string = 'MATRPA';
 const mobileConsignmentSalesCode: string = 'MATRCS';
 const mobileInventoryCountCode: string = 'MATRST';
 const mobileInventoryLevelCode: string = 'MATRIL';
+const mobilePosCashDeposit: string = 'MAMPCD';
 
 @Component({
   selector: 'app-transactions',
@@ -49,6 +50,7 @@ export class TransactionsPage implements OnInit {
 
   showStockCount: boolean = false;
   showInventoryLevel: boolean = false;
+  showCashDeposit: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -75,6 +77,7 @@ export class TransactionsPage implements OnInit {
         this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
         this.showStockCount = pageItems.findIndex(r => r.title === mobileInventoryCountCode) > -1;
         this.showInventoryLevel = pageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
+        this.showCashDeposit = pageItems.findIndex(r => r.title === mobilePosCashDeposit) > -1;
       }
     })
     // this.loadAllRecentList();

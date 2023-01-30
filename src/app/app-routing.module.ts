@@ -165,7 +165,11 @@ const routes: Routes = [
     path: 'transactions/check-balance',
     loadChildren: () => import('./modules/transactions/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
   },
-
+  // transaction-cash-deposit
+  {
+    path: 'transactions/cash-deposit',
+    loadChildren: () => import('./modules/transactions/pages/cash-deposit/cash-deposit.module').then( m => m.CashDepositPageModule)
+  },
 
 
 
@@ -242,6 +246,7 @@ const routes: Routes = [
     path: 'camera-scan-input',
     loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
   },
+
 
 
 

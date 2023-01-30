@@ -32,7 +32,7 @@ export class CommonService {
   }
 
   getTodayDate(): Date {
-    let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate(), 0, 0, 0);
+    let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate(), new Date().getUTCHours(), new Date().getUTCMinutes(), new Date().getUTCSeconds());
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     return today;
   }
@@ -56,6 +56,14 @@ export class CommonService {
     outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
     return outputDate;
   }
+
+  //To add back timezone differences into UTC Date
+  convertDateFormat(inputDate: Date): Date{
+    let outputDate = new Date(inputDate);
+    //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
+    return outputDate;
+  }
+
 
   convertObjectAllDateType(inputObject: any) {
     if (inputObject.hasOwnProperty('trxDate')) {

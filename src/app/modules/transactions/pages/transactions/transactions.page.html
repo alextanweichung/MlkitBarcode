@@ -57,7 +57,13 @@
           <ion-label>
             <h3>Check Balance</h3>
           </ion-label>
-        </ion-item>        
+        </ion-item>
+        
+        <ion-item button routerLink="cash-deposit" *ngIf="showCashDeposit">
+          <ion-label>
+            <h3>Cash Deposit</h3>
+          </ion-label>
+        </ion-item>
         
       </ion-list>
     </ng-container>

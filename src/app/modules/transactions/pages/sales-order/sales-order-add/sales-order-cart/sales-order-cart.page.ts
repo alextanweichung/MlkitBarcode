@@ -322,15 +322,17 @@ export class SalesOrderCartPage implements OnInit {
         header: 'Are you sure to proceed?',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
             text: 'OK',
+            cssClass: 'success',
             role: 'confirm',
             handler: async () => {
               await this.insertQuotation();
             },
+          },
+          {
+            text: 'Cancel',
+            cssClass: 'cancel',
+            role: 'cancel'
           },
         ],
       });

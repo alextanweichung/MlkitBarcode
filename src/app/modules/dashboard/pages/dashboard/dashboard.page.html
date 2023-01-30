@@ -19,7 +19,7 @@
       <ion-label color="dark">Announcement</ion-label>
     </ion-list-header>
     <ion-list class="list-custom" lines="none">
-      <ion-item *ngFor="let memo of dashboardData?.memo" (click)="showModal(memo)">
+      <ion-item button *ngFor="let memo of dashboardData?.memo" (click)="showModal(memo)">
         <h6>{{memo?.header?.subject}}</h6>
       </ion-item>
     </ion-list>
