@@ -1,13 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
-import { Directory, Filesystem } from '@capacitor/filesystem';
-import { FileInfo } from '@capacitor/filesystem/dist/esm/definitions';
-import { ActionSheetController, AlertController, LoadingController, NavController, Platform } from '@ionic/angular';
+import { Directory, FileInfo, Filesystem } from '@capacitor/filesystem';
+import { NavController, ActionSheetController, LoadingController, Platform, AlertController } from '@ionic/angular';
 import { format } from 'date-fns';
-import { finalize } from 'rxjs/operators';
-import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -23,46 +20,41 @@ interface LocalFile {
 }
 
 @Component({
-  selector: 'app-cash-deposit-add',
-  templateUrl: './cash-deposit-add.page.html',
-  styleUrls: ['./cash-deposit-add.page.scss'],
+  selector: 'app-cash-deposit-edit',
+  templateUrl: './cash-deposit-edit.page.html',
+  styleUrls: ['./cash-deposit-edit.page.scss'],
 })
-export class CashDepositAddPage implements OnInit {
+export class CashDepositEditPage implements OnInit {
 
+  objectId: number;
   objectForm: FormGroup;
+  object: CashDeposit;
 
   constructor(
-    private http: HttpClient,
-    private configService: ConfigService,
-    private objectService: CashDepositService,
-    private commonService: CommonService,
-    private actionSheetController: ActionSheetController,
-    private loadingController: LoadingController,
-    private alertController: AlertController,
+    private route: ActivatedRoute,
     private navController: NavController,
-    private formBuilder: FormBuilder,
     private toastService: ToastService,
+    private commonService: CommonService,
+    private formBuilder: FormBuilder,
+    private objectService: CashDepositService,
+    private loadingController: LoadingController,
+    private actionSheetController: ActionSheetController,
+    private alertController: AlertController,
     private plt: Platform
   ) {
-    this.date_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
-    this.date = format(this.commonService.getTodayDate(), 'MMM d, yyyy');
-    this.time_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
-    this.time = format(this.commonService.getTodayDate(), 'hh:mm a');
+    this.route.queryParams.subscribe(params => {
+      this.objectId = params['objectId'];
+    })
     this.newObjectForm();
-  }
-
-  ngOnInit() {
-    this.removeDir();
-    this.loadMasterList();
   }
 
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
       posCashDepositId: 0,
       posCashDepositNum: [null],
-      depositBy: [JSON.parse(localStorage.getItem('loginUser'))?.userName],
+      depositBy: [null],
       depositAmount: [0, [Validators.required]],
-      depositDateTime: [new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()), [Validators.required]],
+      depositDateTime: [new Date, [Validators.required]],
       depositFileId: [null],
       depositSlipNum: [null],
       paymentMethodId: [null],
@@ -70,10 +62,30 @@ export class CashDepositAddPage implements OnInit {
     })
   }
 
+  ngOnInit() {
+    this.loadMasterList();
+    if (this.objectId) {
+      this.loadObject();
+    }
+  }
+
   paymentMethodMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.objectService.getMasterList().subscribe(response => {
       this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  loadObject() {
+    this.objectService.getObject(this.objectId).subscribe(response => {
+      this.object = response;
+      this.objectForm.patchValue(this.object);
+      this.date_value = this.commonService.convertDateFormat(this.object.depositDateTime);
+      this.date = format(this.date_value, 'MMM d, yyyy');
+      this.time_value = this.commonService.convertUtcDate(this.object.depositDateTime);
+      this.time = format(this.commonService.convertDateFormat(this.object.depositDateTime), 'hh:mm a');
     }, error => {
       console.log(error);
     })
@@ -121,10 +133,14 @@ export class CashDepositAddPage implements OnInit {
 
   bindDateTimeToForm() {
     this.objectForm.patchValue({ depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()) })
-    console.log("🚀 ~ file: cash-deposit-add.page.ts:319 ~ CashDepositAddPage ~ insertObject ~ this.objectForm.value", this.objectForm.value)
+    console.log("🚀 ~ file: cash-deposit-edit.page.ts:137 ~ CashDepositEditPage ~ bindDateTimeToForm ~ this.time_value.getUTCSeconds()", this.time_value.getSeconds())
+    console.log("🚀 ~ file: cash-deposit-edit.page.ts:137 ~ CashDepositEditPage ~ bindDateTimeToForm ~ this.time_value.getUTCMinutes()", this.time_value.getMinutes())
+    console.log("🚀 ~ file: cash-deposit-edit.page.ts:137 ~ CashDepositEditPage ~ bindDateTimeToForm ~ this.time_value.getUTCHours()", this.time_value.getHours())
+    console.log("🚀 ~ file: cash-deposit-edit.page.ts:137 ~ CashDepositEditPage ~ bindDateTimeToForm ~ this.objectForm", this.objectForm.value)
   }
 
   /* #endregion */
+
 
   /* #region  attachment */
 
@@ -194,7 +210,7 @@ export class CashDepositAddPage implements OnInit {
   async loadFileData(fileNames: FileInfo[]) {
     for (let f of fileNames) {
       const filePath = `${IMAGE_DIR}/${f.name}`;
-      
+
       const readFile = await Filesystem.readFile({
         path: filePath,
         directory: Directory.Data
@@ -236,7 +252,7 @@ export class CashDepositAddPage implements OnInit {
     reader.readAsDataURL(blob);
   });
 
-  async startUpload(file: LocalFile, objectId: number, fileId: number) {  
+  async startUpload(file: LocalFile, objectId: number, fileId: number) {
     const response = await fetch(file.data);
     const blob = await response.blob();
     const formData = new FormData();
@@ -251,8 +267,8 @@ export class CashDepositAddPage implements OnInit {
 
   async deleteImage(file: LocalFile) {
     await Filesystem.deleteFile({
-        directory: Directory.Data,
-        path: file.path
+      directory: Directory.Data,
+      path: file.path
     });
     this.loadFiles();
   }
@@ -260,14 +276,14 @@ export class CashDepositAddPage implements OnInit {
   /* #endregion */
 
   async removeDir() {
-    await Filesystem.rmdir({      
+    await Filesystem.rmdir({
       path: IMAGE_DIR,
       directory: Directory.Data,
       recursive: true
     })
   }
 
-  async cancelInsert() {
+  async cancelEdit() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Are you sure to cancel?',
       cssClass: 'custom-action-sheet',
@@ -285,7 +301,12 @@ export class CashDepositAddPage implements OnInit {
     const { role } = await actionSheet.onWillDismiss();
     if (role === 'confirm') {
       this.removeDir();
-      this.navController.navigateBack('/transactions/cash-deposit');
+      let navigationExtras: NavigationExtras = {
+        queryParams: {
+          objectId: this.objectId
+        }
+      }
+      this.navController.navigateRoot('/transactions/cash-deposit/cash-deposit-detail', navigationExtras);
     }
   }
 
@@ -299,7 +320,7 @@ export class CashDepositAddPage implements OnInit {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.insertObject();
+              await this.updateObject();
             },
           },
           {
@@ -315,12 +336,12 @@ export class CashDepositAddPage implements OnInit {
     // }
   }
 
-  async insertObject() {
-    let response = await this.objectService.insertObject(this.objectForm.value);
-    if (response.status === 201) {
-      let ret = response.body as CashDeposit;
-      await this.startUpload(this.images[0], ret.posCashDepositId, ret.depositFileId ?? 0);
-      this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+  async updateObject() {
+    console.log("🚀 ~ file: cash-deposit-edit.page.ts:338 ~ CashDepositEditPage ~ updateObject ~ this.objectForm.value", this.objectForm.value)
+    let response = await this.objectService.updateObject(this.objectForm.value);
+    if (response.status === 204) {
+      await this.startUpload(this.images[0], this.object.posCashDepositId, this.object.depositFileId ?? 0);
+      this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
       await this.removeDir();
       this.navController.navigateRoot('transactions/cash-deposit');
     }

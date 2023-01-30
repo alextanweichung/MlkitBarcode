@@ -32,7 +32,7 @@ export class CashDepositService {
   }
 
   updateObject(object) {
-    return this.http.put(this.baseUrl + "MobilePosCashDeposit", object, httpObserveHeader);
+    return this.http.put(this.baseUrl + "MobilePosCashDeposit", object, httpObserveHeader).toPromise();
   }
 
   getObject(objectId: number) {

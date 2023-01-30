@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" *ngFor="let object of objects" >
+      <ion-item button detail="false" (click)="goToDetail(object.posCashDepositId)" *ngFor="let object of objects" >
         <ion-label>
           <h3>{{object.posCashDepositNum}}</h3>
           <p>{{object.depositDateTime|date:'dd/MM/yyyy'}}</p>

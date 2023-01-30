@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/transactions/cash-deposit"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="edit()">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Detail</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2" *ngIf="object">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item>
+        <ion-label>
+          <div>Bank in Number</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.posCashDepositNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Bank in Amount</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.depositAmount|number:'1.2'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Bank in Date</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.depositDateTime|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Bank in Time</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.depositDateTime|date:'hh:mm a'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Bank in Slip Number</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.depositSlipNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Bank name</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.paymentMethodId|idMapping:paymentMethodMasterList}}"></ion-input>
+      </ion-item>
+    </ion-list>    
+  </div>
+</ion-content>

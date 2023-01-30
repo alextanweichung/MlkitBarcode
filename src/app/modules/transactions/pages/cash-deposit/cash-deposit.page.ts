@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController, ViewDidEnter } from '@ionic/angular';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CashDeposit } from '../../models/cash-deposit';
@@ -73,5 +74,14 @@ export class CashDepositPage implements OnInit, ViewDidEnter {
   }
 
   /* #endregion */
+  
+  goToDetail(objectId: number) {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: objectId
+      }
+    }
+    this.navController.navigateForward('/transactions/cash-deposit/cash-deposit-detail', navigationExtras);
+  }
 
 }
