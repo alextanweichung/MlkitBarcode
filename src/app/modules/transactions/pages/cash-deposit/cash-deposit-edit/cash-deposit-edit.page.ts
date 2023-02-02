@@ -360,7 +360,6 @@ export class CashDepositEditPage implements OnInit {
   }
 
   async updateObject() {
-    console.log("🚀 ~ file: cash-deposit-edit.page.ts:338 ~ CashDepositEditPage ~ updateObject ~ this.objectForm.value", this.objectForm.value)
     let response = await this.objectService.updateObject(this.objectForm.value);
     if (response.status === 204) {
       await this.startUpload(this.images[0], this.object.posCashDepositId, this.object.depositFileId ?? 0);

@@ -84,7 +84,7 @@ export class CheckBalancePage implements OnInit {
       // if (this.selectedViewOptions === 'item') {
         this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevel = response;
-          this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
+          // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
           this.hideEmpty = false;
           this.computeVariationXY();
@@ -95,7 +95,7 @@ export class CheckBalancePage implements OnInit {
       if (lookUpItem.variationTypeCode !== '0')
         this.checkBalanceService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevelVariation = response;
-          this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
+          // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
           this.hideEmpty = false;
           this.computeVariationXY();
@@ -133,26 +133,22 @@ export class CheckBalancePage implements OnInit {
     this.selectedVariationX = 'all';
     this.itemVariationY = [{ label: 'All', value: 'all' }];
     this.selectedVariationY = 'all';
-    if (this.selectedViewOptions === 'item') {
-      // does nothing
-    } else {
-      if (this.inventoryLevelVariation.length > 0) {
-        let variationX = this.inventoryLevelVariation[0]?.itemVariationXDescription;
-        let variationY = this.inventoryLevelVariation[0]?.itemVariationYDescription;
-        if (variationX.length > 0) {
-          variationX.forEach(x => {
-            if (x !== null) {
-              this.itemVariationX.push({ label: x, value: x });
-            }
-          })
-        }
-        if (variationY.length > 0) {
-          variationY.forEach(y => {
-            if (y !== null) {
-              this.itemVariationY.push({ label: y, value: y });
-            }
-          })
-        }
+    if (this.inventoryLevelVariation.length > 0) {
+      let variationX = this.inventoryLevelVariation[0]?.itemVariationXDescription;
+      let variationY = this.inventoryLevelVariation[0]?.itemVariationYDescription;
+      if (variationX.length > 0) {
+        variationX.forEach(x => {
+          if (x !== null) {
+            this.itemVariationX.push({ label: x, value: x });
+          }
+        })
+      }
+      if (variationY.length > 0) {
+        variationY.forEach(y => {
+          if (y !== null) {
+            this.itemVariationY.push({ label: y, value: y });
+          }
+        })
       }
     }
   }
@@ -168,7 +164,7 @@ export class CheckBalancePage implements OnInit {
         if (this.hideEmpty) {
           this.inventoryLevel = this.inventoryLevel.filter(r => r.qty !== 0);
         }
-        this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
+        // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
       }, error => {
         console.log(error);
       })
@@ -201,7 +197,7 @@ export class CheckBalancePage implements OnInit {
           this.inventoryLevelVariation = [...temp];
         }
         // variation x, y filter
-        if (this.selectedVariationX !== 'all') {
+        if (this.selectedVariationX !== 'all' || this.selectedVariationY !== 'all') {
           let temp = this.inventoryLevelVariation;
           let itemVariationXIds = [];
           let itemVariationYIds = [];
@@ -212,7 +208,7 @@ export class CheckBalancePage implements OnInit {
                 itemVariationXIds.push(variations[rr].itemVariationXId);
               } else {
                 for (let rrr = 0; rrr < variations[rr].variationDetails.length; rrr++) {
-                  if (this.selectedVariationY != 'all') {
+                  if (this.selectedVariationY !== 'all') {
                     if (variations[rr].variationDetails[rrr].itemVariationYDescription === this.selectedVariationY) {
                       itemVariationYIds.push(variations[rr].variationDetails[rrr].itemVariationYId);
                     }
@@ -239,7 +235,7 @@ export class CheckBalancePage implements OnInit {
           })
           this.inventoryLevelVariation = [...temp];
         }
-        this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
+        // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
       }, error => {
         console.log(error);
       })

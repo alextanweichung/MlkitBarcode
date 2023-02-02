@@ -135,7 +135,6 @@ export class CashDepositAddPage implements OnInit {
 
   bindDateTimeToForm() {
     this.objectForm.patchValue({ depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()) })
-    console.log("🚀 ~ file: cash-deposit-add.page.ts:319 ~ CashDepositAddPage ~ insertObject ~ this.objectForm.value", this.objectForm.value)
   }
 
   /* #endregion */

@@ -53,7 +53,6 @@ export class SigninPage implements OnInit {
     this.submit_attempt = true;
     if (Capacitor.getPlatform() !== 'web') {
       OneSignal.getDeviceState(function (stateChanges) {
-        console.log("🚀 ~ file: signin.page.ts:57 ~ SigninPage ~ player_Id", stateChanges.userId)
         localStorage.setItem('player_Id', stateChanges.userId);
       });
     } else {
