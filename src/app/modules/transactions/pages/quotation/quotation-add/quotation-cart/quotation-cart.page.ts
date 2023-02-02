@@ -321,15 +321,16 @@ export class QuotationCartPage implements OnInit {
         header: 'Are you sure to proceed?',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
             text: 'OK',
             role: 'confirm',
+            cssClass: 'success',
             handler: async () => {
               await this.insertQuotation();
             },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel'
           },
         ],
       });

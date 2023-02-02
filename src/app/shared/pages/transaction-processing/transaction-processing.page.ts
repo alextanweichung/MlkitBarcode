@@ -38,16 +38,16 @@ export class TransactionProcessingPage implements OnInit {
       header: 'Are you sure to ' + action + ' ' + docNum + '?',
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
           text: 'OK',
           role: 'confirm',
           cssClass: 'success',
           handler: () => {
             this.updateDoc(action, docId);
           },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
         },
       ],
     });
@@ -59,7 +59,7 @@ export class TransactionProcessingPage implements OnInit {
     try {
       this.transactionProcessingService.updateDocumentStatus(action, docId).subscribe(async response => {
         if (response.status == 204) {
-          this.toastService.presentToast("Doc review is completed.", "", "bottom", "success", 1000);
+          this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
           this.onObjectUpdated.emit(docId);
         }
       }, error => {

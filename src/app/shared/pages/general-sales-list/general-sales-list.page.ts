@@ -152,7 +152,7 @@ export class GeneralSalesListPage implements OnInit {
             })
             await this.hideLoading();
           } else {
-            this.toastService.presentToast('Item not found', '', ' bottom', 'medium', 1000);
+            this.toastService.presentToast('Item not found', '', ' top', 'medium', 1000);
           }
         }
       }

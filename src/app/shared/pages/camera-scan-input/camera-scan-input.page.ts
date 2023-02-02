@@ -61,16 +61,16 @@ export class CameraScanInputPage implements OnInit {
           message: "Please allow camera access in your setting",
           buttons: [
             {
-              text: "No",
-              role: "cancel"
-            },
-            {
               text: "Open Settings",
               handler: () => {
                 BarcodeScanner.openAppSettings();
                 resolve(false);
               }
-            }
+            },
+            {
+              text: "No",
+              role: "cancel"
+            },
           ]
         })
         await alert.present();

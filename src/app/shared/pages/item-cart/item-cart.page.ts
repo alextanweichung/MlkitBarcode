@@ -117,13 +117,6 @@ export class ItemCartPage implements OnInit {
       header: 'Are you sure to delete?',
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            item.qtyRequest = 1;
-          }
-        },
-        {
           text: 'OK',
           role: 'confirm',
           cssClass: 'danger',
@@ -131,6 +124,13 @@ export class ItemCartPage implements OnInit {
             item.qtyRequest = null;
             this.onItemInCartEditCompleted.emit(trxLine);
           },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            item.qtyRequest = 1;
+          }
         },
       ],
     });
