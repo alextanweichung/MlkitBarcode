@@ -7,9 +7,11 @@ import { FileInfo } from '@capacitor/filesystem/dist/esm/definitions';
 import { ActionSheetController, AlertController, LoadingController, NavController, Platform } from '@ionic/angular';
 import { format } from 'date-fns';
 import { finalize } from 'rxjs/operators';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { CashDeposit } from '../../../models/cash-deposit';
 import { CashDepositService } from '../../../services/cash-deposit.service';
@@ -34,6 +36,7 @@ export class CashDepositAddPage implements OnInit {
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
+    private authService: AuthService,
     private objectService: CashDepositService,
     private commonService: CommonService,
     private actionSheetController: ActionSheetController,
@@ -54,6 +57,7 @@ export class CashDepositAddPage implements OnInit {
   ngOnInit() {
     this.removeDir();
     this.loadMasterList();
+    this.loadModuleControl();
   }
 
   newObjectForm() {
@@ -65,7 +69,7 @@ export class CashDepositAddPage implements OnInit {
       depositDateTime: [new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()), [Validators.required]],
       depositFileId: [null],
       depositSlipNum: [null],
-      paymentMethodId: [null],
+      paymentMethodId: [null, [Validators.required]],
       sequence: [0]
     })
   }
@@ -76,6 +80,16 @@ export class CashDepositAddPage implements OnInit {
       this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
+    })
+  }
+
+  moduleControl: ModuleControl[] = [];
+  fileSizeLimit: number = 1 * 1024 * 1024;
+  loadModuleControl() {    
+    this.authService.moduleControlConfig$.subscribe(obj => {
+      this.moduleControl = obj;
+      let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
+      this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
     })
   }
 
@@ -191,7 +205,9 @@ export class CashDepositAddPage implements OnInit {
 
   // Get the actual base64 data of an image
   // base on the name of the file
+  fileToDelete: LocalFile[] = [];
   async loadFileData(fileNames: FileInfo[]) {
+    this.fileToDelete = [];
     for (let f of fileNames) {
       const filePath = `${IMAGE_DIR}/${f.name}`;
       
@@ -199,13 +215,24 @@ export class CashDepositAddPage implements OnInit {
         path: filePath,
         directory: Directory.Data
       });
-
-      this.images.push({
-        name: f.name,
-        path: filePath,
-        data: `data:image/jpeg;base64,${readFile.data}`
-      });
+      if (f.size > this.fileSizeLimit) {
+        this.fileToDelete.push({
+          name: f.name, 
+          path: filePath,
+          data: `data:image/jpeg;base64,${readFile.data}`
+        });
+        this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
+      } else {
+        this.images.push({
+          name: f.name,
+          path: filePath,
+          data: `data:image/jpeg;base64,${readFile.data}`
+        });
+      }
     }
+    this.fileToDelete.forEach(e => {
+      this.deleteImage(e);
+    });
   }
 
   // https://ionicframework.com/docs/angular/your-first-app/3-saving-photos
@@ -290,7 +317,7 @@ export class CashDepositAddPage implements OnInit {
   }
 
   async nextStep() {
-    // if (this.objectForm.valid && this.images.length === 1) {
+    if (this.objectForm.valid && this.images.length === 1) {
       const alert = await this.alertController.create({
         header: 'Are you sure to proceed?',
         buttons: [
@@ -310,9 +337,9 @@ export class CashDepositAddPage implements OnInit {
         ],
       });
       await alert.present();
-    // } else {
-    //   this.toastService.presentToast('Error', 'Please fill required fields & attach 1 file to continue', 'top', 'danger', 2000);
-    // }
+    } else {
+      this.toastService.presentToast('Error', 'Please fill required fields & attach 1 file to continue', 'top', 'danger', 2000);
+    }
   }
 
   async insertObject() {
