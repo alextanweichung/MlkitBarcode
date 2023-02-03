@@ -61,7 +61,7 @@ export class TransactionsPage implements OnInit {
     private loadingController: LoadingController,
     private commonService: CommonService,
     private configService: ConfigService,
-    private toastService: ToastService
+    private toastService: ToastService,
   ) { }
 
   ngOnInit() {
