@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { DebtorOutStanding } from '../models/debtor-outstanding';
+import { Customer } from '../../transactions/models/customer';
+import { DebtorOutstanding } from '../models/debtor-outstanding';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,12 @@ export class ReportsService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
-  getDebtorOutstanding() {
-    return this.http.get<DebtorOutStanding[]>(this.baseUrl + "mobileReport/lastOutstanding/debtor");
+  getCustomers() {
+    return this.http.get<Customer[]>(this.baseUrl + "mobileReport/customer");
+  }
+
+  getDebtorOutstanding(customerId: number) {
+    return this.http.get<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding/debtor/" + customerId.toString());
   }
   
 }

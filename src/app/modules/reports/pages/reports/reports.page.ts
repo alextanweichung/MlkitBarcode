@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { DebtorOutStanding } from '../../models/debtor-outstanding';
-import { ReportsService } from '../../services/reports.service';
-
-const pageCode: string = 'MAOT';
 
 @Component({
   selector: 'app-reports',
@@ -12,23 +8,11 @@ const pageCode: string = 'MAOT';
 })
 export class ReportsPage implements OnInit {
 
-  debtorOutstandings: DebtorOutStanding[] = [];
-
   constructor(
-    private authService: AuthService,
-    private reportService: ReportsService
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
-    this.loadDebtorReport();
-  }
-
-  loadDebtorReport() {    
-    this.reportService.getDebtorOutstanding().subscribe(response => {
-      this.debtorOutstandings = response;
-    }, error => {
-      console.log(error);
-    })
   }
 
 }
