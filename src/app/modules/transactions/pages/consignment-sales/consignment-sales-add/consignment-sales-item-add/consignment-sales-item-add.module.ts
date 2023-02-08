@@ -11,6 +11,7 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
+import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-input-offline/item-code-input-offline.module';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
     BarcodeScanInputPageModule,
     ItemAddListFlatPageModule,
     IdMappingModule,
-    CameraScanInputPageModule
+    CameraScanInputPageModule,
+    ItemCodeInputOfflinePageModule
   ],
   declarations: [ConsignmentSalesItemAddPage]
 })

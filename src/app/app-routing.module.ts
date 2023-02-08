@@ -245,7 +245,11 @@ const routes: Routes = [
   {
     path: 'camera-scan-input',
     loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
+  },  {
+    path: 'item-code-input-offline',
+    loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then( m => m.ItemCodeInputOfflinePageModule)
   },
+
 
 
 

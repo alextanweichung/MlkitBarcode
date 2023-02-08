@@ -4,6 +4,16 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
+    <ion-buttons slot="primary" *ngIf="scanInput">
+      <ion-button (click)="toggleInputMode()">
+        <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+      </ion-button>      
+    </ion-buttons>
+    <ion-buttons slot="primary" *ngIf="!scanInput">
+      <ion-button (click)="toggleInputMode()">
+        <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen [hidden]="scanActive">
@@ -12,15 +22,16 @@
       <ion-label class="label-title">Pick Item</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2">    
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
-    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
+  <div class="p-2">
+    <app-barcode-scan-input *ngIf="scanInput" (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
+    <app-item-code-input-offline *ngIf="!scanInput" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" (onItemAdd)="onItemsAdd($event)"></app-item-code-input-offline>
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectDetail">
       <ion-item-sliding *ngFor="let line of objectDetail; let i = index">
         <ion-item button detail="false" class="no-ripple">
           <ion-grid class="ion-no-padding">
             <ion-row>
               <ion-col class="ion-margin-auto">
-                <div class="font-bold">{{line.itemBarcode}}</div>                      
+                <div class="font-bold">{{line.itemBarcode}}</div>
               </ion-col>
               <ion-col class="ion-margin-auto" *ngIf="objectHeader.isDisplayTaxInclusive">
                 <p class="ion-text-right">{{line.unitPrice|number:(objectHeader.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</p>
@@ -51,40 +62,6 @@
                       </div>
                     </ion-col>
                   </ion-row>
-                  <!-- <ion-row *ngIf="allowModifyItemInfo">
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="py-1">Unit Price: </div>
-                    </ion-col>
-                    <ion-col size="3" class="ion-margin-auto ion-flex">
-                      <ion-input #unitpriceinput type="number" [min]="0" placeholder="0" [(ngModel)]="line.unitPrice" (ionFocus)="highlight(unitpriceinput)" (keypress)="eventHandler($event.keyCode)"></ion-input>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row *ngIf="allowModifyItemInfo">
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="py-1">Disc Code: </div>
-                    </ion-col>
-                    <ion-col size="3" class="ion-margin-auto ion-flex">
-                      <ion-select class="p-0" interface="popover" placeholder="Select disc code" [(ngModel)]="line.discountGroupCode" (ionChange)="discountGroupCodeChanged(line)">
-                        <ion-select-option *ngFor="let discount of discountGroupMasterList" [value]="discount.code">{{discount.code}} - {{discount.description}}</ion-select-option>
-                      </ion-select>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row *ngIf="allowModifyItemInfo">
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="py-1">Disc Expression: </div>
-                    </ion-col>
-                    <ion-col size="3" class="ion-margin-auto ion-flex">
-                      <ion-input type="text" [(ngModel)]="line.discountExpression" (ionBlur)="computeAllAmount(line)"></ion-input>
-                    </ion-col>
-                  </ion-row>                  
-                  <ion-row *ngIf="allowModifyItemInfo">
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="py-1">Disc Amount: </div>
-                    </ion-col>
-                    <ion-col size="3" class="ion-margin-auto ion-flex">
-                      <div>{{line.discountAmt}}</div>
-                    </ion-col>
-                  </ion-row> -->
                   <ion-row *ngIf="allowModifyItemInfo">
                     <ion-col class="ion-margin-auto ion-flex">
                       <div class="py-1">Subtotal (Before Tax): </div>

@@ -85,6 +85,9 @@ export interface TransactionDetail {
   itemCategoryId?: number
   itemBarcodeTagId?: number
   /* #endregion */
+  /* #region for consignment select */
+  isSelected?: boolean
+  /* #endregion */
   sequence?: number
   createdById?: number
   createdBy?: string

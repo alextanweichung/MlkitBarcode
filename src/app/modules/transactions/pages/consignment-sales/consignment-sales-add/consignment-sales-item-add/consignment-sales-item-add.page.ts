@@ -8,18 +8,20 @@ import { ConsignmentSalesService } from 'src/app/modules/transactions/services/c
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { SearchItemService } from 'src/app/shared/services/search-item.service';
 
 @Component({
   selector: 'app-consignment-sales-item-add',
   templateUrl: './consignment-sales-item-add.page.html',
   styleUrls: ['./consignment-sales-item-add.page.scss'],
-  providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobileConsignmentSales' }]
+  providers: [BarcodeScanInputService, SearchItemService, { provide: 'apiObject', useValue: 'mobileConsignmentSales' }]
 })
 export class ConsignmentSalesItemAddPage implements OnInit {
 
@@ -47,6 +49,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
 
   ngOnInit() {
     this.objectHeader = this.consignmentSalesService.header;
+    console.log("🚀 ~ file: consignment-sales-item-add.page.ts:52 ~ ConsignmentSalesItemAddPage ~ ngOnInit ~ this.objectHeader", this.objectHeader)
     if (!this.objectHeader) {
       this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
     }
@@ -74,11 +77,13 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     })
   }
 
+  fullMasterList: MasterList[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   discountGroupMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.consignmentSalesService.getMasterList().subscribe(response => {
+      this.fullMasterList = response;
       this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -135,7 +140,16 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     this.addItemToLine(event);
   }
 
+  onItemsAdd(event: TransactionDetail[]) {
+    if (event && event.length > 0) {
+      event.forEach(r => {
+        this.addItemToLine(r);
+      })
+    }
+  }
+
   async addItemToLine(trxLine: TransactionDetail) {
+    console.log("🚀 ~ file: consignment-sales-item-add.page.ts:144 ~ ConsignmentSalesItemAddPage ~ addItemToLine ~ trxLine", trxLine)
     if (this.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
       this.objectDetail[0].qtyRequest++;
     } else {
@@ -175,6 +189,16 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     } else {
       this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
     }
+  }
+
+  /* #endregion */
+
+  /* #region input mode */
+
+  scanInput: boolean = true;
+  toggleInputMode() {
+    this.scanInput = !this.scanInput;
+    console.log("🚀 ~ file: consignment-sales-item-add.page.ts:198 ~ ConsignmentSalesItemAddPage ~ toggleInputMode ~ this.scanInput", this.scanInput)
   }
 
   /* #endregion */
@@ -272,7 +296,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
 
   /* #endregion */
 
-  /* #region  modal to edit line detail */  
+  /* #region  modal to edit line detail */
 
   selectedItem: TransactionDetail;
   async showLineDetails(trxLine: TransactionDetail) {
@@ -319,10 +343,10 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     }
   }
 
-  insertConsignmentSales() {    
+  insertConsignmentSales() {
     let trxDto: ConsignmentSalesRoot = {
       header: this.objectHeader,
-      details: this.objectDetail      
+      details: this.objectDetail
     }
     this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
       let css: ConsignmentSalesSummary = {
@@ -342,6 +366,5 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   previousStep() {
     this.navController.navigateBack('/transactions/consignment-sales/consignment-sales-header-add');
   }
-
 
 }

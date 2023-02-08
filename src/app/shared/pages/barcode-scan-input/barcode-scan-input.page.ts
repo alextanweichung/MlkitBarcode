@@ -4,7 +4,6 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
-import { BarcodeScanInputService } from '../../services/barcode-scan-input.service';
 
 @Component({
   selector: 'app-barcode-scan-input',

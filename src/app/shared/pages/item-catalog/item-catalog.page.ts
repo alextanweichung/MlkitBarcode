@@ -110,11 +110,13 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   loadImages(searchText) {
-    this.searchItemService.getItemImageFile(searchText).subscribe(response => {
-      this.availableImages = response;
-    }, error => {
-      console.log(error);
-    })
+    if (this.showImage) {
+      this.searchItemService.getItemImageFile(searchText).subscribe(response => {
+        this.availableImages = response;
+      }, error => {
+        console.log(error);
+      })
+    }
   }
 
   onKeyDown(event) {
