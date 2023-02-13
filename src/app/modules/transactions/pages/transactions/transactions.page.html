@@ -18,42 +18,51 @@
       <ion-list class="list-custom" lines="full">
 
         <ion-item button routerLink="quotation" *ngIf="showQuotation">
+          <!-- <fa-icon icon="credit-card-alt" fixed-width="true"></fa-icon> -->
+          <!-- <i class="fa fa-bath" aria-hidden="true"></i> -->
+          <ion-icon name="newspaper-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Quotation</h3>
           </ion-label>
         </ion-item>
 
         <ion-item button routerLink="sales-order" *ngIf="showSalesOrder">
+          <ion-icon name="exit-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Sales Order</h3>
           </ion-label>
         </ion-item>
 
         <ion-item button routerLink="picking" *ngIf="showPicking">
+          <ion-icon name="people-circle-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Picking</h3>
           </ion-label>
         </ion-item>
 
         <ion-item button routerLink="packing" *ngIf="showPacking">
+          <ion-icon name="cube-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Packing</h3>
           </ion-label>
         </ion-item>
 
         <ion-item button routerLink="consignment-sales" *ngIf="showConsignmentSales">
+          <ion-icon name="storefront-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Consignment Sales</h3>
           </ion-label>
         </ion-item>
 
         <ion-item button routerLink="stock-count" *ngIf="showStockCount">
+          <ion-icon name="receipt-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Stock Count</h3>
           </ion-label>
         </ion-item>
 
         <ion-item button routerLink="check-balance" *ngIf="showInventoryLevel">
+          <ion-icon name="file-tray-full-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Check Balance</h3>
           </ion-label>
