@@ -25,6 +25,7 @@ const mobileConsignmentSalesCode: string = 'MATRCS';
 const mobileInventoryCountCode: string = 'MATRST';
 const mobileInventoryLevelCode: string = 'MATRIL';
 const mobilePosCashDeposit: string = 'MAMPCD';
+const mobileTruckLoading: string = 'MAMTL';
 
 @Component({
   selector: 'app-transactions',
@@ -51,6 +52,7 @@ export class TransactionsPage implements OnInit {
   showStockCount: boolean = false;
   showInventoryLevel: boolean = false;
   showCashDeposit: boolean = false;
+  showTruckLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -78,161 +80,9 @@ export class TransactionsPage implements OnInit {
         this.showStockCount = pageItems.findIndex(r => r.title === mobileInventoryCountCode) > -1;
         this.showInventoryLevel = pageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
         this.showCashDeposit = pageItems.findIndex(r => r.title === mobilePosCashDeposit) > -1;
+        this.showTruckLoading = pageItems.findIndex(r => r.title === mobileTruckLoading) > -1;
       }
     })
-    // this.loadAllRecentList();
   }
-
-  loadAllRecentList() {
-    // quotation
-    if (this.showQuotation) {
-      this.loadRecentQuotation();
-    }
-
-    // sales order
-    if (this.showSalesOrder) {
-      this.loadRecentSalesOrder();
-    }
-
-    // picking
-    if (this.showPicking) {
-      this.loadRecentPicking();
-    }
-
-    // packing
-    if (this.showPacking) {
-      this.loadRecentPacking();
-    }
-
-    // consignment-sales
-    if (this.showConsignmentSales) {
-      this.loadRecentConsignmentSales();
-    }
-  }
-
-  /* #region  quotation */
-
-  loadRecentQuotation() {
-    try {
-      this.quotationService.getObjectList().subscribe(response => {
-        this.quotations = response.slice(0, 3);
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading quotation', '', 'top', 'danger', 1000);
-    }
-  }
-
-  async goToQuotationDetail(objectId: number) {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: objectId
-      }
-    }
-    this.navController.navigateForward('/transactions/quotation/quotation-detail', navigationExtras);
-  }
-
-  /* #endregion */
-
-  /* #region  sales order */
-
-  loadRecentSalesOrder() {
-    try {
-      this.salesOrderService.getObjectList().subscribe(response => {
-        this.salesOrders = response.slice(0, 3);
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading sales order', '', 'top', 'danger', 1000);
-    }
-  }
-
-  async goToSalesOrderDetail(objectId: number) {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: objectId,
-      }
-    }
-    this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);
-  }
-
-  /* #endregion */
-
-  /* #region  picking */
-
-  loadRecentPicking() {
-    try {
-      this.pickingService.getObjectList().subscribe(response => {
-        this.pickings = response.slice(0, 3);
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading picking', '', 'top', 'danger', 1000);
-    }
-  }
-
-  async goToPickingDetail(objectId: number) {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: objectId,
-      }
-    }
-    this.navController.navigateForward('/transactions/picking/picking-detail', navigationExtras);
-  }
-
-  /* #endregion */
-
-  /* #region  packing */
-
-  loadRecentPacking() {
-    try {
-      this.packingService.getObjectList().subscribe(response => {
-        this.packings = response.slice(0, 3);
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading packing', '', 'top', 'danger', 1000);
-    }
-  }
-
-  async goToPackingDetail(objectId: number) {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: objectId,
-      }
-    }
-    this.navController.navigateForward('/transactions/packing/packing-detail', navigationExtras);
-  }
-
-  /* #endregion */
-
-  /* #region  other-sales */
-
-  loadRecentConsignmentSales() {
-    try {
-      this.consignmentSalesService.getObjectList().subscribe(response => {
-        this.consignment_sales = response.slice(0, 3);
-      }, error => {
-        console.log(error);
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading consignment sales', '', 'top', 'danger', 1000);
-    }
-  }
-
-  goToConsignmentSalesDetail(objectId: number) {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: objectId
-      }
-    }
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
-  }
-
-  /* #endregion */
 
 }

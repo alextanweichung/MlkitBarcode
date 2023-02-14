@@ -170,6 +170,10 @@ const routes: Routes = [
     path: 'transactions/cash-deposit',
     loadChildren: () => import('./modules/transactions/pages/cash-deposit/cash-deposit.module').then( m => m.CashDepositPageModule)
   },
+  {
+    path: 'transactions/truck-loading',
+    loadChildren: () => import('./modules/transactions/pages/truck-loading/truck-loading.module').then( m => m.TruckLoadingPageModule)
+  },
 
 
 
@@ -245,7 +249,8 @@ const routes: Routes = [
   {
     path: 'camera-scan-input',
     loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
-  },  {
+  },
+  {
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then( m => m.ItemCodeInputOfflinePageModule)
   },

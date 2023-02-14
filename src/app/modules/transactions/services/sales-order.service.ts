@@ -123,4 +123,14 @@ export class SalesOrderService {
     return this.http.get<CreditInfo>(this.baseUrl + 'MobileSalesOrder/creditInfo/' + customerId);
   }
 
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
+    return this.http.post(this.baseUrl + "MobileSalesOrder/exportPdf", 
+    {
+      "appCode": appCode,
+      "format": format,
+      "documentIds": [ documentId ]
+    },
+    { responseType: "blob"});
+  }
+
 }

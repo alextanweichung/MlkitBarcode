@@ -1,0 +1,112 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/transactions/truck-loading"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Detail</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2" *ngIf="object">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item>
+        <ion-label>
+          <div>Truck Loading Num</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.truckLoadingNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Trx Date</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Vendor</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.vendorId|idMapping:vendorMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Ship Method</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.shipMethodId|idMapping:shipMethodMasterList}}"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Detail</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" *ngFor="let line of object.details" class="no-ripple">
+        <ion-grid class="p-0">
+          <ion-row>
+            <ion-col>
+              <div>Document Num</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.trxNum}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>Document Type</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.trxType}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>From Location</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.fromLocation}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>Customer/To Location</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.toLocation}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>Total Carton</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.totalCarton}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>Total Quantity</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.qty|number:'1.0'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <div>Remark</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{line.remark}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

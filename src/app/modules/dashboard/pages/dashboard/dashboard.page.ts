@@ -139,7 +139,6 @@ export class DashboardPage implements OnInit, ViewDidEnter {
           if (Capacitor.getPlatform() === 'android') {
             this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
               async result => {
-                console.log('has permission?', result.hasPermission)
                 if (!result.hasPermission) {
                   this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
                     async result => {
