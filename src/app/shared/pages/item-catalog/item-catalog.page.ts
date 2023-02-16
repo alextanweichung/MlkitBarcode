@@ -46,11 +46,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // if (changes.showImage) {
-    //   if (this.showImage) {
-    //     this.loadImages();
-    //   }
-    // }
+    
   }
 
   ngOnInit() {
@@ -110,13 +106,11 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   loadImages(searchText) {
-    if (this.showImage) {
-      this.searchItemService.getItemImageFile(searchText).subscribe(response => {
-        this.availableImages = response;
-      }, error => {
-        console.log(error);
-      })
-    }
+    this.searchItemService.getItemImageFile(searchText).subscribe(response => {
+      this.availableImages = response;
+    }, error => {
+      console.log(error);
+    })
   }
 
   onKeyDown(event) {

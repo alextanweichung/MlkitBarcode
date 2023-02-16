@@ -214,6 +214,7 @@ export class CommonQueryService<T> {
 
     return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
       let sqlcmd: string = `UPDATE ${table} SET ${sql} WHERE ${primaryKey}`;
+      console.log("🚀 ~ file: common-query.service.ts:218 ~ CommonQueryService<T> ~ returnthis._databaseService.executeQuery<any> ~ sqlcmd", sqlcmd)
       let ret: any = await db.run(sqlcmd);
       return ret;
     }, database)

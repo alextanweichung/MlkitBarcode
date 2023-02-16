@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from '../../../../shared/services/common.service';
-import { QuotationService } from '../../services/quotation.service';
-import { SalesOrderService } from '../../services/sales-order.service';
 
 @Component({
   selector: 'app-filter',
@@ -21,6 +20,9 @@ export class FilterPage implements OnInit {
   date_to: any;
   startDate: Date;
   endDate: Date;
+
+  customerFilter: boolean = false;
+  customerList: SearchDropdownList[] = [];
 
   constructor(
     private commonService: CommonService,
@@ -60,6 +62,15 @@ export class FilterPage implements OnInit {
     this.date_to_active = false;
   }
 
+  selectedCustomerId: number[] = [];
+  onCustomerSelected(event) {
+    if (event) {
+      event.forEach(r => {
+        this.selectedCustomerId.push(r.id)
+      });
+    }
+  }
+
   // Cancel
   cancel() {
     // Dismiss modal
@@ -70,7 +81,11 @@ export class FilterPage implements OnInit {
   apply() {
     // Add filter logic here...
     // ...
-    this.filters = { startDate: this.startDate, endDate: this.endDate };
+    if (this.customerFilter) {
+      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId };
+    } else {
+      this.filters = { startDate: this.startDate, endDate: this.endDate };
+    }
 
     // Dismiss modal and apply filters
     this.modalController.dismiss(this.filters);

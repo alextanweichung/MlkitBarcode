@@ -11,6 +11,9 @@ import { Capacitor } from '@capacitor/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { Customer } from '../../models/customer';
 
 @Component({
   selector: 'app-sales-order',
@@ -24,6 +27,7 @@ export class PickingSalesOrderPage implements OnInit {
 
   startDate: Date;
   endDate: Date;
+  customerIds: number[] = [];
 
   constructor(
     private commonService: CommonService,
@@ -47,15 +51,45 @@ export class PickingSalesOrderPage implements OnInit {
       this.endDate = this.commonService.getTodayDate();
     }
     this.loadObjects();
+    this.loadCustomerList();
   }
 
   /* #region  crud */
 
   loadObjects() {
-    this.salesOrderService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
-      this.objects = response;
+    try {
+      let obj: SalesSearchModal =  {
+        dateStart: format(this.startDate, 'yyyy-MM-dd'),
+        dateEnd: format(this.endDate, 'yyyy-MM-dd'),
+        customerId: this.customerIds
+      }
+      this.salesOrderService.getObjectListByDate(obj).subscribe(response => {
+        this.objects = response;
+      }, error => {
+        throw Error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+    }
+  }
+
+  customers: Customer[] = [];
+  selectedCustomer: Customer;
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  loadCustomerList() {
+    this.salesOrderService.getCustomerList().subscribe(async response => {
+      this.customers = response;
+      this.customers = this.customers.filter(r => r.businessModelType === 'T');
+      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+      this.customers.forEach(r => {
+        this.customerSearchDropdownList.push({
+          id: r.customerId,
+          code: r.customerCode,
+          description: r.name
+        })
+      })
     }, error => {
-      console.log((error));
+      console.log(error);
     })
   }
 
@@ -177,7 +211,10 @@ export class PickingSalesOrderPage implements OnInit {
       component: FilterPage,
       componentProps: {
         startDate: this.startDate,
-        endDate: this.endDate
+        endDate: this.endDate,
+        customerFilter: true,
+        customerList: this.customerSearchDropdownList,
+        selectedCustomerId: this.customerIds
       },
       canDismiss: true
     })
@@ -186,6 +223,7 @@ export class PickingSalesOrderPage implements OnInit {
     if (data && data !== undefined) {
       this.startDate = new Date(data.startDate);
       this.endDate = new Date(data.endDate);
+      this.customerIds = data.customerIds;
       this.loadObjects();
     }
   }

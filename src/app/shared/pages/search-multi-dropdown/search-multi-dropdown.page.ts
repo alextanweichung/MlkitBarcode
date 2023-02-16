@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { IonSearchbar, LoadingController } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
 
@@ -7,7 +7,7 @@ import { SearchDropdownList } from '../../models/search-dropdown-list';
   templateUrl: './search-multi-dropdown.page.html',
   styleUrls: ['./search-multi-dropdown.page.scss'],
 })
-export class SearchMultiDropdownPage implements OnInit {
+export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
   @Input() title: string = "Search";
   @Input() showHeaderLabel: boolean = true;
@@ -17,6 +17,7 @@ export class SearchMultiDropdownPage implements OnInit {
   @Input() searchDropdownList: SearchDropdownList[];
   @Output() onActionComplete: EventEmitter<SearchDropdownList[]> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
+  @Input() selectedIds: number[] = [];
   selected: SearchDropdownList[] = [];
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
@@ -24,6 +25,16 @@ export class SearchMultiDropdownPage implements OnInit {
   constructor(
     private loadingController: LoadingController,
   ) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.selectedIds || changes.searchDropdownList) {
+      if (this.selectedIds) {
+        this.selected = this.searchDropdownList.filter(r => this.selectedIds.includes(r.id));
+      } else {
+        this.selected = null;
+      }
+    }
+  }
 
   ngOnInit() {
   }

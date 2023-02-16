@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { FilterPageRoutingModule } from './filter-routing.module';
 
 import { FilterPage } from './filter.page';
+import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    FilterPageRoutingModule
+    FilterPageRoutingModule,
+    SearchMultiDropdownPageModule
   ],
   declarations: [FilterPage]
 })

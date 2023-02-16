@@ -41,6 +41,14 @@
       [value]="endDate.toISOString()">
       </ion-datetime>
     </ion-list>
+    
+    <div *ngIf="customerFilter">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>Customer</ion-label>
+      </ion-list-header>
+      <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
+      <app-search-multi-dropdown #appsMultiDropdown title="Customer" [showHeaderLabel]="false" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)" [selectedIds]="selectedCustomerId"></app-search-multi-dropdown>
+    </div>
   </div>
 
 </ion-content>

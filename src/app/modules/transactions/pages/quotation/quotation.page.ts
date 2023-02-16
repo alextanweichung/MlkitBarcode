@@ -7,6 +7,9 @@ import { CommonService } from '../../../../shared/services/common.service';
 import { QuotationService } from '../../services/quotation.service';
 import { FilterPage } from '../filter/filter.page';
 import { format } from 'date-fns';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { Customer } from '../../models/customer';
+import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 
 @Component({
   selector: 'app-quotation',
@@ -20,6 +23,7 @@ export class QuotationPage implements OnInit {
 
   startDate: Date;
   endDate: Date;
+  customerIds: number[] = [];
 
   constructor(
     private commonService: CommonService,
@@ -38,13 +42,19 @@ export class QuotationPage implements OnInit {
       this.endDate = this.commonService.getTodayDate();
     }
     this.loadObjects();
+    this.loadCustomerList();
   }
 
   /* #region  crud */
 
   loadObjects() {
     try {
-      this.quotationService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+      let obj: SalesSearchModal =  {
+        dateStart: format(this.startDate, 'yyyy-MM-dd'),
+        dateEnd: format(this.endDate, 'yyyy-MM-dd'),
+        customerId: this.customerIds
+      }
+      this.quotationService.getObjectListByDate(obj).subscribe(response => {
         this.objects = response;
       }, error => {
         throw Error;
@@ -52,6 +62,26 @@ export class QuotationPage implements OnInit {
     } catch (error) {
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  customers: Customer[] = [];
+  selectedCustomer: Customer;
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  loadCustomerList() {
+    this.quotationService.getCustomerList().subscribe(async response => {
+      this.customers = response;
+      this.customers = this.customers.filter(r => r.businessModelType === 'T');
+      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+      this.customers.forEach(r => {
+        this.customerSearchDropdownList.push({
+          id: r.customerId,
+          code: r.customerCode,
+          description: r.name
+        })
+      })
+    }, error => {
+      console.log(error);
+    })
   }
 
   /* #endregion */
@@ -94,7 +124,10 @@ export class QuotationPage implements OnInit {
       component: FilterPage,
       componentProps: {
         startDate: this.startDate,
-        endDate: this.endDate
+        endDate: this.endDate,
+        customerFilter: true,
+        customerList: this.customerSearchDropdownList,
+        selectedCustomerId: this.customerIds
       },
       canDismiss: true
     })
@@ -103,6 +136,7 @@ export class QuotationPage implements OnInit {
     if (data && data !== undefined) {
       this.startDate = new Date(data.startDate);
       this.endDate = new Date(data.endDate);
+      this.customerIds = data.customerIds;
       this.loadObjects();
     }
   }

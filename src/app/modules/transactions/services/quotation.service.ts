@@ -7,6 +7,7 @@ import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
+import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { Customer } from '../models/customer';
 import { QuotationHeader, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
@@ -107,8 +108,8 @@ export class QuotationService {
     return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/qtlist");
   }
 
-  getObjectListByDate(startDate: string, endDate: string) {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/listing/" + startDate + "/" + endDate);
+  getObjectListByDate(searchObject: SalesSearchModal) {
+    return this.http.post<QuotationList[]>(this.baseUrl + "MobileQuotation/listing", searchObject);
   }
 
   getObjectById(objectId: number) {
