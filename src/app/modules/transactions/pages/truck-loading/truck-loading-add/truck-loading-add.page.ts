@@ -1,11 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, LoadingController, NavController } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TruckLoadingDetail } from '../../../models/truck-loading';
+import { TruckLoadingDetail, TruckLoadingRoot } from '../../../models/truck-loading';
 import { TruckLoadingService } from '../../../services/truck-loading.service';
 
 @Component({
@@ -83,13 +84,13 @@ export class TruckLoadingAddPage implements OnInit {
       e.preventDefault();
     }
   }
-  
+
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
   async validateDocNum(docNum: string) {
     if (docNum) {
       this.docNumInput = '';
       let trxExist = this.lineObjects.findIndex(r => r.trxNum === docNum);
-      if (trxExist) {
+      if (trxExist > -1) {
         this.toastService.presentToast('Document already selected.', '', 'top', 'danger', 1000);
       } else {
         this.objectService.getLineDetailsByTrxNum(docNum).subscribe(response => {
@@ -142,6 +143,54 @@ export class TruckLoadingAddPage implements OnInit {
   }
 
   /* #endregion */
+
+  /* #region line delete */
+
+  async presentDeleteAlert(rowIndex) {    
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'Are you sure to delete?',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'confirm',
+          cssClass: 'danger',
+          handler: (data) => {
+            this.lineObjects.splice(rowIndex, 1);
+          },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  /* #endregion */
+
+  nextStep() {
+    let object: TruckLoadingRoot = {
+      header: this.objectForm.getRawValue(),
+      details: this.lineObjects, 
+      otp: null
+    }
+    this.objectService.insertObject(object).subscribe(response => {
+      if (response.status === 201) {
+        let ret = response.body as TruckLoadingRoot;
+        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: ret.header.truckLoadingId
+          }
+        }
+        this.navController.navigateRoot ('/transactions/truck-loading/truck-loading-detail', navigationExtras);
+      }
+    }, error => {
+      console.log(error);
+    })
+  }
 
   async cancelInsert() {
     const actionSheet = await this.actionSheetController.create({

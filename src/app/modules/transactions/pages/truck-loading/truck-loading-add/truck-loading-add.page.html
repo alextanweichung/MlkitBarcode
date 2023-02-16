@@ -14,6 +14,9 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Document</ion-label>
+    </ion-list-header>
     <form [formGroup]="objectForm">
       <ion-list class="list-custom" lines="full">
         <ion-item>
@@ -55,6 +58,86 @@
       </ion-list>
     </form>
 
-    <input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="docNumInput" placeholder="Scan item barcode" (keydown)="handleKeyDown($event, docNumInput)">
+    <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="docNumInput" placeholder="Scan or Input Doc Num" (keydown)="handleKeyDown($event, docNumInput)">
+
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>Detail Line</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item-sliding *ngFor="let line of lineObjects; let i = index">
+        <ion-item button detail="false" *ngFor="let line of lineObjects" class="no-ripple">
+          <ion-grid class="p-0 pt-2">
+            <ion-row>
+              <ion-col>
+                <div>Document Num</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{line.trxNum}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div>Document Type</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{line.trxType}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div>From Location</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{line.fromLocation}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="line.toLocation">
+              <ion-col>
+                <div>Customer/To Location</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{line.toLocation}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="line.totalCarton">
+              <ion-col>
+                <div>Total Carton</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{line.totalCarton}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div>Total Quantity</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{line.qty|number:'1.0'}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div>Remark</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">
+                  <ion-textarea class="custom-textarea" [autoGrow]="true" [(ngModel)]="line.remark" placeholder="Enter Remark"></ion-textarea>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="presentDeleteAlert(i)"><ion-icon name="trash-outline" slot="bottom"></ion-icon>Reverse</ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+
   </div>
 </ion-content>
+
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid">
+    Save
+  </ion-button>
+</ion-footer>

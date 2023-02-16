@@ -33,7 +33,7 @@ export class TruckLoadingService {
   }
 
   insertObject(object: TruckLoadingRoot) {
-    return this.http.post(this.baseUrl + "MobileTruckLoading" + object, httpObserveHeader);
+    return this.http.post(this.baseUrl + "MobileTruckLoading", object, httpObserveHeader);
   }
 
   updateObject(object: TruckLoadingRoot) {
