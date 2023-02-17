@@ -78,6 +78,7 @@ export class QuotationDetailPage implements OnInit {
     try {
       this.quotationService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        console.log("🚀 ~ file: quotation-detail.page.ts:81 ~ QuotationDetailPage ~ this.quotationService.getObjectById ~ this.object", this.object)
       }, error => {
         throw Error;
       })
@@ -98,5 +99,18 @@ export class QuotationDetailPage implements OnInit {
   filter(details: InnerVariationDetail[]) {
     return details.filter(r => r.qtyRequest > 0);
   }
+
+  /* #region history modal */
+
+  historyModal: boolean = false;
+  showHistoryModal() {
+    this.historyModal = true;
+  }
+
+  hideHistoryModal() {
+    this.historyModal = false;
+  }
+
+  /* #endregion */
 
 }

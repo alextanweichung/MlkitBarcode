@@ -99,4 +99,17 @@ export class SalesOrderDetailPage implements OnInit {
     return details.filter(r => r.qtyRequest > 0);
   }
 
+  /* #region history modal */
+
+  historyModal: boolean = false;
+  showHistoryModal() {
+    this.historyModal = true;
+  }
+
+  hideHistoryModal() {
+    this.historyModal = false;
+  }
+
+  /* #endregion */
+
 }

@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { PurchaseOrderLine } from '../../../models/purchase-order';
+import { PurchaseOrderLine, PurchaseOrderRoot } from '../../../models/purchase-order';
 import { PurchaseOrderService } from '../../../services/purchase-order.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class PurchaseOrderDetailPage implements OnInit {
   parent: string = 'Purchase Order'
 
   objectId: number;
-  purchaseOrder: any;
+  object: PurchaseOrderRoot;
   flattenPurchaseOrder: any;
 
   constructor(
@@ -63,8 +63,8 @@ export class PurchaseOrderDetailPage implements OnInit {
   loadDetail() {
     try {
       this.purchaseOrderService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
-        this.purchaseOrder = response;
-        this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.purchaseOrder);
+        this.object = response;
+        this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.object);
       }, error => {
         throw Error;
       })
@@ -76,5 +76,18 @@ export class PurchaseOrderDetailPage implements OnInit {
   getFlattenVariations(itemId: number): PurchaseOrderLine[] {
     return this.flattenPurchaseOrder.details.filter(r => r.itemId === itemId);
   }
+
+  /* #region history modal */
+
+  historyModal: boolean = false;
+  showHistoryModal() {
+    this.historyModal = true;
+  }
+
+  hideHistoryModal() {
+    this.historyModal = false;
+  }
+
+  /* #endregion */
 
 }

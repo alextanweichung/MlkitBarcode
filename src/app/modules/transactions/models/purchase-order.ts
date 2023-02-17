@@ -1,3 +1,4 @@
+import { ApprovalHistory } from "src/app/shared/models/approval-history"
 import { VariationDetail } from "src/app/shared/models/variation-detail"
 
 export interface PurchaseOrderRoot {
@@ -5,6 +6,7 @@ export interface PurchaseOrderRoot {
    details: PurchaseOrderDetail[]
    // barcodeTag: BarcodeTag[]
    // otp: any
+  approvalHistory?: ApprovalHistory[]
  }
  
  export interface PurchaseOrderHeader {

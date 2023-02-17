@@ -1,3 +1,4 @@
+import { ApprovalHistory } from "src/app/shared/models/approval-history"
 import { TransactionDetail } from "src/app/shared/models/transaction-detail"
 
 export interface QuotationList {
@@ -26,6 +27,7 @@ export interface QuotationRoot {
   details: TransactionDetail[]
   barcodeTag?: any
   otp?: any
+  approvalHistory?: ApprovalHistory[]
 }
 
 export interface QuotationHeader {
