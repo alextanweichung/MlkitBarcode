@@ -96,8 +96,8 @@ export class SalesOrderService {
     return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer");
   }
   
-  getPromotion(trxDate: string) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate);
+  getPromotion(trxDate: string, customerId: number) {
+    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId);
   }
 
   getFullItemList() {

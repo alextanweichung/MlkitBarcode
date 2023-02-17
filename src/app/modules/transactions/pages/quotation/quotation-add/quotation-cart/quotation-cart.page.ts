@@ -135,7 +135,7 @@ export class QuotationCartPage implements OnInit {
   loadPromotion() {
     let trxDate = this.objectHeader.trxDate;
     if (trxDate) {
-      this.quotationService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd')).subscribe(response => {
+      this.quotationService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
         this.promotionMaster = response;
       }, error => {
         console.log(error);

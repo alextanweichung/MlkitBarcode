@@ -96,8 +96,8 @@ export class QuotationService {
     return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer");
   }
   
-  getPromotion(trxDate: string) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileQuotation/promotion/' + trxDate);
+  getPromotion(trxDate: string, customerId: number) {
+    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileQuotation/promotion/' + trxDate + '/' + customerId);
   }
 
   getFullItemList() {

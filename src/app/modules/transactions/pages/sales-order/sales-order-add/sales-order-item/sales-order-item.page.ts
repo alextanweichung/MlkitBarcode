@@ -108,7 +108,7 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
   loadPromotion() {
     let trxDate = this.objectHeader.trxDate;
     if (trxDate) {
-      this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd')).subscribe(response => {
+      this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
         this.promotionMaster = response;
       }, error => {
         console.log(error);
