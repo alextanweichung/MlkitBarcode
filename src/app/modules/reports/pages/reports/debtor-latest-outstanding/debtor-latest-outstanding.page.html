@@ -11,7 +11,9 @@
   <div class="p-2">
     <ion-list class="list-custom" lines="none">
       <app-search-dropdown title="Debtor" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
+      <app-calendar-input #calendar title="Statement Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
     </ion-list>
+    <ion-button class="pt-2" expand="block" size="default" (click)="loadDebtorReport()">Search</ion-button>
     <div class="p-2">
       <table id="qtyMatrix" *ngIf="objects.length > 0">
         <tr>
@@ -24,7 +26,7 @@
           <td class="p-1 font-half-size">{{rowData.salesAgentName}}</td>
           <td class="p-1 font-half-size">{{rowData.currencyCode}}</td>
           <td class="p-1 font-half-size ion-text-right">{{rowData.balance|number:'1.2-2'}}</td>
-          <td class="p-1 font-half-size">Generate</td>
+          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf(rowData.salesAgentId)">Generate</ion-button></td>
         </tr>
       </table>
     </div>
