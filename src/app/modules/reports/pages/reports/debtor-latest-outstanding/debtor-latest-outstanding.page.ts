@@ -1,4 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { LoadingController } from '@ionic/angular';
 import { format } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -11,6 +16,7 @@ import { ReportsService } from '../../../services/reports.service';
   selector: 'app-debtor-latest-outstanding',
   templateUrl: './debtor-latest-outstanding.page.html',
   styleUrls: ['./debtor-latest-outstanding.page.scss'],
+  providers: [File, FileOpener, AndroidPermissions]
 })
 export class DebtorLatestOutstandingPage implements OnInit {
 
@@ -20,7 +26,11 @@ export class DebtorLatestOutstandingPage implements OnInit {
 
   constructor(
     private reportService: ReportsService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private loadingController: LoadingController,
+    private opener: FileOpener,
+    private file: File,
+    private androidPermissions: AndroidPermissions
   ) { }
 
   ngOnInit() {
@@ -44,7 +54,7 @@ export class DebtorLatestOutstandingPage implements OnInit {
     })
   }
 
-  loadDebtorReport() {    
+  loadDebtorReport() {
     if (this.customerId && this.trxDate) {
       this.reportService.getDebtorOutstanding(this.customerId, format(this.trxDate, 'yyyy-MM-dd')).subscribe(response => {
         this.objects = response;
@@ -71,7 +81,12 @@ export class DebtorLatestOutstandingPage implements OnInit {
     }
   }
 
-  downloadPdf(salesAgentId: number) {
+  async downloadPdf(salesAgentId: number) {
+    const loading = await this.loadingController.create({
+      cssClass: 'default-loading',
+      message: '<p>Downloading...</p><span>Please be patient.</span>',
+      spinner: 'crescent'
+    });
     let paramModel: ReportParameterModel = {
       appCode: 'FAAR005',
       format: 'pdf',
@@ -79,17 +94,47 @@ export class DebtorLatestOutstandingPage implements OnInit {
       reportName: 'Statement of Account',
       customReportParam: {
         parameter1: this.customerId,
-        statementDate:  this.trxDate
+        statementDate: this.trxDate
       }
     }
-    this.reportService.getPdf(paramModel).subscribe(blob => {
-      let t: any = new Blob([blob]);
-      const a = document.createElement('a');
-      const objectUrl = URL.createObjectURL(t);
-      a.href = objectUrl;
-      a.download = paramModel.reportName + '.' + paramModel.format;
-      a.click();
-      URL.revokeObjectURL(objectUrl);      
+    this.reportService.getPdf(paramModel).subscribe(response => {
+
+      if (Capacitor.getPlatform() === 'android') {
+        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+          async result => {
+            if (!result.hasPermission) {
+              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+                async result => {
+                  await loading.present();
+                  this.file.writeFile(this.file.externalRootDirectory + "/Download", paramModel.reportName, response, { replace: true }).then(() => {
+                    this.opener.open(this.file.externalRootDirectory + "/Download/" + paramModel.reportName, "application/pdf");
+                    loading.dismiss();
+                  }).catch((Error) => {
+                    loading.dismiss();
+                  });
+                }
+              );
+            } else {
+              await loading.present();
+              this.file.writeFile(this.file.externalRootDirectory + "/Download", paramModel.reportName, response, { replace: true }).then(() => {
+                this.opener.open(this.file.externalRootDirectory + "/Download/" + paramModel.reportName, "application/pdf");
+                loading.dismiss();
+              }).catch((Error) => {
+                loading.dismiss();
+              });
+            }
+          }
+        )
+      }
+      else {
+        let t: any = new Blob([response]);
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(t);
+        a.href = objectUrl;
+        a.download = paramModel.reportName + '.' + paramModel.format;
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      }
     }, error => {
       console.log(error);
     })
