@@ -59,6 +59,15 @@
         </ion-label>
         <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.paymentMethodId|idMapping:paymentMethodMasterList}}"></ion-input>
       </ion-item>
-    </ion-list>    
+    </ion-list>
+
+    <div *ngIf="imageUrl">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>Attachment</ion-label>
+      </ion-list-header>
+      <div class="flex m-2 ion-text-center">
+        <img [src]="imageUrl" style="width: 50%; display: block;"/>
+      </div>
+    </div>
   </div>
 </ion-content>

@@ -59,4 +59,8 @@ export class CashDepositService {
     return this.http.post(this.baseUrl + "MobilePosCashDeposit/slipUpload/" + keyId + "/" + fileId, file, httpObserveHeader);
   }
 
+  downloadFile(fileId: number) {
+    return this.http.get(this.baseUrl + "MobilePosCashDeposit/imageFile/" + fileId, { responseType: 'blob' });
+  }
+
 }

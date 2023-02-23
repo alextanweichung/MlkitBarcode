@@ -50,8 +50,17 @@
       </ion-list>
     </form>
 
+    <div *ngIf="imageUrl && images?.length === 0">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label>Attachment</ion-label>
+      </ion-list-header>
+      <div class="flex m-2 ion-text-center">
+        <img [src]="imageUrl" style="width: 50%; display: block;"/>
+      </div>
+    </div>
+
     <div class="mt-2">
-      <ion-button fill="clear" expand="full" color="dark" (click)="selectImage()" *ngIf="images.length === 0">
+      <ion-button fill="clear" expand="full" color="dark" (click)="presentAlert()" *ngIf="images.length === 0">
         <ion-icon slot="start" name="camera"></ion-icon>
         Select Image
       </ion-button>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { Directory, FileInfo, Filesystem } from '@capacitor/filesystem';
@@ -42,7 +43,8 @@ export class CashDepositEditPage implements OnInit {
     private objectService: CashDepositService,
     private loadingController: LoadingController,
     private actionSheetController: ActionSheetController,
-    private alertController: AlertController,
+    private alertController: AlertController, 
+    private sanitizer: DomSanitizer,
     private plt: Platform
   ) {
     this.route.queryParams.subscribe(params => {
@@ -90,6 +92,19 @@ export class CashDepositEditPage implements OnInit {
       this.date = format(this.date_value, 'MMM d, yyyy');
       this.time_value = this.commonService.convertUtcDate(this.object.depositDateTime);
       this.time = format(this.commonService.convertDateFormat(this.object.depositDateTime), 'hh:mm a');
+      if (this.object && this.object.depositFileId) {
+        this.loadAttachment(this.object.depositFileId);
+      }
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  imageUrl: SafeUrl;
+  loadAttachment(fileId) {
+    this.objectService.downloadFile(fileId).subscribe(blob => {
+      let objectURL = URL.createObjectURL(blob);
+      this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
     }, error => {
       console.log(error);
     })
@@ -154,8 +169,33 @@ export class CashDepositEditPage implements OnInit {
 
   /* #region  attachment */
 
-  images: LocalFile[] = [];
+  async presentAlert() {
+    if (this.object.depositFileId) {
+      const alert = await this.alertController.create({
+        header: "Upload new attachment?",
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.selectImage();
+            },
+          },
+          {
+            text: 'Cancel',
+            cssClass: 'cancel',
+            role: 'cancel'
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.selectImage();
+    }
+  }
 
+  images: LocalFile[] = [];
   async selectImage() {
     const image = await Camera.getPhoto({
       quality: 90,
