@@ -18,6 +18,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
+    
     <ng-container *ngIf="!objects || objects?.length === 0">
       <p>
         <ion-text color="tertiary">
@@ -25,6 +26,7 @@
         </ion-text>
       </p>
     </ng-container>
+
     <ng-container *ngIf="objects?.length > 0">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item-sliding *ngFor="let object of objects">
@@ -45,6 +47,7 @@
       </ion-list>
     </ng-container>
   </div>
+
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>

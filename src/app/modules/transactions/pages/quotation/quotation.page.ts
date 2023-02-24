@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, IonRouterOutlet, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, LoadingController, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { QuotationList } from '../../models/quotation';
 import { CommonService } from '../../../../shared/services/common.service';
@@ -10,12 +10,16 @@ import { format } from 'date-fns';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-quotation',
   templateUrl: './quotation.page.html',
   styleUrls: ['./quotation.page.scss'],
-  providers: [IonRouterOutlet]
+  providers: [File, FileOpener, AndroidPermissions]
 })
 export class QuotationPage implements OnInit {
 
@@ -30,8 +34,13 @@ export class QuotationPage implements OnInit {
     private quotationService: QuotationService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
+    private alertController: AlertController,
+    private loadingController: LoadingController,
     private navController: NavController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private androidPermissions: AndroidPermissions,    
+    private opener: FileOpener,
+    private file: File,
   ) { }
 
   ngOnInit() {
@@ -115,6 +124,83 @@ export class QuotationPage implements OnInit {
         }]
     });
     await actionSheet.present();
+  }
+
+  /* #endregion */
+
+  /* #region download pdf */
+
+  async presentAlertViewPdf(doc) {
+    const alert = await this.alertController.create({
+      header: '',
+      subHeader: 'View Pdf?',
+      message: '',
+      buttons: [
+        {
+          text: 'OK',
+          cssClass: 'success',
+          role: 'confirm',
+          handler: async () => {
+            await this.downloadPdf(doc);
+          },
+        },
+        {
+          cssClass: 'cancel',
+          text: 'Cancel',
+          role: 'cancel'
+        },
+      ]
+    });
+    await alert.present();
+  }
+
+  async downloadPdf(doc) {
+    const loading = await this.loadingController.create({
+      cssClass: 'default-loading',
+      message: '<p>Downloading...</p><span>Please be patient.</span>',
+      spinner: 'crescent'
+    });
+    this.quotationService.downloadPdf("SMSC001", "pdf", doc.quotationId).subscribe(response => {
+      let filename = doc.quotationNum + ".pdf";
+      if (Capacitor.getPlatform() === 'android') {
+        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+          async result => {
+            if (!result.hasPermission) {
+              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+                async result => {
+                  await loading.present();
+                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
+                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                    loading.dismiss();
+                  }).catch((Error) => {
+                    loading.dismiss();
+                  });
+                }
+              );
+            } else {
+              await loading.present();
+              this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
+                this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                loading.dismiss();
+              }).catch((Error) => {
+                loading.dismiss();
+              });
+            }
+          }
+        )
+      } else {
+        const url = window.URL.createObjectURL(response);
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filename);
+        window.document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    }, error => {
+      loading.dismiss();
+      console.log(error);
+    })
   }
 
   /* #endregion */

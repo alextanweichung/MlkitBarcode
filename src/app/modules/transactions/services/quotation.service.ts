@@ -124,4 +124,15 @@ export class QuotationService {
     return this.http.get<CreditInfo>(this.baseUrl + 'MobileQuotation/creditInfo/' + customerId);
   }
 
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
+    return this.http.post(this.baseUrl + "MobileQuotation/exportPdf", 
+    {
+      "appCode": appCode,
+      "format": format,
+      "documentIds": [ documentId ]
+    },
+    { responseType: "blob"});
+  }
+
+
 }

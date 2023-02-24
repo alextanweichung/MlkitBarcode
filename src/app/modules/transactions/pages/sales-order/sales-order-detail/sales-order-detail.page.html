@@ -5,10 +5,30 @@
       <ion-back-button text="Back"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button (click)="showHistoryModal()"><ion-icon name="ellipsis-horizontal-circle-outline" slot="icon-only"></ion-icon></ion-button>
+      <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list class="list-custom" lines="full">
+        <ion-item (click)="showHistoryModal()">
+          <ion-label>
+            <div>Approval History</div>
+          </ion-label>
+        </ion-item>
+        <ion-item (click)="presentAlertViewPdf()">
+          <ion-label>
+            <div>Download Pdf</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -160,7 +180,7 @@
         <ion-list-header class="ion-list-header-small" *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
           <ion-label>Approval History not available.</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        <ion-list class="list-custom" lines="none">
           <ion-item button="false" *ngFor="let h of object?.approvalHistory">
             <ion-grid class="p-1">
               <ion-row>
