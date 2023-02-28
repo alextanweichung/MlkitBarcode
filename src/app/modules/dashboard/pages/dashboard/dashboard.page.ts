@@ -163,7 +163,12 @@ export class DashboardPage implements OnInit, ViewDidEnter {
               }
             )
           } else if (Capacitor.getPlatform() === 'ios') {
-
+            this.file.writeFile(this.file.tempDirectory, filename, response, { replace: true }).then(() => {
+              this.opener.open(this.file.tempDirectory + filename, "application/pdf");
+              loading.dismiss();
+            }).catch((error) => {
+              loading.dismiss();
+            })
           } else {
             const url = window.URL.createObjectURL(response);
             const link = window.document.createElement("a");
