@@ -98,7 +98,6 @@ export class DebtorLatestOutstandingPage implements OnInit {
       }
     }
     this.reportService.getPdf(paramModel).subscribe(response => {
-
       if (Capacitor.getPlatform() === 'android') {
         this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
           async result => {
@@ -125,8 +124,14 @@ export class DebtorLatestOutstandingPage implements OnInit {
             }
           }
         )
-      }
-      else {
+      } else if (Capacitor.getPlatform() === 'ios') {
+        this.file.writeFile(this.file.tempDirectory, paramModel.reportName, response, { replace: true }).then(() => {
+          this.opener.open(this.file.tempDirectory + paramModel.reportName, "application/pdf");
+          loading.dismiss();
+        }).catch((error) => {
+          loading.dismiss();
+        })
+      } else {
         let t: any = new Blob([response]);
         const a = document.createElement('a');
         const objectUrl = URL.createObjectURL(t);

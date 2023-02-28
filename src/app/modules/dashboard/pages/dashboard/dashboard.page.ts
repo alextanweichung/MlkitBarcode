@@ -127,6 +127,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   }
 
   async downloadPdf(memoDetail: MemoDetail) {
+    console.log("🚀 ~ file: dashboard.page.ts:131 ~ DashboardPage ~ downloadPdf ~ Capacitor.getPlatform():", Capacitor.getPlatform())
     const loading = await this.loadingController.create({
       cssClass: 'default-loading',
       message: '<p>Downloading...</p><span>Please be patient.</span>',
