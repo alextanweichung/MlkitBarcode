@@ -1,7 +1,9 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "idcp-mobile",
-	"webDir": "www",
-	"bundledWebRuntime": false,
-	"ios": { "scheme": "App" }
+  "appId": "io.ionic.idcp",
+  "appName": "iDCP Mobile",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "ios": {
+    "scheme": "App"
+  }
 }
