@@ -97,7 +97,8 @@ export class TransactionProcessingPage implements OnInit {
       navigationExtras = {
         queryParams: {
           objectId: docId,
-          parent: this.processType
+          processType: this.processType,
+          selectedSegment: this.selectedSegment
         }
       }
     }
@@ -105,7 +106,8 @@ export class TransactionProcessingPage implements OnInit {
       navigationExtras = {
         queryParams: {
           objectId: docId,
-          parent: this.processType
+          processType: this.processType,
+          selectedSegment: this.selectedSegment
         }
       }
     }
@@ -113,7 +115,8 @@ export class TransactionProcessingPage implements OnInit {
       navigationExtras = {
         queryParams: {
           objectId: docId,
-          parent: this.processType
+          processType: this.processType,
+          selectedSegment: this.selectedSegment
         }
       }
     }

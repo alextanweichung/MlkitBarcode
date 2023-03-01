@@ -24,6 +24,24 @@
             <div>Download Pdf</div>
           </ion-label>
         </ion-item>
+        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="presentConfirmAlert('CONFIRM')">
+          <ion-icon name="checkmark-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Approve</div>
+          </ion-label>
+        </ion-item>
+        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="presentConfirmAlert('REJECT')">
+          <ion-icon name="close-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Reject</div>
+          </ion-label>
+        </ion-item>
+        <ion-item button *ngIf="processType && selectedSegment === 'completed'" (click)="presentConfirmAlert('REVERSE')">
+          <ion-icon name="arrow-undo-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Reverse</div>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ng-template>

@@ -23,6 +23,13 @@ export class CommonService {
       this.endDate = this.getTodayDate();
     }
   }
+  
+  getFirstDayOfTheYear(): Date {
+    let today = this.getTodayDate();
+    let firstDoy = new Date(new Date().getUTCFullYear(), 0, 1, 0, 0, 0);
+    firstDoy.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    return firstDoy;
+  }
 
   getFirstDayOfTodayMonth(): Date {
     let today = this.getTodayDate();

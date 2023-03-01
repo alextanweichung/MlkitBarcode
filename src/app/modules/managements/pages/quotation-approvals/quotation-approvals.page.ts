@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, NavController } from '@ionic/angular';
+import { ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -14,7 +14,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./quotation-approvals.page.scss'],
   providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'mobileQuotationApprove' }]
 })
-export class QuotationApprovalsPage implements OnInit {
+export class QuotationApprovalsPage implements OnInit, ViewWillEnter {
 
   pendingObjects: TransactionProcessingDoc[] = [];
   completedObjects: TransactionProcessingDoc[] = [];
@@ -29,9 +29,20 @@ export class QuotationApprovalsPage implements OnInit {
     private modalController: ModalController
   ) { }
 
+  // make sure refresh when back to this page
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+  }
+
   ngOnInit() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();

@@ -32,7 +32,7 @@ export class PackingPage implements OnInit {
 
   ngOnInit() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();

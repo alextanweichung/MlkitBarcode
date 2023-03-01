@@ -56,6 +56,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
 
   ionViewDidEnter(): void {
     this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
+    this.loadAnnouncements();
   }
 
   ngOnInit() {

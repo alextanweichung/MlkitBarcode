@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
 import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-quotation-pending-review',
@@ -14,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./quotation-reviews.page.scss'],
   providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'mobileQuotationReview' }]
 })
-export class QuotationReviewsPage implements OnInit {
+export class QuotationReviewsPage implements OnInit, ViewWillEnter {
 
   pendingObjects: TransactionProcessingDoc[] = [];
   completedObjects: TransactionProcessingDoc[] = [];
@@ -29,9 +28,20 @@ export class QuotationReviewsPage implements OnInit {
     private toastService: ToastService
   ) { }
 
+  // make sure refresh when back to this
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+  }
+
   ngOnInit() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();

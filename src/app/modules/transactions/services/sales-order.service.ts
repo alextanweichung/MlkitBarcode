@@ -9,6 +9,7 @@ import { MasterList } from 'src/app/shared/models/master-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
 import { SalesOrderHeader, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
 
@@ -132,6 +133,10 @@ export class SalesOrderService {
       "documentIds": [ documentId ]
     },
     { responseType: "blob"});
+  }
+
+  bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
+    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -13,7 +13,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
   styleUrls: ['./purchase-order-reviews.page.scss'],
   providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'mobilePurchaseOrderReview' }]
 })
-export class PurchaseOrderReviewsPage implements OnInit {
+export class PurchaseOrderReviewsPage implements OnInit, ViewWillEnter {
 
   pendingObjects: TransactionProcessingDoc[] = [];
   completedObjects: TransactionProcessingDoc[] = [];
@@ -28,9 +28,20 @@ export class PurchaseOrderReviewsPage implements OnInit {
     private modalController: ModalController
   ) { }
 
+  // make sure refresh when back to this page
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+  }
+
   ngOnInit() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();

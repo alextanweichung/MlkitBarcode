@@ -30,7 +30,7 @@ export class StockCountPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
@@ -40,7 +40,7 @@ export class StockCountPage implements OnInit, ViewWillEnter {
 
   ngOnInit() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();

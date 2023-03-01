@@ -12,6 +12,7 @@ import { SalesOrderRoot } from '../../../models/sales-order';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -23,6 +24,8 @@ export class SalesOrderDetailPage implements OnInit {
 
   objectId: number
   object: SalesOrderRoot;
+  processType: string;
+  selectedSegment: string;
 
   constructor(
     private authService: AuthService,
@@ -38,6 +41,8 @@ export class SalesOrderDetailPage implements OnInit {
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
+      this.processType = params['processType'];
+      this.selectedSegment = params['selectedSegment'];
       if (!this.objectId) {
         this.navController.navigateBack('/transactions/sales-order');
       }
@@ -213,6 +218,77 @@ export class SalesOrderDetailPage implements OnInit {
   showPopover(event) {
     this.popoverMenu.event = event;
     this.isPopoverOpen = true;
+  }
+
+  /* #endregion */
+
+  /* #region approve reject */
+
+  async presentConfirmAlert(action: string) {
+    if (this.processType && this.selectedSegment) {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to ' + action + ' ' + this.object.header.salesOrderId + '?',
+        inputs: [
+          {
+            name: 'actionreason',
+            type: 'textarea',
+            placeholder: 'Please enter Reason',
+            value: ''
+          }
+        ],
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm',
+            cssClass: 'success',
+            handler: (data) => {
+              if (action === 'REJECT' && this.processType) {
+                if (!data.actionreason && data.actionreason.length === 0) {
+                  this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                  return false;
+                } else {
+                  this.updateDoc(action, [this.object.header.salesOrderId.toString()], data.actionreason);
+                }
+              } else {
+                this.updateDoc(action, [this.object.header.salesOrderId.toString()], data.actionreason);
+              }
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ],
+      });
+      await alert.present();
+    } else {
+      this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+    }
+  }
+
+  updateDoc(action: string, listOfDoc: string[], actionReason: string) {
+    if (this.processType && this.selectedSegment) {
+      let bulkConfirmReverse: BulkConfirmReverse = {
+        status: action,
+        reason: actionReason,
+        docId: listOfDoc.map(i => Number(i))
+      }
+      try {
+        this.salesOrderService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileSalesOrderReview' : 'mobileSalesOrderApprove', bulkConfirmReverse).subscribe(async response => {
+          if (response.status == 204) {
+            this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
+            this.navController.back();
+          }
+        }, error => {
+          throw Error;
+        })
+      } catch (error) {
+        this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+      }
+    } else {
+      this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+    }
   }
 
   /* #endregion */
