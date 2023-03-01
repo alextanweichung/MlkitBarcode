@@ -257,16 +257,16 @@ export class PickingItemPage implements OnInit {
         header: 'Are you sure to proceed?',
         buttons: [
           {
-            text: 'Cancel',
-            role: 'cancel',
-            cssClass: 'cancel',
-          },
-          {
             text: 'Confirm',
             cssClass: 'success',
             handler: async () => {
               await this.insertPicking(soLines);
             },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'cancel',
           },
         ],
       });
