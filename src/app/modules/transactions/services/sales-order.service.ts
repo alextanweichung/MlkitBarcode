@@ -78,19 +78,11 @@ export class SalesOrderService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist").pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist");
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/staticLov").pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/staticLov");
   }
 
   getCustomerList() {

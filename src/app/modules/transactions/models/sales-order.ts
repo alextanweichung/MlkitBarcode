@@ -76,7 +76,8 @@ export interface SalesOrderHeader {
   masterUDGroup1: any
   masterUDGroup2: any
   masterUDGroup3: any
-  remark: any
+  remark: string
+  isOpeningBalance: boolean
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean

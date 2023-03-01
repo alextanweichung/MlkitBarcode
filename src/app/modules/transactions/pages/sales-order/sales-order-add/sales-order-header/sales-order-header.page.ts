@@ -77,7 +77,8 @@ export class SalesOrderHeaderPage implements OnInit {
       remark: [null],
       isHomeCurrency: [null],
       maxPrecision: [null],
-      maxPrecisionTax: [null]
+      maxPrecisionTax: [null],
+      isOpeningBalance: [false]
     });
   }
 
