@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonPopover, LoadingController, NavController } from '@ionic/angular';
+import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -8,17 +8,14 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { QuotationRoot } from '../../../models/quotation';
-import { File } from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { Capacitor } from '@capacitor/core';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-quotation-detail',
   templateUrl: './quotation-detail.page.html',
-  styleUrls: ['./quotation-detail.page.scss'],
-  providers: [File, FileOpener, AndroidPermissions]
+  styleUrls: ['./quotation-detail.page.scss']
 })
 export class QuotationDetailPage implements OnInit {
 
@@ -31,13 +28,10 @@ export class QuotationDetailPage implements OnInit {
     private authService: AuthService,
     private quotationService: QuotationService,
     private toastService: ToastService,
+    private commonService: CommonService,
     private route: ActivatedRoute,
     private navController: NavController,
-    private alertController: AlertController,
-    private loadingController: LoadingController,
-    private androidPermissions: AndroidPermissions,
-    private opener: FileOpener,
-    private file: File,
+    private alertController: AlertController
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -154,57 +148,10 @@ export class QuotationDetailPage implements OnInit {
   }
 
   async downloadPdf() {
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Downloading...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
     this.quotationService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
       let filename = this.object.header.quotationNum + ".pdf";
-      if (Capacitor.getPlatform() === 'android') {
-        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-          async result => {
-            if (!result.hasPermission) {
-              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                async result => {
-                  await loading.present();
-                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                    loading.dismiss();
-                  }).catch((Error) => {
-                    loading.dismiss();
-                  });
-                }
-              );
-            } else {
-              await loading.present();
-              this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                loading.dismiss();
-              }).catch((Error) => {
-                loading.dismiss();
-              });
-            }
-          }
-        )
-      } else if (Capacitor.getPlatform() === 'ios') {
-        this.file.writeFile(this.file.tempDirectory, filename, response, { replace: true }).then(() => {
-          this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-          loading.dismiss();
-        }).catch((error) => {
-          loading.dismiss();
-        })
-      } else {
-        const url = window.URL.createObjectURL(response);
-        const link = window.document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filename);
-        window.document.body.appendChild(link);
-        link.click();
-        link.remove();
-      }
+      this.commonService.commonDownloadPdf(response, filename);
     }, error => {
-      loading.dismiss();
       console.log(error);
     })
   }

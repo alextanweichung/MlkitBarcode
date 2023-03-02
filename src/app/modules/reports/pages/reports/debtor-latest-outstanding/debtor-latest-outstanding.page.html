@@ -26,7 +26,7 @@
           <td class="p-1 font-half-size">{{rowData.salesAgentName}}</td>
           <td class="p-1 font-half-size">{{rowData.currencyCode}}</td>
           <td class="p-1 font-half-size ion-text-right">{{rowData.balance|number:'1.2-2'}}</td>
-          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf(rowData.salesAgentId)">Generate</ion-button></td>
+          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf()">Generate</ion-button></td>
         </tr>
       </table>
     </div>

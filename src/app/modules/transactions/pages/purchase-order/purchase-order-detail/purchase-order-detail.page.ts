@@ -1,9 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { File } from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { AlertController, IonPopover, LoadingController, NavController } from '@ionic/angular';
+import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PurchaseOrderLine, PurchaseOrderRoot } from '../../../models/purchase-order';
@@ -11,12 +8,12 @@ import { PurchaseOrderService } from '../../../services/purchase-order.service';
 import { Capacitor } from '@capacitor/core';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-purchase-order-detail',
   templateUrl: './purchase-order-detail.page.html',
-  styleUrls: ['./purchase-order-detail.page.scss'],
-  providers: [File, FileOpener, AndroidPermissions]
+  styleUrls: ['./purchase-order-detail.page.scss']
 })
 export class PurchaseOrderDetailPage implements OnInit {
 
@@ -34,10 +31,7 @@ export class PurchaseOrderDetailPage implements OnInit {
     private toastService: ToastService,
     private purchaseOrderService: PurchaseOrderService,
     private alertController: AlertController,
-    private loadingController: LoadingController,
-    private androidPermissions: AndroidPermissions,
-    private opener: FileOpener,
-    private file: File,
+    private commonService: CommonService,
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -137,57 +131,10 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   async downloadPdf() {
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Downloading...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
     this.purchaseOrderService.downloadPdf("IMPC002", "pdf", this.object.header.purchaseOrderId).subscribe(response => {
       let filename = this.object.header.purchaseOrderNum + ".pdf";
-      if (Capacitor.getPlatform() === 'android') {
-        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-          async result => {
-            if (!result.hasPermission) {
-              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                async result => {
-                  await loading.present();
-                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                    loading.dismiss();
-                  }).catch((Error) => {
-                    loading.dismiss();
-                  });
-                }
-              );
-            } else {
-              await loading.present();
-              this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                loading.dismiss();
-              }).catch((Error) => {
-                loading.dismiss();
-              });
-            }
-          }
-        )
-      } else if (Capacitor.getPlatform() === 'ios') {
-        this.file.writeFile(this.file.tempDirectory, filename, response, { replace: true }).then(() => {
-          this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-          loading.dismiss();
-        }).catch((error) => {
-          loading.dismiss();
-        })
-      } else {
-        const url = window.URL.createObjectURL(response);
-        const link = window.document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filename);
-        window.document.body.appendChild(link);
-        link.click();
-        link.remove();
-      }
+      this.commonService.commonDownloadPdf(response, filename);
     }, error => {
-      loading.dismiss();
       console.log(error);
     })
   }

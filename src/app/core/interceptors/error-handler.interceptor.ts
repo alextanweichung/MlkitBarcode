@@ -50,7 +50,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       
       setTimeout(async () => {
          if (!finished) {
-            this.spinner.show('sp1');
+            // this.spinner.show('sp1');
          }
       }, 800);
 
@@ -105,7 +105,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            this.spinner.hide('sp1');
+            // this.spinner.hide('sp1');
          })
       );
    }
