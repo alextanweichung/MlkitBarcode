@@ -74,11 +74,12 @@ export class SigninPage implements OnInit, ViewDidEnter {
       (await this.authService.signIn(loginModel)).subscribe(async response => {
         await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
+          this.configService.sys_parameter.rememberMe = this.rememberMe;
           if (this.rememberMe) {
             this.configService.sys_parameter.username = this.signin_form.controls.userEmail.value;
             this.configService.sys_parameter.password = this.signin_form.controls.password.value;
             await this.configService.update(this.configService.sys_parameter);
-          } else {            
+          } else {
             this.configService.sys_parameter.username = '';
             this.configService.sys_parameter.password = '';
           }
