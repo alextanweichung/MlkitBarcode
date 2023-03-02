@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, ViewDidEnter } from '@ionic/angular';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -17,7 +17,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
   templateUrl: './signin.page.html',
   styleUrls: ['./signin.page.scss'],
 })
-export class SigninPage implements OnInit, ViewDidEnter {
+export class SigninPage implements OnInit, ViewWillEnter {
 
   current_year: number = new Date().getFullYear();
   currentVersion: string;
@@ -39,14 +39,18 @@ export class SigninPage implements OnInit, ViewDidEnter {
     this.currentVersion = environment.version;
   }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.rememberMe = this.configService.sys_parameter.rememberMe;
     if (this.rememberMe) {
       this.signin_form.get('userEmail').setValue(this.configService.sys_parameter.username);
       this.signin_form.get('password').setValue(this.configService.sys_parameter.password);
     }
+    if (Capacitor.getPlatform() === 'web') {
+      this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+      this.signin_form.get('password').setValue('String1234');
+    }
   }
-
+  
   ngOnInit() {
     // Setup form
     this.signin_form = this.formBuilder.group({

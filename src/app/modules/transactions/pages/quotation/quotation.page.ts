@@ -58,6 +58,7 @@ export class QuotationPage implements OnInit {
       }
       this.quotationService.getObjectListByDate(obj).subscribe(response => {
         this.objects = response;
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
       }, error => {
         throw Error;
       })

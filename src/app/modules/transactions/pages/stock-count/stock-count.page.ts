@@ -3,6 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { StockCount } from '../../models/stock-count';
 import { StockCountService } from '../../services/stock-count.service';
@@ -17,12 +18,12 @@ export class StockCountPage implements OnInit, ViewWillEnter {
   startDate: Date;
   endDate: Date;
 
-  stockCounts: StockCount[] = [];
-  // stockCountList: StockCountList[] = [];
+  objects: StockCount[] = [];
 
   constructor(
     private stockCountService: StockCountService,
     private commonService: CommonService,
+    private toastService: ToastService,
     private modalController: ModalController,
     private navController: NavController,
     private actionSheetController: ActionSheetController
@@ -50,7 +51,8 @@ export class StockCountPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     this.stockCountService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
-      this.stockCounts = response;
+      this.objects = response;
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
     }, error => {
       console.log(error);
     })

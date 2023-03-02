@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -21,7 +20,7 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
   styleUrls: ['./stock-count-item-add.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
-export class StockCountItemAddPage implements OnInit, ViewDidEnter {
+export class StockCountItemAddPage implements OnInit, ViewWillEnter {
   @ViewChild('barcodeScanInput', { static: false }) barcodeScanInput: BarcodeScanInputPage;
 
   stockCountHeader: StockCountHeader;
@@ -37,7 +36,7 @@ export class StockCountItemAddPage implements OnInit, ViewDidEnter {
     private toastService: ToastService
   ) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.barcodeScanInput.barcodeInput.nativeElement.focus();
   }
 

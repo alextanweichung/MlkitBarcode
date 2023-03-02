@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { NavController, ViewDidEnter } from '@ionic/angular';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AnnouncementFile, Dashboard, Memo, MemoDetail } from '../../models/dashboard';
+import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 
 const managementPageCode: string = 'MAAP';
@@ -27,7 +27,7 @@ const mobileSalesOrderCode: string = 'MATRSO';
   styleUrls: ['./dashboard.page.scss'],
   providers: [File, FileOpener, AndroidPermissions]
 })
-export class DashboardPage implements OnInit, ViewDidEnter {
+export class DashboardPage implements OnInit, ViewWillEnter {
 
   showQuotationReview: boolean = false;
   showQuotationApproval: boolean = false;
@@ -51,7 +51,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     private navController: NavController
   ) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
     this.loadAnnouncements();
   }

@@ -18,16 +18,16 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ng-container *ngIf="stockCounts.length === 0">
+    <ng-container *ngIf="objects.length === 0">
       <p>
         <ion-text color="tertiary">
           <h3>Nothing found!</h3>
         </ion-text>
       </p>
     </ng-container>
-    <ng-container *ngIf="stockCounts.length > 0">
+    <ng-container *ngIf="objects.length > 0">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button (click)="goToDetail(object.inventoryCountId)" *ngFor="let object of stockCounts">
+        <ion-item button (click)="goToDetail(object.inventoryCountId)" *ngFor="let object of objects">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
               <ion-col>

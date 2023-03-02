@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { ToastService } from 'src/app/services/toast/toast.service';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { StockCountItem, StockCountRoot } from '../../../models/stock-count';
 import { StockCountService } from '../../../services/stock-count.service';

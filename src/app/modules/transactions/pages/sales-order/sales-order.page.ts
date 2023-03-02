@@ -1,16 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
 import { format } from 'date-fns';
-import { Capacitor } from '@capacitor/core';
-import { File } from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
@@ -21,7 +17,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
   templateUrl: './sales-order.page.html',
   styleUrls: ['./sales-order.page.scss']
 })
-export class PickingSalesOrderPage implements OnInit {
+export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   objects: SalesOrderList[] = [];
 
@@ -39,6 +35,17 @@ export class PickingSalesOrderPage implements OnInit {
     private navController: NavController,
     private toastService: ToastService
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+    this.loadCustomerList();
+  }
 
   ngOnInit() {
     if (!this.startDate) {
@@ -62,6 +69,7 @@ export class PickingSalesOrderPage implements OnInit {
       }
       this.salesOrderService.getObjectListByDate(obj).subscribe(response => {
         this.objects = response;
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
       }, error => {
         throw Error;
       })

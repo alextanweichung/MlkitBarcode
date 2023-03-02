@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewDidEnter } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CashDeposit } from '../../models/cash-deposit';
 import { CashDepositService } from '../../services/cash-deposit.service';
@@ -10,17 +11,18 @@ import { CashDepositService } from '../../services/cash-deposit.service';
   templateUrl: './cash-deposit.page.html',
   styleUrls: ['./cash-deposit.page.scss'],
 })
-export class CashDepositPage implements OnInit, ViewDidEnter {
+export class CashDepositPage implements OnInit, ViewWillEnter {
 
   objects: CashDeposit[] = [];
 
   constructor(
     private objectService: CashDepositService,
+    private toastService: ToastService,
     private actionSheetController: ActionSheetController,
     private navController: NavController
   ) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.loadObjects();
   }
   
@@ -31,6 +33,7 @@ export class CashDepositPage implements OnInit, ViewDidEnter {
   loadObjects() {
     this.objectService.getObjects().subscribe(response => {
       this.objects = response;
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
     }, error => {
       console.log(error);
     })

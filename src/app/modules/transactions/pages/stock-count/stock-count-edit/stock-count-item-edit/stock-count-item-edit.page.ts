@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, IonInput, NavController, ViewDidEnter } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -19,7 +18,7 @@ import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/ba
   templateUrl: './stock-count-item-edit.page.html',
   styleUrls: ['./stock-count-item-edit.page.scss'],
 })
-export class StockCountItemEditPage implements OnInit, ViewDidEnter {
+export class StockCountItemEditPage implements OnInit, ViewWillEnter {
   @ViewChild('barcodeScanInput', { static: false }) barcodeScanInput: BarcodeScanInputPage;
 
   objectId: number;
@@ -34,14 +33,14 @@ export class StockCountItemEditPage implements OnInit, ViewDidEnter {
     private alertController: AlertController,
     private configService: ConfigService,
     private toastService: ToastService,
-    private stockCountService: StockCountService    
+    private stockCountService: StockCountService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
   }
 
-  ionViewDidEnter(): void {    
+  ionViewWillEnter(): void {
     this.barcodeScanInput.barcodeInput.nativeElement.focus();
   }
 
@@ -132,7 +131,7 @@ export class StockCountItemEditPage implements OnInit, ViewDidEnter {
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
-      } else {        
+      } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
@@ -183,12 +182,12 @@ export class StockCountItemEditPage implements OnInit, ViewDidEnter {
         itemBarcodeTagId: trxLine.itemBarcodeTagId,
         qtyRequest: 1,
         sequence: this.objectDetail.length
-      }      
+      }
       await this.objectDetail.length > 0 ? this.objectDetail.unshift(d) : this.objectDetail.push(d);
     }
   }
 
-  /* #region  manual amend qty */  
+  /* #region  manual amend qty */
 
   setFocus(event) {
     event.getInputElement().then(r => {
@@ -202,7 +201,7 @@ export class StockCountItemEditPage implements OnInit, ViewDidEnter {
     } else {
       line.qtyRequest--;
     }
-    if (line.qtyRequest === 0) {      
+    if (line.qtyRequest === 0) {
       await this.deleteLine(index);
     }
   }
@@ -243,7 +242,7 @@ export class StockCountItemEditPage implements OnInit, ViewDidEnter {
             }
           }
         ]
-      });  
+      });
       await alert.present();
     } else {
       this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
@@ -300,12 +299,12 @@ export class StockCountItemEditPage implements OnInit, ViewDidEnter {
           }
         }
       ]
-    });  
+    });
     await alert.present();
   }
 
-  updateObject() {    
-    this.stockCountService.updateInventoryCount({header: this.objectHeader, details: this.objectDetail, barcodeTag: []}).subscribe(response => {
+  updateObject() {
+    this.stockCountService.updateInventoryCount({ header: this.objectHeader, details: this.objectDetail, barcodeTag: [] }).subscribe(response => {
       if (response.status === 204) {
         this.stockCountService.resetVariables();
         this.toastService.presentToast('Stock Count updated', '', 'top', 'success', 1000);

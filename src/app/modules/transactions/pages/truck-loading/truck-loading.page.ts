@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewDidEnter } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { TruckLoadingHeader } from '../../models/truck-loading';
 import { TruckLoadingService } from '../../services/truck-loading.service';
@@ -10,17 +11,18 @@ import { TruckLoadingService } from '../../services/truck-loading.service';
   templateUrl: './truck-loading.page.html',
   styleUrls: ['./truck-loading.page.scss'],
 })
-export class TruckLoadingPage implements OnInit, ViewDidEnter {
+export class TruckLoadingPage implements OnInit, ViewWillEnter {
 
   objects: TruckLoadingHeader[] = [];
 
   constructor(
     private objectService: TruckLoadingService,
+    private toastService: ToastService,
     private actionSheetController: ActionSheetController,
     private navController: NavController
   ) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.loadObjects();
   }
 
@@ -31,6 +33,7 @@ export class TruckLoadingPage implements OnInit, ViewDidEnter {
   loadObjects() {
     this.objectService.getObjects().subscribe(response => {
       this.objects = response;
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
     }, error => {
       console.log(error);
     })

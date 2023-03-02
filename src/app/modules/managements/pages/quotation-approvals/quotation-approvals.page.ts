@@ -55,6 +55,7 @@ export class QuotationApprovalsPage implements OnInit, ViewWillEnter {
       this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
         this.pendingObjects = response.filter(r => !r.isComplete);
         this.completedObjects = response.filter(r => r.isComplete);
+        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
       }, error => {
         throw Error;
       })

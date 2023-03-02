@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -13,7 +13,7 @@ import { FilterPage } from '../filter/filter.page';
   templateUrl: './packing.page.html',
   styleUrls: ['./packing.page.scss'],
 })
-export class PackingPage implements OnInit {
+export class PackingPage implements OnInit, ViewWillEnter {
 
   objects: GoodsPackingList[] = [];
 
@@ -30,6 +30,16 @@ export class PackingPage implements OnInit {
     private toastService: ToastService
   ) { }
 
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+  }
+
   ngOnInit() {
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTheYear();
@@ -45,6 +55,7 @@ export class PackingPage implements OnInit {
   loadObjects() {
     this.goodsPackingService.getObjectListByDate(this.startDate, this.endDate).subscribe(response => {
       this.objects = response;
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
     }, error => {
       console.log((error));
     })

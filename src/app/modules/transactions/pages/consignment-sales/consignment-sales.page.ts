@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -13,7 +13,7 @@ import { FilterPage } from '../filter/filter.page';
   templateUrl: './consignment-sales.page.html',
   styleUrls: ['./consignment-sales.page.scss'],
 })
-export class ConsignmentSalesPage implements OnInit {
+export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
 
   objects: ConsignmentSalesList[] = [];
 
@@ -28,6 +28,16 @@ export class ConsignmentSalesPage implements OnInit {
     private navController: NavController,
     private toastService: ToastService
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+  }
 
   ngOnInit() {
     if (!this.startDate) {
@@ -44,6 +54,7 @@ export class ConsignmentSalesPage implements OnInit {
   loadObjects() {
     this.consignmentSalesService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
       this.objects = response;
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
     }, error => {
       console.log((error));
     })

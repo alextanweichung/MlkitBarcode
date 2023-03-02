@@ -1,11 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
@@ -25,7 +24,7 @@ import {v4 as uuidv4} from 'uuid';
   styleUrls: ['./sales-order-item.page.scss'],
   providers: [DatePipe, SearchItemService, { provide: 'apiObject', useValue: 'mobileSalesOrder' }]
 })
-export class SalesOrderItemPage implements OnInit, ViewDidEnter {
+export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   objectHeader: SalesOrderHeader;
 
@@ -34,15 +33,13 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
 
   constructor(
     private authService: AuthService,
-    private configService: ConfigService,
     private salesOrderService: SalesOrderService,
     private promotionEngineService: PromotionEngineService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService,
-    private alertController: AlertController) { }
+    private toastService: ToastService) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.itemInCart = this.salesOrderService.itemInCart;
   }
 

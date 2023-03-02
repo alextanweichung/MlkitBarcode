@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
@@ -26,7 +26,7 @@ import {v4 as uuidv4} from 'uuid';
   styleUrls: ['./quotation-item.page.scss'],
   providers: [DatePipe, SearchItemService, { provide: 'apiObject', useValue: 'mobileQuotation' }]
 })
-export class QuotationItemPage implements OnInit, ViewDidEnter {
+export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   objectHeader: QuotationHeader;
 
@@ -36,16 +36,14 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   @ViewChild('itemCatalog', { static: false }) itemCatalog: ItemCartPage;
 
   constructor(
-    private configService: ConfigService,
     private authService: AuthService,
     private quotationService: QuotationService,
     private promotionEngineService: PromotionEngineService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService,
-    private alertController: AlertController) { }
+    private toastService: ToastService) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.itemInCart = this.quotationService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
   }
 

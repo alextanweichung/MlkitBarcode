@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
