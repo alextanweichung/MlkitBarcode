@@ -3,7 +3,7 @@ import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, IonInput, NavController } from '@ionic/angular';
+import { AlertController, IonInput, NavController, ViewDidEnter } from '@ionic/angular';
 import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -12,13 +12,15 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 
 @Component({
   selector: 'app-stock-count-item-edit',
   templateUrl: './stock-count-item-edit.page.html',
   styleUrls: ['./stock-count-item-edit.page.scss'],
 })
-export class StockCountItemEditPage implements OnInit {
+export class StockCountItemEditPage implements OnInit, ViewDidEnter {
+  @ViewChild('barcodeScanInput', { static: false }) barcodeScanInput: BarcodeScanInputPage;
 
   objectId: number;
   objectHeader: StockCountHeader;
@@ -32,12 +34,15 @@ export class StockCountItemEditPage implements OnInit {
     private alertController: AlertController,
     private configService: ConfigService,
     private toastService: ToastService,
-    private stockCountService: StockCountService
-    
+    private stockCountService: StockCountService    
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
+  }
+
+  ionViewDidEnter(): void {    
+    this.barcodeScanInput.barcodeInput.nativeElement.focus();
   }
 
   ngOnInit() {

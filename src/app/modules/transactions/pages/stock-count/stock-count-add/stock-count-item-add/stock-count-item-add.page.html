@@ -31,7 +31,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
+    <app-barcode-scan-input #barcodeScanInput (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding *ngFor="let line of stockCountDetail; let i = index">        
         <ion-item button detail="false" class="no-ripple ion-no-padding">

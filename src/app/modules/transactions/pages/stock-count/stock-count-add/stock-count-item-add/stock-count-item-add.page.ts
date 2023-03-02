@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
 import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -12,6 +12,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 
 @Component({
@@ -20,7 +21,8 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
   styleUrls: ['./stock-count-item-add.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
-export class StockCountItemAddPage implements OnInit {
+export class StockCountItemAddPage implements OnInit, ViewDidEnter {
+  @ViewChild('barcodeScanInput', { static: false }) barcodeScanInput: BarcodeScanInputPage;
 
   stockCountHeader: StockCountHeader;
   stockCountDetail: StockCountDetail[] = [];
@@ -34,6 +36,10 @@ export class StockCountItemAddPage implements OnInit {
     private configService: ConfigService,
     private toastService: ToastService
   ) { }
+
+  ionViewDidEnter(): void {
+    this.barcodeScanInput.barcodeInput.nativeElement.focus();
+  }
 
   ngOnInit() {
     this.stockCountHeader = this.stockCountService.stockCountHeader;

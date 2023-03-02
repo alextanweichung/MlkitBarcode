@@ -23,7 +23,15 @@ export class CommonService {
       this.endDate = this.getTodayDate();
     }
   }
-  
+
+  /* #region misc service */
+
+  getCompanyProfile() {
+    return this.http.get(this.baseUrl + "account/companyName");
+  }
+
+  /* #endregion */
+
   getFirstDayOfTheYear(): Date {
     let today = this.getTodayDate();
     let firstDoy = new Date(new Date().getUTCFullYear(), 0, 1, 0, 0, 0);
@@ -66,7 +74,7 @@ export class CommonService {
   }
 
   //To add back timezone differences into UTC Date
-  convertDateFormat(inputDate: Date): Date{
+  convertDateFormat(inputDate: Date): Date {
     let outputDate = new Date(inputDate);
     //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
     return outputDate;
@@ -184,8 +192,8 @@ export class CommonService {
     }
     return inputObject;
   }
-  
-  toFirstCharLowerCase(str: string){
+
+  toFirstCharLowerCase(str: string) {
     return str.charAt(0).toLowerCase() + str.slice(1);
   }
 

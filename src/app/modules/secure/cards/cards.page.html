@@ -5,22 +5,22 @@
     </ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-label class="label-title">Settings</ion-label>
     </ion-toolbar>
   </ion-header>
-
   <div class="p-2">
-
+    <ion-list-header class="ion-list-header-small">
+      <ion-label>
+        <div>{{companyInfo?.name}}</div>
+      </ion-label>
+    </ion-list-header>
     <ion-list-header class="ion-list-header-small">
       <ion-label>Quick Actions</ion-label>
     </ion-list-header>
-
-    <ion-list class="list-custom" lines="full">
-      
+    <ion-list class="list-custom" lines="full">      
       <ion-item detail="false">
         <ion-label>
           <h3>Manual sync</h3>
@@ -31,9 +31,7 @@
         </ion-button>
       </ion-item>
     </ion-list>
-
     <hr class="hr-medium">
-
     <ion-list class="list-custom" lines="full">
       <ion-item button detail="false" (click)="signOut()">
         <ion-avatar slot="start" class="ion-avatar-danger-icon">
@@ -44,7 +42,5 @@
         </ion-label>
       </ion-item>
     </ion-list>
-
   </div>
-
 </ion-content>

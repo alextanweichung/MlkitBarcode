@@ -43,8 +43,8 @@ export class ConfigService {
       this.sys_parameter = {
         Sys_ParameterId: 1,
         // apiUrl: 'https://localhost:44351/api/',
-        // apiUrl: 'https://idcp-demo.com/api/',
-        apiUrl: 'https://idcp-ararat.com:8081/api/',
+        apiUrl: 'https://idcp-demo.com/api/',
+        // apiUrl: 'https://idcp-ararat.com:8081/api/',
         imgUrl: null,
         onlineMode: true,
         lastDownloadAt: null,

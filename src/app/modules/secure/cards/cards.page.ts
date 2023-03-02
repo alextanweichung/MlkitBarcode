@@ -1,4 +1,4 @@
-import { AfterContentChecked, Component, ViewChild } from '@angular/core';
+import { AfterContentChecked, Component, OnInit, ViewChild } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
 import { AlertController, LoadingController } from '@ionic/angular';
@@ -15,7 +15,7 @@ SwiperCore.use([Pagination]);
   templateUrl: './cards.page.html',
   styleUrls: ['./cards.page.scss'],
 })
-export class CardsPage implements AfterContentChecked {
+export class CardsPage implements OnInit, AfterContentChecked {
 
   @ViewChild('swiper') swiper: SwiperComponent;
 
@@ -31,6 +31,8 @@ export class CardsPage implements AfterContentChecked {
   online_mode: boolean = false;
   last_sync_datetime: Date;
 
+  companyInfo: any;
+
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
@@ -39,6 +41,14 @@ export class CardsPage implements AfterContentChecked {
     private loadingController: LoadingController,
     private commonService: CommonService
   ) { }
+
+  ngOnInit(): void {
+    this.commonService.getCompanyProfile().subscribe(response => {
+      this.companyInfo = response;
+    }, error => {
+      console.log(error);
+    })
+  }
 
   ngAfterContentChecked(): void {
     if (this.swiper) {
