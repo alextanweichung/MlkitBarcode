@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import jwt_decode, { JwtHeader, JwtPayload } from "jwt-decode";
+import jwt_decode, { JwtPayload } from "jwt-decode";
 import { ConfigService } from '../config/config.service';
 import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user';
 import { NavController } from '@ionic/angular';

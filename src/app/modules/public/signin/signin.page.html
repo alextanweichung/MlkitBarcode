@@ -7,26 +7,28 @@
       <p>Login to your account.</p>
     </div>
 
-    <form class="form-default" [formGroup]="signin_form" (submit)="signIn()">
-
+    <form class="form-default" [formGroup]="signin_form">
       <ion-list class="item-card-list" lines="none">
         <ion-item>
           <ion-label color="tertiary" position="stacked">Email</ion-label>
-          <ion-input formControlName="userEmail" type="email" autocomplete="off"
-            placeholder="Your email address"></ion-input>
+          <ion-input formControlName="userEmail" type="email" autocomplete="off" placeholder="Your email address"></ion-input>
         </ion-item>
-
         <ion-item class="ion-margin-top-small">
           <ion-label color="tertiary" position="stacked">Password</ion-label>
           <ion-input formControlName="password" type="password" placeholder="Your password"></ion-input>
         </ion-item>
       </ion-list>
-
-      <ion-button class="ion-margin-top" type="submit" expand="block" color="primary">
-        Sign in
-      </ion-button>
-
     </form>
+
+    <ion-item class="ion-flex ion-flex-center" lines="none">
+      <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
+      <ion-label>
+        <div class="ion-text-small">Remember Me!</div></ion-label>
+    </ion-item>
+
+    <ion-button class="ion-margin-top" type="submit" expand="block" color="primary" (click)="signIn()">
+      Sign in
+    </ion-button>
 
     <div class="ion-text-center ion-margin-top">
       <ion-text color="medium">

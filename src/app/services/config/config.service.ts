@@ -64,6 +64,7 @@ export class ConfigService {
   }
 
   async update(object: Sys_Parameter) {
+    this.sys_parameter = object;
     await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);
   }
 

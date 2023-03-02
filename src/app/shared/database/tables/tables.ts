@@ -3,6 +3,9 @@ export interface Sys_Parameter {
    apiUrl: string
    imgUrl?: string
    lastDownloadAt?: Date
+   rememberMe?: boolean
+   username?: string
+   password?: string
 }
 
 export interface FireStoreReturn {

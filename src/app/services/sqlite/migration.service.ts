@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
   apiUrl VARCHAR(255), 
   imgUrl VARCHAR(255), 
   lastDownloadAt DATETIME, 
+  rememberMe INTEGER, 
+  username VARCHAR(50), 
+  password VARCHAR(20) 
 ); `;
 
 export const create_item_master_table: string = `

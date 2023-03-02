@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -17,13 +17,15 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
   templateUrl: './signin.page.html',
   styleUrls: ['./signin.page.scss'],
 })
-export class SigninPage implements OnInit {
+export class SigninPage implements OnInit, ViewDidEnter {
 
   current_year: number = new Date().getFullYear();
   currentVersion: string;
 
   signin_form: UntypedFormGroup;
   submit_attempt: boolean = false;
+
+  rememberMe: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -37,16 +39,20 @@ export class SigninPage implements OnInit {
     this.currentVersion = environment.version;
   }
 
+  ionViewDidEnter(): void {
+    this.rememberMe = this.configService.sys_parameter.rememberMe;
+    if (this.rememberMe) {
+      this.signin_form.get('userEmail').setValue(this.configService.sys_parameter.username);
+      this.signin_form.get('password').setValue(this.configService.sys_parameter.password);
+    }
+  }
+
   ngOnInit() {
     // Setup form
     this.signin_form = this.formBuilder.group({
       userEmail: ['', Validators.compose([Validators.email, Validators.required])],
       password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
-
-    // DEBUG: Prefill inputs
-    this.signin_form.get('userEmail').setValue('aychia@idcp.my');
-    this.signin_form.get('password').setValue('String1234');
   }
 
   // Sign in
@@ -60,7 +66,6 @@ export class SigninPage implements OnInit {
       localStorage.setItem('player_Id', '6ce7134e-5a4b-426f-b89b-54de14e05eba');
     }
 
-
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
@@ -69,6 +74,14 @@ export class SigninPage implements OnInit {
       (await this.authService.signIn(loginModel)).subscribe(async response => {
         await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
+          if (this.rememberMe) {
+            this.configService.sys_parameter.username = this.signin_form.controls.userEmail.value;
+            this.configService.sys_parameter.password = this.signin_form.controls.password.value;
+            await this.configService.update(this.configService.sys_parameter);
+          } else {            
+            this.configService.sys_parameter.username = '';
+            this.configService.sys_parameter.password = '';
+          }
           try {
             await this.loadingService.showLoading("Syncing Offline Table");
             let response = await this.commonService.syncInbound();
