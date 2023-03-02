@@ -1,20 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
-import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { ConfigService } from 'src/app/services/config/config.service';
-import { ToastService } from 'src/app/services/toast/toast.service';
-import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentSalesList } from '../../models/consignment-sales';
 import { GoodsPackingList } from '../../models/packing';
 import { GoodsPickingList } from '../../models/picking';
 import { QuotationList } from '../../models/quotation';
 import { SalesOrderList } from '../../models/sales-order';
-import { ConsignmentSalesService } from '../../services/consignment-sales.service';
-import { PackingService } from '../../services/packing.service';
-import { PickingService } from '../../services/picking.service';
-import { QuotationService } from '../../services/quotation.service';
-import { SalesOrderService } from '../../services/sales-order.service';
 
 const transactionPageCode: string = 'MATR';
 const mobileQuotationCode: string = 'MATRQU';
@@ -55,17 +45,7 @@ export class TransactionsPage implements OnInit {
   showTruckLoading: boolean = false;
 
   constructor(
-    private authService: AuthService,
-    private navController: NavController,
-    private quotationService: QuotationService,
-    private salesOrderService: SalesOrderService,
-    private pickingService: PickingService,
-    private packingService: PackingService,
-    private consignmentSalesService: ConsignmentSalesService,
-    private loadingController: LoadingController,
-    private commonService: CommonService,
-    private configService: ConfigService,
-    private toastService: ToastService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {

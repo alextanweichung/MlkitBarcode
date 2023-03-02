@@ -1,8 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, LoadingController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
 import { format } from 'date-fns';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -25,7 +26,6 @@ export class TruckLoadingAddPage implements OnInit {
     private commonService: CommonService,
     private toastService: ToastService,
     private actionSheetController: ActionSheetController,
-    private loadingController: LoadingController,
     private alertController: AlertController,
     private navController: NavController
   ) {

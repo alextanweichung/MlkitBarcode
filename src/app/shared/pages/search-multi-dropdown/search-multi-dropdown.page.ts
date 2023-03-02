@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { IonSearchbar, LoadingController } from '@ionic/angular';
+import { IonSearchbar } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
 
 @Component({
@@ -22,9 +22,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
   
-  constructor(
-    private loadingController: LoadingController,
-  ) { }
+  constructor() { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.selectedIds || changes.searchDropdownList) {
@@ -43,9 +41,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
   async keypress(event) {
     if (event.keyCode === 13) {
       if (this.searchText.length > 0) {
-        await this.showLoading();
         this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
-        await this.hideLoading();
       } else {
         this.tempDropdownList = this.searchDropdownList;
       }
@@ -85,23 +81,6 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
     this.onActionComplete.emit(object);
     this.isModalOpen = false;
   }
-
-  /* #region  misc */
-
-  async showLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Loading...',
-      spinner: 'circles',
-    });
-
-    loading.present();
-  }
-
-  async hideLoading() {
-    this.loadingController.dismiss();
-  }
-
-  /* #endregion */
 
   // Cancel
   cancel() {

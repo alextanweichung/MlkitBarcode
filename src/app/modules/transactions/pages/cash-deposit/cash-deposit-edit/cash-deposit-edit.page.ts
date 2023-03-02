@@ -230,10 +230,7 @@ export class CashDepositEditPage implements OnInit {
   async loadFiles() {
     this.images = [];
 
-    const loading = await this.loadingController.create({
-      message: 'Loading data...'
-    });
-    await loading.present();
+    await this.loadingService.showLoading();
 
     Filesystem.readdir({
       path: IMAGE_DIR,
@@ -251,8 +248,8 @@ export class CashDepositEditPage implements OnInit {
           });
         }
       )
-      .then((_) => {
-        loading.dismiss();
+      .then(async (_) => {
+        await this.loadingService.dismissLoading();
       });
   }
 

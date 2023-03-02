@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, LoadingController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
@@ -14,12 +14,12 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-sales-order',
   templateUrl: './sales-order.page.html',
-  styleUrls: ['./sales-order.page.scss'],
-  providers: [File, FileOpener, AndroidPermissions]
+  styleUrls: ['./sales-order.page.scss']
 })
 export class PickingSalesOrderPage implements OnInit {
 
@@ -34,13 +34,10 @@ export class PickingSalesOrderPage implements OnInit {
     private salesOrderService: SalesOrderService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    private loadingController: LoadingController,
+    private loadingService: LoadingService,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService,
-    private androidPermissions: AndroidPermissions,    
-    private opener: FileOpener,
-    private file: File,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -101,7 +98,7 @@ export class PickingSalesOrderPage implements OnInit {
     if (this.salesOrderService.hasSalesAgent()) {
       this.navController.navigateForward('/transactions/sales-order/sales-order-header');
     } else {
-      this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'dnager', 1000);
+      this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'danger', 1000);
     }
   }
 
@@ -156,57 +153,11 @@ export class PickingSalesOrderPage implements OnInit {
   }
 
   async downloadPdf(doc) {
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Downloading...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
     this.salesOrderService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
       let filename = doc.salesOrderNum + ".pdf";
-      if (Capacitor.getPlatform() === 'android') {
-        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-          async result => {
-            if (!result.hasPermission) {
-              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                async result => {
-                  await loading.present();
-                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                    loading.dismiss();
-                  }).catch((Error) => {
-                    loading.dismiss();
-                  });
-                }
-              );
-            } else {
-              await loading.present();
-              this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                loading.dismiss();
-              }).catch((Error) => {
-                loading.dismiss();
-              });
-            }
-          }
-        )
-      } else if (Capacitor.getPlatform() === 'ios') {
-        this.file.writeFile(this.file.tempDirectory, filename, response, { replace: true }).then(() => {
-          this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-          loading.dismiss();
-        }).catch((error) => {
-          loading.dismiss();
-        })
-      } else {
-        const url = window.URL.createObjectURL(response);
-        const link = window.document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filename);
-        window.document.body.appendChild(link);
-        link.click();
-        link.remove();
-      }
+      this.commonService.commonDownloadPdf(response, filename);
     }, error => {
-      loading.dismiss();
+      this.loadingService.dismissLoading();
       console.log(error);
     })
   }

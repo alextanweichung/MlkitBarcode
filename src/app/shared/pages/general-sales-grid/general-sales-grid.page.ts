@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { LoadingController } from '@ionic/angular';
 import { format } from 'date-fns';
-import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
+import { ItemImage } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
@@ -35,7 +34,6 @@ export class GeneralSalesGridPage implements OnInit {
   constructor(
     private configService: ConfigService,
     private searchItemService: SearchItemService,
-    private loadingController: LoadingController,
     private toastService: ToastService,
   ) { }
 
@@ -69,14 +67,11 @@ export class GeneralSalesGridPage implements OnInit {
       if (Capacitor.getPlatform() !== 'web') {
         Keyboard.hide();
       }
-      await this.showLoading();
       if (this.onlineMode) {
         this.searchItemService.getItemInfoByKeyword(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(async response => {
           this.availableItems = response;
-          await this.hideLoading();
         }, async error => {
           console.log(error);
-          await this.hideLoading();
         })
         this.searchItemService.getItemImageFile(this.itemSearchText).subscribe(response => {
           this.availableImages = response;
@@ -86,7 +81,6 @@ export class GeneralSalesGridPage implements OnInit {
       } else {
         this.availableItems = [];
         if (this.configService.item_Masters.length === 0 || this.configService.item_Barcodes.length === 0) {
-          await this.hideLoading();
           this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'top', 'danger', 1000);
         } else {
           let found = this.configService.item_Masters.filter(r => r.code.toLowerCase().includes(this.itemSearchText.toLowerCase()));
@@ -167,7 +161,6 @@ export class GeneralSalesGridPage implements OnInit {
                 })
               }
             })
-            await this.hideLoading();
           } else {
             this.toastService.presentToast('Item not found', '', ' bottom', 'medium', 1000);
           }
@@ -245,19 +238,6 @@ export class GeneralSalesGridPage implements OnInit {
     event.getInputElement().then(r => {
       r.select();
     })
-  }
-
-  async showLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Loading...',
-      spinner: 'circles',
-    });
-
-    loading.present();
-  }
-
-  async hideLoading() {
-    this.loadingController.dismiss();
   }
 
   /* #endregion */
