@@ -32,7 +32,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
-  loadImage: boolean = true;
 
   @ViewChild('itemCatalog', { static: false }) itemCatalog: ItemCartPage;
 
@@ -55,7 +54,6 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
       this.navController.navigateBack('/transactions/quotation/quotation-header');
     }
-    this.loadImage = this.configService.sys_parameter.loadImage;
     this.componentsLoad();
   }
 

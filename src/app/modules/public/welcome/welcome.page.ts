@@ -1,4 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterContentChecked, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
 SwiperCore.use([Pagination]);
@@ -100,8 +100,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
             let config: Sys_Parameter = {
               Sys_ParameterId: 1,
               apiUrl: response.fields.url.stringValue,
-              onlineMode: true,
-              loadImage: false
             }
             await this.configService.insert(config).then(async response => {
               await this.loadingService.dismissLoading();

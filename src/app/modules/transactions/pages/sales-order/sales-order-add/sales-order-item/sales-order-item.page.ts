@@ -31,7 +31,6 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
-  loadImage: boolean = true;
 
   constructor(
     private authService: AuthService,
@@ -52,7 +51,6 @@ export class SalesOrderItemPage implements OnInit, ViewDidEnter {
     if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
       this.navController.navigateBack('/transactions/sales-order/sales-order-header');
     }
-    this.loadImage = this.configService.sys_parameter.loadImage;
     this.componentsLoad();
   }
 

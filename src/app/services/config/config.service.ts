@@ -46,9 +46,7 @@ export class ConfigService {
         apiUrl: 'https://idcp-demo.com/api/',
         // apiUrl: 'https://idcp-ararat.com:8081/api/',
         imgUrl: null,
-        onlineMode: true,
-        lastDownloadAt: null,
-        loadImage: false
+        lastDownloadAt: null
       }
     } else {
       this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
@@ -60,9 +58,7 @@ export class ConfigService {
       Sys_ParameterId: 1,
       apiUrl: object.apiUrl,
       imgUrl: object.imgUrl,
-      onlineMode: true,
       lastDownloadAt: null,
-      loadImage: true
     }
     await this.commonQueryService.insert(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
   }

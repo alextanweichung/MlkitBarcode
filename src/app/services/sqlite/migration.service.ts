@@ -8,9 +8,7 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
   sys_ParameterId INTEGER PRIMARY KEY AUTOINCREMENT, 
   apiUrl VARCHAR(255), 
   imgUrl VARCHAR(255), 
-  onlineMode TINYINT(1), 
   lastDownloadAt DATETIME, 
-  loadImage TINYINT(1)
 ); `;
 
 export const create_item_master_table: string = `

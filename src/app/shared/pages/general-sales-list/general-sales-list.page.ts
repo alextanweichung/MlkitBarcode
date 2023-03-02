@@ -36,7 +36,6 @@ export class GeneralSalesListPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.onlineMode = this.configService.sys_parameter.onlineMode;
     if (Capacitor.getPlatform() !== 'web') {
       // this.configService.loadItemMaster();
       // this.configService.loadItemBarcode();

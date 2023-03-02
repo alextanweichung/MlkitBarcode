@@ -28,8 +28,6 @@ export class CardsPage implements OnInit, AfterContentChecked {
     allowTouchMove: true
   }
 
-  show_item_image: boolean = false;
-  online_mode: boolean = false;
   last_sync_datetime: Date;
 
   companyInfo: any;
@@ -55,8 +53,6 @@ export class CardsPage implements OnInit, AfterContentChecked {
     if (this.swiper) {
       this.swiper.updateSwiper({});
     }
-    this.show_item_image = this.configService.sys_parameter.loadImage;
-    this.online_mode = this.configService.sys_parameter.onlineMode;
     this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
   }
 
