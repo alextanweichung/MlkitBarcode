@@ -11,7 +11,6 @@ export class ToastService {
   ) { }
 
   async presentToast(header: string, message: string, position: any, color: string, duration: number, icon?: string) {
-
     if (!icon) {
       switch (color) {
         case 'success':
@@ -26,7 +25,6 @@ export class ToastService {
           break;
       }
     }
-
     const toast = await this.toastController.create({
       header: header,
       message: message,

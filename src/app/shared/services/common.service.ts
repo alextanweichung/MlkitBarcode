@@ -1,36 +1,45 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { LoadingController } from '@ionic/angular';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
   baseUrl: string;
-  startDate: Date;
-  endDate: Date
 
   constructor(
     private http: HttpClient,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private loadingService: LoadingService,
+    private opener: FileOpener,
+    private file: File,
+    private androidPermissions: AndroidPermissions
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
-    if (!this.startDate) {
-      this.startDate = this.getFirstDayOfTodayMonth();
-    }
-    if (!this.endDate) {
-      this.endDate = this.getTodayDate();
-    }
   }
 
-  /* #region misc service */
+  /* #region common service */
 
   getCompanyProfile() {
     return this.http.get(this.baseUrl + "account/companyName");
   }
 
+  syncInbound() {
+    // return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
+    return this.http.get(this.baseUrl + "MobileDownload/itemMaster").toPromise();
+  }
+
   /* #endregion */
+
+  /* #region date related */
 
   getFirstDayOfTheYear(): Date {
     let today = this.getTodayDate();
@@ -52,20 +61,6 @@ export class CommonService {
     return today;
   }
 
-  syncInbound() {
-    // return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
-    return this.http.get(this.baseUrl + "MobileDownload/itemMaster").toPromise();
-  }
-
-  setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {
-    setTimeout(() => {
-      const viewChildElement = viewChildrenQueryList.find(element => element.el.nativeElement.id === (objectType))
-      if (viewChildElement) {
-        viewChildElement.input.nativeElement.select();
-      }
-    }, 1);
-  }
-
   //To add back timezone differences into UTC Date
   convertUtcDate(inputDate: Date): Date {
     let outputDate = new Date(inputDate);
@@ -79,7 +74,6 @@ export class CommonService {
     //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
     return outputDate;
   }
-
 
   convertObjectAllDateType(inputObject: any) {
     if (inputObject.hasOwnProperty('trxDate')) {
@@ -193,9 +187,9 @@ export class CommonService {
     return inputObject;
   }
 
-  toFirstCharLowerCase(str: string) {
-    return str.charAt(0).toLowerCase() + str.slice(1);
-  }
+  /* #endregion */
+
+  /* #region price related */
 
   computeUnitPriceExTax(trxLine: any, useTax: boolean, roundingPrecision: number) {
     if (useTax) {
@@ -318,5 +312,73 @@ export class CommonService {
     }
     return receiptLine;
   }
+
+  /* #endregion */
+
+  /* #region download pdf */
+
+  async commonDownloadPdf(file: Blob, filename: string) {
+    await this.loadingService.showLoading('<p>Downloading...</p><span>Please be patient.</span>');
+    if (Capacitor.getPlatform() === 'android') {
+      this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+        async result => {
+          if (!result.hasPermission) {
+            this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+              async result => {
+                this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true }).then(async () => {
+                  this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                  await this.loadingService.dismissLoading();
+                }).catch(async (error) => {
+                  await this.loadingService.dismissLoading();
+                });
+              }
+            );
+          } else {
+            this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true }).then(async () => {
+              this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+              await this.loadingService.dismissLoading();
+            }).catch(async (error) => {
+              await this.loadingService.dismissLoading();
+            });
+          }
+        }
+      )
+    } else if (Capacitor.getPlatform() === 'ios') {
+      this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
+        this.opener.open(this.file.tempDirectory + filename, "application/pdf");
+        await this.loadingService.dismissLoading();
+      }).catch(async (error) => {
+        await this.loadingService.dismissLoading();
+      })
+    } else {
+      const url = window.URL.createObjectURL(file);
+      const link = window.document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      window.document.body.appendChild(link);
+      link.click();
+      link.remove();
+      await this.loadingService.dismissLoading();
+    }
+  }
+
+  /* #endregion */
+
+  /* #region misc function */
+
+  setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {
+    setTimeout(() => {
+      const viewChildElement = viewChildrenQueryList.find(element => element.el.nativeElement.id === (objectType))
+      if (viewChildElement) {
+        viewChildElement.input.nativeElement.select();
+      }
+    }, 1);
+  }
+
+  toFirstCharLowerCase(str: string) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  }
+
+  /* #endregion */
 
 }

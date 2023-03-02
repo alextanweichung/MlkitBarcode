@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
+import { NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { CommonService } from 'src/app/shared/services/common.service';
 import { AnnouncementFile, Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 
@@ -45,13 +45,10 @@ export class DashboardPage implements OnInit, ViewDidEnter {
 
   constructor(
     private authService: AuthService,
+    private commonService: CommonService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
-    private navController: NavController,
-    private loadingController: LoadingController,
-    private opener: FileOpener,
-    private file: File,
-    private androidPermissions: AndroidPermissions
+    private navController: NavController
   ) { }
 
   ionViewDidEnter(): void {
@@ -89,20 +86,6 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     })
   }
 
-  downloadFile(file: AnnouncementFile) {
-    this.dashboardService.downloadFiles(file.filesId).subscribe(blob => {
-      let t: any = new Blob([blob]);
-      const a = document.createElement('a');
-      const objectUrl = URL.createObjectURL(t);
-      a.href = objectUrl;
-      a.download = file.filesName + file.filesType;
-      a.click();
-      URL.revokeObjectURL(objectUrl);
-    }, error => {
-      console.log(error);
-    })
-  }
-
   goToManagement(page: string, mode: string) {
     if (page && mode) {
       this.navController.navigateRoot(`/managements/${page}-${mode}`);
@@ -128,63 +111,16 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   }
 
   async downloadPdf(memoDetail: MemoDetail) {
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Downloading...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
     if (memoDetail) {
       let filename = memoDetail.filesName + memoDetail.filesType;
       try {
-        this.dashboardService.downloadFiles(memoDetail.filesId).subscribe(response => {
-          if (Capacitor.getPlatform() === 'android') {
-            this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-              async result => {
-                if (!result.hasPermission) {
-                  this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                    async result => {
-                      await loading.present();
-                      this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                        this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                        loading.dismiss();
-                      }).catch((Error) => {
-                        loading.dismiss();
-                      });
-                    }
-                  );
-                } else {
-                  await loading.present();
-                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, response, { replace: true }).then(() => {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                    loading.dismiss();
-                  }).catch((Error) => {
-                    loading.dismiss();
-                  });
-                }
-              }
-            )
-          } else if (Capacitor.getPlatform() === 'ios') {
-            this.file.writeFile(this.file.tempDirectory, filename, response, { replace: true }).then(() => {
-              this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-              loading.dismiss();
-            }).catch((error) => {
-              loading.dismiss();
-            })
-          } else {
-            const url = window.URL.createObjectURL(response);
-            const link = window.document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", filename);
-            window.document.body.appendChild(link);
-            link.click();
-            link.remove();
-          }
+        this.dashboardService.downloadFiles(memoDetail.filesId).subscribe(async response => {
+          await this.commonService.commonDownloadPdf(response, filename);
         }, error => {
-          loading.dismiss();
           console.log(error);
         })
-      } catch(error) {
-        loading.dismiss();
+      } catch (error) {
+        console.log(error);
       }
     }
   }
