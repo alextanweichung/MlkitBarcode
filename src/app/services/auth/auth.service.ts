@@ -91,7 +91,7 @@ export class AuthService {
   updatePlayerId(loginUser: LoginUser) {
     let user = this.getDecodedToken(loginUser.token);
     if (loginUser.playerId !== localStorage.getItem("player_Id")) {
-      this.http.put(this.baseUrl + "user/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
+      this.http.put(this.baseUrl + "MobileDownload/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
       }, error => {
         console.log(error);
       });

@@ -51,26 +51,30 @@ export class CardsPage implements AfterContentChecked {
 
   // Sync
   async sync() {
-    // Loading overlay
     const loading = await this.loadingController.create({
       cssClass: 'default-loading',
       message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
       spinner: 'crescent'
     });
-    await loading.present();
+    if (Capacitor.getPlatform() !== 'web') {
+      try {
+        await loading.present();
+        let response = await this.commonService.syncInbound();
+        let itemMaster: PDItemMaster[] = response['itemMaster'];
+        let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+        await this.configService.syncInboundData(itemMaster, itemBarcode);
+        // await this.configService.loadItemMaster();
+        // await this.configService.loadItemBarcode();
 
-    this.commonService.syncInbound().subscribe(async response => {
-      let itemMaster: PDItemMaster[] = response['itemMaster'];
-      let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-      await this.configService.syncInboundData(itemMaster, itemBarcode);
-    }, error => {
-      console.log(error);
-    })
-
-    // Fake timeout
-    setTimeout(() => {
-      loading.dismiss();
-    }, 2000);
+        // Fake timeout
+        setTimeout(() => {
+          loading.dismiss();
+        }, 2000);
+      } catch (error) {
+        loading.dismiss();
+        this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
+      }
+    }
   }
 
   async toggleShowItemImage(event) {

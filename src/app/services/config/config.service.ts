@@ -43,7 +43,8 @@ export class ConfigService {
       this.sys_parameter = {
         Sys_ParameterId: 1,
         // apiUrl: 'https://localhost:44351/api/',
-        apiUrl: 'https://idcp-demo.com/api/',
+        // apiUrl: 'https://idcp-demo.com/api/',
+        apiUrl: 'https://idcp-ararat.com:8081/api/',
         imgUrl: null,
         onlineMode: true,
         lastDownloadAt: null,
@@ -72,8 +73,10 @@ export class ConfigService {
 
   async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
+    this.item_Masters = itemMasters;
     console.log('done sync item master')
     await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
+    this.item_Barcodes = itemBarcodes;
     console.log('done sync item barcode')
     try {
       let obj = this.sys_parameter;

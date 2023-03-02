@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
 export const create_item_master_table: string = `
 CREATE TABLE IF NOT EXISTS Item_Master (
   id INTEGER,
-  code VARCHAR(20),
+  code VARCHAR(100),
   itemDesc VARCHAR(100),
   brandId INTEGER,
   brandCd VARCHAR(20),

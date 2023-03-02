@@ -44,8 +44,8 @@ export class SigninPage implements OnInit {
     });
 
     // DEBUG: Prefill inputs
-    this.signin_form.get('userEmail').setValue('aychia@idcp.my');
-    this.signin_form.get('password').setValue('String1234');
+    // this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+    // this.signin_form.get('password').setValue('String1234');
   }
 
   // Sign in
@@ -74,18 +74,13 @@ export class SigninPage implements OnInit {
         if (Capacitor.getPlatform() !== 'web') {
           try {
             await loading.present();
-            // let itemMasterCount = (await this.configService.loadItemMaster())?.length;
-            // let itemBarcodeCount = (await this.configService.loadItemBarcode())?.length;
-            // if (!itemMasterCount || itemMasterCount === undefined || itemMasterCount === 0 || !itemBarcodeCount || itemBarcodeCount === undefined || itemBarcodeCount === 0) {
-              this.commonService.syncInbound().subscribe(async response => {
-                let itemMaster: PDItemMaster[] = response['itemMaster'];
-                let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-                await this.configService.syncInboundData(itemMaster, itemBarcode);
-                await this.configService.loadItemMaster();
-                await this.configService.loadItemBarcode();
-              })
-            // }
-            
+            let response = await this.commonService.syncInbound();
+            let itemMaster: PDItemMaster[] = response['itemMaster'];
+            let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+            await this.configService.syncInboundData(itemMaster, itemBarcode);
+            // await this.configService.loadItemMaster();
+            // await this.configService.loadItemBarcode();
+
             // Fake timeout
             setTimeout(() => {
               loading.dismiss();

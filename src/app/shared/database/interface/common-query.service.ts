@@ -300,30 +300,34 @@ export class CommonQueryService<T> {
         for (const key of cols.keys()) {
           switch (this.getColType(cols.get(key))) {
             case "number":
-              sqlParams += `${cols.get(key)},`;
+              sqlParams += `${cols.get(key)}~`;
               break;
             case "boolean":
-              sqlParams += `${cols.get(key)},`;
+              sqlParams += `${cols.get(key)}~`;
               break;
             case "string":
             case "Date":
-              sqlParams += `${cols.get(key)},`;
+              sqlParams += `${cols.get(key)}~`;
               break;
             default:
-              sqlParams += `,`;
+              sqlParams += `~`;
               break;
           }
         }
         sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
 
         statements[2].values.push(
-          sqlParams.split(',')
+          sqlParams.split('~')
         )
       });
+      
+      console.log("🚀 ~ file: common-query.service.ts:328 ~ CommonQueryService<T> ~ syncInboundData ~ statements:", JSON.stringify(statements));
+
       statements.push({
         statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
         values: []
       })
+      
       let timestart = new Date();
       await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let ret: any = await db.executeSet(statements, true);

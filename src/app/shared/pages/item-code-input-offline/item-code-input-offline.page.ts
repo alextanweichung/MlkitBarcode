@@ -49,34 +49,36 @@ export class ItemCodeInputOfflinePage implements OnInit {
           let found_item_master = await this.configService.item_Masters.find(r => found_item_code.id === r.id);
           let found_item_barcode = await this.configService.item_Barcodes.filter(r => r.itemId === found_item_master.id);
           found_item_barcode.forEach(async r => {
-            let outputData: TransactionDetail = {
-              itemId: found_item_master.id,
-              itemCode: found_item_master.code,
-              description: found_item_master.itemDesc,
-              variationTypeCode: found_item_master.varCd,
-              discountGroupCode: found_item_master.discCd,
-              discountExpression: found_item_master.discPct + '%',
-              taxId: found_item_master.taxId,
-              taxCode: found_item_master.taxCd,
-              taxPct: found_item_master.taxPct,
-              qtyRequest: null,
-              itemPricing: {
+            if (this.availableItems.findIndex(rr => rr.itemId === r.itemId) < 0) {
+              let outputData: TransactionDetail = {
                 itemId: found_item_master.id,
-                unitPrice: found_item_master.price,
+                itemCode: found_item_master.code,
+                description: found_item_master.itemDesc,
+                variationTypeCode: found_item_master.varCd,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
-              },
-              itemVariationXId: r.xId,
-              itemVariationYId: r.yId,
-              itemSku: r.sku,
-              itemBarcode: r.barcode,
-              itemBrandId: found_item_master.brandId,
-              itemGroupId: found_item_master.groupId,
-              itemCategoryId: found_item_master.catId,
-              itemBarcodeTagId: r.id
+                taxId: found_item_master.taxId,
+                taxCode: found_item_master.taxCd,
+                taxPct: found_item_master.taxPct,
+                qtyRequest: null,
+                itemPricing: {
+                  itemId: found_item_master.id,
+                  unitPrice: found_item_master.price,
+                  discountGroupCode: found_item_master.discCd,
+                  discountExpression: found_item_master.discPct + '%',
+                  discountPercent: found_item_master.discPct
+                },
+                itemVariationXId: r.xId,
+                itemVariationYId: r.yId,
+                itemSku: r.sku,
+                itemBarcode: r.barcode,
+                itemBrandId: found_item_master.brandId,
+                itemGroupId: found_item_master.groupId,
+                itemCategoryId: found_item_master.catId,
+                itemBarcodeTagId: r.id
+              }
+              await this.availableItems.push(outputData);
             }
-            await this.availableItems.push(outputData);
           })
           if (this.availableItems.length > 0) {
             this.showModal();
