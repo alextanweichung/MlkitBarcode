@@ -23,16 +23,6 @@ const routes: Routes = [
     path: 'signin',
     loadChildren: () => import('./modules/public/signin/signin.module').then(m => m.SigninPageModule),
     // canActivate: [PublicGuard] // Prevent for signed in users
-},
-  {
-    path: 'signup',
-    loadChildren: () => import('./modules/public/signup/signup.module').then(m => m.SignupPageModule),
-    // canActivate: [PublicGuard] // Prevent for signed in users
-  },
-  {
-    path: 'password-reset',
-    loadChildren: () => import('./modules/public/password-reset/password-reset.module').then(m => m.PasswordResetPageModule),
-    // canActivate: [PublicGuard] // Prevent for signed in users
   },
 
 
@@ -41,14 +31,12 @@ const routes: Routes = [
   // dashboard  
   {
     path: 'dashboard',
-    loadChildren: () => import('./modules/dashboard/pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
+    loadChildren: () => import('./modules/dashboard/pages/dashboard/dashboard.module').then(m => m.DashboardPageModule)
   },
 
 
 
 
-
-  
   // management
   {
     path: 'managements',
@@ -75,20 +63,20 @@ const routes: Routes = [
   // management-purchase-order  
   {
     path: 'managements/purchase-order-reviews',
-    loadChildren: () => import('./modules/managements/pages/purchase-order-reviews/purchase-order-reviews.module').then( m => m.PurchaseOrderReviewsPageModule)
+    loadChildren: () => import('./modules/managements/pages/purchase-order-reviews/purchase-order-reviews.module').then(m => m.PurchaseOrderReviewsPageModule)
   },
   {
     path: 'managements/purchase-order-approvals',
-    loadChildren: () => import('./modules/managements/pages/purchase-order-approvals/purchase-order-approvals.module').then( m => m.PurchaseOrderApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/purchase-order-approvals/purchase-order-approvals.module').then(m => m.PurchaseOrderApprovalsPageModule)
   },
   // management-otp-configuration
   {
     path: 'managements/otp-configuration',
-    loadChildren: () => import('./modules/managements/pages/otp-configuration/otp-configuration.module').then( m => m.OtpConfigurationPageModule)
+    loadChildren: () => import('./modules/managements/pages/otp-configuration/otp-configuration.module').then(m => m.OtpConfigurationPageModule)
   },
   {
     path: 'managements/otp-config-list',
-    loadChildren: () => import('./modules/managements/pages/otp-configuration/otp-config-list/otp-config-list.module').then( m => m.OtpConfigListPageModule)
+    loadChildren: () => import('./modules/managements/pages/otp-configuration/otp-config-list/otp-config-list.module').then(m => m.OtpConfigListPageModule)
   },
 
 
@@ -122,7 +110,7 @@ const routes: Routes = [
   // transactions-purchase-order
   {
     path: 'transactions/purchase-order/purchase-order-detail',
-    loadChildren: () => import('./modules/transactions/pages/purchase-order/purchase-order-detail/purchase-order-detail.module').then( m => m.PurchaseOrderDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/purchase-order/purchase-order-detail/purchase-order-detail.module').then(m => m.PurchaseOrderDetailPageModule)
   },
   // transaction-picking  
   {
@@ -136,29 +124,29 @@ const routes: Routes = [
   // transaction-packing
   {
     path: 'transactions/packing',
-    loadChildren: () => import('./modules/transactions/pages/packing/packing.module').then( m => m.PackingPageModule)
+    loadChildren: () => import('./modules/transactions/pages/packing/packing.module').then(m => m.PackingPageModule)
   },
   {
     path: 'transactions/packing/packing-detail',
-    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/packing-detail.module').then( m => m.PackingDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/packing/packing-detail/packing-detail.module').then(m => m.PackingDetailPageModule)
   },
   // transaction-consignment-sales
   {
     path: 'transactions/consignment-sales',
-    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales.module').then( m => m.ConsignmentSalesPageModule)
+    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales.module').then(m => m.ConsignmentSalesPageModule)
   },
   {
     path: 'transactions/consignment-sales/consignment-sales-detail',
-    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales-detail/consignment-sales-detail.module').then( m => m.ConsignmentSalesDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/consignment-sales/consignment-sales-detail/consignment-sales-detail.module').then(m => m.ConsignmentSalesDetailPageModule)
   },
   // transaction-stock-count
   {
     path: 'transactions/stock-count',
-    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count.module').then( m => m.StockCountPageModule)
+    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count.module').then(m => m.StockCountPageModule)
   },
   {
     path: 'transactions/stock-count/stock-count-detail',
-    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then( m => m.StockCountDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then(m => m.StockCountDetailPageModule)
   },
   // transaction-check-balance
   {
@@ -168,11 +156,11 @@ const routes: Routes = [
   // transaction-cash-deposit
   {
     path: 'transactions/cash-deposit',
-    loadChildren: () => import('./modules/transactions/pages/cash-deposit/cash-deposit.module').then( m => m.CashDepositPageModule)
+    loadChildren: () => import('./modules/transactions/pages/cash-deposit/cash-deposit.module').then(m => m.CashDepositPageModule)
   },
   {
     path: 'transactions/truck-loading',
-    loadChildren: () => import('./modules/transactions/pages/truck-loading/truck-loading.module').then( m => m.TruckLoadingPageModule)
+    loadChildren: () => import('./modules/transactions/pages/truck-loading/truck-loading.module').then(m => m.TruckLoadingPageModule)
   },
 
 
@@ -183,8 +171,6 @@ const routes: Routes = [
     path: 'reports',
     loadChildren: () => import('./modules/reports/pages/reports/reports.module').then(m => m.ReportsPageModule)
   },
-
-
 
 
 
@@ -208,7 +194,7 @@ const routes: Routes = [
   },
   {
     path: 'search-multi-dropdown',
-    loadChildren: () => import('./shared/pages/search-multi-dropdown/search-multi-dropdown.module').then( m => m.SearchMultiDropdownPageModule)
+    loadChildren: () => import('./shared/pages/search-multi-dropdown/search-multi-dropdown.module').then(m => m.SearchMultiDropdownPageModule)
   },
   {
     path: 'item-add-grid',
@@ -216,7 +202,7 @@ const routes: Routes = [
   },
   {
     path: 'item-add-list',
-    loadChildren: () => import('./shared/pages/general-sales-list/general-sales-list.module').then( m => m.GeneralSalesListPageModule)
+    loadChildren: () => import('./shared/pages/general-sales-list/general-sales-list.module').then(m => m.GeneralSalesListPageModule)
   },
   {
     path: 'item-cart',
@@ -228,46 +214,40 @@ const routes: Routes = [
   },
   {
     path: 'calendar-input',
-    loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then( m => m.CalendarInputPageModule)
+    loadChildren: () => import('./shared/pages/calendar-input/calendar-input.module').then(m => m.CalendarInputPageModule)
   },
   {
     path: 'barcode-scan-input',
-    loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then( m => m.BarcodeScanInputPageModule)
+    loadChildren: () => import('./shared/pages/barcode-scan-input/barcode-scan-input.module').then(m => m.BarcodeScanInputPageModule)
   },
   {
     path: 'item-add-list-flat',
-    loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then( m => m.ItemAddListFlatPageModule)
+    loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then(m => m.ItemAddListFlatPageModule)
   },
   {
     path: 'item-view-list-flat',
-    loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then( m => m.ItemViewListFlatPageModule)
+    loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then(m => m.ItemViewListFlatPageModule)
   },
   {
     path: 'item-catalog',
-    loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then( m => m.ItemCatalogPageModule)
+    loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then(m => m.ItemCatalogPageModule)
   },
   {
     path: 'camera-scan-input',
-    loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then( m => m.CameraScanInputPageModule)
+    loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then(m => m.CameraScanInputPageModule)
   },
   {
     path: 'item-code-input-offline',
-    loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then( m => m.ItemCodeInputOfflinePageModule)
+    loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
-
-
-
-
-
-
 
 ];
 @NgModule({
   imports: [
     RouterModule.forRoot(
       routes,
-      { 
-        preloadingStrategy: PreloadAllModules, 
+      {
+        preloadingStrategy: PreloadAllModules,
         relativeLinkResolution: 'legacy'
       })
   ],

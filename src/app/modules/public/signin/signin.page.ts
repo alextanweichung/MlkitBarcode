@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, NavController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -10,6 +10,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-signin',
@@ -30,8 +31,8 @@ export class SigninPage implements OnInit {
     private configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
-    private navController: NavController,
-    private loadingController: LoadingController
+    private loadingService: LoadingService,
+    private navController: NavController
   ) { 
     this.currentVersion = environment.version;
   }
@@ -58,12 +59,8 @@ export class SigninPage implements OnInit {
     } else {
       localStorage.setItem('player_Id', '6ce7134e-5a4b-426f-b89b-54de14e05eba');
     }
-    // Loading overlay
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
+
+
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
@@ -73,21 +70,16 @@ export class SigninPage implements OnInit {
         await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           try {
-            await loading.present();
+            await this.loadingService.showLoading("Syncing Offline Table");
             let response = await this.commonService.syncInbound();
             let itemMaster: PDItemMaster[] = response['itemMaster'];
             let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
             await this.configService.syncInboundData(itemMaster, itemBarcode);
             // await this.configService.loadItemMaster();
             // await this.configService.loadItemBarcode();
-
-            // Fake timeout
-            setTimeout(() => {
-              loading.dismiss();
-            }, 2000);
-            
+            await this.loadingService.dismissLoading();       
           } catch (error) {
-            loading.dismiss();
+            await this.loadingService.dismissLoading();
             this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
           }
         }

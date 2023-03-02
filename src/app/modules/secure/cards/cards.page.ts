@@ -1,13 +1,14 @@
 import { AfterContentChecked, Component, OnInit, ViewChild } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -38,7 +39,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
-    private loadingController: LoadingController,
+    private loadingService: LoadingService,
     private commonService: CommonService
   ) { }
 
@@ -61,57 +62,18 @@ export class CardsPage implements OnInit, AfterContentChecked {
 
   // Sync
   async sync() {
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Syncing Offline Table...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
     if (Capacitor.getPlatform() !== 'web') {
       try {
-        await loading.present();
+        await this.loadingService.showLoading("Syncing Offline Table");
         let response = await this.commonService.syncInbound();
         let itemMaster: PDItemMaster[] = response['itemMaster'];
         let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
         // await this.configService.loadItemMaster();
         // await this.configService.loadItemBarcode();
-
-        // Fake timeout
-        setTimeout(() => {
-          loading.dismiss();
-        }, 2000);
+        await this.loadingService.dismissLoading();
       } catch (error) {
-        loading.dismiss();
-        this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
-      }
-    }
-  }
-
-  async toggleShowItemImage(event) {
-    if (Capacitor.getPlatform() !== 'web') {
-      let t = this.configService.sys_parameter;
-      t.loadImage = event.detail.checked;
-      try {
-        await this.configService.update(t);
-        this.configService.load();
-      } catch (error) {
-        this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
-      }
-    }
-  }
-
-  async toggleUseOnlineResources(event) {
-    if (Capacitor.getPlatform() !== 'web') {
-      let t = this.configService.sys_parameter;
-      t.onlineMode = event.detail.checked;
-      try {
-        await this.configService.update(t);
-        this.configService.load();
-        if (!t.onlineMode) {
-          await this.configService.loadItemBarcode()
-          await this.configService.loadItemMaster();
-        }
-      } catch (error) {
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }

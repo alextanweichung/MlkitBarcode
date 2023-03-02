@@ -4,7 +4,6 @@ import { Capacitor } from '@capacitor/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { LoadingController } from '@ionic/angular';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
@@ -318,7 +317,7 @@ export class CommonService {
   /* #region download pdf */
 
   async commonDownloadPdf(file: Blob, filename: string) {
-    await this.loadingService.showLoading('<p>Downloading...</p><span>Please be patient.</span>');
+    await this.loadingService.showLoading("Downloading");
     if (Capacitor.getPlatform() === 'android') {
       this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
         async result => {

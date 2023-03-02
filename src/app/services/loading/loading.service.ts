@@ -12,10 +12,10 @@ export class LoadingService {
     public loadingController: LoadingController
   ) { }
 
-  async showLoading(message: string = '<p>Loading...</p><span>Please be patient.</span>') {
+  async showLoading(message: string = 'Loading') {
     this.loading = await this.loadingController.create({
       cssClass: 'default-loading',
-      message: message,
+      message: `<p>${message}...</p><span>Please be patient.</span>`,
       spinner: 'crescent'
     });
     await this.loading.present();

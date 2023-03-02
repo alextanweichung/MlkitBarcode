@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileInfo } from '@capacitor/filesystem/dist/esm/definitions';
-import { ActionSheetController, AlertController, LoadingController, NavController, Platform } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, Platform } from '@ionic/angular';
 import { format } from 'date-fns';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -40,11 +41,11 @@ export class CashDepositAddPage implements OnInit {
     private objectService: CashDepositService,
     private commonService: CommonService,
     private actionSheetController: ActionSheetController,
-    private loadingController: LoadingController,
     private alertController: AlertController,
     private navController: NavController,
     private formBuilder: FormBuilder,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private plt: Platform
   ) {
     this.date_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
@@ -175,11 +176,8 @@ export class CashDepositAddPage implements OnInit {
 
   async loadFiles() {
     this.images = [];
-
-    const loading = await this.loadingController.create({
-      message: 'Loading data...'
-    });
-    await loading.present();
+    
+    await this.loadingService.showLoading();
 
     Filesystem.readdir({
       path: IMAGE_DIR,
@@ -197,8 +195,8 @@ export class CashDepositAddPage implements OnInit {
           });
         }
       )
-      .then((_) => {
-        loading.dismiss();
+      .then(async (_) => {
+        await this.loadingService.dismissLoading();
       });
   }
 

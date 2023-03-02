@@ -4,10 +4,11 @@ import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
 SwiperCore.use([Pagination]);
 
 import { ConfigService } from 'src/app/services/config/config.service';
-import { LoadingController, NavController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { Keyboard } from '@capacitor/keyboard';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-welcome',
@@ -34,8 +35,8 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   constructor(
     private toastService: ToastService,
     private configService: ConfigService,
-    private navController: NavController,
-    private loadingController: LoadingController
+    private loadingService: LoadingService,
+    private navController: NavController
   ) { }
 
   ngOnInit() {
@@ -89,38 +90,33 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   activationCode: string = '';
   // Go to main content
   async getStarted() {
-    const loading = await this.loadingController.create({
-      cssClass: 'default-loading',
-      message: '<p>Getting Info...</p><span>Please be patient.</span>',
-      spinner: 'crescent'
-    });
     if (this.activationCode.length > 0) {
       try {
         // Loading overlay
-        await loading.present();
+        await this.loadingService.showLoading("Getting Info");
         this.configService.getApiUrl(this.activationCode).subscribe(async response => {
           if (response) {
+            this.toastService.presentToast('Activated Successfully', '', 'top', 'success', 1000);
             let config: Sys_Parameter = {
               Sys_ParameterId: 1,
               apiUrl: response.fields.url.stringValue,
               onlineMode: true,
               loadImage: false
             }
-            this.toastService.presentToast('Activated Successfully', '', 'top', 'success', 1000);
-            await this.configService.insert(config).then(response => {
-              loading.dismiss();
+            await this.configService.insert(config).then(async response => {
+              await this.loadingService.dismissLoading();
               this.navController.navigateRoot('/signin');
-            }).catch(error => {
-              loading.dismiss();
+            }).catch(async error => {
+              await this.loadingService.dismissLoading();
               this.toastService.presentToast(error.message, '', 'top', 'danger', 1000);
             });
           }
-        }, error => {
-          loading.dismiss();
-          this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);          
+        }, async error => {
+          await this.loadingService.dismissLoading();
+          this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
         })
       } catch (error) {
-        loading.dismiss();
+        await this.loadingService.dismissLoading();
       }
     } else {
       this.toastService.presentToast('Please enter activation code', '', 'top', 'danger', 1000);

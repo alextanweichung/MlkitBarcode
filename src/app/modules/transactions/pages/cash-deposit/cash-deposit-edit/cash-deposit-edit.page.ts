@@ -4,9 +4,10 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { Directory, FileInfo, Filesystem } from '@capacitor/filesystem';
-import { NavController, ActionSheetController, LoadingController, Platform, AlertController } from '@ionic/angular';
+import { NavController, ActionSheetController, Platform, AlertController } from '@ionic/angular';
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -41,7 +42,7 @@ export class CashDepositEditPage implements OnInit {
     private commonService: CommonService,
     private formBuilder: FormBuilder,
     private objectService: CashDepositService,
-    private loadingController: LoadingController,
+    private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController, 
     private sanitizer: DomSanitizer,

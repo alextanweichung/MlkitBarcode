@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonPopover, LoadingController, NavController } from '@ionic/angular';
+import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
