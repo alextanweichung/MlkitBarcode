@@ -11,6 +11,7 @@ import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download'
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 @Component({
   selector: 'app-signin',
@@ -34,7 +35,8 @@ export class SigninPage implements OnInit, ViewWillEnter {
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
     private loadingService: LoadingService,
-    private navController: NavController
+    private navController: NavController,
+    private androidPermission: AndroidPermissions
   ) { 
     this.currentVersion = environment.version;
   }
@@ -64,6 +66,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
     this.submit_attempt = true;
     if (Capacitor.getPlatform() !== 'web') {
       OneSignal.getDeviceState(function (stateChanges) {
+        console.log("🚀 ~ file: signin.page.ts:67 ~ SigninPage ~ stateChanges:", JSON.stringify(stateChanges))
         localStorage.setItem('player_Id', stateChanges.userId);
       });
     } else {
@@ -87,19 +90,19 @@ export class SigninPage implements OnInit, ViewWillEnter {
             this.configService.sys_parameter.username = '';
             this.configService.sys_parameter.password = '';
           }
-          try {
-            await this.loadingService.showLoading("Syncing Offline Table");
-            let response = await this.commonService.syncInbound();
-            let itemMaster: PDItemMaster[] = response['itemMaster'];
-            let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-            await this.configService.syncInboundData(itemMaster, itemBarcode);
-            // await this.configService.loadItemMaster();
-            // await this.configService.loadItemBarcode();
-            await this.loadingService.dismissLoading();       
-          } catch (error) {
-            await this.loadingService.dismissLoading();
-            this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
-          }
+          // try {
+          //   await this.loadingService.showLoading("Syncing Offline Table");
+          //   let response = await this.commonService.syncInbound();
+          //   let itemMaster: PDItemMaster[] = response['itemMaster'];
+          //   let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+          //   await this.configService.syncInboundData(itemMaster, itemBarcode);
+          //   // await this.configService.loadItemMaster();
+          //   // await this.configService.loadItemBarcode();
+          //   await this.loadingService.dismissLoading();       
+          // } catch (error) {
+          //   await this.loadingService.dismissLoading();
+          //   this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
+          // }
         }
       });
     }

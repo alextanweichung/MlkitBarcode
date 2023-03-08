@@ -43,7 +43,7 @@ export class AppComponent {
       // If we're on a mobile platform (iOS / Android), not web
       if (Capacitor.getPlatform() !== 'web') {
         // this.pushNotications.initPush();
-        OneSignalInit();
+        await OneSignalInit();
         this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)p
         await StatusBar.setStyle({ style: Style.Dark });
@@ -63,7 +63,6 @@ export class AppComponent {
     });
   }
 }
-
 
 function OneSignalInit() {
   // Uncomment to set OneSignal device logging to VERBOSE  

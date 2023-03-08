@@ -86,7 +86,7 @@ export class DebtorLatestOutstandingPage implements OnInit {
       }
     }
     this.reportService.getPdf(paramModel).subscribe(async response => {
-      await this.commonService.commonDownloadPdf(response, paramModel.reportName);
+      await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
     }, error => {
       console.log(error);
     })
