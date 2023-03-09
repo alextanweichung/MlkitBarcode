@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
+import { NotificationHistory } from '../../models/notification-history';
 
 const managementPageCode: string = 'MAAP';
 const quotationReviewCode: string = 'MAQURV';
@@ -124,5 +125,35 @@ export class DashboardPage implements OnInit, ViewWillEnter {
       }
     }
   }
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    this.popoverMenu.event = event;
+    this.isPopoverOpen = true;
+  }
+
+  /* #endregion */
+
+  /* #region history modal */
+
+  notificationHistoryModal: boolean = false;
+  notificationHistories: NotificationHistory[] = [];
+  showNotificationHistoryModal() {
+    this.dashboardService.loadNotificationHistory().subscribe(response => {
+      this.notificationHistories = response;
+      this.notificationHistoryModal = true;
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  hideNotificationHistoryModal() {
+    this.notificationHistoryModal = false;
+  }
+
+  /* #endregion */
 
 }
