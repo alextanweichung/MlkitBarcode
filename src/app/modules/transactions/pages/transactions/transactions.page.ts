@@ -49,20 +49,24 @@ export class TransactionsPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.authService.menuModel$.subscribe(obj => {
-      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
-      if (pageItems) {
-        this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
-        this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
-        this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
-        this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
-        this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
-        this.showStockCount = pageItems.findIndex(r => r.title === mobileInventoryCountCode) > -1;
-        this.showInventoryLevel = pageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
-        this.showCashDeposit = pageItems.findIndex(r => r.title === mobilePosCashDeposit) > -1;
-        this.showTruckLoading = pageItems.findIndex(r => r.title === mobileTruckLoading) > -1;
-      }
-    })
+    try {
+      this.authService.menuModel$.subscribe(obj => {
+        let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
+        if (pageItems) {
+          this.showQuotation = pageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
+          this.showSalesOrder = pageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
+          this.showPicking = pageItems.findIndex(r => r.title === mobilePickingCode) > -1;
+          this.showPacking = pageItems.findIndex(r => r.title === mobilePackingCode) > -1;
+          this.showConsignmentSales = pageItems.findIndex(r => r.title === mobileConsignmentSalesCode) > -1;
+          this.showStockCount = pageItems.findIndex(r => r.title === mobileInventoryCountCode) > -1;
+          this.showInventoryLevel = pageItems.findIndex(r => r.title === mobileInventoryLevelCode) > -1;
+          this.showCashDeposit = pageItems.findIndex(r => r.title === mobilePosCashDeposit) > -1;
+          this.showTruckLoading = pageItems.findIndex(r => r.title === mobileTruckLoading) > -1;
+        }
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
 }

@@ -37,14 +37,18 @@ export class QuotationPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+    try {
+      if (!this.startDate) {
+        this.startDate = this.commonService.getFirstDayOfTheYear();
+      }
+      if (!this.endDate) {
+        this.endDate = this.commonService.getTodayDate();
+      }
+      this.loadObjects();
+      this.loadCustomerList();      
+    } catch (e) {
+      console.error(e);
     }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-    this.loadObjects();
-    this.loadCustomerList();
   }
 
   /* #region  crud */
@@ -62,7 +66,8 @@ export class QuotationPage implements OnInit {
       }, error => {
         throw Error;
       })
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
   }
@@ -71,20 +76,24 @@ export class QuotationPage implements OnInit {
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
   loadCustomerList() {
-    this.quotationService.getCustomerList().subscribe(async response => {
-      this.customers = response;
-      this.customers = this.customers.filter(r => r.businessModelType === 'T');
-      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-      this.customers.forEach(r => {
-        this.customerSearchDropdownList.push({
-          id: r.customerId,
-          code: r.customerCode,
-          description: r.name
+    try {
+      this.quotationService.getCustomerList().subscribe(async response => {
+        this.customers = response;
+        this.customers = this.customers.filter(r => r.businessModelType === 'T');
+        await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+        this.customers.forEach(r => {
+          this.customerSearchDropdownList.push({
+            id: r.customerId,
+            code: r.customerCode,
+            description: r.name
+          })
         })
+      }, error => {
+        throw error;
       })
-    }, error => {
-      console.log(error);
-    })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
@@ -92,32 +101,40 @@ export class QuotationPage implements OnInit {
   /* #region  add quotation */
 
   async addObject() {
-    if (this.quotationService.hasSalesAgent()) {
-      this.navController.navigateForward('/transactions/quotation/quotation-header');
-    } else {
-      this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'dnager', 1000);
+    try {
+      if (this.quotationService.hasSalesAgent()) {
+        this.navController.navigateForward('/transactions/quotation/quotation-header');
+      } else {
+        this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'dnager', 1000);
+      }      
+    } catch (e) {
+      console.error(e);
     }
   }
 
   async selectAction() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Choose an action',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Add Quotation',
-          icon: 'document-outline',
-          handler: () => {
-            this.addObject();
-          }
-        },
-        {
-          text: 'Cancel',
-          icon: 'close',
-          role: 'cancel'
-        }]
-    });
-    await actionSheet.present();
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Choose an action',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Add Quotation',
+            icon: 'document-outline',
+            handler: () => {
+              this.addObject();
+            }
+          },
+          {
+            text: 'Cancel',
+            icon: 'close',
+            role: 'cancel'
+          }]
+      });
+      await actionSheet.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
@@ -125,70 +142,85 @@ export class QuotationPage implements OnInit {
   /* #region download pdf */
 
   async presentAlertViewPdf(doc) {
-    const alert = await this.alertController.create({
-      header: '',
-      subHeader: 'View Pdf?',
-      message: '',
-      buttons: [
-        {
-          text: 'OK',
-          cssClass: 'success',
-          role: 'confirm',
-          handler: async () => {
-            await this.downloadPdf(doc);
+    try {
+      const alert = await this.alertController.create({
+        header: '',
+        subHeader: 'View Pdf?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf(doc);
+            },
           },
-        },
-        {
-          cssClass: 'cancel',
-          text: 'Cancel',
-          role: 'cancel'
-        },
-      ]
-    });
-    await alert.present();
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async downloadPdf(doc) {
-    this.quotationService.downloadPdf("SMSC001", "pdf", doc.quotationId).subscribe(response => {
-      let filename = doc.quotationNum + ".pdf";
-      this.commonService.commonDownloadPdf(response, filename);
-    }, error => {
-      this.loadingService.dismissLoading();
-      console.log(error);
-    })
+    try {
+      this.quotationService.downloadPdf("SMSC001", "pdf", doc.quotationId).subscribe(response => {
+        let filename = doc.quotationNum + ".pdf";
+        this.commonService.commonDownloadPdf(response, filename);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
 
   async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      componentProps: {
-        startDate: this.startDate,
-        endDate: this.endDate,
-        customerFilter: true,
-        customerList: this.customerSearchDropdownList,
-        selectedCustomerId: this.customerIds
-      },
-      canDismiss: true
-    })
-    await modal.present();
-    let { data } = await modal.onWillDismiss();
-    if (data && data !== undefined) {
-      this.startDate = new Date(data.startDate);
-      this.endDate = new Date(data.endDate);
-      this.customerIds = data.customerIds;
-      this.loadObjects();
+    try {
+      const modal = await this.modalController.create({
+        component: FilterPage,
+        componentProps: {
+          startDate: this.startDate,
+          endDate: this.endDate,
+          customerFilter: true,
+          customerList: this.customerSearchDropdownList,
+          selectedCustomerId: this.customerIds
+        },
+        canDismiss: true
+      })
+      await modal.present();
+      let { data } = await modal.onWillDismiss();
+      if (data && data !== undefined) {
+        this.startDate = new Date(data.startDate);
+        this.endDate = new Date(data.endDate);
+        this.customerIds = data.customerIds;
+        this.loadObjects();
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
   
   goToDetail(objectId: number) {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: objectId
+    try {
+      let navigationExtras: NavigationExtras = {
+        queryParams: {
+          objectId: objectId
+        }
       }
+      this.navController.navigateForward('/transactions/quotation/quotation-detail', navigationExtras);
+    } catch (e) {
+      console.error(e);
     }
-    this.navController.navigateForward('/transactions/quotation/quotation-detail', navigationExtras);
   }
 
 }

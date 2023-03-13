@@ -33,18 +33,22 @@ export class ManagementPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.authService.menuModel$.subscribe(obj => {
-      let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
-      if (pageItems) {
-        this.showQuotationReview = pageItems.findIndex(r => r.title === quotationReviewCode) > -1;
-        this.showQuotationApproval = pageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
-        this.showSalesOrderReview = pageItems.findIndex(r => r.title === salesOrderReviewCode) > -1;
-        this.showSalesOrderApproval = pageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
-        this.showPurchaseOrderReview = pageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
-        this.showPurchaseOrderApproval = pageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
-        this.showOtpConfig = pageItems.findIndex(r => r.title === otpConfigCode) > -1;
-      }
-    })
+    try {
+      this.authService.menuModel$.subscribe(obj => {
+        let pageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
+        if (pageItems) {
+          this.showQuotationReview = pageItems.findIndex(r => r.title === quotationReviewCode) > -1;
+          this.showQuotationApproval = pageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
+          this.showSalesOrderReview = pageItems.findIndex(r => r.title === salesOrderReviewCode) > -1;
+          this.showSalesOrderApproval = pageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
+          this.showPurchaseOrderReview = pageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
+          this.showPurchaseOrderApproval = pageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
+          this.showOtpConfig = pageItems.findIndex(r => r.title === otpConfigCode) > -1;
+        }
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
 }

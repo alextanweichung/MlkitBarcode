@@ -9,6 +9,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 import { NotificationHistory } from '../../models/notification-history';
+import { Badge } from '@ionic-native/badge/ngx'
 
 const managementPageCode: string = 'MAAP';
 const quotationReviewCode: string = 'MAQURV';
@@ -49,80 +50,109 @@ export class DashboardPage implements OnInit, ViewWillEnter {
     private commonService: CommonService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
-    private navController: NavController
+    private navController: NavController,
+    private badge: Badge
   ) { }
 
   ionViewWillEnter(): void {
-    this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
-    this.loadAnnouncements();
+    try {
+      this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
+      this.loadAnnouncements();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   ngOnInit() {
-    this.authService.menuModel$.subscribe(obj => {
-      let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
-      if (mPageItems) {
-        this.showQuotationReview = mPageItems.findIndex(r => r.title === quotationReviewCode) > -1;
-        this.showQuotationApproval = mPageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
-        this.showSalesOrderReview = mPageItems.findIndex(r => r.title === salesOrderReviewCode) > -1;
-        this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
-        this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
-        this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
-      }
-
-      let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
-      if (tPageItems) {
-        this.showQuotation = tPageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
-        this.showSalesOrder = tPageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
-      }
-    })
-    this.loadAnnouncements();
+    try {
+      this.authService.menuModel$.subscribe(obj => {
+        let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
+        if (mPageItems) {
+          this.showQuotationReview = mPageItems.findIndex(r => r.title === quotationReviewCode) > -1;
+          this.showQuotationApproval = mPageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
+          this.showSalesOrderReview = mPageItems.findIndex(r => r.title === salesOrderReviewCode) > -1;
+          this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
+          this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
+          this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
+        }
+  
+        let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
+        if (tPageItems) {
+          this.showQuotation = tPageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
+          this.showSalesOrder = tPageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
+        }
+      })
+      this.loadAnnouncements();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   dashboardData: Dashboard;
   loadAnnouncements() {
-    this.dashboardService.getDashboard().subscribe(response => {
-      this.dashboardData = response;
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.dashboardService.getDashboard().subscribe(response => {
+        this.dashboardData = response;
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   goToManagement(page: string, mode: string) {
-    if (page && mode) {
-      this.navController.navigateRoot(`/managements/${page}-${mode}`);
+    try {
+      if (page && mode) {
+        this.navController.navigateRoot(`/managements/${page}-${mode}`);
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   goToTransaction(page: string) {
-    if (page) {
-      this.navController.navigateRoot(`/transactions/${page}`);
+    try {
+      if (page) {
+        this.navController.navigateRoot(`/transactions/${page}`);
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   isModalOpen: boolean = false;
   selectedAnnouncement: Memo;
   showModal(memo: Memo) {
-    this.selectedAnnouncement = memo;
-    this.isModalOpen = true;
+    try {
+      this.selectedAnnouncement = memo;
+      this.isModalOpen = true;      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   hideModal() {
-    this.isModalOpen = false;
-    this.selectedAnnouncement = null;
+    try {
+      this.isModalOpen = false;
+      this.selectedAnnouncement = null;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async downloadPdf(memoDetail: MemoDetail) {
-    if (memoDetail) {
-      let filename = memoDetail.filesName + memoDetail.filesType;
-      try {
+    try {
+      if (memoDetail) {
+        let filename = memoDetail.filesName + memoDetail.filesType;
         this.dashboardService.downloadFiles(memoDetail.filesId).subscribe(async response => {
           await this.commonService.commonDownloadPdf(response, filename);
         }, error => {
-          console.log(error);
+          throw error;
         })
-      } catch (error) {
-        console.log(error);
       }
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -131,8 +161,12 @@ export class DashboardPage implements OnInit, ViewWillEnter {
   isPopoverOpen: boolean = false;
   @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
-    this.popoverMenu.event = event;
-    this.isPopoverOpen = true;
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
@@ -141,19 +175,43 @@ export class DashboardPage implements OnInit, ViewWillEnter {
 
   notificationHistoryModal: boolean = false;
   notificationHistories: NotificationHistory[] = [];
-  showNotificationHistoryModal() {
-    this.dashboardService.loadNotificationHistory().subscribe(response => {
-      this.notificationHistories = response;
-      this.notificationHistoryModal = true;
-    }, error => {
-      console.log(error);
-    })
+  async showNotificationHistoryModal() {
+    try {
+      await this.dashboardService.loadNotificationHistory().subscribe(response => {
+        this.notificationHistories = response;
+        this.notificationHistoryModal = true;
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   hideNotificationHistoryModal() {
-    this.notificationHistoryModal = false;
+    try {
+      this.notificationHistoryModal = false;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
+
+  badgeNumber: Number;
+  async setBadges() {
+    try {
+      let hasPermission = await this.badge.hasPermission();
+      console.log("🚀 ~ file: dashboard.page.ts:165 ~ DashboardPage ~ setBadges ~ hasPermission:", hasPermission)
+      if (!hasPermission) {
+        let permissions = await this.badge.requestPermission();
+        console.log("🚀 ~ file: dashboard.page.ts:168 ~ DashboardPage ~ setBadges ~ permissions:", permissions)
+      } else {
+        this.badge.set(Number(this.badgeNumber));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
 }

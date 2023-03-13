@@ -44,11 +44,15 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.objectHeader = this.salesOrderService.header;
-    if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
-      this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+    try {
+      this.objectHeader = this.salesOrderService.header;
+      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+        this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+      }
+      this.componentsLoad();
+    } catch (e) {
+      console.error(e);
     }
-    this.componentsLoad();
   }
 
   componentsLoad() {
@@ -61,25 +65,29 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
-    this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;
-      let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-      if (SystemWideActivateTaxControl != undefined) {
-        this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
-      }
-      let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-      if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-        this.configSalesActivatePromotionEngine = true;
-      } else {
-        this.configSalesActivatePromotionEngine = false;
-      }
-    }, error => {
-      console.log(error);
-    })
-    this.authService.precisionList$.subscribe(precision => {
-      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-    })
+    try {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+        this.moduleControl = obj;
+        let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+        if (SystemWideActivateTaxControl != undefined) {
+          this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+        }
+        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
+        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
+          this.configSalesActivatePromotionEngine = true;
+        } else {
+          this.configSalesActivatePromotionEngine = false;
+        }
+      }, error => {
+        throw error;
+      })
+      this.authService.precisionList$.subscribe(precision => {
+        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   fullMasterList: MasterList[] = [];
@@ -101,67 +109,79 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   promotionMaster: PromotionMaster[] = [];
   loadPromotion() {
-    let trxDate = this.objectHeader.trxDate;
-    if (trxDate) {
-      this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
-        this.promotionMaster = response;
-      }, error => {
-        console.log(error);
-      })
+    try {
+      let trxDate = this.objectHeader.trxDate;
+      if (trxDate) {
+        this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
+          this.promotionMaster = response;
+        }, error => {
+          throw error;
+        })
+      }      
+    } catch (e) {
+      console.error(e);
     }
   }
 
   fullItemList: ItemList[] = [];
   loadFullItemList() {
-    this.salesOrderService.getFullItemList().subscribe(response => {
-      this.fullItemList = response;
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.salesOrderService.getFullItemList().subscribe(response => {
+        this.fullItemList = response;
+      }, error => {
+        throw error;
+      })      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
-    if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
-      if (event.variationTypeCode === '0') {
-        this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
-      } else {
-        let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
-        vd.forEach(r => {
-          this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
-            if (rr.itemSku === r.itemSku) {
-              rr.qtyRequest += r.qtyRequest;
-            }
-          })
-        })
-      }
-      await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
-    } else {
-      let trxLine = JSON.parse(JSON.stringify(event));
-      trxLine = this.assignLineUnitPrice(trxLine);
-
-      if (this.objectHeader.isItemPriceTaxInclusive) {
-        await this.computeUnitPriceExTax(trxLine);
-      } else {
-        await this.computeUnitPrice(trxLine);
-      }
-
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        trxLine.uuid = uuidv4();
-        let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-        if (this.objectHeader.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+    try {
+      if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
+        if (event.variationTypeCode === '0') {
+          this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
         } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+          let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
+          vd.forEach(r => {
+            this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
+              if (rr.itemSku === r.itemSku) {
+                rr.qtyRequest += r.qtyRequest;
+              }
+            })
+          })
         }
-        trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
-        trxLine.oriDiscountExpression = trxLine.discountExpression;
+        await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
+      } else {
+        let trxLine = JSON.parse(JSON.stringify(event));
+        trxLine = this.assignLineUnitPrice(trxLine);
+  
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          await this.computeUnitPriceExTax(trxLine);
+        } else {
+          await this.computeUnitPrice(trxLine);
+        }
+  
+        if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+          trxLine.uuid = uuidv4();
+          let discPct = Number(trxLine.discountExpression?.replace("%", ""));
+          if (this.objectHeader.isItemPriceTaxInclusive) {
+            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+          } else {
+            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+          }
+          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
+          trxLine.oriDiscountExpression = trxLine.discountExpression;
+        }
+        this.itemInCart.push(trxLine);
+        await this.computeAllAmount(this.itemInCart[0]);
+        await this.assignSequence();
       }
-      this.itemInCart.push(trxLine);
-      await this.computeAllAmount(this.itemInCart[0]);
-      await this.assignSequence();
+      this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
+    } catch (e) {
+      console.error(e);
     }
-    this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
   }
 
   assignSequence() {
@@ -187,51 +207,75 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   configSalesActivatePromotionEngine: boolean;
   disablePromotionCheckBox: boolean = false;
   async computeAllAmount(trxLine: TransactionDetail) {
-    await this.computeDiscTaxAmount(trxLine);
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
+    try {
+      await this.computeDiscTaxAmount(trxLine);
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
+        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   getVariationSum(trxLine: TransactionDetail) {
-    if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
-      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
+    try {
+      if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
+        trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
-    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
+    try {
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      this.computeDiscTaxAmount(trxLine);      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   computeUnitPrice(trxLine: TransactionDetail) {
-    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
+    try {
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      this.computeDiscTaxAmount(trxLine);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
-    await this.getVariationSum(trxLine);
-    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+    try {
+      await this.getVariationSum(trxLine);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   assignLineUnitPrice(trxLine: TransactionDetail) {
-    if (this.useTax) {
-      if (this.objectHeader.isItemPriceTaxInclusive) {
-        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
-        trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+    try {
+      if (this.useTax) {
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+          trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+        } else {
+          trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+          trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+        }
       } else {
-        trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
         trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
       }
-    } else {
-      trxLine.unitPrice = trxLine.itemPricing.unitPrice;
-      trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+      trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
+      trxLine.discountExpression = trxLine.itemPricing.discountExpression;
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+      return trxLine;      
+    } catch (e) {
+      console.error(e);
     }
-    trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
-    trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-    trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
-    trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
-    return trxLine;
   }
 
   /* #endregion */
@@ -239,12 +283,20 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   /* #region  steps */
 
   async nextStep() {
-    this.salesOrderService.setChoosenItems(this.itemInCart);
-    this.navController.navigateForward('/transactions/sales-order/sales-order-cart');
+    try {
+      this.salesOrderService.setChoosenItems(this.itemInCart);
+      this.navController.navigateForward('/transactions/sales-order/sales-order-cart');
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   previousStep() {
-    this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+    try {
+      this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */

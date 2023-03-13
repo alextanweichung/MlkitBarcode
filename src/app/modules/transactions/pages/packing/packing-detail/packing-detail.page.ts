@@ -22,12 +22,16 @@ export class PackingDetailPage implements OnInit {
     private toastService: ToastService,
     private packingService: PackingService
   ) {
-    this.route.queryParams.subscribe(params => {
-      this.objectId = params['objectId'];
-      if (!this.objectId) {
-        this.navController.navigateBack('/transactions/packing');
-      }
-    })
+    try {
+      this.route.queryParams.subscribe(params => {
+        this.objectId = params['objectId'];
+        if (!this.objectId) {
+          this.navController.navigateBack('/transactions/packing');
+        }
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   ngOnInit() {

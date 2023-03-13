@@ -23,6 +23,8 @@ import { UtcCalendarDirective } from './shared/utilities/utc-calendar.directive'
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { Badge } from '@ionic-native/badge/ngx'
+
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();
@@ -55,7 +57,8 @@ export function initializeFactory(init: InitializeAppService) {
         MigrationService,
         { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        Storage
+        Storage,
+        Badge
     ],
     bootstrap: [AppComponent]
 })
