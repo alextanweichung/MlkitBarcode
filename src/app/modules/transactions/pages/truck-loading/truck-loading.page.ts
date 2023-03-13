@@ -31,23 +31,31 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
   }
 
   loadObjects() {
-    this.objectService.getObjects().subscribe(response => {
-      this.objects = response;
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getObjects().subscribe(response => {
+        this.objects = response;
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   shipMethodMasterList: MasterListDetails[] = [];
   vendorMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getMasterList().subscribe(response => {
+        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #region  add object */
@@ -58,24 +66,28 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
 
   // Select action
   async selectAction() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Choose an action',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Add Truck Loading',
-          icon: 'document-outline',
-          handler: () => {
-            this.addObject();
-          }
-        },
-        {
-          text: 'Cancel',
-          icon: 'close',
-          role: 'cancel'
-        }]
-    });
-    await actionSheet.present();
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Choose an action',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Add Truck Loading',
+            icon: 'document-outline',
+            handler: () => {
+              this.addObject();
+            }
+          },
+          {
+            text: 'Cancel',
+            icon: 'close',
+            role: 'cancel'
+          }]
+      });
+      await actionSheet.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */

@@ -42,24 +42,32 @@ export class TruckLoadingAddPage implements OnInit {
   shipMethodMasterList: MasterListDetails[] = [];
   vendorMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getMasterList().subscribe(response => {
+        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   truckLoadingType: MasterListDetails[] = [];
   loadStaticLov() {
-    this.objectService.getStaticLov().subscribe(response => {
-      this.truckLoadingType = response.filter(x => x.objectName == 'TruckLoadingType').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      if (this.truckLoadingType.findIndex(r => r.isPrimary) > -1) {
-        this.objectForm.patchValue({ typeCode: this.truckLoadingType.find(r => r.isPrimary).code });
-      }
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getStaticLov().subscribe(response => {
+        this.truckLoadingType = response.filter(x => x.objectName == 'TruckLoadingType').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        if (this.truckLoadingType.findIndex(r => r.isPrimary) > -1) {
+          this.objectForm.patchValue({ typeCode: this.truckLoadingType.find(r => r.isPrimary).code });
+        }
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   newObjectForm() {
@@ -87,32 +95,36 @@ export class TruckLoadingAddPage implements OnInit {
 
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
   async validateDocNum(docNum: string) {
-    if (docNum) {
-      this.docNumInput = '';
-      let trxExist = this.lineObjects.findIndex(r => r.trxNum === docNum);
-      if (trxExist > -1) {
-        this.toastService.presentToast('Document already selected.', '', 'top', 'danger', 1000);
-      } else {
-        this.objectService.getLineDetailsByTrxNum(docNum).subscribe(response => {
-          this.lineObjects.push({
-            truckLoadingLineId: 0,
-            truckLoadingId: 0,
-            trxNum: response.trxNum,
-            trxId: response.trxId,
-            trxType: response.trxType,
-            customerName: response.customerName,
-            fromLocation: response.fromLocation,
-            toLocation: response.toLocation,
-            qty: response.qty,
-            totalCarton: response.totalCarton,
-            sequence: this.lineObjects.length
+    try {
+      if (docNum) {
+        this.docNumInput = '';
+        let trxExist = this.lineObjects.findIndex(r => r.trxNum === docNum);
+        if (trxExist > -1) {
+          this.toastService.presentToast('Document already selected.', '', 'top', 'danger', 1000);
+        } else {
+          this.objectService.getLineDetailsByTrxNum(docNum).subscribe(response => {
+            this.lineObjects.push({
+              truckLoadingLineId: 0,
+              truckLoadingId: 0,
+              trxNum: response.trxNum,
+              trxId: response.trxId,
+              trxType: response.trxType,
+              customerName: response.customerName,
+              fromLocation: response.fromLocation,
+              toLocation: response.toLocation,
+              qty: response.qty,
+              totalCarton: response.totalCarton,
+              sequence: this.lineObjects.length
+            })
+          }, error => {
+            console.log(error);
           })
-        }, error => {
-          console.log(error);
-        })
+        }
       }
+      this.barcodeInput.nativeElement.focus();
+    } catch (e) {
+      console.error(e);
     }
-    this.barcodeInput.nativeElement.focus();
   }
 
   /* #endregion */
@@ -146,70 +158,82 @@ export class TruckLoadingAddPage implements OnInit {
 
   /* #region line delete */
 
-  async presentDeleteAlert(rowIndex) {    
-    const alert = await this.alertController.create({
-      cssClass: 'custom-alert',
-      header: 'Are you sure to delete?',
-      buttons: [
-        {
-          text: 'OK',
-          role: 'confirm',
-          cssClass: 'danger',
-          handler: (data) => {
-            this.lineObjects.splice(rowIndex, 1);
+  async presentDeleteAlert(rowIndex) {
+    try {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to delete?',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm',
+            cssClass: 'danger',
+            handler: (data) => {
+              this.lineObjects.splice(rowIndex, 1);
+            },
           },
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-      ],
-    });
-    await alert.present();
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ],
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
 
   nextStep() {
-    let object: TruckLoadingRoot = {
-      header: this.objectForm.getRawValue(),
-      details: this.lineObjects, 
-      otp: null
-    }
-    this.objectService.insertObject(object).subscribe(response => {
-      if (response.status === 201) {
-        let ret = response.body as TruckLoadingRoot;
-        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            objectId: ret.header.truckLoadingId
-          }
-        }
-        this.navController.navigateRoot ('/transactions/truck-loading/truck-loading-detail', navigationExtras);
+    try {
+      let object: TruckLoadingRoot = {
+        header: this.objectForm.getRawValue(),
+        details: this.lineObjects, 
+        otp: null
       }
-    }, error => {
-      console.log(error);
-    })
+      this.objectService.insertObject(object).subscribe(response => {
+        if (response.status === 201) {
+          let ret = response.body as TruckLoadingRoot;
+          this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: ret.header.truckLoadingId
+            }
+          }
+          this.navController.navigateRoot ('/transactions/truck-loading/truck-loading-detail', navigationExtras);
+        }
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async cancelInsert() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Are you sure to cancel?',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Yes',
-          role: 'confirm',
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-        }]
-    });
-    await actionSheet.present();
-    const { role } = await actionSheet.onWillDismiss();
-    if (role === 'confirm') {
-      this.navController.navigateBack('/transactions/truck-loading');
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Are you sure to cancel?',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'confirm',
+          },
+          {
+            text: 'No',
+            role: 'cancel',
+          }]
+      });
+      await actionSheet.present();
+      const { role } = await actionSheet.onWillDismiss();
+      if (role === 'confirm') {
+        this.navController.navigateBack('/transactions/truck-loading');
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 

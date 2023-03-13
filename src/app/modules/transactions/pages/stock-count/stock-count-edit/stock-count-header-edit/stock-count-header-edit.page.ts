@@ -67,37 +67,45 @@ export class StockCountHeaderEditPage implements OnInit {
   zoneMasterList: MasterListDetails[] = [];
   rackMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.stockCountService.getMasterList().subscribe(async response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      await this.mapSearchDropdownList();
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.stockCountService.getMasterList().subscribe(async response => {
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        await this.mapSearchDropdownList();
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   rackSearchDdl: SearchDropdownList[] = [];
   zoneSearchDdl: SearchDropdownList[] = [];
   mapSearchDropdownList() {
-    let rack: SearchDropdownList[] = [];
-    let zone: SearchDropdownList[] = [];
-    this.rackMasterList.forEach(r => {
-      rack.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
+    try {
+      let rack: SearchDropdownList[] = [];
+      let zone: SearchDropdownList[] = [];
+      this.rackMasterList.forEach(r => {
+        rack.push({
+          id: r.id,
+          code: r.code,
+          description: r.description
+        })
       })
-    })
-    this.rackSearchDdl = [...rack];
-    this.zoneMasterList.forEach(r => {
-      zone.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
+      this.rackSearchDdl = [...rack];
+      this.zoneMasterList.forEach(r => {
+        zone.push({
+          id: r.id,
+          code: r.code,
+          description: r.description
+        })
       })
-    })
-    this.zoneSearchDdl = [...zone]
+      this.zoneSearchDdl = [...zone]
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   onTrxDateSelected(event: Date) {
@@ -119,45 +127,53 @@ export class StockCountHeaderEditPage implements OnInit {
   }
 
   loadObject() {
-    this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
-      this.inventoryCount = response;
-      this.inventoryCount.details.forEach(r => {
-        r.itemCode = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).itemCode;
-        r.description = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).description;
+    try {
+      this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
+        this.inventoryCount = response;
+        this.inventoryCount.details.forEach(r => {
+          r.itemCode = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).itemCode;
+          r.description = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).description;
+        })
+        this.commonService.convertObjectAllDateType(this.inventoryCount.header);
+        this.objectForm.patchValue(this.inventoryCount.header);
+      }, error => {
+        throw error;
       })
-      this.commonService.convertObjectAllDateType(this.inventoryCount.header);
-      this.objectForm.patchValue(this.inventoryCount.header);
-    }, error => {
-      console.log(error);
-    })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async cancelEdit() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Are you sure to cancel?',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Yes',
-          role: 'confirm',
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-        }]
-    });
-    await actionSheet.present();
-
-    const { role } = await actionSheet.onWillDismiss();
-
-    if (role === 'confirm') {
-      this.stockCountService.resetVariables();
-      let navigationExtras: NavigationExtras = {
-        queryParams: {
-          objectId: this.objectId
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Are you sure to cancel?',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'confirm',
+          },
+          {
+            text: 'No',
+            role: 'cancel',
+          }]
+      });
+      await actionSheet.present();
+  
+      const { role } = await actionSheet.onWillDismiss();
+  
+      if (role === 'confirm') {
+        this.stockCountService.resetVariables();
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: this.objectId
+          }
         }
+        this.navController.navigateBack('/transactions/stock-count/stock-count-detail', navigationExtras);
       }
-      this.navController.navigateBack('/transactions/stock-count/stock-count-detail', navigationExtras);
+    } catch (e) {
+      console.error(e);
     }
   }
 

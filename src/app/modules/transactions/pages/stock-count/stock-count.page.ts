@@ -30,32 +30,44 @@ export class StockCountPage implements OnInit, ViewWillEnter {
   ) { }
 
   ionViewWillEnter(): void {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+    try {
+      if (!this.startDate) {
+        this.startDate = this.commonService.getFirstDayOfTheYear();
+      }
+      if (!this.endDate) {
+        this.endDate = this.commonService.getTodayDate();
+      }
+      this.loadObjects();
+    } catch (e) {
+      console.error(e);
     }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-    this.loadObjects();
   }
 
   ngOnInit() {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+    try {
+      if (!this.startDate) {
+        this.startDate = this.commonService.getFirstDayOfTheYear();
+      }
+      if (!this.endDate) {
+        this.endDate = this.commonService.getTodayDate();
+      }
+      this.loadObjects();
+    } catch (e) {
+      console.error(e);
     }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-    this.loadObjects();
   }
 
   loadObjects() {
-    this.stockCountService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
-      this.objects = response;
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.stockCountService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+        this.objects = response;
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   goToDetail(objectId: number) {
@@ -69,24 +81,28 @@ export class StockCountPage implements OnInit, ViewWillEnter {
 
   // Select action
   async selectAction() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Choose an action',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Add Stock Count',
-          icon: 'document-outline',
-          handler: () => {
-            this.addObject();
-          }
-        },
-        {
-          text: 'Cancel',
-          icon: 'close',
-          role: 'cancel'
-        }]
-    });
-    await actionSheet.present();
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Choose an action',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Add Stock Count',
+            icon: 'document-outline',
+            handler: () => {
+              this.addObject();
+            }
+          },
+          {
+            text: 'Cancel',
+            icon: 'close',
+            role: 'cancel'
+          }]
+      });
+      await actionSheet.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   addObject() {
@@ -94,20 +110,24 @@ export class StockCountPage implements OnInit, ViewWillEnter {
   }
 
   async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      componentProps: {
-        startDate: this.startDate,
-        endDate: this.endDate
-      },
-      canDismiss: true
-    })
-    await modal.present();
-    let { data } = await modal.onWillDismiss();
-    if (data && data !== undefined) {
-      this.startDate = new Date(data.startDate);
-      this.endDate = new Date(data.endDate);
-      this.loadObjects();
+    try {
+      const modal = await this.modalController.create({
+        component: FilterPage,
+        componentProps: {
+          startDate: this.startDate,
+          endDate: this.endDate
+        },
+        canDismiss: true
+      })
+      await modal.present();
+      let { data } = await modal.onWillDismiss();
+      if (data && data !== undefined) {
+        this.startDate = new Date(data.startDate);
+        this.endDate = new Date(data.endDate);
+        this.loadObjects();
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 }

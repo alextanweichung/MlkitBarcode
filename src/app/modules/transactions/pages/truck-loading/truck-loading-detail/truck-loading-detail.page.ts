@@ -43,21 +43,28 @@ export class TruckLoadingDetailPage implements OnInit {
   shipMethodMasterList: MasterListDetails[] = [];
   vendorMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getMasterList().subscribe(response => {
+        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
   
   loadDetail() {
-    this.objectService.getObject(this.objectId).subscribe(response => {
-      this.object = response;
-      console.log("🚀 ~ file: truck-loading-detail.page.ts:56 ~ TruckLoadingDetailPage ~ this.objectService.getObject ~ this.object", this.object)
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getObject(this.objectId).subscribe(response => {
+        this.object = response;
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
 }

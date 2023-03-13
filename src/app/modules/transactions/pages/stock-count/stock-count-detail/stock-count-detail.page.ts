@@ -41,41 +41,49 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
   zoneMasterList: MasterListDetails[] = [];
   rackMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.stockCountService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.stockCountService.getMasterList().subscribe(response => {
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   loadObject() {
-    this.scannedItems = [];
-    this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
-      this.inventoryCount = response;
-      this.inventoryCount.details.forEach(r => {
-        let barcodeTag = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku);
-        this.scannedItems.push({
-          itemId: r.itemId,
-          itemCode: barcodeTag.itemCode,
-          description: barcodeTag.description,
-          variationTypeCode: barcodeTag.variationTypeCode,
-          itemVariationLineXId: barcodeTag.itemVariationLineXId,
-          itemVariationLineYId: barcodeTag.itemVariationLineYId,
-          itemVariationLineXDescription: barcodeTag.itemVariationLineXDescription,
-          itemVariationLineYDescription: barcodeTag.itemVariationLineYDescription,
-          itemSku: barcodeTag.itemSku,
-          itemBarcodeTagId: barcodeTag.itemBarcodeTagId,
-          itemBarcode: barcodeTag.itemBarcode,
-          itemUomId: barcodeTag.itemUomId,
-          itemUomDescription: barcodeTag.itemUomDescription,
-          qtyRequest: r.qtyRequest
+    try {
+      this.scannedItems = [];
+      this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
+        this.inventoryCount = response;
+        this.inventoryCount.details.forEach(r => {
+          let barcodeTag = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku);
+          this.scannedItems.push({
+            itemId: r.itemId,
+            itemCode: barcodeTag.itemCode,
+            description: barcodeTag.description,
+            variationTypeCode: barcodeTag.variationTypeCode,
+            itemVariationLineXId: barcodeTag.itemVariationLineXId,
+            itemVariationLineYId: barcodeTag.itemVariationLineYId,
+            itemVariationLineXDescription: barcodeTag.itemVariationLineXDescription,
+            itemVariationLineYDescription: barcodeTag.itemVariationLineYDescription,
+            itemSku: barcodeTag.itemSku,
+            itemBarcodeTagId: barcodeTag.itemBarcodeTagId,
+            itemBarcode: barcodeTag.itemBarcode,
+            itemUomId: barcodeTag.itemUomId,
+            itemUomDescription: barcodeTag.itemUomDescription,
+            qtyRequest: r.qtyRequest
+          })
         })
+      }, error => {
+        throw error;
       })
-    }, error => {
-      console.log(error);
-    })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   edit() {

@@ -44,32 +44,44 @@ export class CashDepositDetailPage implements OnInit {
 
   paymentMethodMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);      
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getMasterList().subscribe(response => {
+        this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);      
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
   
   loadDetail() {
-    this.objectService.getObject(this.objectId).subscribe(response => {
-      this.object = response;
-      if (this.object && this.object.depositFileId) {
-        this.loadAttachment(this.object.depositFileId);
-      }
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getObject(this.objectId).subscribe(response => {
+        this.object = response;
+        if (this.object && this.object.depositFileId) {
+          this.loadAttachment(this.object.depositFileId);
+        }
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   imageUrl: SafeUrl;
   loadAttachment(fileId) {
-    this.objectService.downloadFile(fileId).subscribe(blob => {
-      let objectURL = URL.createObjectURL(blob);
-      this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.downloadFile(fileId).subscribe(blob => {
+        let objectURL = URL.createObjectURL(blob);
+        this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   edit() {

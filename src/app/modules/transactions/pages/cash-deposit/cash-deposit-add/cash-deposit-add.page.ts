@@ -77,21 +77,29 @@ export class CashDepositAddPage implements OnInit {
 
   paymentMethodMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.objectService.getMasterList().subscribe(response => {
+        this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        console.log(error);
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   moduleControl: ModuleControl[] = [];
   fileSizeLimit: number = 1 * 1024 * 1024;
-  loadModuleControl() {    
-    this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;
-      let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
-      this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
-    })
+  loadModuleControl() {
+    try {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+        this.moduleControl = obj;
+        let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
+        this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #region  date part */
@@ -145,108 +153,128 @@ export class CashDepositAddPage implements OnInit {
   images: LocalFile[] = [];
 
   async selectImage() {
-    const image = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.Uri,
-      source: CameraSource.Prompt // Camera, Photos or Prompt!
-    });
-
-    if (image) {
-      this.saveImage(image);
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt // Camera, Photos or Prompt!
+      });
+  
+      if (image) {
+        this.saveImage(image);
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   // Create a new file from a capture image
   async saveImage(photo: Photo) {
-    const base64Data = await this.readAsBase64(photo);
-
-    const fileName = new Date().getTime() + '.jpeg';
-    const savedFile = await Filesystem.writeFile({
-      path: `${IMAGE_DIR}/${fileName}`,
-      data: base64Data,
-      directory: Directory.Data,
-      recursive: true
-    });
-
-    // Reload the file list
-    // Improve by only loading for the new image and unshifting array!
-    this.loadFiles();
+    try {
+      const base64Data = await this.readAsBase64(photo);
+  
+      const fileName = new Date().getTime() + '.jpeg';
+      const savedFile = await Filesystem.writeFile({
+        path: `${IMAGE_DIR}/${fileName}`,
+        data: base64Data,
+        directory: Directory.Data,
+        recursive: true
+      });
+  
+      // Reload the file list
+      // Improve by only loading for the new image and unshifting array!
+      this.loadFiles();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async loadFiles() {
-    this.images = [];
-    
-    await this.loadingService.showLoading();
-
-    Filesystem.readdir({
-      path: IMAGE_DIR,
-      directory: Directory.Data
-    })
-      .then(
-        (result) => {
-          this.loadFileData(result.files);
-        },
-        async (err) => {
-          // Folder does not yet exists!
-          await Filesystem.mkdir({
-            path: IMAGE_DIR,
-            directory: Directory.Data
-          });
-        }
-      )
-      .then(async (_) => {
-        await this.loadingService.dismissLoading();
-      });
+    try {
+      this.images = [];
+  
+      await this.loadingService.showLoading();
+  
+      Filesystem.readdir({
+        path: IMAGE_DIR,
+        directory: Directory.Data
+      })
+        .then(
+          (result) => {
+            this.loadFileData(result.files);
+          },
+          async (err) => {
+            // Folder does not yet exists!
+            await Filesystem.mkdir({
+              path: IMAGE_DIR,
+              directory: Directory.Data
+            });
+          }
+        )
+        .then(async (_) => {
+          await this.loadingService.dismissLoading();
+        });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // Get the actual base64 data of an image
   // base on the name of the file
   fileToDelete: LocalFile[] = [];
   async loadFileData(fileNames: FileInfo[]) {
-    this.fileToDelete = [];
-    for (let f of fileNames) {
-      const filePath = `${IMAGE_DIR}/${f.name}`;
-      
-      const readFile = await Filesystem.readFile({
-        path: filePath,
-        directory: Directory.Data
-      });
-      if (f.size > this.fileSizeLimit) {
-        this.fileToDelete.push({
-          name: f.name, 
+    try {
+      this.fileToDelete = [];
+      for (let f of fileNames) {
+        const filePath = `${IMAGE_DIR}/${f.name}`;
+  
+        const readFile = await Filesystem.readFile({
           path: filePath,
-          data: `data:image/jpeg;base64,${readFile.data}`
+          directory: Directory.Data
         });
-        this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
-      } else {
-        this.images.push({
-          name: f.name,
-          path: filePath,
-          data: `data:image/jpeg;base64,${readFile.data}`
-        });
+        if (f.size > this.fileSizeLimit) {
+          this.fileToDelete.push({
+            name: f.name,
+            path: filePath,
+            data: `data:image/jpeg;base64,${readFile.data}`
+          });
+          this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
+        } else {
+          this.images.push({
+            name: f.name,
+            path: filePath,
+            data: `data:image/jpeg;base64,${readFile.data}`
+          });
+        }
       }
+      this.fileToDelete.forEach(e => {
+        this.deleteImage(e);
+      });
+    } catch (e) {
+      console.error(e);
     }
-    this.fileToDelete.forEach(e => {
-      this.deleteImage(e);
-    });
   }
 
   // https://ionicframework.com/docs/angular/your-first-app/3-saving-photos
   private async readAsBase64(photo: Photo) {
-    if (this.plt.is('hybrid')) {
-      const file = await Filesystem.readFile({
-        path: photo.path
-      });
-
-      return file.data;
-    }
-    else {
-      // Fetch the photo, read as a blob, then convert to base64 format
-      const response = await fetch(photo.webPath);
-      const blob = await response.blob();
-
-      return await this.convertBlobToBase64(blob) as string;
+    try {
+      if (this.plt.is('hybrid')) {
+        const file = await Filesystem.readFile({
+          path: photo.path
+        });
+  
+        return file.data;
+      }
+      else {
+        // Fetch the photo, read as a blob, then convert to base64 format
+        const response = await fetch(photo.webPath);
+        const blob = await response.blob();
+  
+        return await this.convertBlobToBase64(blob) as string;
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -260,93 +288,117 @@ export class CashDepositAddPage implements OnInit {
     reader.readAsDataURL(blob);
   });
 
-  async startUpload(file: LocalFile, objectId: number, fileId: number) {  
-    const response = await fetch(file.data);
-    const blob = await response.blob();
-    const formData = new FormData();
-    formData.append('file', blob, file.name);
-    this.objectService.uploadFile(objectId, fileId, formData).subscribe(response => {
-
-    }, error => {
-      console.log(error);
-    })
-    // this.uploadData(formData, objectId, fileId);
+  async startUpload(file: LocalFile, objectId: number, fileId: number) {
+    try {
+      const response = await fetch(file.data);
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append('file', blob, file.name);
+      this.objectService.uploadFile(objectId, fileId, formData).subscribe(response => {
+  
+      }, error => {
+        console.log(error);
+      })
+      // this.uploadData(formData, objectId, fileId);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async deleteImage(file: LocalFile) {
-    await Filesystem.deleteFile({
+    try {
+      await Filesystem.deleteFile({
         directory: Directory.Data,
         path: file.path
-    });
-    this.loadFiles();
+      });
+      this.loadFiles();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
 
   async removeDir() {
-    await Filesystem.rmdir({      
-      path: IMAGE_DIR,
-      directory: Directory.Data,
-      recursive: true
-    })
+    try {
+      await Filesystem.rmdir({
+        path: IMAGE_DIR,
+        directory: Directory.Data,
+        recursive: true
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async cancelInsert() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Are you sure to cancel?',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Yes',
-          role: 'confirm',
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-        }]
-    });
-    await actionSheet.present();
-    const { role } = await actionSheet.onWillDismiss();
-    if (role === 'confirm') {
-      this.removeDir();
-      this.navController.navigateBack('/transactions/cash-deposit');
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Are you sure to cancel?',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'confirm',
+          },
+          {
+            text: 'No',
+            role: 'cancel',
+          }]
+      });
+      await actionSheet.present();
+      const { role } = await actionSheet.onWillDismiss();
+      if (role === 'confirm') {
+        this.removeDir();
+        this.navController.navigateBack('/transactions/cash-deposit');
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   async nextStep() {
-    if (this.objectForm.valid && this.images.length === 1) {
-      const alert = await this.alertController.create({
-        header: 'Are you sure to proceed?',
-        buttons: [
-          {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
-            handler: async () => {
-              await this.insertObject();
+    try {
+      if (this.objectForm.valid && this.images.length === 1) {
+        const alert = await this.alertController.create({
+          header: 'Are you sure to proceed?',
+          buttons: [
+            {
+              text: 'OK',
+              cssClass: 'success',
+              role: 'confirm',
+              handler: async () => {
+                await this.insertObject();
+              },
             },
-          },
-          {
-            text: 'Cancel',
-            cssClass: 'cancel',
-            role: 'cancel'
-          },
-        ],
-      });
-      await alert.present();
-    } else {
-      this.toastService.presentToast('Error', 'Please fill required fields & attach 1 file to continue', 'top', 'danger', 2000);
+            {
+              text: 'Cancel',
+              cssClass: 'cancel',
+              role: 'cancel'
+            },
+          ],
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast('Error', 'Please fill required fields & attach 1 file to continue', 'top', 'danger', 2000);
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   async insertObject() {
-    let response = await this.objectService.insertObject(this.objectForm.value);
-    if (response.status === 201) {
-      let ret = response.body as CashDeposit;
-      await this.startUpload(this.images[0], ret.posCashDepositId, ret.depositFileId ?? 0);
-      this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-      await this.removeDir();
-      this.navController.navigateRoot('transactions/cash-deposit');
+    try {
+      let response = await this.objectService.insertObject(this.objectForm.value);
+      if (response.status === 201) {
+        let ret = response.body as CashDeposit;
+        await this.startUpload(this.images[0], ret.posCashDepositId, ret.depositFileId ?? 0);
+        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+        await this.removeDir();
+        this.navController.navigateRoot('transactions/cash-deposit');
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 

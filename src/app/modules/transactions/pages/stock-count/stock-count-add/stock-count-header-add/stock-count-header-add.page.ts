@@ -56,44 +56,52 @@ export class StockCountHeaderAddPage implements OnInit {
   rackMasterList: MasterListDetails[] = [];
   zoneMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.stockCountService.getMasterList().subscribe(response => {
-      this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUOM').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.mapSearchDropdownList();
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.stockCountService.getMasterList().subscribe(response => {
+        this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUOM').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.mapSearchDropdownList();
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   locationSearchDdl: SearchDropdownList[] = [];
   rackSearchDdl: SearchDropdownList[] = [];
   zoneSearchDdl: SearchDropdownList[] = [];
   mapSearchDropdownList() {
-    this.locationMasterList.forEach(r => {
-      this.locationSearchDdl.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
+    try {
+      this.locationMasterList.forEach(r => {
+        this.locationSearchDdl.push({
+          id: r.id,
+          code: r.code,
+          description: r.description
+        })
       })
-    })
-    this.rackMasterList.forEach(r => {
-      this.rackSearchDdl.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
+      this.rackMasterList.forEach(r => {
+        this.rackSearchDdl.push({
+          id: r.id,
+          code: r.code,
+          description: r.description
+        })
       })
-    })
-    this.zoneMasterList.forEach(r => {
-      this.zoneSearchDdl.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
+      this.zoneMasterList.forEach(r => {
+        this.zoneSearchDdl.push({
+          id: r.id,
+          code: r.code,
+          description: r.description
+        })
       })
-    })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   onTrxDateSelected(event: Date) {
@@ -104,25 +112,29 @@ export class StockCountHeaderAddPage implements OnInit {
   inventoryCountBatchDdl: SearchDropdownList[] = [];
   @ViewChild('inventoryCountBatchSdd', { static: false }) inventoryCountBatchSdd: SearchDropdownPage;
   onLocationSelected(event: SearchDropdownList) {
-    this.objectForm.patchValue({ locationId: null });
-    this.inventoryCountBatchSdd.clearSelected();
-    if (event) {
-      this.objectForm.patchValue({ locationId: event.id });
-      this.inventoryCountBatchDdl = [];
-      this.stockCountService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
-        this.inventoryCountBatchList = response;
-        if (this.inventoryCountBatchList.length> 0) {
-          this.inventoryCountBatchList.forEach(r => {
-            this.inventoryCountBatchDdl.push({
-              id: r.inventoryCountBatchId,
-              code: r.inventoryCountBatchNum,
-              description: r.description
+    try {
+      this.objectForm.patchValue({ locationId: null });
+      this.inventoryCountBatchSdd.clearSelected();
+      if (event) {
+        this.objectForm.patchValue({ locationId: event.id });
+        this.inventoryCountBatchDdl = [];
+        this.stockCountService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
+          this.inventoryCountBatchList = response;
+          if (this.inventoryCountBatchList.length> 0) {
+            this.inventoryCountBatchList.forEach(r => {
+              this.inventoryCountBatchDdl.push({
+                id: r.inventoryCountBatchId,
+                code: r.inventoryCountBatchNum,
+                description: r.description
+              })
             })
-          })
-        }
-      }, error => {
-        console.log(error);
-      })
+          }
+        }, error => {
+          throw error;
+        })
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -148,26 +160,30 @@ export class StockCountHeaderAddPage implements OnInit {
   }
 
   async cancelInsert() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Are you sure to cancel?',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Yes',
-          role: 'confirm',
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-        }]
-    });
-    await actionSheet.present();
-
-    const { role } = await actionSheet.onWillDismiss();
-
-    if (role === 'confirm') {
-      this.stockCountService.resetVariables();
-      this.navController.navigateBack('/transactions/stock-count');
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Are you sure to cancel?',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'confirm',
+          },
+          {
+            text: 'No',
+            role: 'cancel',
+          }]
+      });
+      await actionSheet.present();
+  
+      const { role } = await actionSheet.onWillDismiss();
+  
+      if (role === 'confirm') {
+        this.stockCountService.resetVariables();
+        this.navController.navigateBack('/transactions/stock-count');
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 

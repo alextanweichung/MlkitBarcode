@@ -33,94 +33,106 @@ export class TransactionProcessingPage implements OnInit {
   }
 
   async presentConfirmAlert(action: string, docId: number, docNum: string) {
-    const alert = await this.alertController.create({
-      cssClass: 'custom-alert',
-      header: 'Are you sure to ' + action + ' ' + docNum + '?',
-      inputs: [
-        {
-          name: 'actionreason',
-          type: 'textarea',
-          placeholder: 'Please enter Reason',
-          value: ''
-        }
-      ],
-      buttons: [
-        {
-          text: 'OK',
-          role: 'confirm',
-          cssClass: 'success',
-          handler: (data) => {
-            if (action === 'REJECT' && this.processType === 'APPROVALS') {
-              if (!data.actionreason && data.actionreason.length === 0) {
-                this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
-                return false;
+    try {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to ' + action + ' ' + docNum + '?',
+        inputs: [
+          {
+            name: 'actionreason',
+            type: 'textarea',
+            placeholder: 'Please enter Reason',
+            value: ''
+          }
+        ],
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm',
+            cssClass: 'success',
+            handler: (data) => {
+              if (action === 'REJECT' && this.processType === 'APPROVALS') {
+                if (!data.actionreason && data.actionreason.length === 0) {
+                  this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                  return false;
+                } else {
+                  this.updateDoc(action, [docId.toString()], data.actionreason);
+                }
               } else {
                 this.updateDoc(action, [docId.toString()], data.actionreason);
               }
-            } else {
-              this.updateDoc(action, [docId.toString()], data.actionreason);
-            }
+            },
           },
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-      ],
-    });
-    await alert.present();
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ],
+      });
+      await alert.present();      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  updateDoc(action: string, listOfDoc: string[], actionReason: string) {    
-    let bulkConfirmReverse: BulkConfirmReverse = {
-      status: action,
-      reason: actionReason,
-      docId: listOfDoc.map(i => Number(i))
-    }
+  updateDoc(action: string, listOfDoc: string[], actionReason: string) {
     try {
-      this.transactionProcessingService.bulkUpdateDocumentStatus(bulkConfirmReverse).subscribe(async response => {
-        if (response.status == 204) {
-          this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
-          this.onObjectUpdated.emit(listOfDoc.map(i => Number(i))[0]);
-        }
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+      let bulkConfirmReverse: BulkConfirmReverse = {
+        status: action,
+        reason: actionReason,
+        docId: listOfDoc.map(i => Number(i))
+      }
+      try {
+        this.transactionProcessingService.bulkUpdateDocumentStatus(bulkConfirmReverse).subscribe(async response => {
+          if (response.status == 204) {
+            this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
+            this.onObjectUpdated.emit(listOfDoc.map(i => Number(i))[0]);
+          }
+        }, error => {
+          throw error;
+        })
+      } catch (error) {
+        this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   async openDetail(docId: number) {
-    let navigationExtras: NavigationExtras;
-    if (this.parentType.toLowerCase() === 'quotation') {
-      navigationExtras = {
-        queryParams: {
-          objectId: docId,
-          processType: this.processType,
-          selectedSegment: this.selectedSegment
+    try {
+      let navigationExtras: NavigationExtras;
+      if (this.parentType.toLowerCase() === 'quotation') {
+        navigationExtras = {
+          queryParams: {
+            objectId: docId,
+            processType: this.processType,
+            selectedSegment: this.selectedSegment
+          }
         }
       }
-    }
-    if (this.parentType.toLowerCase() === 'sales-order') {
-      navigationExtras = {
-        queryParams: {
-          objectId: docId,
-          processType: this.processType,
-          selectedSegment: this.selectedSegment
+      if (this.parentType.toLowerCase() === 'sales-order') {
+        navigationExtras = {
+          queryParams: {
+            objectId: docId,
+            processType: this.processType,
+            selectedSegment: this.selectedSegment
+          }
         }
       }
-    }
-    if (this.parentType.toLowerCase() === 'purchase-order') {
-      navigationExtras = {
-        queryParams: {
-          objectId: docId,
-          processType: this.processType,
-          selectedSegment: this.selectedSegment
+      if (this.parentType.toLowerCase() === 'purchase-order') {
+        navigationExtras = {
+          queryParams: {
+            objectId: docId,
+            processType: this.processType,
+            selectedSegment: this.selectedSegment
+          }
         }
       }
+      this.navController.navigateForward(`/transactions/${this.parentType.toLowerCase()}/${this.parentType.toLowerCase()}-detail`, navigationExtras);
+    } catch (e) {
+      console.error(e);
     }
-    this.navController.navigateForward(`/transactions/${this.parentType.toLowerCase()}/${this.parentType.toLowerCase()}-detail`, navigationExtras);
   }
 
 }
