@@ -268,7 +268,7 @@ export class PackingSalesOrderPage implements OnInit {
       masterUDGroup3: [null],
       businessModelType: [null],
       isWithSo: [true],
-      sourceType: [null],
+      sourceType: ['M'],
       remark: [null]
     });
   }
