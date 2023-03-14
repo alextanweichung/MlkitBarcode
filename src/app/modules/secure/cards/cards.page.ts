@@ -31,6 +31,8 @@ export class CardsPage implements OnInit, AfterContentChecked {
   last_sync_datetime: Date;
 
   companyInfo: any;
+  loginName: string;
+  loginEmail: string;
 
   constructor(
     private configService: ConfigService,
@@ -42,6 +44,14 @@ export class CardsPage implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit(): void {
+    console.log("🚀 ~ file: cards.page.ts:48 ~ CardsPage ~ ngOnInit ~ localStorage.getItem('loginUser'):", JSON.parse(localStorage.getItem('loginUser')))
+    this.authService.currentUserToken$.subscribe(obj => {
+      let decodedToken = obj;
+      if (decodedToken != null) {
+        this.loginName = decodedToken.unique_name;
+        this.loginEmail = decodedToken.email;
+      }
+    })
     this.commonService.getCompanyProfile().subscribe(response => {
       this.companyInfo = response;
     }, error => {
