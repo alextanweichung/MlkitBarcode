@@ -10,6 +10,7 @@ import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { SalesOrderStatus } from 'src/app/shared/models/sales-order-status';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -133,7 +134,7 @@ export class SalesOrderDetailPage implements OnInit {
   }
 
   /* #endregion */
-  
+
   /* #region download pdf */
 
   async presentAlertViewPdf() {
@@ -158,7 +159,7 @@ export class SalesOrderDetailPage implements OnInit {
           },
         ]
       });
-      await alert.present();      
+      await alert.present();
     } catch (e) {
       console.error(e);
     }
@@ -171,7 +172,7 @@ export class SalesOrderDetailPage implements OnInit {
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
         console.log(error);
-      })      
+      })
     } catch (e) {
       console.error(e);
     }
@@ -269,6 +270,32 @@ export class SalesOrderDetailPage implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /* #endregion */
+
+  /* #region order status */
+
+  statusModel: boolean = false;
+  orderStatus: SalesOrderStatus;
+  showStatusModel() {
+    try {
+
+    } catch (e) {
+      console.error(e);
+    }
+    this.statusModel = true;
+    this.salesOrderService.getStatus(this.object.header.salesOrderId).subscribe(response => {
+    console.log("🚀 ~ file: sales-order-detail.page.ts:287 ~ SalesOrderDetailPage ~ this.salesOrderService.getStatus ~ response:", response)
+    this.orderStatus = response;
+
+    }, error => {
+      throw error;
+    })
+  }
+
+  hideStatusModel() {
+    this.statusModel = false;
   }
 
   /* #endregion */

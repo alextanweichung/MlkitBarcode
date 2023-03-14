@@ -26,6 +26,12 @@
             <div>Download Pdf</div>
           </ion-label>
         </ion-item>
+        <ion-item button (click)="isPopoverOpen = false; showStatusModel()">
+          <ion-icon name="download-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Status</div>
+          </ion-label>
+        </ion-item>
         <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="isPopoverOpen = false; presentConfirmAlert('CONFIRM')">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
@@ -242,3 +248,48 @@
     </ion-content>
   </ng-template>
 </ion-modal>
+
+<ion-modal [isOpen]="statusModel" (didDismiss)="statusModel = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Status</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideStatusModel()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="p-2">
+        <ion-list-header class="ion-list-header-small" *ngIf="!orderStatus">
+          <ion-label>Order Status not available.</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom" lines="none">          
+          <ion-item button="false">
+            <ion-grid class="p-1">
+              <ion-row>
+                <ion-col>
+                  <div>Status</div>
+                </ion-col>
+                <ion-col>
+                  <div class="ion-text-right">{{orderStatus?.currentStatus}}</div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+        <ion-list-header class="ion-list-header-small" *ngIf="orderStatus?.docNum && orderStatus?.docNum?.length > 0">
+          <ion-label>Related Doc</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom" lines="none" *ngIf="orderStatus?.docNum && orderStatus?.docNum?.length > 0">
+          <ion-item button="false" *ngFor="let d of orderStatus?.docNum">
+            <ion-label>
+              <div>{{d}}</div>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+

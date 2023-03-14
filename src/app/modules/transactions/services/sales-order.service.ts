@@ -7,6 +7,7 @@ import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
+import { SalesOrderStatus } from 'src/app/shared/models/sales-order-status';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
@@ -129,6 +130,10 @@ export class SalesOrderService {
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
     return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+  }
+
+  getStatus(salesOrderId: number) {
+    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + salesOrderId);
   }
 
 }
