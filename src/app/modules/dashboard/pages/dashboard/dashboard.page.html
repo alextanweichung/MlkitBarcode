@@ -112,12 +112,12 @@
       <ion-label class="pl-2">Item Last Sync: {{last_sync_datetime|date:'yyyy-MM-dd hh:mm:ss'}}</ion-label>
     </ion-list-header>
 
-    <ion-item>
+    <ion-item *ngIf="false">
       <ion-label floating>Badge Number</ion-label>
       <ion-input type="number" [(ngModel)]="badgeNumber"></ion-input>
     </ion-item>
 
-    <ion-button (click)="setBadges()">Set Badge to {{badgeNumber}}</ion-button>
+    <ion-button *ngIf="false" (click)="setBadges()">Set Badge to {{badgeNumber}}</ion-button>
 
   </div>
 </ion-content>
