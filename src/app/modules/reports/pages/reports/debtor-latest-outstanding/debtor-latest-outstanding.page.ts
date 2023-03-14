@@ -79,7 +79,7 @@ export class DebtorLatestOutstandingPage implements OnInit {
       appCode: 'FAAR005',
       format: 'pdf',
       documentIds: [],
-      reportName: 'Statement of Account',
+      reportName: 'Debtor Statement',
       customReportParam: {
         parameter1: this.customerId,
         statementDate: this.trxDate
