@@ -33,6 +33,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
   companyInfo: any;
   loginName: string;
   loginEmail: string;
+  userType: string;
 
   constructor(
     private configService: ConfigService,
@@ -45,6 +46,14 @@ export class CardsPage implements OnInit, AfterContentChecked {
 
   ngOnInit(): void {
     console.log("🚀 ~ file: cards.page.ts:48 ~ CardsPage ~ ngOnInit ~ localStorage.getItem('loginUser'):", JSON.parse(localStorage.getItem('loginUser')))
+    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser.procurementAgentId) {
+      this.userType = "Retail";
+    } else if (loginUser.salesAgentId) {
+      this.userType = "Trading";
+    } else if (loginUser.warehouseAgentId) {
+      this.userType = "Warehouse";
+    }
     this.authService.currentUserToken$.subscribe(obj => {
       let decodedToken = obj;
       if (decodedToken != null) {
