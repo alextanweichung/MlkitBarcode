@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonAccordionGroup } from '@ionic/angular';
+import { IonAccordionGroup, IonPopover } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { InventoryLevel, InventoryVariationLevel } from '../../models/check-balance';
+import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../../models/check-balance';
 import { CheckBalanceService } from '../../services/check-balance.service';
 
 @Component({
@@ -91,15 +91,15 @@ export class CheckBalancePage implements OnInit {
       if (lookUpItem) {
         this.itemInfo = lookUpItem;
         // if (this.selectedViewOptions === 'item') {
-          this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
-            this.inventoryLevel = response;
-            // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
-            this.computeLocationList();
-            this.hideEmpty = false;
-            this.computeVariationXY();
-          }, error => {
-            console.log(error);
-          })
+        this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
+          this.inventoryLevel = response;
+          // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
+          this.computeLocationList();
+          this.hideEmpty = false;
+          this.computeVariationXY();
+        }, error => {
+          console.log(error);
+        })
         // } else {
         if (lookUpItem.variationTypeCode !== '0')
           this.checkBalanceService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
@@ -139,7 +139,7 @@ export class CheckBalancePage implements OnInit {
       console.error(e);
     }
   }
-  
+
   itemVariationX: any[] = [{ label: 'All', value: 'all' }];
   selectedVariationX: string = 'all';
   itemVariationY: any[] = [{ label: 'All', value: 'all' }];
@@ -250,7 +250,7 @@ export class CheckBalancePage implements OnInit {
               itemVariationYIds.forEach(r => {
                 tempVariation.forEach(rr => {
                   rr.variationDetails = rr.variationDetails.filter(rrr => rrr.itemVariationYId === r);
-                })  
+                })
               })
               r.variation.variationDetails = [...tempVariation];
             })
@@ -264,6 +264,51 @@ export class CheckBalancePage implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /* #region item price */
+
+  prices: ItemPriceBySegment[] = [];
+  getItemPrice(itemId: number) {
+    this.prices = [];
+    try {
+      let salesAgentId = JSON.parse(localStorage.getItem('loginUser')).salesAgentId;
+      if (salesAgentId) {
+        this.checkBalanceService.getSegmentItemPriceBySalesAgent(salesAgentId, itemId).subscribe(response => {
+          this.prices = response;  
+        }, error => {
+          throw error;
+        })
+      }
+    } catch (e) {
+      console.error(e);
+    }  }
+
+  /* #endregion */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  priceModal: boolean = false;
+  async showPriceDialog() {
+    try {
+      await this.getItemPrice(this.itemInfo.itemId);
+      this.priceModal = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  hidePriceDialog() {
+    this.priceModal = false;
   }
 
 }
