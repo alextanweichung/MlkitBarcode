@@ -2,23 +2,28 @@
 
   <ion-tab-bar slot="bottom">
 
-    <ion-tab-button tab="approvals">
+    <ion-tab-button tab="dashboard">
       <ion-icon name="home"></ion-icon>
-      <ion-label>Approvals</ion-label>
+      <ion-label>Home</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="transactions">
+    <ion-tab-button tab="transactions" [disabled]="!(showQuotation || showSalesOrder || showPicking || showPacking || showConsignmentSales || showStockCount || showInventoryLevel)">
       <ion-icon name="pie-chart"></ion-icon>
-      <ion-label>Transactions</ion-label>
+      <ion-label>Transaction</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="managements" [disabled]="!(showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseOrderReview || showPurchaseOrderApproval || showOtpConfig)">
+      <ion-icon name="clipboard-outline"></ion-icon>
+      <ion-label>Management</ion-label>
     </ion-tab-button>
 
     <!-- Placeholder for fab button -->
-    <ion-tab-button class="ion-tab-button-placeholder">
-    </ion-tab-button>
+    <!-- <ion-tab-button class="ion-tab-button-placeholder">
+    </ion-tab-button> -->
 
-    <ion-tab-button tab="others">
-      <ion-icon name="swap-horizontal"></ion-icon>
-      <ion-label>Others</ion-label>
+    <ion-tab-button tab="reports">
+      <ion-icon name="book-outline"></ion-icon>
+      <ion-label>Report</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="cards">
@@ -28,10 +33,10 @@
  
   </ion-tab-bar>
 
-  <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
+  <!-- <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 
 </ion-tabs>

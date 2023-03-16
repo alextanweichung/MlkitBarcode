@@ -26,5 +26,6 @@ export interface TransactionProcessingCount {
 
 export interface BulkConfirmReverse {
   status: string;
+  reason?: string
   docId: number[];
 }

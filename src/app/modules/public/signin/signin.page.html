@@ -1,15 +1,5 @@
-<ion-header>
-  <!-- <ion-toolbar class="ion-no-border">
-    <ion-buttons slot="end">
-      <ion-button color="primary" routerLink="/signup">
-        Sign up
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar> -->
-</ion-header>
-
 <ion-content>
-
+  
   <div class="ion-padding ion-full-height ion-flex ion-flex-center">
 
     <div class="logo-container">
@@ -17,29 +7,28 @@
       <p>Login to your account.</p>
     </div>
 
-    <form class="form-default" [formGroup]="signin_form" (submit)="signIn()">
-
+    <form class="form-default" [formGroup]="signin_form">
       <ion-list class="item-card-list" lines="none">
         <ion-item>
           <ion-label color="tertiary" position="stacked">Email</ion-label>
-          <ion-input formControlName="userEmail" type="email" autocomplete="off"
-            placeholder="Your email address"></ion-input>
+          <ion-input formControlName="userEmail" type="email" autocomplete="off" placeholder="Your email address"></ion-input>
         </ion-item>
-
         <ion-item class="ion-margin-top-small">
           <ion-label color="tertiary" position="stacked">Password</ion-label>
           <ion-input formControlName="password" type="password" placeholder="Your password"></ion-input>
         </ion-item>
       </ion-list>
-
-      <ion-button class="ion-margin-top" type="submit" expand="block" color="primary">
-        Sign in
-      </ion-button>
-
-      <ion-button color="primary" fill="clear" expand="block" class="ion-button-small ion-margin-top-medium" routerLink="/password-reset">
-        Forgot password?
-      </ion-button>
     </form>
+
+    <ion-item class="ion-flex ion-flex-center" lines="none">
+      <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
+      <ion-label>
+        <div class="ion-text-small">Remember Me!</div></ion-label>
+    </ion-item>
+
+    <ion-button class="ion-margin-top" type="submit" expand="block" color="primary" (click)="signIn()">
+      Sign in
+    </ion-button>
 
     <div class="ion-text-center ion-margin-top">
       <ion-text color="medium">

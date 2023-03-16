@@ -1,0 +1,24 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Reports
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Reports</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">
+    <ion-list class="list-custom" lines="full">
+      <ion-item button routerLink="debtor-latest-outstanding">
+        <ion-label>
+          <h3>Debtor Latest Outstanding</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>     
+  </div>
+
+</ion-content>

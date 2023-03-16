@@ -18,6 +18,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
+
     <ng-container *ngIf="!objects || objects?.length === 0">
       <p>
         <ion-text color="tertiary">
@@ -25,21 +26,28 @@
         </ion-text>
       </p>
     </ng-container>
+
     <ng-container *ngIf="objects?.length > 0">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button detail="false" (click)="goToDetail(object.quotationId)" *ngFor="let object of objects">
-          <ion-label>
-            <h3>{{object.quotationNum}}</h3>
-            <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
-            <p>{{object.customerName}}</p>
-            <p>{{object.salesAgentName}}</p>
-            <p>{{object.countryDescription}}</p>
-          </ion-label>
-          <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
-        </ion-item>
+        <ion-item-sliding *ngFor="let object of objects">
+          <ion-item button detail="false" (click)="goToDetail(object.quotationId)">
+            <ion-label>
+              <h3>{{object.quotationNum}}</h3>
+              <p>{{object.trxDate|date:'dd/MM/yyyy'}}</p>
+              <p>{{object.customerName}}</p>
+              <p>{{object.salesAgentName}}</p>
+              <p>{{object.countryDescription}}</p>
+            </ion-label>
+            <ion-badge mode="ios" slot="end">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-badge>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option (click)="presentAlertViewPdf(object)">Download</ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
       </ion-list>
     </ng-container>
   </div>
+
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>

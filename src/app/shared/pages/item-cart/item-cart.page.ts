@@ -108,7 +108,7 @@ export class ItemCartPage implements OnInit {
   async removeItemById(item: TransactionDetail) {
     this.itemInCart = JSON.parse(JSON.stringify(this.itemInCart.filter(r => r.itemId !== item.itemId)));
     this.onItemInCartDeleteCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'middle', 'success', 1000);
+    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1000);
   }  
 
   async presentDeleteItemVariationAlert(trxLine: TransactionDetail, item: InnerVariationDetail) {
@@ -117,13 +117,6 @@ export class ItemCartPage implements OnInit {
       header: 'Are you sure to delete?',
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            item.qtyRequest = 1;
-          }
-        },
-        {
           text: 'OK',
           role: 'confirm',
           cssClass: 'danger',
@@ -131,6 +124,13 @@ export class ItemCartPage implements OnInit {
             item.qtyRequest = null;
             this.onItemInCartEditCompleted.emit(trxLine);
           },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            item.qtyRequest = 1;
+          }
         },
       ],
     });

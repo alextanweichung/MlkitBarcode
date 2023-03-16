@@ -1,7 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
-import { IonSearchbar, LoadingController } from '@ionic/angular';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { IonSearchbar } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
 
 @Component({
@@ -9,7 +7,7 @@ import { SearchDropdownList } from '../../models/search-dropdown-list';
   templateUrl: './search-multi-dropdown.page.html',
   styleUrls: ['./search-multi-dropdown.page.scss'],
 })
-export class SearchMultiDropdownPage implements OnInit {
+export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
   @Input() title: string = "Search";
   @Input() showHeaderLabel: boolean = true;
@@ -19,30 +17,42 @@ export class SearchMultiDropdownPage implements OnInit {
   @Input() searchDropdownList: SearchDropdownList[];
   @Output() onActionComplete: EventEmitter<SearchDropdownList[]> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
+  @Input() selectedIds: number[] = [];
   selected: SearchDropdownList[] = [];
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
   
-  constructor(
-    private loadingController: LoadingController,
-  ) { }
+  constructor() { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.selectedIds || changes.searchDropdownList) {
+      if (this.selectedIds) {
+        this.selected = this.searchDropdownList.filter(r => this.selectedIds.includes(r.id));
+      } else {
+        this.selected = null;
+      }
+    }
+  }
 
   ngOnInit() {
   }
 
-  async searchItem(event) {
-    if (event.detail.value) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
+  searchText: string = '';
+  async keypress(event) {
+    if (event.keyCode === 13) {
+      if (this.searchText.length > 0) {
+        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
+      } else {
+        this.tempDropdownList = this.searchDropdownList;
       }
-      await this.showLoading();
-      this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(event.detail.value.toLowerCase()) || r.description.toLowerCase().includes(event.detail.value.toLowerCase()));
-      await this.hideLoading();
     } else {
       this.tempDropdownList = this.searchDropdownList;
     }
+    // this.searchBar.setFocus();
+  }
 
-    this.searchBar.setFocus();
+  resetFilter() {
+    this.tempDropdownList = this.searchDropdownList;
   }
   
   itemChecked(event, object: SearchDropdownList) {
@@ -71,23 +81,6 @@ export class SearchMultiDropdownPage implements OnInit {
     this.onActionComplete.emit(object);
     this.isModalOpen = false;
   }
-
-  /* #region  misc */
-
-  async showLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Loading...',
-      spinner: 'circles',
-    });
-
-    loading.present();
-  }
-
-  async hideLoading() {
-    this.loadingController.dismiss();
-  }
-
-  /* #endregion */
 
   // Cancel
   cancel() {

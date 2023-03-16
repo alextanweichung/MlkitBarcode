@@ -3,10 +3,14 @@ import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
+import { SalesOrderStatus } from 'src/app/shared/models/sales-order-status';
+import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
 import { SalesOrderHeader, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
 
@@ -75,27 +79,19 @@ export class SalesOrderService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist").pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist");
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/staticLov").pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/staticLov");
   }
 
   getCustomerList() {
     return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer");
   }
   
-  getPromotion(trxDate: string) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate);
+  getPromotion(trxDate: string, customerId: number) {
+    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId);
   }
 
   getFullItemList() {
@@ -106,8 +102,8 @@ export class SalesOrderService {
     return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/solist");
   }
 
-  getObjectListByDate(startDate: string, endDate: string) {
-    return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing/" + startDate + "/" + endDate);
+  getObjectListByDate(searchObject: SalesSearchModal) {
+    return this.http.post<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing", searchObject);
   }
 
   getObjectById(objectId: number) {
@@ -116,6 +112,28 @@ export class SalesOrderService {
 
   insertObject(object: SalesOrderRoot) {
     return this.http.post(this.baseUrl + "MobileSalesOrder", object, httpObserveHeader);
+  }
+
+  getCreditInfo(customerId: number) {
+    return this.http.get<CreditInfo>(this.baseUrl + 'MobileSalesOrder/creditInfo/' + customerId);
+  }
+
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
+    return this.http.post(this.baseUrl + "MobileSalesOrder/exportPdf", 
+    {
+      "appCode": appCode,
+      "format": format,
+      "documentIds": [ documentId ]
+    },
+    { responseType: "blob"});
+  }
+
+  bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
+    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+  }
+
+  getStatus(salesOrderId: number) {
+    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + salesOrderId);
   }
 
 }

@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { LoadingController } from '@ionic/angular';
 import { format } from 'date-fns';
-import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
+import { ItemImage } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from '../../models/item-list';
@@ -35,15 +34,13 @@ export class GeneralSalesGridPage implements OnInit {
   constructor(
     private configService: ConfigService,
     private searchItemService: SearchItemService,
-    private loadingController: LoadingController,
     private toastService: ToastService,
   ) { }
 
   ngOnInit() {
-    this.onlineMode = this.configService.sys_parameter.onlineMode;
     if (Capacitor.getPlatform() !== 'web') {
-      this.configService.loadItemMaster();
-      this.configService.loadItemBarcode();
+      // this.configService.loadItemMaster();
+      // this.configService.loadItemBarcode();
     }
   }  
 
@@ -69,14 +66,11 @@ export class GeneralSalesGridPage implements OnInit {
       if (Capacitor.getPlatform() !== 'web') {
         Keyboard.hide();
       }
-      await this.showLoading();
       if (this.onlineMode) {
         this.searchItemService.getItemInfoByKeyword(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(async response => {
           this.availableItems = response;
-          await this.hideLoading();
         }, async error => {
           console.log(error);
-          await this.hideLoading();
         })
         this.searchItemService.getItemImageFile(this.itemSearchText).subscribe(response => {
           this.availableImages = response;
@@ -86,8 +80,7 @@ export class GeneralSalesGridPage implements OnInit {
       } else {
         this.availableItems = [];
         if (this.configService.item_Masters.length === 0 || this.configService.item_Barcodes.length === 0) {
-          await this.hideLoading();
-          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Something went wrong!', 'Local Item List not found', 'top', 'danger', 1000);
         } else {
           let found = this.configService.item_Masters.filter(r => r.code.toLowerCase().includes(this.itemSearchText.toLowerCase()));
           if (found) {
@@ -167,14 +160,13 @@ export class GeneralSalesGridPage implements OnInit {
                 })
               }
             })
-            await this.hideLoading();
           } else {
             this.toastService.presentToast('Item not found', '', ' bottom', 'medium', 1000);
           }
         }
       }
     } else {
-      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'middle', 'medium', 1000);
+      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'medium', 1000);
     }
   }
 
@@ -196,7 +188,7 @@ export class GeneralSalesGridPage implements OnInit {
 
   async addItemToCart(data: TransactionDetail) {
     await this.onItemAdded.emit(data);
-    this.toastService.presentToast('Item added to cart', '', 'middle', 'success', 1000);
+    this.toastService.presentToast('Item added to cart', '', 'top', 'success', 1000);
     // clear qty
     data.qtyRequest = null;
   }
@@ -231,7 +223,7 @@ export class GeneralSalesGridPage implements OnInit {
 
   async addItemVariationToCart() {
     await this.onItemAdded.emit(this.selectedItem);
-    this.toastService.presentToast('Item added to cart', '', 'middle', 'success', 1000);
+    this.toastService.presentToast('Item added to cart', '', 'top', 'success', 1000);
     // clear qty
     this.selectedItem.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest = 0);
     this.hideModal();
@@ -245,19 +237,6 @@ export class GeneralSalesGridPage implements OnInit {
     event.getInputElement().then(r => {
       r.select();
     })
-  }
-
-  async showLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Loading...',
-      spinner: 'circles',
-    });
-
-    loading.present();
-  }
-
-  async hideLoading() {
-    this.loadingController.dismiss();
   }
 
   /* #endregion */

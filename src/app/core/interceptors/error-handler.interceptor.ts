@@ -30,7 +30,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {
          const authReq = request.clone({
-            headers: request.headers.set('Access-Control-Allow-Origin', '*')
+            headers: request.headers.delete('skip')
          });
          return next.handle(authReq);
       }
@@ -50,7 +50,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       
       setTimeout(async () => {
          if (!finished) {
-            this.spinner.show('sp1');
+            // this.spinner.show('sp1');
          }
       }, 800);
 
@@ -69,33 +69,32 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                         throw modalStateErrors.flat();
 
                      } else {                        
-                        this.toastService.presentToast('Error', 'Bad request error', 'middle', 'danger', 2000);
+                        this.toastService.presentToast('Bad request error', error.status + ':' + error.statusText, 'top', 'danger', 2000);
                         // this.messageService.add({ severity: 'error', summary: 'Bad request error', detail: error.status + ':' + error.statusText });
                      }
                      break;
                   case 401:
                      if (error.error.description) {
-                        this.toastService.presentToast('Error', 'Unauthorised', 'middle', 'danger', 2000);
+                        this.toastService.presentToast('Unauthorised', error.error.description, 'top', 'danger', 2000);
                         // this.messageService.add({ severity: 'error', summary: 'Unauthorised', detail: error.error.description });
                      } else {
-                        this.toastService.presentToast('Error', 'Unauthorised', 'middle', 'danger', 2000);
+                        this.toastService.presentToast('Unauthorised', error.status + ':' + error.statusText, 'top', 'danger', 2000);
                         // this.messageService.add({ severity: 'error', summary: 'Unauthorised', detail: error.status + ':' + error.statusText });
                      }
                      break;
                   case 404:
                      //this.router.navigateByUrl('/not-found');
-                     this.toastService.presentToast('Error', 'No result', 'middle', 'danger', 2000);
+                     this.toastService.presentToast('No result', 'Resources not found.', 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'custom', summary: 'No result', detail: "Resources not found." });
                      break;
                   case 500:
                      //const navigationExtras: NavigationExtras = {state: {error: error.error}}
                      //this.router.navigateByUrl('/error', navigationExtras);
-                     this.toastService.presentToast('Error', 'Internal server error 500', 'middle', 'danger', 2000);
-                     console.log("🚀 ~ file: error-handler.interceptor.ts:105 ~ ErrorHandlerInterceptor ~ intercept ~ error", JSON.stringify(error))
+                     this.toastService.presentToast('Error', error.error.message, 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'error', summary: 'Internal server error 500', detail: error.error.message });
                      break;
                   default:
-                     this.toastService.presentToast('Error', 'Something went wrong', 'middle', 'danger', 2000);
+                     this.toastService.presentToast('Error', 'Something went wrong', 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'error', summary: 'Something went wrong' });
                      console.log(error);
                      break;
@@ -106,7 +105,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            this.spinner.hide('sp1');
+            // this.spinner.hide('sp1');
          })
       );
    }

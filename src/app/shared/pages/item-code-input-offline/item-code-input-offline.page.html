@@ -1,0 +1,37 @@
+<input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan item code" (keydown)="handleKeyDown($event, itemSearchValue)">
+
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Item List</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideModal()">Close</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-item button detail="false" class="no-ripple" *ngFor="let item of availableItems">
+        <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
+        <ion-grid class="p-0">
+          <ion-row>
+            <ion-col>
+              <div>{{item.itemCode}} - {{item.description}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
+            <ion-col class="ion-margin-auto">
+              <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+              <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-content>
+    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+      <ion-button class="ion-margin" expand="block" (click)="selectItems()">
+        Select Item(s)
+      </ion-button>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

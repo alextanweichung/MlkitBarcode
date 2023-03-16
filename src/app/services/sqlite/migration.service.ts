@@ -8,15 +8,16 @@ CREATE TABLE IF NOT EXISTS Sys_Parameter (
   sys_ParameterId INTEGER PRIMARY KEY AUTOINCREMENT, 
   apiUrl VARCHAR(255), 
   imgUrl VARCHAR(255), 
-  onlineMode TINYINT(1), 
   lastDownloadAt DATETIME, 
-  loadImage TINYINT(1)
+  rememberMe INTEGER, 
+  username VARCHAR(50), 
+  password VARCHAR(20) 
 ); `;
 
 export const create_item_master_table: string = `
 CREATE TABLE IF NOT EXISTS Item_Master (
   id INTEGER,
-  code VARCHAR(20),
+  code VARCHAR(100),
   itemDesc VARCHAR(100),
   brandId INTEGER,
   brandCd VARCHAR(20),
@@ -53,8 +54,14 @@ CREATE TABLE IF NOT EXISTS Item_Barcode (
   ySeq INTEGER,
   barcode VARCHAR(255),
   sku VARCHAR(255),
-  qty DECIMAL(6,0)
+  qty DECIMAL(6,0),
+  transitQty DECIMAL(6,0)
 );`;
+
+export const delete_inbound_tables: string = `
+DROP TABLE IF EXISTS Item_Master;
+DROP TABLE IF EXISTS Item_Barcode;
+`;
 
 @Injectable()
 export class MigrationService {
@@ -64,6 +71,7 @@ export class MigrationService {
 
   async migrate(): Promise<any> {
     await this.createSystemParamTable();
+    await this.deleteInboundTables();
     await this.createInboundTables();
   }
 
@@ -80,6 +88,22 @@ export class MigrationService {
     console.log(`ret: ${JSON.stringify(ret)}`);
 
     await this.sqliteService.closeConnection(dbConfig.idcpcore);
+    console.log(`after closeConnection`);
+  }
+
+  async deleteInboundTables(): Promise<void> {
+    console.log(`going to create a connection`)
+    const db = await this.sqliteService.createConnection(dbConfig.inbounddb, false, "no-encryption", 1);
+    console.log(`db ${JSON.stringify(db)}`);
+
+    await db.open();
+    console.log(`after db.open`);
+    
+    console.log(`query ${delete_inbound_tables}`);
+    const ret: any = await db.execute(delete_inbound_tables);
+    console.log(`ret: ${JSON.stringify(ret)}`);
+
+    await this.sqliteService.closeConnection(dbConfig.inbounddb);
     console.log(`after closeConnection`);
   }
 

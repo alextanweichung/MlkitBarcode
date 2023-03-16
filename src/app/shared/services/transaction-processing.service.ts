@@ -25,7 +25,7 @@ export class TransactionProcessingService {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }  
 
-  getDocumentCount(){
+  getDocumentCount() {
     return this.http.get<TransactionProcessingCount>(this.baseUrl + this.apiObject + '/count');
   }
 
@@ -45,8 +45,8 @@ export class TransactionProcessingService {
     );
   }
 
-  updateDocumentStatus(docStatus: any, trxId: number) {
-    return this.http.post(this.baseUrl + this.apiObject + '/' + docStatus + '/' + trxId, null, httpObserveHeader);
+  updateDocumentStatus(docStatus: any, trxId: number, actionReason: string) {
+    return this.http.post(this.baseUrl + this.apiObject + '/' + docStatus + '/' + trxId + '/' + actionReason, null, httpObserveHeader);
   }
 
   bulkUpdateDocumentStatus(bulkConfirmReverse: BulkConfirmReverse) {

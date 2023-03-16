@@ -2,9 +2,10 @@ export interface Sys_Parameter {
    Sys_ParameterId: number
    apiUrl: string
    imgUrl?: string
-   onlineMode: boolean
    lastDownloadAt?: Date
-   loadImage: boolean
+   rememberMe?: boolean
+   username?: string
+   password?: string
 }
 
 export interface FireStoreReturn {

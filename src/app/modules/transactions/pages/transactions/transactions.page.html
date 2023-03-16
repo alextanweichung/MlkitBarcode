@@ -1,148 +1,88 @@
 <ion-header collapse="fade" [translucent]="true">
   <ion-toolbar>
-    <ion-title>Transactions</ion-title>
+    <ion-title>Transaction</ion-title>
   </ion-toolbar>
 </ion-header>
+
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-label class="label-title">Transactions</ion-label>
+      <ion-label class="label-title">Transaction</ion-label>
     </ion-toolbar>
   </ion-header>
-  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-    <ion-refresher-content>
-    </ion-refresher-content>
-  </ion-refresher>
+  
   <div class="p-2">
     
-    <ng-container *ngIf="showQuotation">
-      <ion-list-header>
-        <ion-label color="dark">Quotation</ion-label>
-        <ion-button routerLink="quotation">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!quotations || quotations?.length === 0">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="quotations?.length > 0">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToQuotationDetail(object.quotationId)" *ngFor="let object of quotations">
-            <ion-label>
-              <h3>{{object.quotationNum}}</h3>
-              <p>{{object.customerName}}</p>
-              <p>{{object.salesAgentName}}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
-    
-    <ng-container *ngIf="showSalesOrder">
-      <ion-list-header>
-        <ion-label color="dark">Sales Order</ion-label>
-        <ion-button routerLink="sales-order">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!salesOrders || salesOrders?.length === 0">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="salesOrders?.length > 0">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToSalesOrderDetail(object.salesOrderId)" *ngFor="let object of salesOrders">
-            <ion-label>
-              <h3>{{object.salesOrderNum}}</h3>
-              <p>{{object.customerName}}</p>
-              <p>{{object.salesAgentName}}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
+    <ng-container>
+      
+      <ion-list class="list-custom" lines="full">
 
-    <ng-container *ngIf="showPicking">
-      <ion-list-header>
-        <ion-label color="dark">Picking</ion-label>
-        <ion-button routerLink="picking">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!pickings || pickings?.length === 0">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="pickings?.length > 0">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToPickingDetail(object.pickingId)" *ngFor="let object of pickings">
-            <ion-label>
-              <h3>{{object.pickingNum}}</h3>
-              <p>{{object.locationCode}} - {{object.locationDescription}}</p>
-              <p>{{object.warehouseAgentName}}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
+        <ion-item button routerLink="quotation" *ngIf="showQuotation">
+          <!-- <fa-icon icon="credit-card-alt" fixed-width="true"></fa-icon> -->
+          <!-- <i class="fa fa-bath" aria-hidden="true"></i> -->
+          <ion-icon name="newspaper-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Quotation</h3>
+          </ion-label>
+        </ion-item>
 
-    <ng-container *ngIf="showPacking">
-      <ion-list-header>
-        <ion-label color="dark">Packing</ion-label>
-        <ion-button routerLink="packing">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!packings || packings?.length === 0">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="packings?.length > 0">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToPackingDetail(object.packingId)" *ngFor="let object of packings">
-            <ion-label>
-              <h3>{{object.packingNum}}</h3>
-              <p>{{object.locationCode}} - {{object.locationDescription}}</p>
-              <p>{{object.warehouseAgentName}}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
-    </ng-container>
+        <ion-item button routerLink="sales-order" *ngIf="showSalesOrder">
+          <ion-icon name="cart-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Sales Order</h3>
+          </ion-label>
+        </ion-item>
 
-    <ng-container *ngIf="showConsignmentSales">
-      <ion-list-header>
-        <ion-label color="dark">Consignment Sales</ion-label>
-        <ion-button routerLink="consignment-sales">See More... <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
-      </ion-list-header>
-      <ng-container *ngIf="!consignment_sales || consignment_sales?.length === 0">
-        <p>
-          <ion-text color="tertiary">
-            <h3>Nothing found!</h3>
-          </ion-text>
-        </p>
-      </ng-container>
-      <ng-container *ngIf="consignment_sales?.length > 0">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" (click)="goToConsignmentSalesDetail(object.otherSalesId)" *ngFor="let object of consignment_sales">
-            <ion-label>
-              <h3>{{object.otherSalesNum}}</h3>
-              <p>{{object.customerName}}</p>
-              <p>{{object.toLocationDesc}}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ng-container>
-      <hr class="hr-small">
+        <ion-item button routerLink="picking" *ngIf="showPicking">
+          <ion-icon name="people-circle-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Picking</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button routerLink="packing" *ngIf="showPacking">
+          <ion-icon name="cube-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Packing</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button routerLink="consignment-sales" *ngIf="showConsignmentSales">
+          <ion-icon name="storefront-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Consignment Sales</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button routerLink="stock-count" *ngIf="showStockCount">
+          <ion-icon name="receipt-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Stock Count</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button routerLink="check-balance" *ngIf="showInventoryLevel">
+          <ion-icon name="file-tray-full-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Check Balance</h3>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item button routerLink="cash-deposit" *ngIf="showCashDeposit">
+          <ion-icon name="cash-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Cash Deposit</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button routerLink="truck-loading" *ngIf="showTruckLoading">
+          <ion-icon name="car-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Truck Loading</h3>
+          </ion-label>
+        </ion-item>
+        
+      </ion-list>
     </ng-container>
     
   </div>

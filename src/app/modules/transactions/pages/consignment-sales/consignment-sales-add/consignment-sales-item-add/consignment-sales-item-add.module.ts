@@ -10,6 +10,8 @@ import { ConsignmentSalesItemAddPage } from './consignment-sales-item-add.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
+import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-input-offline/item-code-input-offline.module';
 
 @NgModule({
   imports: [
@@ -19,7 +21,9 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     ConsignmentSalesItemAddPageRoutingModule,
     BarcodeScanInputPageModule,
     ItemAddListFlatPageModule,
-    IdMappingModule
+    IdMappingModule,
+    CameraScanInputPageModule,
+    ItemCodeInputOfflinePageModule
   ],
   declarations: [ConsignmentSalesItemAddPage]
 })

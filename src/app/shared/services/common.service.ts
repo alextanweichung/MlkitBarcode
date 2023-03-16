@@ -1,46 +1,438 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
-
   baseUrl: string;
-  startDate: Date;
-  endDate: Date
 
   constructor(
     private http: HttpClient,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private loadingService: LoadingService,
+    private opener: FileOpener,
+    private file: File,
+    private androidPermissions: AndroidPermissions
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
-    if (!this.startDate) {
-      this.startDate = this.getFirstDayOfTodayMonth();
+  }
+
+  /* #region common service */
+
+  getCompanyProfile() {
+    try {
+      return this.http.get(this.baseUrl + "account/companyName");
+    } catch (e) {
+      console.error(e);
     }
-    if (!this.endDate) {
-      this.endDate = this.getTodayDate();
+  }
+
+  syncInbound() {
+    try {
+      // return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
+      return this.http.get(this.baseUrl + "MobileDownload/itemMaster").toPromise();      
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region date related */
+
+  getFirstDayOfTheYear(): Date {
+    try {
+      let today = this.getTodayDate();
+      let firstDoy = new Date(new Date().getUTCFullYear(), 0, 1, 0, 0, 0);
+      firstDoy.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return firstDoy;      
+    } catch (e) {
+      console.error(e);
     }
   }
 
   getFirstDayOfTodayMonth(): Date {
-    let today = this.getTodayDate();
-    let firstDom = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1, 0, 0, 0);
-    firstDom.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    return firstDom;
+    try {
+      let today = this.getTodayDate();
+      let firstDom = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1, 0, 0, 0);
+      firstDom.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return firstDom;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   getTodayDate(): Date {
-    let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate(), 0, 0, 0);
-    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    return today;
+    try {
+      let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate(), new Date().getUTCHours(), new Date().getUTCMinutes(), new Date().getUTCSeconds());
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return today;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  syncInbound() {
-    return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
+  //To add back timezone differences into UTC Date
+  convertUtcDate(inputDate: Date): Date {
+    try {
+      let outputDate = new Date(inputDate);
+      outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
+      return outputDate;
+    } catch (e) {
+      console.error(e);
+    }
   }
+
+  //To add back timezone differences into UTC Date
+  convertDateFormat(inputDate: Date): Date {
+    try {
+      let outputDate = new Date(inputDate);
+      //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
+      return outputDate;      
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  convertObjectAllDateType(inputObject: any) {
+    try {
+      if (inputObject.hasOwnProperty('trxDate')) {
+        if (inputObject.trxDate != null) {
+          inputObject.trxDate = this.convertUtcDate(inputObject.trxDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('trxDateTime')) {
+        if (inputObject.trxDateTime != null) {
+          inputObject.trxDateTime = this.convertUtcDate(inputObject.trxDateTime);
+        }
+      }
+      if (inputObject.hasOwnProperty('etaDate')) {
+        if (inputObject.etaDate != null) {
+          inputObject.etaDate = this.convertUtcDate(inputObject.etaDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('cancelDate')) {
+        if (inputObject.cancelDate != null) {
+          inputObject.cancelDate = this.convertUtcDate(inputObject.cancelDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('startDate')) {
+        if (inputObject.startDate != null) {
+          inputObject.startDate = this.convertUtcDate(inputObject.startDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('endDate')) {
+        if (inputObject.endDate != null) {
+          inputObject.endDate = this.convertUtcDate(inputObject.endDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('birthDate')) {
+        if (inputObject.birthDate != null) {
+          inputObject.birthDate = this.convertUtcDate(inputObject.birthDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('joinDate')) {
+        if (inputObject.joinDate != null) {
+          inputObject.joinDate = this.convertUtcDate(inputObject.joinDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('effectiveDate')) {
+        if (inputObject.effectiveDate != null) {
+          inputObject.effectiveDate = this.convertUtcDate(inputObject.effectiveDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('expiryDate')) {
+        if (inputObject.expiryDate != null) {
+          inputObject.expiryDate = this.convertUtcDate(inputObject.expiryDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('resignDate')) {
+        if (inputObject.resignDate != null) {
+          inputObject.resignDate = this.convertUtcDate(inputObject.resignDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('postingDate')) {
+        if (inputObject.postingDate != null) {
+          inputObject.postingDate = this.convertUtcDate(inputObject.postingDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('taxDate')) {
+        if (inputObject.taxDate != null) {
+          inputObject.taxDate = this.convertUtcDate(inputObject.taxDate);
+        }
+      }
+      if (inputObject.hasOwnProperty('bankStatementDate')) {
+        if (inputObject.bankStatementDate != null) {
+          inputObject.bankStatementDate = this.convertUtcDate(inputObject.bankStatementDate);
+        }
+      }
+      return inputObject;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  convertArrayAllDateType(inputObject: any[]) {
+    try {
+      if (inputObject.length >= 1) {
+        inputObject.forEach(x => {
+          if (x.hasOwnProperty('etaDate')) {
+            if (x.etaDate != null) {
+              x.etaDate = this.convertUtcDate(x.etaDate);
+            }
+          }
+          if (x.hasOwnProperty('lineUDDate')) {
+            if (x.lineUDDate != null) {
+              x.lineUDDate = this.convertUtcDate(x.lineUDDate)
+            }
+          }
+          if (x.hasOwnProperty('startDate')) {
+            if (x.startDate != null) {
+              x.startDate = this.convertUtcDate(x.startDate);
+            }
+          }
+          if (x.hasOwnProperty('endDate')) {
+            if (x.endDate != null) {
+              x.endDate = this.convertUtcDate(x.endDate);
+            }
+          }
+          if (x.hasOwnProperty('gainLossPostDate')) {
+            if (x.gainLossPostDate != null) {
+              x.gainLossPostDate = this.convertUtcDate(x.gainLossPostDate);
+            }
+          }
+          if (x.hasOwnProperty('knockOffDate')) {
+            if (x.knockOffDate != null) {
+              x.knockOffDate = this.convertUtcDate(x.knockOffDate);
+            }
+          }
+        })
+      }
+      return inputObject;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region price related */
+
+  computeUnitPriceExTax(trxLine: any, useTax: boolean, roundingPrecision: number) {
+    try {
+      if (useTax) {
+        trxLine.unitPriceExTax = this.computeAmtExclTax(trxLine.unitPrice, trxLine.taxPct);
+      } else {
+        trxLine.unitPriceExTax = trxLine.unitPrice;
+      }
+      trxLine.unitPriceExTax = this.roundToPrecision(trxLine.unitPriceExTax, roundingPrecision);
+      return trxLine.unitPriceExTax;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  computeUnitPrice(trxLine: any, useTax: boolean, roundingPrecision: number) {
+    try {
+      if (useTax) {
+        trxLine.unitPrice = this.computeAmtInclTax(trxLine.unitPriceExTax, trxLine.taxPct);
+      } else {
+        trxLine.unitPrice = trxLine.unitPriceExTax;
+      }
+      trxLine.unitPrice = this.roundToPrecision(trxLine.unitPrice, roundingPrecision);
+      return trxLine.unitPrice;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  computeAmtInclTax(amount: number, taxPct: number) {
+    try {
+      let amtInclTax = amount * (1 + (taxPct / 100));
+      return amtInclTax;      
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  computeAmtExclTax(amount: number, taxPct: number) {
+    try {
+      let amtExclTax = amount / (100 + taxPct) * 100;
+      return amtExclTax;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  roundToPrecision(inputNumber: number, precision: number): number {
+    try {
+      if (inputNumber) {
+        return Number(inputNumber.toFixed(precision));
+      } else {
+        return null;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
+    try {
+      let totalDiscAmt = 0;
+      let unitPrice = trxLine.unitPrice;
+      let unitPriceExTax = trxLine.unitPriceExTax;
+      let discExpression = trxLine.discountExpression;
+      let quantity = trxLine.qtyRequest;
+      let subTotal;
+  
+      if (isItemPriceTaxInclusive) {
+        subTotal = unitPrice * quantity;
+      } else {
+        subTotal = unitPriceExTax * quantity;
+      }
+  
+      //To split the expression with multi level discount, for eg. (10%/5%/3%)
+      if (discExpression != "" && discExpression != null) {
+        let splittedDisc = discExpression.split(/[+/]/g);
+        splittedDisc.forEach(x => {
+          if (x.includes('%')) {
+            let currentdiscPct = parseFloat(x) / 100;
+            //let currentDiscAmt = unitPrice * currentdiscPct;    
+            let currentDiscAmt = subTotal * currentdiscPct;
+            totalDiscAmt = totalDiscAmt + currentDiscAmt;
+            // unitPrice = unitPrice - currentDiscAmt;
+            subTotal = subTotal - currentDiscAmt;
+          } else {
+            totalDiscAmt = totalDiscAmt + parseFloat(x);
+            //unitPrice = unitPrice - parseFloat(x);
+            subTotal = subTotal - parseFloat(x);
+          }
+        })
+      }
+      if (useTax) {
+        if (isItemPriceTaxInclusive) {
+          trxLine.discountAmt = totalDiscAmt;
+          trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
+          trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+          trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+          trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+          trxLine.subTotalExTax = (quantity * this.computeAmtExclTax(unitPrice, trxLine.taxPct)) - trxLine.discountAmtExTax;
+          trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+          trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+          trxLine.taxAmt = trxLine.subTotal - trxLine.subTotalExTax;
+          trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
+          trxLine.taxInclusive = isDisplayTaxInclusive;
+        } else {
+          trxLine.discountAmt = this.computeAmtInclTax(totalDiscAmt, trxLine.taxPct);
+          trxLine.discountAmtExTax = totalDiscAmt;
+          trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+          trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+          trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;
+          trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+          trxLine.taxAmt = trxLine.subTotalExTax * trxLine.taxPct / 100;
+          trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
+          trxLine.taxInclusive = isDisplayTaxInclusive;
+          trxLine.subTotal = trxLine.subTotalExTax + trxLine.taxAmt;
+          trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+        }
+      } else {
+        trxLine.discountAmt = totalDiscAmt;
+        trxLine.discountAmtExTax = totalDiscAmt;
+        trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
+        trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
+        trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+        trxLine.subTotalExTax = trxLine.subTotal
+        trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
+        trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
+        trxLine.taxAmt = null;
+        trxLine.taxInclusive = null;
+      }
+      //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
+      return trxLine;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  reversePromoImpact(receiptLine: TransactionDetail) {
+    try {
+      if (receiptLine.promoEventId != null) {
+        receiptLine.promoEventId = null;
+        receiptLine.isPromoImpactApplied = null;
+        receiptLine.discountGroupCode = receiptLine.oriDiscountGroupCode;
+        receiptLine.discountExpression = receiptLine.oriDiscountExpression;
+      }
+      return receiptLine;      
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region download pdf */
+
+  async commonDownloadPdf(file: Blob, filename: string) {
+    try {
+      await this.loadingService.showLoading("Downloading");
+      if (Capacitor.getPlatform() === 'android') {
+        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+          async result => {
+            if (!result.hasPermission) {
+              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+                async result => {
+                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true }).then(async () => {
+                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                    await this.loadingService.dismissLoading();
+                  }).catch(async (error) => {
+                    await this.loadingService.dismissLoading();
+                  });
+                }
+              );
+            } else {
+              this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true }).then(async () => {
+                this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                await this.loadingService.dismissLoading();
+              }).catch(async (error) => {
+                await this.loadingService.dismissLoading();
+              });
+            }
+          }
+        )
+      } else if (Capacitor.getPlatform() === 'ios') {
+        this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
+          this.opener.open(this.file.tempDirectory + filename, "application/pdf");
+          await this.loadingService.dismissLoading();
+        }).catch(async (error) => {
+          await this.loadingService.dismissLoading();
+        })
+      } else {
+        const url = window.URL.createObjectURL(file);
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filename);
+        window.document.body.appendChild(link);
+        link.click();
+        link.remove();
+        await this.loadingService.dismissLoading();
+      }
+    } catch (e) {
+      await this.loadingService.dismissLoading();
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region misc function */
 
   setInputNumberSelect(viewChildrenQueryList: QueryList<any>, objectType: string) {
     setTimeout(() => {
@@ -51,245 +443,10 @@ export class CommonService {
     }, 1);
   }
 
-  //To add back timezone differences into UTC Date
-  convertUtcDate(inputDate: Date): Date {
-    let outputDate = new Date(inputDate);
-    outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
-    return outputDate;
+  toFirstCharLowerCase(str: string) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
   }
 
-  convertObjectAllDateType(inputObject: any) {
-    if (inputObject.hasOwnProperty('trxDate')) {
-      if (inputObject.trxDate != null) {
-        inputObject.trxDate = this.convertUtcDate(inputObject.trxDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('trxDateTime')) {
-      if (inputObject.trxDateTime != null) {
-        inputObject.trxDateTime = this.convertUtcDate(inputObject.trxDateTime);
-      }
-    }
-    if (inputObject.hasOwnProperty('etaDate')) {
-      if (inputObject.etaDate != null) {
-        inputObject.etaDate = this.convertUtcDate(inputObject.etaDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('cancelDate')) {
-      if (inputObject.cancelDate != null) {
-        inputObject.cancelDate = this.convertUtcDate(inputObject.cancelDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('startDate')) {
-      if (inputObject.startDate != null) {
-        inputObject.startDate = this.convertUtcDate(inputObject.startDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('endDate')) {
-      if (inputObject.endDate != null) {
-        inputObject.endDate = this.convertUtcDate(inputObject.endDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('birthDate')) {
-      if (inputObject.birthDate != null) {
-        inputObject.birthDate = this.convertUtcDate(inputObject.birthDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('joinDate')) {
-      if (inputObject.joinDate != null) {
-        inputObject.joinDate = this.convertUtcDate(inputObject.joinDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('effectiveDate')) {
-      if (inputObject.effectiveDate != null) {
-        inputObject.effectiveDate = this.convertUtcDate(inputObject.effectiveDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('expiryDate')) {
-      if (inputObject.expiryDate != null) {
-        inputObject.expiryDate = this.convertUtcDate(inputObject.expiryDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('resignDate')) {
-      if (inputObject.resignDate != null) {
-        inputObject.resignDate = this.convertUtcDate(inputObject.resignDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('postingDate')) {
-      if (inputObject.postingDate != null) {
-        inputObject.postingDate = this.convertUtcDate(inputObject.postingDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('taxDate')) {
-      if (inputObject.taxDate != null) {
-        inputObject.taxDate = this.convertUtcDate(inputObject.taxDate);
-      }
-    }
-    if (inputObject.hasOwnProperty('bankStatementDate')) {
-      if (inputObject.bankStatementDate != null) {
-        inputObject.bankStatementDate = this.convertUtcDate(inputObject.bankStatementDate);
-      }
-    }
-    return inputObject;
-  }
-
-  convertArrayAllDateType(inputObject: any[]) {
-    if (inputObject.length >= 1) {
-      inputObject.forEach(x => {
-        if (x.hasOwnProperty('etaDate')) {
-          if (x.etaDate != null) {
-            x.etaDate = this.convertUtcDate(x.etaDate);
-          }
-        }
-        if (x.hasOwnProperty('lineUDDate')) {
-          if (x.lineUDDate != null) {
-            x.lineUDDate = this.convertUtcDate(x.lineUDDate)
-          }
-        }
-        if (x.hasOwnProperty('startDate')) {
-          if (x.startDate != null) {
-            x.startDate = this.convertUtcDate(x.startDate);
-          }
-        }
-        if (x.hasOwnProperty('endDate')) {
-          if (x.endDate != null) {
-            x.endDate = this.convertUtcDate(x.endDate);
-          }
-        }
-        if (x.hasOwnProperty('gainLossPostDate')) {
-          if (x.gainLossPostDate != null) {
-            x.gainLossPostDate = this.convertUtcDate(x.gainLossPostDate);
-          }
-        }
-        if (x.hasOwnProperty('knockOffDate')) {
-          if (x.knockOffDate != null) {
-            x.knockOffDate = this.convertUtcDate(x.knockOffDate);
-          }
-        }
-      })
-    }
-    return inputObject;
-  }
-
-  computeUnitPriceExTax(trxLine: any, useTax: boolean, roundingPrecision: number) {
-    if (useTax) {
-      trxLine.unitPriceExTax = this.computeAmtExclTax(trxLine.unitPrice, trxLine.taxPct);
-    } else {
-      trxLine.unitPriceExTax = trxLine.unitPrice;
-    }
-    trxLine.unitPriceExTax = this.roundToPrecision(trxLine.unitPriceExTax, roundingPrecision);
-    return trxLine.unitPriceExTax;
-  }
-
-  computeUnitPrice(trxLine: any, useTax: boolean, roundingPrecision: number) {
-    if (useTax) {
-      trxLine.unitPrice = this.computeAmtInclTax(trxLine.unitPriceExTax, trxLine.taxPct);
-    } else {
-      trxLine.unitPrice = trxLine.unitPriceExTax;
-    }
-    trxLine.unitPrice = this.roundToPrecision(trxLine.unitPrice, roundingPrecision);
-    return trxLine.unitPrice;
-  }
-
-  computeAmtInclTax(amount: number, taxPct: number) {
-    let amtInclTax = amount * (1 + (taxPct / 100));
-    return amtInclTax;
-  }
-
-  computeAmtExclTax(amount: number, taxPct: number) {
-    let amtExclTax = amount / (100 + taxPct) * 100;
-    return amtExclTax;
-  }
-
-  roundToPrecision(inputNumber: number, precision: number): number {
-    if (inputNumber) {
-      return Number(inputNumber.toFixed(precision));
-    } else {
-      return null;
-    }
-  }
-
-  computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
-    let totalDiscAmt = 0;
-    let unitPrice = trxLine.unitPrice;
-    let unitPriceExTax = trxLine.unitPriceExTax;
-    let discExpression = trxLine.discountExpression;
-    let quantity = trxLine.qtyRequest;
-    let subTotal;
-
-    if (isItemPriceTaxInclusive) {
-      subTotal = unitPrice * quantity;
-    } else {
-      subTotal = unitPriceExTax * quantity;
-    }
-
-    //To split the expression with multi level discount, for eg. (10%/5%/3%)
-    if (discExpression != "" && discExpression != null) {
-      let splittedDisc = discExpression.split(/[+/]/g);
-      splittedDisc.forEach(x => {
-        if (x.includes('%')) {
-          let currentdiscPct = parseFloat(x) / 100;
-          //let currentDiscAmt = unitPrice * currentdiscPct;    
-          let currentDiscAmt = subTotal * currentdiscPct;
-          totalDiscAmt = totalDiscAmt + currentDiscAmt;
-          // unitPrice = unitPrice - currentDiscAmt;
-          subTotal = subTotal - currentDiscAmt;
-        } else {
-          totalDiscAmt = totalDiscAmt + parseFloat(x);
-          //unitPrice = unitPrice - parseFloat(x);
-          subTotal = subTotal - parseFloat(x);
-        }
-      })
-    }
-    if (useTax) {
-      if (isItemPriceTaxInclusive) {
-        trxLine.discountAmt = totalDiscAmt;
-        trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
-        trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
-        trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-        trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
-        trxLine.subTotalExTax = (quantity * this.computeAmtExclTax(unitPrice, trxLine.taxPct)) - trxLine.discountAmtExTax;
-        trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
-        trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
-        trxLine.taxAmt = trxLine.subTotal - trxLine.subTotalExTax;
-        trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
-        trxLine.taxInclusive = isDisplayTaxInclusive;
-      } else {
-        trxLine.discountAmt = this.computeAmtInclTax(totalDiscAmt, trxLine.taxPct);
-        trxLine.discountAmtExTax = totalDiscAmt;
-        trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
-        trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-        trxLine.subTotalExTax = (quantity * unitPriceExTax) - trxLine.discountAmtExTax;
-        trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
-        trxLine.taxAmt = trxLine.subTotalExTax * trxLine.taxPct / 100;
-        trxLine.taxAmt = this.roundToPrecision(trxLine.taxAmt, roundingPrecision);
-        trxLine.taxInclusive = isDisplayTaxInclusive;
-        trxLine.subTotal = trxLine.subTotalExTax + trxLine.taxAmt;
-        trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
-      }
-    } else {
-      trxLine.discountAmt = totalDiscAmt;
-      trxLine.discountAmtExTax = totalDiscAmt;
-      trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
-      trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-      trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
-      trxLine.subTotalExTax = trxLine.subTotal
-      trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
-      trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
-      trxLine.taxAmt = null;
-      trxLine.taxInclusive = null;
-    }
-    //this.trxLine.localTaxAmt = this.trxLine.taxAmt * this.headerObject?.currencyRate;
-    return trxLine;
-  }
-
-  reversePromoImpact(receiptLine: TransactionDetail) {
-    if (receiptLine.promoEventId != null) {
-      receiptLine.promoEventId = null;
-      receiptLine.isPromoImpactApplied = null;
-      receiptLine.discountGroupCode = receiptLine.oriDiscountGroupCode;
-      receiptLine.discountExpression = receiptLine.oriDiscountExpression;
-    }
-    return receiptLine;
-  }
+  /* #endregion */
 
 }

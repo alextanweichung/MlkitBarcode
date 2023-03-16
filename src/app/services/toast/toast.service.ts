@@ -11,13 +11,13 @@ export class ToastService {
   ) { }
 
   async presentToast(header: string, message: string, position: any, color: string, duration: number, icon?: string) {
-
     if (!icon) {
       switch (color) {
         case 'success':
           icon = 'checkmark-outline';
           break;
         case 'medium':
+        case 'warning':
           icon = 'information-circle-outline';
           break;
         case 'danger':
@@ -25,7 +25,6 @@ export class ToastService {
           break;
       }
     }
-
     const toast = await this.toastController.create({
       header: header,
       message: message,
@@ -33,7 +32,7 @@ export class ToastService {
       position: position,
       color: color,
       icon: icon,
-      cssClass: 'customToast'
+      // cssClass: 'customToast'
     });
     await toast.present();
   }

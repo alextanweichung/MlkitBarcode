@@ -1,10 +1,13 @@
+import { ApprovalHistory } from "src/app/shared/models/approval-history"
+import { TransactionDetail } from "src/app/shared/models/transaction-detail"
 import { VariationDetail } from "src/app/shared/models/variation-detail"
 
 export interface PurchaseOrderRoot {
    header: PurchaseOrderHeader
-   details: PurchaseOrderDetail[]
+   details: TransactionDetail[]
    // barcodeTag: BarcodeTag[]
    // otp: any
+  approvalHistory?: ApprovalHistory[]
  }
  
  export interface PurchaseOrderHeader {
@@ -49,6 +52,11 @@ export interface PurchaseOrderRoot {
    remark: any
    isItemPriceTaxInclusive: boolean
    isDisplayTaxInclusive: boolean
+   isHomeCurrency: boolean
+   /* #region  special to pass in precision */
+   maxPrecision: number
+   maxPrecisionTax: number
+   /* #endregion */
    sequence: number
    createdById: number
    createdBy: string
@@ -58,88 +66,7 @@ export interface PurchaseOrderRoot {
    modifiedAt: any
    deactivated: boolean
  }
- 
- export interface PurchaseOrderDetail {
-   lineId: number
-   headerId: number
-   locationId: number
-   itemId: number
-   itemCode: string
-   description: string
-   extendedDescription: any
-   shortDescription: any
-   itemUomId: number
-   itemUomCode: any
-   currencyRate: number
-   qtyRequest: number
-   qtyApproved: any
-   qtyCommit: any
-   tempQtyCommit: any
-   qtyReceive: any
-   unitPrice: number
-   unitPriceExTax: number
-   discountGroupCode: any
-   discountExpression: string
-   discountAmt: number
-   discountAmtExTax: number
-   taxId: number
-   taxCode: any
-   taxPct: number
-   taxAmt: number
-   taxInclusive: boolean
-   subTotal: number
-   subTotalExTax: number
-   taxableAmt: number
-   localGrossAmt: number
-   localDiscountAmt: number
-   localTaxAmt: number
-   localSubTotal: number
-   localSubTotalExTax: number
-   localTaxableAmt: number
-   discountAmtMaxPrecision: number
-   taxAmtMaxPrecision: number
-   subTotalMaxPrecision: number
-   subTotalExTaxMaxPrecision: number
-   etaDate: any
-   remark: any
-   overrideFlag: number
-   lineUDDate: any
-   masterUDGroup1: any
-   masterUDGroup2: any
-   masterUDGroup3: any
-   parentId: any
-   parentLineId: any
-   parentNum: any
-   variationTypeCode: string
-   itemVariationRatioId: any
-   itemVariationRatioCode: any
-   actualQty: any
-   openQty: any
-   availableQty: any
-   variationDetails: VariationDetail[]
-   variationX: number[]
-   variationY: number[]
-   itemPricing: any
-   direction: any
-   priceListLine: any
-   itemVariationXId: any
-   itemVariationYId: any
-   itemSku: any
-   itemBarcode: any
-   cartonNum: any
-   glAccountId: number
-   glAccountCode: any
-   glLedgerLineId: any
-   sequence: number
-   createdById: number
-   createdBy: string
-   createdAt: string
-   modifiedById: any
-   modifiedBy: any
-   modifiedAt: any
-   deactivated: boolean
- }
- 
+
  export interface PurchaseOrderDto {
   header: PurchaseOrder
   details: PurchaseOrderLine[]

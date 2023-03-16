@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { BulkConfirmReverse, TransactionProcessingCount } from 'src/app/shared/models/transaction-processing';
 import { PurchaseOrderDto, PurchaseOrderLine, PurchaseOrderRoot } from '../models/purchase-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -112,6 +113,28 @@ export class PurchaseOrderService {
 
   getPurchaseOrderDetail(purchaseOrderId: number) {
     return this.http.get<any>(this.baseUrl + "MobilePurchaseOrder/" + purchaseOrderId);
+  }
+  
+  getReviewDocumentCount() {
+    return this.http.get<TransactionProcessingCount>(this.baseUrl + 'MobilePurchaseOrderReview/count');
+  }
+  
+  getApprovalDocumentCount() {
+    return this.http.get<TransactionProcessingCount>(this.baseUrl + 'MobilePurchaseOrderApprove/count');
+  }
+
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
+    return this.http.post(this.baseUrl + "MobilePurchaseOrder/exportPdf", 
+    {
+      "appCode": appCode,
+      "format": format,
+      "documentIds": [ documentId ]
+    },
+    { responseType: "blob"});
+  }
+
+  bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
+    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
 }

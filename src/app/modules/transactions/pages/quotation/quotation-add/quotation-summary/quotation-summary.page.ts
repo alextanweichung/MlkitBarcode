@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { QuotationSummary } from 'src/app/modules/transactions/models/quotation';
-// import { QuotationSummary } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 
 @Component({
@@ -20,6 +19,10 @@ export class QuotationSummaryPage implements OnInit {
 
   ngOnInit() {
     this.quotationSummary = this.quotationService.quotationSummary;
+  }
+
+  addMore() {
+    this.navController.navigateRoot('/transactions/quotation/quotation-header');
   }
 
   done() {

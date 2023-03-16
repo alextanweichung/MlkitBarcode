@@ -2,6 +2,8 @@ export interface LoginUser {
    userEmail: string;
    token: string;
    refreshToken: string;
+   playerId: string,
+   userName: string
 }
 
 export interface LoginRequest {

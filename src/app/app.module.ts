@@ -8,7 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
-import { Drivers, Storage } from '@ionic/storage';
+import { Storage } from '@ionic/storage';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InitializeAppService } from './services/sqlite/initialize.app.service';
@@ -20,14 +20,15 @@ import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.inter
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UtcCalendarDirective } from './shared/utilities/utc-calendar.directive';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { Badge } from '@ionic-native/badge/ngx'
+
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();
 }
-
-// export function configFactory(configService: ConfigService) {
-//   return () => configService.loadConfig();
-// }
 
 @NgModule({
     declarations: [
@@ -45,6 +46,9 @@ export function initializeFactory(init: InitializeAppService) {
         BrowserAnimationsModule
     ],
     providers: [
+        File,
+        FileOpener,
+        AndroidPermissions,
         SQLiteService,
         DetailService,
         DatabaseService,
@@ -53,7 +57,8 @@ export function initializeFactory(init: InitializeAppService) {
         MigrationService,
         { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        Storage
+        Storage,
+        Badge
     ],
     bootstrap: [AppComponent]
 })

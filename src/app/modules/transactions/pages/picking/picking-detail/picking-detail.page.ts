@@ -46,25 +46,32 @@ export class PickingDetailPage implements OnInit {
   locationMasterList: MasterListDetails[] = [];
   warehouseAgentMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.pickingService.getMasterList().subscribe(response => {
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUom').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.warehouseAgentMasterList = response.filter(x => x.objectName == 'WarehouseAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.pickingService.getMasterList().subscribe(response => {
+        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUom').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.warehouseAgentMasterList = response.filter(x => x.objectName == 'WarehouseAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw error;
+      })       
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   loadDetail() {
-    this.pickingService.getObjectById(this.objectId).subscribe(response => {
-      this.object = response;
-      console.log("🚀 ~ file: picking-detail.page.ts ~ line 65 ~ PickingDetailPage ~ this.pickingService.getObjectById ~ this.object", this.object)
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.pickingService.getObjectById(this.objectId).subscribe(response => {
+        this.object = response;
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
 }

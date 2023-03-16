@@ -1,11 +1,9 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { IonInput } from '@ionic/angular';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
-import { BarcodeScanInputService } from '../../services/barcode-scan-input.service';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -31,7 +29,7 @@ export class BarcodeScanInputPage implements OnInit {
   }
 
   ionViewDidEnter(): void {
-    this.barcodeInput.setFocus();
+    this.barcodeInput.nativeElement.focus();
   }
 
   loadModuleControl() {
@@ -70,7 +68,7 @@ export class BarcodeScanInputPage implements OnInit {
   }
 
   itemSearchValue: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: IonInput;
+  @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
   async validateBarcode(barcode: string) {
     if (barcode) {
       this.itemSearchValue = '';
@@ -107,14 +105,13 @@ export class BarcodeScanInputPage implements OnInit {
           }
           this.onItemAdd.emit(outputData);
         } else {
-          console.log("🚀 ~ file: barcode-scan-input.page.ts:111 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode", barcode)
-          this.toastService.presentToast('Invalid Barcode', '', 'middle', 'danger', 1000);
+          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
       } else {
-        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'middle', 'medium', 1000);
+        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    this.barcodeInput.setFocus();
+    this.barcodeInput.nativeElement.focus();
   }
 
 }

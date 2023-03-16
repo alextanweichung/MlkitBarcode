@@ -1,3 +1,4 @@
+import { ApprovalHistory } from "src/app/shared/models/approval-history"
 import { TransactionDetail } from "src/app/shared/models/transaction-detail"
 
 export interface SalesOrderList {
@@ -26,6 +27,7 @@ export interface SalesOrderRoot {
   details: TransactionDetail[]
   barcodeTag?: any
   otp?: any
+  approvalHistory?: ApprovalHistory[]
 }
 
 export interface SalesOrderHeader {
@@ -74,7 +76,8 @@ export interface SalesOrderHeader {
   masterUDGroup1: any
   masterUDGroup2: any
   masterUDGroup3: any
-  remark: any
+  remark: string
+  isOpeningBalance: boolean
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean

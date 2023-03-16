@@ -1,21 +1,24 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { AlertController, LoadingController, NavController, ViewDidEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
-import { QuotationHeader, QuotationRoot, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
+import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
+import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { ItemCartPage } from 'src/app/shared/pages/item-cart/item-cart.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
+import {v4 as uuidv4} from 'uuid';
 
 @Component({
   selector: 'app-quotation-item',
@@ -23,36 +26,37 @@ import { SearchItemService } from 'src/app/shared/services/search-item.service';
   styleUrls: ['./quotation-item.page.scss'],
   providers: [DatePipe, SearchItemService, { provide: 'apiObject', useValue: 'mobileQuotation' }]
 })
-export class QuotationItemPage implements OnInit, ViewDidEnter {
+export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   objectHeader: QuotationHeader;
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
-  loadImage: boolean = true;
+
+  @ViewChild('itemCatalog', { static: false }) itemCatalog: ItemCartPage;
 
   constructor(
-    private configService: ConfigService,
     private authService: AuthService,
     private quotationService: QuotationService,
     private promotionEngineService: PromotionEngineService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService,
-    private alertController: AlertController) 
-  { }
+    private toastService: ToastService) { }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.itemInCart = this.quotationService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
   }
 
   ngOnInit() {
-    this.objectHeader = this.quotationService.header;
-    if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
-      this.navController.navigateBack('/transactions/quotation/quotation-header');
+    try {
+      this.objectHeader = this.quotationService.header;
+      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+        this.navController.navigateBack('/transactions/quotation/quotation-header');
+      }
+      this.componentsLoad();
+    } catch (e) {
+      console.error(e);
     }
-    this.loadImage = this.configService.sys_parameter.loadImage;
-    this.componentsLoad();
   }
 
   componentsLoad() {
@@ -61,104 +65,131 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     this.loadFullItemList();
     this.loadPromotion();
   }
-  
+
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
-    this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;
-      let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-      if (SystemWideActivateTaxControl != undefined) {
-        this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
-      }
-      let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-      if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-        this.configSalesActivatePromotionEngine = true;
-      } else {
-        this.configSalesActivatePromotionEngine = false;
-      }
-    }, error => {
-      console.log(error);
-    })
-    this.authService.precisionList$.subscribe(precision =>{
-      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-    })
+    try {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+        this.moduleControl = obj;
+        let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+        if (SystemWideActivateTaxControl != undefined) {
+          this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+        }
+        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
+        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
+          this.configSalesActivatePromotionEngine = true;
+        } else {
+          this.configSalesActivatePromotionEngine = false;
+        }
+      }, error => {
+        throw error;
+      })
+      this.authService.precisionList$.subscribe(precision => {
+        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+      })      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
+  fullMasterList: MasterList[] = [];
   customerMasterList: MasterListDetails[] = [];
   discountGroupMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
-    this.quotationService.getMasterList().subscribe(response => {
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getMasterList().subscribe(response => {
+        this.fullMasterList = response;
+        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   promotionMaster: PromotionMaster[] = [];
   loadPromotion() {
-    let trxDate = this.objectHeader.trxDate;
-    if (trxDate) {
-      this.quotationService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd')).subscribe(response => {
-        this.promotionMaster = response;
-      }, error => {
-        console.log(error);
-      })
+    try {
+      let trxDate = this.objectHeader.trxDate;
+      if (trxDate) {
+        this.quotationService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
+          this.promotionMaster = response;
+        }, error => {
+          throw error;
+        })
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   fullItemList: ItemList[] = [];
   loadFullItemList() {
-    this.quotationService.getFullItemList().subscribe(response => {
-      this.fullItemList = response;
-    }, error => {
-      console.log(error);
-    })
+    try {
+      this.quotationService.getFullItemList().subscribe(response => {
+        this.fullItemList = response;
+      }, error => {
+        throw error;
+      })      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
-    if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
-      if (event.variationTypeCode === '0') {
-        this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest
-      } else {
-        let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
-        vd.forEach(r => {
-          this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
-            if (rr.itemSku === r.itemSku) {
-              rr.qtyRequest += r.qtyRequest;
-            }
+    try {
+      if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
+        if (event.variationTypeCode === '0') {
+          this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
+        } else {
+          let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
+          vd.forEach(r => {
+            this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
+              if (rr.itemSku === r.itemSku) {
+                rr.qtyRequest += r.qtyRequest;
+              }
+            })
           })
-        })
+        }
         await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
-      }
-    } else {
-      let trxLine = JSON.parse(JSON.stringify(event));
-      trxLine = this.assignLineUnitPrice(trxLine);
-      if (this.objectHeader.isItemPriceTaxInclusive) {
-        await this.computeUnitPriceExTax(trxLine);
       } else {
-        await this.computeUnitPrice(trxLine);
+        let trxLine = JSON.parse(JSON.stringify(event));
+        trxLine = this.assignLineUnitPrice(trxLine);
+  
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          await this.computeUnitPriceExTax(trxLine);
+        } else {
+          await this.computeUnitPrice(trxLine);
+        }
+  
+        if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+          trxLine.uuid = uuidv4();
+          let discPct = Number(trxLine.discountExpression?.replace("%", ""));
+          if (this.objectHeader.isItemPriceTaxInclusive) {
+            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+          } else {
+            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+          }
+          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
+          trxLine.oriDiscountExpression = trxLine.discountExpression;
+        }
+        this.itemInCart.push(trxLine);
+        await this.computeAllAmount(this.itemInCart[0]);
+        await this.assignSequence();
       }
-      this.itemInCart.push(trxLine);
-      await this.computeAllAmount(this.itemInCart[0]);
-      await this.assignSequence();
+      this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
+    } catch (e) {
+      console.error(e);
     }
-  }
-
-  async onItemInCartEditCompleted(event: TransactionDetail) {
-    await this.computeAllAmount(event);
-  }
-
-  async onItemInCartDeleteCompleted(event: TransactionDetail[]) {
-    this.itemInCart = JSON.parse(JSON.stringify(event));
-    await this.assignSequence();
   }
 
   assignSequence() {
@@ -169,18 +200,14 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
     })
   }
 
-  /* #region  add item modal */
+  /* #region  toggle show image */
 
-  isModalOpen: boolean = false;
-  showAddItemModal() {
-    this.isModalOpen = true;
+  showImage: boolean = false;
+  toggleShowImage() {
+    this.showImage = !this.showImage;
   }
-
-  hideAddItemModal() {
-    this.isModalOpen = false;
-  }
-
-  /* #endregion */  
+  
+  /* #endregion */
 
   /* #region  tax handle here */
 
@@ -188,109 +215,96 @@ export class QuotationItemPage implements OnInit, ViewDidEnter {
   configSalesActivatePromotionEngine: boolean;
   disablePromotionCheckBox: boolean = false;
   async computeAllAmount(trxLine: TransactionDetail) {
-    await this.computeDiscTaxAmount(trxLine);
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
-      console.log('run promotion engine');
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
+    try {
+      await this.computeDiscTaxAmount(trxLine);
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
+        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   getVariationSum(trxLine: TransactionDetail) {
-    if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
-      trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
+    try {
+      if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
+        trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
-    trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
+    try {
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      this.computeDiscTaxAmount(trxLine);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   computeUnitPrice(trxLine: TransactionDetail) {
-    trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
-    this.computeDiscTaxAmount(trxLine);
+    try {
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      this.computeDiscTaxAmount(trxLine);      
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
-    await this.getVariationSum(trxLine);
-    trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+    try {
+      await this.getVariationSum(trxLine);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   assignLineUnitPrice(trxLine: TransactionDetail) {
-    if (this.useTax) {
-      if (this.objectHeader.isItemPriceTaxInclusive) {
-        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
-        trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+    try {
+      if (this.useTax) {
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+          trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+        } else {
+          trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+          trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+        }
       } else {
-        trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
         trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
       }
-    } else {
-      trxLine.unitPrice = trxLine.itemPricing.unitPrice;
-      trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+      trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
+      trxLine.discountExpression = trxLine.itemPricing.discountExpression;
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+      return trxLine;      
+    } catch (e) {
+      console.error(e);
     }
-    trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
-    trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-    trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
-    trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
-    return trxLine;
   }
 
   /* #endregion */
 
   /* #region  steps */
 
-  async nextStep() {    
-    if (this.itemInCart.length > 0) {
-      const alert = await this.alertController.create({
-        header: 'Are you sure to proceed?',
-        buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
-            text: 'OK',
-            role: 'confirm',
-            handler: async () => {
-              await this.insertQuotation();
-            },
-          },
-        ],
-      });
-      await alert.present();
-    } else {
-      this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'middle', 'danger', 1000);
+  async nextStep() {
+    try {
+      this.quotationService.setChoosenItems(this.itemInCart);
+      this.navController.navigateForward('/transactions/quotation/quotation-cart');
+    } catch (e) {
+      console.error(e);
     }
-  }
-
-  insertQuotation() {
-    let trxDto: QuotationRoot = {
-      header: this.objectHeader,
-      details: this.itemInCart      
-    }
-    this.quotationService.insertObject(trxDto).subscribe(response => {
-      let details: any[] = response.body["details"];
-      let totalQty: number = 0;
-      details.forEach(e => {
-        totalQty += e.qtyRequest;
-      })
-      let qs: QuotationSummary = {
-        quotationNum: response.body["header"]["quotationNum"],
-        customerName: this.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
-        totalQuantity: totalQty,
-        totalAmount: response.body["header"]["totalGrossAmt"]
-      }
-      this.quotationService.setQuotationSummary(qs);
-      this.toastService.presentToast('Insert Complete', 'New quotation has been added', 'middle', 'success', 1000);
-      this.navController.navigateRoot('/transactions/quotation/quotation-summary');
-    }, error => {
-      console.log(error);
-    });
   }
 
   previousStep() {
-    this.navController.navigateBack('/transactions/quotation/quotation-header');
+    try {
+      this.navController.navigateBack('/transactions/quotation/quotation-header');
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */

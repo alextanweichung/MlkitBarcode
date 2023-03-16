@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -13,7 +13,7 @@ import { FilterPage } from '../filter/filter.page';
   templateUrl: './consignment-sales.page.html',
   styleUrls: ['./consignment-sales.page.scss'],
 })
-export class ConsignmentSalesPage implements OnInit {
+export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
 
   objects: ConsignmentSalesList[] = [];
 
@@ -29,24 +29,47 @@ export class ConsignmentSalesPage implements OnInit {
     private toastService: ToastService
   ) { }
 
+  ionViewWillEnter(): void {
+    try {
+      if (!this.startDate) {
+        this.startDate = this.commonService.getFirstDayOfTheYear();
+      }
+      if (!this.endDate) {
+        this.endDate = this.commonService.getTodayDate();
+      }
+      this.loadObjects();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   ngOnInit() {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    try {
+      if (!this.startDate) {
+        this.startDate = this.commonService.getFirstDayOfTheYear();
+      }
+      if (!this.endDate) {
+        this.endDate = this.commonService.getTodayDate();
+      }
+      this.loadObjects();
+    } catch (e) {
+      console.error(e);
     }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-    this.loadObjects();
   }
 
   /* #region  crud */
 
   loadObjects() {
-    this.consignmentSalesService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
-      this.objects = response;
-    }, error => {
-      console.log((error));
-    })
+    try {
+      this.consignmentSalesService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+        this.objects = response;
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
@@ -56,7 +79,7 @@ export class ConsignmentSalesPage implements OnInit {
   async addObject() {
     // let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
     // if (salesAgentId === 0 || salesAgentId === undefined) {
-    //   this.toastService.presentToast('Error', 'Sales Agent not set', 'middle', 'danger', 1000);
+    //   this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1000);
     // } else {
       this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
     // }
@@ -65,48 +88,56 @@ export class ConsignmentSalesPage implements OnInit {
   /* #endregion */
 
   async filter() {
-    const modal = await this.modalController.create({
-      component: FilterPage,
-      componentProps: {
-        startDate: this.startDate,
-        endDate: this.endDate
-      },
-      canDismiss: true
-    })
-
-    await modal.present();
-
-    let { data } = await modal.onWillDismiss();
-
-    if (data && data !== undefined) {
-      this.startDate = new Date(data.startDate);
-      this.endDate = new Date(data.endDate);
-
-      this.loadObjects();
+    try {
+      const modal = await this.modalController.create({
+        component: FilterPage,
+        componentProps: {
+          startDate: this.startDate,
+          endDate: this.endDate
+        },
+        canDismiss: true
+      })
+  
+      await modal.present();
+  
+      let { data } = await modal.onWillDismiss();
+  
+      if (data && data !== undefined) {
+        this.startDate = new Date(data.startDate);
+        this.endDate = new Date(data.endDate);
+  
+        this.loadObjects();
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
   // Select action
   async selectAction() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Choose an action',
-      cssClass: 'custom-action-sheet',
-      buttons: [
-        {
-          text: 'Add Consignment Sales',
-          icon: 'document-outline',
-          handler: () => {
-            this.addObject();
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Choose an action',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Add Consignment Sales',
+            icon: 'document-outline',
+            handler: () => {
+              this.addObject();
+            }
+          },
+          {
+            text: 'Cancel',
+            icon: 'close',
+            role: 'cancel'
           }
-        },
-        {
-          text: 'Cancel',
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-    await actionSheet.present();
+        ]
+      });
+      await actionSheet.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   goToDetail(objectId: number) {
