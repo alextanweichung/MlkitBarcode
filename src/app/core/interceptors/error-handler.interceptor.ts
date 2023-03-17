@@ -11,7 +11,7 @@ import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { NgxSpinnerService } from 'ngx-spinner';
+// import { NgxSpinnerService } from 'ngx-spinner';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);
 
@@ -25,7 +25,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    constructor(
       private router: Router,
       private toastService: ToastService,
-      private spinner: NgxSpinnerService
+      // private spinner: NgxSpinnerService
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {

@@ -90,19 +90,19 @@ export class SigninPage implements OnInit, ViewWillEnter {
             this.configService.sys_parameter.username = '';
             this.configService.sys_parameter.password = '';
           }
-          // try {
-          //   await this.loadingService.showLoading("Syncing Offline Table");
-          //   let response = await this.commonService.syncInbound();
-          //   let itemMaster: PDItemMaster[] = response['itemMaster'];
-          //   let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-          //   await this.configService.syncInboundData(itemMaster, itemBarcode);
-          //   // await this.configService.loadItemMaster();
-          //   // await this.configService.loadItemBarcode();
-          //   await this.loadingService.dismissLoading();       
-          // } catch (error) {
-          //   await this.loadingService.dismissLoading();
-          //   this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
-          // }
+          try {
+            await this.loadingService.showLoading("Syncing Offline Table");
+            let response = await this.commonService.syncInbound();
+            let itemMaster: PDItemMaster[] = response['itemMaster'];
+            let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+            await this.configService.syncInboundData(itemMaster, itemBarcode);
+            // await this.configService.loadItemMaster();
+            // await this.configService.loadItemBarcode();
+            await this.loadingService.dismissLoading();       
+          } catch (error) {
+            await this.loadingService.dismissLoading();
+            this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
+          }
         }
       });
     }

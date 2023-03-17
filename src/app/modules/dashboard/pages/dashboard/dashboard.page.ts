@@ -9,7 +9,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 import { NotificationHistory } from '../../models/notification-history';
-import { Badge } from '@ionic-native/badge/ngx'
+// import { Badge } from '@ionic-native/badge/ngx'
 
 const managementPageCode: string = 'MAAP';
 const quotationReviewCode: string = 'MAQURV';
@@ -51,7 +51,7 @@ export class DashboardPage implements OnInit, ViewWillEnter {
     private configService: ConfigService,
     private dashboardService: DashboardService,
     private navController: NavController,
-    private badge: Badge
+    // private badge: Badge
   ) { }
 
   ionViewWillEnter(): void {
@@ -201,14 +201,14 @@ export class DashboardPage implements OnInit, ViewWillEnter {
   badgeNumber: Number;
   async setBadges() {
     try {
-      let hasPermission = await this.badge.hasPermission();
-      console.log("🚀 ~ file: dashboard.page.ts:165 ~ DashboardPage ~ setBadges ~ hasPermission:", hasPermission)
-      if (!hasPermission) {
-        let permissions = await this.badge.requestPermission();
-        console.log("🚀 ~ file: dashboard.page.ts:168 ~ DashboardPage ~ setBadges ~ permissions:", permissions)
-      } else {
-        this.badge.set(Number(this.badgeNumber));
-      }
+      // let hasPermission = await this.badge.hasPermission();
+      // console.log("🚀 ~ file: dashboard.page.ts:165 ~ DashboardPage ~ setBadges ~ hasPermission:", hasPermission)
+      // if (!hasPermission) {
+      //   let permissions = await this.badge.requestPermission();
+      //   console.log("🚀 ~ file: dashboard.page.ts:168 ~ DashboardPage ~ setBadges ~ permissions:", permissions)
+      // } else {
+      //   this.badge.set(Number(this.badgeNumber));
+      // }
     } catch (e) {
       console.error(e);
     }

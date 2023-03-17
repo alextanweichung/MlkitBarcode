@@ -247,9 +247,8 @@ const routes: Routes = [
     RouterModule.forRoot(
       routes,
       {
-        preloadingStrategy: PreloadAllModules,
-        relativeLinkResolution: 'legacy'
-      })
+    preloadingStrategy: PreloadAllModules
+})
   ],
   exports: [RouterModule]
 })
