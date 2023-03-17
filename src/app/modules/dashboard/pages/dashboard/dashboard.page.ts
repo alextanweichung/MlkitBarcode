@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -29,7 +29,7 @@ const mobileSalesOrderCode: string = 'MATRSO';
   styleUrls: ['./dashboard.page.scss'],
   providers: [File, FileOpener, AndroidPermissions]
 })
-export class DashboardPage implements OnInit, ViewWillEnter {
+export class DashboardPage implements OnInit, ViewDidEnter {
 
   showQuotationReview: boolean = false;
   showQuotationApproval: boolean = false;
@@ -53,6 +53,14 @@ export class DashboardPage implements OnInit, ViewWillEnter {
     private navController: NavController,
     // private badge: Badge
   ) { }
+
+  ionViewDidEnter(): void {
+    try {
+      this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   ionViewWillEnter(): void {
     try {
