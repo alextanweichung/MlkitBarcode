@@ -4,6 +4,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
 import { DebtorOutstanding } from '../models/debtor-outstanding';
+import { ReportSOListing } from '../models/rp-so-listing';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,10 @@ export class ReportsService {
 
   getDebtorOutstanding(customerId: number, trxDate: string) {
     return this.http.get<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding/debtor/" + customerId.toString() + "/" + trxDate);
+  }
+
+  getSOListing() {
+    return this.http.get<ReportSOListing[]>(this.baseUrl + "MobileReport/soListing");
   }
 
   getPdf(model: ReportParameterModel) {

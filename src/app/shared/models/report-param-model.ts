@@ -3,7 +3,7 @@ export interface ReportParameterModel {
    format: string
    documentIds: number[]
    reportName: string
-   customReportParam: CustomReportParamModel
+   customReportParam?: CustomReportParamModel
 }
 
 export interface CustomReportParamModel {

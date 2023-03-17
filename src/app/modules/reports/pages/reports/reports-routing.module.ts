@@ -10,6 +10,10 @@ const routes: Routes = [
   },  {
     path: 'debtor-latest-outstanding',
     loadChildren: () => import('./debtor-latest-outstanding/debtor-latest-outstanding.module').then( m => m.DebtorLatestOutstandingPageModule)
+  },
+  {
+    path: 'rp-so-listing',
+    loadChildren: () => import('./rp-so-listing/rp-so-listing.module').then( m => m.RpSoListingPageModule)
   }
 
 ];
