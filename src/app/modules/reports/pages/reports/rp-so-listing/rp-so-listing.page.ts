@@ -35,17 +35,21 @@ export class RpSoListingPage implements OnInit {
   }
 
   async downloadPdf(objectId: number) {
-    let paramModel: ReportParameterModel = {
-      appCode: 'SMSC002',
-      format: 'pdf',
-      documentIds: [objectId],
-      reportName: 'Sales Order'
+    try {
+      let paramModel: ReportParameterModel = {
+        appCode: 'SMSC002',
+        format: 'pdf',
+        documentIds: [objectId],
+        reportName: 'Sales Order'
+      }
+      this.reportService.getPdf(paramModel).subscribe(async response => {
+        await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
+      }, error => {
+        throw error;
+      })      
+    } catch (e) {
+      console.error(e);
     }
-    this.reportService.getPdf(paramModel).subscribe(async response => {
-      await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
-    }, error => {
-      console.log(error);
-    })
   }
 
 }

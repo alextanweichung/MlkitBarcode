@@ -8,6 +8,8 @@ import { ConfigService } from './services/config/config.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NotificationsService } from './shared/services/notifications.service';
 import OneSignal from 'onesignal-cordova-plugin';
+import { Badge } from '@ionic-native/badge/ngx';
+import { DashboardService } from './modules/dashboard/services/dashboard.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +25,9 @@ export class AppComponent {
     private router: Router,
     private configService: ConfigService,
     private navController: NavController,
-    private pushNotications: NotificationsService
+    private pushNotications: NotificationsService,
+    private badge: Badge,
+    private dashboardService: DashboardService
   ) {
     this.initializeApp();
   }
@@ -44,6 +48,7 @@ export class AppComponent {
       if (Capacitor.getPlatform() !== 'web') {
         // this.pushNotications.initPush();
         await OneSignalInit();
+        
         this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)p
         await StatusBar.setStyle({ style: Style.Dark });

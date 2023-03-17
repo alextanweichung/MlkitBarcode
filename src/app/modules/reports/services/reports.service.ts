@@ -4,6 +4,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
 import { DebtorOutstanding } from '../models/debtor-outstanding';
+import { SAPerformaceListing } from '../models/rp-sa-performace-listing';
 import { ReportSOListing } from '../models/rp-so-listing';
 
 @Injectable({
@@ -30,6 +31,10 @@ export class ReportsService {
 
   getSOListing() {
     return this.http.get<ReportSOListing[]>(this.baseUrl + "MobileReport/soListing");
+  }
+
+  getSAPerformance() {
+    return this.http.get<SAPerformaceListing[]>(this.baseUrl + "MobileReport/saPerformance");
   }
 
   getPdf(model: ReportParameterModel) {

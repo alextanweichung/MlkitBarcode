@@ -14,6 +14,10 @@ const routes: Routes = [
   {
     path: 'rp-so-listing',
     loadChildren: () => import('./rp-so-listing/rp-so-listing.module').then( m => m.RpSoListingPageModule)
+  },
+  {
+    path: 'rp-sa-performance-listing',
+    loadChildren: () => import('./rp-sa-performance-listing/rp-sa-performance-listing.module').then( m => m.RpSaPerformanceListingPageModule)
   }
 
 ];

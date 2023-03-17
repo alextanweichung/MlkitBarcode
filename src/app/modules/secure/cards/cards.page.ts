@@ -56,6 +56,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
     }
     this.authService.currentUserToken$.subscribe(obj => {
       let decodedToken = obj;
+      console.log("🚀 ~ file: cards.page.ts:59 ~ CardsPage ~ ngOnInit ~ decodedToken:", decodedToken)
       if (decodedToken != null) {
         this.loginName = decodedToken.unique_name;
         this.loginEmail = decodedToken.email;
