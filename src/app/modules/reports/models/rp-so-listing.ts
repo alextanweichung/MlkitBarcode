@@ -7,7 +7,8 @@ export interface ReportSOListing {
    orderStatus: string
    salesOrderNum: string
    salesOrderId: number
-   deliveryOrder: any
+   deliveryOrders: string
+   deliveryOrderIds: string
    delivered: string
    netAmount: number
  }

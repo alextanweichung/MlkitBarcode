@@ -52,4 +52,44 @@ export class RpSoListingPage implements OnInit {
     }
   }
 
+  doDialog: boolean = false;
+  deliveryOrderObject: string[] = [];
+  async showDialogOrDownload(deliveryOrders: string) {
+    console.log("🚀 ~ file: rp-so-listing.page.ts:58 ~ RpSoListingPage ~ showDialogOrDownload ~ deliveryOrders:", deliveryOrders)
+    this.deliveryOrderObject = []
+    try {
+      this.deliveryOrderObject = deliveryOrders.split(';');
+      console.log("🚀 ~ file: rp-so-listing.page.ts:61 ~ RpSoListingPage ~ showDialogOrDownload ~ this.objectIds:", this.deliveryOrderObject)
+      if (this.deliveryOrderObject && this.deliveryOrderObject.length === 1) {
+        await this.downloadDOPdf(Number(this.deliveryOrderObject[0].split('|')[1]));
+      } else {
+        this.showDoDialog();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  showDoDialog() {
+    this.doDialog = true;
+  }
+
+  hideDoDialog() {
+    this.doDialog = false;
+  }
+
+  downloadDOPdf(objectId: number|string) {
+    let paramModel: ReportParameterModel = {
+      appCode: 'WDOP001',
+      format: 'pdf',
+      documentIds: [Number(objectId)],
+      reportName: 'Delivery Order'
+    }
+    this.reportService.getPdf(paramModel).subscribe(async response => {
+      await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
+    }, error => {
+      throw error;
+    })
+  }
+
 }
