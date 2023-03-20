@@ -20,7 +20,8 @@ export class DashboardService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    console.log("🚀 ~ file: dashboard.service.ts:26 ~ DashboardService ~ this.configService.sys_parameter:", JSON.stringify(this.configService.sys_parameter))
+    this.baseUrl = this.configService.sys_parameter?.apiUrl;
   }
 
   getDashboard() {

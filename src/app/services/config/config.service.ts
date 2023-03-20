@@ -62,10 +62,12 @@ export class ConfigService {
   }
 
   async insert(object: Sys_Parameter) {
+    console.log("🚀 ~ file: config.service.ts:65 ~ ConfigService ~ insert ~ object:", JSON.stringify(object))
+    console.log("🚀 ~ file: config.service.ts:72 ~ ConfigService ~ insert ~ apiUrl:")
     try {
       this.sys_parameter = {
         Sys_ParameterId: 1,
-        apiUrl: object.apiUrl,
+        apiUrl: object?.apiUrl,
         imgUrl: object.imgUrl,
         lastDownloadAt: null,
       }
@@ -76,6 +78,7 @@ export class ConfigService {
   }
 
   async update(object: Sys_Parameter) {
+    console.log("🚀 ~ file: config.service.ts:81 ~ ConfigService ~ update ~ object:", JSON.stringify(object))
     try {
       this.sys_parameter = object;
       await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);      

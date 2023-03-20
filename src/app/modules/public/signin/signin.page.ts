@@ -37,7 +37,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
     private loadingService: LoadingService,
     private navController: NavController,
     private androidPermission: AndroidPermissions
-  ) { 
+  ) {
     this.currentVersion = environment.version;
   }
 
@@ -52,7 +52,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
       this.signin_form.get('password').setValue('String1234');
     }
   }
-  
+
   ngOnInit() {
     // Setup form
     this.signin_form = this.formBuilder.group({
@@ -79,17 +79,17 @@ export class SigninPage implements OnInit, ViewWillEnter {
     } else {
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {
-        await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           this.configService.sys_parameter.rememberMe = this.rememberMe;
           if (this.rememberMe) {
             this.configService.sys_parameter.username = this.signin_form.controls.userEmail.value;
             this.configService.sys_parameter.password = this.signin_form.controls.password.value;
-            await this.configService.update(this.configService.sys_parameter);
           } else {
             this.configService.sys_parameter.username = '';
             this.configService.sys_parameter.password = '';
           }
+          await this.configService.update(this.configService.sys_parameter);
+          await this.navController.navigateRoot('/dashboard');
           try {
             await this.loadingService.showLoading("Syncing Offline Table");
             let response = await this.commonService.syncInbound();
@@ -98,7 +98,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
             await this.configService.syncInboundData(itemMaster, itemBarcode);
             // await this.configService.loadItemMaster();
             // await this.configService.loadItemBarcode();
-            await this.loadingService.dismissLoading();       
+            await this.loadingService.dismissLoading();
           } catch (error) {
             await this.loadingService.dismissLoading();
             this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);

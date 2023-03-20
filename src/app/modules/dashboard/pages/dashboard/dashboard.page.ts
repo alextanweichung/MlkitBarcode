@@ -57,14 +57,6 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   ionViewDidEnter(): void {
     try {
       this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  ionViewWillEnter(): void {
-    try {
-      this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
       this.loadAnnouncements();
     } catch (e) {
       console.error(e);

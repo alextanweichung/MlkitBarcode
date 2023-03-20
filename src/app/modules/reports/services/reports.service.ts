@@ -18,6 +18,7 @@ export class ReportsService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
+    console.log("🚀 ~ file: reports.service.ts:22 ~ ReportsService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

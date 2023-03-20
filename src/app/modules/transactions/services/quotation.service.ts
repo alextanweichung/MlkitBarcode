@@ -29,6 +29,7 @@ export class QuotationService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
+    console.log("🚀 ~ file: quotation.service.ts:33 ~ QuotationService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
