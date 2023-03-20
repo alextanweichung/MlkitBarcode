@@ -49,7 +49,7 @@ export class ItemCodeInputOfflinePage implements OnInit {
           let found_item_master = await this.configService.item_Masters.find(r => found_item_code.id === r.id);
           let found_item_barcode = await this.configService.item_Barcodes.filter(r => r.itemId === found_item_master.id);
           found_item_barcode.forEach(async r => {
-            if (this.availableItems.findIndex(rr => rr.itemId === r.itemId) < 0) {
+            if (this.availableItems.findIndex(rr => rr.itemSku === r.sku) < 0) {
               let outputData: TransactionDetail = {
                 itemId: found_item_master.id,
                 itemCode: found_item_master.code,
