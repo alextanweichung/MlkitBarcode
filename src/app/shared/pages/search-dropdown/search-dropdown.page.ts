@@ -16,6 +16,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   @Input() showCode: boolean = false;
   @Input() searchDropdownList: SearchDropdownList[];
   @Input() emptyMessage: string = 'No results found';
+  @Input() disabled: boolean = false;
   @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();
   tempDropdownList: SearchDropdownList[];
   @Input() selectedId: number;
