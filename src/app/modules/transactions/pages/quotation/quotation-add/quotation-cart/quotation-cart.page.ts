@@ -127,6 +127,7 @@ export class QuotationCartPage implements OnInit {
       let restrictedObject = {};
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
+        console.log("🚀 ~ file: quotation-cart.page.ts:130 ~ QuotationCartPage ~ loadRestrictColumms ~ obj:", obj)
         // let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
         // apiData.forEach(element => {
         //   Object.keys(this.objectForm.controls).forEach(ctrl => {
@@ -137,11 +138,12 @@ export class QuotationCartPage implements OnInit {
         // });
         // this.restrictFields = restrictedObject;
   
-        let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
+        let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "QuotationLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
         });
         this.restrictTrxFields = restrictedTrx;
+        console.log("🚀 ~ file: quotation-cart.page.ts:145 ~ QuotationCartPage ~ loadRestrictColumms ~ this.restrictTrxFields:", this.restrictTrxFields)
       })      
     } catch (e) {
       console.error(e);
