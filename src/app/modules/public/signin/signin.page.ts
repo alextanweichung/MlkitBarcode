@@ -77,8 +77,10 @@ export class SigninPage implements OnInit, ViewWillEnter {
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
     } else {
+      console.log("🚀 ~ file: signin.page.ts:83 ~ SigninPage ~ Capacitor.getPlatform():", Capacitor.getPlatform())
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {
+        await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           this.configService.sys_parameter.rememberMe = this.rememberMe;
           if (this.rememberMe) {
@@ -89,7 +91,6 @@ export class SigninPage implements OnInit, ViewWillEnter {
             this.configService.sys_parameter.password = '';
           }
           await this.configService.update(this.configService.sys_parameter);
-          await this.navController.navigateRoot('/dashboard');
           try {
             await this.loadingService.showLoading("Syncing Offline Table");
             let response = await this.commonService.syncInbound();

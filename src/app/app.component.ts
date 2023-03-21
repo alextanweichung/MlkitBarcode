@@ -33,6 +33,7 @@ export class AppComponent {
 
     // Wait until platform is ready
     this.platform.ready().then(async () => {
+      
       if (this.configService.sys_parameter) {
         this.navController.navigateRoot('/signin');
       } else {
