@@ -1,5 +1,5 @@
 export const dbConfig = {
-   idcpcore: 'idcpccore',
+   idcpcore: 'idcpcore',
    inbounddb: 'inbounddb'
 }
 
