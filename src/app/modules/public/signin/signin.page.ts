@@ -48,7 +48,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
       this.signin_form.get('password').setValue(this.configService.sys_parameter.password);
     }
     if (Capacitor.getPlatform() === 'web') {
-      this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+      this.signin_form.get('userEmail').setValue('aychiapos@idcp.my');
       this.signin_form.get('password').setValue('String1234');
     }
   }

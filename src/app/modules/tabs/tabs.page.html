@@ -7,12 +7,12 @@
       <ion-label>Home</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="transactions" [disabled]="!(showQuotation || showSalesOrder || showPicking || showPacking || showConsignmentSales || showStockCount || showInventoryLevel)">
+    <ion-tab-button tab="transactions" [disabled]="!showTrxTab">
       <ion-icon name="pie-chart"></ion-icon>
       <ion-label>Transaction</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="managements" [disabled]="!(showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseOrderReview || showPurchaseOrderApproval || showOtpConfig)">
+    <ion-tab-button tab="managements" [disabled]="!showMagTab">
       <ion-icon name="clipboard-outline"></ion-icon>
       <ion-label>Management</ion-label>
     </ion-tab-button>
@@ -21,7 +21,7 @@
     <!-- <ion-tab-button class="ion-tab-button-placeholder">
     </ion-tab-button> -->
 
-    <ion-tab-button tab="reports">
+    <ion-tab-button tab="reports" [disabled]="!showRepTab">
       <ion-icon name="book-outline"></ion-icon>
       <ion-label>Report</ion-label>
     </ion-tab-button>

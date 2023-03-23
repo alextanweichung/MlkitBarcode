@@ -62,8 +62,6 @@ export class ConfigService {
   }
 
   async insert(object: Sys_Parameter) {
-    console.log("🚀 ~ file: config.service.ts:65 ~ ConfigService ~ insert ~ object:", JSON.stringify(object))
-    console.log("🚀 ~ file: config.service.ts:72 ~ ConfigService ~ insert ~ apiUrl:")
     try {
       this.sys_parameter = {
         Sys_ParameterId: 1,

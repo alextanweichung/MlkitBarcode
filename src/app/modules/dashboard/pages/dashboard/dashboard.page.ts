@@ -9,19 +9,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 import { NotificationHistory } from '../../models/notification-history';
-// import { Badge } from '@ionic-native/badge/ngx'
-
-const managementPageCode: string = 'MAAP';
-const quotationReviewCode: string = 'MAQURV';
-const quotationApprovalCode: string = 'MAQUAP';
-const salesOrderReviewCode: string = 'MASORV';
-const salesOrderApprovalCode: string = 'MASOAP';
-const purchaseOrderReviewCode: string = 'MAPORV';
-const purchaseOrderApprovalCode: string = 'MAPOAP';
-
-const transactionPageCode: string = 'MATR';
-const mobileQuotationCode: string = 'MATRQU';
-const mobileSalesOrderCode: string = 'MATRSO';
+import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/acl-const';
 
 @Component({
   selector: 'app-dashboard',
@@ -66,20 +54,22 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   ngOnInit() {
     try {
       this.authService.menuModel$.subscribe(obj => {
-        let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === managementPageCode);
-        if (mPageItems) {
-          this.showQuotationReview = mPageItems.findIndex(r => r.title === quotationReviewCode) > -1;
-          this.showQuotationApproval = mPageItems.findIndex(r => r.title === quotationApprovalCode) > -1;
-          this.showSalesOrderReview = mPageItems.findIndex(r => r.title === salesOrderReviewCode) > -1;
-          this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === salesOrderApprovalCode) > -1;
-          this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === purchaseOrderReviewCode) > -1;
-          this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === purchaseOrderApprovalCode) > -1;
-        }
-  
-        let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === transactionPageCode);
-        if (tPageItems) {
-          this.showQuotation = tPageItems.findIndex(r => r.title === mobileQuotationCode) > -1;
-          this.showSalesOrder = tPageItems.findIndex(r => r.title === mobileSalesOrderCode) > -1;
+        if (obj) {
+          let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.approval);
+          if (mPageItems) {
+            this.showQuotationReview = mPageItems.findIndex(r => r.title === approvalAppCode.quotationRV) > -1;
+            this.showQuotationApproval = mPageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
+            this.showSalesOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
+            this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+            this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
+            this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
+          }
+
+          let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction);
+          if (tPageItems) {
+            this.showQuotation = tPageItems.findIndex(r => r.title === trxAppCode.mobileQuotation) > -1;
+            this.showSalesOrder = tPageItems.findIndex(r => r.title === trxAppCode.mobileSalesOrder) > -1;
+          }
         }
       })
       this.loadAnnouncements();
