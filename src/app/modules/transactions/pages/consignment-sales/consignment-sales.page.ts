@@ -44,17 +44,6 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    try {
-      if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
-      }
-      if (!this.endDate) {
-        this.endDate = this.commonService.getTodayDate();
-      }
-      this.loadObjects();
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   /* #region  crud */

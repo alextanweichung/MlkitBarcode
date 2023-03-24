@@ -20,6 +20,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 })
 export class SigninPage implements OnInit, ViewWillEnter {
 
+  companyName: string;
   current_year: number = new Date().getFullYear();
   currentVersion: string;
 
@@ -48,17 +49,26 @@ export class SigninPage implements OnInit, ViewWillEnter {
       this.signin_form.get('password').setValue(this.configService.sys_parameter.password);
     }
     if (Capacitor.getPlatform() === 'web') {
-      this.signin_form.get('userEmail').setValue('aychiapos@idcp.my');
+      this.signin_form.get('userEmail').setValue('aychiacon@idcp.my');
       this.signin_form.get('password').setValue('String1234');
     }
   }
 
   ngOnInit() {
     // Setup form
+    this.loadCompanyName();
     this.signin_form = this.formBuilder.group({
       userEmail: ['', Validators.compose([Validators.email, Validators.required])],
       password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
+  }
+
+  loadCompanyName() {
+    this.authService.getCompanyName().subscribe(response => {
+      this.companyName = response.name;
+    }, error => {
+      console.error(error);
+    })
   }
 
   // Sign in

@@ -264,5 +264,10 @@ export class AuthService {
     // Navigate to sign-in
     this.navController.navigateRoot('/signin');
   }
+
+  getCompanyName() {
+    return this.http.get<any>(this.baseUrl + "account/CompanyName");
+  }
+
 }
 
