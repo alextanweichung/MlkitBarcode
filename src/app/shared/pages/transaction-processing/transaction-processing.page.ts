@@ -36,6 +36,7 @@ export class TransactionProcessingPage implements OnInit {
     try {
       const alert = await this.alertController.create({
         cssClass: 'custom-alert',
+        backdropDismiss: false,
         header: 'Are you sure to ' + action + ' ' + docNum + '?',
         inputs: [
           {

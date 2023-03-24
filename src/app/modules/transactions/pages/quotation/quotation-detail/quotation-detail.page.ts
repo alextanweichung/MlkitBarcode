@@ -214,6 +214,7 @@ export class QuotationDetailPage implements OnInit {
       if (this.processType && this.selectedSegment) {
         const alert = await this.alertController.create({
           cssClass: 'custom-alert',
+          backdropDismiss: false,
           header: 'Are you sure to ' + action + ' ' + this.object.header.quotationNum + '?',
           inputs: [
             {

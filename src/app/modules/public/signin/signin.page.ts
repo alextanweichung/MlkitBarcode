@@ -66,7 +66,6 @@ export class SigninPage implements OnInit, ViewWillEnter {
     this.submit_attempt = true;
     if (Capacitor.getPlatform() !== 'web') {
       OneSignal.getDeviceState(function (stateChanges) {
-        console.log("🚀 ~ file: signin.page.ts:67 ~ SigninPage ~ stateChanges:", JSON.stringify(stateChanges))
         localStorage.setItem('player_Id', stateChanges.userId);
       });
     } else {
@@ -77,7 +76,6 @@ export class SigninPage implements OnInit, ViewWillEnter {
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
     } else {
-      console.log("🚀 ~ file: signin.page.ts:83 ~ SigninPage ~ Capacitor.getPlatform():", Capacitor.getPlatform())
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {
         await this.navController.navigateRoot('/dashboard');
@@ -95,7 +93,9 @@ export class SigninPage implements OnInit, ViewWillEnter {
             await this.loadingService.showLoading("Syncing Offline Table");
             let response = await this.commonService.syncInbound();
             let itemMaster: PDItemMaster[] = response['itemMaster'];
+            console.log("🚀 ~ file: signin.page.ts:96 ~ SigninPage ~ itemMaster:", itemMaster.length)
             let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+            console.log("🚀 ~ file: signin.page.ts:98 ~ SigninPage ~ itemBarcode:", itemBarcode.length)
             await this.configService.syncInboundData(itemMaster, itemBarcode);
             // await this.configService.loadItemMaster();
             // await this.configService.loadItemBarcode();
