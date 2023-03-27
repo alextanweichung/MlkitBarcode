@@ -16,7 +16,7 @@
     <ion-list class="list-custom" lines="none">
       <app-calendar-input title="Trx Date" (onDateSelected)="onTrxDateSelected($event)"></app-calendar-input>
       <!-- <app-search-dropdown title="Customer" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerChanged($event)"></app-search-dropdown> -->
-      <app-search-dropdown #locationSearchDropdown title="Location" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" optionLabel="description" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="onLocationChanged($event)" [selectedId]="objectForm.controls.toLocationId.value"></app-search-dropdown>
+      <app-search-dropdown #locationSearchDropdown title="Location" optionLabel="description" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="onLocationChanged($event)" [selectedId]="objectForm.controls.toLocationId.value"></app-search-dropdown>
     </ion-list>
   </div>
 </ion-content>

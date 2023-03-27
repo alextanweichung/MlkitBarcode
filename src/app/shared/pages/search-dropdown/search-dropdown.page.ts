@@ -10,10 +10,10 @@ import { SearchDropdownList } from '../../models/search-dropdown-list';
 export class SearchDropdownPage implements OnInit, OnChanges {
 
   @Input() title: string = "Search";
-  @Input() showHeaderLabel: boolean = true;
-  @Input() showBoldHeader: boolean = false;
+  // @Input() showHeaderLabel: boolean = true;
+  // @Input() showBoldHeader: boolean = false;
   @Input() optionLabel: string = 'description';
-  @Input() showCode: boolean = false;
+  // @Input() showCode: boolean = false;
   @Input() searchDropdownList: SearchDropdownList[];
   @Input() emptyMessage: string = 'No results found';
   @Input() disabled: boolean = false;

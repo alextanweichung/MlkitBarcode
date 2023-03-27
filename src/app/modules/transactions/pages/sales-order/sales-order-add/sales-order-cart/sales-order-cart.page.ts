@@ -372,6 +372,19 @@ export class SalesOrderCartPage implements OnInit {
     }
   }
 
+  getPromoDesc(promoEventId: number) {
+    if (this.promotionMaster.length > 0) {
+      let find = this.promotionMaster.find(x => x.promoEventId == promoEventId);
+      if (find) {
+        return find.description;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   /* #endregion */
 
   /* #region  step */

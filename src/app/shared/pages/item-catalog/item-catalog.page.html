@@ -22,14 +22,21 @@
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
-              <ion-col>{{item.description}}</ion-col>
+              <ion-col>
+                <div>{{item.description}}</div>
+              </ion-col>
             </ion-row>
             <ion-row class="pb-1">
               <ion-col>
                 U/P: <div class="font-bold ml-2">{{item.unitPrice|number:'1.2-2'}}</div>
               </ion-col>
-              <ion-col>
+              <ion-col *ngIf="item?.availableQty > 0">
                 Qty: <div class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
+              <ion-col>
+                <div>Discount: [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}</div>
               </ion-col>
             </ion-row>
             <ion-row *ngIf="item.variationTypeCode === '0'">
@@ -99,8 +106,13 @@
               <ion-col>
                 U/P: <div class="font-bold ml-2">{{item.unitPrice|number:'1.2-2'}}</div>
               </ion-col>
-              <ion-col>
+              <ion-col *ngIf="item?.availableQty > 0">
                 Qty: <div class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
+              <ion-col>
+                <div>Discount: [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}</div>
               </ion-col>
             </ion-row>
             <ion-row *ngIf="item.qtyRequest > 0">
