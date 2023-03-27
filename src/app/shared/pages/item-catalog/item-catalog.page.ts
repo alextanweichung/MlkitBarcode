@@ -9,6 +9,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterList } from '../../models/master-list';
 import { MasterListDetails } from '../../models/master-list-details';
 import { ModuleControl } from '../../models/module-control';
+import { PrecisionList } from '../../models/precision-list';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
@@ -25,6 +26,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   @Input() locationId: number;
   @Input() fullMasterList: MasterList[] = [];
   @Input() useTax: boolean;
+  @Input() objectHeader: any;
+  @Input() precisionSales: PrecisionList;
   @Input() isItemPriceTaxInclusive: boolean;
   @Input() maxPrecision: number;
   @Input() showImage: boolean = false;

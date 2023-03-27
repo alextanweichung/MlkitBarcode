@@ -102,12 +102,12 @@
               <div class="font-bold">{{item.itemCode}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row class="pb-1">
             <ion-col>
               <div class="ion-text-wrap">{{item.description}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row class="pb-1">
             <ion-col>
               <div>Total Quantity</div>
             </ion-col>
@@ -115,59 +115,44 @@
               <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} <ion-icon *ngIf="item.variationTypeCode !== '0'" name="information-circle-outline"></ion-icon></div>              
             </ion-col>
           </ion-row>
-
-          <ion-row class="pt-1">
-            <ion-col *ngIf="item.discountGroupCode">
-              <div class="font-bold ion-text-center">
+          
+          <ion-row>
+            <ion-col>
+              <div class="font-bold">
+                Unit Price
+              </div>
+            </ion-col>
+            <ion-col>
+              <div class="font-bold">
                 Disc. Code
               </div>
             </ion-col>
-            <ion-col *ngIf="item.discountExpression">
-              <div class="font-bold ion-text-center">
-                Disc. Expr.
-              </div>
-            </ion-col>
-            <ion-col *ngIf="item.discountAmt || item.discountAmtExTax">
-              <div class="font-bold ion-text-center">
+            <ion-col>
+              <div class="font-bold">
                 Disc. Amt.
               </div>
             </ion-col>
-            <ion-col *ngIf="item.taxAmt">
-              <div class="font-bold ion-text-center">
-                Tax Amt. ({{item.taxPct+'%'}})
-              </div>
-            </ion-col>
-            <ion-col *ngIf="item.subTotalExTax">
-              <div class="font-bold ion-text-center">
-                SubTotal Ex. Tax
-              </div>
-            </ion-col>
-            <ion-col *ngIf="item.subTotal">
-              <div class="font-bold ion-text-center">
+            <ion-col>
+              <div class="font-bold">
                 SubTotal
               </div>
             </ion-col>
           </ion-row>
 
-          <ion-row>
-            <ion-col *ngIf="item.discountGroupCode">
-              <div class="ion-text-center">{{item.discountGroupCode}}</div>
+          <ion-row class="pb-1">
+            <ion-col>
+              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
+              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
             </ion-col>
-            <ion-col *ngIf="item.discountExpression">
-              <div class="ion-text-center">{{item.discountExpression}}</div>
+            <ion-col>
+              <div>{{item.discountGroupCode}}</div>
             </ion-col>
-            <ion-col *ngIf="item.discountAmt || item.discountAmtExTax">
-              <div class="ion-text-center" *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt}}</div>
-              <div class="ion-text-center" *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax}}</div>
+            <ion-col>
+              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
-            <ion-col *ngIf="item.taxAmt">
-              <div class="ion-text-center">{{item.taxAmt|number: (object?.header?.isHomeCurrency ? precisionTax.localFormat : precisionTax.foreignFormat)}}</div>
-            </ion-col>
-            <ion-col *ngIf="item.subTotalExTax">
-              <div class="ion-text-center">{{item.subTotalExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-            </ion-col>
-            <ion-col *ngIf="item.subTotal">
-              <div class="ion-text-center">{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            <ion-col>
+              <div>{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

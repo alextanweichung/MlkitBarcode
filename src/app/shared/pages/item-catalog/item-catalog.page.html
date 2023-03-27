@@ -28,7 +28,9 @@
             </ion-row>
             <ion-row class="pb-1">
               <ion-col>
-                U/P: <div class="font-bold ml-2">{{item.unitPrice|number:'1.2-2'}}</div>
+                U/P:
+                <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
               <ion-col *ngIf="item?.availableQty > 0">
                 Qty: <div class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
