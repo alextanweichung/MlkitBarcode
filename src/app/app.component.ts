@@ -33,7 +33,8 @@ export class AppComponent {
 
     // Wait until platform is ready
     this.platform.ready().then(async () => {
-
+      await this.configService.load();
+      
       if (this.configService.sys_parameter) {
         this.navController.navigateRoot('/signin');
       } else {
@@ -44,6 +45,7 @@ export class AppComponent {
       if (Capacitor.getPlatform() !== 'web') {
         // this.pushNotications.initPush();
         await OneSignalInit();
+        
         this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)p
         await StatusBar.setStyle({ style: Style.Dark });

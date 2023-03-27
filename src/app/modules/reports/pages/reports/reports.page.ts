@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
@@ -9,10 +10,15 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 export class ReportsPage implements OnInit {
 
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
+    private navController: NavController,
   ) { }
 
   ngOnInit() {
+  }
+
+  goToReport(link: string) {
+    this.navController.navigateRoot(`/reports/${link}`);
   }
 
 }

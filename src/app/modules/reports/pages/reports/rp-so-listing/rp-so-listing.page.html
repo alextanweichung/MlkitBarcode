@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>SO Listing</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="p-2" style="overflow:auto">
+      <table id="qtyMatrix" *ngIf="objects.length > 0">
+        <tr>
+          <th class="p-1 font-half-size">Issued Date</th>
+          <th class="p-1 font-half-size">Debtor Code</th>
+          <th class="p-1 font-half-size">Debtor Name</th>
+          <th class="p-1 font-half-size">Salesman</th>
+          <th class="p-1 font-half-size">Online Order</th>
+          <th class="p-1 font-half-size">Order Status</th>
+          <th class="p-1 font-half-size">Sales Order</th>
+          <th class="p-1 font-half-size">Delivery Order</th>
+          <th class="p-1 font-half-size">Delivered</th>
+          <th class="p-1 font-half-size">Net Amount</th>
+        </tr>
+        <tr *ngFor="let rowData of objects; let rowIndex = index">
+          <td class="p-1 font-half-size">{{rowData.issuedDate|date:'dd/MM/yyyy'}}</td>
+          <td class="p-1 font-half-size">{{rowData.debtorCode}}</td>
+          <td class="p-1 font-half-size">{{rowData.debtorName}}</td>
+          <td class="p-1 font-half-size">{{rowData.salesmanName}}</td>
+          <td class="p-1 font-half-size">{{rowData.onlineOrder}}</td>
+          <td class="p-1 font-half-size">{{rowData.orderStatus}}</td>
+          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf(rowData.salesOrderId)">{{rowData.salesOrderNum}}</ion-button></td>
+          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="showDialogOrDownload(rowData.deliveryOrderIds)">{{rowData.deliveryOrders?.replace('|', ', ')}}</ion-button></td>
+          <td class="p-1 font-half-size">{{rowData.delivered}}</td>
+          <td class="p-1 font-half-size ion-text-right">{{rowData.netAmount|number:'1.2-2'}}</td>
+        </tr>
+      </table>
+  </div>
+</ion-content>
+
+<ion-modal [isOpen]="doDialog" (didDismiss)="doDialog = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Delivery Orders</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideDoDialog()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="p-2">
+        <ion-list-header class="ion-list-header-small" *ngIf="!deliveryOrderObject">
+          <ion-label>Delivery Orders not available.</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom" lines="none">          
+          <ion-item button="false" *ngFor="let dOrder of deliveryOrderObject">
+            <ion-grid class="p-1">
+              <ion-row>
+                <ion-col>
+                  <div>{{dOrder.split('|')[0]}}</div>
+                </ion-col>
+                <ion-col>
+                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="downloadDOPdf(dOrder.split('|')[1])">Download</ion-button></div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

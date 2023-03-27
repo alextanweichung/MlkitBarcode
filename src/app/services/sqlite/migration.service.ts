@@ -55,8 +55,9 @@ CREATE TABLE IF NOT EXISTS Item_Barcode (
   barcode VARCHAR(255),
   sku VARCHAR(255),
   qty DECIMAL(6,0),
-  transitQty DECIMAL(6,0)
-);`;
+  transitQty DECIMAL(6,0),
+  isOther VARCHAR(20)
+); `;
 
 export const delete_inbound_tables: string = `
 DROP TABLE IF EXISTS Item_Master;

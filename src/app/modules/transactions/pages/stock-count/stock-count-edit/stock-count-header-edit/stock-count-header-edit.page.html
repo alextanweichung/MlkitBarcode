@@ -23,8 +23,8 @@
         <ion-label class="font-bold" position="stacked">Inventory Count Batch</ion-label>
         <ion-input [value]="inventoryCount?.header?.inventoryCountNum" readonly></ion-input>
       </ion-item>
-      <app-search-dropdown #rackSsd title="Rack" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="rackSearchDdl" (onActionComplete)="onRackChanged($event)" [selectedId]="inventoryCount?.header?.rackId"></app-search-dropdown>
-      <app-search-dropdown #zoneSsd title="Zone" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="zoneSearchDdl" (onActionComplete)="onZoneChanged($event)" [selectedId]="inventoryCount?.header?.zoneId"></app-search-dropdown>
+      <app-search-dropdown #rackSsd title="Rack" optionLabel="description" [searchDropdownList]="rackSearchDdl" (onActionComplete)="onRackChanged($event)" [selectedId]="inventoryCount?.header?.rackId"></app-search-dropdown>
+      <app-search-dropdown #zoneSsd title="Zone" optionLabel="description" [searchDropdownList]="zoneSearchDdl" (onActionComplete)="onZoneChanged($event)" [selectedId]="inventoryCount?.header?.zoneId"></app-search-dropdown>
     </ion-list>
   </div>
 </ion-content>

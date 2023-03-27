@@ -10,6 +10,7 @@ import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { QuotationRoot } from '../../../models/quotation';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 @Component({
   selector: 'app-quotation-detail',
@@ -126,12 +127,34 @@ export class QuotationDetailPage implements OnInit {
     }
   }
 
+  /* #region show variaton dialog */
+
+  variationDialog: boolean = false;
+  showVariationDialog() {
+    this.variationDialog = true;
+  }
+
+  hideVariationDialog() {
+    this.selectedItem = null;
+    this.variationDialog = false;
+  }
+
+  selectedItem: TransactionDetail;
+  showDetails(item: TransactionDetail) {
+    if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
+      this.selectedItem = item;
+      this.showVariationDialog();
+    }
+  }
+
+  /* #endregion */
+
   /* #region history modal */
 
   historyModal: boolean = false;
   showHistoryModal() {
     try {
-      this.historyModal = true;      
+      this.historyModal = true;
     } catch (e) {
       console.error(e);
     }
@@ -199,7 +222,7 @@ export class QuotationDetailPage implements OnInit {
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
-      this.isPopoverOpen = true;      
+      this.isPopoverOpen = true;
     } catch (e) {
       console.error(e);
     }
@@ -214,6 +237,7 @@ export class QuotationDetailPage implements OnInit {
       if (this.processType && this.selectedSegment) {
         const alert = await this.alertController.create({
           cssClass: 'custom-alert',
+          backdropDismiss: false,
           header: 'Are you sure to ' + action + ' ' + this.object.header.quotationNum + '?',
           inputs: [
             {
@@ -250,7 +274,7 @@ export class QuotationDetailPage implements OnInit {
         await alert.present();
       } else {
         this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
-      }      
+      }
     } catch (e) {
       console.error(e);
     }

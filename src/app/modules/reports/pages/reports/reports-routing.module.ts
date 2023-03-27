@@ -7,11 +7,7 @@ const routes: Routes = [
   {
     path: '',
     component: ReportsPage
-  },  {
-    path: 'debtor-latest-outstanding',
-    loadChildren: () => import('./debtor-latest-outstanding/debtor-latest-outstanding.module').then( m => m.DebtorLatestOutstandingPageModule)
   }
-
 ];
 
 @NgModule({

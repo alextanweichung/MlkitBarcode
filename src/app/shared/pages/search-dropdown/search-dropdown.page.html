@@ -1,6 +1,8 @@
-<ion-item (click)="showModal()" lines="none">
-  <ion-label [ngStyle]="{'font-weight': showBoldHeader ? 'bold' : ''}" *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
-  <ion-input [placeholder]="'Select ' + title" [value]="selected ? ((showCode ? selected?.code + ' - ' : '') + selected?.[optionLabel]) : null" readonly></ion-input>
+
+<ion-label class="ion-flex mt-2 ml-4" [ngStyle]="{'font-weight': 'bold'}" position="stacked">{{title}}</ion-label>
+<ion-item (click)="showModal()" lines="none" [disabled]="disabled">
+  <ion-badge slot="start" *ngIf="selected && selected?.code">{{selected?.code}}</ion-badge>
+  <ion-input class="ml-2" [placeholder]="'Select ' + title" [value]="selected ? (selected?.[optionLabel]) : null" readonly></ion-input>
 </ion-item>
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
@@ -19,12 +21,13 @@
       <div class="p-2">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none" *ngIf="tempDropdownList.length > 0">
           <ion-item button detail="false" *ngFor="let item of tempDropdownList" (click)="chooseThis(item)">
-            <ion-label><b *ngIf="showCode">{{item?.code}} - </b>  {{item?.description}}</ion-label>
+            <ion-badge slot="start" *ngIf="item?.code">{{item?.code}}</ion-badge>
+            <ion-label class="ml-2">{{item?.description}}</ion-label>
           </ion-item>
         </ion-list>
-          <div *ngIf="tempDropdownList.length === 0 && emptyMessage.length > 0">
-            {{emptyMessage}}
-          </div>          
+        <div class="ml-2" *ngIf="tempDropdownList.length === 0 && emptyMessage.length > 0">
+          {{emptyMessage}}
+        </div>
       </div>
     </ion-content>
   </ng-template>

@@ -100,6 +100,9 @@ export class WelcomePage implements OnInit, AfterContentChecked {
             let config: Sys_Parameter = {
               Sys_ParameterId: 1,
               apiUrl: response.fields.url.stringValue,
+              rememberMe: false,
+              username: '',
+              password: ''
             }
             await this.configService.insert(config).then(async response => {
               await this.loadingService.dismissLoading();

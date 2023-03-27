@@ -45,14 +45,13 @@ export class CardsPage implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit(): void {
-    console.log("🚀 ~ file: cards.page.ts:48 ~ CardsPage ~ ngOnInit ~ localStorage.getItem('loginUser'):", JSON.parse(localStorage.getItem('loginUser')))
     let loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    if (loginUser.procurementAgentId) {
-      this.userType = "Retail";
-    } else if (loginUser.salesAgentId) {
-      this.userType = "Trading";
-    } else if (loginUser.warehouseAgentId) {
-      this.userType = "Warehouse";
+    if (loginUser.loginUserType === 'B') {
+      this.userType = "Base User";
+    } else if (loginUser.loginUserType === 'C') {
+      this.userType = "Consignment User";
+    } else if (loginUser.loginUserType === 'P') {
+      this.userType = "POS User";
     }
     this.authService.currentUserToken$.subscribe(obj => {
       let decodedToken = obj;

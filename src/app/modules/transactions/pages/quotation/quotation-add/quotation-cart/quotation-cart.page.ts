@@ -127,17 +127,7 @@ export class QuotationCartPage implements OnInit {
       let restrictedObject = {};
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
-        // let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
-        // apiData.forEach(element => {
-        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
-        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
-        //       restrictedObject[ctrl] = true;
-        //     }
-        //   });
-        // });
-        // this.restrictFields = restrictedObject;
-  
-        let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
+        let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "QuotationLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
         });
@@ -169,6 +159,7 @@ export class QuotationCartPage implements OnInit {
   selectedItem: TransactionDetail;
   showEditModal(data: TransactionDetail) {
     this.selectedItem = data;
+    console.log("🚀 ~ file: quotation-cart.page.ts:163 ~ QuotationCartPage ~ showEditModal ~ this.selectedItem:", this.selectedItem)
     this.isModalOpen = true;
   }
 
@@ -363,6 +354,19 @@ export class QuotationCartPage implements OnInit {
       }
     } catch (e) {
       console.error(e);
+    }
+  }  
+
+  getPromoDesc(promoEventId: number) {
+    if (this.promotionMaster.length > 0) {
+      let find = this.promotionMaster.find(x => x.promoEventId == promoEventId);
+      if (find) {
+        return find.description;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
     }
   }
 

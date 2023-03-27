@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController } from '@ionic/angular';
 import { format } from 'date-fns';
+import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -20,7 +21,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private consignmentSalesService: ConsignmentSalesService,
+    private objectService: ConsignmentSalesService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private formBuilder: FormBuilder
@@ -52,6 +53,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   ngOnInit() {
     this.loadModuleControl();
+    this.loadConsignmentLocation();
     this.loadMasterList();
   }
 
@@ -68,16 +70,30 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     }
   }
 
+  locationList: ConsignmentSalesLocation[] = [];
+  loadConsignmentLocation() {
+    try {
+      this.objectService.getConsignmentLocation().subscribe(response => {
+        this.locationList = response;
+        this.mapLocationList();
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   salesAgentMasterList: MasterListDetails[] = [];
   customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
+  // locationMasterList: MasterListDetails[] = [];
   currencyMasterList: MasterListDetails[] = [];
   loadMasterList() {
     try {
-      this.consignmentSalesService.getMasterList().subscribe(response => {
+      this.objectService.getMasterList().subscribe(response => {
         this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.attribute5 === "C").filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        // this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.mapMasterListSearchDropdownList();
       }, error => {
@@ -88,8 +104,22 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     }
   }
 
-  customerSearchDropdownList: SearchDropdownList[] = [];
   locationSearchDropdownList: SearchDropdownList[] = [];
+  mapLocationList() {
+    try {
+      this.locationList.forEach(r => {
+        this.locationSearchDropdownList.push({
+          id: r.locationId,
+          code: r.locationCode,
+          description: r.locationDescription
+        })
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  customerSearchDropdownList: SearchDropdownList[] = [];
   salesAgentSearchDropdownList: SearchDropdownList[] = [];
   mapMasterListSearchDropdownList() {
     try {
@@ -107,13 +137,6 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
           description: r.description
         })
       })
-      this.locationMasterList.forEach(r => {
-        this.locationSearchDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
     } catch (e) {
       console.error(e);
     }
@@ -125,21 +148,16 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     }
   }
 
-  onCustomerChanged(event) {
+  onCustomerChanged(customerId: number) {
     try {
-      if (event) {
-        let lookupValue = this.customerMasterList.find(r => r.id === event.id);
+      if (customerId) {
+        let lookupValue = this.customerMasterList.find(r => r.id === customerId);
         if (lookupValue) {
           this.objectForm.patchValue({ customerId: lookupValue.id });
           this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
-          let selectedCustomerLocationList: MasterListDetails[] = [];
-          if (lookupValue.attributeArray1.length > 0) {
-            selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
-          }
           this.objectForm.patchValue({
             salesAgentId: parseFloat(lookupValue.attribute1),
             currencyId: parseFloat(lookupValue.attribute4),
-            toLocationId: null,
             isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
             isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
           });
@@ -148,17 +166,6 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
             this.objectForm.controls.toLocationId.clearValidators();
             this.objectForm.controls.toLocationId.updateValueAndValidity();
           }
-          if (lookupValue.attributeArray1.length == 1) {
-            this.objectForm.patchValue({ toLocationId: selectedCustomerLocationList[0].id });
-          }
-          this.locationSearchDropdownList = [];
-          selectedCustomerLocationList.forEach(r => {
-            this.locationSearchDropdownList.push({
-              id: r.id,
-              code: r.code,
-              description: r.description
-            })
-          })
         }
       }
     } catch (e) {
@@ -190,6 +197,10 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   onLocationChanged(event) {
     if (event) {
+      let customerId = this.locationList.find(r => r.locationId === event.id)?.customerId;
+      if (customerId) {
+        this.onCustomerChanged(customerId)
+      }
       this.objectForm.patchValue({ toLocationId: event.id });
     }
   }
@@ -214,7 +225,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
       const { role } = await actionSheet.onWillDismiss();
   
       if (role === 'confirm') {
-        this.consignmentSalesService.resetVariables();
+        this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/consignment-sales');
       }
     } catch (e) {
@@ -224,7 +235,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   nextStep() {
     try {
-      this.consignmentSalesService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
+      this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
         if (response) { // todo : remove this as in future same criteria will only have 1 record or none.        
           let navigationExtras: NavigationExtras = {
             queryParams: {
@@ -233,7 +244,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
           }
           this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
         } else {
-          this.consignmentSalesService.setHeader(this.objectForm.value);
+          this.objectService.setHeader(this.objectForm.value);
           this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
         }
       }, error => {

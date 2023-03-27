@@ -60,7 +60,8 @@ export class AuthService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    let apiUrl = configService.sys_parameter.apiUrl;
+    console.log("🚀 ~ file: auth.service.ts:64 ~ AuthService ~ apiUrl:")
+    let apiUrl = configService.sys_parameter?.apiUrl;
     this.baseUrl = apiUrl;
 
     if (!this.isTokenExpired()) {
@@ -89,8 +90,6 @@ export class AuthService {
 
   updatePlayerId(loginUser: LoginUser) {
     let user = this.getDecodedToken(loginUser.token);
-    console.log("🚀 ~ file: auth.service.ts:93 ~ AuthService ~ updatePlayerId ~ loginUser.playerId:", loginUser.playerId)
-    console.log("🚀 ~ file: auth.service.ts:94 ~ AuthService ~ updatePlayerId ~ localStorage.getItem('player_Id'):", localStorage.getItem("player_Id"))
     if (loginUser.playerId !== localStorage.getItem("player_Id")) {
       this.http.put(this.baseUrl + "MobileDownload/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
       }, error => {
@@ -265,5 +264,10 @@ export class AuthService {
     // Navigate to sign-in
     this.navController.navigateRoot('/signin');
   }
+
+  getCompanyName() {
+    return this.http.get<any>(this.baseUrl + "account/CompanyName");
+  }
+
 }
 

@@ -96,6 +96,8 @@ export interface TransactionDetail {
   modifiedBy?: any
   modifiedAt?: any
   deactivated?: boolean
+  promoImpactedQty?: number;
+  promoImpactedType?: string;
 }
 
 export interface ItemPricing {

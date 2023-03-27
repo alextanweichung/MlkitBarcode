@@ -13,12 +13,21 @@
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom" lines="full">
-      <ion-item button routerLink="debtor-latest-outstanding">
+      <ion-item button (click)="goToReport('debtor-latest-outstanding')">
         <ion-label>
-          <h3>Debtor Latest Outstanding</h3>
+          <div>Debtor Latest Outstanding</div>
         </ion-label>
       </ion-item>
-    </ion-list>     
+      <ion-item button (click)="goToReport('rp-so-listing')">
+        <ion-label>
+          <div>SO Listing</div>
+        </ion-label>
+      </ion-item>
+      <ion-item button (click)="goToReport('rp-sa-performance-listing')">
+        <ion-label>
+          <div>Sales Agent Performance</div>
+        </ion-label>
+      </ion-item>
+    </ion-list>
   </div>
-
 </ion-content>

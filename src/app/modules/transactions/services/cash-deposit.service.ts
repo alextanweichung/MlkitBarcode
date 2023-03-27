@@ -20,6 +20,7 @@ export class CashDepositService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
+    console.log("🚀 ~ file: cash-deposit.service.ts:24 ~ CashDepositService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesRoot, ConsignmentSalesSummary } from '../models/consignment-sales';
+import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot, ConsignmentSalesSummary } from '../models/consignment-sales';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -20,6 +20,7 @@ export class ConsignmentSalesService {
     private http: HttpClient,
     private configService: ConfigService
   ) { 
+    console.log("🚀 ~ file: consignment-sales.service.ts:24 ~ ConsignmentSalesService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
@@ -48,6 +49,10 @@ export class ConsignmentSalesService {
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/masterList");
+  }
+
+  getConsignmentLocation() {
+    return this.http.get<ConsignmentSalesLocation[]>(this.baseUrl + "MobileConsignmentSales/consignmentLocation");
   }
 
   getStaticLov() {

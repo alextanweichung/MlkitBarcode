@@ -47,8 +47,8 @@ export class ConfigService {
       if (Capacitor.getPlatform() === 'web') {
         this.sys_parameter = {
           Sys_ParameterId: 1,
-          apiUrl: 'https://localhost:44351/api/',
-          // apiUrl: 'https://idcp-demo.com/api/',
+          // apiUrl: 'https://localhost:44351/api/',
+          apiUrl: 'https://idcp-demo.com/api/',
           // apiUrl: 'https://idcp-ararat.com:8081/api/',
           imgUrl: null,
           lastDownloadAt: null
@@ -65,7 +65,7 @@ export class ConfigService {
     try {
       this.sys_parameter = {
         Sys_ParameterId: 1,
-        apiUrl: object.apiUrl,
+        apiUrl: object?.apiUrl,
         imgUrl: object.imgUrl,
         lastDownloadAt: null,
       }
@@ -76,6 +76,7 @@ export class ConfigService {
   }
 
   async update(object: Sys_Parameter) {
+    console.log("🚀 ~ file: config.service.ts:81 ~ ConfigService ~ update ~ object:", JSON.stringify(object))
     try {
       this.sys_parameter = object;
       await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);      

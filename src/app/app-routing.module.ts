@@ -171,6 +171,18 @@ const routes: Routes = [
     path: 'reports',
     loadChildren: () => import('./modules/reports/pages/reports/reports.module').then(m => m.ReportsPageModule)
   },
+  {
+    path: 'reports/debtor-latest-outstanding',
+    loadChildren: () => import('./modules/reports/pages/reports/debtor-latest-outstanding/debtor-latest-outstanding.module').then(m => m.DebtorLatestOutstandingPageModule)
+  },
+  {
+    path: 'reports/rp-so-listing',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-so-listing/rp-so-listing.module').then(m => m.RpSoListingPageModule)
+  },
+  {
+    path: 'reports/rp-sa-performance-listing',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-performance-listing/rp-sa-performance-listing.module').then(m => m.RpSaPerformanceListingPageModule)
+  },
 
 
 
@@ -247,9 +259,8 @@ const routes: Routes = [
     RouterModule.forRoot(
       routes,
       {
-        preloadingStrategy: PreloadAllModules,
-        relativeLinkResolution: 'legacy'
-      })
+    preloadingStrategy: PreloadAllModules
+})
   ],
   exports: [RouterModule]
 })

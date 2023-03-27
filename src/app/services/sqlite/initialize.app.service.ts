@@ -22,8 +22,8 @@ export class InitializeAppService {
         //execute startup queries
         if (Capacitor.getPlatform() !== 'web') {
           await this.migrationService.migrate();
+          await this.configService.load();
         }
-        await this.configService.load();
       } catch (error) {
         throw Error(`initializeAppError: ${error}`);
       }

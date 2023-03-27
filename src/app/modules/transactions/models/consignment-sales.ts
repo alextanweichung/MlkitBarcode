@@ -42,3 +42,10 @@ export interface ConsignmentSalesSummary {
   toLocationId: number
   trxDate: Date
 }
+
+export interface ConsignmentSalesLocation {
+  locationId: number
+  locationCode: string
+  locationDescription: string
+  customerId: number
+}

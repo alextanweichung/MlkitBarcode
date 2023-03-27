@@ -17,13 +17,13 @@ import { DatabaseService } from './services/sqlite/database.service';
 import { MigrationService } from './services/sqlite/migration.service';
 import { DetailService } from './services/sqlite/detail.service';
 import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.interceptor';
-import { NgxSpinnerModule } from 'ngx-spinner';
+// import { NgxSpinnerModule } from 'ngx-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UtcCalendarDirective } from './shared/utilities/utc-calendar.directive';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { Badge } from '@ionic-native/badge/ngx'
+// import { Badge } from '@ionic-native/badge/ngx'
 
 
 export function initializeFactory(init: InitializeAppService) {
@@ -42,7 +42,7 @@ export function initializeFactory(init: InitializeAppService) {
         AppRoutingModule,
         NgChartsModule,
         HttpClientModule,
-        NgxSpinnerModule,
+        // NgxSpinnerModule,
         BrowserAnimationsModule
     ],
     providers: [
@@ -58,7 +58,7 @@ export function initializeFactory(init: InitializeAppService) {
         { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         Storage,
-        Badge
+        // Badge
     ],
     bootstrap: [AppComponent]
 })

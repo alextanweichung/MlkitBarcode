@@ -33,6 +33,7 @@ export class ToastService {
       color: color,
       icon: icon,
       // cssClass: 'customToast'
+      
     });
     await toast.present();
   }

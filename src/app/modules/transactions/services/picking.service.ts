@@ -22,6 +22,7 @@ export class PickingService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
+    console.log("🚀 ~ file: picking.service.ts:26 ~ PickingService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

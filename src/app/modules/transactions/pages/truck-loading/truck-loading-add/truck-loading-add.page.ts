@@ -79,7 +79,8 @@ export class TruckLoadingAddPage implements OnInit {
       vendorId: [null, [Validators.required]],
       plateNumber: [null],
       shipMethodId: [null],
-      remark: [null]
+      remark: [null],
+      sourceType: ['M'],
     })
   }
 

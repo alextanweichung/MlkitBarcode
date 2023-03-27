@@ -23,6 +23,7 @@ export class StockCountService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
+    console.log("🚀 ~ file: stock-count.service.ts:27 ~ StockCountService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

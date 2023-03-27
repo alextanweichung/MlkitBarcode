@@ -20,6 +20,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 })
 export class SigninPage implements OnInit, ViewWillEnter {
 
+  companyName: string;
   current_year: number = new Date().getFullYear();
   currentVersion: string;
 
@@ -37,7 +38,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
     private loadingService: LoadingService,
     private navController: NavController,
     private androidPermission: AndroidPermissions
-  ) { 
+  ) {
     this.currentVersion = environment.version;
   }
 
@@ -52,13 +53,22 @@ export class SigninPage implements OnInit, ViewWillEnter {
       this.signin_form.get('password').setValue('String1234');
     }
   }
-  
+
   ngOnInit() {
     // Setup form
+    this.loadCompanyName();
     this.signin_form = this.formBuilder.group({
       userEmail: ['', Validators.compose([Validators.email, Validators.required])],
       password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
+  }
+
+  loadCompanyName() {
+    this.authService.getCompanyName().subscribe(response => {
+      this.companyName = response.name;
+    }, error => {
+      console.error(error);
+    })
   }
 
   // Sign in
@@ -66,7 +76,6 @@ export class SigninPage implements OnInit, ViewWillEnter {
     this.submit_attempt = true;
     if (Capacitor.getPlatform() !== 'web') {
       OneSignal.getDeviceState(function (stateChanges) {
-        console.log("🚀 ~ file: signin.page.ts:67 ~ SigninPage ~ stateChanges:", JSON.stringify(stateChanges))
         localStorage.setItem('player_Id', stateChanges.userId);
       });
     } else {
@@ -85,24 +94,26 @@ export class SigninPage implements OnInit, ViewWillEnter {
           if (this.rememberMe) {
             this.configService.sys_parameter.username = this.signin_form.controls.userEmail.value;
             this.configService.sys_parameter.password = this.signin_form.controls.password.value;
-            await this.configService.update(this.configService.sys_parameter);
           } else {
             this.configService.sys_parameter.username = '';
             this.configService.sys_parameter.password = '';
           }
-          // try {
-          //   await this.loadingService.showLoading("Syncing Offline Table");
-          //   let response = await this.commonService.syncInbound();
-          //   let itemMaster: PDItemMaster[] = response['itemMaster'];
-          //   let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-          //   await this.configService.syncInboundData(itemMaster, itemBarcode);
-          //   // await this.configService.loadItemMaster();
-          //   // await this.configService.loadItemBarcode();
-          //   await this.loadingService.dismissLoading();       
-          // } catch (error) {
-          //   await this.loadingService.dismissLoading();
-          //   this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
-          // }
+          await this.configService.update(this.configService.sys_parameter);
+          try {
+            await this.loadingService.showLoading("Syncing Offline Table");
+            let response = await this.commonService.syncInbound();
+            let itemMaster: PDItemMaster[] = response['itemMaster'];
+            console.log("🚀 ~ file: signin.page.ts:96 ~ SigninPage ~ itemMaster:", itemMaster.length)
+            let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+            console.log("🚀 ~ file: signin.page.ts:98 ~ SigninPage ~ itemBarcode:", itemBarcode.length)
+            await this.configService.syncInboundData(itemMaster, itemBarcode);
+            // await this.configService.loadItemMaster();
+            // await this.configService.loadItemBarcode();
+            await this.loadingService.dismissLoading();
+          } catch (error) {
+            await this.loadingService.dismissLoading();
+            this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
+          }
         }
       });
     }

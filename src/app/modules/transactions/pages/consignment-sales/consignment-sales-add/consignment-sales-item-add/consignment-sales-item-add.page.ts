@@ -394,6 +394,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
         header: this.objectHeader,
         details: this.objectDetail
       }
+      console.log("🚀 ~ file: consignment-sales-item-add.page.ts:397 ~ ConsignmentSalesItemAddPage ~ insertConsignmentSales ~ trxDto:", JSON.stringify(trxDto))
       this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
         let css: ConsignmentSalesSummary = {
           consignmentSalesNum: response.body["header"]["consignmentSalesNum"],

@@ -38,3 +38,8 @@ export interface InnerIVDetail {
   itemSku: string
   qty?: number
 }
+
+export interface ItemPriceBySegment {
+  priceSegmentCode: string
+  unitPrice: number
+}
