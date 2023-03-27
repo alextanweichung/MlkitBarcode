@@ -11,6 +11,7 @@ import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-li
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-sales-order-header',
@@ -29,6 +30,7 @@ export class SalesOrderHeaderPage implements OnInit {
   constructor(
     private authService: AuthService,
     private salesOrderService: SalesOrderService,
+    private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private toastService: ToastService,
@@ -44,7 +46,7 @@ export class SalesOrderHeaderPage implements OnInit {
         salesOrderId: [0],
         salesOrderNum: [null],
         salesAgentId: [null],
-        trxDate: [new Date()],
+        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate())],
         typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],

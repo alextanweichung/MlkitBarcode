@@ -134,12 +134,12 @@
               </div>
             </ion-col>
             <ion-col>
-              <div class="font-bold">
+              <div class="font-bold ion-text-right">
                 Disc. Amt.
               </div>
             </ion-col>
             <ion-col>
-              <div class="font-bold">
+              <div class="font-bold ion-text-right">
                 SubTotal
               </div>
             </ion-col>
@@ -151,13 +151,16 @@
               <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
             </ion-col>
             <ion-col>
-              <div>{{item.discountGroupCode}}</div>
+              <div class="ion-flex">
+                <div>{{item.discountGroupCode}}</div>
+                <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
+              </div>
             </ion-col>
-            <ion-col>
+            <ion-col class="ion-text-right">
               <div *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
-            <ion-col>
+            <ion-col class="ion-text-right">
               <div>{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>

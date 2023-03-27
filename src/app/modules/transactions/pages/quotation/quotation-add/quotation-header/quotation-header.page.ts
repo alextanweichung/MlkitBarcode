@@ -10,6 +10,7 @@ import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-li
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-quotation-header',
@@ -28,6 +29,7 @@ export class QuotationHeaderPage implements OnInit {
   constructor(
     private authService: AuthService,
     private quotationService: QuotationService,
+    private commonService: CommonService,
     private toastService: ToastService,
     private navController: NavController,
     private formBuilder: FormBuilder,
@@ -42,7 +44,7 @@ export class QuotationHeaderPage implements OnInit {
         quotationId: [0],
         quotationNum: [null],
         salesAgentId: [null],
-        trxDate: [new Date()],
+        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate())],
         typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],
@@ -313,6 +315,7 @@ export class QuotationHeaderPage implements OnInit {
   }
 
   async nextStep() {
+    console.log("🚀 ~ file: quotation-header.page.ts:326 ~ QuotationHeaderPage ~ nextStep ~ this.objectForm.value:", this.objectForm.value)
     try {
       await this.quotationService.setHeader(this.objectForm.value);
       this.navController.navigateForward('/transactions/quotation/quotation-item');

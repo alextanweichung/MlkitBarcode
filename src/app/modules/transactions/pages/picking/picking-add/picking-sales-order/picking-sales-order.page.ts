@@ -6,6 +6,7 @@ import { PickingService } from 'src/app/modules/transactions/services/picking.se
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-picking-sales-order',
@@ -18,6 +19,7 @@ export class PickingSalesOrderPage implements OnInit {
 
   constructor(
     private pickingService: PickingService,
+    private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private toastService: ToastService,
@@ -293,7 +295,7 @@ export class PickingSalesOrderPage implements OnInit {
       this.objectForm = this.formBuilder.group({
         pickingId: [0],
         pickingNum: [null],
-        trxDate: [new Date(), [Validators.required]],
+        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
         locationId: [null, [Validators.required]],
         toLocationId: [null],
         customerId: [null, [Validators.required]],

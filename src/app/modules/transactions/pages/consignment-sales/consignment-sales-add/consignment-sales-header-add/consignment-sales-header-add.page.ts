@@ -9,6 +9,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-consignment-sales-header-add',
@@ -22,6 +23,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
   constructor(
     private authService: AuthService,
     private objectService: ConsignmentSalesService,
+    private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private formBuilder: FormBuilder
@@ -33,7 +35,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     this.objectForm = this.formBuilder.group({
       consignmentSalesId: [0],
       consignmentSalesNum: [null],
-      trxDate: [null, [Validators.required]],
+      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
       toLocationId: [null, [Validators.required]],

@@ -64,7 +64,10 @@ export class QuotationPage implements OnInit, ViewWillEnter {
       }
       this.quotationService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = response;
+        this.objects = this.commonService.convertArrayAllDateType(this.objects);
+        console.log("🚀 ~ file: quotation.page.ts:68 ~ QuotationPage ~ this.quotationService.getObjectListByDate ~ this.objects:", this.objects)
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
+        console.log("🚀 ~ file: quotation.page.ts:69 ~ QuotationPage ~ this.quotationService.getObjectListByDate ~ dates:", dates)
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);

@@ -6,6 +6,7 @@ import { StockCountService } from 'src/app/modules/transactions/services/stock-c
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-stock-count-header-add',
@@ -18,6 +19,7 @@ export class StockCountHeaderAddPage implements OnInit {
 
   constructor(
     private stockCountService: StockCountService,
+    private commonService: CommonService,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private formBuilder: FormBuilder
@@ -30,7 +32,7 @@ export class StockCountHeaderAddPage implements OnInit {
       inventoryCountId: [0],
       inventoryCountNum: [null],
       description: [null],
-      trxDate: [null, [Validators.required]],
+      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
       locationId: [null, [Validators.required]],
       inventoryCountBatchId: [null, [Validators.required]],
       zoneId: [null],

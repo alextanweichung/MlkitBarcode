@@ -85,28 +85,31 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   searchItem() {
     let searchText = this.itemSearchText;
     this.itemSearchText = '';
-    if (searchText && searchText.trim().length > 2) {
-      if (Capacitor.getPlatform() !== 'web') {
-        Keyboard.hide();
+    try {
+      if (searchText && searchText.trim().length > 2) {
+        if (Capacitor.getPlatform() !== 'web') {
+          Keyboard.hide();
+        }
+        // if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
+          // online mode
+          this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
+            this.availableItems = response;
+            this.availableItems.forEach(r =>
+              this.assignLineUnitPrice(r)
+            )
+            this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
+          })
+          this.loadImages(searchText);
+        // } else {
+        //   // offline mode, search item from local item master and item barcode
+        // }
+      } else {
+        this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
       }
-      // if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
-        // online mode
-        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
-          this.availableItems = response;
-          console.log("🚀 ~ file: item-catalog.page.ts:93 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
-          this.availableItems.forEach(r =>
-            this.assignLineUnitPrice(r)
-          )
-          this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
-        })
-        this.loadImages(searchText);
-      // } else {
-      //   // offline mode, search item from local item master and item barcode
-      // }
-    } else {
-      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
+      this.onBrowseModeChanged();
+    } catch (e) {
+      console.error(e);
     }
-    this.onBrowseModeChanged();
   }
 
   loadImages(searchText) {

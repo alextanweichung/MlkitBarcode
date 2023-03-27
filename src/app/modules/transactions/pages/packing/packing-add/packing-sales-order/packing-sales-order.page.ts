@@ -6,6 +6,7 @@ import { PackingService } from 'src/app/modules/transactions/services/packing.se
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-packing-sales-order',
@@ -18,6 +19,7 @@ export class PackingSalesOrderPage implements OnInit {
 
   constructor(
     private packingService: PackingService,
+    private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private toastService: ToastService,
@@ -290,7 +292,7 @@ export class PackingSalesOrderPage implements OnInit {
       this.objectForm = this.formBuilder.group({
         packingId: [0],
         packingNum: [null],
-        trxDate: [new Date(), [Validators.required]],
+        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
         locationId: [null, [Validators.required]],
         toLocationId: [null],
         customerId: [null, [Validators.required]],

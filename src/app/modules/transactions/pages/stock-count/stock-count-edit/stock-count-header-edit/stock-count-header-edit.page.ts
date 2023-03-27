@@ -41,7 +41,7 @@ export class StockCountHeaderEditPage implements OnInit {
       inventoryCountId: [0],
       inventoryCountNum: [null],
       description: [null],
-      trxDate: [null, [Validators.required]],
+      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
       locationId: [null, [Validators.required]],
       inventoryCountBatchId: [null, [Validators.required]],
       zoneId: [null],

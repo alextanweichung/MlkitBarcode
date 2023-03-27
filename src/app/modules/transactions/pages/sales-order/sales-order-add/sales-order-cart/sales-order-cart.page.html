@@ -46,7 +46,7 @@
               </div>
             </div>
 
-            <ion-row class="pb-1">
+            <ion-row class="pt-1">
               <ion-col>
                 <div class="font-bold">
                   Unit Price
@@ -58,29 +58,32 @@
                 </div>
               </ion-col>
               <ion-col>
-                <div class="font-bold">
+                <div class="font-bold ion-text-right">
                   Disc. Amt
                 </div>
               </ion-col>
               <ion-col>
-                <div class="font-bold">
+                <div class="font-bold ion-text-right">
                   Subtotal
                 </div>
               </ion-col>
             </ion-row>
-            <ion-row>
+            <ion-row class="pt-1">
               <ion-col>
                 <div *ngIf="objectHeader.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div *ngIf="!objectHeader.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
               <ion-col>
-                <div>{{item.discountGroupCode}}</div>
+                <div class="ion-flex">
+                  <div>{{item.discountGroupCode}}</div>
+                  <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
+                </div>
               </ion-col>
-              <ion-col>
+              <ion-col class="ion-text-right">
                 <div *ngIf="objectHeader.isDisplayTaxInclusive">{{item.discountAmt|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div *ngIf="!objectHeader.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
-              <ion-col>
+              <ion-col class="ion-text-right">
                 <div *ngIf="objectHeader.isDisplayTaxInclusive">{{item.subTotal|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div *ngIf="!objectHeader.isDisplayTaxInclusive">{{item.subTotalExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
@@ -139,32 +142,31 @@
         </ion-list-header>
         <ion-list class="list-custom" lines="full">
           <ion-item>
-            <ion-label [ngStyle]="{'color': (selectedItem.variationTypeCode !== '0' ? 'red' : 'green')}"><div>Quantity</div></ion-label>
-            <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [readonly]="selectedItem.variationTypeCode !== '0'"></ion-input>
+            <ion-label><div>Quantity</div></ion-label>
+            <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label [ngStyle]="{'color': (restrictTrxFields['unitPrice'] ? 'red' : 'green')}"><div>Unit Price</div></ion-label>
-            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [readonly]='restrictTrxFields["unitPrice"]'></ion-input>
-            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [readonly]='restrictTrxFields["unitPriceExTax"]'></ion-input>
+            <ion-label><div>Unit Price</div></ion-label>
+            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [disabled]='restrictTrxFields["unitPrice"]'></ion-input>
+            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [disabled]='restrictTrxFields["unitPriceExTax"]'></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label [ngStyle]="{'color': (restrictTrxFields['discountGroupCode'] ? 'red' : 'green')}"><div>Disc. Code</div></ion-label>
-            <ion-label *ngIf="restrictTrxFields['discountGroupCode']" slot="end"><div>{{selectedItem.discountGroupCode}}</div></ion-label>
-            <ion-select *ngIf="!restrictTrxFields['discountGroupCode']" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)">
+            <ion-label><div>Disc. Code</div></ion-label>
+            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']">
               <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>
-            <ion-label [ngStyle]="{'color': (restrictTrxFields['discountExpression'] ? 'red' : 'green')}"><div>Disc. Expr.</div></ion-label>
-            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression" [readonly]="restrictTrxFields['discountExpression']"></ion-input>
+            <ion-label><div>Disc. Expr.</div></ion-label>
+            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression']"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label [ngStyle]="{'color': 'red'}"><div>Disc. Amt.</div></ion-label>
-            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #discAmt readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmt"></ion-input>
-            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #discAmt readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmtExTax"></ion-input>
+            <ion-label><div>Disc. Amt.</div></ion-label>
+            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmt" [disabled]="true"></ion-input>
+            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmtExTax" [disabled]="true"></ion-input>
           </ion-item>
           <ion-item *ngIf="selectedItem?.promoEventId">
-            <ion-label [ngStyle]="{'color': 'red'}"><div>Promo Applied</div></ion-label>
+            <ion-label><div>Promo Applied</div></ion-label>
             <ion-label slot="end">{{getPromoDesc(selectedItem?.promoEventId)}}</ion-label>
           </ion-item>
         </ion-list>

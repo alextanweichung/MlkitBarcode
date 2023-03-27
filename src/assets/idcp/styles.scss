@@ -26,6 +26,17 @@
    border-radius: 3px;
 }
 
+.ion-custom-badge {
+   background: var(--ion-color-primary);
+   color: var(--ion-color-primary-contrast);
+   border-radius: 4px;
+   font-size: 12px;
+   font-weight: 500;
+   padding: 3px 3px;
+   display: flex;
+   align-items: center;
+}
+
 .m-0 {
    margin: 0 !important;
 }
