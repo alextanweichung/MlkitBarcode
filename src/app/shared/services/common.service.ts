@@ -102,6 +102,24 @@ export class CommonService {
     }
   }
 
+  convertDateFormatIgnoreTimeAndDate(inputDate: Date): Date {
+    try {
+      let outputDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), 1);
+      return outputDate;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  convertDateFormatIgnoreTime(inputDate: Date): Date {
+    try {
+      let outputDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDay());
+      return outputDate;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   convertObjectAllDateType(inputObject: any) {
     try {
       if (inputObject.hasOwnProperty('trxDate')) {

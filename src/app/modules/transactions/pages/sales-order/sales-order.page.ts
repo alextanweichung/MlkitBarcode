@@ -25,6 +25,8 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
   endDate: Date;
   customerIds: number[] = [];
 
+  uniqueGrouping: Date[] = [];
+
   constructor(
     private commonService: CommonService,
     private salesOrderService: SalesOrderService,
@@ -48,18 +50,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    try {
-      if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
-      }
-      if (!this.endDate) {
-        this.endDate = this.commonService.getTodayDate();
-      }
-      this.loadObjects();
-      this.loadCustomerList();
-    } catch (e) {
-      console.error(e);
-    }
+
   }
 
   /* #region  crud */
@@ -73,6 +64,8 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
       }
       this.salesOrderService.getObjectListByDate(obj).subscribe(response => {
         this.objects = response;
+        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTimeAndDate(new Date(obj.trxDate))))];
+        this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
       }, error => {
         throw error;
@@ -80,6 +73,10 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     } catch (error) {
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  getObjects(date: Date) {
+    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear());
   }
 
   customers: Customer[] = [];

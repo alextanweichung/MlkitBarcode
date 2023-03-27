@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { QuotationList } from '../../models/quotation';
 import { CommonService } from '../../../../shared/services/common.service';
@@ -17,13 +17,15 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
   templateUrl: './quotation.page.html',
   styleUrls: ['./quotation.page.scss']
 })
-export class QuotationPage implements OnInit {
+export class QuotationPage implements OnInit, ViewWillEnter {
 
   objects: QuotationList[] = [];
 
   startDate: Date;
   endDate: Date;
   customerIds: number[] = [];
+
+  uniqueGrouping: Date[] = [];
 
   constructor(
     private commonService: CommonService,
@@ -36,19 +38,19 @@ export class QuotationPage implements OnInit {
     private loadingService: LoadingService
   ) { }
 
-  ngOnInit() {
-    try {
-      if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
-      }
-      if (!this.endDate) {
-        this.endDate = this.commonService.getTodayDate();
-      }
-      this.loadObjects();
-      this.loadCustomerList();      
-    } catch (e) {
-      console.error(e);
+  ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
     }
+    if (!this.endDate) {
+      this.endDate = this.commonService.getTodayDate();
+    }
+    this.loadObjects();
+    this.loadCustomerList();
+  }
+
+  ngOnInit() {
+    
   }
 
   /* #region  crud */
@@ -62,6 +64,8 @@ export class QuotationPage implements OnInit {
       }
       this.quotationService.getObjectListByDate(obj).subscribe(response => {
         this.objects = response;
+        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTimeAndDate(new Date(obj.trxDate))))];
+        this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
       }, error => {
         throw Error;
@@ -70,6 +74,10 @@ export class QuotationPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  getObjects(date: Date) {
+    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear());
   }
 
   customers: Customer[] = [];

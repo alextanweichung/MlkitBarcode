@@ -11,6 +11,7 @@ import { SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SalesOrderStatus } from 'src/app/shared/models/sales-order-status';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -121,6 +122,28 @@ export class SalesOrderDetailPage implements OnInit {
       console.error(e);
     }
   }
+
+  /* #region show variaton dialog */
+
+  variationDialog: boolean = false;
+  showVariationDialog() {
+    this.variationDialog = true;
+  }
+
+  hideVariationDialog() {
+    this.selectedItem = null;
+    this.variationDialog = false;
+  }
+
+  selectedItem: TransactionDetail;
+  showDetails(item: TransactionDetail) {
+    if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
+      this.selectedItem = item;
+      this.showVariationDialog();
+    }
+  }
+
+  /* #endregion */
 
   /* #region history modal */
 
