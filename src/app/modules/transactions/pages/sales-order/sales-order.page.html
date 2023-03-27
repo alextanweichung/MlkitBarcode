@@ -30,14 +30,14 @@
     <ng-container *ngIf="objects?.length > 0">
       <div *ngFor="let m of uniqueGrouping">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-          <ion-label>{{m|date:'MMM yyyy'}}</ion-label>
+          <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
         </ion-list-header>
         <ion-list class="list-custom" lines="full">
           <ion-item-sliding *ngFor="let object of getObjects(m)">
             <ion-item button detail="false" (click)="goToDetail(object.salesOrderId)">
               <ion-grid class="ion-no-padding p-2">
                 <ion-row>
-                  <ion-col>{{object.salesOrderNum}}</ion-col>
+                  <ion-col class="font-bold">{{object.salesOrderNum}}</ion-col>
                   <ion-col class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-col>
                 </ion-row>
                 <ion-row>

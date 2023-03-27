@@ -113,7 +113,7 @@ export class CommonService {
 
   convertDateFormatIgnoreTime(inputDate: Date): Date {
     try {
-      let outputDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDay());
+      let outputDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
       return outputDate;
     } catch (e) {
       console.error(e);

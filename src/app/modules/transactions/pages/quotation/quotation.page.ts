@@ -50,22 +50,23 @@ export class QuotationPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    
+
   }
 
   /* #region  crud */
 
   loadObjects() {
     try {
-      let obj: SalesSearchModal =  {
+      let obj: SalesSearchModal = {
         dateStart: format(this.startDate, 'yyyy-MM-dd'),
         dateEnd: format(this.endDate, 'yyyy-MM-dd'),
         customerId: this.customerIds
       }
-      this.quotationService.getObjectListByDate(obj).subscribe(response => {
+      this.quotationService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = response;
-        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTimeAndDate(new Date(obj.trxDate))))];
+        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
+        await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
       }, error => {
         throw Error;
@@ -77,7 +78,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
   }
 
   getObjects(date: Date) {
-    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear());
+    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
   }
 
   customers: Customer[] = [];
