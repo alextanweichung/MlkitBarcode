@@ -125,24 +125,14 @@ export class SalesOrderDetailPage implements OnInit {
 
   /* #region show variaton dialog */
 
-  variationDialog: boolean = false;
-  showVariationDialog() {
-    this.variationDialog = true;
-  }
-
-  hideVariationDialog() {
-    this.selectedItem = null;
-    this.variationDialog = false;
-  }
-
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.selectedItem = item;
-      this.showVariationDialog();
+      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
     }
   }
-
+  
   /* #endregion */
 
   /* #region history modal */

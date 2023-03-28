@@ -32,6 +32,15 @@
               </ion-col>
             </ion-row>
 
+            <ion-row class="pb-1">
+              <ion-col>
+                <div class="font-bold">Total Quantity</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-text-right">{{item.qtyRequest}}</div>
+              </ion-col>
+            </ion-row>
+            
             <div style="width: 100%;" *ngFor="let vd of item.variationDetails">
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">

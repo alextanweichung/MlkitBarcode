@@ -41,6 +41,13 @@
                 <div>Discount: [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}</div>
               </ion-col>
             </ion-row>
+            <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
+              <ion-col>
+                N/P:
+                <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPrice,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPriceExTax,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              </ion-col>
+            </ion-row>
             <ion-row *ngIf="item.variationTypeCode === '0'">
               <ion-col class="ion-flex ion-margin-auto justify-content-center">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small"(click)="decreaseQty(item)">
@@ -115,6 +122,11 @@
             <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
               <ion-col>
                 <div>Discount: [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}</div>
+              </ion-col>
+              <ion-col>
+                N/P:
+                <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPrice,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPriceExTax,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
             </ion-row>
             <ion-row *ngIf="item.qtyRequest > 0">

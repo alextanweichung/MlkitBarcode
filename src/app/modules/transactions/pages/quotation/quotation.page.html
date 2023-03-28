@@ -38,7 +38,7 @@
               <ion-grid class="ion-no-padding p-2">
                 <ion-row>
                   <ion-col class="font-bold">{{object.quotationNum}}</ion-col>
-                  <ion-col class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-col>
+                  <ion-col class="ion-flex justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
                 </ion-row>
                 <ion-row>
                   <ion-col>{{object.customerName}}</ion-col>

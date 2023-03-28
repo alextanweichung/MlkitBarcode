@@ -94,6 +94,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           // online mode
           this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
             this.availableItems = response;
+            console.log("🚀 ~ file: item-catalog.page.ts:97 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
             this.availableItems.forEach(r =>
               this.assignLineUnitPrice(r)
             )
@@ -166,6 +167,22 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     }
     item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
     item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
+  }
+
+  calculatNetPrice(price, discountExpression) {
+    if (discountExpression != "" && discountExpression != null) {
+      let splittedDisc = discountExpression.split(/[+/]/g);
+      splittedDisc.forEach(x => {
+        if (x.includes('%')) {
+          let currentdiscPct = parseFloat(x) / 100;
+          let currentDiscAmt = price * currentdiscPct;
+          price = price - currentDiscAmt;
+        } else {
+          price = price - parseFloat(x);
+        }
+      })
+    } 
+    return price;
   }
 
   /* #endregion */

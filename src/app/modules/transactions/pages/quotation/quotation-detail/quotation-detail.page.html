@@ -108,11 +108,12 @@
             </ion-col>
           </ion-row>
           <ion-row class="pb-1">
-            <ion-col>
+            <ion-col class="ion-flex">
+              <ion-icon style="position: relative; top: 0.1rem" *ngIf="item.variationTypeCode !== '0'" name="add-circle-outline"></ion-icon>
               <div>Total Quantity</div>
             </ion-col>
             <ion-col>
-              <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} <ion-icon *ngIf="item.variationTypeCode !== '0'" name="information-circle-outline"></ion-icon></div>              
+              <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} </div>              
             </ion-col>
           </ion-row>
 
@@ -152,8 +153,8 @@
               </div>
             </ion-col>
           </ion-row>
-
-          <ion-row class="pb-1">
+          
+          <ion-row class="pt-1">
             <ion-col>
               <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
               <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
