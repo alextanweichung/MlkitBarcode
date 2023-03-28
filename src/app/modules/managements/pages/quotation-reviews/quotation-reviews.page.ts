@@ -30,9 +30,6 @@ export class QuotationReviewsPage implements OnInit, ViewWillEnter {
 
   // make sure refresh when back to this
   ionViewWillEnter(): void {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
-    }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
@@ -40,18 +37,12 @@ export class QuotationReviewsPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
-    }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-    this.loadObjects();
+
   }
 
   loadObjects() {
     try {
-      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
+      this.transactionProcessingService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') : null), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
         this.pendingObjects = response.filter(r => !r.isComplete);
         this.completedObjects = response.filter(r => r.isComplete);
         this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
@@ -68,6 +59,9 @@ export class QuotationReviewsPage implements OnInit, ViewWillEnter {
   }
 
   async filter() {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTheYear();
+    }
     const modal = await this.modalController.create({
       component: FilterPage,
       componentProps: {
