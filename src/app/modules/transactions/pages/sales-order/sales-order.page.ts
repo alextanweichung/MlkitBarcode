@@ -11,6 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-sales-order',
@@ -24,8 +25,12 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
   startDate: Date;
   endDate: Date;
   customerIds: number[] = [];
+  salesAgentIds: number[] = [];
 
   uniqueGrouping: Date[] = [];
+
+  salesAgentMasterList: MasterListDetails[] = [];
+  salesAgentDropdownList: SearchDropdownList[] = [];
 
   constructor(
     private commonService: CommonService,
@@ -45,6 +50,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
+    this.loadMasterList();
     this.loadObjects();
     this.loadCustomerList();
   }
@@ -55,12 +61,32 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   /* #region  crud */
 
+  loadMasterList() {
+    try {
+      this.salesOrderService.getMasterList().subscribe(response => {
+        this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        this.salesAgentMasterList.forEach(r => {
+          this.salesAgentDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+          })
+        })
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   loadObjects() {
     try {
       let obj: SalesSearchModal =  {
         dateStart: format(this.startDate, 'yyyy-MM-dd'),
         dateEnd: format(this.endDate, 'yyyy-MM-dd'),
-        customerId: this.customerIds
+        customerId: this.customerIds,
+        salesAgentId: this.salesAgentIds
       }
       this.salesOrderService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = response;
@@ -202,7 +228,10 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
           endDate: this.endDate,
           customerFilter: true,
           customerList: this.customerSearchDropdownList,
-          selectedCustomerId: this.customerIds
+          selectedCustomerId: this.customerIds,
+          salesAgentFilter: true,
+          salesAgentList: this.salesAgentDropdownList,
+          selectedSalesAgentId: this.salesAgentIds
         },
         canDismiss: true
       })
@@ -212,6 +241,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
         this.startDate = new Date(data.startDate);
         this.endDate = new Date(data.endDate);
         this.customerIds = data.customerIds;
+        this.salesAgentIds = data.salesAgentIds;
         this.loadObjects();
       }
     } catch (e) {

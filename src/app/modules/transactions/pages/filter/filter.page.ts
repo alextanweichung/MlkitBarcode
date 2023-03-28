@@ -24,6 +24,9 @@ export class FilterPage implements OnInit {
   customerFilter: boolean = false;
   customerList: SearchDropdownList[] = [];
 
+  salesAgentFilter: boolean = false;
+  salesAgentList: SearchDropdownList[] = [];
+
   constructor(
     private commonService: CommonService,
     private modalController: ModalController
@@ -71,6 +74,15 @@ export class FilterPage implements OnInit {
     }
   }
 
+  selectedSalesAgentId: number[] = [];
+  onSalesAgentSelected(event) {
+    if (event) {
+      event.forEach(r => {
+        this.selectedSalesAgentId.push(r.id);
+      });
+    }
+  }
+
   // Cancel
   cancel() {
     // Dismiss modal
@@ -81,8 +93,8 @@ export class FilterPage implements OnInit {
   apply() {
     // Add filter logic here...
     // ...
-    if (this.customerFilter) {
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId };
+    if (this.customerFilter || this.salesAgentFilter) {
+      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId };
     } else {
       this.filters = { startDate: this.startDate, endDate: this.endDate };
     }
