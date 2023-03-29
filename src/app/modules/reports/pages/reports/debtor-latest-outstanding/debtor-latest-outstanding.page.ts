@@ -5,7 +5,7 @@ import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { DebtorOutstanding } from '../../../models/debtor-outstanding';
+import { DebtorOutstanding, DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 
@@ -48,22 +48,25 @@ export class DebtorLatestOutstandingPage implements OnInit {
   }
 
   loadDebtorReport() {
-    if (this.customerId && this.trxDate) {
-      this.reportService.getDebtorOutstanding(this.customerId, format(this.trxDate, 'yyyy-MM-dd')).subscribe(response => {
-        this.objects = response;
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
-      }, error => {
-        console.log(error);
-      })
-    } else {
-      this.toastService.presentToast('Invalid Search', '', 'top', 'danger', 1000);
+    let obj: DebtorOutstandingRequest = {
+      customerId: this.customerIds??[],
+      trxDate: format(this.trxDate, 'yyyy-MM-dd')
     }
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:55 ~ DebtorLatestOutstandingPage ~ loadDebtorReport ~ obj:", obj)
+    this.reportService.getDebtorOutstanding(obj).subscribe(response => {
+      this.objects = response;
+      console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:58 ~ DebtorLatestOutstandingPage ~ this.reportService.getDebtorOutstanding ~ this.objects:", this.objects)
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+    }, error => {
+      console.log(error);
+    })
   }
 
-  customerId: number;
-  onCustomerSelected(event) {
+  customerIds: number[];
+  onCustomerSelected(event: any[]) {
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:65 ~ DebtorLatestOutstandingPage ~ onCustomerSelected ~ event:", event)
     if (event && event !== undefined) {
-      this.customerId = event.id;
+      this.customerIds = event.flatMap(r => r.id);
     }
   }
 
@@ -74,14 +77,14 @@ export class DebtorLatestOutstandingPage implements OnInit {
     }
   }
 
-  async downloadPdf() {
+  async downloadPdf(customerId: number) {
     let paramModel: ReportParameterModel = {
       appCode: 'FAAR005',
       format: 'pdf',
       documentIds: [],
       reportName: 'Debtor Statement',
       customReportParam: {
-        parameter1: this.customerId,
+        parameter1: customerId,
         statementDate: this.trxDate
       }
     }

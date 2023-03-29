@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
-import { DebtorOutstanding } from '../models/debtor-outstanding';
+import { DebtorOutstanding, DebtorOutstandingRequest } from '../models/debtor-outstanding';
 import { SAPerformaceListing } from '../models/rp-sa-performace-listing';
 import { ReportSOListing } from '../models/rp-so-listing';
 
@@ -18,7 +18,6 @@ export class ReportsService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: reports.service.ts:22 ~ ReportsService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
@@ -26,8 +25,8 @@ export class ReportsService {
     return this.http.get<Customer[]>(this.baseUrl + "mobileReport/customer");
   }
 
-  getDebtorOutstanding(customerId: number, trxDate: string) {
-    return this.http.get<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding/debtor/" + customerId.toString() + "/" + trxDate);
+  getDebtorOutstanding(object: DebtorOutstandingRequest) {
+    return this.http.post<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding", object);
   }
 
   getSOListing() {

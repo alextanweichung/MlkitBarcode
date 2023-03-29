@@ -9,6 +9,7 @@ import { DebtorLatestOutstandingPageRoutingModule } from './debtor-latest-outsta
 import { DebtorLatestOutstandingPage } from './debtor-latest-outstanding.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
+import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
 
 @NgModule({
   imports: [
@@ -16,6 +17,7 @@ import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/cal
     FormsModule,
     IonicModule,
     DebtorLatestOutstandingPageRoutingModule,
+    SearchMultiDropdownPageModule,
     SearchDropdownPageModule,
     CalendarInputPageModule
   ],

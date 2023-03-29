@@ -129,7 +129,7 @@
             <th style="flex: 0 0 5%" class="p-1 font-half-size ion-text-left">#</th>
             <th style="flex: 0 0 20%" class="p-1 font-half-size">Document Date</th>
             <th style="flex: 0 0 25%" [ngStyle]="{'flex': creditInfoType == 'Overdue Amount' ? '0 0 15%' : '0 0 25%'}" class="p-1 font-half-size" *ngIf="creditInfoType == 'Overdue Amount'">O/D Day</th>
-            <th style="flex: 0 0 20%"class="p-1 font-half-size">Document Number</th>
+            <th style="flex: 0 0 20%" class="p-1 font-half-size">Document Number</th>
             <th style="flex: 0 0 20%" class="p-1 font-half-size ion-text-right">Amount</th>
           </tr>
           <tr *ngFor="let rowData of tableValue; let rowIndex = index">
