@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS Item_Master (
   catId INTEGER,
   catCd VARCHAR(20),
   catDesc VARCHAR(100),
+  deptId INTEGER,
+  seasonId INTEGER,
   varCd VARCHAR(100),
   price DECIMAL(6,6),
   minPrice DECIMAL(6,6),
