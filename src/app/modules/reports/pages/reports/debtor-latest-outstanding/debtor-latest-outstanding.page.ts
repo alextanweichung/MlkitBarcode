@@ -52,10 +52,8 @@ export class DebtorLatestOutstandingPage implements OnInit {
       customerId: this.customerIds??[],
       trxDate: format(this.trxDate, 'yyyy-MM-dd')
     }
-    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:55 ~ DebtorLatestOutstandingPage ~ loadDebtorReport ~ obj:", obj)
     this.reportService.getDebtorOutstanding(obj).subscribe(response => {
       this.objects = response;
-      console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:58 ~ DebtorLatestOutstandingPage ~ this.reportService.getDebtorOutstanding ~ this.objects:", this.objects)
       this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
     }, error => {
       console.log(error);
@@ -64,7 +62,6 @@ export class DebtorLatestOutstandingPage implements OnInit {
 
   customerIds: number[];
   onCustomerSelected(event: any[]) {
-    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:65 ~ DebtorLatestOutstandingPage ~ onCustomerSelected ~ event:", event)
     if (event && event !== undefined) {
       this.customerIds = event.flatMap(r => r.id);
     }

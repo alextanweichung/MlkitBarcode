@@ -76,7 +76,6 @@ export class ConfigService {
   }
 
   async update(object: Sys_Parameter) {
-    console.log("🚀 ~ file: config.service.ts:81 ~ ConfigService ~ update ~ object:", JSON.stringify(object))
     try {
       this.sys_parameter = object;
       await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);      

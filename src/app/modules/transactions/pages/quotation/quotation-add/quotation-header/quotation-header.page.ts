@@ -315,7 +315,6 @@ export class QuotationHeaderPage implements OnInit {
   }
 
   async nextStep() {
-    console.log("🚀 ~ file: quotation-header.page.ts:326 ~ QuotationHeaderPage ~ nextStep ~ this.objectForm.value:", this.objectForm.value)
     try {
       await this.quotationService.setHeader(this.objectForm.value);
       this.navController.navigateForward('/transactions/quotation/quotation-item');

@@ -37,7 +37,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     private salesOrderService: SalesOrderService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    private loadingService: LoadingService,
+    // private loadingService: LoadingService,
     private modalController: ModalController,
     private navController: NavController,
     private toastService: ToastService

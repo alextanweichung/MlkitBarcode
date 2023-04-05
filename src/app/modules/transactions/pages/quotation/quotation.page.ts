@@ -35,7 +35,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
     private alertController: AlertController,
     private navController: NavController,
     private toastService: ToastService,
-    private loadingService: LoadingService
+    // private loadingService: LoadingService
   ) { }
 
   ionViewWillEnter(): void {

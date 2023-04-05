@@ -22,8 +22,7 @@ export class PackingService {
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) { 
-    console.log("🚀 ~ file: packing.service.ts:27 ~ PackingService ~ apiUrl:")
+  ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

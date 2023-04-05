@@ -16,7 +16,8 @@ export class LoadingService {
     this.loading = await this.loadingController.create({
       cssClass: 'default-loading',
       message: `<p>${message}...</p><span>Please be patient.</span>`,
-      spinner: 'crescent'
+      spinner: 'crescent',
+      backdropDismiss: true
     });
     await this.loading.present();
   }
@@ -24,7 +25,9 @@ export class LoadingService {
   async dismissLoading() {
     // at least show 1.5 second
     setTimeout(async () => {
-      this.loading.dismiss();
+      if (this.loading) {
+        this.loading.dismiss();
+      }
     }, 1500);
   }
 

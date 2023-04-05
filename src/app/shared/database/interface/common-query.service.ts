@@ -363,8 +363,6 @@ export class CommonQueryService<T> {
             sqlParams.split('~')
           )
         });
-        
-        console.log("🚀 ~ file: common-query.service.ts:328 ~ CommonQueryService<T> ~ syncInboundData ~ statements:", JSON.stringify(statements));
   
         statements.push({
           statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,

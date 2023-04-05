@@ -97,7 +97,6 @@ export class QuotationDetailPage implements OnInit {
     try {
       this.quotationService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: quotation-detail.page.ts:100 ~ QuotationDetailPage ~ this.quotationService.getObjectById ~ this.object:", this.object)
       }, error => {
         throw error;
       })

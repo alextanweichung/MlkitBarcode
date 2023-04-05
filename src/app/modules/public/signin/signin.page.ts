@@ -35,7 +35,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
     private configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
-    private loadingService: LoadingService,
+    // private loadingService: LoadingService,
     private navController: NavController,
     private androidPermission: AndroidPermissions
   ) {
@@ -84,6 +84,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
 
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
+      this.submit_attempt = false;
       this.toastService.presentToast('Error', 'Please input email and password', 'top', 'danger', 2000);
     } else {
       let loginModel: LoginRequest = this.signin_form.value;
@@ -100,21 +101,22 @@ export class SigninPage implements OnInit, ViewWillEnter {
           }
           await this.configService.update(this.configService.sys_parameter);
           try {
-            await this.loadingService.showLoading("Syncing Offline Table");
+            // await this.loadingService.showLoading("Syncing Offline Table");
             let response = await this.commonService.syncInbound();
             let itemMaster: PDItemMaster[] = response['itemMaster'];
-            console.log("🚀 ~ file: signin.page.ts:96 ~ SigninPage ~ itemMaster:", itemMaster.length)
             let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
-            console.log("🚀 ~ file: signin.page.ts:98 ~ SigninPage ~ itemBarcode:", itemBarcode.length)
             await this.configService.syncInboundData(itemMaster, itemBarcode);
             // await this.configService.loadItemMaster();
             // await this.configService.loadItemBarcode();
-            await this.loadingService.dismissLoading();
+            // await this.loadingService.dismissLoading();
           } catch (error) {
-            await this.loadingService.dismissLoading();
+            // await this.loadingService.dismissLoading();
             this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
           }
         }
+      }, error => {        
+        this.submit_attempt = false;
+        console.error(error);
       });
     }
   }

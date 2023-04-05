@@ -60,7 +60,6 @@ export class AuthService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: auth.service.ts:64 ~ AuthService ~ apiUrl:")
     let apiUrl = configService.sys_parameter?.apiUrl;
     this.baseUrl = apiUrl;
 

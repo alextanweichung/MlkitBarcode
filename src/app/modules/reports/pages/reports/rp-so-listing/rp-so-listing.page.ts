@@ -55,11 +55,9 @@ export class RpSoListingPage implements OnInit {
   doDialog: boolean = false;
   deliveryOrderObject: string[] = [];
   async showDialogOrDownload(deliveryOrders: string) {
-    console.log("🚀 ~ file: rp-so-listing.page.ts:58 ~ RpSoListingPage ~ showDialogOrDownload ~ deliveryOrders:", deliveryOrders)
     this.deliveryOrderObject = []
     try {
       this.deliveryOrderObject = deliveryOrders.split(';');
-      console.log("🚀 ~ file: rp-so-listing.page.ts:61 ~ RpSoListingPage ~ showDialogOrDownload ~ this.objectIds:", this.deliveryOrderObject)
       if (this.deliveryOrderObject && this.deliveryOrderObject.length === 1) {
         await this.downloadDOPdf(Number(this.deliveryOrderObject[0].split('|')[1]));
       } else {

@@ -40,7 +40,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
-    private loadingService: LoadingService,
+    // private loadingService: LoadingService,
     private commonService: CommonService
   ) { }
 
@@ -78,16 +78,16 @@ export class CardsPage implements OnInit, AfterContentChecked {
   async sync() {
     if (Capacitor.getPlatform() !== 'web') {
       try {
-        await this.loadingService.showLoading("Syncing Offline Table");
+        // await this.loadingService.showLoading("Syncing Offline Table");
         let response = await this.commonService.syncInbound();
         let itemMaster: PDItemMaster[] = response['itemMaster'];
         let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
         // await this.configService.loadItemMaster();
         // await this.configService.loadItemBarcode();
-        await this.loadingService.dismissLoading();
+        // await this.loadingService.dismissLoading();
       } catch (error) {
-        await this.loadingService.dismissLoading();
+        // await this.loadingService.dismissLoading();
         this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }

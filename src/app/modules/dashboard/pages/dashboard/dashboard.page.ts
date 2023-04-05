@@ -192,10 +192,8 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   async setBadges() {
     try {
       // let hasPermission = await this.badge.hasPermission();
-      // console.log("🚀 ~ file: dashboard.page.ts:165 ~ DashboardPage ~ setBadges ~ hasPermission:", hasPermission)
       // if (!hasPermission) {
       //   let permissions = await this.badge.requestPermission();
-      //   console.log("🚀 ~ file: dashboard.page.ts:168 ~ DashboardPage ~ setBadges ~ permissions:", permissions)
       // } else {
       //   this.badge.set(Number(this.badgeNumber));
       // }

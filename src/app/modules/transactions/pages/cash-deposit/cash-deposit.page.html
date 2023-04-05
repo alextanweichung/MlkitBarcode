@@ -13,17 +13,26 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" (click)="goToDetail(object.posCashDepositId)" *ngFor="let object of objects" >
-        <ion-label>
-          <h3>{{object.posCashDepositNum}}</h3>
-          <p>{{object.depositDateTime|date:'dd/MM/yyyy'}}</p>
-          <p>{{object.depositSlipNum}}</p>
-          <p>{{object.paymentMethodId|idMapping:paymentMethodMasterList}}</p>
-        </ion-label>
-        <ion-badge mode="ios" slot="end">{{object.depositAmount|number:'1.2'}}</ion-badge>
-      </ion-item>
-    </ion-list>
+    
+    <div *ngFor="let m of uniqueGrouping">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom" lines="full">
+        <ion-item button detail="false" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.posCashDepositId)">
+          <ion-grid class="ion-no-padding p-2">
+            <ion-row>
+              <ion-col class="font-bold">{{object.posCashDepositNum}}</ion-col>
+              <ion-col class="ion-flex justify-content-end"><ion-badge><div class="ion-text-right">{{object.depositAmount|number:'1.2'}}</div></ion-badge></ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>{{object.depositDateTime|date:'dd/MM/yyyy'}}</ion-col>
+              <ion-col class="ion-text-right">{{object.depositSlipNum}}</ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+    </div>
   </div>
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
     <ion-fab-button>

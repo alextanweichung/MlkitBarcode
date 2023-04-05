@@ -159,7 +159,6 @@ export class QuotationCartPage implements OnInit {
   selectedItem: TransactionDetail;
   showEditModal(data: TransactionDetail) {
     this.selectedItem = data;
-    console.log("🚀 ~ file: quotation-cart.page.ts:163 ~ QuotationCartPage ~ showEditModal ~ this.selectedItem:", this.selectedItem)
     this.isModalOpen = true;
   }
 

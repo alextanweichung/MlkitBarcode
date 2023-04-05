@@ -30,7 +30,6 @@ export class SalesOrderService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: sales-order.service.ts:34 ~ SalesOrderService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

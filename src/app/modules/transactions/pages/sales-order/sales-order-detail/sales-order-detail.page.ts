@@ -300,7 +300,6 @@ export class SalesOrderDetailPage implements OnInit {
     }
     this.statusModel = true;
     this.salesOrderService.getStatus(this.object.header.salesOrderId).subscribe(response => {
-    console.log("🚀 ~ file: sales-order-detail.page.ts:287 ~ SalesOrderDetailPage ~ this.salesOrderService.getStatus ~ response:", response)
     this.orderStatus = response;
 
     }, error => {

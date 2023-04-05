@@ -22,7 +22,6 @@ export class CheckBalanceService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: check-balance.service.ts:26 ~ CheckBalanceService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
