@@ -14,7 +14,7 @@
         </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
-        <ion-searchbar #searchBar class="p-0" [(ngModel)]="searchText" showCancelButton="focus" animated="true" [placeholder]="title ? 'Search for ' + title : 'Search'" (keypress)="keypress($event)" (ionClear)="resetFilter()"></ion-searchbar>
+        <ion-searchbar #searchBar class="p-0" [(ngModel)]="searchText" showCancelButton="never" animated="true" [placeholder]="title ? 'Search for ' + title : 'Search'" (keypress)="keypress($event)" (ionClear)="resetFilter()"></ion-searchbar>
       </ion-toolbar>
     </ion-header>
     <ion-content>

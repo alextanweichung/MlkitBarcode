@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
@@ -16,7 +16,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-sales-order-item',
@@ -117,7 +117,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
         }, error => {
           throw error;
         })
-      }      
+      }
     } catch (e) {
       console.error(e);
     }
@@ -130,7 +130,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
         this.fullItemList = response;
       }, error => {
         throw error;
-      })      
+      })
     } catch (e) {
       console.error(e);
     }
@@ -156,13 +156,13 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       } else {
         let trxLine = JSON.parse(JSON.stringify(event));
         trxLine = this.assignLineUnitPrice(trxLine);
-  
+
         if (this.objectHeader.isItemPriceTaxInclusive) {
           await this.computeUnitPriceExTax(trxLine);
         } else {
           await this.computeUnitPrice(trxLine);
         }
-  
+
         if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
           trxLine.uuid = uuidv4();
           let discPct = Number(trxLine.discountExpression?.replace("%", ""));
@@ -201,6 +201,30 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
+  /* #region toggle show available qty */
+
+  showAvailQty: boolean = false;
+  toggleShowAvailQty() {
+    this.showAvailQty = !this.showAvailQty;
+  }
+
+  /* #endregion */
+  
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
   /* #region  tax handle here */
 
   promotionEngineApplicable: boolean = true;
@@ -230,7 +254,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
-      this.computeDiscTaxAmount(trxLine);      
+      this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
     }
@@ -272,7 +296,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
       trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
       trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
-      return trxLine;      
+      return trxLine;
     } catch (e) {
       console.error(e);
     }

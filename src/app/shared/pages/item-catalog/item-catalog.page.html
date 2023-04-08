@@ -1,7 +1,7 @@
 <ion-grid class="ion-no-padding">
   <ion-row>
     <ion-col size="9" class="ion-flex ion-margin-auto">
-      <ion-searchbar #searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
+      <ion-searchbar #searchbar class="p-0" showCancelButton="never"  animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
     </ion-col>
     <ion-col size="3" class="ion-flex ion-margin-auto justify-content-center">
       <ion-button expand="block" size="small" (click)="searchItem()">Search</ion-button>
@@ -33,7 +33,7 @@
                 <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
-              <ion-col *ngIf="item?.availableQty > 0">
+              <ion-col *ngIf="item?.availableQty !== null && showAvailQty">
                 Qty: <div class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
@@ -118,7 +118,7 @@
               <ion-col>
                 U/P: <div class="font-bold ml-2">{{item.unitPrice|number:'1.2-2'}}</div>
               </ion-col>
-              <ion-col *ngIf="item?.availableQty > 0">
+              <ion-col *ngIf="item?.availableQty !== null && showAvailQty">
                 Qty: <div class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
@@ -176,7 +176,7 @@
                     </ion-row>
                     <ion-row *ngIf="isSalesOrder">
                       <ion-col class="ion-flex ion-margin-auto">
-                        Avail. Qty: <div class="font-bold ml-2">{{d.availableQty??0|number:'1.0'}}</div>
+                        Avail. Qty: <div class="font-bold ml-2">{{d.availableQty|number:'1.0'}}</div>
                       </ion-col>
                     </ion-row>
                   </ion-grid>

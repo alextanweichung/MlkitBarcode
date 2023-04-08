@@ -31,6 +31,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   @Input() isItemPriceTaxInclusive: boolean;
   @Input() maxPrecision: number;
   @Input() showImage: boolean = false;
+  @Input() showAvailQty: boolean = false;
   @Input() isSalesOrder: boolean = false;
 
   brandMasterList: MasterListDetails[] = [];
@@ -49,7 +50,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    
+
   }
 
   ngOnInit() {
@@ -90,20 +91,17 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         if (Capacitor.getPlatform() !== 'web') {
           Keyboard.hide();
         }
-        // if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
-          // online mode
-          this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
-            console.log("🚀 ~ file: item-catalog.page.ts:96 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ response:", response)
-            this.availableItems = response;
+        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
+          this.availableItems = response;
+          console.log("🚀 ~ file: item-catalog.page.ts:96 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
+          if (this.availableItems && this.availableItems.length > 0) {
             this.availableItems.forEach(r =>
               this.assignLineUnitPrice(r)
             )
-            this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
-          })
-          this.loadImages(searchText);
-        // } else {
-        //   // offline mode, search item from local item master and item barcode
-        // }
+          }
+          this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
+        })
+        this.loadImages(searchText);
       } else {
         this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
       }
@@ -181,7 +179,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           price = price - parseFloat(x);
         }
       })
-    } 
+    }
     return price;
   }
 
@@ -198,7 +196,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   increaseQty(data: TransactionDetail) {
-    data.qtyRequest = (data.qtyRequest ?? 0) + 1;    
+    data.qtyRequest = (data.qtyRequest ?? 0) + 1;
   }
 
   addToCart(data: TransactionDetail) {
@@ -236,7 +234,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   increaseVariationQty(data: InnerVariationDetail) {
     data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-  }  
+  }
 
   addVariationToCart() {
     var totalQty = 0;
