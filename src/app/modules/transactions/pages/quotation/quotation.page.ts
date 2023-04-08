@@ -95,6 +95,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
           this.customerSearchDropdownList.push({
             id: r.customerId,
             code: r.customerCode,
+            oldCode: r.oldCustomerCode,
             description: r.name
           })
         })
@@ -154,8 +155,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf(doc) {
     try {
       const alert = await this.alertController.create({
-        header: '',
-        subHeader: 'View Pdf?',
+        header: 'Download Pdf?',
         message: '',
         buttons: [
           {

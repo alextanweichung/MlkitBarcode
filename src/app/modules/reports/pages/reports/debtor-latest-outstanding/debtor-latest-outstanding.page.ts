@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
 import { format } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -8,17 +7,22 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstanding, DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { ViewWillEnter } from '@ionic/angular';
+import { CreditInfoDetails } from 'src/app/shared/models/credit-info';
 
 @Component({
   selector: 'app-debtor-latest-outstanding',
   templateUrl: './debtor-latest-outstanding.page.html',
   styleUrls: ['./debtor-latest-outstanding.page.scss']
 })
-export class DebtorLatestOutstandingPage implements OnInit {
+export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
 
   customers: Customer[] = [];
   customerSearchDropdownList: SearchDropdownList[] = [];
   objects: DebtorOutstanding[] = [];
+
+  data: any;
+  columns: any;
 
   constructor(
     private reportService: ReportsService,
@@ -26,8 +30,26 @@ export class DebtorLatestOutstandingPage implements OnInit {
     private commonService: CommonService
   ) { }
 
+  ionViewWillEnter(): void {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
+  }
+
   ngOnInit() {
     this.loadCustomers();
+    this.columns = [
+      { prop: 'customerName', name: 'Customer', draggable: false },
+      { prop: 'salesAgentName', name: 'SA', draggable: false },
+      { prop: 'currencyCode', name: 'Currency', draggable: false },
+      { prop: 'balance', name: 'Outstanding', draggable: false }
+    ]
+    this.creditCols = [
+      { prop: 'trxDate', name: 'Trx Date', draggable: false },
+      { prop: 'overdueDay', name: 'O/D Day', draggable: false },
+      { prop: 'docNum', name: 'Doc. Number', draggable: false },
+      { prop: 'amount', name: 'Amount', draggable: false }
+    ]
   }
 
   loadCustomers() {
@@ -39,6 +61,7 @@ export class DebtorLatestOutstandingPage implements OnInit {
         this.customerSearchDropdownList.push({
           id: r.customerId,
           code: r.customerCode,
+          oldCode: r.oldCustomerCode,
           description: r.name
         })
       })
@@ -67,7 +90,7 @@ export class DebtorLatestOutstandingPage implements OnInit {
     }
   }
 
-  trxDate: Date;
+  trxDate: Date = null;
   onDateSelected(event) {
     if (event) {
       this.trxDate = event;
@@ -90,6 +113,34 @@ export class DebtorLatestOutstandingPage implements OnInit {
     }, error => {
       console.log(error);
     })
+  }
+
+
+  loadCreditInfo(customerId: number) {
+    this.reportService.getCreditInfo(customerId).subscribe(response => {
+      this.displayDetails(response.outstanding, 'Outstanding Amount');
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  displayModal: boolean = false;
+  creditInfoType: string = '';
+  tableValue: CreditInfoDetails[] = [];
+  creditCols: any[] = [];
+  displayDetails(tableValue: CreditInfoDetails[], infoType: string) {
+    try {
+      this.displayModal = true;
+      this.creditInfoType = infoType;
+      this.tableValue = [];
+      this.tableValue = [...tableValue];
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  
+  hideItemModal() {
+    this.displayModal = false;
   }
 
 }

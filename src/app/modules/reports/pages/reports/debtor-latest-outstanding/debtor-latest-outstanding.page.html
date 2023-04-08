@@ -11,26 +11,87 @@
   <div class="p-2" style="overflow:auto">
     <ion-list class="list-custom" lines="none">
       <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"  [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>
-      <app-calendar-input #calendar title="Statement Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
+      <app-calendar-input title="Statement Date" [date_value]="trxDate" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" (click)="loadDebtorReport()">Search</ion-button>
-    <div class="p-2">
-      <table id="qtyMatrix" *ngIf="objects.length > 0">
-        <tr>
-          <th class="p-1 font-half-size">Debtor Name</th>
-          <th class="p-1 font-half-size">Salesman Name</th>
-          <th class="p-1 font-half-size">Currency</th>
-          <th class="p-1 font-half-size">Outstanding</th>
-          <th class="p-1 font-half-size">Statement</th>
-        </tr>
-        <tr *ngFor="let rowData of objects; let rowIndex = index">
-          <td class="p-1 font-half-size">{{rowData.customerName}}</td>
-          <td class="p-1 font-half-size">{{rowData.salesAgentName}}</td>
-          <td class="p-1 font-half-size">{{rowData.currencyCode}}</td>
-          <td class="p-1 font-half-size ion-text-right">{{rowData.balance|number:'1.2-2'}}</td>
-          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf(rowData.customerId)">Generate</ion-button></td>
-        </tr>
-      </table>
-    </div>
+    <ngx-datatable
+      class="material mt-2"
+      [rows]="objects" 
+      [rowHeight]="50" 
+      [columns]="columns"
+      [columnMode]="'force'" 
+      [headerHeight]="50" 
+      [footerHeight]="50">
+      <ngx-datatable-column prop="customerName" name="Customer">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size div-link-button" (click)="downloadPdf(row.customerId)">{{row.customerName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="salesAgentName" name="SA">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.salesAgentName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="currencyCode" name="Currency">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.currencyCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="balance" name="Outstanding">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right div-link-button" (click)="loadCreditInfo(row.customerId)"> {{row.balance | number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
   </div>
 </ion-content>
+
+<ion-modal [isOpen]="displayModal" (didDismiss)="displayModal = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>
+          <div class="ion-text-wrap">
+            {{creditInfoType}}
+          </div>
+        </ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideItemModal()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content *ngIf="tableValue">
+      <div class="p-2">
+        <ngx-datatable
+          class="material mt-2"
+          [rows]="tableValue" 
+          [rowHeight]="50" 
+          [columns]="columns"
+          [columnMode]="'force'" 
+          [headerHeight]="50" 
+          [footerHeight]="50">
+          <ngx-datatable-column prop="trxDate" name="Trx Date">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <div class="flex ion-text-wrap font-half-size">{{row.trxDate|date:'dd/MM/yyyy'}}</div>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column prop="overdueDay" name="O/D Day" *ngIf="creditInfoType == 'Overdue Amount'">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <div class="flex ion-text-wrap font-half-size">{{row.overdueDay}}</div>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column prop="docNum" name="Doc. Number">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <div class="flex ion-text-wrap font-half-size">{{row.docNum}}</div>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column prop="amount" name="Amount">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <div class="font-half-size ion-text-right"> {{row.amount | number:'1.2-2'}}</div>
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

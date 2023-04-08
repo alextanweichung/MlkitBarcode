@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
@@ -16,7 +16,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './consignment-sales-header-add.page.html',
   styleUrls: ['./consignment-sales-header-add.page.scss'],
 })
-export class ConsignmentSalesHeaderAddPage implements OnInit {
+export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
 
@@ -31,11 +31,18 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     this.newObjectForm();
   }
 
+  trxDate: Date = null;
+  ionViewWillEnter(): void {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
+  }
+
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
       consignmentSalesId: [0],
       consignmentSalesNum: [null],
-      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
+      trxDate: [this.commonService.convertUtcDate(this.trxDate), [Validators.required]],
       customerId: [null],
       locationId: [null],
       toLocationId: [null, [Validators.required]],

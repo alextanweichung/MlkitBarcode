@@ -4,7 +4,7 @@
       <ion-searchbar #searchbar class="p-0" showCancelButton="focus" animated="true" placeholder="Search for Item" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
     </ion-col>
     <ion-col size="3" class="ion-flex ion-margin-auto justify-content-center">
-      <ion-button expand="block" size="default" (click)="searchItem()">Search</ion-button>
+      <ion-button expand="block" size="small" (click)="searchItem()">Search</ion-button>
     </ion-col>
   </ion-row>
 </ion-grid>
@@ -19,6 +19,7 @@
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
+                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
@@ -85,6 +86,7 @@
             <ion-row *ngIf="item.variationTypeCode === '0'">
               <ion-col size="8" class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
+                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
               <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small"(click)="decreaseQty(item)">
@@ -103,6 +105,7 @@
             <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
               <ion-col size="8" class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
+                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
               <ion-col size="4" class="ion-flex ion-margin-auto justify-content-end">
                 <ion-button expand="block" size="small" style="width: 100%" (click)="showModal(item)">Variation</ion-button>

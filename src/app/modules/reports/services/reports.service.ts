@@ -4,8 +4,10 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
 import { DebtorOutstanding, DebtorOutstandingRequest } from '../models/debtor-outstanding';
-import { SAPerformaceListing } from '../models/rp-sa-performace-listing';
+import { SAPerformanceListing, SalesAgentAllPerformanceObject } from '../models/rp-sa-performance-listing';
 import { ReportSOListing } from '../models/rp-so-listing';
+import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-customer';
+import { CreditInfo } from 'src/app/shared/models/credit-info';
 
 @Injectable({
   providedIn: 'root'
@@ -34,11 +36,23 @@ export class ReportsService {
   }
 
   getSAPerformance() {
-    return this.http.get<SAPerformaceListing[]>(this.baseUrl + "MobileReport/saPerformance");
+    return this.http.get<SAPerformanceListing[]>(this.baseUrl + "MobileReport/saPerformance");
+  }
+
+  getAllSalesPerformance(dateStart: string, dateEnd: string) {
+    return this.http.get<SalesAgentAllPerformanceObject[]>(this.baseUrl + "MobileReport/allPerformance/" + dateStart + "/" + dateEnd);
+  }
+
+  getSalesByCustomer(object: SalesByCustomerRequest) {
+    return this.http.post<SalesByCustomer[]>(this.baseUrl + "MobileReport/salesByCustomer", object);
   }
 
   getPdf(model: ReportParameterModel) {
     return this.http.post(this.baseUrl + "mobileReport/exportPdf", model, { responseType: 'blob' });
+  }
+
+  getCreditInfo(customerId: number) {
+    return this.http.get<CreditInfo>(this.baseUrl + "mobileReport/creditInfo/" + customerId);
   }
   
 }

@@ -108,8 +108,7 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   async presentAlertViewPdf() {
     const alert = await this.alertController.create({
-      header: '',
-      subHeader: 'View Pdf?',
+      header: 'Download Pdf?',
       message: '',
       buttons: [
         {

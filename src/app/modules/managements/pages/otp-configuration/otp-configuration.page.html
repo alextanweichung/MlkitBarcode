@@ -23,7 +23,7 @@
         <ion-checkbox #checkBox slot="end" (ionChange)="onCheckBoxChecked($event)" [(ngModel)]="checkboxValue"></ion-checkbox>
         <ion-label>Default Expiry</ion-label>
       </ion-item>
-        <app-calendar-input [hidden]="checkBox.checked" #calendar title="Expiry Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
+        <app-calendar-input [hidden]="checkBox.checked" [date_value]="expiryDate" title="Expiry Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
     </div>
 </ion-content>
 <ion-footer>

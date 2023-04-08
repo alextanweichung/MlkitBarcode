@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { RpSaPerformanceListingPageRoutingModule } from './rp-sa-performance-listing-routing.module';
 
 import { RpSaPerformanceListingPage } from './rp-sa-performance-listing.page';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    RpSaPerformanceListingPageRoutingModule
+    RpSaPerformanceListingPageRoutingModule,
+    NgxDatatableModule
   ],
   declarations: [RpSaPerformanceListingPage]
 })

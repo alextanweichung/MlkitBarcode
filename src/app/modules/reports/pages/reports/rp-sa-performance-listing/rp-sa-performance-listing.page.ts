@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SAPerformaceListing } from '../../../models/rp-sa-performace-listing';
+import { SAPerformanceListing } from '../../../models/rp-sa-performance-listing';
 import { ReportsService } from '../../../services/reports.service';
 
 @Component({
@@ -9,7 +9,9 @@ import { ReportsService } from '../../../services/reports.service';
 })
 export class RpSaPerformanceListingPage implements OnInit {
 
-  objects: SAPerformaceListing[] = [];
+  objects: SAPerformanceListing[] = [];
+  
+  columns: any;
 
   constructor(
     private reportService: ReportsService
@@ -17,6 +19,12 @@ export class RpSaPerformanceListingPage implements OnInit {
 
   ngOnInit() {
     this.loadObjects();
+    this.columns = [
+      { prop: 'salesAgentCode', name: 'SA Code', draggable: false },
+      { prop: 'salesAgentName', name: 'SA Name', draggable: false },
+      { prop: 'transactionType', name: 'Trx Type', draggable: false },
+      { prop: 'netAmount', name: 'Net Amount', draggable: false }
+    ]
   }
 
   loadObjects() {

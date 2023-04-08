@@ -169,6 +169,7 @@ export class QuotationHeaderPage implements OnInit {
           this.customerSearchDropdownList.push({
             id: r.customerId,
             code: r.customerCode,
+            oldCode: r.oldCustomerCode,
             description: r.name
           })
         })

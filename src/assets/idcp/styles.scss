@@ -1,3 +1,9 @@
+
+/* ngx datatable */
+@import '../../../node_modules/@swimlane/ngx-datatable/index.css';
+@import '../../../node_modules/@swimlane/ngx-datatable/themes/material.scss';
+@import '../../../node_modules/@swimlane/ngx-datatable/assets/icons.css';
+
 .badge-green {
    background: rgba(101, 214, 173, 0.1);
    color: #27AB83;
@@ -562,4 +568,8 @@ ion-item {
 
 .customToast {
    opacity: 0.75;
+}
+
+.div-link-button {
+  color: var(--ion-color-primary);
 }

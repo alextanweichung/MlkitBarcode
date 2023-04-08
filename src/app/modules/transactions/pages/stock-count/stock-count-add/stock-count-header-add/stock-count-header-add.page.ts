@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { InventoryCountBatchList } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -13,7 +13,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './stock-count-header-add.page.html',
   styleUrls: ['./stock-count-header-add.page.scss'],
 })
-export class StockCountHeaderAddPage implements OnInit {
+export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
 
@@ -27,12 +27,19 @@ export class StockCountHeaderAddPage implements OnInit {
     this.newObjectForm();
   }
 
+  trxDate: Date = null;
+  ionViewWillEnter(): void {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
+  }
+
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
       inventoryCountId: [0],
       inventoryCountNum: [null],
       description: [null],
-      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
+      trxDate: [this.commonService.convertUtcDate(this.trxDate), [Validators.required]],
       locationId: [null, [Validators.required]],
       inventoryCountBatchId: [null, [Validators.required]],
       zoneId: [null],

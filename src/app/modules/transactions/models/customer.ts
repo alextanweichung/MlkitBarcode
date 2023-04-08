@@ -1,6 +1,7 @@
 export interface Customer {
    customerId: number
    customerCode: string
+   oldCustomerCode: string
    name: string
    companyRegNum: string
    taxNum: any

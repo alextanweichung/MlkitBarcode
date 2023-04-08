@@ -1,12 +1,9 @@
-<ion-content>
-  
+<ion-content>  
   <div class="ion-padding ion-full-height ion-flex ion-flex-center">
-
     <div class="logo-container">
       <h1 class="logo-placeholder">{{companyName}}</h1>
       <p>Login to your account.</p>
     </div>
-
     <form class="form-default" [formGroup]="signin_form">
       <ion-list class="item-card-list" lines="none">
         <ion-item>
@@ -19,23 +16,24 @@
         </ion-item>
       </ion-list>
     </form>
-
     <ion-item class="ion-flex ion-flex-center" lines="none">
       <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
       <ion-label>
-        <div class="ion-text-small">Remember Me!</div></ion-label>
+        <div class="ion-text-small">Remember Me!</div>
+      </ion-label>
     </ion-item>
-
     <ion-button class="ion-margin-top" type="submit" expand="block" color="primary" [disabled]="submit_attempt" (click)="signIn()">
       Sign in
     </ion-button>
-
+    <div class="ion-text-center ion-margin-top">
+      <ion-text color="medium" (click)="forgetPassword($event)">
+        <small>forget password?</small>
+      </ion-text>
+    </div>
     <div class="ion-text-center ion-margin-top">
       <ion-text color="medium">
         <small>&copy; {{current_year}} iDCP Systems Sdn Bhd v{{currentVersion}}</small>
       </ion-text>
     </div>
-
   </div>
-
 </ion-content>

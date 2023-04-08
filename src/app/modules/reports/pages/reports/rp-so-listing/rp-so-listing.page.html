@@ -6,38 +6,65 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
-  <div class="p-2" style="overflow:auto">
-      <table id="qtyMatrix" *ngIf="objects.length > 0">
-        <tr>
-          <th class="p-1 font-half-size">Issued Date</th>
-          <th class="p-1 font-half-size">Debtor Code</th>
-          <th class="p-1 font-half-size">Debtor Name</th>
-          <th class="p-1 font-half-size">Salesman</th>
-          <th class="p-1 font-half-size">Online Order</th>
-          <th class="p-1 font-half-size">Order Status</th>
-          <th class="p-1 font-half-size">Sales Order</th>
-          <th class="p-1 font-half-size">Delivery Order</th>
-          <th class="p-1 font-half-size">Delivered</th>
-          <th class="p-1 font-half-size">Net Amount</th>
-        </tr>
-        <tr *ngFor="let rowData of objects; let rowIndex = index">
-          <td class="p-1 font-half-size">{{rowData.issuedDate|date:'dd/MM/yyyy'}}</td>
-          <td class="p-1 font-half-size">{{rowData.debtorCode}}</td>
-          <td class="p-1 font-half-size">{{rowData.debtorName}}</td>
-          <td class="p-1 font-half-size">{{rowData.salesmanName}}</td>
-          <td class="p-1 font-half-size">{{rowData.onlineOrder}}</td>
-          <td class="p-1 font-half-size">{{rowData.orderStatus}}</td>
-          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf(rowData.salesOrderId)">{{rowData.salesOrderNum}}</ion-button></td>
-          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="showDialogOrDownload(rowData.deliveryOrderIds)">{{rowData.deliveryOrders?.replace('|', ', ')}}</ion-button></td>
-          <td class="p-1 font-half-size">{{rowData.delivered}}</td>
-          <td class="p-1 font-half-size ion-text-right">{{rowData.netAmount|number:'1.2-2'}}</td>
-        </tr>
-      </table>
+  <div class="p-2">
+    <ngx-datatable
+    class="fullscreen material mt-2"
+    [rows]="objects" 
+    [rowHeight]="50" 
+    [columns]="columns"
+    [columnMode]="'force'" 
+    [headerHeight]="50" 
+    [footerHeight]="50"
+    [scrollbarH]="true">
+      <ngx-datatable-column prop="issuedDate" name="Issued Date">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.issuedDate|date:'dd/MM/yyyy'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="debtorCode" name="Debtor Code">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.debtorCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="debtorName" name="Debtor Name">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.debtorName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="salesmanName" name="Salesman">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.salesmanName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="orderStatus" name="Order Status">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.orderStatus}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="salesOrderNum" name="Sales Order">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size div-link-button" (click)="downloadPdf(row.salesOrderId)"> {{row.salesOrderNum}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size div-link-button" (click)="showDialogOrDownload(row.deliveryOrderIds)"> {{row.deliveryOrders?.replace('|', ', ')}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="delivered" name="Delivered">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.delivered}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="netAmount" name="Net Amount">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
   </div>
 </ion-content>
-
 <ion-modal [isOpen]="doDialog" (didDismiss)="doDialog = false">
   <ng-template>
     <ion-header>

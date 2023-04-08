@@ -7,6 +7,7 @@ import { LoadingController } from '@ionic/angular';
 export class LoadingService {
 
   loading: HTMLIonLoadingElement;
+  isShowing: boolean = false;
 
   constructor(
     public loadingController: LoadingController
@@ -19,16 +20,15 @@ export class LoadingService {
       spinner: 'crescent',
       backdropDismiss: true
     });
-    await this.loading.present();
+    if (!this.isShowing) {
+      this.isShowing = true;
+      await this.loading.present();
+    }
   }
 
   async dismissLoading() {
-    // at least show 1.5 second
-    setTimeout(async () => {
-      if (this.loading) {
-        this.loading.dismiss();
-      }
-    }, 1500);
+    this.loading?.dismiss();
+    this.isShowing = false;
   }
 
 }

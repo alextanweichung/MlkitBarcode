@@ -4,7 +4,7 @@ import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import jwt_decode, { JwtPayload } from "jwt-decode";
 import { ConfigService } from '../config/config.service';
-import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user';
+import { CustomToken, ForgotPasswordRequest, LoginRequest, LoginUser, ResetPassword, TokenRequest } from './login-user';
 import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -266,6 +266,14 @@ export class AuthService {
 
   getCompanyName() {
     return this.http.get<any>(this.baseUrl + "account/CompanyName");
+  }
+
+  forgotPassword(passwordResetRequest: ForgotPasswordRequest) {
+    return this.http.post(this.baseUrl + 'account/forgotPassword', passwordResetRequest, httpObserveHeader);
+  }
+
+  resetPassword(passwordResetDto: ResetPassword) {
+    return this.http.post(this.baseUrl + 'account/resetPassword', passwordResetDto, httpObserveHeader);
   }
 
 }

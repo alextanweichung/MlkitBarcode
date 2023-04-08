@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2"> 
     <ion-list class="list-custom" lines="full">
-      <app-calendar-input title="Trx Date" (onDateSelected)="onTrxDateSelected($event)"></app-calendar-input>
+      <app-calendar-input title="Trx Date" [date_value]="trxDate" (onDateSelected)="onTrxDateSelected($event)"></app-calendar-input>
       <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="locationSearchDdl" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
       <app-search-dropdown #inventoryCountBatchSdd title="Inventory Count Batch" optionLabel="description" [searchDropdownList]="inventoryCountBatchDdl" (onActionComplete)="onInventoryCountBatchChanged($event)" emptyMessage="This Location do not have Inventory Count Batch" [disabled]="!objectForm.controls.locationId.value"></app-search-dropdown>
       <app-search-dropdown #rackSsd title="Rack" optionLabel="description" [searchDropdownList]="rackSearchDdl" (onActionComplete)="onRackChanged($event)"></app-search-dropdown>

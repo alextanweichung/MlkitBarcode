@@ -26,7 +26,8 @@
           <ion-item detail="false" *ngFor="let item of tempDropdownList">
             <ion-checkbox slot="start" [(ngModel)]="item.checked" (ionChange)="itemChecked($event, item)"></ion-checkbox>
             <ion-badge slot="start" *ngIf="item?.code">{{item?.code}}</ion-badge>
-            <ion-label class="ml-2">{{item?.description}}</ion-label>
+            <ion-badge class="ml-2" color="tertiary" slot="start" *ngIf="item?.oldCode">{{item?.oldCode}}</ion-badge>
+            <div class="ml-2 ion-text-wrap">{{item?.description}}</div>
           </ion-item>
         </ion-list>
       </div>

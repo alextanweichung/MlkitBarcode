@@ -93,6 +93,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         // if (this.configService.sys_parameter && this.configService.sys_parameter.onlineMode) {
           // online mode
           this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
+            console.log("🚀 ~ file: item-catalog.page.ts:96 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ response:", response)
             this.availableItems = response;
             this.availableItems.forEach(r =>
               this.assignLineUnitPrice(r)

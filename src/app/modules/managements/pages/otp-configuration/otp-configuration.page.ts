@@ -7,7 +7,7 @@ import { OtpService } from '../../services/otp.service';
 import { App } from 'src/app/shared/models/app';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.page';
@@ -17,7 +17,7 @@ import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropd
   templateUrl: './otp-configuration.page.html',
   styleUrls: ['./otp-configuration.page.scss'],
 })
-export class OtpConfigurationPage implements OnInit {
+export class OtpConfigurationPage implements OnInit, ViewWillEnter {
 
   lovStatics: MasterListDetails[] = [];
   apps: App[] = [];
@@ -31,7 +31,7 @@ export class OtpConfigurationPage implements OnInit {
   selectedUser: any;
   selectedValidity: any;
   selectedApp: any;
-  expiryDate: Date;
+  expiryDate: Date = null;
 
   checkboxValue: boolean = true;
 
@@ -51,6 +51,12 @@ export class OtpConfigurationPage implements OnInit {
     private commonService: CommonService,
     private alertController: AlertController,
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.expiryDate) {
+      this.expiryDate = this.commonService.getTodayDate();
+    }
+  }
 
   ngOnInit() {
     this.loadUsers();

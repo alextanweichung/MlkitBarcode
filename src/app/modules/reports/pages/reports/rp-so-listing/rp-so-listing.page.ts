@@ -13,6 +13,9 @@ export class RpSoListingPage implements OnInit {
 
   objects: ReportSOListing[] = [];
 
+  data: any;
+  columns: any;
+
   constructor(
     private reportService: ReportsService,
     private commonService: CommonService
@@ -20,6 +23,18 @@ export class RpSoListingPage implements OnInit {
 
   ngOnInit() {
     this.loadObjects();
+    this.columns = [
+      { prop: 'issuedDate', name: 'Issued Date', draggable: false },
+      { prop: 'debtorCode', name: 'Debtor Code', draggable: false },
+      { prop: 'debtorName', name: 'Debtor Name', draggable: false },
+      { prop: 'salesmanName', name: 'Salesman', draggable: false },
+      // { prop: 'onlineOrder', name: 'Online Order', draggable: false },
+      { prop: 'orderStatus', name: 'Order Status', draggable: false },
+      { prop: 'salesOrderNum', name: 'Sales Order', draggable: false },
+      { prop: 'deliveryOrderIds', name: 'Delivery Order', draggable: false },
+      { prop: 'delivered', name: 'Delivered', draggable: false },
+      { prop: 'netAmount', name: 'Net Amount', draggable: false }
+    ]
   }
 
   loadObjects() {

@@ -71,6 +71,10 @@ export class SigninPage implements OnInit, ViewWillEnter {
     })
   }
 
+  forgetPassword(event) {
+    this.navController.navigateRoot('/forget-password');
+  }
+
   // Sign in
   async signIn() {
     this.submit_attempt = true;

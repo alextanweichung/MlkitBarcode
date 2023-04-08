@@ -165,8 +165,7 @@ export class QuotationDetailPage implements OnInit {
   async presentAlertViewPdf() {
     try {
       const alert = await this.alertController.create({
-        header: '',
-        subHeader: 'View Pdf?',
+        header: 'Download Pdf?',
         message: '',
         buttons: [
           {
