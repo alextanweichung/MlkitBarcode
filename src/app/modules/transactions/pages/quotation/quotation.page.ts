@@ -10,7 +10,6 @@ import { format } from 'date-fns';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
-import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-quotation',
@@ -29,14 +28,16 @@ export class QuotationPage implements OnInit, ViewWillEnter {
 
   constructor(
     private commonService: CommonService,
-    private quotationService: QuotationService,
+    private objectService: QuotationService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private navController: NavController,
     private toastService: ToastService,
-    // private loadingService: LoadingService
-  ) { }
+  ) { 
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     if (!this.startDate) {
@@ -46,7 +47,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
       this.endDate = this.commonService.getTodayDate();
     }
     this.loadObjects();
-    this.loadCustomerList();
+    this.bindCustomerList();
   }
 
   ngOnInit() {
@@ -62,7 +63,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
         dateEnd: format(this.endDate, 'yyyy-MM-dd'),
         customerId: this.customerIds
       }
-      this.quotationService.getObjectListByDate(obj).subscribe(async response => {
+      this.objectService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = response;
         this.objects = this.commonService.convertArrayAllDateType(this.objects);
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
@@ -82,29 +83,17 @@ export class QuotationPage implements OnInit, ViewWillEnter {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
   }
 
-  customers: Customer[] = [];
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
-  loadCustomerList() {
-    try {
-      this.quotationService.getCustomerList().subscribe(async response => {
-        this.customers = response;
-        this.customers = this.customers.filter(r => r.businessModelType === 'T');
-        await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-        this.customers.forEach(r => {
-          this.customerSearchDropdownList.push({
-            id: r.customerId,
-            code: r.customerCode,
-            oldCode: r.oldCustomerCode,
-            description: r.name
-          })
-        })
-      }, error => {
-        throw error;
+  bindCustomerList() {
+    this.objectService.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
       })
-    } catch (e) {
-      console.error(e);
-    }
+    })
   }
 
   /* #endregion */
@@ -113,7 +102,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      if (this.quotationService.hasSalesAgent()) {
+      if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward('/transactions/quotation/quotation-header');
       } else {
         this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'dnager', 1000);
@@ -155,7 +144,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf(doc) {
     try {
       const alert = await this.alertController.create({
-        header: 'Download Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -181,7 +170,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
 
   async downloadPdf(doc) {
     try {
-      this.quotationService.downloadPdf("SMSC001", "pdf", doc.quotationId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC001", "pdf", doc.quotationId).subscribe(response => {
         let filename = doc.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {

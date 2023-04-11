@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { InterTransferHeader, InterTransferRoot } from 'src/app/modules/transactions/models/inter-transfer';
 import { InterTransferService } from 'src/app/modules/transactions/services/inter-transfer.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -16,7 +16,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './inter-transfer-cart.page.html',
   styleUrls: ['./inter-transfer-cart.page.scss'],
 })
-export class InterTransferCartPage implements OnInit {
+export class InterTransferCartPage implements OnInit, ViewWillEnter {
 
   objectHeader: InterTransferHeader;
   itemInCart: TransactionDetail[] = [];
@@ -31,11 +31,17 @@ export class InterTransferCartPage implements OnInit {
     private toastService: ToastService,
     private alertController: AlertController,
     private navController: NavController
-  ) { }
-
-  ngOnInit() {
+  ) {
     this.objectHeader = this.objectService.header;
     this.itemInCart = this.objectService.itemInCart;
+  }
+
+  ionViewWillEnter(): void {
+    this.objectHeader = this.objectService.header;
+    this.itemInCart = this.objectService.itemInCart;
+  }
+
+  ngOnInit() {
     this.loadMasterList();
   }
 
@@ -68,13 +74,59 @@ export class InterTransferCartPage implements OnInit {
 
   isModalOpen: boolean = false;
   selectedItem: TransactionDetail;
-  showEditModal(data: TransactionDetail) {
-    this.selectedItem = data;
+  selectedIndex: number;
+  showEditModal(data: TransactionDetail, rowIndex: number) {
+    this.selectedItem = JSON.parse(JSON.stringify(data));
+    this.selectedIndex = rowIndex;
     this.isModalOpen = true;
+  }
+
+  saveChanges() {
+    if (this.selectedIndex === null || this.selectedIndex === undefined) {
+      this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
+      return;
+    } else {
+      this.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+      this.hideEditModal();
+    }
+  }
+
+  async cancelChanges() {
+    try {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to discard changes?',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm',
+            cssClass: 'success',
+            handler: () => {
+              this.isModalOpen = false;
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+  
+            }
+          },
+        ],
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   hideEditModal() {
     this.isModalOpen = false;
+  }
+
+  onModalHide() {
+    this.selectedIndex = null;
+    this.selectedItem = null;
   }
 
   /* #endregion */
@@ -186,7 +238,7 @@ export class InterTransferCartPage implements OnInit {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/sales-order/sales-order-item');
+      this.navController.navigateBack('/transactions/inter-transfer/inter-transfer-item');
     } catch (e) {
       console.error(e);
     }
@@ -230,7 +282,8 @@ export class InterTransferCartPage implements OnInit {
       }
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-        try {
+        try {          
+          this.objectService.resetVariables();
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: response.body["header"]["interTransferId"],

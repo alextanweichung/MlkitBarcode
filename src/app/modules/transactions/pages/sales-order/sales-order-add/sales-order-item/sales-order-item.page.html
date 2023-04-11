@@ -43,7 +43,7 @@
 
 <ion-content fullscreen>
   <div class="p-2">
-    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [objectHeader]="objectHeader" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="true" [showAvailQty]="showAvailQty"></app-item-catalog>
+    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectHeader" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="true" [showAvailQty]="showAvailQty"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

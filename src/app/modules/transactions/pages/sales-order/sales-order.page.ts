@@ -29,19 +29,20 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   uniqueGrouping: Date[] = [];
 
-  salesAgentMasterList: MasterListDetails[] = [];
   salesAgentDropdownList: SearchDropdownList[] = [];
 
   constructor(
     private commonService: CommonService,
-    private salesOrderService: SalesOrderService,
+    private objectService: SalesOrderService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    // private loadingService: LoadingService,
     private modalController: ModalController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     if (!this.startDate) {
@@ -50,9 +51,9 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
-    this.loadMasterList();
     this.loadObjects();
-    this.loadCustomerList();
+    this.bindCustomerList();
+    this.bindSalesAgentList();
   }
 
   ngOnInit() {
@@ -60,25 +61,6 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
   }
 
   /* #region  crud */
-
-  loadMasterList() {
-    try {
-      this.salesOrderService.getMasterList().subscribe(response => {
-        this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.salesAgentMasterList.forEach(r => {
-          this.salesAgentDropdownList.push({
-            id: r.id,
-            code: r.code,
-            description: r.description
-          })
-        })
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
 
   loadObjects() {
     try {
@@ -88,7 +70,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
         customerId: this.customerIds,
         salesAgentId: this.salesAgentIds
       }
-      this.salesOrderService.getObjectListByDate(obj).subscribe(async response => {
+      this.objectService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -106,29 +88,27 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
   }
 
-  customers: Customer[] = [];
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
-  loadCustomerList() {
-    try {
-      this.salesOrderService.getCustomerList().subscribe(async response => {
-        this.customers = response;
-        this.customers = this.customers.filter(r => r.businessModelType === 'T');
-        await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-        this.customers.forEach(r => {
-          this.customerSearchDropdownList.push({
-            id: r.customerId,
-            code: r.customerCode,
-            oldCode: r.oldCustomerCode,
-            description: r.name
-          })
-        })
-      }, error => {
-        throw error;
+  bindCustomerList() {
+    this.objectService.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
       })
-    } catch (e) {
-      console.error(e);
-    }
+    })
+  }
+
+  bindSalesAgentList() {
+    this.objectService.salesAgentMasterList.forEach(r => {
+      this.salesAgentDropdownList.push({
+        id: r.id,
+        code: r.code,
+        description: r.description
+      })
+    })
   }
 
   /* #endregion */
@@ -137,7 +117,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      if (this.salesOrderService.hasSalesAgent()) {
+      if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward('/transactions/sales-order/sales-order-header');
       } else {
         this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'danger', 1000);
@@ -180,7 +160,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf(doc) {
     try {
       const alert = await this.alertController.create({
-        header: 'Download Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -206,7 +186,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   async downloadPdf(doc) {
     try {
-      this.salesOrderService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
         let filename = doc.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {

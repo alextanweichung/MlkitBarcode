@@ -29,7 +29,7 @@ export class SalesOrderDetailPage implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
-    private salesOrderService: SalesOrderService,
+    public objectService: SalesOrderService,
     private alertController: AlertController,
     private toastService: ToastService,
     private commonService: CommonService
@@ -53,7 +53,6 @@ export class SalesOrderDetailPage implements OnInit {
       this.navController.navigateBack('/transactions/sales-order')
     } else {
       this.loadModuleControl();
-      this.loadMasterList();
       this.loadObject();
     }
   }
@@ -72,29 +71,9 @@ export class SalesOrderDetailPage implements OnInit {
     }
   }
 
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.salesOrderService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        console.log("🚀 ~ file: sales-order-detail.page.ts:83 ~ SalesOrderDetailPage ~ this.salesOrderService.getMasterList ~ this.customerMasterList:", this.customerMasterList)
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
-    }
-  }
-
   loadObject() {
     try {
-      this.salesOrderService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
         throw error;
@@ -156,7 +135,7 @@ export class SalesOrderDetailPage implements OnInit {
   async presentAlertViewPdf() {
     try {
       const alert = await this.alertController.create({
-        header: 'Download Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -182,7 +161,7 @@ export class SalesOrderDetailPage implements OnInit {
 
   async downloadPdf() {
     try {
-      this.salesOrderService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId).subscribe(response => {
         let filename = this.object.header.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
@@ -269,7 +248,7 @@ export class SalesOrderDetailPage implements OnInit {
           docId: listOfDoc.map(i => Number(i))
         }
         try {
-          this.salesOrderService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileSalesOrderReview' : 'mobileSalesOrderApprove', bulkConfirmReverse).subscribe(async response => {
+          this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileSalesOrderReview' : 'mobileSalesOrderApprove', bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
               this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
               this.navController.back();
@@ -301,7 +280,7 @@ export class SalesOrderDetailPage implements OnInit {
       console.error(e);
     }
     this.statusModel = true;
-    this.salesOrderService.getStatus(this.object.header.salesOrderId).subscribe(response => {
+    this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
     this.orderStatus = response;
 
     }, error => {

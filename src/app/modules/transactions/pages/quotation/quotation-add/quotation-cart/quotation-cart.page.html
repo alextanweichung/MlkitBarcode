@@ -13,13 +13,13 @@
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-label class="label-title">View Cart</ion-label>
+      <ion-label class="label-title">Cart</ion-label>
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
-      <ion-item-sliding *ngFor="let item of itemInCart">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item)">
+      <ion-item-sliding *ngFor="let item of itemInCart; let i = index">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row class="pb-1">
               <ion-col class="ion-flex ion-margin-auto">
@@ -45,8 +45,8 @@
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">
                   <ion-col class="ion-margin-auto">
-                    <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                    <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                    <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                   </ion-col>
                   <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
                     <div>{{d.qtyRequest|number:'1.0'}}</div>
@@ -135,13 +135,13 @@
   </ion-grid>
 </ion-footer>
 
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalWillDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title>Info</ion-title>
         <ion-buttons slot="start">
-          <ion-button (click)="hideEditModal()">Done</ion-button>
+          <ion-button (click)="cancelChanges()">Cancel</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -163,7 +163,7 @@
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>
             <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']">
-              <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
+              <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>
@@ -188,9 +188,9 @@
             <div *ngFor="let vd of selectedItem.variationDetails">
               <div *ngFor="let d of vd.details">
                 <ion-row>
-                  <ion-col class="ion-margin-auto">
-                    <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                    <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <span class="badge-green px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>  
                   </ion-col>
                   <ion-col class="ion-margin-auto p-0">
                     <ion-grid class="ion-no-padding">
@@ -218,6 +218,17 @@
         </ion-item>
       </div>
     </ion-content>
+    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" (click)="saveChanges()">
+              Apply
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-footer>
   </ng-template>
 </ion-modal>
 
@@ -244,7 +255,7 @@
           <ion-item>
             <ion-label>Ship Method</ion-label>
             <ion-select slot="end" [(ngModel)]="objectHeader.shipMethodId" placeholder="Select ship method">
-              <ion-select-option *ngFor="let s of shipMethodMasterList" [value]="s.id">{{s.description}}</ion-select-option>
+              <ion-select-option *ngFor="let s of objectService.shipMethodMasterList" [value]="s.id">{{s.description}}</ion-select-option>
             </ion-select>
           </ion-item>
         </ion-list>
@@ -281,7 +292,7 @@
           <ion-item>
             <ion-label>Area</ion-label>
             <ion-select slot="end" [(ngModel)]="objectHeader.shipAreaId" placeholder="Select ship area">
-              <ion-select-option *ngFor="let a of areaMasterList" [value]="a.id">{{a.description}}</ion-select-option>
+              <ion-select-option *ngFor="let a of objectService.areaMasterList" [value]="a.id">{{a.description}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>

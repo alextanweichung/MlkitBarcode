@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController } from '@ionic/angular';
-import { format } from 'date-fns';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderHeader, SalesOrderRoot, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -8,7 +7,6 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ShippingInfo, MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -19,31 +17,43 @@ import { PromotionEngineService } from 'src/app/shared/services/promotion-engine
   templateUrl: './sales-order-cart.page.html',
   styleUrls: ['./sales-order-cart.page.scss'],
 })
-export class SalesOrderCartPage implements OnInit {
+export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   objectHeader: SalesOrderHeader;
   itemInCart: TransactionDetail[] = [];
 
   moduleControl: ModuleControl[] = [];
+  promotionEngineApplicable: boolean = true;
   useTax: boolean = false;
 
   constructor(
     private authService: AuthService,
-    private salesOrderService: SalesOrderService,
+    public objectService: SalesOrderService,
     private commonService: CommonService,
     private promotionEngineService: PromotionEngineService,
     private toastService: ToastService,
     private alertController: AlertController,
     private navController: NavController
-  ) { }
+  ) {
+    this.objectHeader = this.objectService.header;
+    this.itemInCart = this.objectService.itemInCart;
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+    }
+  }
+
+  ionViewWillEnter(): void {
+    this.objectHeader = this.objectService.header;
+    this.itemInCart = this.objectService.itemInCart;
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+    }
+  }
 
   ngOnInit() {
-    this.objectHeader = this.salesOrderService.header;
-    this.itemInCart = this.salesOrderService.itemInCart;
     this.loadModuleControl();
-    this.loadMasterList();
-    this.loadPromotion();
     this.loadRestrictColumms();
+    this.loadAvailableAddresses();
   }
 
   availableAddress: ShippingInfo[] = [];
@@ -53,9 +63,9 @@ export class SalesOrderCartPage implements OnInit {
       this.availableAddress = [];
       if (this.objectHeader) {
         if (this.objectHeader.businessModelType === 'T') {
-          this.availableAddress = this.customerMasterList.filter(r => r.id === this.objectHeader.customerId).flatMap(r => r.shippingInfo);
+          this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectHeader.customerId).flatMap(r => r.shippingInfo);
         } else {
-          this.availableAddress = this.locationMasterList.filter(r => r.id === this.objectHeader.toLocationId).flatMap(r => r.shippingInfo);
+          this.availableAddress = this.objectService.locationMasterList.filter(r => r.id === this.objectHeader.toLocationId).flatMap(r => r.shippingInfo);
         }
       }
       this.selectedAddress = this.availableAddress.find(r => r.isPrimary);
@@ -93,72 +103,20 @@ export class SalesOrderCartPage implements OnInit {
       console.error(e);
     }
   }
-
-  customerMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  shipMethodMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  areaMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.salesOrderService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.areaMasterList = response.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.loadAvailableAddresses();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
+  
   // restrictFields: any = {};
   restrictTrxFields: any = {};
   loadRestrictColumms() {
     try {
       let restrictedObject = {};
       let restrictedTrx = {};
-      this.authService.restrictedColumn$.subscribe(obj => {
-        // let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
-        // apiData.forEach(element => {
-        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
-        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
-        //       restrictedObject[ctrl] = true;
-        //     }
-        //   });
-        // });
-        // this.restrictFields = restrictedObject;
-  
+      this.authService.restrictedColumn$.subscribe(obj => {  
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
         });
         this.restrictTrxFields = restrictedTrx;
       })
-
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  loadPromotion() {
-    try {
-      let trxDate = this.objectHeader.trxDate;
-      if (trxDate) {
-        this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
-          this.promotionMaster = response;
-        }, error => {
-          throw error;
-        })
-      }
     } catch (e) {
       console.error(e);
     }
@@ -168,13 +126,63 @@ export class SalesOrderCartPage implements OnInit {
 
   isModalOpen: boolean = false;
   selectedItem: TransactionDetail;
-  showEditModal(data: TransactionDetail) {
-    this.selectedItem = data;
+  selectedIndex: number;
+  showEditModal(data: TransactionDetail, rowIndex: number) {
+    this.selectedItem = JSON.parse(JSON.stringify(data));
+    // this.selectedItem = data;
+    this.selectedIndex = rowIndex;
     this.isModalOpen = true;
+  }
+
+  saveChanges() {
+    if (this.selectedIndex === null || this.selectedIndex === undefined) {
+      this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
+      return;
+    } else {
+      this.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+      this.hideEditModal();
+    }
+  }
+
+  async cancelChanges() {
+    try {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to discard changes?',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm',
+            cssClass: 'success',
+            handler: () => {
+              this.isModalOpen = false;
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+  
+            }
+          },
+        ],
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   hideEditModal() {
     this.isModalOpen = false;
+  }
+
+  onModalHide() {
+    this.selectedIndex = null;
+    this.selectedItem = null;
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+    }
   }
 
   /* #endregion */
@@ -302,7 +310,10 @@ export class SalesOrderCartPage implements OnInit {
       let index = this.itemInCart.findIndex(r => r.itemId === data.itemId);
       if (index > -1) {
         this.itemInCart.splice(index, 1);
-      }      
+      }
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+      }
     } catch (e) {
       console.error(e);
     }
@@ -340,7 +351,7 @@ export class SalesOrderCartPage implements OnInit {
 
   onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
     try {
-      let discPct = this.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
+      let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
       if (discPct) {
         if (discPct == "0") {
           trxLine.discountExpression = null;
@@ -354,8 +365,6 @@ export class SalesOrderCartPage implements OnInit {
     }
   }
 
-  promotionEngineApplicable: boolean = true;
-  promotionMaster: PromotionMaster[] = [];
   computeAllAmount(trxLine: TransactionDetail) {
     try {
       if (trxLine.qtyRequest <= 0) {
@@ -363,18 +372,14 @@ export class SalesOrderCartPage implements OnInit {
         this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
       }
       this.computeDiscTaxAmount(trxLine);
-      // if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
-      }      
     } catch (e) {
       console.error(e);
     }
   }
 
   getPromoDesc(promoEventId: number) {
-    if (this.promotionMaster.length > 0) {
-      let find = this.promotionMaster.find(x => x.promoEventId == promoEventId);
+    if (this.objectService.promotionMaster.length > 0) {
+      let find = this.objectService.promotionMaster.find(x => x.promoEventId == promoEventId);
       if (find) {
         return find.description;
       } else {
@@ -408,7 +413,7 @@ export class SalesOrderCartPage implements OnInit {
               cssClass: 'success',
               role: 'confirm',
               handler: async () => {
-                await this.insertQuotation();
+                await this.insertSalesOrder();
               },
             },
             {
@@ -427,13 +432,13 @@ export class SalesOrderCartPage implements OnInit {
     }
   }
 
-  insertQuotation() {
+  insertSalesOrder() {
     try {
       let trxDto: SalesOrderRoot = {
         header: this.objectHeader,
         details: this.itemInCart
       }
-      this.salesOrderService.insertObject(trxDto).subscribe(response => {
+      this.objectService.insertObject(trxDto).subscribe(response => {
         let details: any[] = response.body["details"];
         let totalQty: number = 0;
         details.forEach(e => {
@@ -441,11 +446,11 @@ export class SalesOrderCartPage implements OnInit {
         })
         let ss: SalesOrderSummary = {
           salesOrderNum: response.body["header"]["salesOrderNum"],
-          customerName: this.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
+          customerName: this.objectService.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
           totalQuantity: totalQty,
           totalAmount: response.body["header"]["grandTotal"]
         }
-        this.salesOrderService.setSalesOrderSummary(ss);
+        this.objectService.setSalesOrderSummary(ss);
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
       }, error => {

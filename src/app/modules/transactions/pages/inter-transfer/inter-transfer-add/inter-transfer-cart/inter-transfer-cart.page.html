@@ -15,8 +15,8 @@
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
-      <ion-item-sliding *ngFor="let item of itemInCart">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item)">
+      <ion-item-sliding *ngFor="let item of itemInCart; let i = index">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row class="pb-1">
               <ion-col class="ion-flex ion-margin-auto">
@@ -64,7 +64,7 @@
   <ion-grid class="ion-no-padding">
     <ion-row class="pt-2 pl-3 pr-3">
       <ion-col class="ion-flex ion-margin-auto">
-        <div style="color: black;">Total Qty:</div>
+        <div style="color: black;">Total Quantity</div>
       </ion-col>
       <ion-col class="ion-flex ion-margin-auto justify-content-end">
         <div style="color: black;">{{itemInCart|sum:'qtyRequest'|number:'1.0'}}</div>
@@ -80,13 +80,13 @@
   </ion-grid>
 </ion-footer>
 
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (onHide)="onModalHide()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title>Info</ion-title>
         <ion-buttons slot="start">
-          <ion-button (click)="hideEditModal()">Done</ion-button>
+          <ion-button (click)="cancelChanges()">Cancel</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -139,5 +139,16 @@
         </ion-item>
       </div>
     </ion-content>
+    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" (click)="saveChanges()">
+              Apply
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-footer>
   </ng-template>
 </ion-modal>

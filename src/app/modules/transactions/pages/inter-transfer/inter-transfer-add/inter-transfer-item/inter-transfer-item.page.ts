@@ -3,7 +3,6 @@ import { NavController, ViewWillEnter } from '@ionic/angular';
 import { InterTransferHeader } from 'src/app/modules/transactions/models/inter-transfer';
 import { InterTransferService } from 'src/app/modules/transactions/services/inter-transfer.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -27,22 +26,33 @@ export class InterTransferItemPage implements OnInit, ViewWillEnter {
     private objectService: InterTransferService,
     private toastService: ToastService,
     private navController: NavController
-  ) { }
-
-  ionViewWillEnter(): void {
-    this.itemInCart = this.objectService.itemInCart;
-  }
-
-  ngOnInit() {
+  ) {
     try {
       this.objectHeader = this.objectService.header;
+      this.itemInCart = this.objectService.itemInCart;
       if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
         this.navController.navigateBack('/transactions/inter-transfer/inter-transfer-header');
       }
-      this.componentsLoad();
     } catch (e) {
       console.error(e);
     }
+  }
+
+  ionViewWillEnter(): void {
+    try {
+      this.objectHeader = this.objectService.header;
+      this.itemInCart = this.objectService.itemInCart;
+      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+        this.navController.navigateBack('/transactions/inter-transfer/inter-transfer-header');
+      } else {
+        this.componentsLoad();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  ngOnInit() {
   }
 
   componentsLoad() {
@@ -117,7 +127,7 @@ export class InterTransferItemPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+      this.navController.navigateBack('/transactions/inter-transfer/inter-transfer-header');
     } catch (e) {
       console.error(e);
     }

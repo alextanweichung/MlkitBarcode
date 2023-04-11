@@ -1,22 +1,15 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
-import { format } from 'date-fns';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemList } from 'src/app/shared/models/item-list';
-import { MasterList } from 'src/app/shared/models/master-list';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { ItemCartPage } from 'src/app/shared/pages/item-cart/item-cart.page';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
 import {v4 as uuidv4} from 'uuid';
 
@@ -37,33 +30,40 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   constructor(
     private authService: AuthService,
-    private quotationService: QuotationService,
-    private promotionEngineService: PromotionEngineService,
+    public objectService: QuotationService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService) { }
-
-  ionViewWillEnter(): void {
-    this.itemInCart = this.quotationService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
-  }
-
-  ngOnInit() {
+    private toastService: ToastService) {
     try {
-      this.objectHeader = this.quotationService.header;
+      this.objectHeader = this.objectService.header;
+      this.itemInCart = this.objectService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
       if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
         this.navController.navigateBack('/transactions/quotation/quotation-header');
       }
-      this.componentsLoad();
     } catch (e) {
       console.error(e);
     }
   }
 
+  ionViewWillEnter(): void {
+    try {
+      this.objectHeader = this.objectService.header;
+      this.itemInCart = this.objectService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
+      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+        this.navController.navigateBack('/transactions/quotation/quotation-header');
+      } else {
+        this.componentsLoad();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  ngOnInit() {
+  }
+
   componentsLoad() {
     this.loadModuleControl();
-    this.loadMasterList();
-    this.loadFullItemList();
-    this.loadPromotion();
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -88,56 +88,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       this.authService.precisionList$.subscribe(precision => {
         this.precisionSales = precision.find(x => x.precisionCode == "SALES");
         this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })      
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  fullMasterList: MasterList[] = [];
-  customerMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.quotationService.getMasterList().subscribe(response => {
-        this.fullMasterList = response;
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  promotionMaster: PromotionMaster[] = [];
-  loadPromotion() {
-    try {
-      let trxDate = this.objectHeader.trxDate;
-      if (trxDate) {
-        this.quotationService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
-          this.promotionMaster = response;
-        }, error => {
-          throw error;
-        })
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  fullItemList: ItemList[] = [];
-  loadFullItemList() {
-    try {
-      this.quotationService.getFullItemList().subscribe(response => {
-        this.fullItemList = response;
-      }, error => {
-        throw error;
       })      
     } catch (e) {
       console.error(e);
@@ -217,9 +167,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   async computeAllAmount(trxLine: TransactionDetail) {
     try {
       await this.computeDiscTaxAmount(trxLine);
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
-        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
-      }
     } catch (e) {
       console.error(e);
     }
@@ -292,7 +239,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.quotationService.setChoosenItems(this.itemInCart);
+      this.objectService.setChoosenItems(this.itemInCart);
       this.navController.navigateForward('/transactions/quotation/quotation-cart');
     } catch (e) {
       console.error(e);

@@ -6,7 +6,6 @@ import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-orde
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemList } from 'src/app/shared/models/item-list';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -33,33 +32,41 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   constructor(
     private authService: AuthService,
-    private salesOrderService: SalesOrderService,
-    private promotionEngineService: PromotionEngineService,
+    public objectService: SalesOrderService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService) { }
-
-  ionViewWillEnter(): void {
-    this.itemInCart = this.salesOrderService.itemInCart;
-  }
-
-  ngOnInit() {
+    private toastService: ToastService) {
     try {
-      this.objectHeader = this.salesOrderService.header;
+      this.objectHeader = this.objectService.header;
+      this.itemInCart = this.objectService.itemInCart;
       if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
         this.navController.navigateBack('/transactions/sales-order/sales-order-header');
       }
-      this.componentsLoad();
     } catch (e) {
       console.error(e);
     }
   }
 
+  ionViewWillEnter(): void {
+    try {
+      this.objectHeader = this.objectService.header;
+      this.itemInCart = this.objectService.itemInCart;
+      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+        this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+      } else {
+        this.componentsLoad();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  ngOnInit() {
+    
+  }
+
   componentsLoad() {
     this.loadModuleControl();
-    this.loadMasterList();
-    // this.loadFullItemList();
-    this.loadPromotion();
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -89,52 +96,6 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       console.error(e);
     }
   }
-
-  fullMasterList: MasterList[] = [];
-  customerMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.salesOrderService.getMasterList().subscribe(response => {
-      this.fullMasterList = response;
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
-  }
-
-  promotionMaster: PromotionMaster[] = [];
-  loadPromotion() {
-    try {
-      let trxDate = this.objectHeader.trxDate;
-      if (trxDate) {
-        this.salesOrderService.getPromotion(format(new Date(trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId).subscribe(response => {
-          this.promotionMaster = response;
-        }, error => {
-          throw error;
-        })
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  // fullItemList: ItemList[] = [];
-  // loadFullItemList() {
-  //   try {
-  //     this.salesOrderService.getFullItemList().subscribe(response => {
-  //       this.fullItemList = response;
-  //     }, error => {
-  //       throw error;
-  //     })
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
 
   itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
@@ -233,9 +194,6 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   async computeAllAmount(trxLine: TransactionDetail) {
     try {
       await this.computeDiscTaxAmount(trxLine);
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine && !this.disablePromotionCheckBox) {
-        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.discountGroupMasterList, true)
-      }
     } catch (e) {
       console.error(e);
     }
@@ -308,7 +266,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.salesOrderService.setChoosenItems(this.itemInCart);
+      this.objectService.setChoosenItems(this.itemInCart);
       this.navController.navigateForward('/transactions/sales-order/sales-order-cart');
     } catch (e) {
       console.error(e);
