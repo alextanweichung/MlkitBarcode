@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ItemCatalogWithoutPricePageRoutingModule } from './item-catalog-without-price-routing.module';
 
 import { ItemCatalogWithoutPricePage } from './item-catalog-without-price.page';
+import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ItemCatalogWithoutPricePageRoutingModule
+    ItemCatalogWithoutPricePageRoutingModule,
+    IdMappingModule
   ],
   exports:[
     ItemCatalogWithoutPricePage

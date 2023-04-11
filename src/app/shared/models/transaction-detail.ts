@@ -6,6 +6,7 @@ export interface TransactionDetail {
   locationId?: number
   itemId?: number
   itemCode?: string
+  oldItemCode?: string
   vendorItemCode?: string
   description?: string
   extendedDescription?: string

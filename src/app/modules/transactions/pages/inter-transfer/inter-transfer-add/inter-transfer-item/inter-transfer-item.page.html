@@ -11,7 +11,7 @@
 </ion-header>
 <ion-content fullscreen>
   <div class="p-2">
-    <item-catalog-without-price></item-catalog-without-price>
+    <item-catalog-without-price [fullMasterList]="fullMasterList" (onItemAdded)="onItemAdded($event)"></item-catalog-without-price>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

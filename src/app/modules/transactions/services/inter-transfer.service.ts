@@ -7,6 +7,11 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 
+//Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
+const httpObserveHeader = {
+  observe: 'response' as 'response'
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,12 +34,24 @@ export class InterTransferService {
     this.header = header;
   }
 
+  setChoosenItems(items: TransactionDetail[]) {
+    this.itemInCart = JSON.parse(JSON.stringify(items));
+    this.itemInCart.forEach(r => {
+      r.locationId = this.header.locationId;
+    })
+  }
+
   removeHeader() {
     this.header = null;
   }
 
+  removeItems() {
+    this.itemInCart = [];
+  }
+
   resetVariables() {
     this.removeHeader();
+    this.removeItems();
   }
 
   /* #endregion */
@@ -57,6 +74,10 @@ export class InterTransferService {
 
   getFullItemList() {
     return this.http.get<ItemList[]>(this.baseUrl + "MobileInterTransfer/item/itemList", { context: background_load() });
+  }
+
+  insertObject(object: InterTransferRoot) {
+    return this.http.post(this.baseUrl + "MobileInterTransfer", object, httpObserveHeader);
   }
 
 }

@@ -58,7 +58,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   componentsLoad() {
     this.loadModuleControl();
     this.loadMasterList();
-    this.loadFullItemList();
+    // this.loadFullItemList();
     this.loadPromotion();
   }
 
@@ -123,18 +123,18 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     }
   }
 
-  fullItemList: ItemList[] = [];
-  loadFullItemList() {
-    try {
-      this.salesOrderService.getFullItemList().subscribe(response => {
-        this.fullItemList = response;
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // fullItemList: ItemList[] = [];
+  // loadFullItemList() {
+  //   try {
+  //     this.salesOrderService.getFullItemList().subscribe(response => {
+  //       this.fullItemList = response;
+  //     }, error => {
+  //       throw error;
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {

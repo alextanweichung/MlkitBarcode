@@ -23,7 +23,7 @@
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
-                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+                <div class="ml-1" *ngIf="item?.oldItemCode"> | {{item?.oldItemCode}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
@@ -92,7 +92,7 @@
             <ion-row *ngIf="item.variationTypeCode === '0'">
               <ion-col size="8" class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
-                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+                <div class="ml-1" *ngIf="item?.oldItemCode"> | {{item?.oldItemCode}}</div>
               </ion-col>
               <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(item)" [disabled]="disableIfPricingNotSet && (item.itemPricing === null)">
@@ -111,7 +111,7 @@
             <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
               <ion-col size="8" class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
-                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+                <div class="ml-1" *ngIf="item?.oldItemCode"> | {{item?.oldItemCode}}</div>
               </ion-col>
               <ion-col size="4" class="ion-flex ion-margin-auto justify-content-end">
                 <ion-button expand="block" size="small" style="width: 100%" (click)="showModal(item)" [disabled]="disableIfPricingNotSet && (item.itemPricing === null)">Variation</ion-button>

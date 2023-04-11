@@ -4,6 +4,7 @@ import { ActionSheetController, NavController } from '@ionic/angular';
 import { InterTransferService } from 'src/app/modules/transactions/services/inter-transfer.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-inter-transfer-header',
@@ -23,6 +24,7 @@ export class InterTransferHeaderPage implements OnInit {
   
   constructor(
     private objectService: InterTransferService,
+    private commonService: CommonService,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private formBuilder: FormBuilder
@@ -34,6 +36,7 @@ export class InterTransferHeaderPage implements OnInit {
     this.objectForm = this.formBuilder.group({
       interTransferId: [0],
       interTransferNum: [null],
+      trxDate: [this.commonService.getTodayDate()],
       locationId: [null, [Validators.required]],
       toLocationId: [null, [Validators.required]],
       shipMethodId: [null],

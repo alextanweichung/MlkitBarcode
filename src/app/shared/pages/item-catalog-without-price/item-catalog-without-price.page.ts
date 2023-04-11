@@ -8,6 +8,8 @@ import { Keyboard } from '@capacitor/keyboard';
 import { format } from 'date-fns';
 import { SearchItemService } from '../../services/search-item.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { InnerVariationDetail } from '../../models/variation-detail';
+import { MasterListDetails } from '../../models/master-list-details';
 
 @Component({
   selector: 'item-catalog-without-price',
@@ -28,6 +30,7 @@ export class ItemCatalogWithoutPricePage implements OnInit {
   ) { }
 
   ngOnInit() {
+    
   }
   
   itemSearchText: string;
@@ -46,7 +49,7 @@ export class ItemCatalogWithoutPricePage implements OnInit {
         if (Capacitor.getPlatform() !== 'web') {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoWithoutPrice(searchText).subscribe(response => {
+        this.searchItemService.getItemInfoWithoutPrice(searchText, format(new Date(), 'yyyy-MM-dd')).subscribe(response => {
           this.availableItems = response;
           console.log("🚀 ~ file: item-catalog-without-price.page.ts:49 ~ ItemCatalogWithoutPricePage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
@@ -68,11 +71,101 @@ export class ItemCatalogWithoutPricePage implements OnInit {
     })
   }
 
+  /* #region  item grid */
+
+  matchImage(itemId: number) {
+    let defaultImageUrl = "assets/icon/favicon.png";
+    let lookup = this.availableImages.find(r => r.keyId === itemId)?.imageSource;
+    if (lookup) {
+      return "data:image/png;base64, " + lookup;
+    }
+    return defaultImageUrl;
+  }
+
+  /* #endregion */
+
+  /* #region  none variation */
+
+  decreaseQty(data: TransactionDetail) {
+    if ((data.qtyRequest - 1) < 0) {
+      data.qtyRequest = 0;
+    } else {
+      data.qtyRequest -= 1;
+    }
+  }
+
+  increaseQty(data: TransactionDetail) {
+    data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+  }
+
+  addToCart(data: TransactionDetail) {
+    this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
+    data.qtyRequest = 0;
+  }
+
+  /* #endregion */
+
+  /* #region  variation */
+
+  isModalOpen: boolean = false;
+  selectedItem: TransactionDetail;
+  hideModal() {
+    this.isModalOpen = false;
+    this.selectedItem = null;
+  }
+
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  showModal(data: TransactionDetail) {
+    this.selectedItem = JSON.parse(JSON.stringify(data));
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.isModalOpen = true;
+  }
+
+  decreaseVariationQty(data: InnerVariationDetail) {
+    if ((data.qtyRequest - 1) < 0) {
+      data.qtyRequest = 0;
+    } else {
+      data.qtyRequest -= 1;
+    }
+  }
+
+  increaseVariationQty(data: InnerVariationDetail) {
+    data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+  }
+
+  addVariationToCart() {
+    var totalQty = 0;
+    if (this.selectedItem.variationDetails) {
+      this.selectedItem.variationDetails.forEach(x => {
+        x.details.forEach(y => {
+          totalQty = totalQty + y.qtyRequest;
+        });
+      })
+    }
+    this.selectedItem.qtyRequest = totalQty;
+    this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+    this.hideModal();
+  }
+
+  /* #endregion */
+
   onKeyDown(event) {
     if (event.keyCode === 13) {
       this.searchItem();
       event.preventDefault();
     }
   }
+
+  /* #region  misc */
+
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
+  /* #endregion */
 
 }
