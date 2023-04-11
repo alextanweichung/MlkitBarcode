@@ -86,6 +86,12 @@
       </ion-item>
       <ion-item>
         <ion-label>
+          <div>Customer</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
           <div>Total Quantity</div>
         </ion-label>
         <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.details|sum:'qtyRequest'|number}}"></ion-input>

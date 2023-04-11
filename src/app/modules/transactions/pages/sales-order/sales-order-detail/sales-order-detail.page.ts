@@ -72,12 +72,15 @@ export class SalesOrderDetailPage implements OnInit {
     }
   }
 
+  customerMasterList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     try {
       this.salesOrderService.getMasterList().subscribe(response => {
+        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+        console.log("🚀 ~ file: sales-order-detail.page.ts:83 ~ SalesOrderDetailPage ~ this.salesOrderService.getMasterList ~ this.customerMasterList:", this.customerMasterList)
         this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
