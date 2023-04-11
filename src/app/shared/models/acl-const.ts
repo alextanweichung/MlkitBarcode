@@ -13,7 +13,8 @@ export const trxAppCode = {
    mobileStockCount: 'MATRST',
    mobileInventoryLevel: 'MATRIL',
    mobileCashDepo: 'MAMPCD',
-   mobileTruckLoading: 'MAMTL'
+   mobileTruckLoading: 'MAMTL',
+   mobileInterTransfer: 'MATRIT'
 }
 
 export const approvalAppCode = {

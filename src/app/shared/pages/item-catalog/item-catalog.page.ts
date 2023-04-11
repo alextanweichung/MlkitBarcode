@@ -33,6 +33,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   @Input() showImage: boolean = false;
   @Input() showAvailQty: boolean = false;
   @Input() isSalesOrder: boolean = false;
+  @Input() disableIfPricingNotSet: boolean = true;
 
   brandMasterList: MasterListDetails[] = [];
   groupMasterList: MasterListDetails[] = [];
@@ -95,9 +96,11 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           this.availableItems = response;
           console.log("🚀 ~ file: item-catalog.page.ts:96 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           if (this.availableItems && this.availableItems.length > 0) {
-            this.availableItems.forEach(r =>
-              this.assignLineUnitPrice(r)
-            )
+            this.availableItems.forEach(r => {
+              if (r.itemPricing !== null) {
+                this.assignLineUnitPrice(r)
+              }
+            })
           }
           this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
         })

@@ -53,7 +53,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       
       setTimeout(async () => {
          if (!finished) {
-            this.loadingService.showLoading('Loading');
+            // this.loadingService.showLoading('Loading');
             // this.spinner.show('sp1');
          }
       }, 800);
@@ -109,7 +109,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            this.loadingService.dismissLoading();
+            // this.loadingService.dismissLoading();
             // this.spinner.hide('sp1');
          })
       );

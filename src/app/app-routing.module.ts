@@ -167,7 +167,10 @@ const routes: Routes = [
     path: 'transactions/truck-loading',
     loadChildren: () => import('./modules/transactions/pages/truck-loading/truck-loading.module').then(m => m.TruckLoadingPageModule)
   },
-
+  {
+    path: 'transactions/inter-transfer',
+    loadChildren: () => import('./modules/transactions/pages/inter-transfer/inter-transfer.module').then( m => m.InterTransferPageModule)
+  },
 
 
 
@@ -259,6 +262,10 @@ const routes: Routes = [
     loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then(m => m.ItemCatalogPageModule)
   },
   {
+    path: 'item-catalog-without-price',
+    loadChildren: () => import('./shared/pages/item-catalog-without-price/item-catalog-without-price.module').then( m => m.ItemCatalogWithoutPricePageModule)
+  },
+  {
     path: 'camera-scan-input',
     loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then(m => m.CameraScanInputPageModule)
   },
@@ -266,6 +273,8 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
+
 
 
 ];

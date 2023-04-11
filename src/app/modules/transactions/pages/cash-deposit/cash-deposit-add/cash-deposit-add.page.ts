@@ -6,7 +6,6 @@ import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileInfo } from '@capacitor/filesystem/dist/esm/definitions';
 import { ActionSheetController, AlertController, NavController, Platform } from '@ionic/angular';
 import { format } from 'date-fns';
-import { finalize } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
@@ -155,7 +154,7 @@ export class CashDepositAddPage implements OnInit {
   async selectImage() {
     try {
       const image = await Camera.getPhoto({
-        quality: 90,
+        quality: 50,
         allowEditing: false,
         resultType: CameraResultType.Uri,
         source: CameraSource.Prompt // Camera, Photos or Prompt!

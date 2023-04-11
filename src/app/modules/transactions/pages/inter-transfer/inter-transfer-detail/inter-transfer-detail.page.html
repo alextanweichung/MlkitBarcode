@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/transactions/cash-deposit"></ion-back-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="primary">
+      <ion-button (click)="edit()">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Detail</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2" *ngIf="object">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Information</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item>
+        <ion-label>
+          <div>Doc. Num</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.interTransferNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Doc. Date</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date: 'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Ori. Location</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.locationId|idMapping: locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Dest. Location</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.toLocationId|idMapping: locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <div>Ship Method</div>
+        </ion-label>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.shipMethodId|idMapping: shipMethodMasterList}}"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Details</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object.details" (click)="showDetails(item)">
+        <ion-grid class="ion-no-padding p-2">
+          <ion-row class="pb-1">
+            <ion-col>
+              <div class="font-bold">{{item.itemCode}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row class="pb-1">
+            <ion-col>
+              <div class="ion-text-wrap">{{item.description}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row class="pb-1">
+            <ion-col class="ion-flex">
+              <ion-icon style="position: relative; top: 0.1rem" *ngIf="item.variationTypeCode !== '0'" name="add-circle-outline"></ion-icon>
+              <div>Total Quantity</div>
+            </ion-col>
+            <ion-col>
+              <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} </div>              
+            </ion-col>
+          </ion-row>
+          <div *ngIf="item.isSelected">
+            <div *ngFor="let vd of item.variationDetails">
+             <ion-row *ngFor="let d of filter(vd.details)">
+                <ion-col>
+                  <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                  <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                </ion-col>
+                <ion-col>
+                  <div class="ion-text-right mr-1">{{d.qtyRequest|number:'1.0'}}</div>
+                </ion-col>
+              </ion-row>
+            </div>
+          </div>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

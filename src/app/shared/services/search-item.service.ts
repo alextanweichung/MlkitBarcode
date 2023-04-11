@@ -38,4 +38,8 @@ export class SearchItemService {
     return this.http.get<ItemImage[]>(this.baseUrl + this.apiObject + "/itemList/imageFile/" + keyword, { context: background_load() });
   }
 
+  getItemInfoWithoutPrice(keyword: string) {
+    return this.http.get<TransactionDetail[]>(this.baseUrl + this.apiObject + "/item/itemList/" + keyword);
+  }
+
 }

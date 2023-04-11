@@ -21,7 +21,7 @@
         <ion-label>Credit Control</ion-label>
       </ion-list-header>
       <ion-list class="list-custom" lines="full" *ngIf="creditInfo?.isCheckCreditLimit">
-        <ion-item>
+      <ion-item>
           <ion-icon slot="start" name="ellipse" [ngClass]="{'color-success': (creditInfo?.availableLimit > 0), 'color-danger': (creditInfo?.availableLimit <= 0)}"></ion-icon>
           <ion-label>
             Available Limit
