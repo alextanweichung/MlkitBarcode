@@ -3,7 +3,7 @@ import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentSalesRoot } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -20,7 +20,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './consignment-sales-item-edit.page.html',
   styleUrls: ['./consignment-sales-item-edit.page.scss'],
 })
-export class ConsignmentSalesItemEditPage implements OnInit {
+export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
 
   objectId: number;
   object: ConsignmentSalesRoot;
@@ -34,21 +34,28 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     private actionSheetController: ActionSheetController,
     private commonService: CommonService,
     private configService: ConfigService,
-    private consignmentSalesService: ConsignmentSalesService,
+    public objectService: ConsignmentSalesService,
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
-  }
-
-  ngOnInit() {
-    this.loadMasterList();
-    this.loadModuleControl();
     if (this.objectId) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('Something went wrong!', 'Invalid ObjectId', 'top', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', 'Invalid Object', 'top', 'danger', 1000);
     }
+  }
+
+  ionViewWillEnter(): void {
+    if (this.objectId) {
+      this.loadObject();
+    } else {
+      this.toastService.presentToast('Something went wrong!', 'Invalid Object', 'top', 'danger', 1000);
+    }
+  }
+
+  ngOnInit() {
+    this.loadModuleControl();
   }
 
   moduleControl: ModuleControl[] = [];
@@ -82,26 +89,9 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     }
   }
 
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.consignmentSalesService.getMasterList().subscribe(response => {
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   loadObject() {
     try {
-      this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
         throw error;
@@ -213,7 +203,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   discountGroupCodeChanged(line: TransactionDetail) {
     try {
       if (line.discountGroupCode) {
-        let lookupValue = this.discountGroupMasterList.find(r => r.code === line.discountGroupCode);
+        let lookupValue = this.objectService.discountGroupMasterList.find(r => r.code === line.discountGroupCode);
         if (lookupValue) {
           if (lookupValue.attribute1 === "0") {
             line.discountExpression = null;
@@ -365,7 +355,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
       if (role === 'confirm') {
-        this.consignmentSalesService.resetVariables();
+        this.objectService.resetVariables();
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectId
@@ -411,7 +401,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   updateObject() {
     try {
-      this.consignmentSalesService.updateObject(this.object).subscribe(response => {
+      this.objectService.updateObject(this.object).subscribe(response => {
         if (response.status === 204) {
           this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'top', 'success', 1000);
           let navigationExtras: NavigationExtras = {

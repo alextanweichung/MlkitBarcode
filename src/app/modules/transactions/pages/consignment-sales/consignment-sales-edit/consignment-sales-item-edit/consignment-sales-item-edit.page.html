@@ -39,8 +39,8 @@
                   <ion-row>
                     <ion-col class="ion-margin-auto ion-flex">
                       <div class="font-bold">{{line.itemCode}}</div>
-                      <span class="badge-green px-1 mx-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                      <span class="badge-purple px-1 mr-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                      <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                      <span class="badge-purple px-1 mr-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                     </ion-col>
                   </ion-row>
                   <ion-row>
@@ -86,9 +86,7 @@
     Save
   </ion-button>
 </ion-footer>
-
 <app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
-
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
     <ion-header>
@@ -121,7 +119,7 @@
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
             <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="discountGroupCodeChanged(selectedItem)">
-              <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
+              <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>

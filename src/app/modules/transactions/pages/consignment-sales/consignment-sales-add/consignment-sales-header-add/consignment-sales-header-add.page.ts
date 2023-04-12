@@ -19,19 +19,22 @@ import { CommonService } from 'src/app/shared/services/common.service';
 export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
+  trxDate: Date = null;
 
   constructor(
     private authService: AuthService,
-    private objectService: ConsignmentSalesService,
+    public objectService: ConsignmentSalesService,
     private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private formBuilder: FormBuilder
   ) {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
     this.newObjectForm();
   }
 
-  trxDate: Date = null;
   ionViewWillEnter(): void {
     if (!this.trxDate) {
       this.trxDate = this.commonService.getTodayDate();
@@ -62,8 +65,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
 
   ngOnInit() {
     this.loadModuleControl();
-    this.loadConsignmentLocation();
-    this.loadMasterList();
+    this.bindLocationList();
+    this.bindMasterList();
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -79,44 +82,10 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     }
   }
 
-  locationList: ConsignmentSalesLocation[] = [];
-  loadConsignmentLocation() {
-    try {
-      this.objectService.getConsignmentLocation().subscribe(response => {
-        this.locationList = response;
-        this.mapLocationList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  salesAgentMasterList: MasterListDetails[] = [];
-  customerMasterList: MasterListDetails[] = [];
-  // locationMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.attribute5 === "C").filter(y => y.deactivated == 0);
-        // this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.mapMasterListSearchDropdownList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   locationSearchDropdownList: SearchDropdownList[] = [];
-  mapLocationList() {
+  bindLocationList() {
     try {
-      this.locationList.forEach(r => {
+      this.objectService.locationList.forEach(r => {
         this.locationSearchDropdownList.push({
           id: r.locationId,
           code: r.locationCode,
@@ -130,16 +99,16 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
 
   customerSearchDropdownList: SearchDropdownList[] = [];
   salesAgentSearchDropdownList: SearchDropdownList[] = [];
-  mapMasterListSearchDropdownList() {
+  bindMasterList() {
     try {
-      this.customerMasterList.forEach(r => {
+      this.objectService.customerMasterList.forEach(r => {
         this.customerSearchDropdownList.push({
           id: r.id,
           code: r.code,
           description: r.description
         })
       })
-      this.salesAgentMasterList.forEach(r => {
+      this.objectService.salesAgentMasterList.forEach(r => {
         this.salesAgentSearchDropdownList.push({
           id: r.id,
           code: r.code,
@@ -160,7 +129,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
   onCustomerChanged(customerId: number) {
     try {
       if (customerId) {
-        let lookupValue = this.customerMasterList.find(r => r.id === customerId);
+        let lookupValue = this.objectService.customerMasterList.find(r => r.id === customerId);
         if (lookupValue) {
           this.objectForm.patchValue({ customerId: lookupValue.id });
           this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
@@ -185,7 +154,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
   onCurrencySelected(event) {
     try {
       if (event) {
-        var lookupValue = this.currencyMasterList?.find(e => e.id == event);
+        var lookupValue = this.objectService.currencyMasterList?.find(e => e.id == event);
         if (lookupValue != undefined) {
           this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
           if (lookupValue.attribute2 == "Y") {
@@ -206,7 +175,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
 
   onLocationChanged(event) {
     if (event) {
-      let customerId = this.locationList.find(r => r.locationId === event.id)?.customerId;
+      let customerId = this.objectService.locationList.find(r => r.locationId === event.id)?.customerId;
       if (customerId) {
         this.onCustomerChanged(customerId)
       }
@@ -229,10 +198,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
             role: 'cancel',
           }]
       });
-      await actionSheet.present();
-  
-      const { role } = await actionSheet.onWillDismiss();
-  
+      await actionSheet.present();  
+      const { role } = await actionSheet.onWillDismiss();  
       if (role === 'confirm') {
         this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/consignment-sales');
@@ -245,7 +212,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
   nextStep() {
     try {
       this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
-        if (response) { // todo : remove this as in future same criteria will only have 1 record or none.        
+        if (response) {
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: response.header.consignmentSalesId

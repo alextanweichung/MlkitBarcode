@@ -24,12 +24,15 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
 
   constructor(
     private commonService: CommonService,
-    private consignmentSalesService: ConsignmentSalesService,
+    private objectService: ConsignmentSalesService,
     private actionSheetController: ActionSheetController,
     private modalController: ModalController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) { 
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
@@ -53,7 +56,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.consignmentSalesService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+      this.objectService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -76,12 +79,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   /* #region  add other sales */
 
   async addObject() {
-    // let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
-    // if (salesAgentId === 0 || salesAgentId === undefined) {
-    //   this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1000);
-    // } else {
-      this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
-    // }
+    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
   }
 
   /* #endregion */
@@ -95,16 +93,12 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
           endDate: this.endDate
         },
         canDismiss: true
-      })
-  
-      await modal.present();
-  
-      let { data } = await modal.onWillDismiss();
-  
+      })  
+      await modal.present();  
+      let { data } = await modal.onWillDismiss();  
       if (data && data !== undefined) {
         this.startDate = new Date(data.startDate);
-        this.endDate = new Date(data.endDate);
-  
+        this.endDate = new Date(data.endDate);  
         this.loadObjects();
       }
     } catch (e) {

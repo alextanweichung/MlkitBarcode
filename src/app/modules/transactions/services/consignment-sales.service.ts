@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot, ConsignmentSalesSummary } from '../models/consignment-sales';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -46,16 +47,51 @@ export class ConsignmentSalesService {
     this.removeSummary();
   }
 
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadStaticLov();
+    await this.loadConsignmentLocation();
+  }
+
+  fullMasterList: MasterList[] = [];
+  customerMasterList: MasterListDetails[] = [];
+  locationMasterList: MasterListDetails[] = [];
+  salesAgentMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  currencyMasterList: MasterListDetails[] = [];
+  discountGroupMasterList: MasterListDetails[] = [];
+  async loadMasterList() {    
+    this.fullMasterList = await this.getMasterList();
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+  }
+
+  loadStaticLov() {
+
+  }
+
+  locationList: ConsignmentSalesLocation[] = [];
+  async loadConsignmentLocation() {
+    this.locationList = await this.getConsignmentLocation();
+  }
+
+
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/masterList");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/masterList").toPromise();
   }
 
   getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.baseUrl + "MobileConsignmentSales/consignmentLocation");
+    return this.http.get<ConsignmentSalesLocation[]>(this.baseUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/staticlov");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/staticlov").toPromise();
   }
 
   getObjectList() {

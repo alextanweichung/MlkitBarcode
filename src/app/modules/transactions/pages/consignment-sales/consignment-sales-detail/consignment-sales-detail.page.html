@@ -38,19 +38,19 @@
         <ion-label>
           Customer
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="object.header.toLocationId">
         <ion-label>
           To Location
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.toLocationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.toLocationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="object.header.salesAgentId">
         <ion-label>
           Sales Agent
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.salesAgentId|idMapping:salesAgentMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.salesAgentId|idMapping:objectService.salesAgentMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
@@ -79,8 +79,8 @@
           <ion-row>
             <ion-col class="ion-flex">
               <div class="font-bold">{{item.itemCode}}</div>
-              <span class="badge-green px-1 mx-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-              <span class="badge-purple px-1 mr-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+              <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && item.itemVariationXId"> {{item.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+              <span class="badge-purple px-1 mr-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && item.itemVariationYId"> {{item.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
             </ion-col>
           </ion-row>
           <ion-row class="pb-1">
