@@ -8,7 +8,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
-import { LoadingService } from 'src/app/services/loading/loading.service';
+import { environment } from 'src/environments/environment';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -34,6 +34,8 @@ export class CardsPage implements OnInit, AfterContentChecked {
   loginName: string;
   loginEmail: string;
   userType: string;
+  current_year: number = new Date().getFullYear();
+  currentVersion: string;
 
   constructor(
     private configService: ConfigService,
@@ -42,7 +44,9 @@ export class CardsPage implements OnInit, AfterContentChecked {
     private toastService: ToastService,
     // private loadingService: LoadingService,
     private commonService: CommonService
-  ) { }
+  ) {
+    this.currentVersion = environment.version;
+  }
 
   ngOnInit(): void {
     let loginUser = JSON.parse(localStorage.getItem('loginUser'));

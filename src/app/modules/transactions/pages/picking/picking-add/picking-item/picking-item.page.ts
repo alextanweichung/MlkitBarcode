@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, IonAccordionGroup, NavController } from '@ionic/angular';
+import { AlertController, IonAccordionGroup, NavController, ViewWillEnter } from '@ionic/angular';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from 'src/app/modules/transactions/models/picking-sales-order';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -9,7 +8,6 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { GoodsPickingHeader, GoodsPickingLine, GoodsPickingRoot, PickingSummary } from 'src/app/modules/transactions/models/picking';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
@@ -19,7 +17,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
   styleUrls: ['./picking-item.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobilePicking' }]
 })
-export class PickingItemPage implements OnInit {
+export class PickingItemPage implements OnInit, ViewWillEnter {
 
   objectHeader: GoodsPickingHeader;
   pickingSalesOrders: PickingSalesOrderRoot[] = [];
@@ -30,27 +28,29 @@ export class PickingItemPage implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
-    private pickingService: PickingService,
+    public objectService: PickingService,
     private navController: NavController,
     private alertController: AlertController,
     private toastService: ToastService,
   ) { }
 
-  ngOnInit() {
+  ionViewWillEnter(): void {
     try {
-      this.objectHeader = this.pickingService.header;
+      this.objectHeader = this.objectService.header;
       if (this.objectHeader === undefined) {
         this.navController.navigateBack('/transactions/picking/picking-sales-order');
       }
-      this.pickingSalesOrders = this.pickingService.selectedSalesOrders;
+      this.pickingSalesOrders = this.objectService.selectedSalesOrders;
       if (this.pickingSalesOrders && this.pickingSalesOrders.length > 0) {
         this.pickingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPickedCurrent = 0);
       }
-      this.loadMasterList();
-      this.loadModuleControl();
     } catch (e) {
       console.error(e);
     }
+  }
+
+  ngOnInit() {
+    this.loadModuleControl();
   }
 
   loadModuleControl() {
@@ -64,21 +64,6 @@ export class PickingItemPage implements OnInit {
       }, error => {
         throw error;
       })      
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.pickingService.getMasterList().subscribe(response => {
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
     } catch (e) {
       console.error(e);
     }
@@ -208,8 +193,8 @@ export class PickingItemPage implements OnInit {
             itemSku: trxLine.itemSku,
             itemVariationTypeCode: trxLine.variationTypeCode,
             itemCode: trxLine.itemCode,
-            itemVariationXDescription: trxLine.itemVariationXId ? this.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
-            itemVariationYDescription: trxLine.itemVariationYId ? this.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
+            itemVariationXDescription: trxLine.itemVariationXId ? this.objectService.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
+            itemVariationYDescription: trxLine.itemVariationYId ? this.objectService.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
             itemUomId: null,
             itemUomDescription: null,
             rack: null,
@@ -359,7 +344,7 @@ export class PickingItemPage implements OnInit {
         header: header,
         details: lines
       }
-      this.pickingService.insertPicking(object).subscribe(response => {
+      this.objectService.insertPicking(object).subscribe(response => {
         if (response.status === 201) {
           let ps: PickingSummary = {
             pickingNum: response.body["header"]["pickingNum"],
@@ -367,7 +352,7 @@ export class PickingItemPage implements OnInit {
             locationId: response.body["header"]["locationId"],
             trxDate: response.body["header"]["trxDate"]
           }        
-          this.pickingService.setPickingSummary(ps);
+          this.objectService.setPickingSummary(ps);
           this.toastService.presentToast('Picking has been added', '', 'top', 'success', 1000);
           this.navController.navigateForward('/transactions/picking/picking-summary');
         }

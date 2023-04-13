@@ -14,7 +14,8 @@ export const trxAppCode = {
    mobileInventoryLevel: 'MATRIL',
    mobileCashDepo: 'MAMPCD',
    mobileTruckLoading: 'MAMTL',
-   mobileInterTransfer: 'MATRIT'
+   mobileInterTransfer: 'MATRIT',
+   mobileTransferConfirmation: 'MATRTC'
 }
 
 export const approvalAppCode = {

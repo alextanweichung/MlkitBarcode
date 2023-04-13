@@ -26,12 +26,15 @@ export class PickingPage implements OnInit, ViewWillEnter {
   constructor(
     private commonService: CommonService,
     private configService: ConfigService,
-    private goodsPickingService: PickingService,
+    private objectService: PickingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
@@ -55,7 +58,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.goodsPickingService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+      this.objectService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -79,7 +82,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      if (this.goodsPickingService.hasWarehouseAgent()) {
+      if (this.objectService.hasWarehouseAgent()) {
         this.navController.navigateForward('/transactions/picking/picking-sales-order');
       } else {
         this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1000);

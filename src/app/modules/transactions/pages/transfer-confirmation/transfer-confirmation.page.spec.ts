@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { RpSaPerformanceListingPage } from './rp-sa-performance-listing.page';
+import { TransferConfirmationPage } from './transfer-confirmation.page';
 
-describe('RpSaPerformanceListingPage', () => {
-  let component: RpSaPerformanceListingPage;
-  let fixture: ComponentFixture<RpSaPerformanceListingPage>;
+describe('TransferConfirmationPage', () => {
+  let component: TransferConfirmationPage;
+  let fixture: ComponentFixture<TransferConfirmationPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ RpSaPerformanceListingPage ],
+      declarations: [ TransferConfirmationPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RpSaPerformanceListingPage);
+    fixture = TestBed.createComponent(TransferConfirmationPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

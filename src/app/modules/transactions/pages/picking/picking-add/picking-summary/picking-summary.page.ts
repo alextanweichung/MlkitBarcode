@@ -14,26 +14,16 @@ export class PickingSummaryPage implements OnInit {
   pickingSummary: PickingSummary;
 
   constructor(
-    private pickingService: PickingService,
+    public objectService: PickingService,
     private navController: NavController
   ) { }
 
   ngOnInit() {
-    this.pickingSummary = this.pickingService.objectSummary;
-    this.loadMasterList();
-  }
-
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.pickingService.getMasterList().subscribe(response => {
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    })
+    this.pickingSummary = this.objectService.objectSummary;
   }
 
   done() {
-    this.pickingService.resetVariables();
+    this.objectService.resetVariables();
     this.navController.navigateRoot('/transactions/picking');
   }
 

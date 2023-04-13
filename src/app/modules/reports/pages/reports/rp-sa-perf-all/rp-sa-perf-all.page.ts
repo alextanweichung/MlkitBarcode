@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { SalesAgentAllPerformanceObject } from '../modules/reports/models/rp-sa-performance-listing';
-import { ReportsService } from '../modules/reports/services/reports.service';
+import { SalesAgentAllPerformanceObject } from '../../../models/rp-sa-performance-listing';
+import { ReportsService } from '../../../services/reports.service';
 import { ViewWillEnter } from '@ionic/angular';
-import { CommonService } from '../shared/services/common.service';
-import { ToastService } from '../services/toast/toast.service';
+import { CommonService } from '../../../../../shared/services/common.service';
+import { ToastService } from '../../../../../services/toast/toast.service';
 import { format } from 'date-fns';
 
 @Component({

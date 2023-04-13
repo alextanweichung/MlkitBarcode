@@ -68,3 +68,40 @@ export interface InterTransferList {
    modifiedAt: string
    deactivated: boolean
  }
+
+ export interface TransferConfirmationRoot {
+  interTransferId: number
+  interTransferNum: string
+  trxDate: string
+  trxDateTime: string
+  typeCode: string
+  locationId: number
+  toLocationId: number
+  sourceType: string
+  transferOutId: any
+  transferOutNum: any
+  deactivated: boolean
+  isCompleted: boolean
+  createdBy: string
+  createdAt: string
+  line: TransferConfirmationLine[]
+}
+
+export interface TransferConfirmationLine {
+  interTransferLineId: number
+  interTransferVariationId: number
+  interTransferId: number
+  sequence: number
+  itemId: number
+  itemCode: string
+  itemSku: string
+  itemDesc: string
+  xId: number
+  xDesc: string
+  yId: number
+  yDesc: string
+  barcode: string
+  qty: number
+  qtyReceive: any
+  isDeleted: any
+}

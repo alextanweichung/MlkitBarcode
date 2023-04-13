@@ -8,7 +8,7 @@ import { RpSaPerfAllPageRoutingModule } from './rp-sa-perf-all-routing.module';
 
 import { RpSaPerfAllPage } from './rp-sa-perf-all.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-import { CalendarInputPageModule } from '../shared/pages/calendar-input/calendar-input.module';
+import { CalendarInputPageModule } from '../../../../../shared/pages/calendar-input/calendar-input.module';
 
 @NgModule({
   imports: [

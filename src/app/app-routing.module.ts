@@ -171,6 +171,10 @@ const routes: Routes = [
     path: 'transactions/inter-transfer',
     loadChildren: () => import('./modules/transactions/pages/inter-transfer/inter-transfer.module').then( m => m.InterTransferPageModule)
   },
+  {
+    path: 'transactions/transfer-confirmation',
+    loadChildren: () => import('./modules/transactions/pages/transfer-confirmation/transfer-confirmation.module').then( m => m.TransferConfirmationPageModule)
+  },
 
 
 
@@ -188,16 +192,12 @@ const routes: Routes = [
     loadChildren: () => import('./modules/reports/pages/reports/rp-so-listing/rp-so-listing.module').then(m => m.RpSoListingPageModule)
   },
   {
-    path: 'reports/rp-sa-performance-listing',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-performance-listing/rp-sa-performance-listing.module').then(m => m.RpSaPerformanceListingPageModule)
-  },
-  {
     path: 'reports/rp-sales-customer',
     loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then( m => m.RpSalesCustomerPageModule)
   },
   {
     path: 'reports/rp-sa-perf-all',
-    loadChildren: () => import('./rp-sa-perf-all/rp-sa-perf-all.module').then( m => m.RpSaPerfAllPageModule)
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-perf-all/rp-sa-perf-all.module').then( m => m.RpSaPerfAllPageModule)
   },
 
 
@@ -273,6 +273,7 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
 
 
 

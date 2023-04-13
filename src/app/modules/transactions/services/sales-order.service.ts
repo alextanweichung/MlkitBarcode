@@ -68,7 +68,7 @@ export class SalesOrderService {
   }
 
   async loadCustomer() {
-    this.customers = await this.getCustomerList();    
+    this.customers = await this.getCustomerList();
     await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
   }
 
