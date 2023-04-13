@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { CheckBalancePageRoutingModule } from './check-balance-routing.module';
+import { InventoryLevelPageRoutingModule } from './inventory-level-routing.module';
 
-import { CheckBalancePage } from './check-balance.page';
+import { InventoryLevelPage } from './inventory-level.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
@@ -14,9 +14,9 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     CommonModule,
     FormsModule,
     IonicModule,
-    CheckBalancePageRoutingModule,
+    InventoryLevelPageRoutingModule,
     SearchDropdownPageModule
   ],
-  declarations: [CheckBalancePage]
+  declarations: [InventoryLevelPage]
 })
-export class CheckBalancePageModule {}
+export class InventoryLevelPageModule {}

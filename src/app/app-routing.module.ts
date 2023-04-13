@@ -153,10 +153,10 @@ const routes: Routes = [
     path: 'transactions/stock-count/stock-count-detail',
     loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then(m => m.StockCountDetailPageModule)
   },
-  // transaction-check-balance
+  // transaction-inventory-level
   {
-    path: 'transactions/check-balance',
-    loadChildren: () => import('./modules/transactions/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
+    path: 'transactions/inventory-level',
+    loadChildren: () => import('./modules/transactions/pages/inventory-level/inventory-level.module').then(m => m.InventoryLevelPageModule)
   },
   // transaction-cash-deposit
   {

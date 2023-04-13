@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ItemList } from 'src/app/shared/models/item-list';
-import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../models/check-balance';
+import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../models/inventory-level';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -14,7 +14,7 @@ const httpObserveHeader = {
 @Injectable({
   providedIn: 'root'
 })
-export class CheckBalanceService {
+export class InventoryLevelService {
 
   baseUrl: string;
 

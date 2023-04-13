@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { CheckBalancePage } from './check-balance.page';
+import { InventoryLevelPage } from './inventory-level.page';
 
-describe('CheckBalancePage', () => {
-  let component: CheckBalancePage;
-  let fixture: ComponentFixture<CheckBalancePage>;
+describe('InventoryLevelPage', () => {
+  let component: InventoryLevelPage;
+  let fixture: ComponentFixture<InventoryLevelPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CheckBalancePage ],
+      declarations: [ InventoryLevelPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CheckBalancePage);
+    fixture = TestBed.createComponent(InventoryLevelPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

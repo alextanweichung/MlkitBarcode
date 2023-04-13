@@ -3,15 +3,15 @@ import { IonAccordionGroup, IonPopover } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../../models/check-balance';
-import { CheckBalanceService } from '../../services/check-balance.service';
+import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../../models/inventory-level';
+import { InventoryLevelService } from '../../services/inventory-level.service';
 
 @Component({
-  selector: 'app-check-balance',
-  templateUrl: './check-balance.page.html',
-  styleUrls: ['./check-balance.page.scss'],
+  selector: 'app-inventory-level',
+  templateUrl: './inventory-level.page.html',
+  styleUrls: ['./inventory-level.page.scss'],
 })
-export class CheckBalancePage implements OnInit {
+export class InventoryLevelPage implements OnInit {
 
   @ViewChild('accordionGroup', { static: false }) accordionGroup: IonAccordionGroup;
 
@@ -25,7 +25,7 @@ export class CheckBalancePage implements OnInit {
   inventoryLevelVariation: InventoryVariationLevel[] = [];
 
   constructor(
-    private checkBalanceService: CheckBalanceService,
+    private inventoryLevelService: InventoryLevelService,
     private toastService: ToastService
   ) { }
 
@@ -36,7 +36,7 @@ export class CheckBalancePage implements OnInit {
   itemSearchDropdownList: SearchDropdownList[] = [];
   loadItemList() {
     try {
-      this.checkBalanceService.getItemList().subscribe(response => {
+      this.inventoryLevelService.getItemList().subscribe(response => {
         this.itemList = response;
         this.itemList.forEach(r => {
           this.itemSearchDropdownList.push({
@@ -91,7 +91,7 @@ export class CheckBalancePage implements OnInit {
       if (lookUpItem) {
         this.itemInfo = lookUpItem;
         // if (this.selectedViewOptions === 'item') {
-        this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
+        this.inventoryLevelService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevel = response;
           // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
@@ -102,7 +102,7 @@ export class CheckBalancePage implements OnInit {
         })
         // } else {
         if (lookUpItem.variationTypeCode !== '0')
-          this.checkBalanceService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
+          this.inventoryLevelService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
             this.inventoryLevelVariation = response;
             // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
             this.computeLocationList();
@@ -177,7 +177,7 @@ export class CheckBalancePage implements OnInit {
   advancedFilter() {
     try {
       if (this.selectedViewOptions === 'item') {
-        this.checkBalanceService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
+        this.inventoryLevelService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevel = response;
           if (this.selectedLocation !== 'all') {
             this.inventoryLevel = this.inventoryLevel.filter(r => r.locationCode === this.selectedLocation);
@@ -191,7 +191,7 @@ export class CheckBalancePage implements OnInit {
         })
       }
       else {
-        this.checkBalanceService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
+        this.inventoryLevelService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
           this.inventoryLevelVariation = response;
           // location filter
           if (this.selectedLocation !== 'all') {
@@ -274,7 +274,7 @@ export class CheckBalancePage implements OnInit {
     try {
       let salesAgentId = JSON.parse(localStorage.getItem('loginUser')).salesAgentId;
       if (salesAgentId) {
-        this.checkBalanceService.getSegmentItemPriceBySalesAgent(salesAgentId, itemId).subscribe(response => {
+        this.inventoryLevelService.getSegmentItemPriceBySalesAgent(salesAgentId, itemId).subscribe(response => {
           this.prices = response;  
         }, error => {
           throw error;
