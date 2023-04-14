@@ -6,7 +6,6 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -17,9 +16,11 @@
     <ion-list class="list-custom animate__animated animate__fadeIn " lines="none">
       <app-search-dropdown title="Location" optionValue="id" [searchDropdownList]="objectService.locationSearchDropdownList" [selectedId]="selectedLocationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
     </ion-list>
-    
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Pending Documents</ion-label>
+    </ion-list-header>
     <ion-list *ngIf="pendingList.length > 0" class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
-      <ion-item button detail="false" *ngFor="let p of pendingList" (click)="showModal(p)">
+      <ion-item button detail="false" *ngFor="let p of pendingList" (click)="goToDetails(p)">
         <ion-grid class="ion-no-padding">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -40,56 +41,5 @@
         </ion-grid>
       </ion-item>
     </ion-list>
-
   </div>
-
 </ion-content>
-
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="onModalHide()">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Detail</ion-title>
-        <ion-buttons slot="start">
-          <ion-button (click)="hideModal()">Cancel</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content *ngIf="selectedObject">      
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item *ngFor="let l of selectedObject.line">
-          <ion-grid class="ion-no-padding">
-            <ion-row class="py-1">
-              <ion-col size="9" class="ion-flex ion-margin-auto">
-                <ion-grid class="ion-no-padding">
-                  <ion-row>
-                    <ion-col class="ion-flex ion-margin-auto">
-                      <div class="font-bold">{{l.itemCode}}</div>
-                      <span class="badge-green px-1 mx-1 ion-flex" *ngIf="l.xDesc"> {{l.xDesc}}</span>
-                      <span class="badge-green px-1 mx-1 ion-flex" *ngIf="l.yDesc"> {{l.yDesc}}</span>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row>
-                    <ion-col class="ion-flex ion-margin-auto">
-                      <div>{{l.itemDesc}}</div>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row class="pb-1">
-                    <ion-col class="ion-flex ion-margin-auto">
-                      <div>{{l.barcode}}</div>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-              </ion-col>
-              <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
-                <div>
-                  <ion-input class="ml-3 custom ion-text-center" type="number" inputmode="numeric" [min]="0" [(ngModel)]="l.qtyReceive"></ion-input>
-                </div>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  </ng-template>
-</ion-modal>

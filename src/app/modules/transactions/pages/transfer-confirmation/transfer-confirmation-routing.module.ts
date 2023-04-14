@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: TransferConfirmationPage
+  },
+  {
+    path: 'transfer-confirmation-item',
+    loadChildren: () => import('./transfer-confirmation-item/transfer-confirmation-item.module').then( m => m.TransferConfirmationItemPageModule)
   }
 ];
 

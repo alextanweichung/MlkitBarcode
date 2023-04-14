@@ -30,13 +30,34 @@ export class TransferConfirmationService {
     await this.loadMasterList();
   }
 
+  /* #region store value */
+
+  selectedObject: TransferConfirmationRoot;
+  setSelectedObject(object: TransferConfirmationRoot) {
+    this.selectedObject = JSON.parse(JSON.stringify(object));
+  }
+
+  getSelectedObject() {
+    return this.selectedObject;
+  }
+
+  resetVariables() {
+    this.clearSelectedObject();
+  }
+  
+  clearSelectedObject() {
+    this.selectedObject = null;
+  }
+
+  /* #endregion */
+
   fullMasterList: MasterList[] = [];
   locationMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);    
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
     await this.locationMasterList.sort((a, c) => { return a.description > c.description ? 1 : -1 });
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -60,6 +81,10 @@ export class TransferConfirmationService {
 
   getPendingList(locationCode: string) {
     return this.http.get<TransferConfirmationRoot[]>(this.baseUrl + "MobileTransferConfirmation/pending/" + locationCode);
+  }
+
+  updateObject(object: TransferConfirmationRoot) {
+    return this.http.put(this.baseUrl + "MobileTransferConfirmation", object, httpObserveHeader);
   }
 
 }
