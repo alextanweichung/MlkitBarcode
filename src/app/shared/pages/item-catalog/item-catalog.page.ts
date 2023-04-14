@@ -92,7 +92,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         if (Capacitor.getPlatform() !== 'web') {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.locationId).subscribe(response => {
+        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, 0).subscribe(response => {
           this.availableItems = response;
           console.log("🚀 ~ file: item-catalog.page.ts:96 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           if (this.availableItems && this.availableItems.length > 0) {

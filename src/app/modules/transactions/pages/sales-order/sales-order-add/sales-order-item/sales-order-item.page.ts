@@ -1,19 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { format } from 'date-fns';
 import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterList } from 'src/app/shared/models/master-list';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
 import { v4 as uuidv4 } from 'uuid';
 
