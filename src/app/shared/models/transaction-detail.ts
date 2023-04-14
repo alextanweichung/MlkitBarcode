@@ -100,6 +100,12 @@ export interface TransactionDetail {
   deactivated?: boolean
   promoImpactedQty?: number;
   promoImpactedType?: string;
+  brandId?: number;
+  groupId?: number;
+  seasonId?: number;
+  categoryId?: number;
+  deptId?: number;
+  oriDiscId?: number;
 }
 
 export interface ItemPricing {
