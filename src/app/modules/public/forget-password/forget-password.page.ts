@@ -74,7 +74,7 @@ export class ForgetPasswordPage implements OnInit {
         handler: () => {
           this.passwordResetRequest = {
             userEmail: this.object_form.get('userEmail').value,
-            clientURI: this.baseUrl + "reset-password"
+            clientURI: this.baseUrl.replace('api/','') + "reset-password"
           };
           this.authService.forgotPassword(this.passwordResetRequest).subscribe(response => {
             if (response.status == 200) {
