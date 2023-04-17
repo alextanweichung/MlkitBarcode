@@ -70,40 +70,40 @@
   <div class="p-2" *ngIf="object">
     <ion-list class="list-custom" lines="full">
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Doc. Number</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.salesOrderNum}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.salesOrderNum}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Doc. Date</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Location</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Customer</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Total Quantity</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.details|sum:'qtyRequest'|number}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.details|sum:'qtyRequest'|number}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Grand Total</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
       </ion-item>
     </ion-list>
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">

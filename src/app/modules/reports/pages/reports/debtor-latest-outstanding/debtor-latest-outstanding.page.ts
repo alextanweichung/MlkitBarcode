@@ -7,7 +7,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstanding, DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { ViewWillEnter } from '@ionic/angular';
+import { AlertController, ViewWillEnter } from '@ionic/angular';
 import { CreditInfoDetails } from 'src/app/shared/models/credit-info';
 
 @Component({
@@ -27,7 +27,8 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   constructor(
     private reportService: ReportsService,
     private toastService: ToastService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private alertController: AlertController,
   ) { }
 
   ionViewWillEnter(): void {
@@ -94,6 +95,33 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   onDateSelected(event) {
     if (event) {
       this.trxDate = event;
+    }
+  }
+
+  async presentAlertViewPdf(customerId: number) {
+    try {
+      const alert = await this.alertController.create({
+        header: 'Download PDF?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf(customerId);
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
     }
   }
 

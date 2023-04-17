@@ -1,8 +1,21 @@
 <ion-label class="ion-flex mt-2 ml-4" [ngStyle]="{'font-weight': 'bold'}" position="stacked">{{title}}</ion-label>
-<ion-item (click)="showModal()" lines="none" [disabled]="disabled">
-  <ion-badge slot="start" *ngIf="selected && selected?.code">{{selected?.code}}</ion-badge>
-  <ion-badge class="ml-2" color="tertiary" slot="start" *ngIf="selected && selected?.oldCode">{{selected?.oldCode}}</ion-badge>
-  <ion-input class="ml-2" [placeholder]="'Select ' + title" [value]="selected ? (selected?.[optionLabel]) : null" readonly></ion-input>
+<ion-item (click)="showModal()" lines="none" [disabled]="disabled">  
+  <div slot="start" *ngIf="selected">
+    <ion-grid class="ion-no-padding mb-2">
+      <ion-row>
+        <ion-col class="ion-margin-auto">
+          <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code"><div>{{selected?.code}}</div></ion-badge>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="selected && selected?.oldCode">
+        <ion-col class="ion-margin-auto">
+          <ion-badge style="display:inline-flex" color="tertiary" *ngIf="selected && selected?.oldCode"><div>{{selected?.oldCode}}</div></ion-badge>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
+  <ion-input *ngIf="!selected" class="ml-2" [placeholder]="'Select ' + title" [value]="null" readonly></ion-input>
 </ion-item>
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
@@ -21,9 +34,21 @@
       <div class="p-2">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none" *ngIf="tempDropdownList.length > 0">
           <ion-item button detail="false" *ngFor="let item of tempDropdownList" (click)="chooseThis(item)">
-            <ion-badge slot="start" *ngIf="item?.code">{{item?.code}}</ion-badge>
-            <ion-badge class="ml-2" color="tertiary" slot="start" *ngIf="item?.oldCode">{{item?.oldCode}}</ion-badge>
-            <div class="ml-2 ion-text-wrap">{{item?.description}}</div>
+            <div slot="start">
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col class="ion-margin-auto">
+                    <ion-badge style="display:inline-flex" *ngIf="item && item?.code"><div>{{item?.code}}</div></ion-badge>
+                  </ion-col>
+                </ion-row>
+                <ion-row *ngIf="item && item?.oldCode">
+                  <ion-col class="ion-margin-auto">
+                    <ion-badge style="display:inline-flex" color="tertiary" *ngIf="item && item?.oldCode"><div>{{item?.oldCode}}</div></ion-badge>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+            <div class="ion-text-wrap">{{item?.description}}</div>
           </ion-item>
         </ion-list>
         <div class="ml-2" *ngIf="tempDropdownList.length === 0 && emptyMessage.length > 0">

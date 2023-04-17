@@ -14,37 +14,34 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2" *ngIf="object">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Information</ion-label>
-    </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Truck Loading Num</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.truckLoadingNum}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.truckLoadingNum}}"></ion-input>
       </ion-item>
-      <ion-item>
-        <ion-label>
+      <ion-item *ngIf="object.header.trxDate">
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Trx Date</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
-      <ion-item>
-        <ion-label>
+      <ion-item *ngIf="object.header.vendorId">
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Vendor</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.vendorId|idMapping:vendorMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.vendorId|idMapping:vendorMasterList}}"></ion-input>
       </ion-item>
-      <ion-item>
-        <ion-label>
+      <ion-item *ngIf="object.header.shipMethodId">
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Ship Method</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.shipMethodId|idMapping:shipMethodMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.shipMethodId|idMapping:shipMethodMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Detail</ion-label>
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" *ngFor="let line of object.details" class="no-ripple">
