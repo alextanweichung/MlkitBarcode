@@ -33,17 +33,15 @@
   <div class="p-2">
     <ion-list class="list-custom" lines="full">
       <app-search-dropdown title="Item" optionValue="code" [searchDropdownList]="itemSearchDropdownList" (onActionComplete)="onItemChanged($event)"></app-search-dropdown>
-      <ion-item *ngIf="itemInfo">
-        <ion-segment [(ngModel)]="selectedViewOptions" [disabled]="itemInfo?.variationTypeCode !== '1' && itemInfo?.variationTypeCode !== '2'" (ionChange)="advancedFilter()">
-          <ion-segment-button value="item">
-            <ion-label>Item</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="variation">
-            <ion-label>Variation</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </ion-item>
     </ion-list>
+    <ion-segment *ngIf="itemInfo" [(ngModel)]="selectedViewOptions" [disabled]="itemInfo?.variationTypeCode !== '1' && itemInfo?.variationTypeCode !== '2'" (ionChange)="advancedFilter()">
+      <ion-segment-button value="item">
+        <ion-label>Item</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="variation">
+        <ion-label>Variation</ion-label>
+      </ion-segment-button>
+    </ion-segment>
     <ion-accordion-group #accordionGroup *ngIf="itemInfo" class="py-1">
       <ion-accordion value="advanced filter">
         <ion-item slot="header" color="light">
@@ -81,7 +79,23 @@
           <ion-card-subtitle>{{item.locationCode}}</ion-card-subtitle>
           <ion-card-title>{{item.locationDescription}}</ion-card-title>
         </ion-card-header>
-        <ion-card-content [ngClass]="{'color-danger': (item.qty < 0), 'color-warning': (item.qty == 0) }">{{item.qty | number:'1.0'}}</ion-card-content>
+        <ion-card-content class="ion-flex ion-margin-auto">
+          <div class="ion-flex ion-margin-auto" [ngClass]="{'color-danger': (item.qty < 0), 'color-warning': (item.qty == 0) }">
+            {{item.qty | number:'1.0'}}
+          </div>
+          <div class="ion-flex ion-margin-auto" *ngIf="loginUser.loginUserType === 'P' && item.transitQty > 0">
+            <!-- Retail -->
+            <div class="badge-purple font-bold px-2 py-1 w-full flex justify-content-center" style="height:2rem">
+              In Transit Qty: {{item.transitQty|number:'1.0'}} | Current Qty: {{item.qty - item.transitQty|number:'1.0'}}
+            </div>
+          </div>
+          <div class="ion-flex ion-margin-auto" *ngIf="loginUser.loginUserType === 'B'">
+            <!-- Trading -->
+            <div class="badge-purple font-bold px-2 py-1 w-full flex justify-content-center" style="height:2rem">
+              Available Qty: {{item.qty - item.openQty|number:'1.0'}}
+            </div>
+          </div>
+        </ion-card-content>
       </ion-card>
     </div>  
     <div *ngIf="selectedViewOptions === 'variation'">

@@ -1,14 +1,16 @@
 import { ItemPricing } from "src/app/shared/models/transaction-detail"
 
 export interface InventoryLevel {
-   itemId: number
-   itemCode: string
-   locationId: number
-   locationCode: string
-   locationDescription: string
-   qty: number
- }
- 
+  itemId: number
+  itemCode: string
+  locationId: number
+  locationCode: string
+  locationDescription: string
+  qty: number
+  transitQty: number
+  openQty: number
+}
+
 export interface InventoryVariationLevel {
   locationId: number
   locationCode: string
