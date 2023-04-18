@@ -8,7 +8,7 @@ import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download'
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
 
-export const getSysParams: string = 
+export const getSysParams: string =
 `SELECT * 
 FROM Sys_Parameter
 WHERE id = 1`;
@@ -28,7 +28,7 @@ export class ConfigService {
     private _databaseService: DatabaseService,
     private commonQueryService: CommonQueryService<Sys_Parameter>
   ) { }
-  
+
   getApiUrl(activationCode: string) {
     try {
       return this.http.get<FireStoreReturn>("https://firestore.googleapis.com/v1/projects/idcp-34e86/databases/(default)/documents/urlList/" + activationCode, {
@@ -41,7 +41,7 @@ export class ConfigService {
       console.error(e);
     }
   }
-  
+
   async load() {
     try {
       if (Capacitor.getPlatform() === 'web') {
@@ -49,6 +49,7 @@ export class ConfigService {
           Sys_ParameterId: 1,
           apiUrl: 'https://localhost:44351/api/',
           // apiUrl: 'https://idcp-demo.com/api/',
+          // apiUrl: 'https://idcp-testing.motorparts.asia/',
           // apiUrl: 'https://idcp-ararat.com:8081/api/',
           imgUrl: null,
           lastDownloadAt: null
@@ -78,7 +79,7 @@ export class ConfigService {
   async update(object: Sys_Parameter) {
     try {
       this.sys_parameter = object;
-      await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);      
+      await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);
     } catch (e) {
       console.error(e);
     }

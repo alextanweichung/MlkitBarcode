@@ -76,11 +76,6 @@
         </ion-list>
       </ion-accordion>
     </ion-accordion-group>
-    <ion-card *ngIf="itemInfo" class="mx-0 my-1">
-      <ion-card-header>
-        <ion-card-title>{{itemInfo.description}}</ion-card-title>
-      </ion-card-header>
-    </ion-card>    
     <div *ngIf="selectedViewOptions === 'item'">
       <ion-card *ngFor="let item of inventoryLevel" class="mx-0 my-1">
         <ion-card-header>
@@ -144,6 +139,14 @@
         <ion-list class="list-custom" lines="full">
           <ion-item button="false" *ngFor="let p of prices">
             <ion-grid class="p-1">
+              <ion-row *ngIf="p.locationId">
+                <ion-col>
+                  <div>Location</div>
+                </ion-col>
+                <ion-col [size]="9">
+                  <div class="ion-text-right">{{p.locationId|idMapping:objectService.locationMasterList}}</div>
+                </ion-col>
+              </ion-row>
               <ion-row>
                 <ion-col>
                   <div>Segment</div>

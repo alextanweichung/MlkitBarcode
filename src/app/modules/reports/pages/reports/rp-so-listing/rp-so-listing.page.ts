@@ -54,7 +54,7 @@ export class RpSoListingPage implements OnInit {
       let paramModel: ReportParameterModel = {
         appCode: 'SMSC002',
         format: 'pdf',
-        documentIds: [objectId],
+        documentIds: [Number(objectId)],
         reportName: 'Sales Order'
       }
       this.reportService.getPdf(paramModel).subscribe(async response => {

@@ -11,54 +11,54 @@
     <ngx-datatable
     class="fullscreen material mt-2"
     [rows]="objects" 
-    [rowHeight]="50" 
+    [rowHeight]="'auto'" 
     [columns]="columns"
     [columnMode]="'force'" 
     [headerHeight]="50" 
     [footerHeight]="50"
     [limit]="12"
     [scrollbarH]="true">
-      <ngx-datatable-column prop="issuedDate" name="Issued Date">
+      <ngx-datatable-column prop="issuedDate" name="Issued Date" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.issuedDate|date:'dd/MM/yyyy'}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="debtorCode" name="Debtor Code">
+      <ngx-datatable-column prop="debtorCode" name="Debtor Code" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.debtorCode}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="debtorName" name="Debtor Name">
+      <ngx-datatable-column prop="debtorName" name="Debtor Name" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.debtorName}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="salesmanName" name="Salesman">
+      <ngx-datatable-column prop="salesmanName" name="Salesman" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.salesmanName}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="orderStatus" name="Order Status">
+      <ngx-datatable-column prop="orderStatus" name="Order Status" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.orderStatus}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="salesOrderNum" name="Sales Order">
+      <ngx-datatable-column prop="salesOrderNum" name="Sales Order" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="font-half-size div-link-button" (click)="downloadPdf(row.salesOrderId)"> {{row.salesOrderNum}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order">
+      <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="font-half-size div-link-button" (click)="showDialogOrDownload(row.deliveryOrderIds)"> {{row.deliveryOrders?.replace('|', ', ')}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="delivered" name="Delivered">
+      <ngx-datatable-column prop="delivered" name="Delivered" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.delivered}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="netAmount" name="Net Amount">
+      <ngx-datatable-column prop="netAmount" name="Net Amount" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
         </ng-template>

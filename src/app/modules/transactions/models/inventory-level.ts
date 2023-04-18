@@ -40,6 +40,7 @@ export interface InnerIVDetail {
 }
 
 export interface ItemPriceBySegment {
+  locationId: number
   priceSegmentCode: string
   unitPrice: number
 }

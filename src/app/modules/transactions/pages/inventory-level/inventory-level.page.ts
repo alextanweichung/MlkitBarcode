@@ -5,6 +5,10 @@ import { ItemList } from 'src/app/shared/models/item-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../../models/inventory-level';
 import { InventoryLevelService } from '../../services/inventory-level.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { LoginUser } from 'src/app/services/auth/login-user';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-inventory-level',
@@ -24,19 +28,41 @@ export class InventoryLevelPage implements OnInit {
   inventoryLevel: InventoryLevel[] = [];
   inventoryLevelVariation: InventoryVariationLevel[] = [];
 
+  loginUser: any;
+
   constructor(
-    private inventoryLevelService: InventoryLevelService,
-    private toastService: ToastService
-  ) { }
+    public objectService: InventoryLevelService,
+    private toastService: ToastService,
+    private authService: AuthService
+  ) {
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ngOnInit() {
+    this.loadModuleControl();
     this.loadItemList();
+  }
+
+  moduleControl: ModuleControl[] = [];
+  inventoryLevelLocationList: string[] = [];
+  loadModuleControl() {
+    try {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+        this.moduleControl = obj;
+        let inventoryLevelLocationList = this.moduleControl.find(x => x.ctrlName === "InventoryLevelLocationList")?.ctrlValue;
+        this.inventoryLevelLocationList = inventoryLevelLocationList === 'ALL' ? [] : inventoryLevelLocationList.split(',');
+      })
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   itemSearchDropdownList: SearchDropdownList[] = [];
   loadItemList() {
     try {
-      this.inventoryLevelService.getItemList().subscribe(response => {
+      this.objectService.getItemList().subscribe(response => {
         this.itemList = response;
         this.itemList.forEach(r => {
           this.itemSearchDropdownList.push({
@@ -91,7 +117,7 @@ export class InventoryLevelPage implements OnInit {
       if (lookUpItem) {
         this.itemInfo = lookUpItem;
         // if (this.selectedViewOptions === 'item') {
-        this.inventoryLevelService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
+        this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
           this.inventoryLevel = response;
           // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
@@ -102,7 +128,7 @@ export class InventoryLevelPage implements OnInit {
         })
         // } else {
         if (lookUpItem.variationTypeCode !== '0')
-          this.inventoryLevelService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
+          this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
             this.inventoryLevelVariation = response;
             // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
             this.computeLocationList();
@@ -177,7 +203,7 @@ export class InventoryLevelPage implements OnInit {
   advancedFilter() {
     try {
       if (this.selectedViewOptions === 'item') {
-        this.inventoryLevelService.getInventoryLevelByItem(this.itemInfo.itemId).subscribe(response => {
+        this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId??0).subscribe(response => {
           this.inventoryLevel = response;
           if (this.selectedLocation !== 'all') {
             this.inventoryLevel = this.inventoryLevel.filter(r => r.locationCode === this.selectedLocation);
@@ -191,7 +217,7 @@ export class InventoryLevelPage implements OnInit {
         })
       }
       else {
-        this.inventoryLevelService.getInventoryLevelByVariation(this.itemInfo.itemId).subscribe(response => {
+        this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId??0).subscribe(response => {
           this.inventoryLevelVariation = response;
           // location filter
           if (this.selectedLocation !== 'all') {
@@ -270,19 +296,21 @@ export class InventoryLevelPage implements OnInit {
 
   prices: ItemPriceBySegment[] = [];
   getItemPrice(itemId: number) {
-    this.prices = [];
-    try {
-      let salesAgentId = JSON.parse(localStorage.getItem('loginUser')).salesAgentId;
-      if (salesAgentId) {
-        this.inventoryLevelService.getSegmentItemPriceBySalesAgent(salesAgentId, itemId).subscribe(response => {
-          this.prices = response;  
+    if (itemId) {
+      this.prices = [];
+      try {
+        this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+          this.prices = response;
         }, error => {
           throw error;
         })
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }  }
+    } else {
+      this.toastService.presentToast('Invalid Item', 'Please select Item.', 'top', 'warn', 1000);
+    }
+  }
 
   /* #endregion */
 

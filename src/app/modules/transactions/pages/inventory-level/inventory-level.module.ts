@@ -8,6 +8,7 @@ import { InventoryLevelPageRoutingModule } from './inventory-level-routing.modul
 
 import { InventoryLevelPage } from './inventory-level.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     FormsModule,
     IonicModule,
     InventoryLevelPageRoutingModule,
-    SearchDropdownPageModule
+    SearchDropdownPageModule,
+    IdMappingModule
   ],
   declarations: [InventoryLevelPage]
 })

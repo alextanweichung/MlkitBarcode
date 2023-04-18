@@ -126,21 +126,25 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   async downloadPdf(customerId: number) {
-    let paramModel: ReportParameterModel = {
-      appCode: 'FAAR005',
-      format: 'pdf',
-      documentIds: [],
-      reportName: 'Debtor Statement',
-      customReportParam: {
-        parameter1: customerId,
-        statementDate: this.trxDate
+    if (customerId) {
+      let paramModel: ReportParameterModel = {
+        appCode: 'FAAR005',
+        format: 'pdf',
+        documentIds: [Number(customerId)],
+        reportName: 'Debtor Statement',
+        customReportParam: {
+          parameter1: customerId,
+          statementDate: this.trxDate
+        }
       }
+      this.reportService.getPdf(paramModel).subscribe(async response => {
+        await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
+      }, error => {
+        console.log(error);
+      })
+    } else {
+      this.toastService.presentToast('Invalid Key Id', 'Please contact adminstrator.', 'top', 'danger', 1000);
     }
-    this.reportService.getPdf(paramModel).subscribe(async response => {
-      await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
-    }, error => {
-      console.log(error);
-    })
   }
 
 
