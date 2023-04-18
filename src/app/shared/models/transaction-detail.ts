@@ -115,4 +115,5 @@ export interface ItemPricing {
   discountGroupCode: string
   discountExpression: any
   discountPercent: number
+  priceSegmentCode?: string
 }

@@ -1,3 +1,5 @@
+import { ItemPricing } from "src/app/shared/models/transaction-detail"
+
 export interface InventoryLevel {
    itemId: number
    itemCode: string
@@ -41,6 +43,5 @@ export interface InnerIVDetail {
 
 export interface ItemPriceBySegment {
   locationId: number
-  priceSegmentCode: string
-  unitPrice: number
+  itemPricing: ItemPricing
 }

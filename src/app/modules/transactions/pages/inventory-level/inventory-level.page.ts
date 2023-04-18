@@ -118,6 +118,7 @@ export class InventoryLevelPage implements OnInit {
         this.itemInfo = lookUpItem;
         // if (this.selectedViewOptions === 'item') {
         this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
+          console.log("🚀 ~ file: inventory-level.page.ts:121 ~ InventoryLevelPage ~ this.objectService.getInventoryLevelByItem ~ response:", response)
           this.inventoryLevel = response;
           // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
@@ -129,6 +130,7 @@ export class InventoryLevelPage implements OnInit {
         // } else {
         if (lookUpItem.variationTypeCode !== '0')
           this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
+            console.log("🚀 ~ file: inventory-level.page.ts:133 ~ InventoryLevelPage ~ this.objectService.getInventoryLevelByVariation ~ response:", response)
             this.inventoryLevelVariation = response;
             // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
             this.computeLocationList();
@@ -300,6 +302,7 @@ export class InventoryLevelPage implements OnInit {
       this.prices = [];
       try {
         this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+          console.log("🚀 ~ file: inventory-level.page.ts:305 ~ InventoryLevelPage ~ this.objectService.getSegmentItemPriceBySalesAgent ~ response:", response)
           this.prices = response;
         }, error => {
           throw error;
@@ -328,8 +331,12 @@ export class InventoryLevelPage implements OnInit {
   priceModal: boolean = false;
   async showPriceDialog() {
     try {
-      await this.getItemPrice(this.itemInfo.itemId);
-      this.priceModal = true;
+      if (this.itemInfo !== undefined) {
+        await this.getItemPrice(this.itemInfo.itemId);
+        this.priceModal = true;
+      } else {
+        this.toastService.presentToast('Invalid Item', 'Please select Item.', 'top', 'warn', 1000);
+      }
     } catch (e) {
       console.error(e);
     }

@@ -43,7 +43,7 @@ export function initializeFactory(init: InitializeAppService) {
         NgChartsModule,
         HttpClientModule,
         // NgxSpinnerModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
     ],
     providers: [
         File,
