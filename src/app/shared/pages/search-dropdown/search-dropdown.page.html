@@ -1,22 +1,36 @@
-<ion-label class="ion-flex mt-2 ml-4" [ngStyle]="{'font-weight': 'bold'}" position="stacked">{{title}}</ion-label>
-<ion-item (click)="showModal()" lines="none" [disabled]="disabled">  
-  <div slot="start" *ngIf="selected">
+
+<ion-item (click)="showModal()" [disabled]="disabled">
+  <ion-label position="stacked">{{title}}</ion-label>
+  <div *ngIf="selected">
     <ion-grid class="ion-no-padding">
       <ion-row>
-        <ion-col class="ion-margin-auto">
-          <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code"><div>{{selected?.code}}</div></ion-badge>
+        <ion-col class="ion-margin-auto" size="auto">
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <ion-badge *ngIf="selected && selected?.code">
+                  <div>{{selected?.code}}</div>
+                </ion-badge>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="selected && selected?.oldCode" class="mb-1">
+              <ion-col class="ion-flex ion-margin-auto">
+                <ion-badge color="tertiary">
+                  <div>{{selected?.oldCode}}</div>
+                </ion-badge>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
         </ion-col>
-      </ion-row>
-      <ion-row *ngIf="selected && selected?.oldCode">
         <ion-col class="ion-margin-auto">
-          <ion-badge style="display:inline-flex" color="tertiary" *ngIf="selected && selected?.oldCode"><div>{{selected?.oldCode}}</div></ion-badge>
+          <div class="ion-text-wrap ml-2">{{selected?.[optionLabel]}}</div>
         </ion-col>
       </ion-row>
     </ion-grid>
   </div>
-  <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
-  <ion-input *ngIf="!selected" class="ml-2" [placeholder]="'Select ' + title" [value]="null" readonly></ion-input>
+  <ion-input *ngIf="!selected" [placeholder]="'Select ' + title" readonly></ion-input>
 </ion-item>
+
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
     <ion-header>

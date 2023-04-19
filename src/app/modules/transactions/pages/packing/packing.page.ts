@@ -25,12 +25,15 @@ export class PackingPage implements OnInit, ViewWillEnter {
   constructor(
     private commonService: CommonService,
     private configService: ConfigService,
-    private goodsPackingService: PackingService,
+    private objectService: PackingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
@@ -54,7 +57,7 @@ export class PackingPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.goodsPackingService.getObjectListByDate(this.startDate, this.endDate).subscribe(async response => {
+      this.objectService.getObjectListByDate(this.startDate, this.endDate).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -78,7 +81,7 @@ export class PackingPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      if (this.goodsPackingService.hasWarehouseAgent()) {
+      if (this.objectService.hasWarehouseAgent()) {
         this.navController.navigateForward('/transactions/packing/packing-sales-order');
       } else {
         this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1000);

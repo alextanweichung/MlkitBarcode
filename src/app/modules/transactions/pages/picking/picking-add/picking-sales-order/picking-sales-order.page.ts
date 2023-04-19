@@ -18,7 +18,7 @@ export class PickingSalesOrderPage implements OnInit {
   objectForm: FormGroup;
 
   constructor(
-    private objectService: PickingService,
+    public objectService: PickingService,
     private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
@@ -29,28 +29,12 @@ export class PickingSalesOrderPage implements OnInit {
   }
 
   ngOnInit() {
-    this.bindMasterList();    
+    
   }
 
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  locationSearchDropdownList: SearchDropdownList[] = [];
   selectedCustomerLocationSearchDropdownList: SearchDropdownList[] = [];
   bindMasterList() {
     try {
-      this.objectService.customerMasterList.forEach(r => {
-        this.customerSearchDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-      this.objectService.locationMasterList.forEach(r => {
-        this.locationSearchDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
       if (this.selectedCustomerLocationList && this.selectedCustomerLocationList.length > 0) {
         this.selectedCustomerLocationList.forEach(r => {
           this.selectedCustomerLocationSearchDropdownList.push({

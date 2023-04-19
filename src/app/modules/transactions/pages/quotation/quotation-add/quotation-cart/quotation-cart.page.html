@@ -150,7 +150,8 @@
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{selectedItem?.itemCode}} - {{selectedItem?.description}}</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><div>Quantity</div></ion-label>
             <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
@@ -247,7 +248,8 @@
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Info</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label>Remark</ion-label>
             <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.remark" placeholder="Enter remark" [autoGrow]="true"></ion-textarea>
@@ -262,7 +264,8 @@
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Delivery Address</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label>Address List</ion-label>
             <ion-select slot="end" placeholder="Select ship address" [(ngModel)]="selectedAddress" (ionChange)="onAddressSelected()">

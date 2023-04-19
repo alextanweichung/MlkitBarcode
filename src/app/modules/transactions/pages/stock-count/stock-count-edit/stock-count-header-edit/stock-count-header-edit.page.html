@@ -17,14 +17,14 @@
       <app-calendar-input title="Trx Date" (onDateSelected)="onTrxDateSelected($event)" [date_value]="inventoryCount?.header?.trxDate"></app-calendar-input>
       <ion-item lines="none">
         <ion-label class="font-bold" position="stacked">Location</ion-label>
-        <ion-input value="{{inventoryCount?.header?.locationId|idMapping:locationMasterList}}" readonly></ion-input>
+        <ion-input value="{{inventoryCount?.header?.locationId|idMapping:objectService.locationMasterList}}" readonly></ion-input>
       </ion-item>
       <ion-item lines="none">
         <ion-label class="font-bold" position="stacked">Inventory Count Batch</ion-label>
         <ion-input [value]="inventoryCount?.header?.inventoryCountNum" readonly></ion-input>
       </ion-item>
-      <app-search-dropdown #rackSsd title="Rack" optionLabel="description" [searchDropdownList]="rackSearchDdl" (onActionComplete)="onRackChanged($event)" [selectedId]="inventoryCount?.header?.rackId"></app-search-dropdown>
-      <app-search-dropdown #zoneSsd title="Zone" optionLabel="description" [searchDropdownList]="zoneSearchDdl" (onActionComplete)="onZoneChanged($event)" [selectedId]="inventoryCount?.header?.zoneId"></app-search-dropdown>
+      <app-search-dropdown title="Rack" optionLabel="description" [masterDropdownList]="objectService.rackMasterList" (onActionComplete)="onRackChanged($event)" [selectedId]="inventoryCount?.header?.rackId"></app-search-dropdown>
+      <app-search-dropdown title="Zone" optionLabel="description" [searchDropdownList]="objectService.zoneMasterList" (onActionComplete)="onZoneChanged($event)" [selectedId]="inventoryCount?.header?.zoneId"></app-search-dropdown>
     </ion-list>
   </div>
 </ion-content>

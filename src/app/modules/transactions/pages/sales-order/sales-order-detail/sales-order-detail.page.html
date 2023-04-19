@@ -13,7 +13,8 @@
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">
-      <ion-list class="list-custom" lines="full">
+      
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button (click)="isPopoverOpen = false; showHistoryModal()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
@@ -68,7 +69,8 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2" *ngIf="object">
-    <ion-list class="list-custom" lines="full">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Doc. Number</div>

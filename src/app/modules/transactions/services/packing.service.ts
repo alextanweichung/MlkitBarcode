@@ -6,6 +6,7 @@ import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingList, GoodsPackingRoot, GoodsPackingSummary } from '../models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from '../models/packing-sales-order';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -24,6 +25,31 @@ export class PackingService {
     private configService: ConfigService
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
+  }
+
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadStaticLov();
+  }
+
+  fullMasterList: MasterList[] = [];
+  customerMasterList: MasterListDetails[] = [];
+  itemUomMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  locationMasterList: MasterListDetails[] = [];
+  warehouseAgentMasterList: MasterListDetails[] = [];
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+  }
+
+  async loadStaticLov() {
+
   }
 
   header: GoodsPackingHeader;
@@ -78,7 +104,7 @@ export class PackingService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePacking/masterList");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobilePacking/masterList").toPromise();
   }
 
   getStaticLov() {

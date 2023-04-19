@@ -175,6 +175,16 @@ const routes: Routes = [
     path: 'transactions/transfer-confirmation',
     loadChildren: () => import('./modules/transactions/pages/transfer-confirmation/transfer-confirmation.module').then( m => m.TransferConfirmationPageModule)
   },
+  {
+    path: 'transactions/debtor-application',
+    loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then( m => m.DebtorApplicationPageModule)
+  },
+
+
+
+  
+
+
 
 
 
@@ -277,7 +287,6 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
-
 
 
 

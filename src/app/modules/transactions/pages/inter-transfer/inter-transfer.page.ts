@@ -29,7 +29,10 @@ export class InterTransferPage implements OnInit, ViewWillEnter {
     private modalController: ModalController,
     private navController: NavController,
     private actionSheetController: ActionSheetController
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     if (!this.startDate) {

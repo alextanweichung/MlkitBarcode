@@ -18,7 +18,7 @@ export class PackingSalesOrderPage implements OnInit {
   objectForm: FormGroup;
 
   constructor(
-    private packingService: PackingService,
+    public objectService: PackingService,
     private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
@@ -29,52 +29,12 @@ export class PackingSalesOrderPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMasterList();
+
   }
 
-  customerMasterList: MasterListDetails[] = [];
-  itemUomMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  warehouseAgentMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.packingService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUom').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.warehouseAgentMasterList = response.filter(x => x.objectName == 'WarehouseAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.mapSearchDropdownList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  locationSearchDropdownList: SearchDropdownList[] = [];
   selectedCustomerLocationSearchDropdownList: SearchDropdownList[] = [];
   mapSearchDropdownList() {
     try {
-      this.customerMasterList.forEach(r => {
-        this.customerSearchDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-      this.locationMasterList.forEach(r => {
-        this.locationSearchDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
       if (this.selectedCustomerLocationList && this.selectedCustomerLocationList.length > 0) {
         this.selectedCustomerLocationList.forEach(r => {
           this.selectedCustomerLocationSearchDropdownList.push({
@@ -101,7 +61,7 @@ export class PackingSalesOrderPage implements OnInit {
       this.customerId = event ? event.id : null;
       this.objectForm.patchValue({ customerId: this.customerId });
       if (this.customerId) {
-        this.selectedCustomer = this.customerMasterList.find(r => r.id === this.customerId);
+        this.selectedCustomer = this.objectService.customerMasterList.find(r => r.id === this.customerId);
   
         if (this.selectedCustomer) {
           this.objectForm.patchValue({ businessModelType: this.selectedCustomer.attribute5 });
@@ -113,7 +73,7 @@ export class PackingSalesOrderPage implements OnInit {
           }
   
           if (this.selectedCustomer.attributeArray1.length > 0) {
-            this.selectedCustomerLocationList = this.locationMasterList.filter(value => this.selectedCustomer.attributeArray1.includes(value.id));
+            this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => this.selectedCustomer.attributeArray1.includes(value.id));
           } else {
             this.selectedCustomerLocationList = [];
           }
@@ -189,7 +149,7 @@ export class PackingSalesOrderPage implements OnInit {
       this.availableSalesOrders = [];
       this.selectedSOs = [];
       if (customerId) {
-        this.packingService.getSoByCustomer(customerId).subscribe(response => {
+        this.objectService.getSoByCustomer(customerId).subscribe(response => {
           this.availableSalesOrders = response;
           this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
         }, error => {
@@ -208,7 +168,7 @@ export class PackingSalesOrderPage implements OnInit {
       this.availableSalesOrders = [];
       this.selectedSOs = [];
       if (customerId && locationId) {
-        this.packingService.getSoByCustomerLocation(customerId, locationId).subscribe(response => {
+        this.objectService.getSoByCustomerLocation(customerId, locationId).subscribe(response => {
           this.availableSalesOrders = response;
           this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
         }, error => {
@@ -259,7 +219,7 @@ export class PackingSalesOrderPage implements OnInit {
       const { role } = await actionSheet.onWillDismiss();
   
       if (role === 'confirm') {
-        this.packingService.resetVariables();
+        this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/packing');
       }
     } catch (e) {
@@ -277,8 +237,8 @@ export class PackingSalesOrderPage implements OnInit {
         this.toastService.presentToast('Select at least 1 SO', '', 'top', 'danger', 1000);
         return;
       }
-      this.packingService.setHeader(this.objectForm.getRawValue());
-      this.packingService.setChoosenSalesOrders(this.selectedSOs);
+      this.objectService.setHeader(this.objectForm.getRawValue());
+      this.objectService.setChoosenSalesOrders(this.selectedSOs);
       this.navController.navigateForward('/transactions/packing/packing-item');
     } catch (e) {
       console.error(e);

@@ -13,7 +13,8 @@
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">
-      <ion-list class="list-custom" lines="full">
+      
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button (click)="isPopoverOpen = false; showHistoryModal()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
@@ -59,7 +60,8 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label>
           <p>Sales Order Number</p>
@@ -197,7 +199,8 @@
         <ion-list-header class="ion-list-header-small" *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
           <ion-label>Approval History not available.</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item button="false" *ngFor="let h of object?.approvalHistory">
             <ion-grid class="p-1">
               <ion-row>

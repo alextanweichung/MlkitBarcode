@@ -38,19 +38,19 @@
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Location</div>
         </ion-label>
-        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="inventoryCount.header.zoneId">
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Zone</div>
         </ion-label>
-        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.zoneId|idMapping:zoneMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.zoneId|idMapping:objectService.zoneMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="inventoryCount.header.rackId">
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Rack</div>
         </ion-label>
-        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.rackId|idMapping:rackMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.rackId|idMapping:objectService.rackMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">

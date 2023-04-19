@@ -23,13 +23,15 @@ export class StockCountPage implements OnInit, ViewWillEnter {
   uniqueGrouping: Date[] = [];
 
   constructor(
-    private stockCountService: StockCountService,
+    private objectService: StockCountService,
     private commonService: CommonService,
     private toastService: ToastService,
     private modalController: ModalController,
     private navController: NavController,
     private actionSheetController: ActionSheetController
-  ) { }
+  ) { 
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
@@ -51,7 +53,7 @@ export class StockCountPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.stockCountService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+      this.objectService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));

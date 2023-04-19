@@ -61,18 +61,6 @@ export class TransferConfirmationService {
     await this.locationMasterList.sort((a, c) => { return a.description > c.description ? 1 : -1 });
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.bindLocationList();
-  }
-
-  locationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    this.locationMasterList.forEach(r => {
-      this.locationSearchDropdownList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
   }
 
   getMasterList() {

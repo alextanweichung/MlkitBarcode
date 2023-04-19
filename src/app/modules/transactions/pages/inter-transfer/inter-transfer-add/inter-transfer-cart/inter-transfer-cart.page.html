@@ -42,8 +42,8 @@
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">
                   <ion-col class="ion-margin-auto">
-                    <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                    <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                    <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                   </ion-col>
                   <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
                     <div>{{d.qtyRequest|number:'1.0'}}</div>
@@ -95,7 +95,8 @@
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{selectedItem?.itemCode}} - {{selectedItem?.description}}</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><div>Quantity</div></ion-label>
             <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
@@ -110,8 +111,8 @@
               <div *ngFor="let d of vd.details">
                 <ion-row>
                   <ion-col class="ion-margin-auto">
-                    <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                    <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
+                    <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>  
                   </ion-col>
                   <ion-col class="ion-margin-auto p-0">
                     <ion-grid class="ion-no-padding">

@@ -23,7 +23,7 @@ export class InterTransferItemPage implements OnInit, ViewWillEnter {
   moduleControl: ModuleControl[] = [];
 
   constructor(
-    private objectService: InterTransferService,
+    public objectService: InterTransferService,
     private toastService: ToastService,
     private navController: NavController
   ) {
@@ -45,7 +45,6 @@ export class InterTransferItemPage implements OnInit, ViewWillEnter {
       if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
         this.navController.navigateBack('/transactions/inter-transfer/inter-transfer-header');
       } else {
-        this.componentsLoad();
       }
     } catch (e) {
       console.error(e);
@@ -53,23 +52,7 @@ export class InterTransferItemPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-  }
 
-  componentsLoad() {
-    this.loadMasterList();
-  }
-
-  fullMasterList: MasterList[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.fullMasterList = response;
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
   }
 
   async onItemAdded(event: TransactionDetail) {

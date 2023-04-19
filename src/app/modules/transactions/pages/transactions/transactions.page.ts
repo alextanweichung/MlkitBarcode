@@ -35,6 +35,7 @@ export class TransactionsPage implements OnInit {
   showTruckLoading: boolean = false;
   showInterTransfer: boolean = false;
   showTransferConfirmation: boolean = false;
+  showDebtorApplication: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -56,6 +57,7 @@ export class TransactionsPage implements OnInit {
           this.showTruckLoading = pageItems.findIndex(r => r.title === trxAppCode.mobileTruckLoading) > -1;
           this.showInterTransfer = pageItems.findIndex(r => r.title === trxAppCode.mobileInterTransfer) > -1;
           this.showTransferConfirmation = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferConfirmation) > -1;
+          this.showDebtorApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileDebtorApp) > -1;
         }
       })
     } catch (e) {

@@ -17,13 +17,8 @@ export class InterTransferDetailPage implements OnInit {
   objectId: number;
   object: InterTransferRoot;
 
-  locationMasterList: MasterListDetails[] = [];
-  shipMethodMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-
   constructor(
-    private objectService: InterTransferService,
+    public objectService: InterTransferService,
     private navController: NavController,
     private route: ActivatedRoute,
   ) {
@@ -39,26 +34,13 @@ export class InterTransferDetailPage implements OnInit {
     if (!this.objectId) {
       this.navController.navigateBack('/transactions/inter-transfer')
     } else {
-      this.loadMasterList();
       this.loadObject();
     }
-  }
-
-  loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.error(error);
-    })
   }
 
   loadObject() {
     this.objectService.getObjectById(this.objectId).subscribe(response => {
       this.object = response;
-      console.log("🚀 ~ file: inter-transfer-detail.page.ts:46 ~ InterTransferDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
     }, error => {
       console.error(error);
     })

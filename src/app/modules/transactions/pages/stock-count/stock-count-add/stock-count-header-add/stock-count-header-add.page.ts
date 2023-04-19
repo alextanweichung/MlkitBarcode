@@ -18,7 +18,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
   objectForm: FormGroup;
 
   constructor(
-    private stockCountService: StockCountService,
+    public objectService: StockCountService,
     private commonService: CommonService,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
@@ -55,62 +55,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.loadMasterList();
-  }
-
-  itemUomMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  rackMasterList: MasterListDetails[] = [];
-  zoneMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.stockCountService.getMasterList().subscribe(response => {
-        this.itemUomMasterList = response.filter(x => x.objectName == 'ItemUOM').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.mapSearchDropdownList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  locationSearchDdl: SearchDropdownList[] = [];
-  rackSearchDdl: SearchDropdownList[] = [];
-  zoneSearchDdl: SearchDropdownList[] = [];
-  mapSearchDropdownList() {
-    try {
-      this.locationMasterList.forEach(r => {
-        this.locationSearchDdl.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-      this.rackMasterList.forEach(r => {
-        this.rackSearchDdl.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-      this.zoneMasterList.forEach(r => {
-        this.zoneSearchDdl.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
+    
   }
 
   onTrxDateSelected(event: Date) {
@@ -127,7 +72,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
       if (event) {
         this.objectForm.patchValue({ locationId: event.id });
         this.inventoryCountBatchDdl = [];
-        this.stockCountService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
+        this.objectService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
           this.inventoryCountBatchList = response;
           if (this.inventoryCountBatchList.length> 0) {
             this.inventoryCountBatchList.forEach(r => {
@@ -188,7 +133,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
       const { role } = await actionSheet.onWillDismiss();
   
       if (role === 'confirm') {
-        this.stockCountService.resetVariables();
+        this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/stock-count');
       }
     } catch (e) {
@@ -197,8 +142,8 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
   }
 
   nextStep() {
-    this.stockCountService.setHeader(this.objectForm.getRawValue());
-    this.stockCountService.removeLines();
+    this.objectService.setHeader(this.objectForm.getRawValue());
+    this.objectService.removeLines();
     this.navController.navigateForward('/transactions/stock-count/stock-count-add/stock-count-item');
   }
 

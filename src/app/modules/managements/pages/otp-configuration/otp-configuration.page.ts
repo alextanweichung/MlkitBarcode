@@ -79,7 +79,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
       this.users.forEach(r => {
         this.userSearchDropDownList.push({
           id: r.userId,
-          code: null,
+          code: r.userName[0],
           description: r.userName
         })
       })
@@ -89,13 +89,6 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
 
     this.otpConfigService.getStaticLov().subscribe(response => {
       this.lovStatics = response.filter(x => x.objectName == 'OtpValidity' && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.lovStatics.forEach(r => {
-        this.validitySerachDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
     }, error => {
       console.log(error);
     })

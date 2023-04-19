@@ -27,7 +27,7 @@ export class StockCountHeaderEditPage implements OnInit {
     private toastService: ToastService,
     private commonService: CommonService,
     private formBuilder: FormBuilder,
-    private stockCountService: StockCountService,
+    public objectService: StockCountService,
     private actionSheetController: ActionSheetController
   ) {
     this.route.queryParams.subscribe(params => {
@@ -57,54 +57,8 @@ export class StockCountHeaderEditPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMasterList();
     if (this.objectId) {
       this.loadObject();
-    }
-  }
-
-  locationMasterList: MasterListDetails[] = [];
-  zoneMasterList: MasterListDetails[] = [];
-  rackMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.stockCountService.getMasterList().subscribe(async response => {
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        await this.mapSearchDropdownList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  rackSearchDdl: SearchDropdownList[] = [];
-  zoneSearchDdl: SearchDropdownList[] = [];
-  mapSearchDropdownList() {
-    try {
-      let rack: SearchDropdownList[] = [];
-      let zone: SearchDropdownList[] = [];
-      this.rackMasterList.forEach(r => {
-        rack.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-      this.rackSearchDdl = [...rack];
-      this.zoneMasterList.forEach(r => {
-        zone.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
-      this.zoneSearchDdl = [...zone]
-    } catch (e) {
-      console.error(e);
     }
   }
 
@@ -128,7 +82,7 @@ export class StockCountHeaderEditPage implements OnInit {
 
   loadObject() {
     try {
-      this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
+      this.objectService.getInventoryCount(this.objectId).subscribe(response => {
         this.inventoryCount = response;
         this.inventoryCount.details.forEach(r => {
           r.itemCode = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku).itemCode;
@@ -164,7 +118,7 @@ export class StockCountHeaderEditPage implements OnInit {
       const { role } = await actionSheet.onWillDismiss();
   
       if (role === 'confirm') {
-        this.stockCountService.resetVariables();
+        this.objectService.resetVariables();
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectId
@@ -178,8 +132,8 @@ export class StockCountHeaderEditPage implements OnInit {
   }
 
   nextStep() {
-    this.stockCountService.setHeader(this.objectForm.getRawValue());
-    this.stockCountService.setLines(this.inventoryCount.details);
+    this.objectService.setHeader(this.objectForm.getRawValue());
+    this.objectService.setLines(this.inventoryCount.details);
     this.navController.navigateForward('/transactions/stock-count/stock-count-edit/stock-count-item');
   }
 

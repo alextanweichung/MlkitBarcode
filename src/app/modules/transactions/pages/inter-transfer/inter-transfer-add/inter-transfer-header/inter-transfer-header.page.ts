@@ -14,16 +14,9 @@ import { CommonService } from 'src/app/shared/services/common.service';
 export class InterTransferHeaderPage implements OnInit {
 
   objectForm: FormGroup;
-
-  locationMasterList: MasterListDetails[] = [];
-  shipMethodMasterList: MasterListDetails[] = [];
-  interTransferTypeMasterList: MasterListDetails[] = [];
-
-  locationSearchList: SearchDropdownList[] = [];
-  shipMethodSearchList: SearchDropdownList[] = [];
   
   constructor(
-    private objectService: InterTransferService,
+    public objectService: InterTransferService,
     private commonService: CommonService,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
@@ -48,43 +41,7 @@ export class InterTransferHeaderPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMasterList();
-    this.loadStaticLov();
-  }
-
-  loadMasterList() {
-    this.objectService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.mapSearchDropdownList();
-    }, error => {
-      console.error(error);
-    })
-  }
-
-  mapSearchDropdownList() {
-    this.locationMasterList.forEach(r => {
-      this.locationSearchList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-    this.shipMethodMasterList.forEach(r => {
-      this.shipMethodSearchList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-  }
-
-  loadStaticLov() {
-    this.objectService.getStaticLov().subscribe(response => {
-      this.interTransferTypeMasterList = response.filter(x => x.objectName == 'InterTransferType' && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);      
-    }, error => {
-      console.error(error);
-    })
+    
   }
 
   onLocationSelected(event) {

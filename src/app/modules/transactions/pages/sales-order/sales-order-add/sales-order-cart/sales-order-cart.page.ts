@@ -36,7 +36,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     private navController: NavController
   ) {
     this.objectHeader = this.objectService.header;
-    console.log("🚀 ~ file: sales-order-cart.page.ts:39 ~ SalesOrderCartPage ~ this.objectHeader:", this.objectHeader)
     this.itemInCart = this.objectService.itemInCart;
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)

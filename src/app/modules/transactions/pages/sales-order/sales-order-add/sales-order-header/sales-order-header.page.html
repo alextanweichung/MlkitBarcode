@@ -13,7 +13,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2"> 
-    <ion-list class="list-custom" lines="none">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
       <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
     <div *ngIf="objectForm.controls.customerId.value">
@@ -53,7 +53,8 @@
       <ion-list-header class="ion-list-header-small">
         <ion-label>Credit Limit Info</ion-label>
       </ion-list-header>
-      <ion-list class="list-custom" lines="full">
+      
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
           <ion-label>
             Credit Limit

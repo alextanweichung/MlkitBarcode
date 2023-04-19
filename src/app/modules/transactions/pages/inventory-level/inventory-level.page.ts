@@ -92,6 +92,7 @@ export class InventoryLevelPage implements OnInit {
         let lookUpItem = this.itemList.find(e => e.itemCode.toUpperCase() == this.itemCode.toUpperCase());
         if (lookUpItem) {
           this.itemInfo = lookUpItem;
+          console.log("🚀 ~ file: inventory-level.page.ts:95 ~ InventoryLevelPage ~ validateItemCode ~ this.itemInfo:", this.itemInfo)
           if (this.itemInfo.variationTypeCode === "0") {
             this.selectedViewOptions = 'item';
           }

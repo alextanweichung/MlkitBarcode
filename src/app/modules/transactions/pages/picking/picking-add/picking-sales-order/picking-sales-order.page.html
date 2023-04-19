@@ -16,8 +16,9 @@
   </ion-header>
   <div class="p-2">
     <form [formGroup]="objectForm">
-      <ion-list class="list-custom" lines="full">
-        <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
+      
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <app-search-dropdown title="Customer" [masterDropdownList]="objectService.customerMasterList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
         <app-search-dropdown *ngIf="objectForm.get('businessModelType').value !== 'T' &&objectForm.get('businessModelType').value !== null" title="Dest. Location"[searchDropdownList]="selectedCustomerLocationSearchDropdownList" (onActionComplete)="onCustomerLocationSelected($event)"></app-search-dropdown>
       </ion-list>
       <div class="pt-1">
