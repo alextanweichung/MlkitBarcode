@@ -14,9 +14,10 @@
     <ion-row *ngIf="showImage">
       <ion-col size="6" *ngFor="let item of availableItems">
         <ion-card class="m-1">
-          <ion-badge class="overlapBadgeTopRight">
-            <div class="font-bold" *ngIf="objectHeader?.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-            <div class="font-bold" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+          <ion-badge class="overlapBadgeTopRight" *ngIf="item?.itemPricing?.discountExpression">
+            <div class="font-bold">
+              [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}
+            </div>
           </ion-badge>
           <ion-img style="height: 120px" [src]="matchImage(item.itemId)"></ion-img>
           <ion-grid class="m-2">
@@ -31,21 +32,16 @@
                 <div>{{item.description}}</div>
               </ion-col>
             </ion-row>
-            <!-- <ion-row class="pb-1">
-              <ion-col>
-                U/P:
-                <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-            </ion-row> -->
             <ion-row>              
               <ion-col *ngIf="item?.availableQty !== null && showAvailQty">
                 Qty: <div class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
-            <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
+            <ion-row *ngIf="item?.unitPrice || item?.unitPriceExTax">
               <ion-col>
-                Discount: <div class="font-bold ml-2">[{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}</div>
+                U/P: 
+                <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
