@@ -8,6 +8,7 @@ import { SAPerformanceListing, SalesAgentAllPerformanceObject } from '../models/
 import { ReportSOListing } from '../models/rp-so-listing';
 import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-customer';
 import { CreditInfo } from 'src/app/shared/models/credit-info';
+import { CheckQohRoot } from '../models/rp-check-qoh';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +46,10 @@ export class ReportsService {
 
   getSalesByCustomer(object: SalesByCustomerRequest) {
     return this.http.post<SalesByCustomer[]>(this.baseUrl + "MobileReport/salesByCustomer", object);
+  }
+
+  getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
+    return this.http.get<CheckQohRoot[]>(this.baseUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
   }
 
   getPdf(model: ReportParameterModel) {

@@ -1,4 +1,13 @@
+.prefix-css .datatable-body-cell {
+   padding: 0 !important;
+ }
+ 
+ .prefix-css .datatable-header-cell {
+   padding-top: 0 !important;
+   padding-bottom: 0 !important;
+ }
 
+ 
 
 :host ::ng-deep .datatable-header-cell {
    padding: .5rem !important;

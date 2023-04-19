@@ -14,14 +14,12 @@
       <app-calendar-input title="Statement Date" [date_value]="trxDate" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" (click)="loadDebtorReport()">Search</ion-button>
-    <ngx-datatable
+    <ngx-datatable *ngIf="objects && objects.length > 0"
       class="material mt-2"
       [rows]="objects" 
       [rowHeight]="50" 
       [columns]="columns"
-      [columnMode]="'force'" 
-      [headerHeight]="50" 
-      [footerHeight]="50">
+      [columnMode]="'force'" >
       <ngx-datatable-column prop="customerName" name="Customer">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size div-link-button" (click)="presentAlertViewPdf(row.customerId)">{{row.customerName}}</div>

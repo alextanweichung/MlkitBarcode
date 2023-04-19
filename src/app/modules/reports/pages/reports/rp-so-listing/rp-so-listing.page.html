@@ -8,13 +8,12 @@
 </ion-header>
 <ion-content>
   <div class="p-2">
-    <ngx-datatable
+    <ngx-datatable *ngIf="objects && objects.length > 0"
     class="fullscreen material mt-2"
     [rows]="objects" 
     [rowHeight]="'auto'" 
     [columns]="columns"
     [columnMode]="'force'" 
-    [headerHeight]="50" 
     [footerHeight]="50"
     [limit]="12"
     [scrollbarH]="true">

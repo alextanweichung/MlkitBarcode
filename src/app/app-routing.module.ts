@@ -199,6 +199,10 @@ const routes: Routes = [
     path: 'reports/rp-sa-perf-all',
     loadChildren: () => import('./modules/reports/pages/reports/rp-sa-perf-all/rp-sa-perf-all.module').then( m => m.RpSaPerfAllPageModule)
   },
+  {
+    path: 'reports/rp-check-qoh',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then( m => m.RpCheckQohPageModule)
+  },
 
 
 
