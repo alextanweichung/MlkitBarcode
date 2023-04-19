@@ -41,7 +41,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   async keypress(event) {
     if (event.keyCode === 13) {
       if (this.searchText.length > 0) {
-        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
+        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
       } else {
         this.tempDropdownList = this.searchDropdownList;
       }
