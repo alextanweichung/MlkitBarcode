@@ -132,7 +132,7 @@ export class SalesOrderDetailPage implements OnInit {
 
   /* #region download pdf */
 
-  async presentAlertViewPdf() {
+  async presentAlertViewPdf(reportName: string) {
     try {
       const alert = await this.alertController.create({
         header: 'Download PDF?',
@@ -143,7 +143,7 @@ export class SalesOrderDetailPage implements OnInit {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.downloadPdf();
+              await this.downloadPdf(reportName);
             },
           },
           {
@@ -159,9 +159,10 @@ export class SalesOrderDetailPage implements OnInit {
     }
   }
 
-  async downloadPdf() {
+  async downloadPdf(reportName: string) {
     try {
-      this.objectService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId, reportName).subscribe(response => {
+        console.log("🚀 ~ file: sales-order-detail.page.ts:165 ~ SalesOrderDetailPage ~ this.objectService.downloadPdf ~ response:", response)
         let filename = this.object.header.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {

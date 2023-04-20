@@ -21,14 +21,20 @@
             <div>Approval History</div>
           </ion-label>
         </ion-item>
-        <ion-item button (click)="isPopoverOpen = false; presentAlertViewPdf()">
+        <ion-item button (click)="isPopoverOpen = false; presentAlertViewPdf('Sales Order')">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
-            <div>Download Pdf</div>
+            <div>Sales Order</div>
+          </ion-label>
+        </ion-item>
+        <ion-item button (click)="isPopoverOpen = false; presentAlertViewPdf('Proforma Invoice')">
+          <ion-icon name="download-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Proforma Invoice</div>
           </ion-label>
         </ion-item>
         <ion-item button (click)="isPopoverOpen = false; showStatusModel()">
-          <ion-icon name="download-outline" slot="end"></ion-icon>
+          <!-- <ion-icon name="download-outline" slot="end"></ion-icon> -->
           <ion-label>
             <div>Status</div>
           </ion-label>
