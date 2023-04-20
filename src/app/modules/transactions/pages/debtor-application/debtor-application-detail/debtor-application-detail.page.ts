@@ -73,9 +73,20 @@ export class DebtorApplicationDetailPage implements OnInit {
   showHistoryModal() {
     this.objectService.getWorkflow(this.object.header.customerPreId).subscribe(response => {
       console.log("🚀 ~ file: debtor-application-detail.page.ts:75 ~ DebtorApplicationDetailPage ~ this.objectService.getWorkflow ~ response:", response)
+      if (response.length === 0) {
+        this.toastService.presentToast('Doc Status', 'No workflow found.', 'top', 'success', 2000);
+      } else {
+        let currenctStatus = response.filter(r => !r.isCompleted).sort((a,b) => a.sequence-b.sequence)[0].title;
+        this.toastService.presentToast('Doc Status', 'Pending ' + currenctStatus, 'top', 'success', 2000);
+      }
     }, error => {
       console.error(error);
     })
   }
   
+  onFileChange(fileChangeEvent) {
+    let file = fileChangeEvent.target.files[0];
+    console.log("🚀 ~ file: debtor-application-detail.page.ts:89 ~ DebtorApplicationDetailPage ~ onFileChange ~ file:", file)
+  }
+
 }
