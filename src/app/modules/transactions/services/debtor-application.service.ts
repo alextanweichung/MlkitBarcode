@@ -23,6 +23,14 @@ export class DebtorApplicationService {
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
+  
+  hasSalesAgent(): boolean {
+    let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
+    if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
+      return false;
+    }
+    return true
+  }
 
   async loadRequiredMaster() {
     await this.loadMasterList();
@@ -43,7 +51,6 @@ export class DebtorApplicationService {
   termPeriodMasterList: MasterListDetails[] = [];
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
-    console.log("🚀 ~ file: debtor-application.service.ts:41 ~ DebtorApplicationService ~ loadMasterList ~ this.fullMasterList:", this.fullMasterList)
     this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.countryMasterList = this.fullMasterList.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -75,6 +82,10 @@ export class DebtorApplicationService {
   
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileDebtorApplication/masterlist").toPromise();
+  }
+
+  getWorkflow(objectId: number) {
+    return this.http.get<any>(this.baseUrl + "MobileDebtorApplication/workflow/" + objectId);
   }
 
 }

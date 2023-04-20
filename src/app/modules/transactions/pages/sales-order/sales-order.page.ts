@@ -10,8 +10,6 @@ import { format } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
-import { LoadingService } from 'src/app/services/loading/loading.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-sales-order',
@@ -119,8 +117,8 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     try {
       if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward('/transactions/sales-order/sales-order-header');
-      } else {
-        this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'danger', 1000);
+      } else {        
+        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
       }
     } catch (e) {
       console.error(e);

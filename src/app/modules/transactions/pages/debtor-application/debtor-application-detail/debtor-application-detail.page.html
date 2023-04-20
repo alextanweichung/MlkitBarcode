@@ -14,8 +14,15 @@
   <ng-template>
     <ion-content class="p-2">
       
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
 
+        <ion-item button (click)="isPopoverOpen = false; showHistoryModal()">
+          <ion-icon name="time-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Approval History</div>
+          </ion-label>
+        </ion-item>
+        
       </ion-list>
     </ion-content>
   </ng-template>

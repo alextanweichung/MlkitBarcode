@@ -92,7 +92,12 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      this.navController.navigateForward('/transactions/debtor-application/debtor-application-add');
+      if (this.objectService.hasSalesAgent()) {
+        this.navController.navigateForward('/transactions/debtor-application/debtor-application-add');
+      }
+      else {
+        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
+      }
     } catch (e) {
       console.error(e);
     }

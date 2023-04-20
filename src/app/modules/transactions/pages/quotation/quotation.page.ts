@@ -105,7 +105,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
       if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward('/transactions/quotation/quotation-header');
       } else {
-        this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'dnager', 1000);
+        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
       }      
     } catch (e) {
       console.error(e);

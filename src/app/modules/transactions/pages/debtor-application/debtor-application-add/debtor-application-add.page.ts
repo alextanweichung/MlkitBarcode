@@ -30,6 +30,8 @@ export class DebtorApplicationAddPage implements OnInit {
   }
 
   newObjectForm() {
+    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    console.log("🚀 ~ file: debtor-application-add.page.ts:34 ~ DebtorApplicationAddPage ~ newObjectForm ~ loginUser:", loginUser)
     this.objectForm = this.formBuilder.group({
       customerPreId: [0],
       customerPreCode: [null, [Validators.required, Validators.maxLength(100)]],
@@ -46,7 +48,7 @@ export class DebtorApplicationAddPage implements OnInit {
       bankAcct: [null, [Validators.maxLength(100)]],
       controlAccountId: [null, [Validators.maxLength(20)]],
       locationId: [null],
-      salesAgentId: [null],
+      salesAgentId: [loginUser.salesAgentId],
       latestSalesAgentId: [{ value: null, disabled: true }],
       termPeriodId: [null],
       gracePeriodInDay: [null],
@@ -181,7 +183,7 @@ export class DebtorApplicationAddPage implements OnInit {
   }
 
   insertObject() {
-    this.objectService.insertObject(this.objectForm.value).subscribe(response => {
+    this.objectService.insertObject(this.objectForm.getRawValue()).subscribe(response => {
       if (response.status === 201) {
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/debtor-application');

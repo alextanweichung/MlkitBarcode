@@ -69,5 +69,13 @@ export class DebtorApplicationDetailPage implements OnInit {
   }
 
   /* #endregion */
+
+  showHistoryModal() {
+    this.objectService.getWorkflow(this.object.header.customerPreId).subscribe(response => {
+      console.log("🚀 ~ file: debtor-application-detail.page.ts:75 ~ DebtorApplicationDetailPage ~ this.objectService.getWorkflow ~ response:", response)
+    }, error => {
+      console.error(error);
+    })
+  }
   
 }
