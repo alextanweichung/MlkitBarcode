@@ -41,37 +41,37 @@
     
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Name</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object.header.name}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Company Reg. Num</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object.header.companyRegNum}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Country</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object.header.countryId|idMapping:objectService.countryMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="object?.header?.creditLimit">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Credit Limit</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.creditLimit|number:'1.2'}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="object?.header?.termPeriodId">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Term Period</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.termPeriodId|idMapping:objectService.termPeriodMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="object?.header?.remark">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Remark</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.remark}}"></ion-input>
@@ -81,46 +81,72 @@
       <ion-label>Billing Address</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-
       <ion-item *ngIf="object?.header?.billAddress">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Address</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.shipAddress}}"></ion-input>
       </ion-item>
+      <ion-item *ngIf="object?.header?.billAttention">
+        <ion-label position="stacked">
+          <div>Attention</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.billAttention}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="object?.header?.billEmail">
+        <ion-label position="stacked">
+          <div>Email</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.billEmail}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="object?.header?.billPhone">
+        <ion-label position="stacked">
+          <div>Phone Number</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.billPhone}}"></ion-input>
+      </ion-item>
       <ion-item *ngIf="object?.header?.billStateId">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>State</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.billStateId|idMapping:objectService.stateMasterList}}"></ion-input>
       </ion-item>
-
     </ion-list>
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Shipping Address</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">      
       <ion-item *ngIf="object?.header?.shipAddress">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>Address</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.shipAddress}}"></ion-input>
       </ion-item>
+      <ion-item *ngIf="object?.header?.shipAttention">
+        <ion-label position="stacked">
+          <div>Attention</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.shipAttention}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="object?.header?.shipEmail">
+        <ion-label position="stacked">
+          <div>Email</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.shipEmail}}"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="object?.header?.shipPhone">
+        <ion-label position="stacked">
+          <div>Phone Number</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.shipPhone}}"></ion-input>
+      </ion-item>
       <ion-item *ngIf="object?.header?.shipStateId">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+        <ion-label position="stacked">
           <div>State</div>
         </ion-label>
         <ion-input readonly class="font-size-small" value="{{object?.header?.shipStateId|idMapping:objectService.stateMasterList}}"></ion-input>
       </ion-item>
-
     </ion-list>
-<!-- 
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">      
-      <ion-label>Attachments</ion-label>
-    </ion-list-header>
-    <input type="file" (change)="onFileChange($event)" /> -->
-
   </div>
 </ion-content>
 

@@ -126,6 +126,16 @@ export class DebtorApplicationAddPage implements OnInit {
     this.objectForm.updateValueAndValidity();
   }
 
+  applyToShipping() {
+    this.objectForm.patchValue({
+      shipAddress: this.objectForm.controls.billAddress.value,
+      shipAttention: this.objectForm.controls.billAttention.value,
+      shipEmail: this.objectForm.controls.billEmail.value,
+      shipPhone: this.objectForm.controls.billPhone.value,
+      shipStateId: this.objectForm.controls.billStateId.value,
+    });
+  }
+
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
