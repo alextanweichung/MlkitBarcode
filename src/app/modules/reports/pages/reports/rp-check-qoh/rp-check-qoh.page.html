@@ -20,38 +20,27 @@
       [columns]="columns"
       [columnMode]="'force'" 
       [scrollbarH]="true">
-        <ngx-datatable-column prop="itemCode" [width]="100">
-          <ng-template ngx-datatable-header-template>
-            <div class="flex ion-text-wrap font-half-size">Stock Code</div>
-          </ng-template>
+        <ngx-datatable-column prop="itemCode" name="Stock Code" [width]="100">
           <ng-template let-row="row" ngx-datatable-cell-template>
             <div class="flex ion-text-wrap font-half-size">{{row.itemCode}}</div>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="itemDescription" [width]="120">
-          <ng-template ngx-datatable-header-template>
-            <div class="flex ion-text-wrap font-half-size">Description</div>
-          </ng-template>
+        <ngx-datatable-column prop="itemDescription" name="Description" [width]="120">
           <ng-template let-row="row" ngx-datatable-cell-template>
             <div class="flex ion-text-wrap font-half-size">{{row.itemDescription}}</div>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="qoh" name="QOH" [width]="80">
+        <ngx-datatable-column prop="qoh" name="QOH" [width]="70">
           <ng-template let-row="row" ngx-datatable-cell-template>
             <div class="flex ion-text-wrap font-half-size">{{row.qoh|number:'1.0'}}</div>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="priceSegmentCode" name="Segment" [width]="80">
+        <ngx-datatable-column prop="price" name="Segment" [width]="80">
           <ng-template ngx-datatable-header-template>
-            <div class="flex ion-text-wrap font-half-size">Price Category</div>
+            <div class="flex ion-text-wrap font-half-size">Price</div>
           </ng-template>
           <ng-template let-row="row" ngx-datatable-cell-template>
-            <div class="flex ion-text-wrap font-half-size">{{row.priceSegmentCode}}</div>
-          </ng-template>
-        </ngx-datatable-column>
-        <ngx-datatable-column prop="nettPrice" name="Price" [width]="80">
-          <ng-template let-row="row" ngx-datatable-cell-template>
-            <div class="flex ion-text-wrap font-half-size">{{row.nettPrice|number:'1.2-2'}}</div>
+            <div class="flex ion-text-wrap font-half-size" *ngFor="let p of row.price">{{p.segmentCode}} - {{p.price|number:'1.2'}}</div>
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>

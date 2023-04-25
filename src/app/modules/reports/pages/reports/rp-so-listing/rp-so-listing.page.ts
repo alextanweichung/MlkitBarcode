@@ -3,6 +3,7 @@ import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportSOListing } from '../../../models/rp-so-listing';
 import { ReportsService } from '../../../services/reports.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-rp-so-listing',
@@ -18,7 +19,8 @@ export class RpSoListingPage implements OnInit {
 
   constructor(
     private reportService: ReportsService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -89,6 +91,33 @@ export class RpSoListingPage implements OnInit {
 
   hideDoDialog() {
     this.doDialog = false;
+  }
+
+  async presentAlertViewPdf(objectId: number) {
+    try {
+      const alert = await this.alertController.create({
+        header: 'Download PDF?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf(objectId);
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   downloadDOPdf(objectId: number|string) {

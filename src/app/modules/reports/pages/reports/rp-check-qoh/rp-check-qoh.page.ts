@@ -28,8 +28,7 @@ export class RpCheckQohPage implements OnInit {
       { prop: 'itemCode', name: 'Stock Code', draggable: false },
       { prop: 'itemDescription', name: 'Description', draggable: false },
       { prop: 'qoh', name: 'QOH', draggable: false },
-      { prop: 'priceSegmentCode', name: 'Price Category', draggable: false },
-      { prop: 'nettPrice', name: 'Price', draggable: false },
+      { prop: 'price', name: 'Price', draggable: false }
     ]
   }
 
@@ -63,16 +62,20 @@ export class RpCheckQohPage implements OnInit {
   realObject: any[] = [];
   massageData() {
     this.realObject = [];
-    this.objects.flatMap(r => r.segmentPricing).forEach(r => {
+
+    this.objects.forEach(r => {
+      let price: any[] = [];
+      r.segmentPricing.forEach(rr => {
+        price.push({
+          segmentCode: rr.itemPricing.priceSegmentCode,
+          price: rr.itemPricing.unitPrice
+        })
+      })
       this.realObject.push({
-        itemCode: this.objects.find(rr => rr.itemId === r.itemPricing.itemId).itemCode,
-        itemDescription: this.objects.find(rr => rr.itemId === r.itemPricing.itemId).itemDescription,
-
-        qoh: this.objects.flatMap(rr => rr.inventoryLevel).filter(rr => rr.itemId === r.itemPricing.itemId).reduce((a, c) => a + c.qty, 0),
-
-        priceSegmentCode: r.itemPricing.priceSegmentCode,
-
-        nettPrice: r.itemPricing.unitPrice * (r.itemPricing.discountPercent?((100-r.itemPricing.discountPercent)/100) : 1)
+        itemCode: r.itemCode,
+        itemDescription: r.itemDescription,
+        qoh: r.inventoryLevel.reduce((a, c) => a + c.qty, 0),
+        price: price
       })
     })
     console.log("🚀 ~ file: rp-check-qoh.page.ts:70 ~ RpCheckQohPage ~ massageData ~ this.realObject:", this.realObject)
