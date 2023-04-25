@@ -8,19 +8,19 @@
 </ion-header>
 <ion-content>
   <div class="p-2">    
-    <form [formGroup]="objectForm">      
+    <form class="form-default" [formGroup]="objectForm">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
           <ion-label position="stacked">Code</ion-label>
-          <ion-input placeholder="Enter Code" formControlName="customerPreCode"></ion-input>
+          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Code" formControlName="customerPreCode"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Name</ion-label>
-          <ion-input placeholder="Enter Name" formControlName="name"></ion-input>
+          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Name" formControlName="name"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Company Reg. Num</ion-label>
-          <ion-input placeholder="Enter Company Reg. Num" formControlName="companyRegNum"></ion-input>
+          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Company Reg. Num" formControlName="companyRegNum"></ion-input>
         </ion-item>
         <app-search-dropdown title="Country" optionLabel="description" [masterDropdownList]="objectService.countryMasterList" (onActionComplete)="onCountrySelected($event)"></app-search-dropdown>
         <app-search-dropdown title="State" optionLabel="description" [masterDropdownList]="objectService.stateMasterList" (onActionComplete)="onStateSelected($event)"></app-search-dropdown>        
@@ -31,7 +31,7 @@
         <app-search-dropdown title="Term Period" optionLabel="description" [masterDropdownList]="objectService.termPeriodMasterList" (onActionComplete)="onTermPeriodSelected($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked">Remark</ion-label>
-          <ion-textarea autoGrow="true" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
+          <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
         </ion-item>
       </ion-list>
       <ion-list-header class="ion-list-header-small ion-flex">
@@ -41,21 +41,21 @@
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
           <ion-label position="stacked">Address</ion-label>
-          <ion-textarea autoGrow="true" placeholder="Enter Address" formControlName="billAddress"></ion-textarea>
+          <ion-textarea autoGrow="true" type="text" enterkeyhint="enter" placeholder="Enter Address" formControlName="billAddress"></ion-textarea>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Attention</ion-label>
-          <ion-input inputmode="text" placeholder="Attention" formControlName="billAttention"></ion-input>
+          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Attention" formControlName="billAttention"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Email Address</ion-label>
-          <ion-input inputmode="email" placeholder="Enter Email" formControlName="billEmail"></ion-input>
+          <ion-input inputmode="email" type="email" enterkeyhint="next" placeholder="Enter Email" formControlName="billEmail"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Phone Number</ion-label>
-          <ion-input inputmode="numeric" placeholder="Phone Number" formControlName="billPhone"></ion-input>
+          <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Phone Number" formControlName="billPhone"></ion-input>
         </ion-item>
-        <app-search-dropdown title="State" optionLabel="description" [masterDropdownList]="objectService.stateMasterList" [selectedId]="objectForm?.controls?.billStateId?.value" (onActionComplete)="onBillStateSelected($event)"></app-search-dropdown>        
+        <app-search-dropdown title="State" optionLabel="description" [masterDropdownList]="objectService.stateMasterList" [selectedId]="objectForm?.controls?.billStateId?.value" (onActionComplete)="onBillStateSelected($event)"></app-search-dropdown>
       </ion-list>
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label>Shipping Address</ion-label>
@@ -63,19 +63,19 @@
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
           <ion-label position="stacked">Address</ion-label>
-          <ion-textarea autoGrow="true" placeholder="Enter Address" formControlName="shipAddress"></ion-textarea>
+          <ion-textarea autoGrow="true" type="text" enterkeyhint="enter" placeholder="Enter Address" formControlName="shipAddress"></ion-textarea>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Attention</ion-label>
-          <ion-input inputmode="text" placeholder="Attention" formControlName="shipAttention"></ion-input>
+          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Attention" formControlName="shipAttention"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Email Address</ion-label>
-          <ion-input inputmode="email" placeholder="Enter Email" formControlName="shipEmail"></ion-input>
+          <ion-input inputmode="email" type="email" enterkeyhint="next" placeholder="Enter Email" formControlName="shipEmail"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Phone Number</ion-label>
-          <ion-input inputmode="numeric" placeholder="Phone Number" formControlName="shipPhone"></ion-input>
+          <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Phone Number" formControlName="shipPhone"></ion-input>
         </ion-item>
         <app-search-dropdown title="State" optionLabel="description" [masterDropdownList]="objectService.stateMasterList" [selectedId]="objectForm?.controls?.shipStateId?.value" (onActionComplete)="onShipStateSelected($event)"></app-search-dropdown>
       </ion-list>
