@@ -1,7 +1,7 @@
 
 <ion-label class="ion-flex mt-2 ml-4" [ngStyle]="{'font-weight': showBoldHeader ? 'bold' : ''}" *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label>
 <ion-item (click)="showModal()" lines="none">
-  <ion-input [placeholder]="'Select ' + title" [value]="selected.length > 0 ? (selected.length + ' selected') : undefined" readonly></ion-input>
+  <ion-input [placeholder]="'Select ' + title" [value]="selected.length > 0 ? (selected.length + ' selected') : undefined" readonly clearInput="true"></ion-input>
 </ion-item>
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
@@ -24,9 +24,25 @@
       <div class="p-2">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
           <ion-item detail="false" *ngFor="let item of tempDropdownList">
-            <ion-checkbox slot="start" [(ngModel)]="item.checked" (ionChange)="itemChecked($event, item)"></ion-checkbox>
+            <!-- <ion-checkbox slot="start" [(ngModel)]="item.checked" (ionChange)="itemChecked($event, item)"></ion-checkbox>
             <ion-badge slot="start" *ngIf="item?.code">{{item?.code}}</ion-badge>
             <ion-badge class="ml-2" color="tertiary" slot="start" *ngIf="item?.oldCode">{{item?.oldCode}}</ion-badge>
+            <div class="ml-2 ion-text-wrap">{{item?.description}}</div> -->
+            <ion-checkbox slot="start" [(ngModel)]="item.checked" (ionChange)="itemChecked($event, item)"></ion-checkbox>
+            <div>
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col class="ion-margin-auto">
+                    <ion-badge style="display:inline-flex" *ngIf="item && item?.code"><div>{{item?.code}}</div></ion-badge>
+                  </ion-col>
+                </ion-row>
+                <ion-row *ngIf="item && item?.oldCode">
+                  <ion-col class="ion-margin-auto">
+                    <ion-badge style="display:inline-flex" color="tertiary" *ngIf="item && item?.oldCode"><div>{{item?.oldCode}}</div></ion-badge>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
             <div class="ml-2 ion-text-wrap">{{item?.description}}</div>
           </ion-item>
         </ion-list>

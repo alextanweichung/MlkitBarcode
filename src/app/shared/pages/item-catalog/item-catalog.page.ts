@@ -94,7 +94,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         }
         this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, 0).subscribe(response => {
           this.availableItems = response;
-          console.log("🚀 ~ file: item-catalog.page.ts:96 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           if (this.availableItems && this.availableItems.length > 0) {
             this.availableItems.forEach(r => {
               if (r.itemPricing !== null) {

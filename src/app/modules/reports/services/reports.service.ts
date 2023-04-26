@@ -9,6 +9,7 @@ import { ReportSOListing } from '../models/rp-so-listing';
 import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-customer';
 import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { CheckQohRoot } from '../models/rp-check-qoh';
+import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
 
 @Injectable({
   providedIn: 'root'
@@ -50,6 +51,10 @@ export class ReportsService {
 
   getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
     return this.http.get<CheckQohRoot[]>(this.baseUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
+  }
+
+  getCheckCn(object: CheckCnRequest) {
+    return this.http.post<CheckCn[]>(this.baseUrl + "mobileReport/checkCn", object);
   }
 
   getPdf(model: ReportParameterModel) {

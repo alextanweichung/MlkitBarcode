@@ -213,6 +213,10 @@ const routes: Routes = [
     path: 'reports/rp-check-qoh',
     loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then( m => m.RpCheckQohPageModule)
   },
+  {
+    path: 'reports/rp-check-cn',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then( m => m.RpCheckCnPageModule)
+  },
 
 
 
