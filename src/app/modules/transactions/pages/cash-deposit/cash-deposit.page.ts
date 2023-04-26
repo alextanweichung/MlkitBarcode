@@ -24,14 +24,16 @@ export class CashDepositPage implements OnInit, ViewWillEnter {
     private toastService: ToastService,
     private actionSheetController: ActionSheetController,
     private navController: NavController
-  ) { }
+  ) {
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     this.loadObjects();
   }
   
   ngOnInit() {
-    this.loadMasterList();
+    
   }
 
   loadObjects() {
@@ -52,19 +54,6 @@ export class CashDepositPage implements OnInit, ViewWillEnter {
 
   getObjects(date: Date) {
     return this.objects.filter(r => new Date(r.depositDateTime).getMonth() === date.getMonth() && new Date(r.depositDateTime).getFullYear() === date.getFullYear() && new Date(r.depositDateTime).getDate() === date.getDate());
-  }
-  
-  paymentMethodMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   /* #region  add object */

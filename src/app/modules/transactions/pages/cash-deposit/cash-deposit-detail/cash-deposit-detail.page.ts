@@ -22,7 +22,7 @@ export class CashDepositDetailPage implements OnInit {
     private navController: NavController,
     private modalController: ModalController,
     private toastService: ToastService,
-    private objectService: CashDepositService,    
+    public objectService: CashDepositService,    
     private sanitizer: DomSanitizer
   ) {
     this.route.queryParams.subscribe(params => {
@@ -37,21 +37,7 @@ export class CashDepositDetailPage implements OnInit {
     if (!this.objectId) {
       this.navController.navigateBack('/transactions/cash-deposit')
     } else {
-      this.loadMasterList();
       this.loadDetail();
-    }
-  }
-
-  paymentMethodMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);      
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
     }
   }
   

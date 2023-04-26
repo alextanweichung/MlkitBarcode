@@ -54,7 +54,7 @@
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Bank name</div>
         </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.paymentMethodId|idMapping:paymentMethodMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
     <div *ngIf="imageUrl">

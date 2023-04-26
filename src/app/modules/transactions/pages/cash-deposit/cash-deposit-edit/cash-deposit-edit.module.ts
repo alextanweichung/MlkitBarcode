@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { CashDepositEditPageRoutingModule } from './cash-deposit-edit-routing.module';
 
 import { CashDepositEditPage } from './cash-deposit-edit.page';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
@@ -14,7 +15,8 @@ import { CashDepositEditPage } from './cash-deposit-edit.page';
     FormsModule,
     IonicModule,
     CashDepositEditPageRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SearchDropdownPageModule
   ],
   declarations: [CashDepositEditPage]
 })

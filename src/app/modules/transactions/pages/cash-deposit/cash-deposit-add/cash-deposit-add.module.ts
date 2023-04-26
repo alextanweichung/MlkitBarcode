@@ -8,6 +8,7 @@ import { CashDepositAddPageRoutingModule } from './cash-deposit-add-routing.modu
 
 import { CashDepositAddPage } from './cash-deposit-add.page';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/cal
     IonicModule,
     CashDepositAddPageRoutingModule,
     ReactiveFormsModule,
-    CalendarInputPageModule
+    CalendarInputPageModule,
+    SearchDropdownPageModule
   ],
   declarations: [CashDepositAddPage]
 })

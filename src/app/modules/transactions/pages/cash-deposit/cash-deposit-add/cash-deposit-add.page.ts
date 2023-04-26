@@ -15,6 +15,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { CashDeposit } from '../../../models/cash-deposit';
 import { CashDepositService } from '../../../services/cash-deposit.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -37,7 +38,7 @@ export class CashDepositAddPage implements OnInit {
     private http: HttpClient,
     private configService: ConfigService,
     private authService: AuthService,
-    private objectService: CashDepositService,
+    public objectService: CashDepositService,
     private commonService: CommonService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
@@ -56,8 +57,20 @@ export class CashDepositAddPage implements OnInit {
 
   ngOnInit() {
     this.removeDir();
-    this.loadMasterList();
     this.loadModuleControl();
+    this.bindCustomerList();
+  }
+
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  bindCustomerList() {
+    this.objectService.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
+      })
+    })
   }
 
   newObjectForm() {
@@ -70,21 +83,17 @@ export class CashDepositAddPage implements OnInit {
       depositFileId: [null],
       depositSlipNum: [null],
       paymentMethodId: [null, [Validators.required]],
+      customerId: [null],
       sequence: [0]
     })
   }
 
-  paymentMethodMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        console.log(error);
-      })
-    } catch (e) {
-      console.error(e);
-    }
+  onCustomerSelected(event) {
+    this.objectForm.patchValue({ customerId: event.id });
+  }
+
+  onPaymentMethodSelected(event) {
+    this.objectForm.patchValue({ paymentMethodId: event.id });
   }
 
   moduleControl: ModuleControl[] = [];
