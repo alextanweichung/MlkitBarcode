@@ -63,7 +63,7 @@ export class RpSoListingPage implements OnInit {
         await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
       }, error => {
         throw error;
-      })      
+      })
     } catch (e) {
       console.error(e);
     }
@@ -76,7 +76,7 @@ export class RpSoListingPage implements OnInit {
     try {
       this.deliveryOrderObject = deliveryOrders.split(';');
       if (this.deliveryOrderObject && this.deliveryOrderObject.length === 1) {
-        await this.downloadDOPdf(Number(this.deliveryOrderObject[0].split('|')[1]));
+        await this.presentAlertViewPdf(Number(this.deliveryOrderObject[0].split('|')[1]), 'DO');
       } else {
         this.showDoDialog();
       }
@@ -93,7 +93,7 @@ export class RpSoListingPage implements OnInit {
     this.doDialog = false;
   }
 
-  async presentAlertViewPdf(objectId: number) {
+  async presentAlertViewPdf(objectId: any, type: string) {
     try {
       const alert = await this.alertController.create({
         header: 'Download PDF?',
@@ -104,7 +104,11 @@ export class RpSoListingPage implements OnInit {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.downloadPdf(objectId);
+              if (type === 'SO') {
+                await this.downloadPdf(Number(objectId));
+              } else {
+                await this.downloadDOPdf(Number(objectId));
+              }
             },
           },
           {
@@ -120,7 +124,7 @@ export class RpSoListingPage implements OnInit {
     }
   }
 
-  downloadDOPdf(objectId: number|string) {
+  downloadDOPdf(objectId: number) {
     let paramModel: ReportParameterModel = {
       appCode: 'WDOP001',
       format: 'pdf',

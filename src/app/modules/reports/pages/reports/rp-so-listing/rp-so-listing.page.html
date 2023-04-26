@@ -44,7 +44,7 @@
       </ngx-datatable-column>
       <ngx-datatable-column prop="salesOrderNum" name="Sales Order" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size div-link-button" (click)="presentAlertViewPdf(row.salesOrderId)"> {{row.salesOrderNum}}</div>
+          <div class="font-half-size div-link-button" (click)="presentAlertViewPdf(row.salesOrderId, 'SO')"> {{row.salesOrderNum}}</div>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order" [width]="120">
@@ -88,7 +88,7 @@
                   <div>{{dOrder.split('|')[0]}}</div>
                 </ion-col>
                 <ion-col>
-                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="downloadDOPdf(dOrder.split('|')[1])">Download</ion-button></div>
+                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="presentAlertViewPdf(dOrder.split('|')[1], 'DO')">Download</ion-button></div>
                 </ion-col>
               </ion-row>
             </ion-grid>
