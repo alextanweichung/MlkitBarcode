@@ -11,7 +11,6 @@ import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { LoadingController } from '@ionic/angular';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 // import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -53,7 +52,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       
       setTimeout(async () => {
          if (!finished) {
-            // this.loadingService.showLoading('Loading');
+            await this.loadingService.showLoading('Loading');
             // this.spinner.show('sp1');
          }
       }, 800);
@@ -107,9 +106,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
             return throwError(error);
          }),
          //Clear spinner
-         finalize(() => {
+         finalize(async () => {
             finished = true;
-            // this.loadingService.dismissLoading();
+            await this.loadingService.dismissLoading();
             // this.spinner.hide('sp1');
          })
       );

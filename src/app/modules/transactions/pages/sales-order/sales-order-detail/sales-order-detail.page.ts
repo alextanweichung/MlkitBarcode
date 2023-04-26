@@ -75,6 +75,7 @@ export class SalesOrderDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        console.log("🚀 ~ file: sales-order-detail.page.ts:78 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
       }, error => {
         throw error;
       })
@@ -272,25 +273,17 @@ export class SalesOrderDetailPage implements OnInit {
 
   /* #region order status */
 
-  statusModel: boolean = false;
-  orderStatus: SalesOrderStatus;
-  showStatusModel() {
+  showStatus() {
     try {
-
+      this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
+        console.log("🚀 ~ file: sales-order-detail.page.ts:278 ~ SalesOrderDetailPage ~ this.objectService.getStatus ~ response:", response);
+        this.toastService.presentToast('Doc Status', response.currentStatus, 'top', 'success', 2000);
+      }, error => {
+        throw error;
+      })
     } catch (e) {
       console.error(e);
     }
-    this.statusModel = true;
-    this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
-    this.orderStatus = response;
-
-    }, error => {
-      throw error;
-    })
-  }
-
-  hideStatusModel() {
-    this.statusModel = false;
   }
 
   /* #endregion */

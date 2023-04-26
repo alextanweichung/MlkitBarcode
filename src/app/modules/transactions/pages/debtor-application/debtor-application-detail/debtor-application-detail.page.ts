@@ -70,9 +70,8 @@ export class DebtorApplicationDetailPage implements OnInit {
 
   /* #endregion */
 
-  showHistoryModal() {
+  showStatus() {
     this.objectService.getWorkflow(this.object.header.customerPreId).subscribe(response => {
-      console.log("🚀 ~ file: debtor-application-detail.page.ts:75 ~ DebtorApplicationDetailPage ~ this.objectService.getWorkflow ~ response:", response)
       if (response.length === 0) {
         this.toastService.presentToast('Doc Status', 'No workflow found.', 'top', 'success', 2000);
       } else {

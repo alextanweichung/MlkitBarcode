@@ -16,7 +16,7 @@
       
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
 
-        <ion-item button (click)="isPopoverOpen = false; showHistoryModal()">
+        <ion-item button (click)="isPopoverOpen = false; showStatus()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Current Status</div>
@@ -147,6 +147,11 @@
         <ion-input readonly class="font-size-small" value="{{object?.header?.shipStateId|idMapping:objectService.stateMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
+    <!-- <ion-button expand="full">
+      <ion-icon lazy="true" slot="start" name="image"></ion-icon>
+      <ion-label slot="end">Upload File</ion-label>
+      <input type="file" id="file-input" accept="image/png, image/jpeg">
+    </ion-button> -->
   </div>
 </ion-content>
 

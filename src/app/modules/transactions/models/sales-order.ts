@@ -28,6 +28,7 @@ export interface SalesOrderRoot {
   barcodeTag?: any
   otp?: any
   approvalHistory?: ApprovalHistory[]
+  isWorkFlowDone?: boolean
 }
 
 export interface SalesOrderHeader {
@@ -37,6 +38,7 @@ export interface SalesOrderHeader {
   trxDateTime: string
   typeCode: string
   sourceType: string
+  status: string
   customerId: number
   businessModelType: string
   salesAgentId: number

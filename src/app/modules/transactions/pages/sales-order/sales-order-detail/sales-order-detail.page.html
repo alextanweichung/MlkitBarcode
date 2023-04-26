@@ -9,19 +9,17 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
-    <ion-content class="p-2">
-      
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <ion-content class="p-2">      
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button (click)="isPopoverOpen = false; showHistoryModal()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approval History</div>
           </ion-label>
         </ion-item>
-        <ion-item button (click)="isPopoverOpen = false; presentAlertViewPdf('Sales Order')">
+        <ion-item button *ngIf="object.isWorkFlowDone??false" (click)="isPopoverOpen = false; presentAlertViewPdf('Sales Order')">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Sales Order</div>
@@ -33,28 +31,24 @@
             <div>Proforma Invoice</div>
           </ion-label>
         </ion-item>
-        <ion-item button (click)="isPopoverOpen = false; showStatusModel()">
-          <!-- <ion-icon name="download-outline" slot="end"></ion-icon> -->
+        <ion-item button (click)="isPopoverOpen = false; showStatus()">
           <ion-label>
             <div>Status</div>
           </ion-label>
         </ion-item>
-        <ion-item button *ngIf="processType && selectedSegment === 'pending'"
-          (click)="isPopoverOpen = false; presentConfirmAlert('CONFIRM')">
+        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="isPopoverOpen = false; presentConfirmAlert('CONFIRM')">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approve</div>
           </ion-label>
         </ion-item>
-        <ion-item button *ngIf="processType && selectedSegment === 'pending'"
-          (click)="isPopoverOpen = false; presentConfirmAlert('REJECT')">
+        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="isPopoverOpen = false; presentConfirmAlert('REJECT')">
           <ion-icon name="close-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reject</div>
           </ion-label>
         </ion-item>
-        <ion-item button *ngIf="processType && selectedSegment === 'completed'"
-          (click)="isPopoverOpen = false; presentConfirmAlert('REVERSE')">
+        <ion-item button *ngIf="processType && selectedSegment === 'completed'" (click)="isPopoverOpen = false; presentConfirmAlert('REVERSE')">
           <ion-icon name="arrow-undo-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reverse</div>
@@ -64,7 +58,6 @@
     </ion-content>
   </ng-template>
 </ion-popover>
-
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -74,8 +67,7 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2" *ngIf="object">
-    
+  <div class="p-2" *ngIf="object">    
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
@@ -198,7 +190,6 @@
     </ion-list>
   </div>
 </ion-content>
-
 <ion-modal [isOpen]="historyModal" (didDismiss)="historyModal = false">
   <ng-template>
     <ion-header>
@@ -250,50 +241,6 @@
                 </ion-col>
               </ion-row>
             </ion-grid>
-          </ion-item>
-        </ion-list>
-      </div>
-    </ion-content>
-  </ng-template>
-</ion-modal>
-
-<ion-modal [isOpen]="statusModel" (didDismiss)="statusModel = false">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Status</ion-title>
-        <ion-buttons slot="start">
-          <ion-button (click)="hideStatusModel()">Done</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <div class="p-2">
-        <ion-list-header class="ion-list-header-small" *ngIf="!orderStatus">
-          <ion-label>Order Status not available.</ion-label>
-        </ion-list-header>
-        <ion-list class="list-custom" lines="none">
-          <ion-item button="false">
-            <ion-grid class="p-1">
-              <ion-row>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div>Status</div>
-                </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{orderStatus?.currentStatus}}</div>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-item>
-        </ion-list>
-        <ion-list-header class="ion-list-header-small" *ngIf="orderStatus?.docNum && orderStatus?.docNum?.length > 0">
-          <ion-label>Related Doc</ion-label>
-        </ion-list-header>
-        <ion-list class="list-custom" lines="none" *ngIf="orderStatus?.docNum && orderStatus?.docNum?.length > 0">
-          <ion-item button="false" *ngFor="let d of orderStatus?.docNum">
-            <ion-label>
-              <div>{{d}}</div>
-            </ion-label>
           </ion-item>
         </ion-list>
       </div>
