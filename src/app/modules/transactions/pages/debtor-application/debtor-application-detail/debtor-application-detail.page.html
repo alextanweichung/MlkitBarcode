@@ -85,7 +85,7 @@
         <ion-label position="stacked">
           <div>Address</div>
         </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object?.header?.shipAddress}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object?.header?.billAddress}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="object?.header?.billAttention">
         <ion-label position="stacked">
@@ -147,9 +147,9 @@
         <ion-input readonly class="font-size-small" value="{{object?.header?.shipStateId|idMapping:objectService.stateMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+    <!-- <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Attachments</ion-label>
-    </ion-list-header>
+    </ion-list-header> -->
     <!-- <ion-button expand="full" (click)="uploadFiles">
       <ion-icon lazy="true" slot="start" name="document-outline"></ion-icon>
       <ion-label slot="end">Upload File</ion-label>
