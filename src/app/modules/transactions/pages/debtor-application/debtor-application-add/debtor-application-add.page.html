@@ -17,6 +17,7 @@
         <ion-item>
           <ion-label position="stacked">Name</ion-label>
           <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Name" formControlName="name"></ion-input>
+          <div *ngIf="objectForm.controls['name'].errors && objectForm.controls['name'].touched" class="font-x-smaller pb-1 color-danger" padding>Name is required</div>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Company Reg. Num</ion-label>
@@ -49,7 +50,8 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Email Address</ion-label>
-          <ion-input inputmode="email" type="email" enterkeyhint="next" placeholder="Enter Email" formControlName="billEmail"></ion-input>
+          <ion-input inputmode="email" type="email" email enterkeyhint="next" placeholder="Enter Email" formControlName="billEmail" errorText="Invalid email format"></ion-input>
+          <div *ngIf="objectForm.controls['billEmail'].errors && objectForm.controls['billEmail'].dirty" class="font-x-smaller pb-1 color-danger" padding>Invalid Email</div>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Phone Number</ion-label>
@@ -71,7 +73,8 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Email Address</ion-label>
-          <ion-input inputmode="email" type="email" enterkeyhint="next" placeholder="Enter Email" formControlName="shipEmail"></ion-input>
+          <ion-input inputmode="email" type="email" email enterkeyhint="next" placeholder="Enter Email" formControlName="shipEmail" errorText="Invalid email format"></ion-input>
+          <div *ngIf="objectForm.controls['shipEmail'].errors && objectForm.controls['shipEmail'].dirty" class="font-x-smaller pb-1 color-danger" padding>Invalid Email</div>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Phone Number</ion-label>
