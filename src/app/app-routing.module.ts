@@ -112,6 +112,12 @@ const routes: Routes = [
     path: 'transactions/sales-order/sales-order-detail',
     loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/sales-order-detail.module').then(m => m.SalesOrderDetailPageModule)
   },
+  // transaction-backtoback-order
+  {
+    path: 'transactions/backtoback-order',
+    loadChildren: () => import('./modules/transactions/pages/backtoback-order/backtoback-order.module').then( m => m.BackToBackOrderPageModule)
+  },
+
   // transactions-purchase-order
   {
     path: 'transactions/purchase-order/purchase-order-detail',

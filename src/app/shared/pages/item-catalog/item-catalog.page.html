@@ -26,7 +26,7 @@
               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
                 Qty: 
                 <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{item.actualQty|number:'1.0'}}</div>
-                <div *ngIf="salesOrderQuantityControl === '2'" class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
+                <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
             <ion-row *ngIf="item?.unitPrice || item?.unitPriceExTax">
@@ -115,7 +115,7 @@
               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
                 Qty: 
                 <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{item.actualQty|number:'1.0'}}</div>
-                <div *ngIf="salesOrderQuantityControl === '2'" class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
+                <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
@@ -161,7 +161,7 @@
           <div *ngFor="let vd of selectedItem.variationDetails">
             <div *ngFor="let d of vd.details">
               <ion-row class="py-0">
-                <ion-col size="8" class="ion-flex ion-margin-auto">
+                <ion-col size="7" class="ion-flex ion-margin-auto">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-flex ion-margin-auto">
@@ -173,12 +173,12 @@
                       <ion-col class="ion-flex ion-margin-auto">
                         Qty:
                         <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{d.actualQty|number:'1.0'}}</div>
-                        <div *ngIf="salesOrderQuantityControl === '2'" class="font-bold ml-2">{{d.availableQty|number:'1.0'}}</div>
+                        <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{d.availableQty|number:'1.0'}}</div>
                       </ion-col>
                     </ion-row>
                   </ion-grid>
                 </ion-col>
-                <ion-col size="4" class="ion-margin-auto p-0">
+                <ion-col size="5" class="ion-margin-auto p-0">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-flex ion-margin-auto justify-content-center">

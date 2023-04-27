@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { SalesOrderPage } from './sales-order.page';
+import { BacktobackOrderHeaderPage } from './backtoback-order-header.page';
 
-describe('PickingSalesOrderPage', () => {
-  let component: SalesOrderPage;
-  let fixture: ComponentFixture<SalesOrderPage>;
+describe('BacktobackOrderHeaderPage', () => {
+  let component: BacktobackOrderHeaderPage;
+  let fixture: ComponentFixture<BacktobackOrderHeaderPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SalesOrderPage ],
+      declarations: [ BacktobackOrderHeaderPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SalesOrderPage);
+    fixture = TestBed.createComponent(BacktobackOrderHeaderPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

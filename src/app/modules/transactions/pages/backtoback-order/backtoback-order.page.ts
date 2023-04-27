@@ -1,24 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
-import { ToastService } from 'src/app/services/toast/toast.service';
-import { SalesOrderList } from '../../models/sales-order';
-import { CommonService } from '../../../../shared/services/common.service';
-import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
+import { ViewWillEnter, ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
 import { format } from 'date-fns';
-import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { Customer } from '../../models/customer';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { BackToBackOrderService } from '../../services/backtoback-order.service';
+import { BackToBackOrderList } from '../../models/backtoback-order';
 
 @Component({
-  selector: 'app-sales-order',
-  templateUrl: './sales-order.page.html',
-  styleUrls: ['./sales-order.page.scss']
+  selector: 'app-backtoback-order',
+  templateUrl: './backtoback-order.page.html',
+  styleUrls: ['./backtoback-order.page.scss'],
 })
-export class SalesOrderPage implements OnInit, ViewWillEnter {
+export class BackToBackOrderPage implements OnInit, ViewWillEnter {
 
-  objects: SalesOrderList[] = [];
+  objects: BackToBackOrderList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -31,7 +29,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   constructor(
     private commonService: CommonService,
-    private objectService: SalesOrderService,
+    private objectService: BackToBackOrderService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
@@ -50,8 +48,8 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
       this.endDate = this.commonService.getTodayDate();
     }
     this.loadObjects();
-    this.bindCustomerList();
-    this.bindSalesAgentList();
+    // this.bindCustomerList();
+    // this.bindSalesAgentList();
   }
 
   ngOnInit() {
@@ -62,14 +60,9 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      let obj: SalesSearchModal =  {
-        dateStart: format(this.startDate, 'yyyy-MM-dd'),
-        dateEnd: format(this.endDate, 'yyyy-MM-dd'),
-        customerId: this.customerIds,
-        salesAgentId: this.salesAgentIds
-      }
-      this.objectService.getObjectListByDate(obj).subscribe(async response => {
+      this.objectService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
         this.objects = response;
+        console.log("🚀 ~ file: backtoback-order.page.ts:65 ~ BackToBackOrderPage ~ this.objectService.getObjectListByDate ~ this.objects:", this.objects)
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
@@ -86,28 +79,28 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
   }
 
-  selectedCustomer: Customer;
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  bindCustomerList() {
-    this.objectService.customers.forEach(r => {
-      this.customerSearchDropdownList.push({
-        id: r.customerId,
-        code: r.customerCode,
-        oldCode: r.oldCustomerCode,
-        description: r.name
-      })
-    })
-  }
+  // selectedCustomer: Customer;
+  // customerSearchDropdownList: SearchDropdownList[] = [];
+  // bindCustomerList() {
+  //   this.objectService.customers.forEach(r => {
+  //     this.customerSearchDropdownList.push({
+  //       id: r.customerId,
+  //       code: r.customerCode,
+  //       oldCode: r.oldCustomerCode,
+  //       description: r.name
+  //     })
+  //   })
+  // }
 
-  bindSalesAgentList() {
-    this.objectService.salesAgentMasterList.forEach(r => {
-      this.salesAgentDropdownList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-  }
+  // bindSalesAgentList() {
+  //   this.objectService.salesAgentMasterList.forEach(r => {
+  //     this.salesAgentDropdownList.push({
+  //       id: r.id,
+  //       code: r.code,
+  //       description: r.description
+  //     })
+  //   })
+  // }
 
   /* #endregion */
 
@@ -116,8 +109,8 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
   async addObject() {
     try {
       if (this.objectService.hasSalesAgent()) {
-        this.navController.navigateForward('/transactions/sales-order/sales-order-header');
-      } else {        
+        this.navController.navigateForward('/transactions/backtoback-order/backtoback-order-header');
+      } else {
         this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
       }
     } catch (e) {
@@ -133,7 +126,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         cssClass: 'custom-action-sheet',
         buttons: [
           {
-            text: 'Add Sales Order',
+            text: 'Add B2B Order',
             icon: 'document-outline',
             handler: () => {
               this.addObject();
@@ -155,45 +148,45 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   /* #region download pdf */
 
-  async presentAlertViewPdf(doc) {
-    try {
-      const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
-        buttons: [
-          {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
-            handler: async () => {
-              await this.downloadPdf(doc);
-            },
-          },
-          {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
-          },
-        ]
-      });
-      await alert.present();
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // async presentAlertViewPdf(doc) {
+  //   try {
+  //     const alert = await this.alertController.create({
+  //       header: 'Download PDF?',
+  //       message: '',
+  //       buttons: [
+  //         {
+  //           text: 'OK',
+  //           cssClass: 'success',
+  //           role: 'confirm',
+  //           handler: async () => {
+  //             await this.downloadPdf(doc);
+  //           },
+  //         },
+  //         {
+  //           cssClass: 'cancel',
+  //           text: 'Cancel',
+  //           role: 'cancel'
+  //         },
+  //       ]
+  //     });
+  //     await alert.present();
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
-  async downloadPdf(doc) {
-    try {
-      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
-        let filename = doc.salesOrderNum + ".pdf";
-        this.commonService.commonDownloadPdf(response, filename);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // async downloadPdf(doc) {
+  //   try {
+  //     this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
+  //       let filename = doc.salesOrderNum + ".pdf";
+  //       this.commonService.commonDownloadPdf(response, filename);
+  //     }, error => {
+  //       throw error;
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   /* #endregion */
 
@@ -204,12 +197,8 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         componentProps: {
           startDate: this.startDate,
           endDate: this.endDate,
-          customerFilter: true,
-          customerList: this.customerSearchDropdownList,
-          selectedCustomerId: this.customerIds,
-          salesAgentFilter: true,
-          salesAgentList: this.salesAgentDropdownList,
-          selectedSalesAgentId: this.salesAgentIds
+          customerFilter: false,
+          salesAgentFilter: false
         },
         canDismiss: true
       })
@@ -218,8 +207,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
       if (data && data !== undefined) {
         this.startDate = new Date(data.startDate);
         this.endDate = new Date(data.endDate);
-        this.customerIds = data.customerIds;
-        this.salesAgentIds = data.salesAgentIds;
         this.loadObjects();
       }
     } catch (e) {
@@ -234,7 +221,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);
+      this.navController.navigateForward('/transactions/backtoback-order/backtoback-order-detail', navigationExtras);
     } catch (e) {
       console.error(e);
     }

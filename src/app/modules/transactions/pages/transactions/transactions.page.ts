@@ -15,20 +15,11 @@ import { SalesOrderList } from '../../models/sales-order';
 export class TransactionsPage implements OnInit {
 
   showQuotation: boolean = false;
-  quotations: QuotationList[] = [];
-
   showSalesOrder: boolean = false;
-  salesOrders: SalesOrderList[] = [];
-
+  showBackToBackOrder: boolean = false;
   showPicking: boolean = false;
-  pickings: GoodsPickingList[] = [];
-
   showPacking: boolean = false;
-  packings: GoodsPackingList[] = [];
-
   showConsignmentSales: boolean = false;
-  consignment_sales: ConsignmentSalesList[] = [];
-
   showStockCount: boolean = false;
   showInventoryLevel: boolean = false;
   showCashDeposit: boolean = false;
@@ -48,6 +39,7 @@ export class TransactionsPage implements OnInit {
         if (pageItems) {
           this.showQuotation = pageItems.findIndex(r => r.title === trxAppCode.mobileQuotation) > -1;
           this.showSalesOrder = pageItems.findIndex(r => r.title === trxAppCode.mobileSalesOrder) > -1;
+          this.showBackToBackOrder = pageItems.findIndex(r => r.title === trxAppCode.mobileBackToBackOrder) > -1;
           this.showPicking = pageItems.findIndex(r => r.title === trxAppCode.mobilePicking) > -1;
           this.showPacking = pageItems.findIndex(r => r.title === trxAppCode.mobilePacking) > -1;
           this.showConsignmentSales = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignment) > -1;

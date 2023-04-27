@@ -1,0 +1,68 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Summary</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Summary</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2" *ngIf="object">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Doc. Number</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.backToBackOrderNum}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Doc. Date</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Location</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Customer</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Total Quantity</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.details|sum:'qtyRequest'|number}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Grand Total</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col>
+        <ion-button class="ion-margin" expand="block" size="default" (click)="addMore()">
+          Add New
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button class="ion-margin" expand="block" size="default" (click)="done()">
+          Done
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>

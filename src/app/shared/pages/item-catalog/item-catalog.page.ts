@@ -92,8 +92,9 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         if (Capacitor.getPlatform() !== 'web') {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId??0).subscribe(response => {
+        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0).subscribe(response => {
           this.availableItems = response;
+          console.log("🚀 ~ file: item-catalog.page.ts:97 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           if (this.availableItems && this.availableItems.length > 0) {
             this.availableItems.forEach(r => {
               if (r.itemPricing !== null) {
@@ -203,18 +204,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
         this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
-      } else {
-        data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
     } else if (this.isSalesOrder && this.salesOrderQuantityControl == '2') {
       if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
         data.qtyRequest = null;
         this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
-      } else {
-        data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
-    } else {
-      data.qtyRequest = (data.qtyRequest ?? 0) + 1;
     }
   }
 
@@ -278,19 +273,13 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
         this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
-      } else {
-        data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
     } else if (this.isSalesOrder && this.salesOrderQuantityControl == '2') {
       if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
         data.qtyRequest = null;
         this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
-      } else {
-        data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
-    } else {
-      data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-    }  
+    }
   }
 
   increaseVariationQty(data: InnerVariationDetail) {

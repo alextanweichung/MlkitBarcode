@@ -7,6 +7,7 @@ export const moduleCode = {
 export const trxAppCode = {
    mobileQuotation: 'MATRQU',
    mobileSalesOrder: 'MATRSO',
+   mobileBackToBackOrder: 'MATRB2B',
    mobilePicking: 'MATRPI',
    mobilePacking: 'MATRPA',
    mobileConsignment: 'MATRCS',
