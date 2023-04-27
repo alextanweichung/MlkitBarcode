@@ -9,25 +9,20 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
-    <ion-content class="p-2">
-      
+    <ion-content class="p-2">      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-
         <ion-item button (click)="isPopoverOpen = false; showStatus()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Current Status</div>
           </ion-label>
         </ion-item>
-
       </ion-list>
     </ion-content>
   </ng-template>
 </ion-popover>
-
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -37,8 +32,7 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2" *ngIf="object">
-    
+  <div class="p-2" *ngIf="object">    
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label position="stacked">
@@ -150,11 +144,17 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Attachments</ion-label>
     </ion-list-header>
-    <ion-button expand="full">
+    <ion-button expand="full" (click)="startUpload()">
       <ion-icon lazy="true" slot="start" name="document-outline"></ion-icon>
       <ion-label slot="end">Upload File</ion-label>
-      <input type="file" id="file-input">
+      <input #fileInput type="file" id="file-input" (change)="onFileChange($event)">
     </ion-button>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item *ngFor="let a of object?.attachmentFile">
+        <ion-label (click)="downloadFile(a)"><div class="ion-text-wrap div-link-button">{{a.filesName}}{{a.filesType}}</div></ion-label>
+        <ion-icon (click)="deleteFile(a)" slot="end" name="trash-outline"></ion-icon>
+      </ion-item>
+    </ion-list>
   </div>
 </ion-content>
 

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { DebtorApplicationHeader, DebtorApplicationList, DebtorApplicationRoot } from '../models/debtor-application';
@@ -91,6 +91,14 @@ export class DebtorApplicationService {
 
   uploadFile(keyId: number, fileId: number, file: any) {
     return this.http.post(this.baseUrl + "MobileDebtorApplication/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
+  }
+
+  downloadFile(keyId: number) {
+    return this.http.get(this.baseUrl + "MobileDebtorApplication/downloadFile/" + keyId, { responseType: "blob"});
+  }
+
+  deleteFile(keyId: number) {
+    return this.http.delete(this.baseUrl + "MobileDebtorApplication/deleteFile/" + keyId, httpObserveHeader);
   }
 
 }

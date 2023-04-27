@@ -1,9 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DebtorApplicationRoot } from '../../../models/debtor-application';
 import { DebtorApplicationService } from '../../../services/debtor-application.service';
 import { ActivatedRoute } from '@angular/router';
-import { IonPopover, NavController } from '@ionic/angular';
+import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-debtor-application-detail',
@@ -18,8 +19,10 @@ export class DebtorApplicationDetailPage implements OnInit {
   constructor(
     public objectService: DebtorApplicationService,
     private route: ActivatedRoute,
+    private alertController: AlertController,
     private navController: NavController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private commonService: CommonService
   ) {
     try {
       this.route.queryParams.subscribe(params => {
@@ -45,6 +48,7 @@ export class DebtorApplicationDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        console.log("🚀 ~ file: debtor-application-detail.page.ts:48 ~ DebtorApplicationDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
       }, error => {
         throw error;
       })
@@ -82,26 +86,76 @@ export class DebtorApplicationDetailPage implements OnInit {
     })
   }
   
+  file: any;
+  @ViewChild("fileInput", {static:false}) fileInput: ElementRef;
   onFileChange(fileChangeEvent) {
-    let file = fileChangeEvent.target.files[0];
+    this.file = fileChangeEvent.target.files[0];
   }
 
-  async startUpload(file: any, objectId: number, fileId: number) {
+  async startUpload() {
+    if (this.file) {
+      try {
+        // const response = await fetch(this.file.data);
+        // const blob = await response.blob();
+        const formData = new FormData();
+        formData.append('file', this.file, this.file.name);
+        this.objectService.uploadFile(this.object.header.customerPreId, 0, formData).subscribe(response => {
+          if (response.status === 204) {
+            this.file = null;
+            this.fileInput.nativeElement.value = null;
+            this.loadObject();
+            this.toastService.presentToast("Upload Complete", "", "top", "success", 1000);
+          }
+        }, error => {
+          console.log(error);
+        })
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+
+  downloadFile(object) {
+    this.objectService.downloadFile(object.filesId).subscribe(async response => {
+      await this.commonService.commonDownload(response, object);
+      this.toastService.presentToast("Download Complete", "", "top", "success", 1000);
+    }, error => {
+      throw error;
+    })
+  }
+
+  async deleteFile(object) {
     try {
-      const response = await fetch(file.data);
-      const blob = await response.blob();
-      const formData = new FormData();
-      formData.append('file', blob, file.name);
-      this.objectService.uploadFile(objectId, fileId, formData).subscribe(response => {
-  
-      }, error => {
-        console.log(error);
-      })
-      // this.uploadData(formData, objectId, fileId);
+      const alert = await this.alertController.create({
+        header: 'Delete File?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              this.objectService.deleteFile(object.filesId).subscribe(response => {
+                if (response.status === 204) {
+                  this.loadObject();
+                  this.toastService.presentToast("Delete Complete", "", "top", "success", 1000);
+                }
+              }, error => {
+                console.error(error);
+              })
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
     } catch (e) {
       console.error(e);
     }
   }
-
 
 }
