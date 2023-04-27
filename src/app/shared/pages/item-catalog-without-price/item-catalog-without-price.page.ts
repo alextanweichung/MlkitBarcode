@@ -51,7 +51,6 @@ export class ItemCatalogWithoutPricePage implements OnInit {
         }
         this.searchItemService.getItemInfoWithoutPrice(searchText, format(new Date(), 'yyyy-MM-dd')).subscribe(response => {
           this.availableItems = response;
-          console.log("🚀 ~ file: item-catalog-without-price.page.ts:49 ~ ItemCatalogWithoutPricePage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
         })
         this.loadImages(searchText);

@@ -263,7 +263,6 @@ export class BacktobackOrderHeaderPage implements OnInit {
       this.objectService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
         if (response) {
           this.creditInfo = response;
-          console.log("🚀 ~ file: backtoback-order-header.page.ts:262 ~ BacktobackOrderHeaderPage ~ this.objectService.getCreditInfo ~ this.creditInfo:", this.creditInfo)
         }
       })
     }

@@ -161,7 +161,6 @@ export class DebtorApplicationAddPage implements OnInit {
   }
 
   async nextStep() {
-    console.log("🚀 ~ file: debtor-application-add.page.ts:186 ~ DebtorApplicationAddPage ~ nextStep ~ this.objectForm:", this.objectForm)
     if (this.objectForm.valid) {
       try {
         const alert = await this.alertController.create({

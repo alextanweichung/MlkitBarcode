@@ -59,7 +59,6 @@ export class BackToBackOrderService {
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
     this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    console.log("🚀 ~ file: backtoback-order.service.ts:57 ~ BackToBackOrderService ~ loadMasterList ~ this.customerMasterList:", this.customerMasterList)
     this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -89,7 +88,6 @@ export class BackToBackOrderService {
   itemInCart: TransactionDetail[] = [];
   async setHeader(objectHeader: BackToBackOrderHeader) {
     this.objectHeader = objectHeader;
-    console.log("🚀 ~ file: backtoback-order.service.ts:86 ~ BackToBackOrderService ~ setHeader ~ this.objectHeader:", this.objectHeader)
     // load promotion first after customer confirmed or whenever header changed.
     this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId);
   }

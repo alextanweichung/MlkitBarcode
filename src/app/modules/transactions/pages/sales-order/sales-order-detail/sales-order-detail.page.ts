@@ -75,7 +75,6 @@ export class SalesOrderDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: sales-order-detail.page.ts:78 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
       }, error => {
         throw error;
       })
@@ -163,7 +162,6 @@ export class SalesOrderDetailPage implements OnInit {
   async downloadPdf(reportName: string) {
     try {
       this.objectService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId, reportName).subscribe(response => {
-        console.log("🚀 ~ file: sales-order-detail.page.ts:165 ~ SalesOrderDetailPage ~ this.objectService.downloadPdf ~ response:", response)
         let filename = this.object.header.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
@@ -276,7 +274,6 @@ export class SalesOrderDetailPage implements OnInit {
   showStatus() {
     try {
       this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
-        console.log("🚀 ~ file: sales-order-detail.page.ts:278 ~ SalesOrderDetailPage ~ this.objectService.getStatus ~ response:", response);
         this.toastService.presentToast('Doc Status', response.currentStatus, 'top', 'success', 2000);
       }, error => {
         throw error;

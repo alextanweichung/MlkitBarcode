@@ -36,8 +36,6 @@ export class CashDepositService {
   paymentMethodMasterList: MasterListDetails[] = [];
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
-    console.log("🚀 ~ file: cash-deposit.service.ts:37 ~ CashDepositService ~ loadMasterList ~ this.fullMasterList:", this.fullMasterList)
-    this.paymentMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
     // this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
     // this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
     // this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);

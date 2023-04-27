@@ -47,7 +47,6 @@ export class RpCheckQohPage implements OnInit {
         }
         this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
           this.objects = response;
-          console.log("🚀 ~ file: rp-check-qoh.page.ts:52 ~ RpCheckQohPage ~ this.objectService.getCheckQoh ~ this.objects:", this.objects)
           this.massageData();
           this.toastService.presentToast('Search Completed', `${this.objects.length} item(s) found.`, 'top', 'success', 1000);
         })
@@ -78,7 +77,6 @@ export class RpCheckQohPage implements OnInit {
         price: price
       })
     })
-    console.log("🚀 ~ file: rp-check-qoh.page.ts:70 ~ RpCheckQohPage ~ massageData ~ this.realObject:", this.realObject)
   }
 
   onKeyDown(event) {

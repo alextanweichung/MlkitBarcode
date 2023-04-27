@@ -67,7 +67,6 @@ export class RpCheckCnPage implements OnInit {
       try {
         this.objectService.getCheckCn(obj).subscribe(response => {
           this.objects = response;
-          console.log("🚀 ~ file: rp-check-cn.page.ts:67 ~ RpCheckCnPage ~ this.objectService.getCheckCn ~ this.objects:", this.objects)
           this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
         }, error => {
           throw error;

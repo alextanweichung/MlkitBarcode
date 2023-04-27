@@ -67,7 +67,6 @@ export class BacktobackOrderDetailPage implements OnInit {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: backtoback-order-detail.page.ts:70 ~ BacktobackOrderDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
       }, error => {
         throw error;

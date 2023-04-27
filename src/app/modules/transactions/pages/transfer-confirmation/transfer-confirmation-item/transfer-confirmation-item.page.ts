@@ -65,7 +65,6 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
   }
 
   onItemAdd(event: TransactionDetail) {
-    console.log("🚀 ~ file: transfer-confirmation.page.ts:66 ~ TransferConfirmationPage ~ onItemAdd ~ event:", JSON.stringify(event))
     let newLine: TransferConfirmationLine = {
       interTransferLineId: 0,
       interTransferVariationId: 0,

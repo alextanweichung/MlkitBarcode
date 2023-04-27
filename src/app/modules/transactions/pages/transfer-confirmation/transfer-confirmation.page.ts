@@ -31,7 +31,6 @@ export class TransferConfirmationPage implements OnInit, ViewWillEnter {
     if (this.selectedLocationId) {
       this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.selectedLocationId).code).subscribe(response => {
         this.pendingList = response;
-        console.log("🚀 ~ file: transfer-confirmation.page.ts:31 ~ TransferConfirmationPage ~ this.objectService.getPendingList ~ this.pendingList:", this.pendingList)
       }, error => {
         console.error(error);
       })
@@ -64,7 +63,7 @@ export class TransferConfirmationPage implements OnInit, ViewWillEnter {
   // }
 
   // onItemAdd(event: TransactionDetail) {
-  //   console.log("🚀 ~ file: transfer-confirmation.page.ts:66 ~ TransferConfirmationPage ~ onItemAdd ~ event:", event)    
+    
   // }
 
   /* #region  barcode scanner */

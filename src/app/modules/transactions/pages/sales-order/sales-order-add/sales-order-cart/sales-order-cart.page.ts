@@ -140,7 +140,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   }
 
   saveChanges() {
-    console.log("🚀 ~ file: sales-order-cart.page.ts:144 ~ SalesOrderCartPage ~ saveChanges ~ this.selectedItem:", this.selectedItem)
     if (this.selectedIndex === null || this.selectedIndex === undefined) {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
       return;
@@ -237,7 +236,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   increaseVariationQty(data: InnerVariationDetail) {
     try {
-      console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ increaseQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
       if (this.salesOrderQuantityControl == '1') {
         if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
           data.qtyRequest = null;
@@ -394,7 +392,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   computeAllAmount(data: TransactionDetail) {
     try {
-      console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ increaseQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
       if (this.salesOrderQuantityControl == '1') {
         if (data.qtyRequest && data.qtyRequest > data.actualQty) {
           data.qtyRequest = null;

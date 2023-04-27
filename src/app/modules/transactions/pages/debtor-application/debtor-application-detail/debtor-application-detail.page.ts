@@ -45,7 +45,6 @@ export class DebtorApplicationDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: debtor-application-detail.page.ts:48 ~ DebtorApplicationDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
       }, error => {
         throw error;
       })
@@ -85,11 +84,9 @@ export class DebtorApplicationDetailPage implements OnInit {
   
   onFileChange(fileChangeEvent) {
     let file = fileChangeEvent.target.files[0];
-    console.log("🚀 ~ file: debtor-application-detail.page.ts:89 ~ DebtorApplicationDetailPage ~ onFileChange ~ file:", file)
   }
 
   async startUpload(file: any, objectId: number, fileId: number) {
-    console.log("🚀 ~ file: debtor-application-detail.page.ts:92 ~ DebtorApplicationDetailPage ~ startUpload ~ file:", file)
     try {
       const response = await fetch(file.data);
       const blob = await response.blob();

@@ -94,7 +94,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         }
         this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0).subscribe(response => {
           this.availableItems = response;
-          console.log("🚀 ~ file: item-catalog.page.ts:97 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeyword ~ this.availableItems:", this.availableItems)
           if (this.availableItems && this.availableItems.length > 0) {
             this.availableItems.forEach(r => {
               if (r.itemPricing !== null) {
@@ -199,7 +198,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   isValidQty(data: TransactionDetail) {
-    console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ isValidQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
     if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
@@ -214,7 +212,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   increaseQty(data: TransactionDetail) {
-    console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ increaseQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
     if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
@@ -268,7 +265,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   isValidVariationQty(data: InnerVariationDetail) {
-    console.log("🚀 ~ file: item-catalog.page.ts:257 ~ ItemCatalogPage ~ isValidVariationQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
     if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
@@ -283,7 +279,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   increaseVariationQty(data: InnerVariationDetail) {
-    console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ increaseQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
     if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;

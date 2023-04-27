@@ -470,9 +470,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         header: this.objectHeader,
         details: this.itemInCart
       }
-      console.log("🚀 ~ file: backtoback-order-cart.page.ts:474 ~ BacktobackOrderCartPage ~ this.objectService.insertObject ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
-        console.log("🚀 ~ file: backtoback-order-cart.page.ts:474 ~ BacktobackOrderCartPage ~ this.objectService.insertObject ~ response:", response)
         let object = response.body as BackToBackOrderRoot;
         this.objectService.setObjectRoot(object);
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
