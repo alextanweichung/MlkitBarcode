@@ -9,7 +9,6 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -31,7 +30,6 @@
                 <div class="ion-text-wrap">{{item.description}}</div>
               </ion-col>
             </ion-row>
-
             <ion-row class="pb-1">
               <ion-col>
                 <div class="font-bold">Total Quantity</div>
@@ -40,7 +38,6 @@
                 <div class="ion-text-right">{{item.qtyRequest}}</div>
               </ion-col>
             </ion-row>
-
             <div style="width: 100%;" *ngFor="let vd of item.variationDetails">
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">
@@ -54,7 +51,6 @@
                 </ion-row>
               </div>
             </div>
-
             <ion-row class="pt-1">
               <ion-col>
                 <div class="font-bold">
@@ -106,7 +102,6 @@
     </ion-list>
   </div>
 </ion-content>
-
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
   <ion-grid class="ion-no-padding">
     <ion-row class="pt-2 pl-3 pr-3">
@@ -134,7 +129,6 @@
     </ion-row>
   </ion-grid>
 </ion-footer>
-
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalWillDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
@@ -149,9 +143,8 @@
       <div class="p-2">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{selectedItem?.itemCode}} - {{selectedItem?.description}}</ion-label>
-        </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        </ion-list-header>        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><div>Quantity</div></ion-label>
             <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
@@ -173,8 +166,8 @@
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Amt.</div></ion-label>
-            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmt" [disabled]="true"></ion-input>
-            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmtExTax" [disabled]="true"></ion-input>
+            <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmt|number:'1.2-2'}}" [disabled]="true"></ion-input>
+            <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmtExTax|number:'1.2-2'}}" [disabled]="true"></ion-input>
           </ion-item>
           <ion-item *ngIf="selectedItem?.promoEventId">
             <ion-label><div>Promo Applied</div></ion-label>
@@ -232,7 +225,6 @@
     </ion-footer>
   </ng-template>
 </ion-modal>
-
 <ion-modal [isOpen]="isExtraInfoModal" (didDismiss)="isExtraInfoModal = false">
   <ng-template>
     <ion-header>
@@ -247,9 +239,8 @@
       <div class="p-2">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Info</ion-label>
-        </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        </ion-list-header>        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label>Remark</ion-label>
             <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="objectHeader.remark" placeholder="Enter remark" [autoGrow]="true"></ion-textarea>
@@ -263,9 +254,8 @@
         </ion-list>
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Delivery Address</ion-label>
-        </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        </ion-list-header>        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label>Address List</ion-label>
             <ion-select slot="end" placeholder="Select ship address" [(ngModel)]="selectedAddress" (ionChange)="onAddressSelected()">

@@ -89,4 +89,8 @@ export class DebtorApplicationService {
     return this.http.get<Workflow[]>(this.baseUrl + "MobileDebtorApplication/workflow/" + objectId);
   }
 
+  uploadFile(keyId: number, fileId: number, file: any) {
+    return this.http.post(this.baseUrl + "MobileDebtorApplication/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
+  }
+
 }

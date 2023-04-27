@@ -75,6 +75,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
+  salesOrderQuantityControl: string = "0";
   configSalesActivatePromotionEngine: boolean;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -91,6 +92,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
           this.configSalesActivatePromotionEngine = true;
         } else {
           this.configSalesActivatePromotionEngine = false;
+        }
+        let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
+        if (salesOrderQuantityControl) {
+          this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
         }
       }, error => {
         throw error;
@@ -135,12 +140,17 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   }
 
   saveChanges() {
+    console.log("🚀 ~ file: sales-order-cart.page.ts:144 ~ SalesOrderCartPage ~ saveChanges ~ this.selectedItem:", this.selectedItem)
     if (this.selectedIndex === null || this.selectedIndex === undefined) {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
       return;
     } else {
-      this.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-      this.hideEditModal();
+      if ((this.selectedItem.qtyRequest??0)<= 0) {
+        this.toastService.presentToast("Invalid Qty", "", "top", "warning", 1000);
+      } else {
+        this.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+        this.hideEditModal();
+      }
     }
   }
 
@@ -215,7 +225,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   decreaseVariationQty(data: InnerVariationDetail) {
     try {
       if ((data.qtyRequest - 1) < 0) {
-        data.qtyRequest = 0;
+        data.qtyRequest = null;
       } else {
         data.qtyRequest -= 1;
       }
@@ -227,7 +237,24 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   increaseVariationQty(data: InnerVariationDetail) {
     try {
-      data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+      console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ increaseQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
+      if (this.salesOrderQuantityControl == '1') {
+        if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
+          data.qtyRequest = null;
+          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+        } else {
+          data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+        }
+      } else if (this.salesOrderQuantityControl == '2') {
+        if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
+          data.qtyRequest = null;
+          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+        } else {
+          data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+        }
+      } else {
+        data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+      }
       this.computeQty();
     } catch (e) {
       console.error(e);
@@ -365,13 +392,21 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  computeAllAmount(trxLine: TransactionDetail) {
+  computeAllAmount(data: TransactionDetail) {
     try {
-      if (trxLine.qtyRequest <= 0) {
-        trxLine.qtyRequest = 1;
-        this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
+      console.log("🚀 ~ file: item-catalog.page.ts:202 ~ ItemCatalogPage ~ increaseQty ~ this.salesOrderQuantityControl:", this.salesOrderQuantityControl)
+      if (this.salesOrderQuantityControl == '1') {
+        if (data.qtyRequest && data.qtyRequest > data.actualQty) {
+          data.qtyRequest = null;
+          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+        }
+      } else if (this.salesOrderQuantityControl == '2') {
+        if (data.qtyRequest && data.qtyRequest > data.availableQty) {
+          data.qtyRequest = null;
+          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+        }
       }
-      this.computeDiscTaxAmount(trxLine);
+      this.computeDiscTaxAmount(data);
     } catch (e) {
       console.error(e);
     }

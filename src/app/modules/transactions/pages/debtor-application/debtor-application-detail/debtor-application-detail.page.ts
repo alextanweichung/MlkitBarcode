@@ -88,4 +88,23 @@ export class DebtorApplicationDetailPage implements OnInit {
     console.log("🚀 ~ file: debtor-application-detail.page.ts:89 ~ DebtorApplicationDetailPage ~ onFileChange ~ file:", file)
   }
 
+  async startUpload(file: any, objectId: number, fileId: number) {
+    console.log("🚀 ~ file: debtor-application-detail.page.ts:92 ~ DebtorApplicationDetailPage ~ startUpload ~ file:", file)
+    try {
+      const response = await fetch(file.data);
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append('file', blob, file.name);
+      this.objectService.uploadFile(objectId, fileId, formData).subscribe(response => {
+  
+      }, error => {
+        console.log(error);
+      })
+      // this.uploadData(formData, objectId, fileId);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+
 }

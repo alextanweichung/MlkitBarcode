@@ -94,6 +94,15 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
+    if (event.variationTypeCode === '0') {
+      if (event.qtyRequest === null || event.qtyRequest === undefined || event.qtyRequest === 0) {
+        return;
+      }
+    } else {
+      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest??0 !== 0)).length === 0) {
+        return;
+      }
+    }
     try {
       if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
         if (event.variationTypeCode === '0') {
@@ -197,7 +206,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   getVariationSum(trxLine: TransactionDetail) {
     try {
       if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
-        trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
+        trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest && r.qtyRequest > 0).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
       }
     } catch (e) {
       console.error(e);

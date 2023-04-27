@@ -11,10 +11,6 @@
     <form class="form-default" [formGroup]="objectForm">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
-          <ion-label position="stacked">Code</ion-label>
-          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Code" formControlName="customerPreCode"></ion-input>
-        </ion-item>
-        <ion-item>
           <ion-label position="stacked">Name</ion-label>
           <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Name" formControlName="name"></ion-input>
           <div *ngIf="objectForm.controls['name'].errors && objectForm.controls['name'].touched" class="font-x-smaller pb-1 color-danger" padding>Name is required</div>
