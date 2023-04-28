@@ -128,7 +128,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   async downloadPdf(customerId: number) {
     if (customerId) {
       let paramModel: ReportParameterModel = {
-        appCode: 'FAAR005',
+        appCode: 'FAMS002',
         format: 'pdf',
         documentIds: [Number(customerId)],
         reportName: 'Debtor Statement',
