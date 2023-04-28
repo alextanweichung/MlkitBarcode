@@ -44,7 +44,7 @@
       </ngx-datatable-column>
       <ngx-datatable-column prop="salesOrderNum" name="Sales Order" [width]="100">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size div-link-button" (click)="presentAlertViewPdf(row.salesOrderId, 'SO')"> {{row.salesOrderNum}}</div>
+          <div class="font-half-size div-link-button" (click)="presentAlertViewPdf(row.salesOrderId, row.salesOrderNum, 'SO')"> {{row.salesOrderNum}}</div>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order" [width]="120">
@@ -77,6 +77,7 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
+        {{error|json}}
         <ion-list-header class="ion-list-header-small" *ngIf="!deliveryOrderObject">
           <ion-label>Delivery Orders not available.</ion-label>
         </ion-list-header>
@@ -84,11 +85,11 @@
           <ion-item button="false" *ngFor="let dOrder of deliveryOrderObject">
             <ion-grid class="p-1">
               <ion-row>
-                <ion-col>
+                <ion-col class="ion-margin-auto">
                   <div>{{dOrder.split('|')[0]}}</div>
                 </ion-col>
                 <ion-col>
-                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="presentAlertViewPdf(dOrder.split('|')[1], 'DO')">Download</ion-button></div>
+                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="presentAlertViewPdf(dOrder.split('|')[1], dOrder.split('|')[0], 'DO')">Download</ion-button></div>
                 </ion-col>
               </ion-row>
             </ion-grid>

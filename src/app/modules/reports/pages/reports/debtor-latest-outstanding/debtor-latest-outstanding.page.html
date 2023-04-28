@@ -26,7 +26,7 @@
       [columnMode]="'force'" >
       <ngx-datatable-column prop="customerName" name="Customer">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="flex ion-text-wrap font-half-size div-link-button" (click)="presentAlertViewPdf(row.customerId)">{{row.customerName}}</div>
+          <div class="flex ion-text-wrap font-half-size div-link-button" (click)="presentAlertViewPdf(row)">{{row.customerName}}</div>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column prop="salesAgentName" name="SA">

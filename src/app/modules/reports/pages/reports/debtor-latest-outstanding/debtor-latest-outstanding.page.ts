@@ -98,7 +98,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     }
   }
 
-  async presentAlertViewPdf(customerId: number) {
+  async presentAlertViewPdf(object: DebtorOutstanding) {
     try {
       const alert = await this.alertController.create({
         header: 'Download PDF?',
@@ -109,7 +109,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.downloadPdf(customerId);
+              await this.downloadPdf(object);
             },
           },
           {
@@ -125,20 +125,20 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     }
   }
 
-  async downloadPdf(customerId: number) {
-    if (customerId) {
+  async downloadPdf(object: DebtorOutstanding) {
+    if (object) {
       let paramModel: ReportParameterModel = {
         appCode: 'FAMS002',
         format: 'pdf',
-        documentIds: [Number(customerId)],
+        documentIds: [object.customerId],
         reportName: 'Debtor Statement',
         customReportParam: {
-          parameter1: customerId,
+          parameter1: object.customerId,
           statementDate: this.trxDate
         }
       }
       this.reportService.getPdf(paramModel).subscribe(async response => {
-        await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
+        await this.commonService.commonDownloadPdf(response, object.customerName + "." + paramModel.format);
       }, error => {
         console.log(error);
       })
