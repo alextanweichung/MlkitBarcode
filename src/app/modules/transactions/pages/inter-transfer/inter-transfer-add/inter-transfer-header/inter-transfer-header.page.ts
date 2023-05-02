@@ -29,7 +29,7 @@ export class InterTransferHeaderPage implements OnInit {
     this.objectForm = this.formBuilder.group({
       interTransferId: [0],
       interTransferNum: [null],
-      trxDate: [this.commonService.getTodayDate()],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
       locationId: [null, [Validators.required]],
       toLocationId: [null, [Validators.required]],
       shipMethodId: [null],

@@ -39,7 +39,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
       inventoryCountId: [0],
       inventoryCountNum: [null],
       description: [null],
-      trxDate: [this.commonService.convertUtcDate(this.trxDate), [Validators.required]],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.trxDate), [Validators.required]],
       locationId: [null, [Validators.required]],
       inventoryCountBatchId: [null, [Validators.required]],
       zoneId: [null],

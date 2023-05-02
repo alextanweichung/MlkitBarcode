@@ -252,7 +252,7 @@ export class PackingSalesOrderPage implements OnInit {
       this.objectForm = this.formBuilder.group({
         packingId: [0],
         packingNum: [null],
-        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
+        trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
         locationId: [null, [Validators.required]],
         toLocationId: [null],
         customerId: [null, [Validators.required]],

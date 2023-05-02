@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
+import { format } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -45,7 +46,7 @@ export class SalesOrderHeaderPage implements OnInit {
         salesOrderId: [0],
         salesOrderNum: [null],
         salesAgentId: [null],
-        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate())],
+        trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
         typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],

@@ -254,7 +254,7 @@ export class PickingSalesOrderPage implements OnInit {
       this.objectForm = this.formBuilder.group({
         pickingId: [0],
         pickingNum: [null],
-        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate()), [Validators.required]],
+        trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
         locationId: [null, [Validators.required]],
         toLocationId: [null],
         customerId: [null, [Validators.required]],

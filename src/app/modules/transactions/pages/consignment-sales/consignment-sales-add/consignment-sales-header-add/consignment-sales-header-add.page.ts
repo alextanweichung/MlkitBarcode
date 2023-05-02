@@ -45,7 +45,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     this.objectForm = this.formBuilder.group({
       consignmentSalesId: [0],
       consignmentSalesNum: [null],
-      trxDate: [this.commonService.convertUtcDate(this.trxDate), [Validators.required]],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
       toLocationId: [null, [Validators.required]],

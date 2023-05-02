@@ -470,6 +470,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         header: this.objectHeader,
         details: this.itemInCart
       }
+      console.log("🚀 ~ file: sales-order-cart.page.ts:473 ~ SalesOrderCartPage ~ insertSalesOrder ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
         let details: any[] = response.body["details"];
         let totalQty: number = 0;

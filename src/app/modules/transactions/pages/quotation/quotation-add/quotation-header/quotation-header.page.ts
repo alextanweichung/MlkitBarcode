@@ -44,7 +44,7 @@ export class QuotationHeaderPage implements OnInit {
         quotationId: [0],
         quotationNum: [null],
         salesAgentId: [null],
-        trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate())],
+        trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
         typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],

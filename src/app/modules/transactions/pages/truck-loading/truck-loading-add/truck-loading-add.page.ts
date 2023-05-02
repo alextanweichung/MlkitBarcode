@@ -74,7 +74,7 @@ export class TruckLoadingAddPage implements OnInit {
     this.objectForm = this.formBuilder.group({
       truckLoadingId: 0,
       truckLoadingNum: [null],
-      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate())],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
       typeCode: [null, [Validators.required]],
       vendorId: [null, [Validators.required]],
       plateNumber: [null],

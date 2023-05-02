@@ -44,7 +44,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
       backToBackOrderId: [0],
       backToBackOrderNum: [null],
       salesAgentId: [null],
-      trxDate: [this.commonService.convertUtcDate(this.commonService.getTodayDate())],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
       typeCode: [null],
       customerId: [null],
       shipAddress: [null, [Validators.maxLength(500)]],

@@ -81,6 +81,12 @@ export class CommonService {
     }
   }
 
+  getDateWithoutTimeZone(inputDate: Date): Date{
+    let newDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(),0,0,0)
+    newDate.setMinutes(newDate.getMinutes() - newDate.getTimezoneOffset())
+    return newDate;
+  }
+
   //To add back timezone differences into UTC Date
   convertUtcDate(inputDate: Date): Date {
     try {
