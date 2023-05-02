@@ -104,21 +104,21 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       }
     }
     try {
-      if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
-        if (event.variationTypeCode === '0') {
-          this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
-        } else {
-          let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
-          vd.forEach(r => {
-            this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
-              if (rr.itemSku === r.itemSku) {
-                rr.qtyRequest += r.qtyRequest;
-              }
-            })
-          })
-        }
-        await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
-      } else {
+      // if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
+      //   if (event.variationTypeCode === '0') {
+      //     this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
+      //   } else {
+      //     let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
+      //     vd.forEach(r => {
+      //       this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
+      //         if (rr.itemSku === r.itemSku) {
+      //           rr.qtyRequest += r.qtyRequest;
+      //         }
+      //       })
+      //     })
+      //   }
+      //   await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
+      // } else {
         let trxLine = JSON.parse(JSON.stringify(event));
         trxLine = this.assignLineUnitPrice(trxLine);
 
@@ -142,7 +142,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
         this.itemInCart.push(trxLine);
         await this.computeAllAmount(this.itemInCart[0]);
         await this.assignSequence();
-      }
+      // }
       this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
     } catch (e) {
       console.error(e);

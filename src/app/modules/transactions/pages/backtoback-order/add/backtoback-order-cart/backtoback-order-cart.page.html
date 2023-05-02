@@ -162,7 +162,7 @@
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Expr.</div></ion-label>
-            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression']"></ion-input>
+            <ion-input #discExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" (ionBlur)="computeAllAmount(selectedItem)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression']"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Amt.</div></ion-label>
