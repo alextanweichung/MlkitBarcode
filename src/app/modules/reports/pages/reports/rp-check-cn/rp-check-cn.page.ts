@@ -58,24 +58,18 @@ export class RpCheckCnPage implements OnInit {
   objects: CheckCn[] = [];
   loadReport() {
     this.objects = [];
-    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    if (loginUser.salesAgentId && loginUser.salesAgentId > 0) {
-      let obj: CheckCnRequest = {
-        salesAgentId: loginUser.salesAgentId,
-        customerIds: this.customerIds
-      }
-      try {
-        this.objectService.getCheckCn(obj).subscribe(response => {
-          this.objects = response;
-          this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
-        }, error => {
-          throw error;
-        })
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      this.toastService.presentToast('System Error', 'Please contact Administrator.', 'top', 'danger', 1000);
+    let obj: CheckCnRequest = {
+      customerIds: this.customerIds
+    }
+    try {
+      this.objectService.getCheckCn(obj).subscribe(response => {
+        this.objects = response;
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+      }, error => {
+        throw error;
+      })
+    } catch (e) {
+      console.error(e);
     }
   }
 

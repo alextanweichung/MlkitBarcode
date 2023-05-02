@@ -8,6 +8,5 @@ export interface CheckCn {
 }
 
 export interface CheckCnRequest {
-   salesAgentId: number
    customerIds: number[]
 }
