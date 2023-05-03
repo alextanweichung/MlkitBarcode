@@ -12,6 +12,9 @@ export interface InnerVariationDetail {
   itemSku?: string
   itemBarcodeTagId?: any
   itemBarcode?: any
+  /* #region for mobile only */
+  qtyInCart?: number
+  /* #endregion */
   qtyRequest?: number
   qtyCommit?: any
   qtyApproved?: any

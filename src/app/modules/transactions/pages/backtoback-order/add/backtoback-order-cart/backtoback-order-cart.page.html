@@ -23,6 +23,7 @@
             <ion-row class="pb-1">
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
+                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">

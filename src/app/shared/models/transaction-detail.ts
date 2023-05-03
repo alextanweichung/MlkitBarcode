@@ -14,6 +14,9 @@ export interface TransactionDetail {
   itemUomId?: number
   itemUomCode?: any
   currencyRate?: number
+  /* #region for mobile only */
+  qtyInCart?: number
+  /* #endregion */
   qtyRequest?: number
   qtyApproved?: any
   qtyCommit?: any

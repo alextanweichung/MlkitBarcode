@@ -22,6 +22,7 @@ import { SearchItemService } from '../../services/search-item.service';
 })
 export class ItemCatalogPage implements OnInit, OnChanges {
 
+  @Input() itemInCart: TransactionDetail[] = [];
   @Input() keyId: number;
   @Input() locationId: number;
   @Input() fullMasterList: MasterList[] = [];
@@ -51,7 +52,9 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-
+    if (changes.itemInCart) {
+      this.computeQtyInCart();      
+    }
   }
 
   ngOnInit() {
@@ -131,6 +134,21 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   browseMode: string = 'brand';
   onBrowseModeChanged() {
     this.browseBy = [];
+  }
+
+  computeQtyInCart() {
+    if (this.availableItems && this.availableItems.length > 0) {
+      this.availableItems.forEach(r => {
+        if (this.itemInCart.findIndex(rr => rr.itemId === r.itemId) > -1) {
+          r.qtyInCart = this.itemInCart.filter(rr => rr.itemId === r.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+          if (r.variationTypeCode === '1' || r.variationTypeCode === '2') {
+            r.variationDetails.flatMap(x => x.details).forEach(y => {
+              y.qtyInCart = this.itemInCart.filter(rr => rr.itemId === r.itemId).flatMap(rr => rr.variationDetails).flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+            })
+          }
+        }
+      })
+    }
   }
 
   browseBy: string[];
@@ -232,6 +250,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   addToCart(data: TransactionDetail) {
+    this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
     this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
     data.qtyRequest = 0;
   }
@@ -308,6 +327,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       })
     }
     this.selectedItem.qtyRequest = totalQty;
+    // count total in cart
+    this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + totalQty;
+    // count variation in cart
+    this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
+      x.details.forEach(y => {
+        y.qtyInCart = (y.qtyInCart??0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+      })
+    })
     this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
     this.hideModal();
   }

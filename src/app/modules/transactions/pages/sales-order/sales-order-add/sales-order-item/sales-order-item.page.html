@@ -9,12 +9,10 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
-    <ion-content class="p-2">
-      
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <ion-content class="p-2">      
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button="false" (click)="isPopoverOpen = false; toggleShowImage()" *ngIf="!showImage">
           <ion-icon name="image-outline" slot="end"></ion-icon>
           <ion-label>
@@ -41,10 +39,9 @@
     </ion-content>
   </ng-template>
 </ion-popover>
-
 <ion-content fullscreen>
   <div class="p-2">
-    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectHeader" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="true" [showAvailQty]="showAvailQty"></app-item-catalog>
+    <app-item-catalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectHeader" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="itemInCart"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
