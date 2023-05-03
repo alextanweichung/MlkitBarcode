@@ -103,6 +103,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                 this.assignLineUnitPrice(r)
               }
             })
+            this.computeQtyInCart();
           }
           this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
         })
