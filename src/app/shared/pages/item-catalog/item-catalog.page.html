@@ -24,7 +24,9 @@
             </ion-row>
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto" *ngIf="item?.qtyInCart > 0">
-                [In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]
+                <ion-badge>
+                  <div class="ion-flex">[In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]</div>
+                </ion-badge>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
                 Qty: 
@@ -112,7 +114,9 @@
             </ion-row>
             <ion-row class="pb-1">
               <ion-col size="" class="ion-flex ion-margin-auto" *ngIf="item?.qtyInCart > 0">
-                [In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]
+                <ion-badge>
+                  <div class="ion-flex">[In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]</div>
+                </ion-badge>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
                 Qty: 
@@ -166,27 +170,29 @@
           <div *ngFor="let vd of selectedItem.variationDetails">
             <div *ngFor="let d of vd.details">
               <ion-row class="py-0">
-                <ion-col size="7" class="ion-flex ion-margin-auto">
+                <ion-col size="6" class="ion-flex ion-margin-auto">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
-                      <ion-col class="ion-flex ion-margin-auto">
-                          <span class="badge-green px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                          <span class="badge-purple px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                      <ion-col class="ion-margin-auto">
+                        <span class="badge-green px-1 mr-1 ion-margin-auto" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                        <span class="badge-purple px-1 mr-1 ion-margin-auto" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>                        
                       </ion-col>
                     </ion-row>
-                    <ion-row>
-                      <ion-col class="ion-flex ion-margin-auto" *ngIf="d?.qtyInCart > 0">
-                        [In cart: <div class="font-bold ml-1">{{d?.qtyInCart|number:'1.0'}}</div>]
-                      </ion-col>
+                    <ion-row class="pt-1">
                       <ion-col class="ion-flex ion-margin-auto" *ngIf="isSalesOrder && showAvailQty">
                         Qty:
                         <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{d.actualQty|number:'1.0'}}</div>
                         <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{d.availableQty|number:'1.0'}}</div>
                       </ion-col>
+                      <ion-col class="ion-flex ion-margin-auto" *ngIf="d?.qtyInCart > 0">
+                        <ion-badge>
+                          <div class="ion-flex">[In cart: <div class="font-bold ml-1">{{d?.qtyInCart|number:'1.0'}}</div>]</div>
+                        </ion-badge>
+                      </ion-col>
                     </ion-row>
                   </ion-grid>
                 </ion-col>
-                <ion-col size="5" class="ion-margin-auto p-0">
+                <ion-col size="6" class="ion-margin-auto p-0">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-flex ion-margin-auto justify-content-center">

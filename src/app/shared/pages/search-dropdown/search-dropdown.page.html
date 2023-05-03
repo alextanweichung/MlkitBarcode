@@ -3,27 +3,19 @@
   <ion-label position="stacked">{{title}}</ion-label>
   <div *ngIf="selected">
     <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col class="ion-margin-auto" size="auto">
-          <ion-grid class="ion-no-padding">
-            <ion-row>
-              <ion-col class="ion-flex ion-margin-auto">
-                <ion-badge *ngIf="selected && selected?.code">
-                  <div>{{selected?.code}}</div>
-                </ion-badge>
-              </ion-col>
-            </ion-row>
-            <ion-row *ngIf="selected && selected?.oldCode" class="mb-1">
-              <ion-col class="ion-flex ion-margin-auto">
-                <ion-badge color="tertiary">
-                  <div>{{selected?.oldCode}}</div>
-                </ion-badge>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
+      <ion-row class="mt-2">
+        <ion-col class="ion-flex ion-margin-auto">
+          <ion-badge *ngIf="selected && selected?.code">
+            <div>{{selected?.code}}</div>
+          </ion-badge>
+          <ion-badge color="tertiary"*ngIf="selected && selected?.oldCode">
+            <div>{{selected?.oldCode}}</div>
+          </ion-badge>
         </ion-col>
+      </ion-row>
+      <ion-row class="my-2">
         <ion-col class="ion-margin-auto">
-          <div class="ion-text-wrap ml-2">{{selected?.[optionLabel]}}</div>
+          <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
         </ion-col>
       </ion-row>
     </ion-grid>
