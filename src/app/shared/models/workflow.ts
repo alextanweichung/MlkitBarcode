@@ -1,16 +1,18 @@
-export interface Workflow {
-   stateId: number
-   title: string
-   stateType: string
-   trxId: any
-   trxNum: any
-   trxDate: any
-   trxBy: any
-   routerLink: string
-   icon: string
-   isCompleted: boolean
-   interval: any
-   sequence: number
-   appCode: string
- }
- 
+export interface WorkFlowState {
+  stateId: number
+  title: string
+  trxId: number
+  trxIds?: number[]
+  trxNum: string
+  trxNums?: string[]
+  trxDate: Date
+  trxDates?: Date[]
+  trxBy: string
+  routerLink: string
+  routerLinks?: string[]
+  icon: string
+  stateType: string
+  isCompleted: boolean
+  sequence: number
+  interval: string
+}

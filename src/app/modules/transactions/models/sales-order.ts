@@ -87,6 +87,9 @@ export interface SalesOrderHeader {
   maxPrecision: number
   maxPrecisionTax: number
   /* #endregion */
+
+  isPricingApproval?: boolean
+  
   sequence: number
   createdById: number
   createdBy: string

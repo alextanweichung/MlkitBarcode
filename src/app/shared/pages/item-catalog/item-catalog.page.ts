@@ -100,7 +100,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           if (this.availableItems && this.availableItems.length > 0) {
             this.availableItems.forEach(r => {
               if (r.itemPricing !== null) {
-                this.assignLineUnitPrice(r)
+                this.assignTrxItemToDataLine(r)
               }
             })
             this.computeQtyInCart();
@@ -171,7 +171,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   /* #region  unit price, tax, discount */
 
-  assignLineUnitPrice(item: TransactionDetail) {
+  assignTrxItemToDataLine(item: TransactionDetail) {
     if (this.useTax) {
       if (this.isItemPriceTaxInclusive) {
         item.unitPrice = item.itemPricing.unitPrice;
@@ -186,6 +186,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     }
     item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
     item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
+    item.oriUnitPrice = item.unitPrice;
+    item.oriUnitPriceExTax = item.unitPriceExTax;
   }
 
   calculatNetPrice(price, discountExpression) {

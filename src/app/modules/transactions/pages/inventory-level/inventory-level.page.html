@@ -9,12 +9,10 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
-    <ion-content class="p-2">
-      
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <ion-content class="p-2">      
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button (click)="isPopoverOpen = false; showPriceDialog()">
           <ion-label>
             <div>View Price</div>
@@ -24,7 +22,6 @@
     </ion-content>
   </ng-template>
 </ion-popover>
-
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -35,7 +32,6 @@
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <app-search-dropdown title="Item" optionValue="code" [searchDropdownList]="itemSearchDropdownList" (onActionComplete)="onItemChanged($event)"></app-search-dropdown>
     </ion-list>
-
     <ion-segment *ngIf="itemInfo && (itemInfo?.variationTypeCode === '1' || itemInfo?.variationTypeCode === '2')" [(ngModel)]="selectedViewOptions" (ionChange)="advancedFilter()">
       <ion-segment-button value="item">
         <ion-label>Item</ion-label>
@@ -44,7 +40,6 @@
         <ion-label>Variation</ion-label>
       </ion-segment-button>
     </ion-segment>
-
     <ion-accordion-group #accordionGroup *ngIf="itemInfo" class="py-1">
       <ion-accordion value="advanced filter">
         <ion-item slot="header" color="light">
@@ -76,7 +71,6 @@
         </ion-list>
       </ion-accordion>
     </ion-accordion-group>
-
     <div *ngIf="selectedViewOptions === 'item'">
       <ion-card *ngFor="let item of inventoryLevel" class="mx-0 my-1">
         <ion-card-header>
@@ -102,7 +96,6 @@
         </ion-card-content>
       </ion-card>
     </div>  
-
     <div *ngIf="selectedViewOptions === 'variation'">
       <ion-card *ngFor="let item of inventoryLevelVariation" class="mx-0 my-1">
         <ion-card-header>
@@ -138,7 +131,6 @@
     </div>
   </div>
 </ion-content>
-
 <ion-modal [isOpen]="priceModal" (didDismiss)="priceModal = false">
   <ng-template>
     <ion-header>
@@ -153,9 +145,8 @@
       <div class="p-2">
         <ion-list-header class="ion-list-header-small" *ngIf="prices.length === 0">
           <ion-label>Price not available.</ion-label>
-        </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        </ion-list-header>        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item button="false" *ngFor="let p of prices">
             <ion-grid class="p-1">
               <ion-row *ngIf="p.locationId">

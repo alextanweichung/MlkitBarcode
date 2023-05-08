@@ -4,7 +4,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { DebtorApplicationHeader, DebtorApplicationList, DebtorApplicationRoot } from '../models/debtor-application';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { Workflow } from 'src/app/shared/models/workflow';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -86,7 +86,7 @@ export class DebtorApplicationService {
   }
 
   getWorkflow(objectId: number) {
-    return this.http.get<Workflow[]>(this.baseUrl + "MobileDebtorApplication/workflow/" + objectId);
+    return this.http.get<WorkFlowState[]>(this.baseUrl + "MobileDebtorApplication/workflow/" + objectId);
   }
 
   uploadFile(keyId: number, fileId: number, file: any) {

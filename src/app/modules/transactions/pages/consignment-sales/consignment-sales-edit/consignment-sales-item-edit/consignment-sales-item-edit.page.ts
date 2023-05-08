@@ -116,7 +116,7 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
         trxLine.qtyRequest = 1;
         trxLine.locationId = this.object.header.toLocationId;
         trxLine.sequence = 0;
-        trxLine = this.assignLineUnitPrice(trxLine);
+        trxLine = this.assignTrxItemToDataLine(trxLine);
         await this.object.details.unshift(trxLine);
         await this.computeAllAmount(this.object.details[0]);
       }
@@ -269,7 +269,7 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     }
   }
 
-  assignLineUnitPrice(trxLine: TransactionDetail) {
+  assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       if (this.useTax) {
         if (this.object.header.isItemPriceTaxInclusive) {

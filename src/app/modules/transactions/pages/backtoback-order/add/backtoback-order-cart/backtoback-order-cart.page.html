@@ -170,6 +170,10 @@
             <ion-input *ngIf="objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmt|number:'1.2-2'}}" [disabled]="true"></ion-input>
             <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmtExTax|number:'1.2-2'}}" [disabled]="true"></ion-input>
           </ion-item>
+          <ion-item>
+            <ion-label><div>Remark</div></ion-label>
+            <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="selectedItem.remark" placeholder="Enter remark" [autoGrow]="true"></ion-textarea>
+          </ion-item>
           <ion-item *ngIf="selectedItem?.promoEventId">
             <ion-label><div>Promo Applied</div></ion-label>
             <ion-label slot="end">{{getPromoDesc(selectedItem?.promoEventId)}}</ion-label>

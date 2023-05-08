@@ -14,7 +14,7 @@ export class LoadingService {
   ) { }
 
   async showLoading(message: string = 'Loading') {
-    if (!this.isShowing) {
+    if (!this.isShowing && !this.loading) {
       this.isShowing = true;
       this.loading = await this.loadingController.create({
         cssClass: 'default-loading',
@@ -26,8 +26,10 @@ export class LoadingService {
     } else {
       // If loader is showing, only change text, won't create a new loader.
       this.isShowing = true;
-      this.loading.message = message;
-  }
+      if (this.loading) {
+        this.loading.message = `<p>${message}...</p><span>Please be patient.</span>`;
+      }
+    }
   }
 
   async dismissLoading() {    

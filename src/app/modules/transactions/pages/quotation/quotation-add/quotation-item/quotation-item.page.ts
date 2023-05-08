@@ -113,7 +113,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       //   await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
       // } else {
         let trxLine = JSON.parse(JSON.stringify(event));
-        trxLine = this.assignLineUnitPrice(trxLine);
+        trxLine = this.assignTrxItemToDataLine(trxLine);
   
         if (this.objectHeader.isItemPriceTaxInclusive) {
           await this.computeUnitPriceExTax(trxLine);
@@ -209,7 +209,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     }
   }
 
-  assignLineUnitPrice(trxLine: TransactionDetail) {
+  assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       if (this.useTax) {
         if (this.objectHeader.isItemPriceTaxInclusive) {

@@ -4,14 +4,14 @@ import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { SalesOrderStatus } from 'src/app/shared/models/sales-order-status';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -74,7 +74,9 @@ export class SalesOrderDetailPage implements OnInit {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: sales-order-detail.page.ts:77 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
+        this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
         throw error;
       })
@@ -82,6 +84,58 @@ export class SalesOrderDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  workFlowState: WorkFlowState[] = [];
+  trxChild: TrxChild[] = [];
+  loadWorkflow(objectId: number) {
+    this.workFlowState = [];
+    this.objectService.getWorkflow(objectId).subscribe(response => {
+      this.workFlowState = response;
+      console.log("🚀 ~ file: sales-order-detail.page.ts:95 ~ SalesOrderDetailPage ~ this.objectService.getWorkflow ~ this.workFlowState:", this.workFlowState)
+
+      this.objectService.getTrxChild(objectId).subscribe(response2 => {
+        this.trxChild = response2;
+        if (this.trxChild.length > 0) {
+          let trxTypes: string[] = this.trxChild.map(x => x.serviceName);
+          trxTypes = [...new Set(trxTypes)];
+          trxTypes.forEach(type => {
+            let relatedArray = this.trxChild.filter(x => x.serviceName == type);
+            let trxIds = relatedArray.map(x => x.trxId);
+            let trxNums = relatedArray.map(x => x.trxNum);
+            let trxDates = relatedArray.map(x => x.trxDate);
+            let routerLinks = relatedArray.map(x => x.routerLink);
+            if (type == 'SalesInvoice') {
+              type = 'Sales Invoice';
+            }
+            let newState: WorkFlowState = {
+              stateId: null,
+              title: type,
+              trxId: null,
+              trxIds: trxIds,
+              trxNum: null,
+              trxNums: trxNums,
+              trxDate: null,
+              trxDates: trxDates,
+              trxBy: null,
+              routerLink: null,
+              routerLinks: routerLinks,
+              icon: 'pi pi-star-fill',
+              stateType: 'TRANSACTION',
+              isCompleted: true,
+              sequence: null,
+              interval: null
+            }
+            this.workFlowState = [...this.workFlowState, newState]
+          })
+          console.log("🚀 ~ file: sales-order-detail.page.ts:130 ~ SalesOrderDetailPage ~ this.objectService.getTrxChild ~ this.workFlowState:", this.workFlowState)
+        }
+      }, error => {
+        console.log(error);
+      });
+    }, error => {
+      console.error(error);
+    })
   }
 
   matchImage(itemId: number) {
@@ -114,7 +168,7 @@ export class SalesOrderDetailPage implements OnInit {
       item.isSelected = !item.isSelected;
     }
   }
-  
+
   /* #endregion */
 
   /* #region history modal */

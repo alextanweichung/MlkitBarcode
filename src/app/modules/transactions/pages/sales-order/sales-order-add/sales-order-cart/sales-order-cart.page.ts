@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderHeader, SalesOrderRoot, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -144,11 +144,15 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
       return;
     } else {
-      if ((this.selectedItem.qtyRequest??0)<= 0) {
+      if ((this.selectedItem.qtyRequest ?? 0) <= 0) {
         this.toastService.presentToast("Invalid Qty", "", "top", "warning", 1000);
       } else {
         this.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
         this.hideEditModal();
+      }
+
+      if (this.selectedItem.isPricingApproval) {
+        this.objectHeader.isPricingApproval = true;
       }
     }
   }
@@ -292,6 +296,21 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         this.objectHeader.shipAreaId = null;
         this.objectHeader.attention = null;
       }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
     } catch (e) {
       console.error(e);
     }
@@ -445,7 +464,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
               cssClass: 'success',
               role: 'confirm',
               handler: async () => {
-                await this.insertSalesOrder();
+                await this.insertObject();
               },
             },
             {
@@ -464,7 +483,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  insertSalesOrder() {
+  insertObject() {
     try {
       let trxDto: SalesOrderRoot = {
         header: this.objectHeader,

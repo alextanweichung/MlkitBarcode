@@ -26,6 +26,13 @@ export interface TransactionDetail {
   unitPriceExTax?: number
   discountGroupCode?: any
   discountExpression?: any
+
+  oriUnitPrice?: number
+  oriUnitPriceExTax?: number
+  oriDiscountGroupCode?: string
+  oriDiscountExpression?: string
+  isPricingApproval?: boolean
+  
   discountAmt?: any
   discountAmtExTax?: any
   taxId?: number
@@ -47,7 +54,7 @@ export interface TransactionDetail {
   subTotalMaxPrecision?: number
   subTotalExTaxMaxPrecision?: number
   etaDate?: any
-  remark?: any
+  remark?: string
   overrideFlag?: number
   lineUDDate?: any
   masterUDGroup1?: any
@@ -82,8 +89,6 @@ export interface TransactionDetail {
   promoEventId?: any
   isPromoImpactApplied?: any
   discountedUnitPrice?: any
-  oriDiscountGroupCode?: any
-  oriDiscountExpression?: any
   /* #region  for stock-count */
   itemBrandId?: number
   itemGroupId?: number

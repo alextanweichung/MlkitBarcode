@@ -14,6 +14,9 @@ import { Customer } from '../models/customer';
 import { SalesOrderHeader, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
 import { format } from 'date-fns';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { map } from 'rxjs/operators';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -174,8 +177,20 @@ export class SalesOrderService {
     return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
-  getStatus(salesOrderId: number) {
-    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + salesOrderId);
+  getStatus(objectId: number) {
+    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + objectId);
+  }
+
+  getWorkflow(objectId: number) {
+    return this.http.get<WorkFlowState[]>(this.baseUrl + "MobileSalesOrder/workflow/" + objectId);
+  }
+
+  getTrxChild(objectId: number){
+    return this.http.get<TrxChild>(this.baseUrl + "MobileSalesOrder/child/" + objectId).pipe(
+      map((response: any) =>       
+        response.map((item: any) => item)   
+      )
+    );
   }
 
 }

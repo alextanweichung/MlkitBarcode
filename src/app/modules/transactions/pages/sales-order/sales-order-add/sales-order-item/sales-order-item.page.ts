@@ -104,45 +104,27 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       }
     }
     try {
-      // if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
-      //   if (event.variationTypeCode === '0') {
-      //     this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
-      //   } else {
-      //     let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
-      //     vd.forEach(r => {
-      //       this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
-      //         if (rr.itemSku === r.itemSku) {
-      //           rr.qtyRequest += r.qtyRequest;
-      //         }
-      //       })
-      //     })
-      //   }
-      //   await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
-      // } else {
-        let trxLine = JSON.parse(JSON.stringify(event));
-        trxLine = this.assignLineUnitPrice(trxLine);
-
+      let trxLine = JSON.parse(JSON.stringify(event));
+      trxLine = this.assignTrxItemToDataLine(trxLine);
+      if (this.objectHeader.isItemPriceTaxInclusive) {
+        await this.computeUnitPriceExTax(trxLine);
+      } else {
+        await this.computeUnitPrice(trxLine);
+      }
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+        trxLine.uuid = uuidv4();
+        let discPct = Number(trxLine.discountExpression?.replace("%", ""));
         if (this.objectHeader.isItemPriceTaxInclusive) {
-          await this.computeUnitPriceExTax(trxLine);
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
         } else {
-          await this.computeUnitPrice(trxLine);
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
         }
-
-        if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-          trxLine.uuid = uuidv4();
-          let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-          if (this.objectHeader.isItemPriceTaxInclusive) {
-            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
-          } else {
-            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
-          }
-          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
-          trxLine.oriDiscountExpression = trxLine.discountExpression;
-        }
-        this.itemInCart.push(trxLine);
-        await this.computeAllAmount(this.itemInCart[0]);
-        await this.assignSequence();
-      // }
+        trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
+        trxLine.oriDiscountExpression = trxLine.discountExpression;
+      }
+      this.itemInCart.push(trxLine);
+      await this.computeAllAmount(this.itemInCart[0]);
+      await this.assignSequence();
       this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
     } catch (e) {
       console.error(e);
@@ -240,7 +222,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     }
   }
 
-  assignLineUnitPrice(trxLine: TransactionDetail) {
+  assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       if (this.useTax) {
         if (this.objectHeader.isItemPriceTaxInclusive) {
@@ -258,6 +240,13 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
       trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
       trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+
+      // for isPricingApproval
+      trxLine.oriUnitPrice = trxLine.unitPrice;
+      trxLine.oriUnitPriceExTax = trxLine.unitPriceExTax;
+      trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
+      trxLine.oriDiscountExpression = trxLine.discountExpression;
+
       return trxLine;
     } catch (e) {
       console.error(e);

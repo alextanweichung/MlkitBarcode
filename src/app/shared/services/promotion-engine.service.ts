@@ -43,21 +43,27 @@ export class PromotionEngineService {
       let eligibleAmt: number = event.eligibleBillAmount;                 //Eligible amount for promotion
       let eligibleAmtCheck: boolean = true;                               //Default the check result to true in case validation not required
 
-      groupList = event.groupList.map(x => x.eventGroupId);
-      excludeItemList = event.excludeItemList.map(x => x.itemId);
-
-      if(eventItemType == "S"){
+      if (event.groupList) {
+        groupList = event.groupList.map(x => x.eventGroupId);
+      }
+      if (event.excludeItemList) {
+        excludeItemList = event.excludeItemList.map(x => x.itemId);
+      }
+      //Default the check result to true in case validation not required
+      if (eventItemType == "S" && event.itemList) {
         impactItemList = event.itemList.filter(x => x.isImpactOnly).map(x => x.itemId);
-        eventItemList = event.itemList.filter(x => !x.isImpactOnly).map(x => x.itemId);        
-      }else{
+        eventItemList = event.itemList.filter(x => !x.isImpactOnly).map(x => x.itemId);
+      } else {
         let lineImpactItemList: PromotionLineItemList[] = [];
         //If eventItemType is for All Item, look for event line, whether there is any row with specific item (If found, run for logic Buy X Impact Y)
-        event.line.forEach(line =>{
-          if(line.lineItemType == "S"){
+        event.line.forEach(line => {
+          if (line.lineItemType == "S") {
             lineImpactItemList = line.lineItemList;
           }
         })
-        impactItemList = lineImpactItemList.map(x => x.itemId);
+        if (lineImpactItemList && lineImpactItemList.length > 0) {
+          impactItemList = lineImpactItemList.map(x => x.itemId);
+        }
       }
 
       //Create a copy of original salesBillLine, and check whether scanned item is in itemList

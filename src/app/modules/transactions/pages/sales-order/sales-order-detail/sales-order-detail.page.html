@@ -68,6 +68,47 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2" *ngIf="object">    
+    <div *ngIf="workFlowState && workFlowState.length > 0">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label>Workflow</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item *ngFor="let w of workFlowState; let i = index">
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">{{w.title}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="w.trxBy">
+              <ion-col class="ion-flex ion-margin-auto">
+                {{w.trxBy}}
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="w.trxDate">
+              <ion-col class="ion-flex ion-margin-auto">
+                {{w.trxDate|date:'dd/MM/yyyy hh:mm a'}}
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="w.interval">
+              <ion-col class="ion-flex ion-margin-auto">
+                {{w.interval}}
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="w.trxNums && w.trxNums.length > 0">
+              <ion-col class="ion-flex ion-margin-auto">
+                <div *ngFor="let tn of w.trxNums">[{{tn}}]</div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+          <ion-icon slot="end" name="ellipse" class="color-success" *ngIf="w.isCompleted"></ion-icon>
+          <ion-icon slot="end" name="ellipse" class="color-danger" *ngIf="!w.isCompleted"></ion-icon>
+        </ion-item>
+      </ion-list>
+    </div>
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Document</ion-label>
+    </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
