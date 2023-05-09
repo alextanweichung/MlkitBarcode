@@ -30,7 +30,8 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label class="pl-2">Quick Actions</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full">      
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">      
       <ion-item detail="false">
         <ion-label>
           <h3>Manual sync</h3>
@@ -42,7 +43,8 @@
       </ion-item>
     </ion-list>
     <hr class="hr-medium">
-    <ion-list class="list-custom" lines="full">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" (click)="signOut()">
         <ion-avatar slot="start" class="ion-avatar-danger-icon">
           <ion-icon color="danger" name="log-out-outline"></ion-icon>
@@ -52,5 +54,10 @@
         </ion-label>
       </ion-item>
     </ion-list>
+    <div class="ion-text-center ion-margin-top">
+      <ion-text color="medium">
+        <small>&copy; {{current_year}} iDCP Systems Sdn Bhd v{{currentVersion}}</small>
+      </ion-text>
+    </div>
   </div>
 </ion-content>

@@ -24,7 +24,7 @@
   </ion-header>
   <div class="p-2">
     <app-barcode-scan-input *ngIf="scanInput" (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
-    <app-item-code-input-offline *ngIf="!scanInput" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" (onItemAdd)="onItemsAdd($event)"></app-item-code-input-offline>
+    <app-item-code-input-offline *ngIf="!scanInput" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" (onItemAdd)="onItemsAdd($event)"></app-item-code-input-offline>
     <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectDetail">
       <ion-item-sliding *ngFor="let line of objectDetail; let i = index">
         <ion-item button detail="false" class="no-ripple">
@@ -51,8 +51,8 @@
                   <ion-row>
                     <ion-col class="ion-margin-auto ion-flex">
                       <div class="font-bold">{{line.itemCode}}</div>
-                      <span class="badge-green px-1 mx-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                      <span class="badge-purple px-1 mr-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                      <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                      <span class="badge-purple px-1 mr-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                     </ion-col>
                   </ion-row>
                   <ion-row>
@@ -116,7 +116,8 @@
         <ion-list-header class="ion-list-header-small">
           <ion-label>Info</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><p>Code</p></ion-label>
             {{selectedItem?.itemCode}}
@@ -133,7 +134,7 @@
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
             <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="discountGroupCodeChanged(selectedItem)">
-              <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
+              <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>

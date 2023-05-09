@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -192,10 +192,8 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   async setBadges() {
     try {
       // let hasPermission = await this.badge.hasPermission();
-      // console.log("🚀 ~ file: dashboard.page.ts:165 ~ DashboardPage ~ setBadges ~ hasPermission:", hasPermission)
       // if (!hasPermission) {
       //   let permissions = await this.badge.requestPermission();
-      //   console.log("🚀 ~ file: dashboard.page.ts:168 ~ DashboardPage ~ setBadges ~ permissions:", permissions)
       // } else {
       //   this.badge.set(Number(this.badgeNumber));
       // }

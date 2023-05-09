@@ -12,7 +12,8 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list class="list-custom" lines="full">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button (click)="goToReport('debtor-latest-outstanding')">
         <ion-label>
           <div>Debtor Latest Outstanding</div>
@@ -23,9 +24,24 @@
           <div>SO Listing</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('rp-sa-performance-listing')">
+      <ion-item button (click)="goToReport('rp-sa-perf-all')">
         <ion-label>
-          <div>Sales Agent Performance</div>
+          <div>Sales Agent Performance (All)</div>
+        </ion-label>
+      </ion-item>
+      <ion-item button (click)="goToReport('rp-sales-customer')">
+        <ion-label>
+          <div>Sales by Customer</div>
+        </ion-label>
+      </ion-item>
+      <ion-item button (click)="goToReport('rp-check-qoh')">
+        <ion-label>
+          <div>Check QOH</div>
+        </ion-label>
+      </ion-item>
+      <ion-item button (click)="goToReport('rp-check-cn')">
+        <ion-label>
+          <div>Check Credit Note</div>
         </ion-label>
       </ion-item>
     </ion-list>

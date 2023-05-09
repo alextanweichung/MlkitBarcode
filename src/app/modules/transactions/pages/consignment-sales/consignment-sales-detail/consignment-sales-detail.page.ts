@@ -20,7 +20,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   constructor(
     private route: ActivatedRoute,
     private authService: AuthService,
-    private consignmentSalesService: ConsignmentSalesService,
+    public objectService: ConsignmentSalesService,
     private navController: NavController
   ) {
     this.route.queryParams.subscribe(params => {
@@ -36,10 +36,6 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   ngOnInit() {
     this.loadModuleControl();
-    this.loadMasterList();
-    if (this.objectId) {
-      this.loadObject();
-    }
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -59,30 +55,9 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
   }
 
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  salesAgentMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.consignmentSalesService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   loadObject() {
     try {
-      this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
         throw error;

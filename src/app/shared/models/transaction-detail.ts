@@ -6,12 +6,17 @@ export interface TransactionDetail {
   locationId?: number
   itemId?: number
   itemCode?: string
+  oldItemCode?: string
+  vendorItemCode?: string
   description?: string
   extendedDescription?: string
   shortDescription?: any
   itemUomId?: number
   itemUomCode?: any
   currencyRate?: number
+  /* #region for mobile only */
+  qtyInCart?: number
+  /* #endregion */
   qtyRequest?: number
   qtyApproved?: any
   qtyCommit?: any
@@ -21,6 +26,13 @@ export interface TransactionDetail {
   unitPriceExTax?: number
   discountGroupCode?: any
   discountExpression?: any
+
+  oriUnitPrice?: number
+  oriUnitPriceExTax?: number
+  oriDiscountGroupCode?: string
+  oriDiscountExpression?: string
+  isPricingApproval?: boolean
+  
   discountAmt?: any
   discountAmtExTax?: any
   taxId?: number
@@ -42,7 +54,7 @@ export interface TransactionDetail {
   subTotalMaxPrecision?: number
   subTotalExTaxMaxPrecision?: number
   etaDate?: any
-  remark?: any
+  remark?: string
   overrideFlag?: number
   lineUDDate?: any
   masterUDGroup1?: any
@@ -77,8 +89,6 @@ export interface TransactionDetail {
   promoEventId?: any
   isPromoImpactApplied?: any
   discountedUnitPrice?: any
-  oriDiscountGroupCode?: any
-  oriDiscountExpression?: any
   /* #region  for stock-count */
   itemBrandId?: number
   itemGroupId?: number
@@ -98,6 +108,12 @@ export interface TransactionDetail {
   deactivated?: boolean
   promoImpactedQty?: number;
   promoImpactedType?: string;
+  brandId?: number;
+  groupId?: number;
+  seasonId?: number;
+  categoryId?: number;
+  deptId?: number;
+  oriDiscId?: number;
 }
 
 export interface ItemPricing {
@@ -107,4 +123,5 @@ export interface ItemPricing {
   discountGroupCode: string
   discountExpression: any
   discountPercent: number
+  priceSegmentCode?: string
 }

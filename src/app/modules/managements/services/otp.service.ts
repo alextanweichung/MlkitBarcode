@@ -22,7 +22,6 @@ export class OtpService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: otp.service.ts:26 ~ OtpService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

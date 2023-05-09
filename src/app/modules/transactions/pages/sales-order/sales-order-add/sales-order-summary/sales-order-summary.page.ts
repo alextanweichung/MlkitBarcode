@@ -22,6 +22,7 @@ export class SalesOrderSummaryPage implements OnInit {
   }
 
   addMore() {
+    this.salesOrderService.resetVariables();
     this.navController.navigateRoot('/transactions/sales-order/sales-order-header');
   }
 

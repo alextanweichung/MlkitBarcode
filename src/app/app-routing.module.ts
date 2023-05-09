@@ -24,6 +24,11 @@ const routes: Routes = [
     loadChildren: () => import('./modules/public/signin/signin.module').then(m => m.SigninPageModule),
     // canActivate: [PublicGuard] // Prevent for signed in users
   },
+  {
+    path: 'forget-password',
+    loadChildren: () => import('./modules/public/forget-password/forget-password.module').then( m => m.ForgetPasswordPageModule)
+  },
+
 
 
 
@@ -107,6 +112,12 @@ const routes: Routes = [
     path: 'transactions/sales-order/sales-order-detail',
     loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/sales-order-detail.module').then(m => m.SalesOrderDetailPageModule)
   },
+  // transaction-backtoback-order
+  {
+    path: 'transactions/backtoback-order',
+    loadChildren: () => import('./modules/transactions/pages/backtoback-order/backtoback-order.module').then( m => m.BackToBackOrderPageModule)
+  },
+
   // transactions-purchase-order
   {
     path: 'transactions/purchase-order/purchase-order-detail',
@@ -148,10 +159,10 @@ const routes: Routes = [
     path: 'transactions/stock-count/stock-count-detail',
     loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then(m => m.StockCountDetailPageModule)
   },
-  // transaction-check-balance
+  // transaction-inventory-level
   {
-    path: 'transactions/check-balance',
-    loadChildren: () => import('./modules/transactions/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
+    path: 'transactions/inventory-level',
+    loadChildren: () => import('./modules/transactions/pages/inventory-level/inventory-level.module').then(m => m.InventoryLevelPageModule)
   },
   // transaction-cash-deposit
   {
@@ -162,6 +173,23 @@ const routes: Routes = [
     path: 'transactions/truck-loading',
     loadChildren: () => import('./modules/transactions/pages/truck-loading/truck-loading.module').then(m => m.TruckLoadingPageModule)
   },
+  {
+    path: 'transactions/inter-transfer',
+    loadChildren: () => import('./modules/transactions/pages/inter-transfer/inter-transfer.module').then( m => m.InterTransferPageModule)
+  },
+  {
+    path: 'transactions/transfer-confirmation',
+    loadChildren: () => import('./modules/transactions/pages/transfer-confirmation/transfer-confirmation.module').then( m => m.TransferConfirmationPageModule)
+  },
+  {
+    path: 'transactions/debtor-application',
+    loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then( m => m.DebtorApplicationPageModule)
+  },
+
+
+
+  
+
 
 
 
@@ -180,9 +208,22 @@ const routes: Routes = [
     loadChildren: () => import('./modules/reports/pages/reports/rp-so-listing/rp-so-listing.module').then(m => m.RpSoListingPageModule)
   },
   {
-    path: 'reports/rp-sa-performance-listing',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-performance-listing/rp-sa-performance-listing.module').then(m => m.RpSaPerformanceListingPageModule)
+    path: 'reports/rp-sales-customer',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then( m => m.RpSalesCustomerPageModule)
   },
+  {
+    path: 'reports/rp-sa-perf-all',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-perf-all/rp-sa-perf-all.module').then( m => m.RpSaPerfAllPageModule)
+  },
+  {
+    path: 'reports/rp-check-qoh',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then( m => m.RpCheckQohPageModule)
+  },
+  {
+    path: 'reports/rp-check-cn',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then( m => m.RpCheckCnPageModule)
+  },
+
 
 
 
@@ -245,6 +286,10 @@ const routes: Routes = [
     loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then(m => m.ItemCatalogPageModule)
   },
   {
+    path: 'item-catalog-without-price',
+    loadChildren: () => import('./shared/pages/item-catalog-without-price/item-catalog-without-price.module').then( m => m.ItemCatalogWithoutPricePageModule)
+  },
+  {
     path: 'camera-scan-input',
     loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then(m => m.CameraScanInputPageModule)
   },
@@ -252,6 +297,9 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
+
+
 
 ];
 @NgModule({

@@ -29,7 +29,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
 
   constructor(
     private authService: AuthService,
-    private stockCountService: StockCountService,
+    public objectService: StockCountService,
     private navController: NavController,
     private alertController: AlertController,
     private configService: ConfigService,
@@ -41,7 +41,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.stockCountHeader = this.stockCountService.stockCountHeader;
+    this.stockCountHeader = this.objectService.stockCountHeader;
     this.stockCountDetail = [];
     if (this.stockCountHeader === undefined) {
       this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
@@ -49,29 +49,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
     } else {
       this.loadInventoryCountBatchCriteria();
     }
-    this.loadMasterList();
     this.loadModuleControl();
-  }
-
-  itemBrandMasterList: MasterListDetails[] = [];
-  itemGroupMasterList: MasterListDetails[] = [];
-  itemCategoryMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.stockCountService.getMasterList().subscribe(response => {
-        this.itemBrandMasterList = response.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemGroupMasterList = response.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemCategoryMasterList = response.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   moduleControl: ModuleControl[] = [];
@@ -94,7 +72,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
   inventoryCountBatchCriteria: InventoryCountBatchCriteria
   loadInventoryCountBatchCriteria() {
     try {
-      this.stockCountService.getInventoryCountBatchCriteria(this.stockCountHeader.inventoryCountBatchId).subscribe(response => {
+      this.objectService.getInventoryCountBatchCriteria(this.stockCountHeader.inventoryCountBatchId).subscribe(response => {
         this.inventoryCountBatchCriteria = response;
       }, error => {
         throw error;
@@ -330,10 +308,10 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
 
   insertObject() {
     try {
-      this.stockCountService.insertInventoryCount({ header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: [] }).subscribe(response => {
+      this.objectService.insertInventoryCount({ header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: [] }).subscribe(response => {
         if (response.status === 201) {
           let object = response.body as StockCountRoot;
-          this.stockCountService.resetVariables();
+          this.objectService.resetVariables();
           this.toastService.presentToast('Stock Count added', '', 'top', 'success', 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {

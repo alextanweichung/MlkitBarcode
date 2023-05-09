@@ -13,7 +13,8 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label>Information</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label>
           <p>Document Num</p>
@@ -30,13 +31,13 @@
         <ion-label>
           <p>Customer Name</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectSummary.customerId|idMapping:customerMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectSummary.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Location</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectSummary.toLocationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectSummary.toLocationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
   </div>

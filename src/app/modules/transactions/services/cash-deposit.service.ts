@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { CashDeposit } from '../models/cash-deposit';
+import { Customer } from '../models/customer';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -16,12 +18,38 @@ export class CashDepositService {
 
   baseUrl: string;
 
+  customers: Customer[] = [];
+
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: cash-deposit.service.ts:24 ~ CashDepositService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
+  }
+
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    // await this.loadCustomer();
+  }
+
+  fullMasterList: MasterList[] = [];
+  paymentMethodMasterList: MasterListDetails[] = [];
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    // this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+    // this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    // this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+  }
+
+  async loadCustomer() {
+    this.customers = await this.getCustomerList();
+    await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
   }
 
   getObjects() {
@@ -52,8 +80,12 @@ export class CashDepositService {
 
   // update collection
 
+  getCustomerList() {
+    return this.http.get<Customer[]>(this.baseUrl + "MobilePosCashDeposit/customer").toPromise();
+  }
+
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePosCashDeposit/masterlist");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobilePosCashDeposit/masterlist").toPromise();
   }
 
   uploadFile(keyId: number, fileId: number, file: any) {

@@ -7,13 +7,17 @@ export const moduleCode = {
 export const trxAppCode = {
    mobileQuotation: 'MATRQU',
    mobileSalesOrder: 'MATRSO',
+   mobileBackToBackOrder: 'MATRB2B',
    mobilePicking: 'MATRPI',
    mobilePacking: 'MATRPA',
    mobileConsignment: 'MATRCS',
    mobileStockCount: 'MATRST',
    mobileInventoryLevel: 'MATRIL',
    mobileCashDepo: 'MAMPCD',
-   mobileTruckLoading: 'MAMTL'
+   mobileTruckLoading: 'MAMTL',
+   mobileInterTransfer: 'MATRIT',
+   mobileTransferConfirmation: 'MATRTC',
+   mobileDebtorApp: 'MATRDA'
 }
 
 export const approvalAppCode = {

@@ -35,7 +35,7 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   constructor(
     private toastService: ToastService,
     private configService: ConfigService,
-    private loadingService: LoadingService,
+    // private loadingService: LoadingService,
     private navController: NavController
   ) { }
 
@@ -93,7 +93,7 @@ export class WelcomePage implements OnInit, AfterContentChecked {
     if (this.activationCode.length > 0) {
       try {
         // Loading overlay
-        await this.loadingService.showLoading("Getting Info");
+        // await this.loadingService.showLoading("Getting Info");
         this.configService.getApiUrl(this.activationCode).subscribe(async response => {
           if (response) {
             this.toastService.presentToast('Activated Successfully', '', 'top', 'success', 1000);
@@ -105,19 +105,19 @@ export class WelcomePage implements OnInit, AfterContentChecked {
               password: ''
             }
             await this.configService.insert(config).then(async response => {
-              await this.loadingService.dismissLoading();
+              // await this.loadingService.dismissLoading();
               this.navController.navigateRoot('/signin');
             }).catch(async error => {
-              await this.loadingService.dismissLoading();
+              // await this.loadingService.dismissLoading();
               this.toastService.presentToast(error.message, '', 'top', 'danger', 1000);
             });
           }
         }, async error => {
-          await this.loadingService.dismissLoading();
+          // await this.loadingService.dismissLoading();
           this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
         })
       } catch (error) {
-        await this.loadingService.dismissLoading();
+        // await this.loadingService.dismissLoading();
       }
     } else {
       this.toastService.presentToast('Please enter activation code', '', 'top', 'danger', 1000);

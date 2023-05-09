@@ -12,38 +12,37 @@
       <ion-label class="label-title">Detail</ion-label>
     </ion-toolbar>
   </ion-header>  
-  <div class="ion-padding" *ngIf="object">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Information</ion-label>
-    </ion-list-header>
+  <div class="p-2" *ngIf="object">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Picking Num</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.pickingNum}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.pickingNum}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Trx Date</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
-      </ion-item><ion-item>
-        <ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Location</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.locationId|idMapping:locationMasterList}}"></ion-input>
-      </ion-item><ion-item>
-        <ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
           <div>Customer</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Detail Line</ion-label>
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Details</ion-label>
     </ion-list-header>
-    <app-item-view-list-flat [data]="object.details" [isWithSo]="object.header.isWithSo" [isPicking]="true" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList"></app-item-view-list-flat>
+    <app-item-view-list-flat [data]="object.details" [isWithSo]="object.header.isWithSo" [isPicking]="true" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-item-view-list-flat>
   </div>
 
 </ion-content>

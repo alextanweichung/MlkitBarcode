@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { SalesOrderPageRoutingModule } from './sales-order-routing.module';
 
-import { PickingSalesOrderPage } from './sales-order.page';
+import { SalesOrderPage } from './sales-order.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
 
 @NgModule({
@@ -17,6 +17,6 @@ import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton
     SalesOrderPageRoutingModule,
     ListingSkeletonPageModule
   ],
-  declarations: [PickingSalesOrderPage]
+  declarations: [SalesOrderPage]
 })
 export class SalesOrderPageModule {}

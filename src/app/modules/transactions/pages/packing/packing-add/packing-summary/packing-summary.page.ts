@@ -14,26 +14,17 @@ export class PackingSummaryPage implements OnInit {
   objectSummary: GoodsPackingSummary;
 
   constructor(
-    private packingService: PackingService,
+    public objectService: PackingService,
     private navController: NavController
   ) { }
 
   ngOnInit() {
-    this.objectSummary = this.packingService.objectSummary;
-    this.loadMasterList();
-  }
-
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.packingService.getMasterList().subscribe(response => {
-      this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    })
+    this.objectSummary = this.objectService.objectSummary;
   }
 
   done() {
-    this.packingService.resetVariables();
+    this.objectService.resetVariables();
     this.navController.navigateRoot('/transactions/packing');
   }
+
 }

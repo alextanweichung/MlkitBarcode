@@ -22,7 +22,8 @@
     <ion-list-header class="ion-list-header-small">
       <ion-label class="pl-2">Transaction Date</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label>
           <p>From</p>
@@ -48,6 +49,14 @@
       </ion-list-header>
       <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
       <app-search-multi-dropdown #appsMultiDropdown title="Customer" [showHeaderLabel]="false" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)" [selectedIds]="selectedCustomerId"></app-search-multi-dropdown>
+    </div>
+    
+    <div *ngIf="salesAgentFilter">
+      <ion-list-header class="ion-list-header-small">
+        <ion-label class="pl-2">Sales Agent</ion-label>
+      </ion-list-header>
+      <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
+      <app-search-multi-dropdown title="Sales Agent" [showHeaderLabel]="false" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="salesAgentList" (onActionComplete)="onSalesAgentSelected($event)" [selectedIds]="selectedSalesAgentId"></app-search-multi-dropdown>
     </div>
   </div>
 

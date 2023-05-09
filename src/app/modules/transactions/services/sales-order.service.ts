@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CreditInfo } from 'src/app/shared/models/credit-info';
@@ -13,6 +12,11 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
 import { SalesOrderHeader, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
+import { format } from 'date-fns';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { map } from 'rxjs/operators';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -25,13 +29,50 @@ const httpObserveHeader = {
 export class SalesOrderService {
 
   baseUrl: string;
+  
+  promotionMaster: PromotionMaster[] = [];
+
+  fullMasterList: MasterList[] = [];
+  customerMasterList: MasterListDetails[] = [];
+  discountGroupMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  shipMethodMasterList: MasterListDetails[] = [];
+  locationMasterList: MasterListDetails[] = [];
+  areaMasterList: MasterListDetails[] = [];
+  currencyMasterList: MasterListDetails[] = [];
+  salesAgentMasterList: MasterListDetails[] = [];
+
+  customers: Customer[] = [];
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: sales-order.service.ts:34 ~ SalesOrderService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
+  }
+
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadCustomer();
+  }
+
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+    this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+  }
+
+  async loadCustomer() {
+    this.customers = await this.getCustomerList();
+    await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
   }
 
   /* #region  for insert */
@@ -39,8 +80,10 @@ export class SalesOrderService {
   header: SalesOrderHeader;
   itemInCart: TransactionDetail[] = [];
   salesOrderSummary: SalesOrderSummary;
-  setHeader(header: SalesOrderHeader) {
+  async setHeader(header: SalesOrderHeader) {
     this.header = header;
+    // load promotion first after customer confirmed or whenever header changed.
+    this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), 'yyyy-MM-dd'), this.header.customerId);
   }
 
   setChoosenItems(items: TransactionDetail[]) {
@@ -80,7 +123,7 @@ export class SalesOrderService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist").toPromise();
   }
 
   getStaticLovList() {
@@ -88,11 +131,11 @@ export class SalesOrderService {
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer");
+    return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer").toPromise();
   }
-  
+
   getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId);
+    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId).toPromise();
   }
 
   getFullItemList() {
@@ -119,22 +162,35 @@ export class SalesOrderService {
     return this.http.get<CreditInfo>(this.baseUrl + 'MobileSalesOrder/creditInfo/' + customerId);
   }
 
-  downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
-    return this.http.post(this.baseUrl + "MobileSalesOrder/exportPdf", 
-    {
-      "appCode": appCode,
-      "format": format,
-      "documentIds": [ documentId ]
-    },
-    { responseType: "blob"});
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
+    return this.http.post(this.baseUrl + "MobileSalesOrder/exportPdf",
+      {
+        "appCode": appCode,
+        "format": format,
+        "documentIds": [documentId],
+        "reportName": reportName??null
+      },
+      { responseType: "blob" });
   }
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
     return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
-  getStatus(salesOrderId: number) {
-    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + salesOrderId);
+  getStatus(objectId: number) {
+    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + objectId);
+  }
+
+  getWorkflow(objectId: number) {
+    return this.http.get<WorkFlowState[]>(this.baseUrl + "MobileSalesOrder/workflow/" + objectId);
+  }
+
+  getTrxChild(objectId: number){
+    return this.http.get<TrxChild>(this.baseUrl + "MobileSalesOrder/child/" + objectId).pipe(
+      map((response: any) =>       
+        response.map((item: any) => item)   
+      )
+    );
   }
 
 }

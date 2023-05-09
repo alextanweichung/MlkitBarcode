@@ -1,4 +1,4 @@
-<input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan item code" (keydown)="handleKeyDown($event, itemSearchValue)">
+<input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter item code" (keydown)="handleKeyDown($event, itemSearchValue)">
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
@@ -6,7 +6,7 @@
       <ion-toolbar>
         <ion-title>Item List</ion-title>
         <ion-buttons slot="start">
-          <ion-button (click)="hideModal()">Close</ion-button>
+          <ion-button (click)="hideModal()">Cancel</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>

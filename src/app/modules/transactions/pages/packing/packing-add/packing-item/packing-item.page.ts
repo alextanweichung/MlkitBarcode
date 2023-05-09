@@ -32,7 +32,7 @@ export class PackingItemPage implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
-    private packingService: PackingService,
+    public objectService: PackingService,
     private navController: NavController,
     private alertController: AlertController,
     private toastService: ToastService,
@@ -40,16 +40,15 @@ export class PackingItemPage implements OnInit {
 
   ngOnInit() {
     try {
-      this.objectHeader = this.packingService.header;
+      this.objectHeader = this.objectService.header;
       if (this.objectHeader === undefined) {
         this.navController.navigateBack('/transactions/packing/packing-sales-order');
       }
-      this.packingSalesOrders = this.packingService.selectedSalesOrders;
+      this.packingSalesOrders = this.objectService.selectedSalesOrders;
       if (this.packingSalesOrders && this.packingSalesOrders.length > 0) {
         this.packingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPackedCurrent = 0);
       }
       this.loadModuleControl();
-      this.loadMasterList();
     } catch (e) {
       console.error(e);
     }
@@ -67,21 +66,6 @@ export class PackingItemPage implements OnInit {
         if (ignoreCheckdigit != undefined) {
           this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
         }
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.packingService.getMasterList().subscribe(response => {
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
       }, error => {
         throw error;
       })
@@ -228,8 +212,8 @@ export class PackingItemPage implements OnInit {
             itemSku: trxLine.itemSku,
             itemVariationTypeCode: trxLine.variationTypeCode,
             itemCode: trxLine.itemCode,
-            itemVariationXDescription: trxLine.itemVariationXId ? this.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
-            itemVariationYDescription: trxLine.itemVariationYId ? this.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
+            itemVariationXDescription: trxLine.itemVariationXId ? this.objectService.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
+            itemVariationYDescription: trxLine.itemVariationYId ? this.objectService.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
             itemUomId: null,
             itemUomDescription: null,
             rack: null,
@@ -373,7 +357,7 @@ export class PackingItemPage implements OnInit {
         header: header,
         details: lines
       }
-      this.packingService.insertPacking(object).subscribe(response => {
+      this.objectService.insertPacking(object).subscribe(response => {
         if (response.status === 201) {
           let ps: GoodsPackingSummary = {
             packingNum: response.body["header"]["packingNum"],
@@ -381,7 +365,7 @@ export class PackingItemPage implements OnInit {
             locationId: response.body["header"]["locationId"],
             trxDate: response.body["header"]["trxDate"]
           }
-          this.packingService.setPackingSummary(ps);
+          this.objectService.setPackingSummary(ps);
           this.toastService.presentToast('Packing has been added', '', 'top', 'success', 1000);
           this.navController.navigateForward('/transactions/packing/packing-summary');
         }

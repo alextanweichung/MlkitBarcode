@@ -13,17 +13,17 @@
       </ion-toolbar>
     </ion-header>
     <div class="ion-padding">
-      <ion-list class="list-custom" lines="none">
-        <app-search-dropdown #usersDropdown title="Users" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>        
-        <app-search-dropdown #validityDropdown title="Validity" optionLabel="description" [searchDropdownList]="validitySerachDropdownList" (onActionComplete)="onValidityChanged($event)" [hidden]="selectedUser==null"></app-search-dropdown>
-        <app-search-dropdown #appsDropdown [hidden]="selectedValidity !== 'SINGLE'" title="App" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-dropdown>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <app-search-dropdown title="Users" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>
+        <app-search-dropdown title="Validity" optionLabel="description" [masterDropdownList]="lovStatics" (onActionComplete)="onValidityChanged($event)" [hidden]="selectedUser==null"></app-search-dropdown>
+        <app-search-dropdown [hidden]="selectedValidity !== 'SINGLE'" title="App" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-dropdown>
         <app-search-multi-dropdown #appsMultiDropdown [hidden]="selectedValidity !== 'MULTIPLE'" title="App" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-multi-dropdown>
       </ion-list>
       <ion-item lines="none" color="none">
         <ion-checkbox #checkBox slot="end" (ionChange)="onCheckBoxChecked($event)" [(ngModel)]="checkboxValue"></ion-checkbox>
         <ion-label>Default Expiry</ion-label>
       </ion-item>
-        <app-calendar-input [hidden]="checkBox.checked" #calendar title="Expiry Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
+        <app-calendar-input [hidden]="checkBox.checked" [date_value]="expiryDate" title="Expiry Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
     </div>
 </ion-content>
 <ion-footer>

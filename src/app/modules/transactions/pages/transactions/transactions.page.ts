@@ -15,24 +15,18 @@ import { SalesOrderList } from '../../models/sales-order';
 export class TransactionsPage implements OnInit {
 
   showQuotation: boolean = false;
-  quotations: QuotationList[] = [];
-
   showSalesOrder: boolean = false;
-  salesOrders: SalesOrderList[] = [];
-
+  showBackToBackOrder: boolean = false;
   showPicking: boolean = false;
-  pickings: GoodsPickingList[] = [];
-
   showPacking: boolean = false;
-  packings: GoodsPackingList[] = [];
-
   showConsignmentSales: boolean = false;
-  consignment_sales: ConsignmentSalesList[] = [];
-
   showStockCount: boolean = false;
   showInventoryLevel: boolean = false;
   showCashDeposit: boolean = false;
   showTruckLoading: boolean = false;
+  showInterTransfer: boolean = false;
+  showTransferConfirmation: boolean = false;
+  showDebtorApplication: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -45,6 +39,7 @@ export class TransactionsPage implements OnInit {
         if (pageItems) {
           this.showQuotation = pageItems.findIndex(r => r.title === trxAppCode.mobileQuotation) > -1;
           this.showSalesOrder = pageItems.findIndex(r => r.title === trxAppCode.mobileSalesOrder) > -1;
+          this.showBackToBackOrder = pageItems.findIndex(r => r.title === trxAppCode.mobileBackToBackOrder) > -1;
           this.showPicking = pageItems.findIndex(r => r.title === trxAppCode.mobilePicking) > -1;
           this.showPacking = pageItems.findIndex(r => r.title === trxAppCode.mobilePacking) > -1;
           this.showConsignmentSales = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignment) > -1;
@@ -52,6 +47,9 @@ export class TransactionsPage implements OnInit {
           this.showInventoryLevel = pageItems.findIndex(r => r.title === trxAppCode.mobileInventoryLevel) > -1;
           this.showCashDeposit = pageItems.findIndex(r => r.title === trxAppCode.mobileCashDepo) > -1;
           this.showTruckLoading = pageItems.findIndex(r => r.title === trxAppCode.mobileTruckLoading) > -1;
+          this.showInterTransfer = pageItems.findIndex(r => r.title === trxAppCode.mobileInterTransfer) > -1;
+          this.showTransferConfirmation = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferConfirmation) > -1;
+          this.showDebtorApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileDebtorApp) > -1;
         }
       })
     } catch (e) {

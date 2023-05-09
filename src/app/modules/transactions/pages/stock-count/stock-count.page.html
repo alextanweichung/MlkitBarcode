@@ -26,40 +26,32 @@
       </p>
     </ng-container>
     <ng-container *ngIf="objects.length > 0">
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button (click)="goToDetail(object.inventoryCountId)" *ngFor="let object of objects">
-          <ion-grid class="ion-no-padding p-2">
-            <ion-row>
-              <ion-col>
-                <div class="font-bold">{{object.inventoryCountNum}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <div>{{object.trxDate|date:'dd/MM/yyyy'}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <div>{{object.description}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>                
-                <div>{{object.locationCode}} - {{object.locationDescription}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row *ngIf="object.zoneCode">
-              <ion-col>
-                <div>{{object.zoneCode}} - {{object.zoneDescription}}</div>
-              </ion-col>
-              <ion-col *ngIf="object.rackCode">
-                <div>{{object.rackCode}} - {{object.rackDescription}}</div>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-item>
-      </ion-list>
+      
+      <div *ngFor="let m of uniqueGrouping">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+          <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
+        </ion-list-header>
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.inventoryCountId)">
+            <ion-grid class="ion-no-padding p-2">
+              <ion-row>
+                <ion-col class="font-bold">{{object.inventoryCountNum}}</ion-col>
+                <ion-col class="ion-flex justify-content-end"><div class="ion-text-right">{{object.trxDate|date:'dd/MM/yyyy'}}</div></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>{{object.description}}</ion-col>
+                <ion-col class="ion-text-right">{{object.locationCode}}</ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col *ngIf="object.zoneCode">{{object.zoneCode}} - {{object.zoneDescription}}</ion-col>
+                <ion-col *ngIf="object.rackCode" class="ion-text-right">{{object.rackCode}} - {{object.rackDescription}}</ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+      </div>
+
     </ng-container>
   </div>
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">

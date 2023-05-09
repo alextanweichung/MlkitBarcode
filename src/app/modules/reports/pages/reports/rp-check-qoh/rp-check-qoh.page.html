@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Check QOH</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <div class="p-2">
+    <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="searchText" (ionFocus)="highlight(searchbar)" (search)="search()" (keydown)="onKeyDown($event)"></ion-searchbar>
+
+    <div class="prefix-css" *ngIf="realObject && realObject.length > 0">
+      <ngx-datatable
+      class="fullscreen material mt-2"
+      [rows]="realObject" 
+      [rowHeight]="'auto'" 
+      [columns]="columns"
+      [columnMode]="'force'" 
+      [scrollbarH]="true">
+        <ngx-datatable-column prop="itemCode" name="Stock Code" [width]="100">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div class="flex ion-text-wrap font-half-size">{{row.itemCode}}</div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column prop="itemDescription" name="Description" [width]="120">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div class="flex ion-text-wrap font-half-size">{{row.itemDescription}}</div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column prop="qoh" name="QOH" [width]="70">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div class="flex ion-text-wrap font-half-size">{{row.qoh|number:'1.0'}}</div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column prop="price" name="Segment" [width]="80">
+          <ng-template ngx-datatable-header-template>
+            <div class="flex ion-text-wrap font-half-size">Price</div>
+          </ng-template>
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div class="flex ion-text-wrap font-half-size" *ngFor="let p of row.price">{{p.segmentCode}} - {{p.price|number:'1.2'}}</div>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+
+    </div>
+  </div>
+
+</ion-content>

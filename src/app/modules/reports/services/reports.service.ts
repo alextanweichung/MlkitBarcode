@@ -3,9 +3,13 @@ import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
-import { DebtorOutstanding } from '../models/debtor-outstanding';
-import { SAPerformaceListing } from '../models/rp-sa-performace-listing';
+import { DebtorOutstanding, DebtorOutstandingRequest } from '../models/debtor-outstanding';
+import { SAPerformanceListing, SalesAgentAllPerformanceObject } from '../models/rp-sa-performance-listing';
 import { ReportSOListing } from '../models/rp-so-listing';
+import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-customer';
+import { CreditInfo } from 'src/app/shared/models/credit-info';
+import { CheckQohRoot } from '../models/rp-check-qoh';
+import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +22,6 @@ export class ReportsService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: reports.service.ts:22 ~ ReportsService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
@@ -26,8 +29,8 @@ export class ReportsService {
     return this.http.get<Customer[]>(this.baseUrl + "mobileReport/customer");
   }
 
-  getDebtorOutstanding(customerId: number, trxDate: string) {
-    return this.http.get<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding/debtor/" + customerId.toString() + "/" + trxDate);
+  getDebtorOutstanding(object: DebtorOutstandingRequest) {
+    return this.http.post<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding", object);
   }
 
   getSOListing() {
@@ -35,11 +38,31 @@ export class ReportsService {
   }
 
   getSAPerformance() {
-    return this.http.get<SAPerformaceListing[]>(this.baseUrl + "MobileReport/saPerformance");
+    return this.http.get<SAPerformanceListing[]>(this.baseUrl + "MobileReport/saPerformance");
+  }
+
+  getAllSalesPerformance(dateStart: string, dateEnd: string) {
+    return this.http.get<SalesAgentAllPerformanceObject[]>(this.baseUrl + "MobileReport/allPerformance/" + dateStart + "/" + dateEnd);
+  }
+
+  getSalesByCustomer(object: SalesByCustomerRequest) {
+    return this.http.post<SalesByCustomer[]>(this.baseUrl + "MobileReport/salesByCustomer", object);
+  }
+
+  getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
+    return this.http.get<CheckQohRoot[]>(this.baseUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
+  }
+
+  getCheckCn(object: CheckCnRequest) {
+    return this.http.post<CheckCn[]>(this.baseUrl + "mobileReport/checkCn", object);
   }
 
   getPdf(model: ReportParameterModel) {
     return this.http.post(this.baseUrl + "mobileReport/exportPdf", model, { responseType: 'blob' });
+  }
+
+  getCreditInfo(customerId: number) {
+    return this.http.get<CreditInfo>(this.baseUrl + "mobileReport/creditInfo/" + customerId);
   }
   
 }

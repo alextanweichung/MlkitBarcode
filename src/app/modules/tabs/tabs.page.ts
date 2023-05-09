@@ -22,7 +22,6 @@ export class TabsPage {
     private navController: NavController
   ) {
     this.authService.menuModel$.subscribe(obj => {
-      console.log("🚀 ~ file: tabs.page.ts:25 ~ TabsPage ~ obj:", obj)
       if (obj) {
         this.showTrxTab = obj.flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction)?.length > 0
 

@@ -12,31 +12,37 @@
       <ion-label class="label-title">Detail</ion-label>
     </ion-toolbar>
   </ion-header>  
-  <div class="ion-padding" *ngIf="object">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Information</ion-label>
-    </ion-list-header>
-    <ion-list class="list-custom" lines="full">
+  <div class="p-2" *ngIf="object">
+    
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
-        <ion-label position="stacked"><p>Packing Num</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.packingNum}}"></ion-input>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Packing Num</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.packingNum}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="stacked"><p>Trx Date</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Trx Date</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="stacked"><p>Location</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Location</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="stacked"><p>Customer</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Customer</div>
+        </ion-label>
+        <ion-input readonly class="font-size-small" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
       </ion-item>
     </ion-list>    
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Detail Line</ion-label>
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Details</ion-label>
     </ion-list-header>
-    <app-item-view-list-flat [data]="object.details" [isWithSo]="object.header.isWithSo" [isPacking]="true" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList"></app-item-view-list-flat>
+    <app-item-view-list-flat [data]="object.details" [isWithSo]="object.header.isWithSo" [isPacking]="true" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-item-view-list-flat>
   </div>
 </ion-content>

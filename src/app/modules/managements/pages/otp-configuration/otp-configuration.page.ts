@@ -7,7 +7,7 @@ import { OtpService } from '../../services/otp.service';
 import { App } from 'src/app/shared/models/app';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.page';
@@ -17,7 +17,7 @@ import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropd
   templateUrl: './otp-configuration.page.html',
   styleUrls: ['./otp-configuration.page.scss'],
 })
-export class OtpConfigurationPage implements OnInit {
+export class OtpConfigurationPage implements OnInit, ViewWillEnter {
 
   lovStatics: MasterListDetails[] = [];
   apps: App[] = [];
@@ -31,7 +31,7 @@ export class OtpConfigurationPage implements OnInit {
   selectedUser: any;
   selectedValidity: any;
   selectedApp: any;
-  expiryDate: Date;
+  expiryDate: Date = null;
 
   checkboxValue: boolean = true;
 
@@ -51,6 +51,12 @@ export class OtpConfigurationPage implements OnInit {
     private commonService: CommonService,
     private alertController: AlertController,
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.expiryDate) {
+      this.expiryDate = this.commonService.getTodayDate();
+    }
+  }
 
   ngOnInit() {
     this.loadUsers();
@@ -73,7 +79,7 @@ export class OtpConfigurationPage implements OnInit {
       this.users.forEach(r => {
         this.userSearchDropDownList.push({
           id: r.userId,
-          code: null,
+          code: r.userName[0],
           description: r.userName
         })
       })
@@ -83,13 +89,6 @@ export class OtpConfigurationPage implements OnInit {
 
     this.otpConfigService.getStaticLov().subscribe(response => {
       this.lovStatics = response.filter(x => x.objectName == 'OtpValidity' && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.lovStatics.forEach(r => {
-        this.validitySerachDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
     }, error => {
       console.log(error);
     })

@@ -21,48 +21,45 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Information</ion-label>
-    </ion-list-header>
     <ion-list class="list-custom" lines="full" *ngIf="inventoryCount">
       <ion-item>
-        <ion-label>
-          <p>Doc Number</p>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Doc Number</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.inventoryCountNum}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.inventoryCountNum}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
-          <p>Trx Date</p>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Trx Date</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
-          <p>Location</p>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Location</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="inventoryCount.header.zoneId">
-        <ion-label>
-          <p>Zone</p>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Zone</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.zoneId|idMapping:zoneMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.zoneId|idMapping:objectService.zoneMasterList}}"></ion-input>
       </ion-item>
       <ion-item *ngIf="inventoryCount.header.rackId">
-        <ion-label>
-          <p>Rack</p>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Rack</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{inventoryCount.header.rackId|idMapping:rackMasterList}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{inventoryCount.header.rackId|idMapping:objectService.rackMasterList}}"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>
-          <p>Total Qty</p>
+        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
+          <div>Total Qty</div>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{scannedItems|sum:'qtyRequest'|number:'1.0'}}"></ion-input>
+        <ion-input readonly class="font-size-small" value="{{scannedItems|sum:'qtyRequest'|number:'1.0'}}"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -84,7 +81,7 @@
           </ion-row>
           <ion-row>
             <ion-col>
-              <p>{{item.description}}</p>
+              <div>{{item.description}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

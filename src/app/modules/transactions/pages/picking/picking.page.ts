@@ -21,15 +21,20 @@ export class PickingPage implements OnInit, ViewWillEnter {
   startDate: Date;
   endDate: Date;
 
+  uniqueGrouping: Date[] = [];
+
   constructor(
     private commonService: CommonService,
     private configService: ConfigService,
-    private goodsPickingService: PickingService,
+    private objectService: PickingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
@@ -46,25 +51,18 @@ export class PickingPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    try {
-      if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
-      }
-      if (!this.endDate) {
-        this.endDate = this.commonService.getTodayDate();
-      }
-      this.loadObjects();
-    } catch (e) {
-      console.error(e);
-    }
+
   }
 
   /* #region  crud */
 
   loadObjects() {
     try {
-      this.goodsPickingService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+      this.objectService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
         this.objects = response;
+        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
+        this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
+        await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
       }, error => {
         throw error;
@@ -74,13 +72,17 @@ export class PickingPage implements OnInit, ViewWillEnter {
     }
   }
 
+  getObjects(date: Date) {
+    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
+  }
+
   /* #endregion */
 
   /* #region  add goods picking */
 
   async addObject() {
     try {
-      if (this.goodsPickingService.hasWarehouseAgent()) {
+      if (this.objectService.hasWarehouseAgent()) {
         this.navController.navigateForward('/transactions/picking/picking-sales-order');
       } else {
         this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1000);

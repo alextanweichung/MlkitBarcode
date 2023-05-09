@@ -15,31 +15,13 @@ export class StockCountSummaryEditPage implements OnInit {
   stockCountDetail: StockCountDetail[] = [];
 
   constructor(
-    private stockCountService: StockCountService,
+    public objectService: StockCountService,
     private navController: NavController
   ) { }
 
   ngOnInit() {
-    this.loadMasterList();
-    this.stockCountHeader = this.stockCountService.stockCountHeader;
-    this.stockCountDetail = this.stockCountService.stockCountLines;
-  }
-
-  locationMasterList: MasterListDetails[] = [];
-  zoneMasterList: MasterListDetails[] = [];
-  rackMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    this.stockCountService.getMasterList().subscribe(response => {
-      this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    }, error => {
-      console.log(error);
-    })
+    this.stockCountHeader = this.objectService.stockCountHeader;
+    this.stockCountDetail = this.objectService.stockCountLines;
   }
 
   nextStep() {

@@ -10,10 +10,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Information</ion-label>
-    </ion-list-header>
-    <ion-list class="list-custom" lines="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label>
           <p>Document Num</p>
@@ -24,7 +21,9 @@
         <ion-label>
           <p>Customer Name</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.customerName}}"></ion-input>
+        <div class="ion-flex ion-text-wrap">
+          <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{salesOrderSummary.customerName}}"></ion-input>
+        </div>
       </ion-item>
       <ion-item>
         <ion-label>

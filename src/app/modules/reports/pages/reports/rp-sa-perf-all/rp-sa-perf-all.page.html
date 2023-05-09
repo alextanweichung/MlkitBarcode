@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>All Performance</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="p-2">
+    <ion-list class="list-custom" lines="none">
+      <app-calendar-input title="Start Date" [date_value]="startDate" (onDateSelected)="onStartDateSelected($event)"></app-calendar-input>
+      <app-calendar-input title="End Date" [date_value]="endDate" (onDateSelected)="onEndDateSelected($event)"></app-calendar-input>
+    </ion-list>
+    <ion-button class="pt-2" expand="block" size="default" [disabled]="!startDate||!endDate" (click)="loadReport()">Search</ion-button>
+    <ngx-datatable *ngIf="objects && objects.length > 0"
+    class="fullscreen material mt-2"
+    [rows]="objects" 
+    [rowHeight]="50" 
+    [columns]="columns"
+    [columnMode]="'force'">
+      <ngx-datatable-column prop="salesAgentName" name="SA Name">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.salesAgentName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="invoiceAmt" name="Invoice">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right">{{row.invoiceAmt|number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="cnAmount" name="Credit Note">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right"> {{row.cnAmount | number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="netAmount" name="Net Amount">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</ion-content>

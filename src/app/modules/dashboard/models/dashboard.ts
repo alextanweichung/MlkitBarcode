@@ -55,7 +55,8 @@ export interface MemoDetail {
 }
 
 export interface AnnouncementFile {
-  filesId: number,
-  filesName: string,
+  filesId: number
+  filesName: string  
   filesType: string
+  filesSize: number
 }

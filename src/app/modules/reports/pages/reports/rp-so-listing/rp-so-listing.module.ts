@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { RpSoListingPageRoutingModule } from './rp-so-listing-routing.module';
 
 import { RpSoListingPage } from './rp-so-listing.page';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    RpSoListingPageRoutingModule
+    RpSoListingPageRoutingModule,
+    NgxDatatableModule
   ],
   declarations: [RpSoListingPage]
 })

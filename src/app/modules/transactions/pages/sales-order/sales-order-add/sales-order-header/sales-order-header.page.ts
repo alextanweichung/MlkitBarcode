@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActionSheetController, ModalController, NavController } from '@ionic/angular';
-import { CategoryScale } from 'chart.js';
+import { format } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -11,6 +11,7 @@ import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-li
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-sales-order-header',
@@ -28,7 +29,8 @@ export class SalesOrderHeaderPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private salesOrderService: SalesOrderService,
+    private objectService: SalesOrderService,
+    private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private toastService: ToastService,
@@ -44,7 +46,7 @@ export class SalesOrderHeaderPage implements OnInit {
         salesOrderId: [0],
         salesOrderNum: [null],
         salesAgentId: [null],
-        trxDate: [new Date()],
+        trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
         typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],
@@ -88,9 +90,9 @@ export class SalesOrderHeaderPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadCustomerList();
-    this.loadMasterList();
     this.loadModuleControl();
+    this.setDefaultValue();
+    this.bindCustomerList();
   }
     
   moduleControl: ModuleControl[];
@@ -136,53 +138,22 @@ export class SalesOrderHeaderPage implements OnInit {
     }
   }
 
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  shipMethodMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.salesOrderService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.setDefaultValue();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  customers: Customer[] = [];
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
-  loadCustomerList() {
-    try {
-      this.salesOrderService.getCustomerList().subscribe(async response => {
-        this.customers = response;
-        this.customers = this.customers.filter(r => r.businessModelType === 'T');
-        await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-        this.customers.forEach(r => {
-          this.customerSearchDropdownList.push({
-            id: r.customerId,
-            code: r.customerCode,
-            description: r.name
-          })
-        })
-      }, error => {
-        throw error;
+  bindCustomerList() {
+    this.objectService.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
       })
-    } catch (e) {
-      console.error(e);
-    }
+    })
   }
 
   setDefaultValue() {
     try {
-      let defaultShipMethod = this.shipMethodMasterList.find(r => r.isPrimary);
+      let defaultShipMethod = this.objectService.shipMethodMasterList.find(r => r.isPrimary);
       if (defaultShipMethod) {
         this.objectForm.patchValue({ shipMethodId: defaultShipMethod.id });
       }      
@@ -197,13 +168,13 @@ export class SalesOrderHeaderPage implements OnInit {
   onCustomerSelected(event) {
     try {
       if (event && event !== undefined) {
-        var lookupValue = this.customerMasterList?.find(e => e.id === event.id);
+        var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
         if (lookupValue != undefined) {
-          this.salesOrderService.removeItems();
+          this.objectService.removeItems();
           this.objectForm.patchValue({ customerId: lookupValue.id });
           this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
           if (lookupValue.attributeArray1.length > 0) {
-            this.selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
+            this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
           } else {
             this.selectedCustomerLocationList = [];
           }
@@ -219,7 +190,7 @@ export class SalesOrderHeaderPage implements OnInit {
           });
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
-            this.availableAddress = this.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);
+            this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);
             this.objectForm.controls.toLocationId.clearValidators();
             this.objectForm.controls.toLocationId.updateValueAndValidity();
           } else {
@@ -236,7 +207,7 @@ export class SalesOrderHeaderPage implements OnInit {
           }
         }
         if (!this.disableTradeTransactionGenerateGL) {
-          this.salesOrderService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
+          this.objectService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
             if (response) {
               this.creditInfo = response;
             }
@@ -251,7 +222,7 @@ export class SalesOrderHeaderPage implements OnInit {
   onCurrencySelected(event: any) {
     try {
       if (event) {
-        var lookupValue = this.currencyMasterList?.find(e => e.id == event);
+        var lookupValue = this.objectService.currencyMasterList?.find(e => e.id == event);
         if (lookupValue != undefined) {
           this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
           if (lookupValue.attribute2 == "Y") {
@@ -306,7 +277,7 @@ export class SalesOrderHeaderPage implements OnInit {
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
       if (role === 'confirm') {
-        this.salesOrderService.resetVariables();
+        this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/sales-order');
       }      
     } catch (e) {
@@ -316,7 +287,7 @@ export class SalesOrderHeaderPage implements OnInit {
 
   async nextStep() {
     try {
-      await this.salesOrderService.setHeader(this.objectForm.value);
+      await this.objectService.setHeader(this.objectForm.value);
       this.navController.navigateForward('/transactions/sales-order/sales-order-item');
     } catch (e) {
       console.error(e);

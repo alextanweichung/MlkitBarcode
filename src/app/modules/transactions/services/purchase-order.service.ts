@@ -22,7 +22,6 @@ export class PurchaseOrderService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: purchase-order.service.ts:26 ~ PurchaseOrderService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 

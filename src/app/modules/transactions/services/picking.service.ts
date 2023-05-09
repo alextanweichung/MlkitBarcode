@@ -5,6 +5,7 @@ import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { GoodsPickingHeader, GoodsPickingList, GoodsPickingRoot, PickingSummary } from '../models/picking';
 import { PickingSalesOrderDetail, PickingSalesOrderRoot } from '../models/picking-sales-order'
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -22,7 +23,6 @@ export class PickingService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: picking.service.ts:26 ~ PickingService ~ apiUrl:")
     this.baseUrl = configService.sys_parameter.apiUrl;
   }
 
@@ -77,12 +77,37 @@ export class PickingService {
     return true
   }
 
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadStaticLov();
+  }
+
+  fullMasterList: MasterList[] = [];
+  customerMasterList: MasterListDetails[] = [];
+  itemUomMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  locationMasterList: MasterListDetails[] = [];
+  warehouseAgentMasterList: MasterListDetails[] = [];
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+  }
+
+  async loadStaticLov() {
+
+  }
+
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/masterList");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/masterList").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/staticLov");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/staticLov").toPromise();
   }
 
   getObjectList() {
@@ -107,10 +132,6 @@ export class PickingService {
 
   insertPicking(object: GoodsPickingRoot) {
     return this.http.post(this.baseUrl + "MobilePicking", object, httpObserveHeader);
-  }
-
-  getItemInfoByBarcode(barcode: string) {
-    return this.http.get<ItemBarcodeModel>(this.baseUrl + "MobilePicking/item/" + barcode);
   }
 
 }

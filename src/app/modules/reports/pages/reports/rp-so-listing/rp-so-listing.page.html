@@ -6,38 +6,65 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
-  <div class="p-2" style="overflow:auto">
-      <table id="qtyMatrix" *ngIf="objects.length > 0">
-        <tr>
-          <th class="p-1 font-half-size">Issued Date</th>
-          <th class="p-1 font-half-size">Debtor Code</th>
-          <th class="p-1 font-half-size">Debtor Name</th>
-          <th class="p-1 font-half-size">Salesman</th>
-          <th class="p-1 font-half-size">Online Order</th>
-          <th class="p-1 font-half-size">Order Status</th>
-          <th class="p-1 font-half-size">Sales Order</th>
-          <th class="p-1 font-half-size">Delivery Order</th>
-          <th class="p-1 font-half-size">Delivered</th>
-          <th class="p-1 font-half-size">Net Amount</th>
-        </tr>
-        <tr *ngFor="let rowData of objects; let rowIndex = index">
-          <td class="p-1 font-half-size">{{rowData.issuedDate|date:'dd/MM/yyyy'}}</td>
-          <td class="p-1 font-half-size">{{rowData.debtorCode}}</td>
-          <td class="p-1 font-half-size">{{rowData.debtorName}}</td>
-          <td class="p-1 font-half-size">{{rowData.salesmanName}}</td>
-          <td class="p-1 font-half-size">{{rowData.onlineOrder}}</td>
-          <td class="p-1 font-half-size">{{rowData.orderStatus}}</td>
-          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="downloadPdf(rowData.salesOrderId)">{{rowData.salesOrderNum}}</ion-button></td>
-          <td class="p-1 font-half-size"><ion-button fill="clear" size="small" (click)="showDialogOrDownload(rowData.deliveryOrderIds)">{{rowData.deliveryOrders?.replace('|', ', ')}}</ion-button></td>
-          <td class="p-1 font-half-size">{{rowData.delivered}}</td>
-          <td class="p-1 font-half-size ion-text-right">{{rowData.netAmount|number:'1.2-2'}}</td>
-        </tr>
-      </table>
+  <div class="p-2">
+    <ngx-datatable *ngIf="objects && objects.length > 0"
+    class="fullscreen material mt-2"
+    [rows]="objects" 
+    [rowHeight]="'auto'" 
+    [columns]="columns"
+    [columnMode]="'force'" 
+    [footerHeight]="50"
+    [limit]="12"
+    [scrollbarH]="true">
+      <ngx-datatable-column prop="issuedDate" name="Issued Date" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.issuedDate|date:'dd/MM/yyyy'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="debtorCode" name="Debtor Code" [width]="100">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.debtorCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="debtorName" name="Debtor Name" [width]="100">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.debtorName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="salesmanName" name="Salesman" [width]="100">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.salesmanName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="orderStatus" name="Order Status" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.orderStatus}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="salesOrderNum" name="Sales Order" [width]="100">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size div-link-button" (click)="presentAlertViewPdf(row.salesOrderId, row.salesOrderNum, 'SO')"> {{row.salesOrderNum}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size div-link-button" (click)="showDialogOrDownload(row.deliveryOrderIds)"> {{row.deliveryOrders?.replace('|', ', ')}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="delivered" name="Delivered" [width]="100">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.delivered}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="netAmount" name="Net Amount" [width]="100">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
   </div>
 </ion-content>
-
 <ion-modal [isOpen]="doDialog" (didDismiss)="doDialog = false">
   <ng-template>
     <ion-header>
@@ -50,6 +77,7 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
+        {{error|json}}
         <ion-list-header class="ion-list-header-small" *ngIf="!deliveryOrderObject">
           <ion-label>Delivery Orders not available.</ion-label>
         </ion-list-header>
@@ -57,11 +85,11 @@
           <ion-item button="false" *ngFor="let dOrder of deliveryOrderObject">
             <ion-grid class="p-1">
               <ion-row>
-                <ion-col>
+                <ion-col class="ion-margin-auto">
                   <div>{{dOrder.split('|')[0]}}</div>
                 </ion-col>
                 <ion-col>
-                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="downloadDOPdf(dOrder.split('|')[1])">Download</ion-button></div>
+                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="presentAlertViewPdf(dOrder.split('|')[1], dOrder.split('|')[0], 'DO')">Download</ion-button></div>
                 </ion-col>
               </ion-row>
             </ion-grid>

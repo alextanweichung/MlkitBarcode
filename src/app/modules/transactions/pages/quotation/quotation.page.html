@@ -32,13 +32,14 @@
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="full">
+        
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item-sliding *ngFor="let object of getObjects(m)">
             <ion-item button detail="false" (click)="goToDetail(object.quotationId)">
               <ion-grid class="ion-no-padding p-2">
                 <ion-row>
                   <ion-col class="font-bold">{{object.quotationNum}}</ion-col>
-                  <ion-col class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</ion-col>
+                  <ion-col class="ion-flex justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
                 </ion-row>
                 <ion-row>
                   <ion-col>{{object.customerName}}</ion-col>

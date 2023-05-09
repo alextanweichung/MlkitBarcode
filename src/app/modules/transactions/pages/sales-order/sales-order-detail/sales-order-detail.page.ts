@@ -4,14 +4,14 @@ import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { SalesOrderStatus } from 'src/app/shared/models/sales-order-status';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -29,7 +29,7 @@ export class SalesOrderDetailPage implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
-    private salesOrderService: SalesOrderService,
+    public objectService: SalesOrderService,
     private alertController: AlertController,
     private toastService: ToastService,
     private commonService: CommonService
@@ -53,7 +53,6 @@ export class SalesOrderDetailPage implements OnInit {
       this.navController.navigateBack('/transactions/sales-order')
     } else {
       this.loadModuleControl();
-      this.loadMasterList();
       this.loadObject();
     }
   }
@@ -72,27 +71,12 @@ export class SalesOrderDetailPage implements OnInit {
     }
   }
 
-  locationMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.salesOrderService.getMasterList().subscribe(response => {
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw Error;
-      })
-    } catch (error) {
-      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
-    }
-  }
-
   loadObject() {
     try {
-      this.salesOrderService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: sales-order-detail.page.ts:77 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
+        this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
         throw error;
       })
@@ -100,6 +84,58 @@ export class SalesOrderDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  workFlowState: WorkFlowState[] = [];
+  trxChild: TrxChild[] = [];
+  loadWorkflow(objectId: number) {
+    this.workFlowState = [];
+    this.objectService.getWorkflow(objectId).subscribe(response => {
+      this.workFlowState = response;
+      console.log("🚀 ~ file: sales-order-detail.page.ts:95 ~ SalesOrderDetailPage ~ this.objectService.getWorkflow ~ this.workFlowState:", this.workFlowState)
+
+      this.objectService.getTrxChild(objectId).subscribe(response2 => {
+        this.trxChild = response2;
+        if (this.trxChild.length > 0) {
+          let trxTypes: string[] = this.trxChild.map(x => x.serviceName);
+          trxTypes = [...new Set(trxTypes)];
+          trxTypes.forEach(type => {
+            let relatedArray = this.trxChild.filter(x => x.serviceName == type);
+            let trxIds = relatedArray.map(x => x.trxId);
+            let trxNums = relatedArray.map(x => x.trxNum);
+            let trxDates = relatedArray.map(x => x.trxDate);
+            let routerLinks = relatedArray.map(x => x.routerLink);
+            if (type == 'SalesInvoice') {
+              type = 'Sales Invoice';
+            }
+            let newState: WorkFlowState = {
+              stateId: null,
+              title: type,
+              trxId: null,
+              trxIds: trxIds,
+              trxNum: null,
+              trxNums: trxNums,
+              trxDate: null,
+              trxDates: trxDates,
+              trxBy: null,
+              routerLink: null,
+              routerLinks: routerLinks,
+              icon: 'pi pi-star-fill',
+              stateType: 'TRANSACTION',
+              isCompleted: true,
+              sequence: null,
+              interval: null
+            }
+            this.workFlowState = [...this.workFlowState, newState]
+          })
+          console.log("🚀 ~ file: sales-order-detail.page.ts:130 ~ SalesOrderDetailPage ~ this.objectService.getTrxChild ~ this.workFlowState:", this.workFlowState)
+        }
+      }, error => {
+        console.log(error);
+      });
+    }, error => {
+      console.error(error);
+    })
   }
 
   matchImage(itemId: number) {
@@ -125,21 +161,11 @@ export class SalesOrderDetailPage implements OnInit {
 
   /* #region show variaton dialog */
 
-  variationDialog: boolean = false;
-  showVariationDialog() {
-    this.variationDialog = true;
-  }
-
-  hideVariationDialog() {
-    this.selectedItem = null;
-    this.variationDialog = false;
-  }
-
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.selectedItem = item;
-      this.showVariationDialog();
+      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
     }
   }
 
@@ -160,11 +186,10 @@ export class SalesOrderDetailPage implements OnInit {
 
   /* #region download pdf */
 
-  async presentAlertViewPdf() {
+  async presentAlertViewPdf(reportName: string) {
     try {
       const alert = await this.alertController.create({
-        header: '',
-        subHeader: 'View Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -172,7 +197,7 @@ export class SalesOrderDetailPage implements OnInit {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.downloadPdf();
+              await this.downloadPdf(reportName);
             },
           },
           {
@@ -188,9 +213,9 @@ export class SalesOrderDetailPage implements OnInit {
     }
   }
 
-  async downloadPdf() {
+  async downloadPdf(reportName: string) {
     try {
-      this.salesOrderService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId, reportName).subscribe(response => {
         let filename = this.object.header.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
@@ -277,7 +302,7 @@ export class SalesOrderDetailPage implements OnInit {
           docId: listOfDoc.map(i => Number(i))
         }
         try {
-          this.salesOrderService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileSalesOrderReview' : 'mobileSalesOrderApprove', bulkConfirmReverse).subscribe(async response => {
+          this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileSalesOrderReview' : 'mobileSalesOrderApprove', bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
               this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
               this.navController.back();
@@ -300,26 +325,16 @@ export class SalesOrderDetailPage implements OnInit {
 
   /* #region order status */
 
-  statusModel: boolean = false;
-  orderStatus: SalesOrderStatus;
-  showStatusModel() {
+  showStatus() {
     try {
-
+      this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
+        this.toastService.presentToast('Doc Status', response.currentStatus, 'top', 'success', 2000);
+      }, error => {
+        throw error;
+      })
     } catch (e) {
       console.error(e);
     }
-    this.statusModel = true;
-    this.salesOrderService.getStatus(this.object.header.salesOrderId).subscribe(response => {
-    console.log("🚀 ~ file: sales-order-detail.page.ts:287 ~ SalesOrderDetailPage ~ this.salesOrderService.getStatus ~ response:", response)
-    this.orderStatus = response;
-
-    }, error => {
-      throw error;
-    })
-  }
-
-  hideStatusModel() {
-    this.statusModel = false;
   }
 
   /* #endregion */

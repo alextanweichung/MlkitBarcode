@@ -32,8 +32,13 @@ export class ToastService {
       position: position,
       color: color,
       icon: icon,
-      // cssClass: 'customToast'
-      
+      buttons: [
+        {
+          text: 'Close',
+          role: 'cancel',
+          handler: () => { toast.dismiss(); }
+        }
+      ]      
     });
     await toast.present();
   }

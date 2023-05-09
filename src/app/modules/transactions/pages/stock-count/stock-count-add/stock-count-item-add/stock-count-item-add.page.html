@@ -14,9 +14,9 @@
             <div>Count Type: {{inventoryCountBatchCriteria.randomCountType}}</div>
             <div *ngIf="inventoryCountBatchCriteria.keyId.length > 0">
               {{inventoryCountBatchCriteria.randomCountType}}: 
-              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Brand'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemBrandMasterList}}</div></div>
-              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Group'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemGroupMasterList}}</div></div>
-              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Category'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemCategoryMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Brand'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:objectService.itemBrandMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Group'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:objectService.itemGroupMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Category'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:objectService.itemCategoryMasterList}}</div></div>
             </div>
           </ion-content>
         </ng-template>
@@ -55,8 +55,8 @@
             </ion-row>
             <ion-row>
               <ion-col>              
-                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
               </ion-col>
             </ion-row>
             <ion-row>

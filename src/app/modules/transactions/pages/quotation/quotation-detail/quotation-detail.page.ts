@@ -26,7 +26,7 @@ export class QuotationDetailPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private quotationService: QuotationService,
+    public objectService: QuotationService,
     private toastService: ToastService,
     private commonService: CommonService,
     private route: ActivatedRoute,
@@ -53,7 +53,6 @@ export class QuotationDetailPage implements OnInit {
         this.navController.navigateBack('/transactions/quotation')
       } else {
         this.loadModuleControl();
-        this.loadMasterList();
         this.loadObject();
       }
     } catch (e) {
@@ -75,27 +74,9 @@ export class QuotationDetailPage implements OnInit {
     }
   }
 
-  locationMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.quotationService.getMasterList().subscribe(response => {
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
-    }
-  }
-
   loadObject() {
     try {
-      this.quotationService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
         throw error;
@@ -129,21 +110,11 @@ export class QuotationDetailPage implements OnInit {
 
   /* #region show variaton dialog */
 
-  variationDialog: boolean = false;
-  showVariationDialog() {
-    this.variationDialog = true;
-  }
-
-  hideVariationDialog() {
-    this.selectedItem = null;
-    this.variationDialog = false;
-  }
-
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.selectedItem = item;
-      this.showVariationDialog();
+      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
     }
   }
 
@@ -175,8 +146,7 @@ export class QuotationDetailPage implements OnInit {
   async presentAlertViewPdf() {
     try {
       const alert = await this.alertController.create({
-        header: '',
-        subHeader: 'View Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -202,7 +172,7 @@ export class QuotationDetailPage implements OnInit {
 
   async downloadPdf() {
     try {
-      this.quotationService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
         let filename = this.object.header.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
@@ -289,7 +259,7 @@ export class QuotationDetailPage implements OnInit {
           docId: listOfDoc.map(i => Number(i))
         }
         try {
-          this.quotationService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileQuotationReview' : 'mobileQuotationApprove', bulkConfirmReverse).subscribe(async response => {
+          this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileQuotationReview' : 'mobileQuotationApprove', bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
               this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
               this.navController.back();

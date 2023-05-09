@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentSalesHeader, ConsignmentSalesRoot, ConsignmentSalesSummary } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -23,7 +23,7 @@ import { SearchItemService } from 'src/app/shared/services/search-item.service';
   styleUrls: ['./consignment-sales-item-add.page.scss'],
   providers: [BarcodeScanInputService, SearchItemService, { provide: 'apiObject', useValue: 'mobileConsignmentSales' }]
 })
-export class ConsignmentSalesItemAddPage implements OnInit {
+export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
 
   objectHeader: ConsignmentSalesHeader;
   objectDetail: TransactionDetail[] = [];
@@ -38,21 +38,28 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   maxPrecisionTax: number = 2;
 
   constructor(
-    private consignmentSalesService: ConsignmentSalesService,
+    public objectService: ConsignmentSalesService,
     private authService: AuthService,
     private commonService: CommonService,
     private configService: ConfigService,
     private toastService: ToastService,
     private navController: NavController,
     private alertController: AlertController
-  ) { }
-
-  ngOnInit() {
-    this.objectHeader = this.consignmentSalesService.header;
+  ) {
+    this.objectHeader = this.objectService.header;
     if (!this.objectHeader) {
       this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
     }
-    this.loadMasterList();
+  }
+
+  ionViewWillEnter(): void {
+    this.objectHeader = this.objectService.header;
+    if (!this.objectHeader) {
+      this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
+    }
+  }
+
+  ngOnInit() {
     this.loadModuleControl();
   }
 
@@ -74,25 +81,6 @@ export class ConsignmentSalesItemAddPage implements OnInit {
         this.precisionTax = precision.find(x => x.precisionCode == "TAX");
         this.maxPrecision = this.precisionSales.localMax;
         this.maxPrecisionTax = this.precisionTax.localMax;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  fullMasterList: MasterList[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.consignmentSalesService.getMasterList().subscribe(response => {
-        this.fullMasterList = response;
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
       })
     } catch (e) {
       console.error(e);
@@ -168,7 +156,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
         trxLine.qtyRequest = 1;
         trxLine.locationId = this.objectHeader.toLocationId;
         trxLine.sequence = 0;
-        trxLine = this.assignLineUnitPrice(trxLine);
+        trxLine = this.assignTrxItemToDataLine(trxLine);
         await this.objectDetail.unshift(trxLine);
         await this.computeAllAmount(this.objectDetail[0]);
       }
@@ -241,7 +229,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
   discountGroupCodeChanged(line: TransactionDetail) {
     try {
       if (line.discountGroupCode) {
-        let lookupValue = this.discountGroupMasterList.find(r => r.code === line.discountGroupCode);
+        let lookupValue = this.objectService.discountGroupMasterList.find(r => r.code === line.discountGroupCode);
         if (lookupValue) {
           if (lookupValue.attribute1 === "0") {
             line.discountExpression = null;
@@ -307,7 +295,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     }
   }
 
-  assignLineUnitPrice(trxLine: TransactionDetail) {
+  assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       if (this.useTax) {
         if (this.objectHeader.isItemPriceTaxInclusive) {
@@ -369,7 +357,7 @@ export class ConsignmentSalesItemAddPage implements OnInit {
               cssClass: 'success',
               role: 'confirm',
               handler: async () => {
-                await this.insertConsignmentSales();
+                await this.insertObject();
               },
             },
             {
@@ -388,21 +376,20 @@ export class ConsignmentSalesItemAddPage implements OnInit {
     }
   }
 
-  insertConsignmentSales() {
+  insertObject() {
     try {
       let trxDto: ConsignmentSalesRoot = {
         header: this.objectHeader,
         details: this.objectDetail
       }
-      console.log("🚀 ~ file: consignment-sales-item-add.page.ts:397 ~ ConsignmentSalesItemAddPage ~ insertConsignmentSales ~ trxDto:", JSON.stringify(trxDto))
-      this.consignmentSalesService.insertObject(trxDto).subscribe(response => {
+      this.objectService.insertObject(trxDto).subscribe(response => {
         let css: ConsignmentSalesSummary = {
           consignmentSalesNum: response.body["header"]["consignmentSalesNum"],
           customerId: response.body["header"]["customerId"],
           toLocationId: response.body["header"]["toLocationId"],
           trxDate: response.body["header"]["trxDate"]
         }
-        this.consignmentSalesService.setSummary(css);
+        this.objectService.setSummary(css);
         this.toastService.presentToast('Insert Complete', 'New Consignment Sales has been added', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/consignment-sales/consignment-sales-summary');
       }, error => {

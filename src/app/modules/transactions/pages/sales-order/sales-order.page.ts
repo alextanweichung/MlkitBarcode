@@ -10,33 +10,37 @@ import { format } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
-import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-sales-order',
   templateUrl: './sales-order.page.html',
   styleUrls: ['./sales-order.page.scss']
 })
-export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
+export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   objects: SalesOrderList[] = [];
 
   startDate: Date;
   endDate: Date;
   customerIds: number[] = [];
+  salesAgentIds: number[] = [];
 
   uniqueGrouping: Date[] = [];
 
+  salesAgentDropdownList: SearchDropdownList[] = [];
+
   constructor(
     private commonService: CommonService,
-    private salesOrderService: SalesOrderService,
+    private objectService: SalesOrderService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    private loadingService: LoadingService,
     private modalController: ModalController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     if (!this.startDate) {
@@ -46,7 +50,8 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
       this.endDate = this.commonService.getTodayDate();
     }
     this.loadObjects();
-    this.loadCustomerList();
+    this.bindCustomerList();
+    this.bindSalesAgentList();
   }
 
   ngOnInit() {
@@ -60,9 +65,10 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
       let obj: SalesSearchModal =  {
         dateStart: format(this.startDate, 'yyyy-MM-dd'),
         dateEnd: format(this.endDate, 'yyyy-MM-dd'),
-        customerId: this.customerIds
+        customerId: this.customerIds,
+        salesAgentId: this.salesAgentIds
       }
-      this.salesOrderService.getObjectListByDate(obj).subscribe(async response => {
+      this.objectService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -80,28 +86,27 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
   }
 
-  customers: Customer[] = [];
   selectedCustomer: Customer;
   customerSearchDropdownList: SearchDropdownList[] = [];
-  loadCustomerList() {
-    try {
-      this.salesOrderService.getCustomerList().subscribe(async response => {
-        this.customers = response;
-        this.customers = this.customers.filter(r => r.businessModelType === 'T');
-        await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-        this.customers.forEach(r => {
-          this.customerSearchDropdownList.push({
-            id: r.customerId,
-            code: r.customerCode,
-            description: r.name
-          })
-        })
-      }, error => {
-        throw error;
+  bindCustomerList() {
+    this.objectService.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
       })
-    } catch (e) {
-      console.error(e);
-    }
+    })
+  }
+
+  bindSalesAgentList() {
+    this.objectService.salesAgentMasterList.forEach(r => {
+      this.salesAgentDropdownList.push({
+        id: r.id,
+        code: r.code,
+        description: r.description
+      })
+    })
   }
 
   /* #endregion */
@@ -110,10 +115,10 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      if (this.salesOrderService.hasSalesAgent()) {
+      if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward('/transactions/sales-order/sales-order-header');
-      } else {
-        this.toastService.presentToast('Invalid Sales Agent', '', 'top', 'danger', 1000);
+      } else {        
+        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
       }
     } catch (e) {
       console.error(e);
@@ -153,8 +158,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf(doc) {
     try {
       const alert = await this.alertController.create({
-        header: '',
-        subHeader: 'View Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -180,7 +184,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
 
   async downloadPdf(doc) {
     try {
-      this.salesOrderService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
         let filename = doc.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
@@ -202,7 +206,10 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
           endDate: this.endDate,
           customerFilter: true,
           customerList: this.customerSearchDropdownList,
-          selectedCustomerId: this.customerIds
+          selectedCustomerId: this.customerIds,
+          salesAgentFilter: true,
+          salesAgentList: this.salesAgentDropdownList,
+          selectedSalesAgentId: this.salesAgentIds
         },
         canDismiss: true
       })
@@ -212,6 +219,7 @@ export class PickingSalesOrderPage implements OnInit, ViewWillEnter {
         this.startDate = new Date(data.startDate);
         this.endDate = new Date(data.endDate);
         this.customerIds = data.customerIds;
+        this.salesAgentIds = data.salesAgentIds;
         this.loadObjects();
       }
     } catch (e) {

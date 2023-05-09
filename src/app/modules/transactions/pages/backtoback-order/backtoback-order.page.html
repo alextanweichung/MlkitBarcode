@@ -1,0 +1,60 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>B2B Order</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/transactions"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="filter()">
+        <ion-icon slot="icon-only" name="filter"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">B2B Order</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">
+    <ng-container *ngIf="!objects || objects?.length === 0">
+      <p>
+        <ion-text color="tertiary">
+          <h3>Nothing found!</h3>
+        </ion-text>
+      </p>
+    </ng-container>    
+    <ng-container *ngIf="objects?.length > 0">
+      <div *ngFor="let m of uniqueGrouping">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+          <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
+        </ion-list-header>        
+        <ion-list *ngFor="let object of getObjects(m)" class="list-custom animate__animated animate__fadeIn" lines="full">
+          <!-- <ion-item-sliding *ngFor="let object of getObjects(m)"> -->
+            <ion-item button detail="false" (click)="goToDetail(object.backToBackOrderId)">
+              <ion-grid class="ion-no-padding p-2">
+                <ion-row>
+                  <ion-col class="font-bold">{{object.backToBackOrderNum}}</ion-col>
+                  <ion-col class="ion-flex justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col>{{object.customerName}}</ion-col>
+                  <ion-col class="ion-text-right">{{object.salesAgentName}}</ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-item>
+            <!-- <ion-item-options side="end"> -->
+              <!-- <ion-item-option (click)="presentAlertViewPdf(object)">DOWNLOAD</ion-item-option> -->
+            <!-- </ion-item-options> -->
+          <!-- </ion-item-sliding> -->
+        </ion-list>
+      </div>
+    </ng-container>
+  </div>
+  <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

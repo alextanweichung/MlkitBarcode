@@ -8,7 +8,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
-import { LoadingService } from 'src/app/services/loading/loading.service';
+import { environment } from 'src/environments/environment';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -34,15 +34,19 @@ export class CardsPage implements OnInit, AfterContentChecked {
   loginName: string;
   loginEmail: string;
   userType: string;
+  current_year: number = new Date().getFullYear();
+  currentVersion: string;
 
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
-    private loadingService: LoadingService,
+    // private loadingService: LoadingService,
     private commonService: CommonService
-  ) { }
+  ) {
+    this.currentVersion = environment.version;
+  }
 
   ngOnInit(): void {
     let loginUser = JSON.parse(localStorage.getItem('loginUser'));
@@ -78,16 +82,16 @@ export class CardsPage implements OnInit, AfterContentChecked {
   async sync() {
     if (Capacitor.getPlatform() !== 'web') {
       try {
-        await this.loadingService.showLoading("Syncing Offline Table");
+        // await this.loadingService.showLoading("Syncing Offline Table");
         let response = await this.commonService.syncInbound();
         let itemMaster: PDItemMaster[] = response['itemMaster'];
         let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
         // await this.configService.loadItemMaster();
         // await this.configService.loadItemBarcode();
-        await this.loadingService.dismissLoading();
+        // await this.loadingService.dismissLoading();
       } catch (error) {
-        await this.loadingService.dismissLoading();
+        // await this.loadingService.dismissLoading();
         this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }
