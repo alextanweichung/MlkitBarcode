@@ -20,49 +20,108 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2">
-    <ion-list class="list-custom" lines="full" *ngIf="object">
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Doc. Number</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.consignmentSalesNum}}"></ion-input>
+  <div class="p-2" *ngIf="object">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Document</ion-label>
+    </ion-list-header>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Num.</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.consignmentSalesNum}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Doc. Date</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Date</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Customer</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Customer</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item *ngIf="object.header.toLocationId">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Location</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.toLocationId|idMapping:objectService.locationMasterList}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Location</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.toLocationId|idMapping:objectService.locationMasterList}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item *ngIf="object.header.salesAgentId">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          Sales Agent
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.salesAgentId|idMapping:objectService.salesAgentMasterList}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Sales Agent</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.salesAgentId|idMapping:objectService.salesAgentMasterList}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Total Quantity</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.details|sum:'qtyRequest'|number}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Total Quantity</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.details|sum:'qtyRequest'|number}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Grand Total</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Grand Total</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.details|sum:'subTotal'|number:'1.2-2'}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
     </ion-list>
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">

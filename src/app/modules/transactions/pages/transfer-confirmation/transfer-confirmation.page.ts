@@ -29,7 +29,7 @@ export class TransferConfirmationPage implements OnInit, ViewWillEnter {
 
   loadPendingList() {
     if (this.selectedLocationId) {
-      this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.selectedLocationId).code).subscribe(response => {
+      this.objectService.getPendingList(this.selectedLocationId).subscribe(response => {
         this.pendingList = response;
       }, error => {
         console.error(error);

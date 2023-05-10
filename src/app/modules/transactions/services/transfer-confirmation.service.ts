@@ -67,8 +67,8 @@ export class TransferConfirmationService {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileTransferConfirmation/masterlist").toPromise();
   }
 
-  getPendingList(locationCode: string) {
-    return this.http.get<TransferConfirmationRoot[]>(this.baseUrl + "MobileTransferConfirmation/pending/" + locationCode);
+  getPendingList(locationId: number) {
+    return this.http.get<TransferConfirmationRoot[]>(this.baseUrl + "MobileTransferConfirmation/pending/" + locationId);
   }
 
   updateObject(object: TransferConfirmationRoot) {
