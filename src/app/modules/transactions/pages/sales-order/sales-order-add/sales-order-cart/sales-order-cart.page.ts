@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { SalesOrderHeader, SalesOrderRoot, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
+import { SalesOrderHeader, SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -490,19 +490,8 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         details: this.itemInCart
       }
       console.log("🚀 ~ file: sales-order-cart.page.ts:473 ~ SalesOrderCartPage ~ insertSalesOrder ~ trxDto:", trxDto)
-      this.objectService.insertObject(trxDto).subscribe(response => {
-        let details: any[] = response.body["details"];
-        let totalQty: number = 0;
-        details.forEach(e => {
-          totalQty += e.qtyRequest;
-        })
-        let ss: SalesOrderSummary = {
-          salesOrderNum: response.body["header"]["salesOrderNum"],
-          customerName: this.objectService.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
-          totalQuantity: totalQty,
-          totalAmount: response.body["header"]["grandTotal"]
-        }
-        this.objectService.setSalesOrderSummary(ss);
+      this.objectService.insertObject(trxDto).subscribe(response => {        
+        this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
       }, error => {

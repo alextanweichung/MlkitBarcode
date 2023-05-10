@@ -11,15 +11,9 @@ export interface SalesOrderList {
   currencyCode: string
   grandTotal: number
   qty: number
+  otherAmountCount: number
   deactivated: boolean
   createdById: number
-}
-
-export interface SalesOrderSummary {
-  salesOrderNum: string
-  customerName: string
-  totalQuantity: number
-  totalAmount: number
 }
 
 export interface SalesOrderRoot {
@@ -29,6 +23,7 @@ export interface SalesOrderRoot {
   otp?: any
   approvalHistory?: ApprovalHistory[]
   isWorkFlowDone?: boolean
+  otherAmount?: OtherAmount[]
 }
 
 export interface SalesOrderHeader {
@@ -98,4 +93,16 @@ export interface SalesOrderHeader {
   modifiedBy: any
   modifiedAt: any
   deactivated: boolean
+}
+
+export interface OtherAmount {
+  lineId: number
+  headerId: number
+  amountCode: string
+  amountDescription: string
+  amountExpression: string
+  currentSubtotal: number
+  totalAmount: number
+  cumulativeAmount: number
+  sequence: number
 }

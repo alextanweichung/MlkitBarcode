@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
-import { format } from 'date-fns';
-import { QuotationHeader, QuotationRoot, QuotationSummary } from 'src/app/modules/transactions/models/quotation';
+import { QuotationHeader, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
@@ -437,18 +436,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         details: this.itemInCart
       }
       this.objectService.insertObject(trxDto).subscribe(response => {
-        let details: any[] = response.body["details"];
-        let totalQty: number = 0;
-        details.forEach(e => {
-          totalQty += e.qtyRequest;
-        })
-        let qs: QuotationSummary = {
-          quotationNum: response.body["header"]["quotationNum"],
-          customerName: this.objectService.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
-          totalQuantity: totalQty,
-          totalAmount: response.body["header"]["grandTotal"]
-        }
-        this.objectService.setQuotationSummary(qs);
+        this.objectService.setObject((response.body as QuotationRoot))
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/quotation/quotation-summary');
       }, error => {

@@ -15,13 +15,6 @@ export interface QuotationList {
   createdById: number
 }
 
-export interface QuotationSummary {
-  quotationNum: string
-  customerName: string
-  totalQuantity: number
-  totalAmount: number
-}
-
 export interface QuotationRoot {
   header: QuotationHeader
   details: TransactionDetail[]
