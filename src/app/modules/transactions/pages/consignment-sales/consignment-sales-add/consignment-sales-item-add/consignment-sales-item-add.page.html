@@ -123,7 +123,7 @@
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>
-            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode'] && !selectedItem.isPricingApproval">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode'] && !selectedItem.isPricingApproval">
               <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>

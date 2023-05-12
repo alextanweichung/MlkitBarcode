@@ -129,7 +129,7 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
-            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscountGroupChanged()">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscountGroupChanged()">
               <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
