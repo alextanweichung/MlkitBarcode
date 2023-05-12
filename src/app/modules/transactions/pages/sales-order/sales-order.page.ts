@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-sales-order',
@@ -30,6 +31,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
   salesAgentDropdownList: SearchDropdownList[] = [];
 
   constructor(
+    private authService: AuthService,
     private commonService: CommonService,
     private objectService: SalesOrderService,
     private actionSheetController: ActionSheetController,
@@ -73,7 +75,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })

@@ -6,6 +6,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { TruckLoadingHeader } from '../../models/truck-loading';
 import { TruckLoadingService } from '../../services/truck-loading.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-truck-loading',
@@ -19,6 +20,7 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
   uniqueGrouping: Date[] = [];
 
   constructor(
+    private authService: AuthService,
     private objectService: TruckLoadingService,
     private commonService: CommonService,
     private toastService: ToastService,
@@ -41,7 +43,7 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })

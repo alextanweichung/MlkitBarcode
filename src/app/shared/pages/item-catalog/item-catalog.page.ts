@@ -105,7 +105,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             })
             this.computeQtyInCart();
           }
-          this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
+          this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
         })
         this.loadImages(searchText);
       } else {

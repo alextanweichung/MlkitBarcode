@@ -7,6 +7,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { GoodsPackingList } from '../../models/packing';
 import { PackingService } from '../../services/packing.service';
 import { FilterPage } from '../filter/filter.page';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-packing',
@@ -23,6 +24,7 @@ export class PackingPage implements OnInit, ViewWillEnter {
   uniqueGrouping: Date[] = [];
 
   constructor(
+    private authService: AuthService,
     private commonService: CommonService,
     private configService: ConfigService,
     private objectService: PackingService,
@@ -62,7 +64,7 @@ export class PackingPage implements OnInit, ViewWillEnter {
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })

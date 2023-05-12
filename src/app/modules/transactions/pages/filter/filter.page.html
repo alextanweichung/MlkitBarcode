@@ -19,7 +19,7 @@
 <ion-content>
 
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label class="pl-2">Transaction Date</ion-label>
     </ion-list-header>
     
@@ -44,7 +44,7 @@
     </ion-list>
     
     <div *ngIf="customerFilter">
-      <ion-list-header class="ion-list-header-small">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label class="pl-2">Customer</ion-label>
       </ion-list-header>
       <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
@@ -52,7 +52,7 @@
     </div>
     
     <div *ngIf="salesAgentFilter">
-      <ion-list-header class="ion-list-header-small">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label class="pl-2">Sales Agent</ion-label>
       </ion-list-header>
       <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->

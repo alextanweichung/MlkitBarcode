@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,9 +9,10 @@ export class ToastService {
 
   constructor(
     public toastController: ToastController
-  ) { }
+  ) {
+  }
 
-  async presentToast(header: string, message: string, position: any, color: string, duration: number, icon?: string) {
+  async presentToast(header: string, message: string, position: any, color: string, duration: number, showSearchResult: boolean = false, icon?: string) {
     if (!icon) {
       switch (color) {
         case 'success':
@@ -38,8 +40,12 @@ export class ToastService {
           role: 'cancel',
           handler: () => { toast.dismiss(); }
         }
-      ]      
+      ]
     });
-    await toast.present();
+    if (!showSearchResult && header === 'Search Complete') {
+      
+    } else {
+      await toast.present();
+    }
   }
 }

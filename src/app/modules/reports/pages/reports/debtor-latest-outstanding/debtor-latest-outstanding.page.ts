@@ -9,6 +9,7 @@ import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { AlertController, ViewWillEnter } from '@ionic/angular';
 import { CreditInfoDetails } from 'src/app/shared/models/credit-info';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-debtor-latest-outstanding',
@@ -25,7 +26,8 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   columns: any;
 
   constructor(
-    private reportService: ReportsService,
+    private authService: AuthService,
+    private objectService: ReportsService,
     private toastService: ToastService,
     private commonService: CommonService,
     private alertController: AlertController,
@@ -54,7 +56,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   loadCustomers() {
-    this.reportService.getCustomers().subscribe(async response => {
+    this.objectService.getCustomers().subscribe(async response => {
       this.customers = response;
       this.customers = this.customers.filter(r => r.businessModelType === 'T');
       await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
@@ -76,9 +78,9 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
       customerId: this.customerIds??[],
       trxDate: format(this.trxDate, 'yyyy-MM-dd')
     }
-    this.reportService.getDebtorOutstanding(obj).subscribe(response => {
+    this.objectService.getDebtorOutstanding(obj).subscribe(response => {
       this.objects = response;
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
     }, error => {
       console.log(error);
     })
@@ -137,7 +139,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
           statementDate: this.trxDate
         }
       }
-      this.reportService.getPdf(paramModel).subscribe(async response => {
+      this.objectService.getPdf(paramModel).subscribe(async response => {
         await this.commonService.commonDownloadPdf(response, object.customerName + "." + paramModel.format);
       }, error => {
         console.log(error);
@@ -149,7 +151,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
 
 
   loadCreditInfo(customerId: number) {
-    this.reportService.getCreditInfo(customerId).subscribe(response => {
+    this.objectService.getCreditInfo(customerId).subscribe(response => {
       this.displayDetails(response.outstanding, 'Outstanding Amount');
     }, error => {
       console.error(error);

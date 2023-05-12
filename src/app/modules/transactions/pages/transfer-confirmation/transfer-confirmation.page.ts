@@ -17,14 +17,16 @@ export class TransferConfirmationPage implements OnInit, ViewWillEnter {
     public objectService: TransferConfirmationService,
     private authService: AuthService,
     private navController: NavController
-  ) { }
+  ) {
+
+  }
 
   ionViewWillEnter(): void {
     this.loadPendingList();
   }
 
   ngOnInit() {
-    
+
   }
 
   loadPendingList() {
@@ -52,85 +54,5 @@ export class TransferConfirmationPage implements OnInit, ViewWillEnter {
     this.objectService.setSelectedObject(this.selectedObject);
     this.navController.navigateForward("/transactions/transfer-confirmation/transfer-confirmation-item");
   }
-
-  // hideModal() {
-  //   this.isModalOpen = false;
-  // }
-
-  // onModalHide() {
-  //   this.selectedObject = null;
-  //   this.isModalOpen = false;
-  // }
-
-  // onItemAdd(event: TransactionDetail) {
-    
-  // }
-
-  /* #region  barcode scanner */
-
-  // scanActive: boolean = false;
-  // onCameraStatusChanged(event) {
-  //   try {
-  //     this.scanActive = event;
-  //     if (this.scanActive) {
-  //       document.body.style.background = "transparent";
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
-
-  // async onDoneScanning(event) {
-  //   try {
-  //     if (event) {
-  //       await this.validateBarcode(event);
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
-
-  // async validateBarcode(barcode: string) {
-  //   try {
-  //     if (barcode) {
-  //       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-  //         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-  //         if (found_barcode) {
-  //           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-  //           let outputData: TransactionDetail = {
-  //             itemId: found_item_master.id,
-  //             itemCode: found_item_master.code,
-  //             description: found_item_master.itemDesc,
-  //             variationTypeCode: found_item_master.varCd,
-  //             discountGroupCode: found_item_master.discCd,
-  //             discountExpression: found_item_master.discPct + '%',
-  //             taxId: found_item_master.taxId,
-  //             taxCode: found_item_master.taxCd,
-  //             taxPct: found_item_master.taxPct,
-  //             qtyRequest: null,
-  //             itemPricing: {
-  //               itemId: found_item_master.id,
-  //               unitPrice: found_item_master.price,
-  //               discountGroupCode: found_item_master.discCd,
-  //               discountExpression: found_item_master.discPct + '%',
-  //               discountPercent: found_item_master.discPct
-  //             },
-  //             itemVariationXId: found_barcode.xId,
-  //             itemVariationYId: found_barcode.yId,
-  //             itemSku: found_barcode.sku,
-  //             itemBarcode: found_barcode.barcode
-  //           }
-  //           this.onItemAdd(outputData);
-  //         } else {
-  //           this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
-  //         }
-  //       }
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
-
-  /* #endregion */
 
 }

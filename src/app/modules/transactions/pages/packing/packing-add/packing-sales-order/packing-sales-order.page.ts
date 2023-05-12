@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, IonSegment, NavController } from '@ionic/angular';
 import { PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
@@ -18,6 +19,7 @@ export class PackingSalesOrderPage implements OnInit {
   objectForm: FormGroup;
 
   constructor(
+    private authService: AuthService,
     public objectService: PackingService,
     private commonService: CommonService,
     private navController: NavController,
@@ -151,7 +153,7 @@ export class PackingSalesOrderPage implements OnInit {
       if (customerId) {
         this.objectService.getSoByCustomer(customerId).subscribe(response => {
           this.availableSalesOrders = response;
-          this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
+          this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
         }, error => {
           console.log(error);
         })
@@ -170,7 +172,7 @@ export class PackingSalesOrderPage implements OnInit {
       if (customerId && locationId) {
         this.objectService.getSoByCustomerLocation(customerId, locationId).subscribe(response => {
           this.availableSalesOrders = response;
-          this.toastService.presentToast('Search Completed', '', 'top', 'success', 1000);
+          this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
         }, error => {
           console.log(error);
         })

@@ -58,6 +58,7 @@ export class TransferConfirmationService {
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+    console.log("🚀 ~ file: transfer-confirmation.service.ts:61 ~ TransferConfirmationService ~ loadMasterList ~ this.locationMasterList:", this.locationMasterList)
     await this.locationMasterList.sort((a, c) => { return a.description > c.description ? 1 : -1 });
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);

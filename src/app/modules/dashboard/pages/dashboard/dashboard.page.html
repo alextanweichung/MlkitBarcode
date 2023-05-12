@@ -110,7 +110,7 @@
       </ion-list>
     </div>
     <hr class="hr-medium">
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label class="pl-2">Item Last Sync: {{last_sync_datetime|date:'yyyy-MM-dd hh:mm:ss'}}</ion-label>
     </ion-list-header>
     <ion-item *ngIf="false">
@@ -132,7 +132,7 @@
     </ion-header>
     <ion-content *ngIf="selectedAnnouncement">
       <div class="p-2">
-        <ion-list-header class="ion-list-header-small">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Subject</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -140,7 +140,7 @@
             <ion-textarea [autoGrow]="true" [readonly]="true" [(ngModel)]="selectedAnnouncement.header.subject"></ion-textarea>
           </ion-item>
         </ion-list>
-        <ion-list-header class="ion-list-header-small">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Body</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -148,7 +148,7 @@
             <span [innerHTML]="selectedAnnouncement.header.body | sanitizeHtml"></span>
           </ion-item>
         </ion-list>
-        <ion-list-header class="ion-list-header-small">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Attachment</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">

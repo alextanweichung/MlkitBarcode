@@ -10,6 +10,7 @@ import { SearchItemService } from '../../services/search-item.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { MasterListDetails } from '../../models/master-list-details';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'item-catalog-without-price',
@@ -24,6 +25,7 @@ export class ItemCatalogWithoutPricePage implements OnInit {
   @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
   
   constructor(    
+    private authService: AuthService,
     private commonService: CommonService,
     private searchItemService: SearchItemService,
     private toastService: ToastService
@@ -51,7 +53,7 @@ export class ItemCatalogWithoutPricePage implements OnInit {
         }
         this.searchItemService.getItemInfoWithoutPrice(searchText, format(new Date(), 'yyyy-MM-dd')).subscribe(response => {
           this.availableItems = response;
-          this.toastService.presentToast('Search Completed', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000);
+          this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
         })
         this.loadImages(searchText);
       } else {

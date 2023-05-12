@@ -6,6 +6,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
 import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-sales-order-pending-review',
@@ -22,7 +23,8 @@ export class SalesOrderReviewsPage implements OnInit, ViewWillEnter {
   endDate: Date;
 
   constructor(
-    private transactionProcessingService: TransactionProcessingService,
+    private authService: AuthService,
+    private objectService: TransactionProcessingService,
     private toastService: ToastService,
     private modalController: ModalController,
     private commonService: CommonService
@@ -42,10 +44,10 @@ export class SalesOrderReviewsPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.transactionProcessingService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') : null), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
+      this.objectService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') : null), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
         this.pendingObjects = response.filter(r => !r.isComplete);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw Error;
       })      

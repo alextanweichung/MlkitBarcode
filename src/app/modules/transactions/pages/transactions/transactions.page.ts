@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { moduleCode, trxAppCode } from 'src/app/shared/models/acl-const';
-import { ConsignmentSalesList } from '../../models/consignment-sales';
-import { GoodsPackingList } from '../../models/packing';
-import { GoodsPickingList } from '../../models/picking';
-import { QuotationList } from '../../models/quotation';
-import { SalesOrderList } from '../../models/sales-order';
 
 @Component({
   selector: 'app-transactions',
