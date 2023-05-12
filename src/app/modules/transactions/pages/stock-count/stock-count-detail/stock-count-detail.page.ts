@@ -14,7 +14,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
 
-  inventoryCount: StockCountRoot;
+  object: StockCountRoot;
   scannedItems: StockCountItem[] = [];
 
   constructor(
@@ -41,9 +41,9 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
     try {
       this.scannedItems = [];
       this.objectService.getInventoryCount(this.objectId).subscribe(response => {
-        this.inventoryCount = response;
-        this.inventoryCount.details.forEach(r => {
-          let barcodeTag = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku);
+        this.object = response;
+        this.object.details.forEach(r => {
+          let barcodeTag = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku);
           this.scannedItems.push({
             itemId: r.itemId,
             itemCode: barcodeTag.itemCode,

@@ -54,22 +54,22 @@ export class StockCountService {
     this.zoneMasterList = this.fullMasterList.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
   }
 
-  stockCountHeader: StockCountHeader;
-  setHeader(stockCountHeader: StockCountHeader) {
-    this.stockCountHeader = stockCountHeader;
+  objectHeader: StockCountHeader;
+  setHeader(objectHeader: StockCountHeader) {
+    this.objectHeader = objectHeader;
   }
   
-  stockCountLines: StockCountDetail[] = []
-  setLines(stockCountLines: StockCountDetail[]) {
-    this.stockCountLines = stockCountLines;
+  objectDetail: StockCountDetail[] = []
+  setLines(objectDetail: StockCountDetail[]) {
+    this.objectDetail = objectDetail;
   }
 
   removeHeader() {
-    this.stockCountHeader = null
+    this.objectHeader = null
   }
 
   removeLines() {
-    this.stockCountLines = [];
+    this.objectDetail = [];
   }
 
   resetVariables() {

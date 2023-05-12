@@ -56,6 +56,7 @@ export class StockCountPage implements OnInit, ViewWillEnter {
   loadObjects() {
     try {
       this.objectService.getInventoryCountByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+        console.log("🚀 ~ file: stock-count.page.ts:67 ~ StockCountPage ~ this.objectService.getInventoryCountByDate ~ response:", response)
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));

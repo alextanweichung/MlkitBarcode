@@ -45,8 +45,8 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.objectHeader = this.objectService.stockCountHeader;
-    this.objectDetail = this.objectService.stockCountLines;
+    this.objectHeader = this.objectService.objectHeader;
+    this.objectDetail = this.objectService.objectDetail;
     if (!this.objectHeader || this.objectHeader === undefined) {
       this.navController.navigateBack('/transactions/stock-count');
     }
