@@ -32,7 +32,7 @@
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
         </ion-list-header>
         
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item button detail="false" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.inventoryCountId)">
             <ion-grid class="ion-no-padding p-2">
               <ion-row>

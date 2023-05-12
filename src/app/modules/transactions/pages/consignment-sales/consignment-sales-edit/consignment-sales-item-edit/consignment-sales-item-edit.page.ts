@@ -9,7 +9,6 @@ import { ConsignmentSalesService } from 'src/app/modules/transactions/services/c
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -36,21 +35,17 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     private configService: ConfigService,
     public objectService: ConsignmentSalesService,
   ) {
+    
+  }
+
+  ionViewWillEnter(): void {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
     if (this.objectId) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('Something went wrong!', 'Invalid Object', 'top', 'danger', 1000);
-    }
-  }
-
-  ionViewWillEnter(): void {
-    if (this.objectId) {
-      this.loadObject();
-    } else {
-      this.toastService.presentToast('Something went wrong!', 'Invalid Object', 'top', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', 'Invalid Objectss', 'top', 'danger', 1000);
     }
   }
 
