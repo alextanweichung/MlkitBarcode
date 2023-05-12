@@ -139,6 +139,18 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.isModalOpen = true;
   }
 
+  hideEditModal() {
+    this.isModalOpen = false;
+  }
+
+  onModalHide() {
+    this.selectedIndex = null;
+    this.selectedItem = null;
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+    }
+  }
+
   saveChanges() {
     if (this.selectedIndex === null || this.selectedIndex === undefined) {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
@@ -183,18 +195,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       await alert.present();
     } catch (e) {
       console.error(e);
-    }
-  }
-
-  hideEditModal() {
-    this.isModalOpen = false;
-  }
-
-  onModalHide() {
-    this.selectedIndex = null;
-    this.selectedItem = null;
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
     }
   }
 

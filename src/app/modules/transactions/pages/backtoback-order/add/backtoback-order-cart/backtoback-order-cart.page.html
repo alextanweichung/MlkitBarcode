@@ -130,7 +130,7 @@
     </ion-row>
   </ion-grid>
 </ion-footer>
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalWillDismiss)="onModalHide()">
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
       <ion-toolbar>

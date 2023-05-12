@@ -1,84 +1,94 @@
 <ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
   <ion-toolbar>
-    <ion-title>Pick Item</ion-title>
+    <ion-title>Add Item</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary" *ngIf="scanInput">
+      <ion-button (click)="toggleInputMode()">
+        <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+      </ion-button>      
+    </ion-buttons>
+    <ion-buttons slot="primary" *ngIf="!scanInput">
+      <ion-button (click)="toggleInputMode()">
+        <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen [hidden]="scanActive">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-label class="label-title">Pick Item</ion-label>
+      <ion-label class="label-title">Add Item</ion-label>
     </ion-toolbar>
-  </ion-header><div class="p-2">    
+  </ion-header><div class="p-2">
     <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
-    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding *ngFor="let line of object?.details; let i = index">
-        <ion-item button detail="false" class="no-ripple">
-          <ion-grid class="ion-no-padding">
+    <app-item-code-input-offline *ngIf="!scanInput" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" (onItemAdd)="onItemsAdd($event)"></app-item-code-input-offline>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item-sliding #slidingItem *ngFor="let line of object?.details; let i = index">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="highlight(inputNumWithoutSo)">
+          <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
-              <ion-col class="ion-margin-auto">
-                <div class="font-bold">{{line.itemBarcode}}</div>                      
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">{{line.itemBarcode}}</div>
               </ion-col>
-              <ion-col class="ion-margin-auto" *ngIf="object.header.isDisplayTaxInclusive">
-                <p class="ion-text-right">{{line.unitPrice|number:(object.header.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</p>
-              </ion-col>
-              <ion-col class="ion-margin-auto" *ngIf="!object.header.isDisplayTaxInclusive">
-                <p class="ion-text-right">{{line.unitPriceExTax|number:(object.header.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</p>
-              </ion-col>
-              <ion-col size="2" class="ion-margin-auto">
-                <ion-button fill="clear" color="primary" size="small" (click)="showLineDetails(line)">
-                  <ion-icon slot="icon-only" name="create"></ion-icon>
-                </ion-button>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">                
+                <ion-input #inputNumWithoutSo type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (ionFocus)="highlight(inputNumWithoutSo)" (keypress)="eventHandler($event.keyCode)" (ionChange)="computeAllAmount(line)"></ion-input>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col size="10">
-                <ion-grid class="ion-no-padding p-0">
-                  <ion-row>
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="font-bold">{{line.itemCode}}</div>
-                      <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                      <span class="badge-purple px-1 mr-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row>
-                    <ion-col class="ion-margin-auto">
-                      <div>
-                        {{line.description}}
-                      </div>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row>
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="py-1">Subtotal (Before Tax): </div>
-                    </ion-col>
-                    <ion-col size="3" class="ion-margin-auto ion-flex">
-                      <div>{{line.subTotalExTax|number: (object.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                    </ion-col>
-                  </ion-row>
-                  <ion-row>
-                    <ion-col class="ion-margin-auto ion-flex">
-                      <div class="py-1">Subtotal: </div>
-                    </ion-col>
-                    <ion-col size="3" class="ion-margin-auto ion-flex">
-                      <div>{{line.subTotal|number:  (object.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">{{line.itemCode}}</div>
+                <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                <span class="badge-purple px-1 mr-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
               </ion-col>
-              <ion-col size="2" class="ion-margin-auto ion-flex">
-                <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (ionFocus)="highlight(inputNumWithoutSo)" (keypress)="eventHandler($event.keyCode)" (ionChange)="computeAllAmount(line)"></ion-input>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div>{{line.description}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Unit Price</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Disc. Code</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div class="font-bold">Disc. Amt.</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div class="font-bold">SubTotal</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div *ngIf="object.header.isDisplayTaxInclusive">{{line.unitPrice}}</div>
+                <div *ngIf="!object.header.isDisplayTaxInclusive">{{line.unitPriceExTax}}</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="ion-flex">
+                  <div>{{line.discountGroupCode}}</div>
+                  <div *ngIf="line.discountExpression"> [{{line.discountExpression}}]</div>
+                </div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div *ngIf="object.header.isDisplayTaxInclusive">{{line.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                <div *ngIf="!object.header.isDisplayTaxInclusive">{{line.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div >{{line.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
             </ion-row>
           </ion-grid>
         </ion-item>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="deleteLine(i)">Delete</ion-item-option>
+          <ion-item-option color="primary" (click)="slidingItem.close(); showEditModal(line, i)"><ion-icon name="create-outline"></ion-icon></ion-item-option>
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
-    </ion-list>    
+    </ion-list>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
@@ -87,53 +97,56 @@
   </ion-button>
 </ion-footer>
 <app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{selectedItem?.itemCode}}</ion-title>
+        <ion-title>Info</ion-title>
         <ion-buttons slot="start">
-          <ion-button (click)="hideItemModal()">Done</ion-button>
+          <ion-button (click)="cancelChanges()">Cancel</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content *ngIf="selectedItem">
       <div class="p-2">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-          <ion-label>Info</ion-label>
+          <ion-label>{{selectedItem?.itemCode}} - {{selectedItem?.description}}</ion-label>
         </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
-            <ion-label><p>Code</p></ion-label>
-            {{selectedItem?.itemCode}}
+            <ion-label><div>Unit Price</div></ion-label>
+            <ion-input *ngIf="object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [disabled]="restrictTrxFields['unitPrice'] && !selectedItem.isPricingApproval"></ion-input>
+            <ion-input *ngIf="!object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [disabled]="restrictTrxFields['unitPriceExTax'] && !selectedItem.isPricingApproval"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label><p>Description</p></ion-label>
-            {{selectedItem?.description}}
-          </ion-item>
-          <ion-item>
-            <ion-label><p>Unit Price</p></ion-label>
-            <ion-input *ngIf="object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)"></ion-input>
-            <ion-input *ngIf="!object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label><p>Discount Code</p></ion-label>
-            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="discountGroupCodeChanged(selectedItem)">
+            <ion-label><div>Disc. Code</div></ion-label>
+            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode'] && !selectedItem.isPricingApproval">
               <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>
-            <ion-label><p>Discount Expression</p></ion-label>
-            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression"></ion-input>
+            <ion-label><div>Disc. Expr.</div></ion-label>
+            <ion-input #discExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" (ionBlur)="computeAllAmount(selectedItem)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression'] && !selectedItem.isPricingApproval"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label><p>Discount Amount</p></ion-label>
-            <ion-input *ngIf="object.header.isDisplayTaxInclusive" #discAmt readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmt"></ion-input>
-            <ion-input *ngIf="!object.header.isDisplayTaxInclusive" #discAmt readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" [value]="selectedItem.discountAmtExTax"></ion-input>
+            <ion-label><div>Disc. Amt.</div></ion-label>
+            <ion-input *ngIf="object.header.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmt|number:'1.2-2'}}" [disabled]="true"></ion-input>
+            <ion-input *ngIf="!object.header.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmtExTax|number:'1.2-2'}}" [disabled]="true"></ion-input>
           </ion-item>
         </ion-list>
       </div>
     </ion-content>
+    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" (click)="saveChanges()">
+              Apply
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-footer>
   </ng-template>
 </ion-modal>

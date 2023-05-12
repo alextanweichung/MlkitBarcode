@@ -216,8 +216,8 @@
               <ion-icon style="position: relative; top: 0.1rem" *ngIf="item.variationTypeCode !== '0'" name="add-circle-outline"></ion-icon>
               <div>Total Quantity</div>
             </ion-col>
-            <ion-col>
-              <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} </div>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div >{{item.qtyRequest|number:'1.0'}} </div>
             </ion-col>
           </ion-row>
           <div *ngIf="item.isSelected">
@@ -228,7 +228,7 @@
                   <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                 </ion-col>
                 <ion-col>
-                  <div class="ion-text-right">{{d.qtyRequest|number:'1.0'}}</div>
+                  <div >{{d.qtyRequest|number:'1.0'}}</div>
                 </ion-col>
               </ion-row>
             </div>
@@ -244,13 +244,13 @@
                 Disc. Code
               </div>
             </ion-col>
-            <ion-col>
-              <div class="font-bold ion-text-right">
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">
                 Disc. Amt.
               </div>
             </ion-col>
-            <ion-col>
-              <div class="font-bold ion-text-right">
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">
                 SubTotal
               </div>
             </ion-col>
@@ -266,12 +266,12 @@
                 <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
               </div>
             </ion-col>
-            <ion-col>
-              <div class="ion-text-right" *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              <div class="ion-text-right" *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
-            <ion-col>
-              <div class="ion-text-right">{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div >{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -357,7 +357,7 @@
                   <div>Date</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.createdAt|date:'dd/MM/yyyy hh:mm:ss a'}}</div>
+                  <div >{{h.createdAt|date:'dd/MM/yyyy hh:mm:ss a'}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
@@ -365,7 +365,7 @@
                   <div>Action By</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.createdBy}}</div>
+                  <div >{{h.createdBy}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
@@ -373,7 +373,7 @@
                   <div>Status</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.status}}</div>
+                  <div >{{h.status}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
@@ -381,7 +381,7 @@
                   <div>Reason</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.reason}}</div>
+                  <div >{{h.reason}}</div>
                 </ion-col>
               </ion-row>
             </ion-grid>

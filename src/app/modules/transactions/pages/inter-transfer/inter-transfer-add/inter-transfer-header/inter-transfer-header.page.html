@@ -15,10 +15,6 @@
   <div class="p-2">
     <form [formGroup]="objectForm">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item>
-          <ion-label position="stacked">Doc. Num</ion-label>
-          <ion-input formControlName="interTransferNum" placeholder="Leave blank for auto assign"></ion-input>
-        </ion-item>
         <app-search-dropdown title="Ori. Location" optionLabel="description" [masterDropdownList]="objectService.locationMasterList" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
         <app-search-dropdown title="Dest. Location" optionLabel="description" [masterDropdownList]="objectService.locationMasterList" (onActionComplete)="onToLocationSelected($event)"></app-search-dropdown>
         <app-search-dropdown title="Ship Method" optionLabel="description" [masterDropdownList]="objectService.shipMethodMasterList" (onActionComplete)="onShipMethodSelected($event)"></app-search-dropdown>
