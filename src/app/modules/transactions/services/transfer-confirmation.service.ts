@@ -28,6 +28,7 @@ export class TransferConfirmationService {
 
   async loadRequiredMaster() {
     await this.loadMasterList();
+    await this.loadUserLocationIds();
   }
 
   /* #region store value */
@@ -58,14 +59,30 @@ export class TransferConfirmationService {
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
-    console.log("🚀 ~ file: transfer-confirmation.service.ts:61 ~ TransferConfirmationService ~ loadMasterList ~ this.locationMasterList:", this.locationMasterList)
     await this.locationMasterList.sort((a, c) => { return a.description > c.description ? 1 : -1 });
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
   }
 
+  userLocationIds: number[] = [];
+  oriLocationMasterList: MasterListDetails[] = [];
+  async loadUserLocationIds() {
+    this.userLocationIds = await this.getUserLocationIds();
+    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser.loginUserType === 'B') {
+      this.oriLocationMasterList = this.locationMasterList;
+    } else {
+      this.oriLocationMasterList = this.locationMasterList.filter(r => this.userLocationIds.includes(r.id));
+    }
+    console.log("🚀 ~ file: transfer-confirmation.service.ts:76 ~ TransferConfirmationService ~ loadUserLocationIds ~ this.oriLocationMasterList:", this.oriLocationMasterList)
+  }
+
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileTransferConfirmation/masterlist").toPromise();
+  }
+  
+  getUserLocationIds() {
+    return this.http.get<number[]>(this.baseUrl + "MobileTransferConfirmation/userLocation").toPromise();
   }
 
   getPendingList(locationId: number) {
