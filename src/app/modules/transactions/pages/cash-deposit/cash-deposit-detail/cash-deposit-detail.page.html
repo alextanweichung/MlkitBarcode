@@ -20,51 +20,64 @@
   </ion-header>
   <div class="p-2" *ngIf="object">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Bank in Number</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.posCashDepositNum}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Bank in Amount</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.depositAmount|number:'1.2'}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Bank in Date</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.depositDateTime|date:'dd/MM/yyyy'}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Bank in Time</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.depositDateTime|date:'hh:mm a'}}"></ion-input>
-      </ion-item>
-      <ion-item *ngIf="object.depositSlipNum">
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Bank in Slip Number</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.depositSlipNum}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Bank name</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Num.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.posCashDepositNum}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Date</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.depositDateTime|date:'dd/MM/yyyy'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Time</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.depositDateTime|date:'hh:mm a'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Bank In Amount</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.depositAmount|number:'1.2'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Bank In Slip Num.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.depositSlipNum}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Bank Name</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
     </ion-list>
     <div *ngIf="imageUrl">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label>Details</ion-label>
       </ion-list-header>
-      <!-- <div class="image-container flex m-2 ion-text-center"> -->
-        <!-- <img #imageEle [src]="imageUrl" style="width: 50%; display: block;" (ontouchend)="onTouchEnd($event)" /> -->
-        <a (ontouchstart)="onTouchStart($event)" (ontouchmove)="onTouchMove($event)" (ontouchend)="onTouchEnd($event)"><img [src]="imageUrl"></a>
-      <!-- </div> -->
+      <img [src]="imageUrl">
     </div>
   </div>
 </ion-content>

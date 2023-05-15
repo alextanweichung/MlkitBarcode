@@ -34,14 +34,13 @@
         </ion-datetime>
         <ion-item>
           <ion-label position="stacked">Bank in Amount</ion-label>
-          <ion-input formControlName="depositAmount" inputmode="numeric" type="number" enterkeyhint="next" placeholder="Enter Amount"></ion-input>
+          <ion-input #amtInput formControlName="depositAmount" inputmode="numeric" type="number" enterkeyhint="next" (ionFocus)="highlight(amtInput)" placeholder="Enter Amount"></ion-input>
         </ion-item>
         <app-search-dropdown title="Bank Name" [masterDropdownList]="objectService.paymentMethodMasterList" [selectedId]="objectForm.controls.paymentMethodId.value" (onActionComplete)="onPaymentMethodSelected($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked">Bank in Slip Number</ion-label>
           <ion-input formControlName="depositSlipNum" inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Num"></ion-input>
         </ion-item>
-        <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList"  [selectedId]="objectForm.controls.customerId.value" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
       </ion-list>
     </form>
     <div *ngIf="imageUrl && images?.length === 0">
@@ -56,15 +55,11 @@
         <ion-icon slot="start" name="camera"></ion-icon>
         Select Image
       </ion-button>
-
       <ion-item *ngFor="let file of images; let i = index">
         <ion-thumbnail slot="start">
           <ion-img [src]="file.data"></ion-img>
         </ion-thumbnail>
         <ion-label class="ion-text-wrap"> {{ file.name }} </ion-label>
-        <!-- <ion-button slot="end" fill="clear" (click)="startUpload(file)">
-          <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
-        </ion-button> -->
         <ion-button slot="end" fill="clear" (click)="deleteImage(file)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-button>
