@@ -21,19 +21,22 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
 
   constructor(
     private authService: AuthService,
-    private objectService: TruckLoadingService,
+    public objectService: TruckLoadingService,
     private commonService: CommonService,
     private toastService: ToastService,
     private actionSheetController: ActionSheetController,
     private navController: NavController
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     this.loadObjects();
   }
 
   ngOnInit() {
-    this.loadMasterList();
+
   }
 
   loadObjects() {
@@ -56,24 +59,9 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
   }
 
-  shipMethodMasterList: MasterListDetails[] = [];
-  vendorMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   /* #region  add object */
 
-  async addObject() {    
+  async addObject() {
     this.navController.navigateForward('/transactions/truck-loading/truck-loading-add');
   }
 
@@ -104,7 +92,7 @@ export class TruckLoadingPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
-  
+
   goToDetail(objectId: number) {
     let navigationExtras: NavigationExtras = {
       queryParams: {

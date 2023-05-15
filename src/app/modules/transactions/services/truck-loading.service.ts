@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { TruckLoadingHeader, TruckLoadingRoot, TruckLoadingTrxDetails } from '../models/truck-loading';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -22,6 +23,26 @@ export class TruckLoadingService {
     private configService: ConfigService
   ) {
     this.baseUrl = configService.sys_parameter.apiUrl;
+  }
+
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadStaticLov();
+  }
+
+  fullMasterList: MasterList[] = [];
+  shipMethodMasterList: MasterListDetails[] = [];
+  vendorMasterList: MasterListDetails[] = [];
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.vendorMasterList = this.fullMasterList.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
+  }
+  
+  truckLoadingType: MasterListDetails[] = [];
+  async loadStaticLov() {
+    let staticLov = await this.getStaticLov();
+    this.truckLoadingType = await staticLov.filter(x => x.objectName == 'TruckLoadingType').flatMap(src => src.details).filter(y => y.deactivated == 0);
   }
 
   getObjects() {
@@ -53,11 +74,11 @@ export class TruckLoadingService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileTruckLoading/masterlist");
+    return this.http.get<MasterList[]>(this.baseUrl + "MobileTruckLoading/masterlist").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>( this.baseUrl + "MobileTruckLoading/staticLov");
+    return this.http.get<MasterList[]>( this.baseUrl + "MobileTruckLoading/staticLov").toPromise();
   }
 
   getLineDetailsByTrxNum(trxNum: string){
