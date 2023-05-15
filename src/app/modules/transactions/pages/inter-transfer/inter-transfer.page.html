@@ -17,27 +17,24 @@
       <ion-label class="label-title">Inter Transfer</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2">
-    
+  <div class="p-2">    
     <ng-container *ngIf="!objects || objects?.length === 0">
       <div class="mt-2">Nothing found!</div>
-    </ng-container>
-    
+    </ng-container>    
     <ng-container *ngIf="objects?.length > 0">
       <div *ngFor="let m of uniqueGrouping">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
-        </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.interTransferId)">
-            <ion-grid class="ion-no-padding p-2">
+        </ion-list-header>        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" class="ion-no-padding" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.interTransferId)">
+            <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
-                <ion-col class="font-bold">{{object.interTransferNum}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto font-bold">{{object.interTransferNum}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.locationCode}} - {{object.locationDescription}}</ion-col>
               </ion-row>
               <ion-row>
-                <ion-col>{{object.locationCode}} - {{object.locationDescription}}</ion-col>
-                <ion-col class="ion-text-right">{{object.toLocationCode}} - {{object.toLocationDescription}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.toLocationCode}} - {{object.toLocationDescription}}</ion-col>
               </ion-row>
             </ion-grid>
           </ion-item>
@@ -45,7 +42,6 @@
       </div>
     </ng-container>
   </div>
-
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>
