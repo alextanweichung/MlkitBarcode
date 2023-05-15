@@ -10,19 +10,34 @@
   <hr class="hr-small">
   <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="pendingObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'pending'">    
     <ion-item-sliding *ngFor="let object of pendingObjects">      
-      <ion-item button detail="false" class="no-ripple" (click)="openDetail(object.docId)">
-        <ion-label>
-        <h3>{{object.docNum}}</h3>
-          <p>Transaction Amt: {{object.amount|number:'1.2'}}</p>
-          <p style="white-space: break-spaces;">
-            <span class="badge-other px-1 mr-1" style="font-size: small;"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
-            <span class="badge-green px-1 mr-1" style="font-size: small;"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
-          </p>
-          <p class="pt-1" style="white-space: break-spaces;">
-            <span class="badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
-            <span class="badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
-          </p>
-        </ion-label>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="openDetail(object.docId)">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">{{object.docNum}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Transaction Amount</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.amount|number:'1.2'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <span class="ion-text-wrap badge-other px-1 mr-1" style="font-size: small;"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
+              <span class="ion-text-wrap badge-green px-1 mr-1" style="font-size: small;"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <span class="ion-text-wrap badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
+              <span class="ion-text-wrap badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
       <ion-item-options side="start">
         <ion-item-option color="danger" (click)="presentConfirmAlert('REJECT', object.docId, object.docNum)"><ion-icon name="close-outline" slot="bottom"></ion-icon>Reject</ion-item-option>
@@ -34,19 +49,34 @@
   </ion-list>
   <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="completedObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'completed'">    
     <ion-item-sliding *ngFor="let object of completedObjects">      
-      <ion-item button detail="false" class="no-ripple" (click)="openDetail(object.docId)">
-        <ion-label>
-          <h3>{{object.docNum}}</h3>
-          <p>Transaction Amt: {{object.amount|number:'1.2'}}</p>
-          <p style="white-space: break-spaces;">
-            <span class="badge-other px-1 mr-1" style="font-size: small;"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
-            <span class="badge-green px-1 mr-1" style="font-size: small;"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
-          </p>
-          <p class="pt-1" style="white-space: break-spaces;">
-            <span class="badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
-            <span class="badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
-          </p>
-        </ion-label>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="openDetail(object.docId)">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">{{object.docNum}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Transaction Amount</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.amount|number:'1.2'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <span class="ion-text-wrap badge-other px-1 mr-1" style="font-size: small;"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
+              <span class="ion-text-wrap badge-green px-1 mr-1" style="font-size: small;"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <span class="ion-text-wrap badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
+              <span class="ion-text-wrap badge-purple px-1 mr-1" style="font-size: small;"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="presentConfirmAlert('REVERSE', object.docId, object.docNum)"><ion-icon name="arrow-undo-outline" slot="bottom"></ion-icon>Reverse</ion-item-option>

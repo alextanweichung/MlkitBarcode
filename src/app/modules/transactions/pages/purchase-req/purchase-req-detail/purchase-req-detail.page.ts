@@ -1,30 +1,29 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonPopover, NavController } from '@ionic/angular';
+import { NavController, AlertController, IonPopover } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { PurchaseOrderLine, PurchaseOrderRoot } from '../../../models/purchase-order';
-import { PurchaseOrderService } from '../../../services/purchase-order.service';
-import { Capacitor } from '@capacitor/core';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { AuthService } from 'src/app/services/auth/auth.service';
-import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { PurchaseReqService } from '../../../services/purchase-req.service';
+import { PurchaseReqLine, PurchaseReqRoot } from '../../../models/purchase-req';
 
 @Component({
-  selector: 'app-purchase-order-detail',
-  templateUrl: './purchase-order-detail.page.html',
-  styleUrls: ['./purchase-order-detail.page.scss']
+  selector: 'app-purchase-req-detail',
+  templateUrl: './purchase-req-detail.page.html',
+  styleUrls: ['./purchase-req-detail.page.scss'],
 })
-export class PurchaseOrderDetailPage implements OnInit {
+export class PurchaseReqDetailPage implements OnInit {
 
-  parent: string = 'Purchase Order'
+  parent: string = 'Purchase Req'
 
   objectId: number;
-  object: PurchaseOrderRoot;
-  flattenPurchaseOrder: any;
+  object: PurchaseReqRoot;
+  flattenPurchaseReq: any;
   processType: string;
   selectedSegment: string;
   
@@ -36,13 +35,14 @@ export class PurchaseOrderDetailPage implements OnInit {
     private route: ActivatedRoute,
     private navController: NavController,
     private toastService: ToastService,
-    private objectService: PurchaseOrderService,
+    private objectService: PurchaseReqService,
     private alertController: AlertController,
     private commonService: CommonService,
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
       this.processType = params['processType'];
+      console.log("🚀 ~ file: purchase-req-detail.page.ts:45 ~ PurchaseReqDetailPage ~ this.processType:", this.processType)
       this.selectedSegment = params['selectedSegment'];
       if (params['parent']) {
         this.parent = params['parent'];
@@ -87,9 +87,11 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   loadDetail() {
     try {
-      this.objectService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
+      this.objectService.getPurchaseReqDetail(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: purchase-req-detail.page.ts:90 ~ PurchaseReqDetailPage ~ this.objectService.getPurchaseReqDetail ~ response:", response)
         this.object = response;
-        this.flattenPurchaseOrder = this.objectService.unflattenDtoDetail(this.object);
+        this.object.approvalHistory = this.object.approvalHistory.filter(r => this.processType.includes(r.approvalReasonType));
+        this.flattenPurchaseReq = this.objectService.unflattenDtoDetail(this.object);
       }, error => {
         throw Error;
       })
@@ -98,8 +100,8 @@ export class PurchaseOrderDetailPage implements OnInit {
     }
   }
 
-  getFlattenVariations(itemId: number): PurchaseOrderLine[] {
-    return this.flattenPurchaseOrder.details.filter(r => r.itemId === itemId);
+  getFlattenVariations(itemId: number): PurchaseReqLine[] {
+    return this.flattenPurchaseReq.details.filter(r => r.itemId === itemId);
   }
 
   filter(details: InnerVariationDetail[]) {
@@ -156,8 +158,8 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   async downloadPdf() {
-    this.objectService.downloadPdf("IMPC002", "pdf", this.object.header.purchaseOrderId).subscribe(response => {
-      let filename = this.object.header.purchaseOrderNum + ".pdf";
+    this.objectService.downloadPdf("IMPC001", "pdf", this.object.header.purchaseReqId).subscribe(response => {
+      let filename = this.object.header.purchaseReqNum + ".pdf";
       this.commonService.commonDownloadPdf(response, filename);
     }, error => {
       console.log(error);
@@ -184,7 +186,7 @@ export class PurchaseOrderDetailPage implements OnInit {
       const alert = await this.alertController.create({
         cssClass: 'custom-alert',
         backdropDismiss: false,
-        header: 'Are you sure to ' + action + ' ' + this.object.header.purchaseOrderNum + '?',
+        header: 'Are you sure to ' + action + ' ' + this.object.header.purchaseReqNum + '?',
         inputs: [
           {
             name: 'actionreason',
@@ -204,10 +206,10 @@ export class PurchaseOrderDetailPage implements OnInit {
                   this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
                   return false;
                 } else {
-                  this.updateDoc(action, [this.object.header.purchaseOrderId.toString()], data.actionreason);
+                  this.updateDoc(action, [this.object.header.purchaseReqId.toString()], data.actionreason);
                 }
               } else {
-                this.updateDoc(action, [this.object.header.purchaseOrderId.toString()], data.actionreason);
+                this.updateDoc(action, [this.object.header.purchaseReqId.toString()], data.actionreason);
               }
             },
           },
@@ -231,7 +233,7 @@ export class PurchaseOrderDetailPage implements OnInit {
         docId: listOfDoc.map(i => Number(i))
       }
       try {
-        this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobilePurchaseOrderReview' : 'mobilePurchaseOrderApprove', bulkConfirmReverse).subscribe(async response => {
+        this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobilePurchaseReqReview' : 'mobilePurchaseReqApprove', bulkConfirmReverse).subscribe(async response => {
           if (response.status == 204) {
             this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
             this.navController.back();

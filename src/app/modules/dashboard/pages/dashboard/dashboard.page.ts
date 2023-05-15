@@ -25,6 +25,9 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   showSalesOrderReview: boolean = false;
   showSalesOrderApproval: boolean = false;
 
+  showPurchaseReqReview: boolean = false;
+  showPurchaseReqApproval: boolean = false;
+
   showPurchaseOrderReview: boolean = false;
   showPurchaseOrderApproval: boolean = false;
   
@@ -61,6 +64,8 @@ export class DashboardPage implements OnInit, ViewDidEnter {
             this.showQuotationApproval = mPageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
             this.showSalesOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
             this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+            this.showPurchaseReqReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;
+            this.showPurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
             this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
             this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
           }

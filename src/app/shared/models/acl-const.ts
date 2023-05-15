@@ -25,6 +25,8 @@ export const approvalAppCode = {
    quotationAP: 'MAQUAP',
    salesOrderRV: 'MASORV',
    salesOrderAP: 'MASOAP',
+   purchaseReqRV: 'MAPRRV',
+   purchaseReqAP: 'MAPRAP',
    purchaseOrderRV: 'MAPORV',
    purchaseOrderAP: 'MAPOAP',
    otpConfig: 'MAMAOTP',

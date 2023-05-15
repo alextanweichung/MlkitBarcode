@@ -65,6 +65,15 @@ const routes: Routes = [
     path: 'managements/sales-order-approvals',
     loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
   },
+  // management-purchase-req
+  {
+    path: 'managements/purchase-req-reviews',
+    loadChildren: () => import('./modules/managements/pages/purchase-req-reviews/purchase-req-reviews.module').then( m => m.PurchaseReqReviewsPageModule)
+  },
+  {
+    path: 'managements/purchase-req-approvals',
+    loadChildren: () => import('./modules/managements/pages/purchase-req-approvals/purchase-req-approvals.module').then( m => m.PurchaseReqApprovalsPageModule)
+  },
   // management-purchase-order  
   {
     path: 'managements/purchase-order-reviews',
@@ -117,7 +126,11 @@ const routes: Routes = [
     path: 'transactions/backtoback-order',
     loadChildren: () => import('./modules/transactions/pages/backtoback-order/backtoback-order.module').then( m => m.BackToBackOrderPageModule)
   },
-
+  // transaction-purchase-req
+  {
+    path: 'transactions/purchase-req/purchase-req-detail',
+    loadChildren: () => import('./modules/transactions/pages/purchase-req/purchase-req-detail/purchase-req-detail.module').then( m => m.PurchaseReqDetailPageModule)
+  },
   // transactions-purchase-order
   {
     path: 'transactions/purchase-order/purchase-order-detail',
@@ -297,7 +310,6 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
-
 
 
 

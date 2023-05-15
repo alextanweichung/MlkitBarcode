@@ -24,6 +24,9 @@ export class ManagementPage implements OnInit {
   showSalesOrderReview: boolean = false;
   showSalesOrderApproval: boolean = false;
 
+  showPurchaseReqReview: boolean = false;
+  showPurchaseReqApproval: boolean = false;
+
   showPurchaseOrderReview: boolean = false;
   showPurchaseOrderApproval: boolean = false;
   
@@ -42,6 +45,8 @@ export class ManagementPage implements OnInit {
           this.showQuotationApproval = pageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
           this.showSalesOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
           this.showSalesOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+          this.showPurchaseReqReview = pageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;
+          this.showPurchaseReqApproval = pageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
           this.showPurchaseOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
           this.showPurchaseOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
           this.showOtpConfig = pageItems.findIndex(r => r.title === approvalAppCode.otpConfig) > -1;

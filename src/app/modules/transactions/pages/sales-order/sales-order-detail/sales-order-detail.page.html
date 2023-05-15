@@ -106,9 +106,6 @@
         </ion-item>
       </ion-list>
     </div>
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-      <ion-label>Document</ion-label>
-    </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
         <ion-grid class="ion-no-padding py-2 pl-2">
@@ -324,40 +321,40 @@
     <ion-content>
       <div class="p-2">
         <ion-list-header class="ion-list-header-small" *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
-          <ion-label>Approval History not available.</ion-label>
+          <ion-label>Approval History Not Available.</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="none">
-          <ion-item button="false" *ngFor="let h of object?.approvalHistory">
-            <ion-grid class="p-1">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let h of object?.approvalHistory">
+            <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Date</div>
+                  <div class="font-bold">Date</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
                   <div >{{h.createdAt|date:'dd/MM/yyyy hh:mm:ss a'}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Action By</div>
+                  <div class="font-bold">Action By</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
                   <div >{{h.createdBy}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Status</div>
+                  <div class="font-bold">Status</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div >{{h.status}}</div>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <div>{{h.status}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Reason</div>
+                  <div class="font-bold">Reason</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
                   <div >{{h.reason}}</div>
                 </ion-col>
               </ion-row>
