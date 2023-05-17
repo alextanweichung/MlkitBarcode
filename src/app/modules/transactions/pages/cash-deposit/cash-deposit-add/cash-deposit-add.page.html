@@ -27,13 +27,21 @@
           <ion-label position="stacked">Bank In Date</ion-label>
           <ion-input readonly type="text" (click)="toggleDate()" [value]="date"></ion-input>
         </ion-item>
-        <ion-datetime class="animate__animated animate__fadeIn" *ngIf="date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onDateSelect($event)" [value]="date_value.toISOString()">
+        <ion-datetime #date class="animate__animated animate__fadeIn" *ngIf="date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onDateSelect($event)" [value]="date_value.toISOString()">
+          <ion-buttons slot="buttons">
+            <ion-button color="danger" (click)="date.cancel(); date_active=false">Cancel</ion-button>
+            <ion-button color="primary" (click)="date.confirm()">Done</ion-button>
+          </ion-buttons>
         </ion-datetime>
         <ion-item>
           <ion-label position="stacked">Bank In Time</ion-label>
           <ion-input readonly type="text" (click)="toggleTime()" [value]="time"></ion-input>
         </ion-item>
         <ion-datetime #time class="animate__animated animate__fadeIn" *ngIf="time_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="true" presentation="time" (ionChange)="onTimeSelect($event)" [value]="time_value.toISOString()">
+          <ion-buttons slot="buttons">
+            <ion-button color="danger" (click)="time.cancel(); time_active=false">Cancel</ion-button>
+            <ion-button color="primary" (click)="time.confirm()">Done</ion-button>
+          </ion-buttons>
         </ion-datetime>
         <ion-item>
           <ion-label position="stacked">Bank In Amount</ion-label>
