@@ -86,7 +86,10 @@ export class GeneralSalesListPage implements OnInit {
                     unitPrice: r.price,
                     discountGroupCode: r.discCd,
                     discountExpression: r.discPct + '%',
-                    discountPercent: r.discPct
+                    discountPercent: r.discPct,
+                    discountGroupId: null,
+                    unitPriceMin: null,
+                    currencyId: null
                   }
                 })
               } else {
@@ -137,7 +140,10 @@ export class GeneralSalesListPage implements OnInit {
                     unitPrice: r.price,
                     discountGroupCode: r.discCd,
                     discountExpression: r.discPct + '%',
-                    discountPercent: r.discPct
+                    discountPercent: r.discPct,
+                    discountGroupId: null,
+                    unitPriceMin: null,
+                    currencyId: null
                   },
                   variationDetails: vd
                 })

@@ -48,7 +48,6 @@ export class DebtorApplicationDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: debtor-application-detail.page.ts:48 ~ DebtorApplicationDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
       }, error => {
         throw error;
       })

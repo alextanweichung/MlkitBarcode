@@ -188,7 +188,10 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
+                discountPercent: found_item_master.discPct,
+                discountGroupId: null,
+                unitPriceMin: null,
+                currencyId: null
               },
               itemVariationXId: found_barcode.xId,
               itemVariationYId: found_barcode.yId,

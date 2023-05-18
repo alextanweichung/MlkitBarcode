@@ -19,7 +19,7 @@ export class ItemViewListFlatPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log("🚀 ~ file: item-view-list-flat.page.ts:25 ~ ItemViewListFlatPage ~ ngOnInit ~ this.data:", this.data)
+    
   }
 
 }

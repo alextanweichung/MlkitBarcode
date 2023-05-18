@@ -57,7 +57,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    
+
   }
 
   componentsLoad() {
@@ -99,50 +99,21 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
         return;
       }
     } else {
-      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest??0 !== 0)).length === 0) {
+      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest ?? 0 !== 0)).length === 0) {
         return;
       }
     }
     try {
-      // if (this.itemInCart.findIndex(r => r.itemId === event.itemId) > -1) {
-      //   if (event.variationTypeCode === '0') {
-      //     this.itemInCart.find(r => r.itemId === event.itemId).qtyRequest += event.qtyRequest;
-      //   } else {
-      //     let vd = event.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest > 0);
-      //     vd.forEach(r => {
-      //       this.itemInCart.find(rr => rr.itemId === event.itemId).variationDetails.flatMap(rr => rr.details).forEach(rr => {
-      //         if (rr.itemSku === r.itemSku) {
-      //           rr.qtyRequest += r.qtyRequest;
-      //         }
-      //       })
-      //     })
-      //   }
-      //   await this.computeAllAmount(this.itemInCart.find(r => r.itemId === event.itemId));
-      // } else {
-        let trxLine = JSON.parse(JSON.stringify(event));
-        trxLine = this.assignTrxItemToDataLine(trxLine);
-
-        if (this.objectHeader.isItemPriceTaxInclusive) {
-          await this.computeUnitPriceExTax(trxLine);
-        } else {
-          await this.computeUnitPrice(trxLine);
-        }
-
-        if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-          trxLine.uuid = uuidv4();
-          let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-          if (this.objectHeader.isItemPriceTaxInclusive) {
-            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
-          } else {
-            trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
-          }
-          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
-          trxLine.oriDiscountExpression = trxLine.discountExpression;
-        }
-        this.itemInCart.push(trxLine);
-        await this.computeAllAmount(this.itemInCart[0]);
-        await this.assignSequence();
-      // }
+      let trxLine = JSON.parse(JSON.stringify(event));
+      trxLine = this.assignTrxItemToDataLine(trxLine);
+      if (this.objectHeader.isItemPriceTaxInclusive) {
+        await this.computeUnitPriceExTax(trxLine);
+      } else {
+        await this.computeUnitPrice(trxLine);
+      }
+      this.itemInCart.push(trxLine);
+      await this.computeAllAmount(this.itemInCart[0]);
+      await this.assignSequence();
       this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
     } catch (e) {
       console.error(e);
@@ -174,7 +145,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
-  
+
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
@@ -258,6 +229,31 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
       trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
       trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+        trxLine.uuid = uuidv4();
+        let discPct = Number(trxLine.discountExpression?.replace("%", ""));
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+        } else {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+        }
+        if (trxLine.itemGroupInfo) {
+          trxLine.brandId = trxLine.itemGroupInfo.brandId;
+          trxLine.groupId = trxLine.itemGroupInfo.groupId;
+          trxLine.seasonId = trxLine.itemGroupInfo.seasonId;
+          trxLine.categoryId = trxLine.itemGroupInfo.categoryId;
+          trxLine.deptId = trxLine.itemGroupInfo.deptId;
+          trxLine.oriDiscId = trxLine.itemPricing.discountGroupId;
+        }
+      }
+
+      // for isPricingApproval
+      trxLine.oriUnitPrice = trxLine.unitPrice;
+      trxLine.oriUnitPriceExTax = trxLine.unitPriceExTax;
+      trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
+      trxLine.oriDiscountExpression = trxLine.discountExpression;
+
       return trxLine;
     } catch (e) {
       console.error(e);

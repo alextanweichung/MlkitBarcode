@@ -38,7 +38,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.objectHeader = this.objectService.header;
     this.itemInCart = this.objectService.itemInCart;
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
     }
   }
 
@@ -46,7 +46,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.objectHeader = this.objectService.header;
     this.itemInCart = this.objectService.itemInCart;
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
     }
   }
 
@@ -147,7 +147,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.selectedIndex = null;
     this.selectedItem = null;
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
     }
   }
 
@@ -356,7 +356,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         this.itemInCart.splice(index, 1);
       }
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
       }
     } catch (e) {
       console.error(e);
@@ -489,7 +489,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         header: this.objectHeader,
         details: this.itemInCart
       }
-      console.log("🚀 ~ file: sales-order-cart.page.ts:473 ~ SalesOrderCartPage ~ insertSalesOrder ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {        
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);

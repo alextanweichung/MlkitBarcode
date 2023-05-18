@@ -74,7 +74,6 @@ export class TransferConfirmationService {
     } else {
       this.oriLocationMasterList = this.locationMasterList.filter(r => this.userLocationIds.includes(r.id));
     }
-    console.log("🚀 ~ file: transfer-confirmation.service.ts:76 ~ TransferConfirmationService ~ loadUserLocationIds ~ this.oriLocationMasterList:", this.oriLocationMasterList)
   }
 
   getMasterList() {

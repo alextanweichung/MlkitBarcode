@@ -74,7 +74,6 @@ export class SalesOrderDetailPage implements OnInit {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: sales-order-detail.page.ts:77 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
@@ -92,7 +91,6 @@ export class SalesOrderDetailPage implements OnInit {
     this.workFlowState = [];
     this.objectService.getWorkflow(objectId).subscribe(response => {
       this.workFlowState = response;
-      console.log("🚀 ~ file: sales-order-detail.page.ts:95 ~ SalesOrderDetailPage ~ this.objectService.getWorkflow ~ this.workFlowState:", this.workFlowState)
 
       this.objectService.getTrxChild(objectId).subscribe(response2 => {
         this.trxChild = response2;
@@ -128,7 +126,6 @@ export class SalesOrderDetailPage implements OnInit {
             }
             this.workFlowState = [...this.workFlowState, newState]
           })
-          console.log("🚀 ~ file: sales-order-detail.page.ts:130 ~ SalesOrderDetailPage ~ this.objectService.getTrxChild ~ this.workFlowState:", this.workFlowState)
         }
       }, error => {
         console.log(error);

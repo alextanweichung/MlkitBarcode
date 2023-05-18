@@ -111,17 +111,6 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       } else {
         await this.computeUnitPrice(trxLine);
       }
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        trxLine.uuid = uuidv4();
-        let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-        if (this.objectHeader.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
-        } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
-        }
-        trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
-        trxLine.oriDiscountExpression = trxLine.discountExpression;
-      }
       this.itemInCart.push(trxLine);
       await this.computeAllAmount(this.itemInCart[0]);
       await this.assignSequence();
@@ -240,6 +229,24 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
       trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
       trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+      
+      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+        trxLine.uuid = uuidv4();
+        let discPct = Number(trxLine.discountExpression?.replace("%", ""));
+        if (this.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+        } else {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+        }
+        if (trxLine.itemGroupInfo) {
+          trxLine.brandId = trxLine.itemGroupInfo.brandId;
+          trxLine.groupId = trxLine.itemGroupInfo.groupId;
+          trxLine.seasonId = trxLine.itemGroupInfo.seasonId;
+          trxLine.categoryId = trxLine.itemGroupInfo.categoryId;
+          trxLine.deptId = trxLine.itemGroupInfo.deptId;
+          trxLine.oriDiscId = trxLine.itemPricing.discountGroupId;
+        }
+      }
 
       // for isPricingApproval
       trxLine.oriUnitPrice = trxLine.unitPrice;

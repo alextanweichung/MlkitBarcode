@@ -66,7 +66,10 @@ export class ItemCodeInputOfflinePage implements OnInit {
                   unitPrice: found_item_master.price,
                   discountGroupCode: found_item_master.discCd,
                   discountExpression: found_item_master.discPct + '%',
-                  discountPercent: found_item_master.discPct
+                  discountPercent: found_item_master.discPct,
+                  discountGroupId: null,
+                  unitPriceMin: null,
+                  currencyId: null
                 },
                 itemVariationXId: r.xId,
                 itemVariationYId: r.yId,

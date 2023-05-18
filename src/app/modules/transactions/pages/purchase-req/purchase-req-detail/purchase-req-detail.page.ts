@@ -42,7 +42,6 @@ export class PurchaseReqDetailPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
       this.processType = params['processType'];
-      console.log("🚀 ~ file: purchase-req-detail.page.ts:45 ~ PurchaseReqDetailPage ~ this.processType:", this.processType)
       this.selectedSegment = params['selectedSegment'];
       if (params['parent']) {
         this.parent = params['parent'];
@@ -88,7 +87,6 @@ export class PurchaseReqDetailPage implements OnInit {
   loadDetail() {
     try {
       this.objectService.getPurchaseReqDetail(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: purchase-req-detail.page.ts:90 ~ PurchaseReqDetailPage ~ this.objectService.getPurchaseReqDetail ~ response:", response)
         this.object = response;
         this.object.approvalHistory = this.object.approvalHistory.filter(r => this.processType.includes(r.approvalReasonType));
         this.flattenPurchaseReq = this.objectService.unflattenDtoDetail(this.object);
