@@ -28,6 +28,7 @@ export class TransferConfirmationService {
 
   async loadRequiredMaster() {
     await this.loadMasterList();
+    await this.loadUserLocationIds();
   }
 
   /* #region store value */
@@ -63,12 +64,28 @@ export class TransferConfirmationService {
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
   }
 
+  userLocationIds: number[] = [];
+  oriLocationMasterList: MasterListDetails[] = [];
+  async loadUserLocationIds() {
+    this.userLocationIds = await this.getUserLocationIds();
+    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser.loginUserType === 'B') {
+      this.oriLocationMasterList = this.locationMasterList;
+    } else {
+      this.oriLocationMasterList = this.locationMasterList.filter(r => this.userLocationIds.includes(r.id));
+    }
+  }
+
   getMasterList() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileTransferConfirmation/masterlist").toPromise();
   }
+  
+  getUserLocationIds() {
+    return this.http.get<number[]>(this.baseUrl + "MobileTransferConfirmation/userLocation").toPromise();
+  }
 
-  getPendingList(locationCode: string) {
-    return this.http.get<TransferConfirmationRoot[]>(this.baseUrl + "MobileTransferConfirmation/pending/" + locationCode);
+  getPendingList(locationId: number) {
+    return this.http.get<TransferConfirmationRoot[]>(this.baseUrl + "MobileTransferConfirmation/pending/" + locationId);
   }
 
   updateObject(object: TransferConfirmationRoot) {

@@ -211,11 +211,6 @@ export class BacktobackOrderHeaderPage implements OnInit {
     if (defaultTypeCode) {
       this.objectForm.patchValue({ typeCode: defaultTypeCode });
     }
-    let defaultCustomer = this.objectService.customerMasterList.find(r => r.isPrimary);
-    if (defaultCustomer) {
-      this.objectForm.patchValue({ customerId: defaultCustomer.id });
-      this.onCustomerSelected(defaultCustomer);
-    }
     let defaultShipMethod = this.objectService.shipMethodMasterList.find(r => r.isPrimary);
     if (defaultShipMethod) {
       this.objectForm.patchValue({ shipMethodId: defaultShipMethod.id });
@@ -293,11 +288,6 @@ export class BacktobackOrderHeaderPage implements OnInit {
     }
   }
 
-  
-
-
-
-
   displayModal: boolean = false;
   creditInfoType: string = '';
   tableValue: CreditInfoDetails[] = [];
@@ -320,6 +310,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
     try {
       const actionSheet = await this.actionSheetController.create({
         header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
         cssClass: 'custom-action-sheet',
         buttons: [
           {

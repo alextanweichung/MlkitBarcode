@@ -1,10 +1,11 @@
 
-<ion-label class="ion-flex mt-2 ml-4" [ngStyle]="{'font-weight': 'bold'}" [position]="labelPosition"> {{title}}</ion-label>
-<ion-item lines="none">
+<ion-item>
+  <ion-label position="stacked"> {{title}}</ion-label>
   <ion-input readonly type="text" [placeholder]="title" class="ion-no-padding-end" (click)="toggleDate()" [(ngModel)]="date_display"></ion-input>
 </ion-item>
+
 <ion-datetime #ionDateTime class="animate__animated animate__fadeIn pb-2" *ngIf="date_active" color="primary" locale="en-EN" size="cover" [presentation]="presentation" (ionChange)="onDateSelect($event)" [value]="date_value_for_ion_calendar.toISOString()">
-  <ion-buttons slot="buttons" *ngIf="presentation === 'date-time'">
+  <ion-buttons slot="buttons">
     <ion-button color="danger" (click)="ionDateTime.cancel(); date_active=false">Cancel</ion-button>
     <ion-button color="primary" (click)="ionDateTime.confirm()">Done</ion-button>
   </ion-buttons>

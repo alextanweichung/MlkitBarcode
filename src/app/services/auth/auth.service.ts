@@ -26,10 +26,12 @@ export class AuthService {
   isDebug: string = 'False';
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
+  showSearchResult: boolean = false;
   restrictedColumn: RestrictedColumn[];
   moduleControlConfig: ModuleControl[];
   model: MenuItem[];
   precisionList: PrecisionList[];
+
   // dashboardItem: MenuItem;
 
   // 1 is the size of buffer
@@ -218,6 +220,10 @@ export class AuthService {
 
   setModuleControl(item: any) {
     this.moduleControlSubject.next(item);
+    let showSearchResult = item.find(x => x.ctrlName === "ShowSearchResult");
+    if (showSearchResult) {
+      this.showSearchResult = (showSearchResult.ctrlValue === '0') ? false : true;
+    } 
   }
 
   setPrecisionList(item: any) {

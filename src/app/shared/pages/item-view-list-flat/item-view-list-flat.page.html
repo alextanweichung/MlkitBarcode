@@ -1,4 +1,25 @@
-<div *ngIf="isWithSo">
+<div *ngIf="isWithSo">  
+  <!-- <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let d of data">
+      <ion-grid class="ion-no-padding py-2 pl-2">
+        <ion-row>
+          <ion-col class="ion-flex ion-margin-auto">
+            <div class="font-bold">{{d.salesOrderNum}}</div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-flex ion-margin-auto">
+            <div class="font-bold">Outstanding List</div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-flex ion-margin-auto">
+            <div></div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  </ion-list> -->
   <ion-accordion-group>
     <ion-accordion *ngFor="let line of data;">
       <ion-item slot="header" color="light">

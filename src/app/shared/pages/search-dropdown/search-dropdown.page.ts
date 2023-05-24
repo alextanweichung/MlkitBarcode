@@ -27,9 +27,13 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes.masterDropdownList) {
+      this.bindFromMasterList();
+      this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
+    }
     if (changes.selectedId || changes.searchDropdownList) {
       if (this.selectedId) {
-        this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
+        this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
       } else {
         this.selected = null;
       }
@@ -37,6 +41,9 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+  }
+
+  bindFromMasterList() {
     if (this.masterDropdownList && this.masterDropdownList.length > 0) {
       this.masterDropdownList.forEach(r => {
         this.searchDropdownList.push({
@@ -46,7 +53,6 @@ export class SearchDropdownPage implements OnInit, OnChanges {
         })
       })
     }
-    this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
   }
 
   searchText: string = '';

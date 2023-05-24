@@ -45,8 +45,8 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.objectHeader = this.objectService.stockCountHeader;
-    this.objectDetail = this.objectService.stockCountLines;
+    this.objectHeader = this.objectService.objectHeader;
+    this.objectDetail = this.objectService.objectDetail;
     if (!this.objectHeader || this.objectHeader === undefined) {
       this.navController.navigateBack('/transactions/stock-count');
     }
@@ -107,7 +107,10 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
+                discountPercent: found_item_master.discPct,
+                discountGroupId: null,
+                unitPriceMin: null,
+                currencyId: null
               },
               itemVariationXId: found_barcode.xId,
               itemVariationYId: found_barcode.yId,

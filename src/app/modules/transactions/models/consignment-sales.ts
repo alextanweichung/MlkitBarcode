@@ -36,13 +36,6 @@ export interface ConsignmentSalesHeader {
   maxPrecisionTax: number
 }
 
-export interface ConsignmentSalesSummary {
-  consignmentSalesNum: string
-  customerId: number
-  toLocationId: number
-  trxDate: Date
-}
-
 export interface ConsignmentSalesLocation {
   locationId: number
   locationCode: string

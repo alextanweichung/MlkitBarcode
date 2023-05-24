@@ -67,14 +67,14 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2" *ngIf="object">    
+  <div class="p-2" *ngIf="object">
     <div *ngIf="workFlowState && workFlowState.length > 0">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label>Workflow</ion-label>
       </ion-list-header>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item *ngFor="let w of workFlowState; let i = index">
-          <ion-grid class="ion-no-padding">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let w of workFlowState; let i = index">
+          <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{w.title}}</div>
@@ -106,70 +106,106 @@
         </ion-item>
       </ion-list>
     </div>
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-      <ion-label>Document</ion-label>
-    </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Doc. Number</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.salesOrderNum}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Doc. Date</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Location</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Customer</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.header.customerId|idMapping:objectService.customerMasterList}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Total Quantity</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.details|sum:'qtyRequest'|number}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label [ngStyle]="{'font-weight': 'bold'}" position="stacked">
-          <div>Grand Total</div>
-        </ion-label>
-        <ion-input readonly class="font-size-small" value="{{object.details|sum:'subTotal'|number:'1.2-2'}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Num.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.salesOrderNum}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Date</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Location</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Customer</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Total Quantity</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.details|sum:'qtyRequest'|number}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Grand Total</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.details|sum:'subTotal'|number:'1.2-2'}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
     </ion-list>
+    <div *ngIf="object && object.header.remark && object.header.remark.length > 0">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label>Remark</ion-label>
+      </ion-list-header><ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div>{{object.header.remark}}</div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+    </div>
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object.details" (click)="showDetails(item)">
-        <ion-grid class="ion-no-padding p-2">
-          <ion-row class="pb-1">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">{{item.itemCode}}</div>
             </ion-col>
           </ion-row>
-          <ion-row class="pb-1">
+          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="ion-text-wrap">{{item.description}}</div>
             </ion-col>
           </ion-row>
-          <ion-row class="pb-1">
+          <ion-row *ngIf="item.remark && item.remark.length > 0">
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Remark</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="ion-text-wrap">{{item.remark}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <ion-icon style="position: relative; top: 0.1rem" *ngIf="item.variationTypeCode !== '0'" name="add-circle-outline"></ion-icon>
-              <div>Total Quantity</div>
+              <div class="font-bold">Total Quantity</div>
             </ion-col>
-            <ion-col>
-              <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} </div>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div >{{item.qtyRequest|number:'1.0'}} </div>
             </ion-col>
           </ion-row>
           <div *ngIf="item.isSelected">
@@ -180,12 +216,12 @@
                   <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                 </ion-col>
                 <ion-col>
-                  <div class="ion-text-right">{{d.qtyRequest|number:'1.0'}}</div>
+                  <div >{{d.qtyRequest|number:'1.0'}}</div>
                 </ion-col>
               </ion-row>
             </div>
           </div>
-          <ion-row class="pt-1">
+          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">
                 Unit Price
@@ -196,18 +232,18 @@
                 Disc. Code
               </div>
             </ion-col>
-            <ion-col>
-              <div class="font-bold ion-text-right">
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">
                 Disc. Amt.
               </div>
             </ion-col>
-            <ion-col>
-              <div class="font-bold ion-text-right">
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">
                 SubTotal
               </div>
             </ion-col>
           </ion-row>
-          <ion-row class="pt-1">
+          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
               <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
@@ -218,17 +254,58 @@
                 <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
               </div>
             </ion-col>
-            <ion-col>
-              <div class="ion-text-right" *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              <div class="ion-text-right" *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
-            <ion-col>
-              <div class="ion-text-right">{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div >{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
       </ion-item>
     </ion-list>
+    <div *ngIf="object.otherAmount && object.otherAmount?.length > 0">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label>Other Amount</ion-label>
+      </ion-list-header>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let om of object.otherAmount">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Code</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{om.amountCode}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Description</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{om.amountDescription}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Amt. Expr.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{om.amountExpression}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Amt.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{om.totalAmount|number:'1.2'}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </div>
   </div>
 </ion-content>
 <ion-modal [isOpen]="historyModal" (didDismiss)="historyModal = false">
@@ -244,41 +321,41 @@
     <ion-content>
       <div class="p-2">
         <ion-list-header class="ion-list-header-small" *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
-          <ion-label>Approval History not available.</ion-label>
+          <ion-label>Approval History Not Available.</ion-label>
         </ion-list-header>
-        <ion-list class="list-custom" lines="none">
-          <ion-item button="false" *ngFor="let h of object?.approvalHistory">
-            <ion-grid class="p-1">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let h of object?.approvalHistory">
+            <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Date</div>
+                  <div class="font-bold">Date</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.createdAt|date:'dd/MM/yyyy hh:mm:ss a'}}</div>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <div >{{h.createdAt|date:'dd/MM/yyyy hh:mm:ss a'}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Action By</div>
+                  <div class="font-bold">Action By</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.createdBy}}</div>
-                </ion-col>
-              </ion-row>
-              <ion-row>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div>Status</div>
-                </ion-col>
-                <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.status}}</div>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <div >{{h.createdBy}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Reason</div>
+                  <div class="font-bold">Status</div>
                 </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <div>{{h.status}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div class="ion-text-right">{{h.reason}}</div>
+                  <div class="font-bold">Reason</div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <div >{{h.reason}}</div>
                 </ion-col>
               </ion-row>
             </ion-grid>

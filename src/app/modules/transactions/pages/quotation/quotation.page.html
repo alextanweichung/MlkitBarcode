@@ -18,7 +18,6 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-
     <ng-container *ngIf="!objects || objects?.length === 0">
       <p>
         <ion-text color="tertiary">
@@ -26,24 +25,22 @@
         </ion-text>
       </p>
     </ng-container>
-    
     <ng-container *ngIf="objects?.length > 0">
       <div *ngFor="let m of uniqueGrouping">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
         </ion-list-header>
-        
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item-sliding *ngFor="let object of getObjects(m)">
-            <ion-item button detail="false" (click)="goToDetail(object.quotationId)">
-              <ion-grid class="ion-no-padding p-2">
+            <ion-item button detail="false" class="ion-no-padding" (click)="goToDetail(object.quotationId)">
+              <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
-                  <ion-col class="font-bold">{{object.quotationNum}}</ion-col>
-                  <ion-col class="ion-flex justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto font-bold">{{object.quotationNum}}</ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
                 </ion-row>
                 <ion-row>
-                  <ion-col>{{object.customerName}}</ion-col>
-                  <ion-col class="ion-text-right">{{object.salesAgentName}}</ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">{{object.customerName}}</ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.salesAgentName}}</ion-col>
                 </ion-row>
               </ion-grid>
             </ion-item>

@@ -9,6 +9,9 @@ import { Capacitor } from '@capacitor/core';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 @Component({
   selector: 'app-purchase-order-detail',
@@ -24,12 +27,16 @@ export class PurchaseOrderDetailPage implements OnInit {
   flattenPurchaseOrder: any;
   processType: string;
   selectedSegment: string;
+  
+  precisionPurchase: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
 
   constructor(
+    private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
     private toastService: ToastService,
-    private purchaseOrderService: PurchaseOrderService,
+    private objectService: PurchaseOrderService,
     private alertController: AlertController,
     private commonService: CommonService,
   ) {
@@ -44,6 +51,7 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   ngOnInit() {
+    this.loadModuleControl();
     if (!this.objectId) {
       this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
       this.navController.navigateBack('/transactions')
@@ -53,12 +61,19 @@ export class PurchaseOrderDetailPage implements OnInit {
     }
   }
 
+  loadModuleControl() {
+    this.authService.precisionList$.subscribe(precision =>{
+      this.precisionPurchase = precision.find(x => x.precisionCode == "PURCHASE");
+      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+    })
+  }
+
   locationMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
   loadMasterList() {
     try {
-      this.purchaseOrderService.getMasterList().subscribe(response => {
+      this.objectService.getMasterList().subscribe(response => {
         this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -72,9 +87,9 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   loadDetail() {
     try {
-      this.purchaseOrderService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
+      this.objectService.getPurchaseOrderDetail(this.objectId).subscribe(response => {
         this.object = response;
-        this.flattenPurchaseOrder = this.purchaseOrderService.unflattenDtoDetail(this.object);
+        this.flattenPurchaseOrder = this.objectService.unflattenDtoDetail(this.object);
       }, error => {
         throw Error;
       })
@@ -90,6 +105,17 @@ export class PurchaseOrderDetailPage implements OnInit {
   filter(details: InnerVariationDetail[]) {
     return details.filter(r => r.qtyRequest > 0);
   }
+
+  /* #region show variaton dialog */
+
+  showDetails(item: TransactionDetail) {
+    if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
+      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
+    }
+  }
+
+  /* #endregion */
 
   /* #region history modal */
 
@@ -130,7 +156,7 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   async downloadPdf() {
-    this.purchaseOrderService.downloadPdf("IMPC002", "pdf", this.object.header.purchaseOrderId).subscribe(response => {
+    this.objectService.downloadPdf("IMPC002", "pdf", this.object.header.purchaseOrderId).subscribe(response => {
       let filename = this.object.header.purchaseOrderNum + ".pdf";
       this.commonService.commonDownloadPdf(response, filename);
     }, error => {
@@ -205,7 +231,7 @@ export class PurchaseOrderDetailPage implements OnInit {
         docId: listOfDoc.map(i => Number(i))
       }
       try {
-        this.purchaseOrderService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobilePurchaseOrderReview' : 'mobilePurchaseOrderApprove', bulkConfirmReverse).subscribe(async response => {
+        this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobilePurchaseOrderReview' : 'mobilePurchaseOrderApprove', bulkConfirmReverse).subscribe(async response => {
           if (response.status == 204) {
             this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
             this.navController.back();

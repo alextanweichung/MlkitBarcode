@@ -8,6 +8,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { BackToBackOrderService } from '../../services/backtoback-order.service';
 import { BackToBackOrderList } from '../../models/backtoback-order';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-backtoback-order',
@@ -28,6 +29,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   salesAgentDropdownList: SearchDropdownList[] = [];
 
   constructor(
+    private authService: AuthService,
     private commonService: CommonService,
     private objectService: BackToBackOrderService,
     private actionSheetController: ActionSheetController,
@@ -65,7 +67,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })

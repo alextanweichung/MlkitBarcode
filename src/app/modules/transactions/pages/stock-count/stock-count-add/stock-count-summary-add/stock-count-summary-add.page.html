@@ -13,7 +13,7 @@
     </ion-toolbar>
   </ion-header>  
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Information</ion-label>
     </ion-list-header>
     <ion-list class="list-custom" lines="full" *ngIf="stockCountRoot">
@@ -36,7 +36,7 @@
         <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">

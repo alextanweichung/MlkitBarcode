@@ -11,7 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
-import { QuotationHeader, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
+import { QuotationHeader, QuotationList, QuotationRoot } from '../models/quotation';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { format } from 'date-fns';
 
@@ -76,7 +76,7 @@ export class QuotationService {
 
   header: QuotationHeader;
   itemInCart: TransactionDetail[] = [];
-  quotationSummary: QuotationSummary;
+  object: QuotationRoot;
   async setHeader(header: QuotationHeader) {
     this.header = header;
     // load promotion first after customer confirmed or whenever header changed.
@@ -87,8 +87,8 @@ export class QuotationService {
     this.itemInCart = JSON.parse(JSON.stringify(items));
   }
 
-  setQuotationSummary(qs: QuotationSummary) {
-    this.quotationSummary = qs;
+  setObject(object: QuotationRoot) {
+    this.object = object;
   }
 
   removeCustomer() {
@@ -99,14 +99,14 @@ export class QuotationService {
     this.itemInCart = [];
   }
 
-  removeSummary() {
-    this.quotationSummary = null;
+  removeObject() {
+    this.object = null;
   }
 
   resetVariables() {
     this.removeCustomer();
     this.removeItems();
-    this.removeSummary();
+    this.removeObject();
   }
 
   hasSalesAgent(): boolean {

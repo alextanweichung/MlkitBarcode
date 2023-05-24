@@ -21,7 +21,7 @@ export class TruckLoadingDetailPage implements OnInit {
     private navController: NavController,
     private modalController: ModalController,
     private toastService: ToastService,
-    private objectService: TruckLoadingService
+    public objectService: TruckLoadingService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -35,23 +35,7 @@ export class TruckLoadingDetailPage implements OnInit {
     if (!this.objectId) {
       this.navController.navigateBack('/transactions/truck-loading')
     } else {
-      this.loadMasterList();
       this.loadDetail();
-    }
-  }
-
-  shipMethodMasterList: MasterListDetails[] = [];
-  vendorMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
     }
   }
   

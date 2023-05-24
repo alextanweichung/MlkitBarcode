@@ -11,7 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
-import { SalesOrderHeader, SalesOrderList, SalesOrderRoot, SalesOrderSummary } from '../models/sales-order';
+import { SalesOrderHeader, SalesOrderList, SalesOrderRoot } from '../models/sales-order';
 import { format } from 'date-fns';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
@@ -79,7 +79,7 @@ export class SalesOrderService {
 
   header: SalesOrderHeader;
   itemInCart: TransactionDetail[] = [];
-  salesOrderSummary: SalesOrderSummary;
+  object: SalesOrderRoot;
   async setHeader(header: SalesOrderHeader) {
     this.header = header;
     // load promotion first after customer confirmed or whenever header changed.
@@ -90,8 +90,8 @@ export class SalesOrderService {
     this.itemInCart = JSON.parse(JSON.stringify(items));
   }
 
-  setSalesOrderSummary(ss: SalesOrderSummary) {
-    this.salesOrderSummary = ss;
+  setObject(object: SalesOrderRoot) {
+    this.object = object;
   }
 
   removeCustomer() {
@@ -102,14 +102,14 @@ export class SalesOrderService {
     this.itemInCart = [];
   }
 
-  removeSummary() {
-    this.salesOrderSummary = null;
+  removeObject() {
+    this.object = null;
   }
 
   resetVariables() {
     this.removeCustomer();
     this.removeItems();
-    this.removeSummary();
+    this.removeObject();
   }
 
   hasSalesAgent(): boolean {

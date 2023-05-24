@@ -109,7 +109,7 @@
     </ion-header>
     <ion-content *ngIf="selectedItem">
       <div class="p-2">
-        <ion-list-header class="ion-list-header-small">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Info</ion-label>
         </ion-list-header>
         
@@ -129,7 +129,7 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
-            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscountGroupChanged()">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscountGroupChanged()">
               <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>

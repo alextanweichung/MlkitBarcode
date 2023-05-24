@@ -11,9 +11,9 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 })
 export class StockCountSummaryAddPage implements OnInit {
 
-  stockCountRoot: StockCountRoot;
-  stockCountHeader: StockCountHeader;
-  stockCountLines: StockCountDetail[] = [];
+  objectRoot: StockCountRoot;
+  objectHeader: StockCountHeader;
+  objectDetail: StockCountDetail[] = [];
 
   constructor(
     public objectService: StockCountService,
@@ -21,11 +21,11 @@ export class StockCountSummaryAddPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.stockCountHeader = this.objectService.stockCountHeader;
-    this.stockCountLines = this.objectService.stockCountLines;
-    this.stockCountRoot = {
-      header: this.stockCountHeader,
-      details: this.stockCountLines,
+    this.objectHeader = this.objectService.objectHeader;
+    this.objectDetail = this.objectService.objectDetail;
+    this.objectRoot = {
+      header: this.objectHeader,
+      details: this.objectDetail,
       barcodeTag: []
     }
   }

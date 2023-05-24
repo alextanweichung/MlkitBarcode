@@ -23,8 +23,8 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
 export class StockCountItemAddPage implements OnInit, ViewWillEnter {
   @ViewChild('barcodeScanInput', { static: false }) barcodeScanInput: BarcodeScanInputPage;
 
-  stockCountHeader: StockCountHeader;
-  stockCountDetail: StockCountDetail[] = [];
+  objectHeader: StockCountHeader;
+  objectDetail: StockCountDetail[] = [];
   systemWideEAN13IgnoreCheckDigit: boolean = false;
 
   constructor(
@@ -41,9 +41,9 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.stockCountHeader = this.objectService.stockCountHeader;
-    this.stockCountDetail = [];
-    if (this.stockCountHeader === undefined) {
+    this.objectHeader = this.objectService.objectHeader;
+    this.objectDetail = [];
+    if (this.objectHeader === undefined) {
       this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
       this.navController.navigateBack('/transactions/stock-count/stock-count-add/stock-count-header');
     } else {
@@ -72,7 +72,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
   inventoryCountBatchCriteria: InventoryCountBatchCriteria
   loadInventoryCountBatchCriteria() {
     try {
-      this.objectService.getInventoryCountBatchCriteria(this.stockCountHeader.inventoryCountBatchId).subscribe(response => {
+      this.objectService.getInventoryCountBatchCriteria(this.objectHeader.inventoryCountBatchId).subscribe(response => {
         this.inventoryCountBatchCriteria = response;
       }, error => {
         throw error;
@@ -105,7 +105,10 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
+                discountPercent: found_item_master.discPct,
+                discountGroupId: null,
+                unitPriceMin: null,
+                currencyId: null
               },
               itemVariationXId: found_barcode.xId,
               itemVariationYId: found_barcode.yId,
@@ -158,13 +161,13 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
           break;
       }
   
-      if (this.stockCountDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
-        this.stockCountDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+      if (this.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+        this.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
       } else {
         let d: StockCountDetail = {
           inventoryCountLineId: 0,
           inventoryCountId: 0,
-          locationId: this.stockCountHeader.locationId,
+          locationId: this.objectHeader.locationId,
           itemId: trxLine.itemId,
           itemCode: trxLine.itemCode,
           description: trxLine.description,
@@ -174,9 +177,9 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
           itemBarcode: trxLine.itemBarcode,
           itemBarcodeTagId: trxLine.itemBarcodeTagId,
           qtyRequest: 1,
-          sequence: this.stockCountDetail.length
+          sequence: this.objectDetail.length
         }
-        await this.stockCountDetail.length > 0 ? this.stockCountDetail.unshift(d) : this.stockCountDetail.push(d);
+        await this.objectDetail.length > 0 ? this.objectDetail.unshift(d) : this.objectDetail.push(d);
       }
     } catch (e) {
       console.error(e);
@@ -220,7 +223,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
 
   async deleteLine(index) {
     try {
-      if (this.stockCountDetail[index]) {
+      if (this.objectDetail[index]) {
         const alert = await this.alertController.create({
           cssClass: 'custom-alert',
           header: 'Delete this item?',
@@ -230,7 +233,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
               text: 'Delete item',
               cssClass: 'danger',
               handler: async () => {
-                this.stockCountDetail.splice(index, 1);
+                this.objectDetail.splice(index, 1);
                 this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
               }
             },
@@ -239,7 +242,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
               role: 'cancel',
               cssClass: 'cancel',
               handler: async () => {
-                this.stockCountDetail[index].qtyRequest === 0 ? this.stockCountDetail[index].qtyRequest++ : 1;
+                this.objectDetail[index].qtyRequest === 0 ? this.objectDetail[index].qtyRequest++ : 1;
               }
             }
           ]
@@ -308,7 +311,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
 
   insertObject() {
     try {
-      this.objectService.insertInventoryCount({ header: this.stockCountHeader, details: this.stockCountDetail, barcodeTag: [] }).subscribe(response => {
+      this.objectService.insertInventoryCount({ header: this.objectHeader, details: this.objectDetail, barcodeTag: [] }).subscribe(response => {
         if (response.status === 201) {
           let object = response.body as StockCountRoot;
           this.objectService.resetVariables();

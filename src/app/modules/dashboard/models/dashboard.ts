@@ -8,6 +8,8 @@ export interface Dashboard {
   quotationApprovalCount: TransactionProcessingCount
   salesOrderReviewCount: TransactionProcessingCount
   salesOrderApprovalCount: TransactionProcessingCount
+  purchaseReqReviewCount: TransactionProcessingCount
+  purchaseReqApprovalCount: TransactionProcessingCount
   purchaseOrderReviewCount: TransactionProcessingCount
   purchaseOrderApprovalCount: TransactionProcessingCount
   quotationList: QuotationList[]

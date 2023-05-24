@@ -7,13 +7,17 @@ import { IonicModule } from '@ionic/angular';
 import { QuotationSummaryPageRoutingModule } from './quotation-summary-routing.module';
 
 import { QuotationSummaryPage } from './quotation-summary.page';
+import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    QuotationSummaryPageRoutingModule
+    QuotationSummaryPageRoutingModule,
+    IdMappingModule,
+    SumModule
   ],
   declarations: [QuotationSummaryPage]
 })

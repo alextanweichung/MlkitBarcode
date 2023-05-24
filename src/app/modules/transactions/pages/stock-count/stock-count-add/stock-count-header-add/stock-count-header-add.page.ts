@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { InventoryCountBatchList } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -27,7 +26,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
     this.newObjectForm();
   }
 
-  trxDate: Date = null;
+  trxDate: Date = this.commonService.getTodayDate();
   ionViewWillEnter(): void {
     if (!this.trxDate) {
       this.trxDate = this.commonService.getTodayDate();
@@ -117,6 +116,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
     try {
       const actionSheet = await this.actionSheetController.create({
         header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
         cssClass: 'custom-action-sheet',
         buttons: [
           {

@@ -32,7 +32,9 @@ export interface TransactionDetail {
   oriDiscountGroupCode?: string
   oriDiscountExpression?: string
   isPricingApproval?: boolean
-  
+
+  itemGroupInfo?: ItemGroupInfo
+
   discountAmt?: any
   discountAmtExTax?: any
   taxId?: number
@@ -117,11 +119,21 @@ export interface TransactionDetail {
 }
 
 export interface ItemPricing {
-  itemId: number
-  unitPrice: number
-  currencyId?: number
-  discountGroupCode: string
-  discountExpression: any
+  itemId: number,
+  unitPrice: number,
+  unitPriceMin: number,
+  currencyId?: number,
+  discountGroupId: number,
+  discountGroupCode: string,
+  discountExpression: string,
   discountPercent: number
   priceSegmentCode?: string
+}
+
+export interface ItemGroupInfo {
+  brandId: number,
+  groupId: number,
+  seasonId: number,
+  categoryId: number,
+  deptId: number
 }

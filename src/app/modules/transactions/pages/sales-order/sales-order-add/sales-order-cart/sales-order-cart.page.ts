@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { SalesOrderHeader, SalesOrderRoot, SalesOrderSummary } from 'src/app/modules/transactions/models/sales-order';
+import { SalesOrderHeader, SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -38,7 +38,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.objectHeader = this.objectService.header;
     this.itemInCart = this.objectService.itemInCart;
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
     }
   }
 
@@ -46,7 +46,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.objectHeader = this.objectService.header;
     this.itemInCart = this.objectService.itemInCart;
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
     }
   }
 
@@ -139,6 +139,18 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     this.isModalOpen = true;
   }
 
+  hideEditModal() {
+    this.isModalOpen = false;
+  }
+
+  onModalHide() {
+    this.selectedIndex = null;
+    this.selectedItem = null;
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
+    }
+  }
+
   saveChanges() {
     if (this.selectedIndex === null || this.selectedIndex === undefined) {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
@@ -183,18 +195,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       await alert.present();
     } catch (e) {
       console.error(e);
-    }
-  }
-
-  hideEditModal() {
-    this.isModalOpen = false;
-  }
-
-  onModalHide() {
-    this.selectedIndex = null;
-    this.selectedItem = null;
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
     }
   }
 
@@ -356,7 +356,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         this.itemInCart.splice(index, 1);
       }
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, false)
+        this.promotionEngineService.runPromotionEngine(this.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision, this.objectService.discountGroupMasterList, true)
       }
     } catch (e) {
       console.error(e);
@@ -489,20 +489,8 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         header: this.objectHeader,
         details: this.itemInCart
       }
-      console.log("🚀 ~ file: sales-order-cart.page.ts:473 ~ SalesOrderCartPage ~ insertSalesOrder ~ trxDto:", trxDto)
-      this.objectService.insertObject(trxDto).subscribe(response => {
-        let details: any[] = response.body["details"];
-        let totalQty: number = 0;
-        details.forEach(e => {
-          totalQty += e.qtyRequest;
-        })
-        let ss: SalesOrderSummary = {
-          salesOrderNum: response.body["header"]["salesOrderNum"],
-          customerName: this.objectService.customerMasterList.find(r => r.id === response.body["header"]["customerId"]).description,
-          totalQuantity: totalQty,
-          totalAmount: response.body["header"]["grandTotal"]
-        }
-        this.objectService.setSalesOrderSummary(ss);
+      this.objectService.insertObject(trxDto).subscribe(response => {        
+        this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
       }, error => {

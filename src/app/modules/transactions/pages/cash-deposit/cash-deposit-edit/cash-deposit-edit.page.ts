@@ -392,6 +392,12 @@ export class CashDepositEditPage implements OnInit {
 
   /* #endregion */
 
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
   async removeDir() {
     try {
       await Filesystem.rmdir({
@@ -437,7 +443,7 @@ export class CashDepositEditPage implements OnInit {
 
   async nextStep() {
     try {
-      if (this.objectForm.valid && this.images.length === 1) {
+      if (this.objectForm.valid) {
         const alert = await this.alertController.create({
           header: 'Are you sure to proceed?',
           buttons: [
@@ -458,7 +464,7 @@ export class CashDepositEditPage implements OnInit {
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('Error', 'Please fill required fields & attach 1 file to continue', 'top', 'danger', 2000);
+        this.toastService.presentToast('Error', 'Please fill required fields.', 'top', 'danger', 2000);
       }
     } catch (e) {
       console.error(e);

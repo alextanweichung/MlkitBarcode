@@ -19,7 +19,7 @@ export class ItemViewListFlatPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
+    
   }
 
 }

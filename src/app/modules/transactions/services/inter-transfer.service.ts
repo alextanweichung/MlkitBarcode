@@ -30,10 +30,12 @@ export class InterTransferService {
   async loadRequiredMaster() {
     await this.loadMasterList();
     await this.loadStaticLov();
+    await this.loadUserLocationIds();
   }
 
   fullMasterList: MasterList[] = [];
   locationMasterList: MasterListDetails[] = [];
+  destLocationMasterList: MasterListDetails[] = [];
   shipMethodMasterList: MasterListDetails[] = [];
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
@@ -43,6 +45,15 @@ export class InterTransferService {
     this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+
+    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser.loginUserType === 'B') {
+      this.destLocationMasterList = this.locationMasterList;
+    } else if (loginUser.loginUserType === 'C') {
+      this.oriLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === 'C' || r.attribute1 === 'W');
+    } else {
+      this.oriLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === 'O' || r.attribute1 === 'W');
+    }
   }
 
   fullStaticLovMasterList: MasterList[] = [];
@@ -50,6 +61,18 @@ export class InterTransferService {
   async loadStaticLov() {
     this.fullStaticLovMasterList = await this.getStaticLov();
     this.interTransferTypeMasterList = this.fullStaticLovMasterList.filter(x => x.objectName == 'InterTransferType' && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
+  }
+
+  userLocationIds: number[] = [];
+  oriLocationMasterList: MasterListDetails[] = [];
+  async loadUserLocationIds() {
+    this.userLocationIds = await this.getUserLocationIds();
+    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser.loginUserType === 'B') {
+      this.oriLocationMasterList = this.locationMasterList;
+    } else {
+      this.oriLocationMasterList = this.locationMasterList.filter(r => this.userLocationIds.includes(r.id));
+    }
   }
 
   /* #region hold object value */
@@ -96,6 +119,10 @@ export class InterTransferService {
 
   getStaticLov() {
     return this.http.get<MasterList[]>(this.baseUrl + "MobileInterTransfer/staticLov").toPromise();
+  }
+  
+  getUserLocationIds() {
+    return this.http.get<number[]>(this.baseUrl + "MobileInterTransfer/userLocation").toPromise();
   }
 
   getFullItemList() {

@@ -130,7 +130,7 @@
     </ion-row>
   </ion-grid>
 </ion-footer>
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalWillDismiss)="onModalHide()">
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -157,7 +157,7 @@
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>
-            <ion-select slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']">
               <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
@@ -252,7 +252,7 @@
           </ion-item>
           <ion-item>
             <ion-label>Ship Method</ion-label>
-            <ion-select slot="end" [(ngModel)]="objectHeader.shipMethodId" placeholder="Select ship method">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="objectHeader.shipMethodId" placeholder="Select ship method">
               <ion-select-option *ngFor="let s of objectService.shipMethodMasterList" [value]="s.id">{{s.description}}</ion-select-option>
             </ion-select>
           </ion-item>
@@ -263,7 +263,7 @@
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label>Address List</ion-label>
-            <ion-select slot="end" placeholder="Select ship address" [(ngModel)]="selectedAddress" (ionChange)="onAddressSelected()">
+            <ion-select interface="action-sheet" slot="end" placeholder="Select ship address" [(ngModel)]="selectedAddress" (ionChange)="onAddressSelected()">
               <ion-select-option *ngFor="let a of availableAddress" [value]="a">{{a.description}}</ion-select-option>
             </ion-select>
           </ion-item>
@@ -289,7 +289,7 @@
           </ion-item>
           <ion-item>
             <ion-label>Area</ion-label>
-            <ion-select slot="end" [(ngModel)]="objectHeader.shipAreaId" placeholder="Select ship area">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="objectHeader.shipAreaId" placeholder="Select ship area">
               <ion-select-option *ngFor="let a of objectService.areaMasterList" [value]="a.id">{{a.description}}</ion-select-option>
             </ion-select>
           </ion-item>

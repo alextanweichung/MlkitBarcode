@@ -135,7 +135,7 @@
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Prices</ion-title>
+        <ion-title>Price</ion-title>
         <ion-buttons slot="start">
           <ion-button (click)="hidePriceDialog()">Done</ion-button>
         </ion-buttons>
@@ -145,48 +145,48 @@
       <div class="p-2">
         <ion-list-header class="ion-list-header-small" *ngIf="prices.length === 0">
           <ion-label>Price not available.</ion-label>
-        </ion-list-header>        
+        </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button="false" *ngFor="let p of prices">
-            <ion-grid class="p-1">
+          <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let p of prices">
+            <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row *ngIf="p.locationId">
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Location</div>
+                  <div class="font-bold">Location</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">{{p.locationId|idMapping:objectService.locationMasterList}}</div>
+                  <div>{{p.locationId|idMapping:objectService.locationMasterList}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Segment</div>
+                  <div class="font-bold">Segment</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">{{p.itemPricing.priceSegmentCode}}</div>
+                  <div>{{p.itemPricing.priceSegmentCode}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Unit Price</div>
+                  <div class="font-bold">Unit Price</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">{{p.itemPricing.unitPrice|number:'1.2-2'}}</div>
+                  <div>{{p.itemPricing.unitPrice|number:'1.2-2'}}</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Discount Code</div>
+                  <div class="font-bold">Discount Code</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">{{p.itemPricing.discountGroupCode}} [{{p.itemPricing.discountExpression}}]</div>
+                  <div>{{p.itemPricing.discountGroupCode}} [{{p.itemPricing.discountExpression}}]</div>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">
-                  <div>Nett Price</div>
+                  <div class="font-bold">Nett Price</div>
                 </ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">
+                  <div>
                     {{p.itemPricing.unitPrice*(p.itemPricing.discountPercent?((100-p.itemPricing.discountPercent)/100) : 1)|number:'1.2-2'}}</div>
                 </ion-col>
               </ion-row>

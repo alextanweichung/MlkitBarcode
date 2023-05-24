@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot, ConsignmentSalesSummary } from '../models/consignment-sales';
+import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot } from '../models/consignment-sales';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -29,22 +29,22 @@ export class ConsignmentSalesService {
     this.header = header;
   }
 
-  summary: ConsignmentSalesSummary;
-  setSummary(summary: ConsignmentSalesSummary) {
-    this.summary = summary;
+  object: ConsignmentSalesRoot;
+  setObject(object: ConsignmentSalesRoot) {
+    this.object = object;
   }
 
   removeHeader() {
     this.header = null;
   }
 
-  removeSummary() {
-    this.summary = null;
+  removeObject() {
+    this.object = null;
   }
 
   resetVariables() {
     this.removeHeader();
-    this.removeSummary();
+    this.removeObject();
   }
 
   async loadRequiredMaster() {

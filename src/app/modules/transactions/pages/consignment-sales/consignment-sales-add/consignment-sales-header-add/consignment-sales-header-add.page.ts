@@ -187,6 +187,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     try {
       const actionSheet = await this.actionSheetController.create({
         header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
         cssClass: 'custom-action-sheet',
         buttons: [
           {

@@ -6,7 +6,6 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -14,114 +13,114 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Document</ion-label>
-    </ion-list-header>
-    <form [formGroup]="objectForm">
-      
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <form [formGroup]="objectForm">      
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
-          <ion-label color="dark">Doc Num</ion-label>
-          <ion-input class="font-size-small ion-text-right ion-no-padding-end" formControlName="truckLoadingNum" placeholder="Leave blank for auto assign"></ion-input>
+          <ion-label position="stacked">Doc Num</ion-label>
+          <ion-input formControlName="truckLoadingNum" placeholder="Leave blank for auto assign"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label color="dark">Trx Date</ion-label>
-          <ion-input readonly slot="end" type="text" class="ion-text-right ion-no-padding-end" (click)="toggleDate()" [value]="date"></ion-input>
+          <ion-label position="stacked">Trx Date</ion-label>
+          <ion-input readonly type="text" (click)="toggleDate()" [value]="date"></ion-input>
         </ion-item>
-        <ion-datetime class="animate__animated animate__fadeIn" *ngIf="date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onDateSelect($event)" [value]="date_value.toISOString()">
+        <ion-datetime #ionDate class="animate__animated animate__fadeIn" *ngIf="date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onDateSelect($event)" [value]="date_value.toISOString()">
+          <ion-buttons slot="buttons">
+            <ion-button color="danger" (click)="ionDate.cancel(); date_active=false">Cancel</ion-button>
+            <ion-button color="primary" (click)="ionDate.confirm()">Done</ion-button>
+          </ion-buttons>
         </ion-datetime>
         <ion-item>
-          <ion-label color="dark">Type</ion-label>
+          <ion-label position="stacked">Type</ion-label>
           <ion-select interface="action-sheet" formControlName="typeCode">
-            <ion-select-option *ngFor="let opt of truckLoadingType" [value]="opt.code">{{opt.description}}</ion-select-option>
+            <ion-select-option *ngFor="let opt of objectService.truckLoadingType" [value]="opt.code">{{opt.description}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-label color="dark">Logistic Vendor</ion-label>
+          <ion-label position="stacked">Logistic Vendor</ion-label>
           <ion-select interface="action-sheet" formControlName="vendorId">
-            <ion-select-option *ngFor="let opt of vendorMasterList" [value]="opt.id">{{opt.description}}</ion-select-option>
+            <ion-select-option *ngFor="let opt of objectService.vendorMasterList" [value]="opt.id">{{opt.description}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-label color="dark">Plate Number</ion-label>
-          <ion-input class="font-size-small ion-text-right ion-no-padding-end" formControlName="plateNumber" placeholder="Plate Num"></ion-input>
+          <ion-label position="stacked">Plate Number</ion-label>
+          <ion-input formControlName="plateNumber" placeholder="Plate Num"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label color="dark">Ship Method</ion-label>
+          <ion-label position="stacked">Ship Method</ion-label>
           <ion-select interface="action-sheet" formControlName="shipMethodId">
-            <ion-select-option *ngFor="let opt of shipMethodMasterList" [value]="opt.id">{{opt.description}}</ion-select-option>
+            <ion-select-option *ngFor="let opt of objectService.shipMethodMasterList" [value]="opt.id">{{opt.description}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-label color="dark">Remark</ion-label>
-          <ion-textarea class="font-size-small ion-text-right ion-no-padding-end" formControlName="remark" [autoGrow]="true" placeholder="Remark"></ion-textarea>
+          <ion-label position="stacked">Remark</ion-label>
+          <ion-textarea formControlName="remark" [autoGrow]="true" placeholder="Remark"></ion-textarea>
         </ion-item>
       </ion-list>
     </form>
 
     <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="docNumInput" placeholder="Scan or Input Doc Num" (keydown)="handleKeyDown($event, docNumInput)">
-
-    <ion-list-header class="ion-list-header-small">
+    <!-- DO2305010 -->
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Detail Line</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding *ngFor="let line of lineObjects; let i = index">
-        <ion-item button detail="false" *ngFor="let line of lineObjects" class="no-ripple">
-          <ion-grid class="p-0 pt-2">
+        <ion-item button detail="false" class="ion-no-padding">
+          <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
-              <ion-col>
-                <div>Document Num</div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Document Num</div>
               </ion-col>
-              <ion-col>
-                <div class="ion-text-right">{{line.trxNum}}</div>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{line.trxNum}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
-                <div>Document Type</div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Document Type</div>
               </ion-col>
-              <ion-col>
-                <div class="ion-text-right">{{line.trxType}}</div>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{line.trxType}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
-                <div>From Location</div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">From Location</div>
               </ion-col>
               <ion-col>
-                <div class="ion-text-right">{{line.fromLocation}}</div>
+                <div class="ion-flex ion-margin-auto justify-content-end">{{line.fromLocation}}</div>
               </ion-col>
             </ion-row>
             <ion-row *ngIf="line.toLocation">
-              <ion-col>
-                <div>Customer/To Location</div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Customer/To Location</div>
               </ion-col>
               <ion-col>
-                <div class="ion-text-right">{{line.toLocation}}</div>
+                <div class="ion-flex ion-margin-auto justify-content-end">{{line.toLocation}}</div>
               </ion-col>
             </ion-row>
             <ion-row *ngIf="line.totalCarton">
-              <ion-col>
-                <div>Total Carton</div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Total Carton</div>
               </ion-col>
               <ion-col>
-                <div class="ion-text-right">{{line.totalCarton}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <div>Total Quantity</div>
-              </ion-col>
-              <ion-col>
-                <div class="ion-text-right">{{line.qty|number:'1.0'}}</div>
+                <div class="ion-flex ion-margin-auto justify-content-end">{{line.totalCarton}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
-                <div>Remark</div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Total Quantity</div>
               </ion-col>
               <ion-col>
-                <div class="ion-text-right">
+                <div class="ion-flex ion-margin-auto justify-content-end">{{line.qty|number:'1.0'}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Remark</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-flex ion-margin-auto justify-content-end">
                   <ion-textarea class="custom-textarea" [autoGrow]="true" [(ngModel)]="line.remark" placeholder="Enter Remark"></ion-textarea>
                 </div>
               </ion-col>

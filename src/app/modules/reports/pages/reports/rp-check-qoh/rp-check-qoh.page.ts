@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CheckQohRoot } from '../../../models/rp-check-qoh';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-rp-check-qoh',
@@ -17,6 +18,7 @@ export class RpCheckQohPage implements OnInit {
   columns: any;
 
   constructor(
+    private authService: AuthService,
     private objectService: ReportsService,
     private toastService: ToastService
   ) {
@@ -48,7 +50,7 @@ export class RpCheckQohPage implements OnInit {
         this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
           this.objects = response;
           this.massageData();
-          this.toastService.presentToast('Search Completed', `${this.objects.length} item(s) found.`, 'top', 'success', 1000);
+          this.toastService.presentToast('Search Complete', `${this.objects.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
         })
       } else {
         this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);

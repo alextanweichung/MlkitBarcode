@@ -541,7 +541,7 @@
 }
 
 .item-inner {
-   padding: 0;
+   padding: 0 !important;
 }
 
 .no-ripple {
@@ -608,6 +608,7 @@ input {
 }
 
 .justify-content-end {
+   text-align: end;
    justify-content: end;
 }
 

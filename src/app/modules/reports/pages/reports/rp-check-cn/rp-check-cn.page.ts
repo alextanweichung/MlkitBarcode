@@ -7,6 +7,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CheckCn, CheckCnRequest } from '../../../models/rp-check-cn';
 import { AlertController } from '@ionic/angular';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-rp-check-cn',
@@ -16,6 +17,7 @@ import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 export class RpCheckCnPage implements OnInit {
 
   constructor(
+    private authService: AuthService,
     private objectService: ReportsService,    
     private commonService: CommonService,
     private toastService: ToastService,
@@ -64,7 +66,7 @@ export class RpCheckCnPage implements OnInit {
     try {
       this.objectService.getCheckCn(obj).subscribe(response => {
         this.objects = response;
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })

@@ -5,6 +5,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { NavigationExtras } from '@angular/router';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-debtor-application',
@@ -16,6 +17,7 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
   objects: DebtorApplicationList[] = [];
 
   constructor(
+    private authService: AuthService,
     private objectService: DebtorApplicationService,
     private commonService: CommonService,
     private toastService: ToastService,
@@ -41,7 +43,7 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
       let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.createdAt))))];
       this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
       await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
     }, error => {
       console.error(error);
     })
