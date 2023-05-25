@@ -37,8 +37,7 @@ export class GeneralSalesListPage implements OnInit {
 
   ngOnInit() {
     if (Capacitor.getPlatform() !== 'web') {
-      // this.configService.loadItemMaster();
-      // this.configService.loadItemBarcode();
+      
     }
   }
 

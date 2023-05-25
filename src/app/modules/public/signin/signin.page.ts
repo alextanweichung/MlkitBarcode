@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -10,7 +10,6 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
-import { LoadingService } from 'src/app/services/loading/loading.service';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 @Component({
@@ -20,7 +19,6 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 })
 export class SigninPage implements OnInit, ViewWillEnter {
 
-  companyName: string;
   current_year: number = new Date().getFullYear();
   currentVersion: string;
 
@@ -32,21 +30,64 @@ export class SigninPage implements OnInit, ViewWillEnter {
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
-    private configService: ConfigService,
+    public configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
-    // private loadingService: LoadingService,
+    private alertController: AlertController,
     private navController: NavController,
     private androidPermission: AndroidPermissions
   ) {
     this.currentVersion = environment.version;
+    this.newForm();
+    this.companyNames = new Map([]);
+    if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
+      this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
+    }
+  }
+
+  newForm() {
+    // Setup form
+    this.signin_form = this.formBuilder.group({
+      apiUrl: [this.configService.selected_sys_param ? this.configService.selected_sys_param.apiUrl : null, [Validators.required]],
+      userEmail: [null, Validators.compose([Validators.email, Validators.required])],
+      password: [null, Validators.compose([Validators.minLength(6), Validators.required])]
+    });
   }
 
   ionViewWillEnter(): void {
-    this.rememberMe = this.configService.sys_parameter.rememberMe;
-    if (this.rememberMe) {
-      this.signin_form.get('userEmail').setValue(this.configService.sys_parameter.username);
-      this.signin_form.get('password').setValue(this.configService.sys_parameter.password);
+
+  }
+
+  companyNames: Map<string, string> = new Map([]);
+  ngOnInit() {
+    if (Capacitor.getPlatform() === 'web') {
+      // this.signin_form.get('userEmail').setValue('kccon@idcp.my');
+      this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+      this.signin_form.get('password').setValue('String1234');
+    } else {
+      this.setSelectedParam();
+    }
+  }
+
+  mapCompanyName(apiUrl: string) {
+    return this.companyNames.get(apiUrl);
+  }
+
+  forgetPassword(event) {
+    this.navController.navigateRoot('/forget-password');
+  }
+
+  setSelectedParam() {
+    if (this.signin_form.controls.apiUrl.value) {
+      this.configService.selected_sys_param = this.configService.sys_parameter.find(r => r.apiUrl === this.signin_form.controls.apiUrl.value);
+      this.rememberMe = this.configService.selected_sys_param.rememberMe;
+      if (this.rememberMe) {
+        this.signin_form.get('userEmail').setValue(this.configService.selected_sys_param.username);
+        this.signin_form.get('password').setValue(this.configService.selected_sys_param.password);
+      } else {
+        this.signin_form.get('userEmail').setValue(null);
+        this.signin_form.get('password').setValue(null);
+      }
     }
     if (Capacitor.getPlatform() === 'web') {
       // this.signin_form.get('userEmail').setValue('kccon@idcp.my');
@@ -55,29 +96,47 @@ export class SigninPage implements OnInit, ViewWillEnter {
     }
   }
 
-  ngOnInit() {
-    // Setup form
-    this.loadCompanyName();
-    this.signin_form = this.formBuilder.group({
-      userEmail: ['', Validators.compose([Validators.email, Validators.required])],
-      password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
-    });
-  }
-
-  loadCompanyName() {
-    this.authService.getCompanyName().subscribe(response => {
-      this.companyName = response.name;
-    }, error => {
-      console.error(error);
-    })
-  }
-
-  forgetPassword(event) {
-    this.navController.navigateRoot('/forget-password');
+  async deleteAlert() {
+    if (this.configService.selected_sys_param) {
+      try {
+        const alert = await this.alertController.create({
+          header: `Delete ${this.mapCompanyName(this.configService.selected_sys_param.apiUrl)}?`,
+          message: 'This action cannot be undone.',
+          buttons: [
+            {
+              text: 'OK',
+              cssClass: 'success',
+              role: 'confirm',
+              handler: async () => {
+                if (this.configService.selected_sys_param) {
+                  await this.configService.deleteSys_Param();
+                  await this.configService.load();
+                  await this.signin_form.patchValue({ apiUrl: this.configService.selected_sys_param.apiUrl });
+                  await this.setSelectedParam();
+                }
+              },
+            },
+            {
+              cssClass: 'cancel',
+              text: 'Cancel',
+              role: 'cancel'
+            },
+          ]
+        });
+        await alert.present();
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      this.toastService.presentToast("Please select Company", "", "top", "warning", 1000);
+    }
   }
 
   // Sign in
   async signIn() {
+    // todo : check if delay
+    this.configService.selected_sys_param = this.configService.sys_parameter.find(r => r.apiUrl === this.signin_form.controls.apiUrl.value);
+
     this.submit_attempt = true;
     if (Capacitor.getPlatform() !== 'web') {
       OneSignal.getDeviceState(function (stateChanges) {
@@ -86,7 +145,6 @@ export class SigninPage implements OnInit, ViewWillEnter {
     } else {
       localStorage.setItem('player_Id', '6ce7134e-5a4b-426f-b89b-54de14e05eba');
     }
-
     // If email or password empty
     if (this.signin_form.value.email == '' || this.signin_form.value.password == '') {
       this.submit_attempt = false;
@@ -96,34 +154,74 @@ export class SigninPage implements OnInit, ViewWillEnter {
       (await this.authService.signIn(loginModel)).subscribe(async response => {
         await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
-          this.configService.sys_parameter.rememberMe = this.rememberMe;
+          this.configService.selected_sys_param.rememberMe = this.rememberMe;
           if (this.rememberMe) {
-            this.configService.sys_parameter.username = this.signin_form.controls.userEmail.value;
-            this.configService.sys_parameter.password = this.signin_form.controls.password.value;
+            this.configService.selected_sys_param.username = this.signin_form.controls.userEmail.value;
+            this.configService.selected_sys_param.password = this.signin_form.controls.password.value;
           } else {
-            this.configService.sys_parameter.username = '';
-            this.configService.sys_parameter.password = '';
+            this.configService.selected_sys_param.username = '';
+            this.configService.selected_sys_param.password = '';
           }
-          await this.configService.update(this.configService.sys_parameter);
+          await this.configService.update(this.configService.selected_sys_param);
           try {
-            // await this.loadingService.showLoading("Syncing Offline Table");
+            // download item master
             let response = await this.commonService.syncInbound();
+            // update current version to db
+            this.commonService.saveVersion().subscribe(response => {
+
+            }, error => {
+              console.error(error);
+            })
+            // save to local db
             let itemMaster: PDItemMaster[] = response['itemMaster'];
             let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
             await this.configService.syncInboundData(itemMaster, itemBarcode);
-            // await this.configService.loadItemMaster();
-            // await this.configService.loadItemBarcode();
-            // await this.loadingService.dismissLoading();
           } catch (error) {
-            // await this.loadingService.dismissLoading();
             this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
           }
         }
-      }, error => {        
+      }, error => {
         this.submit_attempt = false;
         console.error(error);
       });
     }
   }
+
+  /* #region more action */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async addNewActivation() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'New Activation?',
+      buttons: [
+        {
+          text: 'Ok',
+          cssClass: 'success',
+          handler: async () => {
+            this.navController.navigateRoot('/welcome');
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel'
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  /* #endregion */
 
 }

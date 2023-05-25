@@ -16,14 +16,12 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class PickingService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   header: GoodsPickingHeader;
@@ -103,35 +101,35 @@ export class PickingService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/masterList").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePicking/masterList").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePicking/staticLov").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePicking/staticLov").toPromise();
   }
 
   getObjectList() {
-    return this.http.get<GoodsPickingList[]>(this.baseUrl + "MobilePicking/gpList");
+    return this.http.get<GoodsPickingList[]>(this.configService.selected_sys_param.apiUrl + "MobilePicking/gpList");
   }
 
   getObjectListByDate(startDate: string, endDate: string) {
-    return this.http.get<GoodsPickingList[]>(this.baseUrl + "MobilePicking/listing/" + startDate + "/" + endDate);
+    return this.http.get<GoodsPickingList[]>(this.configService.selected_sys_param.apiUrl + "MobilePicking/listing/" + startDate + "/" + endDate);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<any>(this.baseUrl + "MobilePicking/" + objectId);
+    return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "MobilePicking/" + objectId);
   }
 
   getSoByCustomer(customerId: number) {
-    return this.http.get<PickingSalesOrderRoot[]>(this.baseUrl + "MobilePicking/fromSO/customer/" + customerId);
+    return this.http.get<PickingSalesOrderRoot[]>(this.configService.selected_sys_param.apiUrl + "MobilePicking/fromSO/customer/" + customerId);
   }
 
   getSoByCustomerLocation(customerId: number, toLocationId: number){
-    return this.http.get<PickingSalesOrderRoot[]>(this.baseUrl + "MobilePicking/fromSo/customer/" + customerId + "/" + toLocationId);
+    return this.http.get<PickingSalesOrderRoot[]>(this.configService.selected_sys_param.apiUrl + "MobilePicking/fromSo/customer/" + customerId + "/" + toLocationId);
   }
 
   insertPicking(object: GoodsPickingRoot) {
-    return this.http.post(this.baseUrl + "MobilePicking", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobilePicking", object, httpObserveHeader);
   }
 
 }

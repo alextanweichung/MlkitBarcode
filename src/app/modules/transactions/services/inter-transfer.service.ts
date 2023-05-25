@@ -17,14 +17,12 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class InterTransferService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -106,31 +104,31 @@ export class InterTransferService {
   /* #endregion */
 
   getObjectList(dateStart: string, dateEnd: string) {
-    return this.http.get<InterTransferList[]>(this.baseUrl + "MobileInterTransfer/listing/" + dateStart + "/" + dateEnd);
+    return this.http.get<InterTransferList[]>(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer/listing/" + dateStart + "/" + dateEnd);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<InterTransferRoot>(this.baseUrl + "MobileInterTransfer/" + objectId);
+    return this.http.get<InterTransferRoot>(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer/" + objectId);
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileInterTransfer/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer/masterlist").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileInterTransfer/staticLov").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer/staticLov").toPromise();
   }
   
   getUserLocationIds() {
-    return this.http.get<number[]>(this.baseUrl + "MobileInterTransfer/userLocation").toPromise();
+    return this.http.get<number[]>(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer/userLocation").toPromise();
   }
 
   getFullItemList() {
-    return this.http.get<ItemList[]>(this.baseUrl + "MobileInterTransfer/item/itemList", { context: background_load() });
+    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer/item/itemList", { context: background_load() });
   }
 
   insertObject(object: InterTransferRoot) {
-    return this.http.post(this.baseUrl + "MobileInterTransfer", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileInterTransfer", object, httpObserveHeader);
   }
 
 }

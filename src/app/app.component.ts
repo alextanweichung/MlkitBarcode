@@ -35,7 +35,7 @@ export class AppComponent {
     this.platform.ready().then(async () => {
       await this.configService.load();
       
-      if (this.configService.sys_parameter) {
+      if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
         this.navController.navigateRoot('/signin');
       } else {
         this.navController.navigateRoot('/welcome');

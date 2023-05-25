@@ -45,6 +45,7 @@ export class RpSalesCustomerPage implements OnInit, ViewWillEnter {
     this.columns = [
       { prop: 'customerCode', name: 'Debtor Code', draggable: false },
       { prop: 'customerName', name: 'Debtor Name', draggable: false },
+      { prop: 'trxMonth', name: 'Trx Month', draggable: false },
       { prop: 'salesAmount', name: 'Sales Amount', draggable: false }
     ]
   }

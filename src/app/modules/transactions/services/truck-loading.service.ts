@@ -16,13 +16,13 @@ const httpObserveHeader = {
 })
 export class TruckLoadingService {
 
-  baseUrl: string;
+  
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -46,7 +46,7 @@ export class TruckLoadingService {
   }
 
   getObjects() {
-    return this.http.get<TruckLoadingHeader[]>(this.baseUrl + "MobileTruckLoading").pipe(
+    return this.http.get<TruckLoadingHeader[]>(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading").pipe(
       map((response: any) =>
         response.data.map((item: any) => item)
       )
@@ -54,35 +54,35 @@ export class TruckLoadingService {
   }
 
   insertObject(object: TruckLoadingRoot) {
-    return this.http.post(this.baseUrl + "MobileTruckLoading", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading", object, httpObserveHeader);
   }
 
   updateObject(object: TruckLoadingRoot) {
-    return this.http.put(this.baseUrl + "MobileTruckLoading", object, httpObserveHeader);
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading", object, httpObserveHeader);
   }
 
   getObject(objectId: number) {
-    return this.http.get<TruckLoadingRoot>(this.baseUrl + "MobileTruckLoading/" + objectId);
+    return this.http.get<TruckLoadingRoot>(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading/" + objectId);
   }
 
   deleteObject(objectId: number) {
-    return this.http.delete(this.baseUrl + "MobileTruckLoading/" + objectId, httpObserveHeader);
+    return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading/" + objectId, httpObserveHeader);
   }
 
   toggleObject(objectId: number) {
-    return this.http.put(this.baseUrl + "MobileTruckLoading/deactivate/" + objectId, httpObserveHeader);
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading/deactivate/" + objectId, httpObserveHeader);
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileTruckLoading/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading/masterlist").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>( this.baseUrl + "MobileTruckLoading/staticLov").toPromise();
+    return this.http.get<MasterList[]>( this.configService.selected_sys_param.apiUrl + "MobileTruckLoading/staticLov").toPromise();
   }
 
   getLineDetailsByTrxNum(trxNum: string){
-    return this.http.get<TruckLoadingTrxDetails>(this.baseUrl + "MobileTruckLoading/fromTrxNum/" + trxNum);    
+    return this.http.get<TruckLoadingTrxDetails>(this.configService.selected_sys_param.apiUrl + "MobileTruckLoading/fromTrxNum/" + trxNum);    
   }
 
 }

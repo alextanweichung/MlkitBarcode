@@ -14,14 +14,12 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class ConsignmentSalesService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) { 
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   header: ConsignmentSalesHeader;
@@ -83,39 +81,39 @@ export class ConsignmentSalesService {
 
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/masterList").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/masterList").toPromise();
   }
 
   getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.baseUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
+    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileConsignmentSales/staticlov").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/staticlov").toPromise();
   }
 
   getObjectList() {
-    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileConsignmentSales/cslist");
+    return this.http.get<ConsignmentSalesList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/cslist");
   }
 
   getObjectListByDate(startDate: string, endDate: string) {
-    return this.http.get<ConsignmentSalesList[]>(this.baseUrl + "MobileConsignmentSales/listing/" + startDate + "/" + endDate);
+    return this.http.get<ConsignmentSalesList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/listing/" + startDate + "/" + endDate);
   }  
 
   getObjectById(objectId: number) {
-    return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileConsignmentSales/" + objectId);
+    return this.http.get<ConsignmentSalesRoot>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/" + objectId);
   }
 
   getExistingObject(trxDate: string, toLocationId: number) {
-    return this.http.get<ConsignmentSalesRoot>(this.baseUrl + "MobileConsignmentSales/existing/" + trxDate + "/" + toLocationId);
+    return this.http.get<ConsignmentSalesRoot>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/existing/" + trxDate + "/" + toLocationId);
   }
 
   insertObject(object: ConsignmentSalesRoot) {
-    return this.http.post(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales", object, httpObserveHeader);
   }
 
   updateObject(object: ConsignmentSalesRoot) {
-    return this.http.put(this.baseUrl + "MobileConsignmentSales", object, httpObserveHeader);
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales", object, httpObserveHeader);
   }
 
 }

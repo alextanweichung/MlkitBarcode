@@ -13,7 +13,7 @@ const httpObserveHeader = {
 })
 export class BarcodeScanInputService {
 
-  baseUrl: string;
+  
 
   constructor(
     private http: HttpClient,
@@ -21,11 +21,11 @@ export class BarcodeScanInputService {
     @Inject('apiObject') private apiObject: string
   ) {
     this.apiObject = apiObject;
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   getItemInfoByBarcode(barcode: string) {
-    return this.http.get<ItemBarcodeModel>(this.baseUrl + this.apiObject + "/itemByBarcode/" + barcode);
+    return this.http.get<ItemBarcodeModel>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/itemByBarcode/" + barcode);
   }
 
 }

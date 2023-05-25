@@ -15,16 +15,14 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class CashDepositService {
-
-  baseUrl: string;
-
+  
   customers: Customer[] = [];
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -45,27 +43,27 @@ export class CashDepositService {
   }
 
   getObjects() {
-    return this.http.get<CashDeposit[]>(this.baseUrl + "MobilePosCashDeposit");
+    return this.http.get<CashDeposit[]>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit");
   }
 
   insertObject(object) {
-    return this.http.post(this.baseUrl + "MobilePosCashDeposit", object, httpObserveHeader).toPromise();
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit", object, httpObserveHeader).toPromise();
   }
 
   updateObject(object) {
-    return this.http.put(this.baseUrl + "MobilePosCashDeposit", object, httpObserveHeader).toPromise();
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit", object, httpObserveHeader).toPromise();
   }
 
   getObject(objectId: number) {
-    return this.http.get<CashDeposit>(this.baseUrl + "MobilePosCashDeposit/" + objectId);
+    return this.http.get<CashDeposit>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/" + objectId);
   }
 
   deleteObject(objectId: number) {
-    return this.http.delete(this.baseUrl + "MobilePosCashDeposit/" + objectId, httpObserveHeader);
+    return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/" + objectId, httpObserveHeader);
   }
 
   toggleObject(objectId: number) {
-    return this.http.put(this.baseUrl + "MobilePosCashDeposit/deactivate/" + objectId, null, httpObserveHeader);
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/deactivate/" + objectId, null, httpObserveHeader);
   }
 
   // upload file
@@ -73,19 +71,19 @@ export class CashDepositService {
   // update collection
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobilePosCashDeposit/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/customer").toPromise();
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePosCashDeposit/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/masterlist").toPromise();
   }
 
   uploadFile(keyId: number, fileId: number, file: any) {
-    return this.http.post(this.baseUrl + "MobilePosCashDeposit/slipUpload/" + keyId + "/" + fileId, file, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/slipUpload/" + keyId + "/" + fileId, file, httpObserveHeader);
   }
 
   downloadFile(fileId: number) {
-    return this.http.get(this.baseUrl + "MobilePosCashDeposit/imageFile/" + fileId, { responseType: 'blob' });
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/imageFile/" + fileId, { responseType: 'blob' });
   }
 
 }

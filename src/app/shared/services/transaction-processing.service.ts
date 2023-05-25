@@ -13,24 +13,22 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class TransactionProcessingService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
     @Inject('apiObject') private apiObject: string
   ) {
     this.apiObject = apiObject;
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }  
 
   getDocumentCount() {
-    return this.http.get<TransactionProcessingCount>(this.baseUrl + this.apiObject + '/count');
+    return this.http.get<TransactionProcessingCount>(this.configService.selected_sys_param.apiUrl + this.apiObject + '/count');
   }
 
   getProcessingDocumentByDateRange(dateStart: string, dateEnd: string) {
-    return this.http.get<TransactionProcessingDoc[]>(this.baseUrl + this.apiObject + '/processing/' + dateStart + '/' + dateEnd).pipe(
+    return this.http.get<TransactionProcessingDoc[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + '/processing/' + dateStart + '/' + dateEnd).pipe(
       map((response: any) => {
         return response.map((item: any) => item)
       })
@@ -38,7 +36,7 @@ export class TransactionProcessingService {
   }
 
   getGeneratedDocumentByDateRange(dateStart: string, dateEnd: string) {
-    return this.http.get<TransactionProcessingDoc[]>(this.baseUrl + this.apiObject + '/generated/' + dateStart + '/' + dateEnd).pipe(
+    return this.http.get<TransactionProcessingDoc[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + '/generated/' + dateStart + '/' + dateEnd).pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -46,15 +44,15 @@ export class TransactionProcessingService {
   }
 
   updateDocumentStatus(docStatus: any, trxId: number, actionReason: string) {
-    return this.http.post(this.baseUrl + this.apiObject + '/' + docStatus + '/' + trxId + '/' + actionReason, null, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + this.apiObject + '/' + docStatus + '/' + trxId + '/' + actionReason, null, httpObserveHeader);
   }
 
   bulkUpdateDocumentStatus(bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.baseUrl + this.apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + this.apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
   rejectDocumentStatus(docStatus: any, trxId: number) {
-    return this.http.post(this.baseUrl + this.apiObject + '/' + docStatus + '/' + trxId, null, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + this.apiObject + '/' + docStatus + '/' + trxId, null, httpObserveHeader);
   }
 
 }

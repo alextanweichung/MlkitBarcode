@@ -25,7 +25,7 @@ const httpObserveHeader = {
 })
 export class QuotationService {
 
-  baseUrl: string;
+  
   
   promotionMaster: PromotionMaster[] = [];
 
@@ -46,7 +46,7 @@ export class QuotationService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -120,11 +120,11 @@ export class QuotationService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/masterlist").toPromise();
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/staticLov").pipe(
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/staticLov").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -132,39 +132,39 @@ export class QuotationService {
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/customer").toPromise();
   }
   
   getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileQuotation/promotion/' + trxDate + '/' + customerId).toPromise();
+    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + 'MobileQuotation/promotion/' + trxDate + '/' + customerId).toPromise();
   }
 
   getFullItemList() {
-    return this.http.get<ItemList[]>(this.baseUrl + "MobileQuotation/item/itemList", { context: background_load() });
+    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/item/itemList", { context: background_load() });
   }
 
   getObjectList() {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/qtlist");
+    return this.http.get<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/qtlist");
   }
 
   getObjectListByDate(searchObject: SalesSearchModal) {
-    return this.http.post<QuotationList[]>(this.baseUrl + "MobileQuotation/listing", searchObject);
+    return this.http.post<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/listing", searchObject);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + objectId);
+    return this.http.get<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/" + objectId);
   }
 
   insertObject(object: QuotationRoot) {
-    return this.http.post(this.baseUrl + "MobileQuotation", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
   }
 
   getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.baseUrl + 'MobileQuotation/creditInfo/' + customerId);
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + 'MobileQuotation/creditInfo/' + customerId);
   }
 
   downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
-    return this.http.post(this.baseUrl + "MobileQuotation/exportPdf", 
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation/exportPdf", 
     {
       "appCode": appCode,
       "format": format,
@@ -174,7 +174,7 @@ export class QuotationService {
   }
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
 }

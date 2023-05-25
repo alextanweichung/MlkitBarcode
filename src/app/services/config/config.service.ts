@@ -7,18 +7,15 @@ import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/t
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
-
-export const getSysParams: string =
-`SELECT * 
-FROM Sys_Parameter
-WHERE id = 1`;
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigService {
 
-  sys_parameter: Sys_Parameter;
+  sys_parameter: Sys_Parameter[] = [];
+  selected_sys_param: Sys_Parameter;
   item_Masters: PDItemMaster[] = [];
   item_Barcodes: PDItemBarcode[] = [];
 
@@ -44,8 +41,9 @@ export class ConfigService {
 
   async load() {
     try {
+      // for web development
       if (Capacitor.getPlatform() === 'web') {
-        this.sys_parameter = {
+        this.sys_parameter.push({
           Sys_ParameterId: 1,
           // apiUrl: 'https://localhost:44351/api/',
           apiUrl: 'https://idcp-demo.com/api/',
@@ -54,9 +52,28 @@ export class ConfigService {
           // apiUrl: 'https://idcp-ararat.com:8081/api/',
           imgUrl: null,
           lastDownloadAt: null
-        }
-      } else {
+        })
+        this.sys_parameter.push({
+          Sys_ParameterId: 2,
+          // apiUrl: 'https://localhost:44351/api/',
+          // apiUrl: 'https://idcp-demo.com/api/',
+          apiUrl: 'https://idcp-testing.motorparts.asia/api/',
+          // apiUrl: 'https://idcp.motorparts.asia/api/',
+          // apiUrl: 'https://idcp-ararat.com:8081/api/',
+          imgUrl: null,
+          lastDownloadAt: null
+        })
+        // if (this.sys_parameter && this.sys_parameter.length === 1) {
+          this.selected_sys_param = this.sys_parameter[0];
+        // }
+      }
+      else { // live
         this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
+        if (this.sys_parameter && this.sys_parameter.length === 1) {
+          this.selected_sys_param = this.sys_parameter[0];
+        } else {
+          // let user select in login screen
+        }
       }
     } catch (e) {
       console.error(e);
@@ -65,13 +82,15 @@ export class ConfigService {
 
   async insert(object: Sys_Parameter) {
     try {
-      this.sys_parameter = {
-        Sys_ParameterId: 1,
+      let sys_parameter: Sys_Parameter = {
+        Sys_ParameterId: object.Sys_ParameterId,
         apiUrl: object?.apiUrl,
         imgUrl: object.imgUrl,
         lastDownloadAt: null,
       }
-      await this.commonQueryService.insert(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
+      await this.commonQueryService.insert(sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
+      // reload.
+      await this.load();
     } catch (e) {
       console.error(e);
     }
@@ -79,8 +98,15 @@ export class ConfigService {
 
   async update(object: Sys_Parameter) {
     try {
-      this.sys_parameter = object;
       await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async deleteSys_Param() {
+    try {
+      await this.commonQueryService.delete(this.selected_sys_param, "Sys_Parameter", dbConfig.idcpcore);
     } catch (e) {
       console.error(e);
     }
@@ -98,7 +124,7 @@ export class ConfigService {
       console.error(e);
     }
     try {
-      let obj = this.sys_parameter;
+      let obj = this.selected_sys_param;
       obj.lastDownloadAt = new Date;
       await this.update(obj);
     } catch (e) {

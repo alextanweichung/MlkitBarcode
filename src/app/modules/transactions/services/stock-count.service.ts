@@ -18,13 +18,13 @@ const httpObserveHeader = {
 })
 export class StockCountService {
 
-  baseUrl: string;
+  
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -78,39 +78,39 @@ export class StockCountService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileInventoryCount/masterList").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/masterList").toPromise();
   }
 
   getInventoryCountByDate(startDate, endDate) {
-    return this.http.get<StockCount[]>(this.baseUrl + "MobileInventoryCount/listing/" + startDate + "/" + endDate);
+    return this.http.get<StockCount[]>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/listing/" + startDate + "/" + endDate);
   }
 
   getInventoryCountList() {
-    return this.http.get<StockCountList[]>(this.baseUrl + "MobileInventoryCount/iclist");
+    return this.http.get<StockCountList[]>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/iclist");
   }
 
   getInventoryCount(inventoryCountId: number) {
-    return this.http.get<StockCountRoot>(this.baseUrl + "MobileInventoryCount/" + inventoryCountId);
+    return this.http.get<StockCountRoot>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/" + inventoryCountId);
   }
 
   getInventoryCountBatchByLocationId(locationId: number) {
-    return this.http.get<InventoryCountBatchList[]>(this.baseUrl + "MobileInventoryCount/batchlist/" + locationId);
+    return this.http.get<InventoryCountBatchList[]>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/batchlist/" + locationId);
   }
   
   getInventoryCountBatchCriteria(inventoryCountBatchId: number) {
-    return this.http.get<InventoryCountBatchCriteria>(this.baseUrl + "MobileInventoryCount/batchRandomList/" + inventoryCountBatchId);
+    return this.http.get<InventoryCountBatchCriteria>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/batchRandomList/" + inventoryCountBatchId);
   }
 
   getItemInfoByBarcode(barcode: string) {
-    return this.http.get<ItemBarcodeModel>(this.baseUrl + "MobileInventoryCount/itemByBarcode/" + barcode);
+    return this.http.get<ItemBarcodeModel>(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/itemByBarcode/" + barcode);
   }
 
   insertInventoryCount(inventoryCountRoot: StockCountRoot) {
-    return this.http.post(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
   }
 
   updateInventoryCount(inventoryCountRoot: StockCountRoot) {
-    return this.http.put(this.baseUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
   }
   
 }

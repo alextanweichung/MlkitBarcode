@@ -21,6 +21,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   customers: Customer[] = [];
   customerSearchDropdownList: SearchDropdownList[] = [];
   objects: DebtorOutstanding[] = [];
+  isOverdueOnly: boolean = false;
 
   data: any;
   columns: any;
@@ -76,7 +77,8 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   loadDebtorReport() {
     let obj: DebtorOutstandingRequest = {
       customerId: this.customerIds??[],
-      trxDate: format(this.trxDate, 'yyyy-MM-dd')
+      trxDate: format(this.trxDate, 'yyyy-MM-dd'),
+      isOverdueOnly: this.isOverdueOnly
     }
     this.objectService.getDebtorOutstanding(obj).subscribe(response => {
       this.objects = response;

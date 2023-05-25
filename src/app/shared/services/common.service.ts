@@ -8,13 +8,13 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { AnnouncementFile } from 'src/app/modules/dashboard/models/dashboard';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
@@ -23,14 +23,22 @@ export class CommonService {
     private file: File,
     private androidPermissions: AndroidPermissions
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   /* #region common service */
 
   getCompanyProfile() {
     try {
-      return this.http.get(this.baseUrl + "account/companyName");
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "account/companyName");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  getCompanyProfileByUrl(apiUrl) {
+    try {
+      return this.http.get(apiUrl + "account/companyName").toPromise().then(r => { return r['name'] });
     } catch (e) {
       console.error(e);
     }
@@ -38,8 +46,15 @@ export class CommonService {
 
   syncInbound() {
     try {
-      // return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
-      return this.http.get(this.baseUrl + "MobileDownload/itemMaster").toPromise();      
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster").toPromise();      
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  saveVersion() {
+    try {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/mobileVersion/" + environment.version, null)
     } catch (e) {
       console.error(e);
     }

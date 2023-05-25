@@ -1,5 +1,5 @@
 export interface Sys_Parameter {
-   Sys_ParameterId: number
+   Sys_ParameterId?: number
    apiUrl: string
    imgUrl?: string
    lastDownloadAt?: Date

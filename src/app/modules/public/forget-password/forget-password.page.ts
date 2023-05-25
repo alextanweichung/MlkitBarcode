@@ -26,7 +26,7 @@ export class ForgetPasswordPage implements OnInit {
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
-    private configService: ConfigService,
+    public configService: ConfigService,
     private navController: NavController,
     private alertController: AlertController,
     private toastService: ToastService,
@@ -36,9 +36,9 @@ export class ForgetPasswordPage implements OnInit {
     this.newObjectForm();
   }
 
-  newObjectForm() {    
-    this.baseUrl = this.configService.sys_parameter.apiUrl;
+  newObjectForm() {
     this.object_form = this.formBuilder.group({
+      apiUrl: [this.configService.selected_sys_param ? this.configService.selected_sys_param.apiUrl : null, [Validators.required]],
       userEmail: ['', Validators.compose([Validators.email, Validators.required])]
     });
   }
@@ -47,24 +47,25 @@ export class ForgetPasswordPage implements OnInit {
     if (Capacitor.getPlatform() === 'web') {
       this.object_form.get('userEmail').setValue('aychia@idcp.my');
     }
-    this.loadCompanyName();
+    if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {      
+      this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
+    }
   }
 
-  loadCompanyName() {
-    this.authService.getCompanyName().subscribe(response => {
-      this.companyName = response.name;
-    }, error => {
-      console.error(error);
-    })
+  companyNames: Map<string,string> = new Map([]);
+  mapCompanyName(apiUrl: string) {
+    return this.companyNames.get(apiUrl);
   }
 
   backToLogin(event) {
     this.navController.navigateRoot('/signin');
   }
-
-  baseUrl: string;
+  
   passwordResetRequest: ForgotPasswordRequest;
-  async emailResetLink() {    
+  async emailResetLink() {
+    // todo : check if delay
+    this.configService.selected_sys_param = this.configService.sys_parameter.find(r => r.apiUrl === this.object_form.controls.apiUrl.value);
+
     const alert = await this.alertController.create({
       cssClass: 'custom-alert',
       header: 'Are you sure to reset?',
@@ -74,7 +75,7 @@ export class ForgetPasswordPage implements OnInit {
         handler: () => {
           this.passwordResetRequest = {
             userEmail: this.object_form.get('userEmail').value,
-            clientURI: this.baseUrl.replace('api/','') + "reset-password"
+            clientURI: this.configService.selected_sys_param.apiUrl.replace('api/','') + "reset-password"
           };
           this.authService.forgotPassword(this.passwordResetRequest).subscribe(response => {
             if (response.status == 200) {

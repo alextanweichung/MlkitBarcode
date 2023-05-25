@@ -9,6 +9,7 @@ import { RpSaPerfAllPageRoutingModule } from './rp-sa-perf-all-routing.module';
 import { RpSaPerfAllPage } from './rp-sa-perf-all.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { CalendarInputPageModule } from '../../../../../shared/pages/calendar-input/calendar-input.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { CalendarInputPageModule } from '../../../../../shared/pages/calendar-in
     IonicModule,
     RpSaPerfAllPageRoutingModule,
     NgxDatatableModule,
-    CalendarInputPageModule
+    CalendarInputPageModule,
+    SumModule
   ],
   declarations: [RpSaPerfAllPage]
 })

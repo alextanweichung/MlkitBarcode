@@ -10,6 +10,7 @@ import { RpSalesCustomerPage } from './rp-sales-customer.page';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi
     RpSalesCustomerPageRoutingModule,
     SearchMultiDropdownPageModule,
     CalendarInputPageModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    SumModule
   ],
   declarations: [RpSalesCustomerPage]
 })

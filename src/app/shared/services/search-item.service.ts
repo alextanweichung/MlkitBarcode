@@ -15,7 +15,7 @@ const httpObserveHeader = {
 })
 export class SearchItemService {
 
-  baseUrl: string;
+  
 
   constructor(
     private http: HttpClient,
@@ -23,23 +23,23 @@ export class SearchItemService {
     @Inject('apiObject') private apiObject: string
   ) {
     this.apiObject = apiObject;
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   getItemInfo(itemId: number, trxDate: string, keyId: number, locationId: number) {
-    return this.http.get<TransactionDetail>(this.baseUrl + this.apiObject + "/item/" + itemId + "/" + trxDate + "/" + keyId + "/" + locationId, { context: background_load() });
+    return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/" + itemId + "/" + trxDate + "/" + keyId + "/" + locationId, { context: background_load() });
   }
 
   getItemInfoByKeyword(keyword: string, trxDate: string, keyId: number, locationId: number) {
-    return this.http.get<TransactionDetail[]>(this.baseUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId);
+    return this.http.get<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId);
   }
 
   getItemImageFile(keyword: string) {
-    return this.http.get<ItemImage[]>(this.baseUrl + this.apiObject + "/itemList/imageFile/" + keyword, { context: background_load() });
+    return this.http.get<ItemImage[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/itemList/imageFile/" + keyword, { context: background_load() });
   }
 
   getItemInfoWithoutPrice(keyword: string, trxDate: string) {
-    return this.http.get<TransactionDetail[]>(this.baseUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate);
+    return this.http.get<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate);
   }
 
 }

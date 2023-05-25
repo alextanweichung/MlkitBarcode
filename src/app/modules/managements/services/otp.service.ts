@@ -15,18 +15,16 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class OtpService {
-
-  baseUrl: string;
   
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   getOtps() {
-    return this.http.get(this.baseUrl + "Otp").pipe(
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "Otp").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -34,27 +32,27 @@ export class OtpService {
   }
 
   insertOtp(otp: OtpDTO) {
-    return this.http.post(this.baseUrl + "Otp", otp, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "Otp", otp, httpObserveHeader);
   }
 
   getOtpLines(otpId: number) {
-    return this.http.get(this.baseUrl + "Otp/otpLine/" + otpId);
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "Otp/otpLine/" + otpId);
   }
 
   getOtpHistory(otpLineId: number) {
-    return this.http.get(this.baseUrl + "Otp/History/" + otpLineId);
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "Otp/History/" + otpLineId);
   }
 
   getDescendantUser() {
-    return this.http.get<User[]>(this.baseUrl + "Otp/descendantUser");
+    return this.http.get<User[]>(this.configService.selected_sys_param.apiUrl + "Otp/descendantUser");
   }
 
   getUserApps(userId: number) {
-    return this.http.get(this.baseUrl + "Otp/userApps/" + userId);
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "Otp/userApps/" + userId);
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + 'Otp/staticLov').pipe(
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + 'Otp/staticLov').pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -62,7 +60,7 @@ export class OtpService {
   }
 
   getAllApps() {
-    return this.http.get(this.baseUrl + "App").pipe(
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "App").pipe(
       map((response: any) =>
         response.data.map((item: any) => item)
       )

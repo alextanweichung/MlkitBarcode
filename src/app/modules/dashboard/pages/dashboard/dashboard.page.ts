@@ -41,13 +41,12 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     private commonService: CommonService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
-    private navController: NavController,
-    // private badge: Badge
+    private navController: NavController
   ) { }
 
   ionViewDidEnter(): void {
     try {
-      this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
+      this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
       this.loadAnnouncements();
     } catch (e) {
       console.error(e);

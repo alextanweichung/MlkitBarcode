@@ -15,6 +15,7 @@ body {
 
 app-welcome .swiper-welcome {
   text-align: center;
+  // margin-top: 82px;
 }
 
 app-welcome .swiper {
@@ -34,7 +35,7 @@ app-welcome h3 {
   font-size: 24px;
   line-height: 32px;
   font-weight: 600;
-  margin: 82px 0 12px 0;
+  margin: 0 0 12px 0;
   background: -webkit-linear-gradient(var(--ion-color-medium), var(--ion-color-tertiary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -75,13 +76,19 @@ app-welcome ion-footer {
   background: transparent;
 }
 
-input {
-  width: 100%;
-  background-color: transparent;
-  border: none;
-}
-
-input[type=text]:focus {
-  border: none;
+ion-input[type=text]{
+  border: solid 1px;
+  border-radius: 8px;
+  width: 3ch;
+  height: 4ch;
+  background-color: lightgray;
   outline: none;
 }
+
+// input[type=text]:focus {
+//   border: solid 1px;
+//   border-radius: 8px;
+//   width: 3ch;
+//   background-color: lightgray;
+//   outline: none;
+// }

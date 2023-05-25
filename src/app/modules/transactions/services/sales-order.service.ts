@@ -28,7 +28,7 @@ const httpObserveHeader = {
 })
 export class SalesOrderService {
 
-  baseUrl: string;
+  
   
   promotionMaster: PromotionMaster[] = [];
 
@@ -49,7 +49,7 @@ export class SalesOrderService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -123,47 +123,47 @@ export class SalesOrderService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/masterlist").toPromise();
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileSalesOrder/staticLov");
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/staticLov");
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobileSalesOrder/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/customer").toPromise();
   }
 
   getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId).toPromise();
+    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId).toPromise();
   }
 
   getFullItemList() {
-    return this.http.get<ItemList[]>(this.baseUrl + "MobileSalesOrder/item/itemList", { context: background_load() });
+    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/item/itemList", { context: background_load() });
   }
 
   getObjectList() {
-    return this.http.get<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/solist");
+    return this.http.get<SalesOrderList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/solist");
   }
 
   getObjectListByDate(searchObject: SalesSearchModal) {
-    return this.http.post<SalesOrderList[]>(this.baseUrl + "MobileSalesOrder/listing", searchObject);
+    return this.http.post<SalesOrderList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/listing", searchObject);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<SalesOrderRoot>(this.baseUrl + "MobileSalesOrder/" + objectId);
+    return this.http.get<SalesOrderRoot>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/" + objectId);
   }
 
   insertObject(object: SalesOrderRoot) {
-    return this.http.post(this.baseUrl + "MobileSalesOrder", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder", object, httpObserveHeader);
   }
 
   getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.baseUrl + 'MobileSalesOrder/creditInfo/' + customerId);
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + 'MobileSalesOrder/creditInfo/' + customerId);
   }
 
   downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
-    return this.http.post(this.baseUrl + "MobileSalesOrder/exportPdf",
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/exportPdf",
       {
         "appCode": appCode,
         "format": format,
@@ -174,19 +174,19 @@ export class SalesOrderService {
   }
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
   getStatus(objectId: number) {
-    return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileSalesOrder/status/" + objectId);
+    return this.http.get<SalesOrderStatus>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/status/" + objectId);
   }
 
   getWorkflow(objectId: number) {
-    return this.http.get<WorkFlowState[]>(this.baseUrl + "MobileSalesOrder/workflow/" + objectId);
+    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/workflow/" + objectId);
   }
 
   getTrxChild(objectId: number){
-    return this.http.get<TrxChild>(this.baseUrl + "MobileSalesOrder/child/" + objectId).pipe(
+    return this.http.get<TrxChild>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/child/" + objectId).pipe(
       map((response: any) =>       
         response.map((item: any) => item)   
       )

@@ -65,7 +65,7 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
   // On date from select
   onDateSelect(event: any) {
     let date = new Date(event.detail.value);
-    this.date_active = false
+    // this.date_active = false
     if (this.presentation === 'date-time') {
       this.date_value = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), 0);
       this.date_value_for_ion_calendar = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), 0);

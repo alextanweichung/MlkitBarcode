@@ -75,26 +75,45 @@ export class CardsPage implements OnInit, AfterContentChecked {
     if (this.swiper) {
       this.swiper.updateSwiper({});
     }
-    this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
+    this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
   }
 
   // Sync
   async sync() {
     if (Capacitor.getPlatform() !== 'web') {
       try {
-        // await this.loadingService.showLoading("Syncing Offline Table");
         let response = await this.commonService.syncInbound();
         let itemMaster: PDItemMaster[] = response['itemMaster'];
         let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
-        // await this.configService.loadItemMaster();
-        // await this.configService.loadItemBarcode();
-        // await this.loadingService.dismissLoading();
       } catch (error) {
-        // await this.loadingService.dismissLoading();
         this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }
+  }
+
+  async addNewActivation() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'New Activation?',
+      subHeader: "You'll be signed out to do this!",
+      buttons: [
+        {
+          text: 'Sign-out',
+          cssClass: 'danger',
+          handler: async () => {
+            this.authService.signOut(true);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel'
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   async signOut() {

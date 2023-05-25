@@ -15,14 +15,12 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class TransferConfirmationService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
     this.loadRequiredMaster();
   }
 
@@ -77,19 +75,19 @@ export class TransferConfirmationService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileTransferConfirmation/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferConfirmation/masterlist").toPromise();
   }
   
   getUserLocationIds() {
-    return this.http.get<number[]>(this.baseUrl + "MobileTransferConfirmation/userLocation").toPromise();
+    return this.http.get<number[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferConfirmation/userLocation").toPromise();
   }
 
   getPendingList(locationId: number) {
-    return this.http.get<TransferConfirmationRoot[]>(this.baseUrl + "MobileTransferConfirmation/pending/" + locationId);
+    return this.http.get<TransferConfirmationRoot[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferConfirmation/pending/" + locationId);
   }
 
   updateObject(object: TransferConfirmationRoot) {
-    return this.http.put(this.baseUrl + "MobileTransferConfirmation", object, httpObserveHeader);
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileTransferConfirmation", object, httpObserveHeader);
   }
 
 }

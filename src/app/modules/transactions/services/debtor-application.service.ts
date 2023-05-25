@@ -15,14 +15,12 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class DebtorApplicationService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
   
   hasSalesAgent(): boolean {
@@ -70,35 +68,35 @@ export class DebtorApplicationService {
   }
 
   getObjects() {
-    return this.http.get<DebtorApplicationList[]>(this.baseUrl + "MobileDebtorApplication");
+    return this.http.get<DebtorApplicationList[]>(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication");
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<DebtorApplicationRoot>(this.baseUrl + "MobileDebtorApplication/" + objectId);
+    return this.http.get<DebtorApplicationRoot>(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/" + objectId);
   }
 
   insertObject(object: DebtorApplicationHeader) {
-    return this.http.post(this.baseUrl + "MobileDebtorApplication", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication", object, httpObserveHeader);
   }
   
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileDebtorApplication/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/masterlist").toPromise();
   }
 
   getWorkflow(objectId: number) {
-    return this.http.get<WorkFlowState[]>(this.baseUrl + "MobileDebtorApplication/workflow/" + objectId);
+    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/workflow/" + objectId);
   }
 
   uploadFile(keyId: number, fileId: number, file: any) {
-    return this.http.post(this.baseUrl + "MobileDebtorApplication/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
   }
 
   downloadFile(keyId: number) {
-    return this.http.get(this.baseUrl + "MobileDebtorApplication/downloadFile/" + keyId, { responseType: "blob"});
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/downloadFile/" + keyId, { responseType: "blob"});
   }
 
   deleteFile(keyId: number) {
-    return this.http.delete(this.baseUrl + "MobileDebtorApplication/deleteFile/" + keyId, httpObserveHeader);
+    return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/deleteFile/" + keyId, httpObserveHeader);
   }
 
 }

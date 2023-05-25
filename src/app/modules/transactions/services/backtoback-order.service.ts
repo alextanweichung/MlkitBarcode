@@ -21,8 +21,6 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class BackToBackOrderService {
-
-  baseUrl: string;
   
   promotionMaster: PromotionMaster[] = [];
 
@@ -47,7 +45,7 @@ export class BackToBackOrderService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   async loadRequiredMaster() {
@@ -129,47 +127,47 @@ export class BackToBackOrderService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileBackToBackOrder/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/masterlist").toPromise();
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileBackToBackOrder/staticLov").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/staticLov").toPromise();
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobileBackToBackOrder/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/customer").toPromise();
   }
 
   getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileBackToBackOrder/promotion/' + trxDate + '/' + customerId).toPromise();
+    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + 'MobileBackToBackOrder/promotion/' + trxDate + '/' + customerId).toPromise();
   }
 
   getFullItemList() {
-    return this.http.get<ItemList[]>(this.baseUrl + "MobileBackToBackOrder/item/itemList", { context: background_load() });
+    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/item/itemList", { context: background_load() });
   }
 
   // getObjectList() {
-  //   return this.http.get<BackToBackOrderList[]>(this.baseUrl + "MobileBackToBackOrder/b2blist");
+  //   return this.http.get<BackToBackOrderList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/b2blist");
   // }
 
   getObjectListByDate(startDate: string, endDate: string) {
-    return this.http.get<BackToBackOrderList[]>(this.baseUrl + "MobileBackToBackOrder/listing/" + startDate + "/" + endDate);
+    return this.http.get<BackToBackOrderList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/listing/" + startDate + "/" + endDate);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<BackToBackOrderRoot>(this.baseUrl + "MobileBackToBackOrder/" + objectId);
+    return this.http.get<BackToBackOrderRoot>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/" + objectId);
   }
 
   insertObject(object: BackToBackOrderRoot) {
-    return this.http.post(this.baseUrl + "MobileBackToBackOrder", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder", object, httpObserveHeader);
   }
 
   getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.baseUrl + 'MobileBackToBackOrder/creditInfo/' + customerId);
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + 'MobileBackToBackOrder/creditInfo/' + customerId);
   }
 
   // downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
-  //   return this.http.post(this.baseUrl + "MobileBackToBackOrder/exportPdf",
+  //   return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/exportPdf",
   //     {
   //       "appCode": appCode,
   //       "format": format,
@@ -180,11 +178,11 @@ export class BackToBackOrderService {
   // }
 
   // bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-  //   return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+  //   return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   // }
 
   // getStatus(salesOrderId: number) {
-  //   return this.http.get<SalesOrderStatus>(this.baseUrl + "MobileBackToBackOrder/status/" + salesOrderId);
+  //   return this.http.get<SalesOrderStatus>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/status/" + salesOrderId);
   // }
 
 }

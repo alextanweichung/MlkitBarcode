@@ -15,54 +15,52 @@ import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
   providedIn: 'root'
 })
 export class ReportsService {
-
-  baseUrl: string;
   
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   getCustomers() {
-    return this.http.get<Customer[]>(this.baseUrl + "mobileReport/customer");
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/customer");
   }
 
   getDebtorOutstanding(object: DebtorOutstandingRequest) {
-    return this.http.post<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding", object);
+    return this.http.post<DebtorOutstanding[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/lastOutstanding", object);
   }
 
   getSOListing() {
-    return this.http.get<ReportSOListing[]>(this.baseUrl + "MobileReport/soListing");
+    return this.http.get<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing");
   }
 
   getSAPerformance() {
-    return this.http.get<SAPerformanceListing[]>(this.baseUrl + "MobileReport/saPerformance");
+    return this.http.get<SAPerformanceListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/saPerformance");
   }
 
   getAllSalesPerformance(dateStart: string, dateEnd: string) {
-    return this.http.get<SalesAgentAllPerformanceObject[]>(this.baseUrl + "MobileReport/allPerformance/" + dateStart + "/" + dateEnd);
+    return this.http.get<SalesAgentAllPerformanceObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/allPerformance/" + dateStart + "/" + dateEnd);
   }
 
   getSalesByCustomer(object: SalesByCustomerRequest) {
-    return this.http.post<SalesByCustomer[]>(this.baseUrl + "MobileReport/salesByCustomer", object);
+    return this.http.post<SalesByCustomer[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/salesByCustomer", object);
   }
 
   getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
-    return this.http.get<CheckQohRoot[]>(this.baseUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
+    return this.http.get<CheckQohRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
   }
 
   getCheckCn(object: CheckCnRequest) {
-    return this.http.post<CheckCn[]>(this.baseUrl + "mobileReport/checkCn", object);
+    return this.http.post<CheckCn[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkCn", object);
   }
 
   getPdf(model: ReportParameterModel) {
-    return this.http.post(this.baseUrl + "mobileReport/exportPdf", model, { responseType: 'blob' });
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "mobileReport/exportPdf", model, { responseType: 'blob' });
   }
 
   getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.baseUrl + "mobileReport/creditInfo/" + customerId);
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + "mobileReport/creditInfo/" + customerId);
   }
   
 }

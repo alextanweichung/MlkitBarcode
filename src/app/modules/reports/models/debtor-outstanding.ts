@@ -12,4 +12,5 @@ export interface DebtorOutstanding {
 export interface DebtorOutstandingRequest {
   customerId: number[]
   trxDate: string
+  isOverdueOnly: boolean
 }
