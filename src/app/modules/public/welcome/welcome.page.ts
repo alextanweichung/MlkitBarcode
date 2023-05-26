@@ -4,7 +4,7 @@ import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
 SwiperCore.use([Pagination]);
 
 import { ConfigService } from 'src/app/services/config/config.service';
-import { IonInput, NavController } from '@ionic/angular';
+import { AlertController, IonInput, NavController } from '@ionic/angular';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { Keyboard } from '@capacitor/keyboard';
@@ -39,9 +39,10 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   }
 
   constructor(
-    private configService: ConfigService,
+    public configService: ConfigService,
     private toastService: ToastService,
-    private navController: NavController
+    private navController: NavController,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -125,5 +126,26 @@ export class WelcomePage implements OnInit, AfterContentChecked {
       this.toastService.presentToast('Please enter valid activation code', '', 'top', 'danger', 1000);
     }
   }
+
+  async backToLogin() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'Cancel Activation?',
+      buttons: [
+        {
+          text: 'Ok',
+          cssClass: 'success',
+          handler: async () => {
+            this.navController.navigateRoot('/signin');
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel'
+        }
+      ]
+    });
+    await alert.present();}
 
 }

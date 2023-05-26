@@ -30,6 +30,13 @@
               <ion-input #input6 id="input6" class="ion-text-center" type="text" inputmode="text" enterkeyhint="next" clearOnEdit="true" [maxlength]="1" [(ngModel)]="activationCode[5]" (ionChange)="uppercase($event);"></ion-input>
             </ion-col>
           </ion-row>
+          <ion-row class="mt-3" *ngIf="configService.sys_parameter && configService.sys_parameter.length > 0">
+            <ion-col class="ion-flex ion-margin-auto justify-content-center">
+              <ion-text color="medium" (click)="backToLogin()">
+                <small>back to login?</small>
+              </ion-text>
+            </ion-col>
+          </ion-row>
         </ion-grid>
       </div>
     </ng-template>

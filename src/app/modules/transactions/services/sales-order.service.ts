@@ -27,8 +27,6 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class SalesOrderService {
-
-  
   
   promotionMaster: PromotionMaster[] = [];
 
