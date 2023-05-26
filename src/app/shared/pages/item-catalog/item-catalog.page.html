@@ -14,7 +14,7 @@
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
-                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+                <div class="font-bold ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
@@ -84,7 +84,7 @@
             <ion-row *ngIf="item.variationTypeCode === '0'">
               <ion-col size="8" class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{item.itemCode}}</div>
-                <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+                <div class="font-bold ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
               <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(item)" [disabled]="disableIfPricingNotSet && (item.itemPricing === null)">
