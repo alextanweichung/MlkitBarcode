@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -74,6 +74,7 @@ export class SalesOrderDetailPage implements OnInit {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: sales-order-detail.page.ts:77 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
@@ -133,6 +134,30 @@ export class SalesOrderDetailPage implements OnInit {
     }, error => {
       console.error(error);
     })
+  }
+
+  toggleObject() {
+    this.objectService.toggleObject(this.object.header.salesOrderId).subscribe(response => {
+      if (response.status === 204) {
+        this.loadObject();
+        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+      }      
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  editObject() {
+    
+    console.log("🚀 ~ file: sales-order-detail.page.ts:152 ~ SalesOrderDetailPage ~ editObject ~ this.object:", this.object)
+    this.objectService.setHeader(this.object.header);
+    this.objectService.setChoosenItems(this.object.details);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.header.salesOrderId
+      }
+    }
+    this.navController.navigateRoot('/transactions/sales-order/sales-order-cart', navigationExtras);
   }
 
   matchImage(itemId: number) {

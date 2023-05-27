@@ -29,7 +29,7 @@
           </ion-segment-button>
         </ion-segment>
       </div>
-      <ion-list-header class="ion-list-header-small" *ngIf="objectForm.get('isWithSo').value">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="objectForm.get('isWithSo').value">
         <ion-label>Available Sales Orders</ion-label>
       </ion-list-header>
       <p *ngIf="availableSalesOrders?.length === 0 && objectForm.get('isWithSo').value">

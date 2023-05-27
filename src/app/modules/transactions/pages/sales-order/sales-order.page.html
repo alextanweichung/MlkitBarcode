@@ -31,11 +31,14 @@
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item-sliding *ngFor="let object of getObjects(m)">
+          <ion-item-sliding #slidingItem *ngFor="let object of getObjects(m)">
             <ion-item [button]="false" [detail]="false" class="ion-no-padding" (click)="goToDetail(object.salesOrderId)">
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
-                  <ion-col class="ion-flex ion-margin-auto font-bold">{{object.salesOrderNum}}</ion-col>
+                  <ion-col class="ion-flex ion-margin-auto font-bold">
+                    {{object.salesOrderNum}} 
+                    <ion-icon class="ion-flex ml-2" name="ellipse" [class]="object.deactivated?'color-danger':'color-success'"></ion-icon>
+                  </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
                 </ion-row>
                 <ion-row>
@@ -49,7 +52,9 @@
               </ion-grid>
             </ion-item>
             <ion-item-options side="end">
-              <ion-item-option (click)="presentAlertViewPdf(object)">DOWNLOAD</ion-item-option>
+              <ion-item-option (click)="slidingItem.close(); presentAlertViewPdf(object)">
+                <ion-icon name="download-outline"></ion-icon>
+              </ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
         </ion-list>

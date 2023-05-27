@@ -12,7 +12,7 @@
   <ng-template>
     <ion-content class="p-2">      
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button (click)="isPopoverOpen = false; showNotificationHistoryModal()">
+        <ion-item button (click)="popover.dismiss(); showNotificationHistoryModal()">
           <ion-label>
             <div>Notification History</div>
           </ion-label>
@@ -189,7 +189,7 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-list-header class="ion-list-header-small" *ngIf="notificationHistories.length === 0">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="notificationHistories.length === 0">
           <ion-label>Notification History not available.</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">

@@ -13,7 +13,7 @@
   <ng-template>
     <ion-content class="p-2">      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button (click)="isPopoverOpen = false; showPriceDialog()">
+        <ion-item button (click)="popover.dismiss(); showPriceDialog()">
           <ion-label>
             <div>View Price</div>
           </ion-label>
@@ -143,8 +143,8 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-list-header class="ion-list-header-small" *ngIf="prices.length === 0">
-          <ion-label>Price not available.</ion-label>
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="prices.length === 0">
+          <ion-label>Price Not Available.</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let p of prices">

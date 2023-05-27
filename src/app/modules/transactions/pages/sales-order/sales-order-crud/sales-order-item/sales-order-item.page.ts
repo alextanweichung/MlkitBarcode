@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { NavigationExtras } from '@angular/router';
+import { ActionSheetController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -30,7 +31,9 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     public objectService: SalesOrderService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService) {
+    private toastService: ToastService,
+    private actionSheetController: ActionSheetController
+  ) {
     try {
       this.objectHeader = this.objectService.header;
       this.itemInCart = this.objectService.itemInCart;
@@ -57,7 +60,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    
+
   }
 
   componentsLoad() {
@@ -99,7 +102,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
         return;
       }
     } else {
-      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest??0 !== 0)).length === 0) {
+      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest ?? 0 !== 0)).length === 0) {
         return;
       }
     }
@@ -145,7 +148,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
-  
+
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
@@ -229,7 +232,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
       trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
       trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
-      
+
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
@@ -276,6 +279,37 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   previousStep() {
     try {
       this.navController.navigateBack('/transactions/sales-order/sales-order-header');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async backToDetail() {
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'confirm',
+          },
+          {
+            text: 'No',
+            role: 'cancel',
+          }]
+      });
+      await actionSheet.present();
+      const { role } = await actionSheet.onWillDismiss();
+      if (role === 'confirm') {
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: this.objectService.header.salesOrderId
+          }
+        }
+        this.navController.navigateRoot('/transactions/sales-order/sales-order-detail', navigationExtras);
+      }
     } catch (e) {
       console.error(e);
     }

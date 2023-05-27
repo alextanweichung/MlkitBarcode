@@ -13,31 +13,31 @@
   <ng-template>
     <ion-content class="p-2">      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item button (click)="isPopoverOpen = false; showHistoryModal()">
+        <ion-item button (click)="popover.dismiss(); showHistoryModal()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approval History</div>
           </ion-label>
         </ion-item>
-        <ion-item button (click)="isPopoverOpen = false; presentAlertViewPdf()">
+        <ion-item button (click)="popover.dismiss(); presentAlertViewPdf()">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Download Pdf</div>
           </ion-label>
         </ion-item>
-        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="isPopoverOpen = false; presentConfirmAlert('CONFIRM')">
+        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('CONFIRM')">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approve</div>
           </ion-label>
         </ion-item>
-        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="isPopoverOpen = false; presentConfirmAlert('REJECT')">
+        <ion-item button *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('REJECT')">
           <ion-icon name="close-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reject</div>
           </ion-label>
         </ion-item>
-        <ion-item button *ngIf="processType && selectedSegment === 'completed'" (click)="isPopoverOpen = false; presentConfirmAlert('REVERSE')">
+        <ion-item button *ngIf="processType && selectedSegment === 'completed'" (click)="popover.dismiss(); presentConfirmAlert('REVERSE')">
           <ion-icon name="arrow-undo-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reverse</div>
@@ -204,7 +204,7 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-list-header class="ion-list-header-small" *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
           <ion-label>Approval History Not Available.</ion-label>
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
