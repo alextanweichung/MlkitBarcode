@@ -1,8 +1,7 @@
 export interface SalesByCustomer {
    customerCode: string
    customerName: string
-   year: number
-   month: number
+   trxMonth: string
    salesAmount: number
 }
 

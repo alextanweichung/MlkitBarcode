@@ -19,6 +19,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
   tempDropdownList: SearchDropdownList[];
   @Input() selectedIds: number[] = [];
   selected: SearchDropdownList[] = [];
+  selectAll: boolean = false;
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
   
@@ -48,11 +49,23 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
     } else {
       this.tempDropdownList = this.searchDropdownList;
     }
-    // this.searchBar.setFocus();
   }
 
   resetFilter() {
     this.tempDropdownList = this.searchDropdownList;
+  }  
+
+  toggleSelectAll(event) {
+    this.selected = [];
+    if (this.selectAll) {
+      this.tempDropdownList.forEach(r => {
+        r.checked = true;
+      })
+    } else {
+      this.tempDropdownList.forEach(r => {
+        r.checked = false;
+      })
+    }
   }
   
   itemChecked(event, object: SearchDropdownList) {
