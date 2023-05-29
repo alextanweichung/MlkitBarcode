@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -85,6 +85,28 @@ export class QuotationDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  editObject() {
+    this.objectService.setHeader(this.object.header);
+    this.objectService.setChoosenItems(this.object.details);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.header.quotationId
+      }
+    }
+    this.navController.navigateRoot('/transactions/quotation/quotation-cart', navigationExtras);
+  }
+
+  toggleObject() {
+    this.objectService.toggleObject(this.object.header.quotationId).subscribe(response => {
+      if (response.status === 204) {
+        this.loadObject();
+        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+      }
+    }, error => {
+      console.error(error);
+    })
   }
 
   matchImage(itemId: number) {

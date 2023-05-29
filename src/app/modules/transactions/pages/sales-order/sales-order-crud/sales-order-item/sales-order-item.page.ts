@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { SalesOrderHeader } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -21,8 +20,6 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
-  objectHeader: SalesOrderHeader;
-
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
 
@@ -35,9 +32,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     private actionSheetController: ActionSheetController
   ) {
     try {
-      this.objectHeader = this.objectService.header;
-      this.itemInCart = this.objectService.itemInCart;
-      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/sales-order/sales-order-header');
       }
     } catch (e) {
@@ -47,9 +42,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     try {
-      this.objectHeader = this.objectService.header;
-      this.itemInCart = this.objectService.itemInCart;
-      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/sales-order/sales-order-header');
       } else {
         this.componentsLoad();
@@ -95,7 +88,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     }
   }
 
-  itemInCart: TransactionDetail[] = [];
+  // itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
     if (event.variationTypeCode === '0') {
       if (event.qtyRequest === null || event.qtyRequest === undefined || event.qtyRequest === 0) {
@@ -109,13 +102,13 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignTrxItemToDataLine(trxLine);
-      if (this.objectHeader.isItemPriceTaxInclusive) {
+      if (this.objectService.header.isItemPriceTaxInclusive) {
         await this.computeUnitPriceExTax(trxLine);
       } else {
         await this.computeUnitPrice(trxLine);
       }
-      this.itemInCart.push(trxLine);
-      await this.computeAllAmount(this.itemInCart[0]);
+      this.objectService.itemInCart.unshift(trxLine);
+      await this.computeAllAmount(this.objectService.itemInCart[0]);
       await this.assignSequence();
       this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
     } catch (e) {
@@ -125,7 +118,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   assignSequence() {
     let index = 0;
-    this.itemInCart.forEach(r => {
+    this.objectService.itemInCart.forEach(r => {
       r.sequence = index;
       index++;
     })
@@ -189,7 +182,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -198,7 +191,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -208,16 +201,18 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
       await this.getVariationSum(trxLine);
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision);
     } catch (e) {
       console.error(e);
     }
   }
 
-  assignTrxItemToDataLine(trxLine: TransactionDetail) {
+  assignTrxItemToDataLine(trxLine: TransactionDetail): TransactionDetail {
     try {
+      trxLine.lineId = 0;
+      trxLine.headerId = this.objectService.header.salesOrderId;
       if (this.useTax) {
-        if (this.objectHeader.isItemPriceTaxInclusive) {
+        if (this.objectService.header.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
           trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
         } else {
@@ -230,16 +225,16 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       }
       trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
-      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.header.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.header.maxPrecision);
 
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-        if (this.objectHeader.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+        if (this.objectService.header.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPrice;
         } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPriceExTax;
         }
         if (trxLine.itemGroupInfo) {
           trxLine.brandId = trxLine.itemGroupInfo.brandId;
@@ -269,7 +264,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.objectService.setChoosenItems(this.itemInCart);
+      // this.objectService.setChoosenItems(this.objectService.itemInCart);
       this.navController.navigateForward('/transactions/sales-order/sales-order-cart');
     } catch (e) {
       console.error(e);

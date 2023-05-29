@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { NavigationExtras } from '@angular/router';
+import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -31,9 +32,10 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     public objectService: QuotationService,
     private navController: NavController,
     private commonService: CommonService,
-    private toastService: ToastService) {
+    private toastService: ToastService,
+    private actionSheetController: ActionSheetController
+  ) {
     try {
-      this.itemInCart = this.objectService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/quotation/quotation-header');
       }
@@ -44,8 +46,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     try {
-      this.objectService.header = this.objectService.header;
-      this.itemInCart = this.objectService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/quotation/quotation-header');
       } else {
@@ -91,7 +91,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     }
   }
 
-  itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
@@ -101,8 +100,8 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       } else {
         await this.computeUnitPrice(trxLine);
       }
-      this.itemInCart.push(trxLine);
-      await this.computeAllAmount(this.itemInCart[0]);
+      this.objectService.itemInCart.unshift(trxLine);
+      await this.computeAllAmount(this.objectService.itemInCart[0]);
       await this.assignSequence();
       this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
     } catch (e) {
@@ -112,7 +111,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   assignSequence() {
     let index = 0;
-    this.itemInCart.forEach(r => {
+    this.objectService.itemInCart.forEach(r => {
       r.sequence = index;
       index++;
     })
@@ -179,6 +178,8 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
+      trxLine.lineId = 0;
+      trxLine.headerId = this.objectService.header.quotationId;
       if (this.useTax) {
         if (this.objectService.header.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
@@ -232,7 +233,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.objectService.setChoosenItems(this.itemInCart);
       this.navController.navigateForward('/transactions/quotation/quotation-cart');
     } catch (e) {
       console.error(e);
@@ -242,6 +242,37 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   previousStep() {
     try {
       this.navController.navigateBack('/transactions/quotation/quotation-header');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async backToDetail() {
+    try {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
+        cssClass: 'custom-action-sheet',
+        buttons: [
+          {
+            text: 'Yes',
+            role: 'confirm',
+          },
+          {
+            text: 'No',
+            role: 'cancel',
+          }]
+      });
+      await actionSheet.present();
+      const { role } = await actionSheet.onWillDismiss();
+      if (role === 'confirm') {
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: this.objectService.header.quotationId
+          }
+        }
+        this.navController.navigateRoot('/transactions/quotation/quotation-detail', navigationExtras);
+      }
     } catch (e) {
       console.error(e);
     }

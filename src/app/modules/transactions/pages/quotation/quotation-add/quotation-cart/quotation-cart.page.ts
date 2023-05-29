@@ -404,7 +404,11 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
               role: 'confirm',
               cssClass: 'success',
               handler: async () => {
-                await this.insertObject();
+                if (this.objectService.header.quotationId) {
+                  await this.updateObject();
+                } else {
+                  await this.insertObject();
+                }
               },
             },
             {
@@ -429,7 +433,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         details: this.objectService.itemInCart
       }
       this.objectService.insertObject(trxDto).subscribe(response => {
-        console.log("🚀 ~ file: quotation-cart.page.ts:432 ~ QuotationCartPage ~ this.objectService.insertObject ~ response:", response)
         this.objectService.setObject((response.body as QuotationRoot))
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/quotation/quotation-summary');
@@ -439,6 +442,22 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  updateObject() {
+    let trxDto: QuotationRoot = {
+      header: this.objectService.header,
+      details: this.objectService.itemInCart
+    }
+    this.objectService.updateObject(trxDto).subscribe(response => {
+      this.objectService.setObject((response.body as QuotationRoot));
+      this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
+      this.navController.navigateRoot('/transactions/quotation/quotation-summary');
+    }, error => {
+      throw error;
+    });
+  } catch(e) {
+    console.error(e);
   }
 
   /* #endregion */

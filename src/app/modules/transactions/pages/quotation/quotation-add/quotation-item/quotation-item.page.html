@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Item</ion-title>
-    <ion-buttons slot="start">
+    <ion-buttons slot="start" *ngIf="objectService.header.quotationId === 0">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="start" *ngIf="objectService.header.quotationId > 0">
+      <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
     <ion-buttons slot="primary" *ngIf="!showImage">
       <ion-button (click)="toggleShowImage()">Grid</ion-button>
@@ -22,7 +25,7 @@
     <ion-row>
       <ion-col>
         <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-          View Cart ({{itemInCart.length|number:'1.0'}})
+          View Cart ({{objectService.itemInCart.length|number:'1.0'}})
         </ion-button>
       </ion-col>
     </ion-row>

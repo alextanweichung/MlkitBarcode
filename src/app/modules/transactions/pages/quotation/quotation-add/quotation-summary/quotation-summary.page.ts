@@ -44,7 +44,6 @@ export class QuotationSummaryPage implements OnInit {
 
   // selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
-    console.log("🚀 ~ file: quotation-summary.page.ts:49 ~ QuotationSummaryPage ~ showDetails ~ this.objectService.object:", this.objectService.object)
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
       this.objectService.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;

@@ -159,6 +159,14 @@ export class QuotationService {
     return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
   }
 
+  updateObject(object: QuotationRoot) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
+  }
+
+  toggleObject(objectId: number) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileQuotation/deactivate/" + objectId, null, httpObserveHeader);
+  }
+
   getCreditInfo(customerId: number) {
     return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + 'MobileQuotation/creditInfo/' + customerId);
   }

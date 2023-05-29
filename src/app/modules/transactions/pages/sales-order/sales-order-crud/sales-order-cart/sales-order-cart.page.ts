@@ -264,7 +264,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   isExtraInfoModal: boolean = false;
   showExtraInfo() {
-    console.log("🚀 ~ file: sales-order-cart.page.ts:268 ~ SalesOrderCartPage ~ showExtraInfo ~ this.objectService.header:", this.objectService.header)
     this.isExtraInfoModal = true;
   }
 
@@ -481,9 +480,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         header: this.objectService.header,
         details: this.objectService.itemInCart
       }
-      console.log("🚀 ~ file: sales-order-cart.page.ts:489 ~ SalesOrderCartPage ~ insertObject ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
-        console.log("🚀 ~ file: sales-order-cart.page.ts:491 ~ SalesOrderCartPage ~ this.objectService.insertObject ~ response:", response)
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
@@ -500,9 +497,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       header: this.objectService.header,
       details: this.objectService.itemInCart
     }
-    console.log("🚀 ~ file: sales-order-cart.page.ts:506 ~ SalesOrderCartPage ~ updateObject ~ trxDto:", trxDto)
     this.objectService.updateObject(trxDto).subscribe(response => {
-      console.log("🚀 ~ file: sales-order-cart.page.ts:509 ~ SalesOrderCartPage ~ this.objectService.updateObject ~ response:", response)
       this.objectService.setObject((response.body as SalesOrderRoot));
       this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
       this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
