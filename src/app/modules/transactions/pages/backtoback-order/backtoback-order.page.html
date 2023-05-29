@@ -34,7 +34,10 @@
           <ion-item button detail="false" class="ion-no-padding" (click)="goToDetail(object.backToBackOrderId)">
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
-                <ion-col class="ion-flex ion-margin-auto font-bold">{{object.backToBackOrderNum}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto font-bold">
+                  {{object.backToBackOrderNum}}
+                  <ion-icon class="ion-flex ml-2" name="ellipse" [class]="object.deactivated?'color-danger':'color-success'"></ion-icon>
+                </ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
               </ion-row>
               <ion-row>

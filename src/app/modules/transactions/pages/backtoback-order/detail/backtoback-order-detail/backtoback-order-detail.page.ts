@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { BackToBackOrderRoot } from 'src/app/modules/transactions/models/backtoback-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
@@ -77,6 +77,28 @@ export class BacktobackOrderDetailPage implements OnInit {
     }
   }
 
+  editObject() {
+    this.objectService.setHeader(this.object.header);
+    this.objectService.setChoosenItems(this.object.details);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.header.backToBackOrderId
+      }
+    }
+    this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-cart', navigationExtras);
+  }
+
+  toggleObject() {
+    this.objectService.toggleObject(this.object.header.backToBackOrderId).subscribe(response => {
+      if (response.status === 204) {
+        this.loadObject();
+        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+      }
+    }, error => {
+      console.error(error);
+    })
+  }
+
   matchImage(itemId: number) {
     try {
       let defaultImageUrl = "assets/icon/favicon.png";
@@ -105,5 +127,21 @@ export class BacktobackOrderDetailPage implements OnInit {
   }
   
   /* #endregion */
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
 
 }

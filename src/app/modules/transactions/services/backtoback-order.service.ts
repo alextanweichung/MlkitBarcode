@@ -82,12 +82,12 @@ export class BackToBackOrderService {
   /* #region  for insert */
 
   object: BackToBackOrderRoot;
-  objectHeader: BackToBackOrderHeader;
+  header: BackToBackOrderHeader;
   itemInCart: TransactionDetail[] = [];
   async setHeader(objectHeader: BackToBackOrderHeader) {
-    this.objectHeader = objectHeader;
+    this.header = objectHeader;
     // load promotion first after customer confirmed or whenever header changed.
-    this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), 'yyyy-MM-dd'), this.objectHeader.customerId);
+    this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), 'yyyy-MM-dd'), this.header.customerId);
   }
 
   setChoosenItems(items: TransactionDetail[]) {
@@ -99,7 +99,7 @@ export class BackToBackOrderService {
   }
 
   removeCustomer() {
-    this.objectHeader = null;
+    this.header = null;
   }
 
   removeItems() {
@@ -160,6 +160,14 @@ export class BackToBackOrderService {
 
   insertObject(object: BackToBackOrderRoot) {
     return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder", object, httpObserveHeader);
+  }
+
+  updateObject(object: BackToBackOrderRoot) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder", object, httpObserveHeader);
+  }
+
+  toggleObject(objectId: number) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/deactivate/" + objectId, null, httpObserveHeader);
   }
 
   getCreditInfo(customerId: number) {

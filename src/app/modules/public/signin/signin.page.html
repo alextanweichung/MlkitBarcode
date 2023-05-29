@@ -2,10 +2,11 @@
   <div class="ion-flex ion-margin-auto justify-content-end">
     <ion-button (click)="showPopover($event)" fill="clear"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
   </div>
-  <div class="p-2 ion-full-height ion-flex ion-flex-center">
+  <div class="p-2 ion-flex ion-flex-center">
     <div class="logo-container">
       <ion-img src="../../../../assets/idcp/logo-idcp.svg" style="width: 50%" class="animate__animated animate__fadeInDown ion-flex ion-margin-auto" alt="iDCP Logo"></ion-img>
-      <p>Login to your account.</p>
+      <p *ngIf="configService.selected_sys_param">{{mapCompanyName(configService.selected_sys_param.apiUrl)}}</p>
+      <p class="mt-2 font-size-small">Login to your account</p>
     </div>
     <ion-list class="item-card-list" lines="none">
       <form class="form-default" [formGroup]="signin_form">
@@ -46,7 +47,6 @@
     </div>
   </div>
 </ion-content>
-
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">      

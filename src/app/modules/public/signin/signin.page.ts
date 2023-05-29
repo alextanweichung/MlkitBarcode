@@ -39,10 +39,6 @@ export class SigninPage implements OnInit, ViewWillEnter {
   ) {
     this.currentVersion = environment.version;
     this.newForm();
-    this.companyNames = new Map([]);
-    if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
-      this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
-    }
   }
 
   newForm() {
@@ -55,7 +51,10 @@ export class SigninPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
-
+    this.companyNames = new Map([]);
+    if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
+      this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
+    }
   }
 
   companyNames: Map<string, string> = new Map([]);
