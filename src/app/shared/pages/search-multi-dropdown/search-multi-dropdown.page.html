@@ -1,6 +1,6 @@
 
 <!-- <ion-label class="ion-flex mt-2" *ngIf="showHeaderLabel" position="stacked">{{title}}</ion-label> -->
-<ion-item (click)="showModal()">
+<ion-item (click)="showModal()" lines="none">
   <ion-label position="stacked"> {{title}}</ion-label>
   <ion-input [placeholder]="'Select ' + title" [value]="selected.length > 0 ? (selected.length + ' selected') : undefined" readonly clearInput="true"></ion-input>
 </ion-item>

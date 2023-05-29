@@ -20,7 +20,6 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 export class QuotationDetailPage implements OnInit {
 
   objectId: number
-  object: QuotationRoot;
   processType: string;
   selectedSegment: string;
 
@@ -77,7 +76,7 @@ export class QuotationDetailPage implements OnInit {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        this.object = response;
+        this.objectService.object = response;
       }, error => {
         throw error;
       })
@@ -113,7 +112,7 @@ export class QuotationDetailPage implements OnInit {
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      this.objectService.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;
     }
   }
@@ -172,8 +171,8 @@ export class QuotationDetailPage implements OnInit {
 
   async downloadPdf() {
     try {
-      this.objectService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
-        let filename = this.object.header.quotationNum + ".pdf";
+      this.objectService.downloadPdf("SMSC001", "pdf", this.objectService.object.header.quotationId).subscribe(response => {
+        let filename = this.objectService.object.header.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
         throw error;
@@ -208,7 +207,7 @@ export class QuotationDetailPage implements OnInit {
         const alert = await this.alertController.create({
           cssClass: 'custom-alert',
           backdropDismiss: false,
-          header: 'Are you sure to ' + action + ' ' + this.object.header.quotationNum + '?',
+          header: 'Are you sure to ' + action + ' ' + this.objectService.object.header.quotationNum + '?',
           inputs: [
             {
               name: 'actionreason',
@@ -228,10 +227,10 @@ export class QuotationDetailPage implements OnInit {
                     this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
                     return false;
                   } else {
-                    this.updateDoc(action, [this.object.header.quotationId.toString()], data.actionreason);
+                    this.updateDoc(action, [this.objectService.object.header.quotationId.toString()], data.actionreason);
                   }
                 } else {
-                  this.updateDoc(action, [this.object.header.quotationId.toString()], data.actionreason);
+                  this.updateDoc(action, [this.objectService.object.header.quotationId.toString()], data.actionreason);
                 }
               },
             },

@@ -187,7 +187,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   async downloadPdf(doc) {
     try {
-      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId, 'Proforma Invoice').subscribe(response => {
         let filename = doc.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {

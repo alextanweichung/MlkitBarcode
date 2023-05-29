@@ -21,8 +21,6 @@ import {v4 as uuidv4} from 'uuid';
 })
 export class QuotationItemPage implements OnInit, ViewWillEnter {
 
-  objectHeader: QuotationHeader;
-
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
 
@@ -35,9 +33,8 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     private commonService: CommonService,
     private toastService: ToastService) {
     try {
-      this.objectHeader = this.objectService.header;
       this.itemInCart = this.objectService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
-      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/quotation/quotation-header');
       }
     } catch (e) {
@@ -47,9 +44,9 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     try {
-      this.objectHeader = this.objectService.header;
+      this.objectService.header = this.objectService.header;
       this.itemInCart = this.objectService.itemInCart; // update itemCart when this page shown, to handle qty update + delete
-      if (!this.objectHeader || this.objectHeader === undefined || this.objectHeader === null) {
+      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/quotation/quotation-header');
       } else {
         this.componentsLoad();
@@ -99,7 +96,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignTrxItemToDataLine(trxLine);
-      if (this.objectHeader.isItemPriceTaxInclusive) {
+      if (this.objectService.header.isItemPriceTaxInclusive) {
         await this.computeUnitPriceExTax(trxLine);
       } else {
         await this.computeUnitPrice(trxLine);
@@ -155,7 +152,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -164,7 +161,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.maxPrecision);
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);      
     } catch (e) {
       console.error(e);
@@ -174,7 +171,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
       await this.getVariationSum(trxLine);
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.maxPrecision);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision);
     } catch (e) {
       console.error(e);
     }
@@ -183,7 +180,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       if (this.useTax) {
-        if (this.objectHeader.isItemPriceTaxInclusive) {
+        if (this.objectService.header.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
           trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
         } else {
@@ -196,16 +193,16 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       }
       trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectHeader.maxPrecision);
-      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectHeader.maxPrecision);
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.header.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.header.maxPrecision);
       
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-        if (this.objectHeader.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPrice;
+        if (this.objectService.header.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPrice;
         } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectHeader.maxPrecision) : trxLine.unitPriceExTax;
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPriceExTax;
         }
         if (trxLine.itemGroupInfo) {
           trxLine.brandId = trxLine.itemGroupInfo.brandId;

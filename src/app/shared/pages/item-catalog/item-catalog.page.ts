@@ -109,7 +109,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         })
         this.loadImages(searchText);
       } else {
-        this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
+        this.toastService.presentToast('Enter at least 3 characters to search', '', 'top', 'warning', 1000);
       }
       this.onBrowseModeChanged();
     } catch (e) {
