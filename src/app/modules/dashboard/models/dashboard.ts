@@ -4,16 +4,8 @@ import { SalesOrderList } from "../../transactions/models/sales-order"
 
 export interface Dashboard {
   memo: Memo[]
-  quotationReviewCount: TransactionProcessingCount
-  quotationApprovalCount: TransactionProcessingCount
-  salesOrderReviewCount: TransactionProcessingCount
-  salesOrderApprovalCount: TransactionProcessingCount
-  purchaseReqReviewCount: TransactionProcessingCount
-  purchaseReqApprovalCount: TransactionProcessingCount
-  purchaseOrderReviewCount: TransactionProcessingCount
-  purchaseOrderApprovalCount: TransactionProcessingCount
-  quotationList: QuotationList[]
-  salesOrderList: SalesOrderList[]
+  // quotationList: QuotationList[]
+  // salesOrderList: SalesOrderList[]
 }
 
 export interface Memo {

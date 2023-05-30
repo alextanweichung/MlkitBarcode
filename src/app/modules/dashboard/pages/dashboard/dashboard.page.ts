@@ -10,6 +10,9 @@ import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 import { NotificationHistory } from '../../models/notification-history';
 import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/acl-const';
+import { TransactionProcessingCount } from 'src/app/shared/models/transaction-processing';
+import { QuotationList } from 'src/app/modules/transactions/models/quotation';
+import { SalesOrderList } from 'src/app/modules/transactions/models/sales-order';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,12 +38,24 @@ export class DashboardPage implements OnInit, ViewDidEnter {
 
   showQuotation: boolean = false;
   showSalesOrder: boolean = false;
+  
+  quotationReviewCount: TransactionProcessingCount
+  quotationApprovalCount: TransactionProcessingCount
+  salesOrderReviewCount: TransactionProcessingCount
+  salesOrderApprovalCount: TransactionProcessingCount
+  purchaseReqReviewCount: TransactionProcessingCount
+  purchaseReqApprovalCount: TransactionProcessingCount
+  purchaseOrderReviewCount: TransactionProcessingCount
+  purchaseOrderApprovalCount: TransactionProcessingCount
+
+  quotationList: QuotationList[] = [];
+  salesOrderList: SalesOrderList[] = [];
 
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
     private configService: ConfigService,
-    private dashboardService: DashboardService,
+    private objectService: DashboardService,
     private navController: NavController
   ) { }
 
@@ -67,12 +82,14 @@ export class DashboardPage implements OnInit, ViewDidEnter {
             this.showPurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
             this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
             this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
+            this.loadCounts();
           }
 
           let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction);
           if (tPageItems) {
             this.showQuotation = tPageItems.findIndex(r => r.title === trxAppCode.mobileQuotation) > -1;
             this.showSalesOrder = tPageItems.findIndex(r => r.title === trxAppCode.mobileSalesOrder) > -1;
+            this.loadSalesCounts();
           }
         }
       })
@@ -85,13 +102,49 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   dashboardData: Dashboard;
   loadAnnouncements() {
     try {
-      this.dashboardService.getDashboard().subscribe(response => {
+      this.objectService.getDashboard().subscribe(response => {
         this.dashboardData = response;
       }, error => {
         throw error;
       })
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async loadCounts() {
+    if (this.showQuotationReview) {
+      this.quotationReviewCount = await this.objectService.getQuotationReviewCount();
+    }
+    if (this.showQuotationApproval) {
+      this.quotationApprovalCount = await this.objectService.getQuotationApproveCount();
+    }
+    if (this.showSalesOrderReview) {
+      this.salesOrderReviewCount = await this.objectService.getSalesOrderReviewCount();
+    }
+    if (this.showSalesOrderApproval) {
+      this.salesOrderApprovalCount = await this.objectService.getSalesOrderApproveCount();
+    }
+    if (this.showPurchaseReqReview) {
+      this.purchaseReqReviewCount = await this.objectService.getPurchaseReqReviewCount();
+    }
+    if (this.showPurchaseReqApproval) {
+      this.purchaseReqApprovalCount = await this.objectService.getPurchaseReqApproveCount();
+    }
+    if (this.showPurchaseOrderReview) {
+      this.purchaseOrderReviewCount = await this.objectService.getPurchaseOrderReviewCount();
+    }
+    if (this.showPurchaseOrderApproval) {
+      this.purchaseOrderApprovalCount = await this.objectService.getPurchaseOrderApproveCount();
+    }
+  }
+
+  async loadSalesCounts() {
+    if (this.showQuotation) {
+      this.quotationList = await this.objectService.getQuotationList();
+    }
+    if (this.showQuotationApproval) {
+      this.salesOrderList = await this.objectService.getSalesOrderList();
     }
   }
 
@@ -139,7 +192,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     try {
       if (memoDetail) {
         let filename = memoDetail.filesName + memoDetail.filesType;
-        this.dashboardService.downloadFiles(memoDetail.filesId).subscribe(async response => {
+        this.objectService.downloadFiles(memoDetail.filesId).subscribe(async response => {
           await this.commonService.commonDownloadPdf(response, filename);
         }, error => {
           throw error;
@@ -171,7 +224,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   notificationHistories: NotificationHistory[] = [];
   async showNotificationHistoryModal() {
     try {
-      await this.dashboardService.loadNotificationHistory().subscribe(response => {
+      await this.objectService.loadNotificationHistory().subscribe(response => {
         this.notificationHistories = response;
         this.notificationHistoryModal = true;
       }, error => {
