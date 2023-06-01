@@ -431,6 +431,57 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
       } else {
         this.objectService.validateBarcode(this.itemSearchValue).subscribe(async response => {
           this.itemSearchValue = null;
+          if (response) {
+            const alert = await this.alertController.create({
+              cssClass: 'custom-alert',
+              backdropDismiss: false,
+              header: 'Enter Quantity',
+              inputs: [
+                {
+                  name: 'inputQty',
+                  type: 'number',
+                  placeholder: 'Enter Quantity',
+                  value: 1,
+                  min: 1
+                }
+              ],
+              buttons: [
+                {
+                  text: 'OK',
+                  role: 'confirm',
+                  cssClass: 'success',
+                  handler: async (data) => {
+                    if (this.objectService.header.isWithSo) {
+                      await this.runPickingEngine(response, Number(data.inputQty));
+                    } else {
+                      await this.insertPickingLineWithoutSo(response, Number(data.inputQty));
+                    }
+                  },
+                },
+                {
+                  text: 'Cancel',
+                  role: 'cancel'
+                },
+              ],
+            });
+            await alert.present();
+          }
+        }, error => {
+          console.error(error);
+        })
+      }
+      event.preventDefault();
+    }
+  }
+
+  /* #endregion */
+
+  async onItemAdd(event: TransactionDetail) {
+    try {
+      if (this.objectService.multiPickingObject.pickingCarton.length === 0) {
+        this.toastService.presentToast("Control Validation", "Please create carton before adding items.", "top", "warning", 1000);
+      } else {
+        if (event) {
           const alert = await this.alertController.create({
             cssClass: 'custom-alert',
             backdropDismiss: false,
@@ -451,9 +502,9 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
                 cssClass: 'success',
                 handler: async (data) => {
                   if (this.objectService.header.isWithSo) {
-                    await this.runPickingEngine(response, Number(data.inputQty));
+                    await this.runPickingEngine(event, Number(data.inputQty));
                   } else {
-                    await this.insertPickingLineWithoutSo(response, Number(data.inputQty));
+                    await this.insertPickingLineWithoutSo(event, Number(data.inputQty));
                   }
                 },
               },
@@ -464,54 +515,7 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
             ],
           });
           await alert.present();
-        }, error => {
-          console.error(error);
-        })
-      }
-      event.preventDefault();
-    }
-  }
-
-  /* #endregion */
-
-  async onItemAdd(event: TransactionDetail) {
-    try {
-      if (this.objectService.multiPickingObject.pickingCarton.length === 0) {
-        this.toastService.presentToast("Control Validation", "Please create carton before adding items.", "top", "warning", 1000);
-      } else {
-        const alert = await this.alertController.create({
-          cssClass: 'custom-alert',
-          backdropDismiss: false,
-          header: 'Enter Quantity',
-          inputs: [
-            {
-              name: 'inputQty',
-              type: 'number',
-              placeholder: 'Enter Quantity',
-              value: 1,
-              min: 1
-            }
-          ],
-          buttons: [
-            {
-              text: 'OK',
-              role: 'confirm',
-              cssClass: 'success',
-              handler: async (data) => {
-                if (this.objectService.header.isWithSo) {
-                  await this.runPickingEngine(event, Number(data.inputQty));
-                } else {
-                  await this.insertPickingLineWithoutSo(event, Number(data.inputQty));
-                }
-              },
-            },
-            {
-              text: 'Cancel',
-              role: 'cancel'
-            },
-          ],
-        });
-        await alert.present();
+        }
 
         // if (this.objectService.header.isWithSo) {
         //   await this.runPickingEngine(event, 1);
@@ -647,40 +651,41 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
     try {
       if (event) {
         let itemFound = await this.validateBarcode(event);
-        
-        const alert = await this.alertController.create({
-          cssClass: 'custom-alert',
-          backdropDismiss: false,
-          header: 'Enter Quantity',
-          inputs: [
-            {
-              name: 'inputQty',
-              type: 'number',
-              placeholder: 'Enter Quantity',
-              value: 1,
-              min: 1
-            }
-          ],
-          buttons: [
-            {
-              text: 'OK',
-              role: 'confirm',
-              cssClass: 'success',
-              handler: async (data) => {
-                if (this.objectService.header.isWithSo) {
-                  await this.runPickingEngine(itemFound, Number(data.inputQty));
-                } else {
-                  await this.insertPickingLineWithoutSo(itemFound, Number(data.inputQty));
-                }
+        if (itemFound) {
+          const alert = await this.alertController.create({
+            cssClass: 'custom-alert',
+            backdropDismiss: false,
+            header: 'Enter Quantity',
+            inputs: [
+              {
+                name: 'inputQty',
+                type: 'number',
+                placeholder: 'Enter Quantity',
+                value: 1,
+                min: 1
+              }
+            ],
+            buttons: [
+              {
+                text: 'OK',
+                role: 'confirm',
+                cssClass: 'success',
+                handler: async (data) => {
+                  if (this.objectService.header.isWithSo) {
+                    await this.runPickingEngine(itemFound, Number(data.inputQty));
+                  } else {
+                    await this.insertPickingLineWithoutSo(itemFound, Number(data.inputQty));
+                  }
+                },
               },
-            },
-            {
-              text: 'Cancel',
-              role: 'cancel'
-            },
-          ],
-        });
-        await alert.present();
+              {
+                text: 'Cancel',
+                role: 'cancel'
+              },
+            ],
+          });
+          await alert.present();
+        }
 
         // if (this.objectService.header.isWithSo) {
         //   await this.runPickingEngine(itemFound, 1);
@@ -743,13 +748,12 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
   }
 
   previousStep() {
-    this.modalController.dismiss();
-    // try {
-    //   this.objectService.setMultiPickingObject(this.objectService.multiPickingObject);
-    //   this.navController.navigateBack('/transactions/picking/picking-header');
-    // } catch (e) {
-    //   console.error(e);
-    // }
+    // this.modalController.dismiss();
+    try {
+      this.navController.navigateBack('/transactions/picking/picking-header');
+    } catch (e) {
+      console.error(e);
+    }
 
 
     // this.modalController.dismiss(this.filters);

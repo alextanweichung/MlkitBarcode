@@ -215,15 +215,16 @@ export class PickingHeaderPage implements OnInit {
 
   async showDetail() {
     this.objectService.setHeader(this.objectForm.getRawValue());
-    const modal = await this.modalController.create({
-      component: PickingItemPage,
-      canDismiss: true
-    })
-    await modal.present();
-    let { data } = await modal.onWillDismiss();
-    if (data && data !== undefined) {
-      console.log("🚀 ~ file: picking-header.page.ts:227 ~ PickingHeaderPage ~ showDetail ~ data:", data)      
-    }
+    this.navController.navigateForward("/transactions/picking/picking-item");
+    // const modal = await this.modalController.create({
+    //   component: PickingItemPage,
+    //   canDismiss: true
+    // })
+    // await modal.present();
+    // let { data } = await modal.onWillDismiss();
+    // if (data && data !== undefined) {
+    //   console.log("🚀 ~ file: picking-header.page.ts:227 ~ PickingHeaderPage ~ showDetail ~ data:", data)      
+    // }
   }
 
   /* #endregion */

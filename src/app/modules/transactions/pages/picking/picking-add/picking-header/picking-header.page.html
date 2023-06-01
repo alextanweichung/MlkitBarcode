@@ -167,4 +167,4 @@
     Next
   </ion-button>
 </ion-footer> -->
-<app-camera-scan-input [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+<app-camera-scan-input *ngIf="isWithSo==='true'" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
