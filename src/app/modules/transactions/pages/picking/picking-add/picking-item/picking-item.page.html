@@ -74,8 +74,8 @@
       </ion-item>
     </ion-list>
 
-    <!-- <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input> -->
-    <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)">
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
+    <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
 
     <div class="font-bold mt-2">Selected: Carton {{selectedCartonNum}}</div>
     <ion-segment class="mt-2" [scrollable]="true" [(ngModel)]="selectedCartonNum">
@@ -114,7 +114,7 @@
     Insert
   </ion-button>
 </ion-footer> -->
-<!-- <app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input> -->
+<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
 
 <ion-modal [isOpen]="isImageModalOpen" [initialBreakpoint]="1" [breakpoints]="[0, 1]" (ionModalDidDismiss)="isImageModalOpen = false">
   <ng-template>
