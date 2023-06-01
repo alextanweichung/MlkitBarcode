@@ -15,15 +15,12 @@ const httpObserveHeader = {
 })
 export class SearchItemService {
 
-  
-
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
     @Inject('apiObject') private apiObject: string
   ) {
-    this.apiObject = apiObject;
-    
+    this.apiObject = apiObject;    
   }
 
   getItemInfo(itemId: number, trxDate: string, keyId: number, locationId: number) {

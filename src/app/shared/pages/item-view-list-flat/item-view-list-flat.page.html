@@ -1,4 +1,5 @@
-<div *ngIf="isWithSo">  
+<div *ngIf="isWithSo">
+  
   <!-- <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
     <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let d of data">
       <ion-grid class="ion-no-padding py-2 pl-2">
@@ -20,12 +21,14 @@
       </ion-grid>
     </ion-item>
   </ion-list> -->
-  <ion-accordion-group>
-    <ion-accordion *ngFor="let line of data;">
-      <ion-item slot="header" color="light">
+  <!-- <ion-accordion-group>
+    <ion-accordion *ngFor="let line of data;"> -->
+
+      <!-- <ion-item slot="header" color="light">
         <ion-label>{{line.salesOrderNum}}</ion-label>
-      </ion-item>
-      <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" style="font-size: smaller;" lines="full">
+      </ion-item> -->
+
+      <!-- <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" style="font-size: smaller;" lines="full">
         <div class="px-2 pt-2 font-bold" *ngIf="isPicking">Outstanding Pick List</div>
         <div class="px-2 pt-2 font-bold" *ngIf="isPacking">Outstanding Pack List</div>
         <div class="ion-flex p-2" *ngIf="isPicking">Other Picking:
@@ -195,12 +198,12 @@
             </ion-grid>
           </ion-item>
         </div>        
-      </ion-list>
-    </ion-accordion>
-  </ion-accordion-group>
+      </ion-list> -->
+    <!-- </ion-accordion>
+  </ion-accordion-group> -->
 </div>
 
-<div *ngIf="!isWithSo">
+<!-- <div *ngIf="!isWithSo">
   <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" style="font-size: smaller;" lines="full">
     <div class="px-2 pt-2 font-bold" *ngIf="isPicking">Current Picked List</div>
     <div class="px-2 pt-2 font-bold" *ngIf="isPacking">Current Packed List</div>
@@ -241,4 +244,4 @@
       </ion-grid>
     </ion-item>
   </ion-list>
-</div>
+</div> -->

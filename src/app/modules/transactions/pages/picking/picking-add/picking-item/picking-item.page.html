@@ -1,11 +1,37 @@
 <ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
   <ion-toolbar>
-    <ion-title>Pick Item</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item (click)="popover.dismiss(); addCarton()">
+          <ion-icon name="add-circle-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Add Carton</div>
+          </ion-label>
+        </ion-item>
+        <ion-item (click)="popover.dismiss(); deleteCarton()">
+          <ion-icon name="close-circle-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Delete Carton</div>
+          </ion-label>
+        </ion-item>        
+        <ion-item>
+          <ion-label><div>Show Variation</div></ion-label>
+          <ion-checkbox [(ngModel)]="showVariation"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 <ion-content fullscreen [hidden]="scanActive">
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -13,34 +39,87 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
-    <ion-accordion-group #accordianGroup1 *ngIf="objectHeader?.isWithSo">
-      <ion-accordion *ngFor="let salesOrder of pickingSalesOrders">
-        <ion-item slot="header" color="light" (click)="setSelectedSo(salesOrder)">
-          <ion-label>{{salesOrder.header.salesOrderNum}}</ion-label>
+      
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.header.isWithSo">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
+        <circle-progress slot="start" [percent]="objectService.getProgressByItemCode(i)"></circle-progress>
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">{{i}}</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{objectService.getQtyPickedByItemCode(i)}} / {{objectService.getQtyRequestByItemCode(i)}} Units</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div>{{objectService.getLocationByItemCode(i)}}</div>
+            </ion-col>
+          </ion-row>
+          <div *ngIf="showVariation">
+            <ion-row *ngFor="let v of objectService.getItemVariation(i)">
+              <ion-col class="ion-flex ion-margin-auto" *ngIf="v && v.variationTypeCode !== '0'">
+                <div class="ion-flex">
+                  <span class="badge-green px-1 ion-text-wrap ion-flex my-auto" style="font-size: xx-small;" *ngIf="v.xDesc"> {{v.xDesc}}</span>
+                  <span class="badge-purple px-1 ion-text-wrap ion-flex my-auto" style="font-size: xx-small;" *ngIf="v.yDesc"> {{v.yDesc}}</span>
+                </div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="v && v.variationTypeCode !== '0'">
+                <div class="ml-1" style="font-size: xx-small;">{{objectService.getQtyPickedByItemSku(v.itemSku)}} / {{objectService.getQtyRequestByItemSku(v.itemSku)}} Units</div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+
+    <!-- <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input> -->
+    <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)">
+
+    <div class="font-bold mt-2">Selected: Carton {{selectedCartonNum}}</div>
+    <ion-segment class="mt-2" [scrollable]="true" [(ngModel)]="selectedCartonNum">
+      <ion-segment-button *ngFor="let c of objectService.multiPickingObject.pickingCarton" [value]="c.cartonNum">
+        <ion-label>Carton {{c.cartonNum}}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
+      <ion-item-sliding #slidingItem *ngFor="let o of getCartonItems(); let i = index">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="editCartonLine(o);">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row *ngIf="i === 0">
+              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Barcode</div></ion-col>
+              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Item Code</div></ion-col>
+              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Qty</div></ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">{{o.itemBarcode}}</ion-col>
+              <ion-col class="ion-flex ion-margin-auto">{{o.itemCode}}</ion-col>
+              <ion-col class="ion-flex ion-margin-auto">{{o.qtyPicked}}</ion-col>
+            </ion-row>
+          </ion-grid>
         </ion-item>
-        <div slot="content">
-          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <app-item-add-list-flat [line]="soLine" [isPicking]="true" qtyField="qtyPickedCurrent" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" *ngFor="let soLine of salesOrder?.details; let i = index" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
-          </ion-list>
-        </div>
-      </ion-accordion>
-    </ion-accordion-group>
-    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!objectHeader?.isWithSo && pickingSalesOrders.length > 0">
-      <ion-item-sliding *ngFor="let soLine of pickingSalesOrders[0]?.details; let i = index">
-        <app-item-add-list-flat [line]="soLine" [isPicking]="true" qtyField="qtyPickedCurrent" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="deleteSoLine(i)">Delete</ion-item-option>
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteCartonLine(i, o);"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
+
   </div>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+<!-- <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
     Insert
   </ion-button>
-</ion-footer>
+</ion-footer> -->
+<!-- <app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input> -->
 
-<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+<ion-modal [isOpen]="isImageModalOpen" [initialBreakpoint]="1" [breakpoints]="[0, 1]" (ionModalDidDismiss)="isImageModalOpen = false">
+  <ng-template>
+    <div class="block">
+      <ion-img [src]="imageUrl"></ion-img>
+    </div>
+  </ng-template>
+</ion-modal>

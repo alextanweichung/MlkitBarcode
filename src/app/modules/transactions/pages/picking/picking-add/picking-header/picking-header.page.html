@@ -1,0 +1,170 @@
+<ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
+  <ion-toolbar>
+    <ion-title>Multi Picking</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelInsert()">
+        <ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen [hidden]="scanActive">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Multi Picking</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">
+    <ion-segment [(ngModel)]="isWithSo" (ionChange)="isWithSoChanged($event)" *ngIf="selectedSalesOrders && selectedSalesOrders.length === 0">
+      <ion-segment-button value="true">
+        <ion-label>With SO</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="false">
+        <ion-label>Without SO</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <div class="mt-2" *ngIf="isWithSo === 'false'">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
+        <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
+        <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
+      </ion-list>
+    </div>
+    <div *ngIf="isWithSo === 'true'">
+      <ion-segment [(ngModel)]="groupType" (ionChange)="groupTypeChanged($event)" *ngIf="selectedSalesOrders && selectedSalesOrders.length > 0">
+        <ion-segment-button value="S">
+          <ion-label>Group By Sales Order</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="I">
+          <ion-label>Group By Item</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+      <input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" [ngModelOptions]="{standalone:true}" placeholder="Scan or Enter Sales Order" (keydown)="handleSoKeyDown($event)">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Customer</div></ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedCustomerId|idMapping:objectService.customerMasterList}}</div></ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Origin Location</div></ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedLocationId|idMapping:objectService.locationMasterList}}</div></ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Destination Location</div></ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedToLocationId|idMapping:objectService.locationMasterList}}</div></ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+      <div *ngIf="groupType === 'S'">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <!-- <ion-item-sliding #slidingItem *ngFor="let o of uniqueSo"> -->
+            <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let so of uniqueSo" (click)="showDetail()">
+              <circle-progress [percent]="objectService.getProgressBySoNum(so)"></circle-progress>
+              <ion-grid class="ion-no-padding py-2 pl-2">
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                    <div class="font-bold">{{so}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="6" class="ion-flex ion-margin-auto"><div class="font-bold">Item Code</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">SO Qty</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Picked Qty</div></ion-col>
+                </ion-row>
+                <ion-row class="mt-1" *ngFor="let i of getUniqueItemBySoNum(so)">
+                  <ion-col size="6" class="ion-flex ion-margin-auto"><div>{{i}}</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{getSoQtyBySoItemCode(so, i)}}</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{getPickedBySoItemCode(so, i)}}</div></ion-col>
+                </ion-row>
+
+                <!-- <ion-row class="mt-1" *ngFor="let l of getUniqueItemBySoNum(o)">
+                  <ion-col size="6" class="ion-flex ion-margin-auto">
+                    <ion-grid class="ion-no-padding">
+                      <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                          <div>{{l.itemCode}}</div>
+                          <span class="badge-green px-1 ion-text-wrap ion-flex my-auto ml-1" style="font-size: xx-small;" *ngIf="l.itemVariationXDescription"> {{l.itemVariationXDescription}}</span>
+                          <span class="badge-purple px-1 ion-text-wrap ion-flex my-auto ml-1" style="font-size: xx-small;" *ngIf="l.itemVariationYDescription"> {{l.itemVariationYDescription}}</span>
+                        </ion-col>
+                      </ion-row>
+                      <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                          <div style="font-size: xx-small" *ngIf="l.subRack">{{l.rack}} - {{l.subRack}}</div>
+                          <div style="font-size: xx-small" *ngIf="!l.subRack">{{l.rack}}</div>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{l.qtyRequest|number:'1.0'}}</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{l.qtyPicked+l.qtyCurrent|number:'1.0'}}</div></ion-col>
+                </ion-row> -->
+              </ion-grid>
+            </ion-item>
+            <!-- <ion-item-options>
+              <ion-item-option color="danger" (click)="slidingItem.close(); deleteSo(o)"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
+            </ion-item-options> -->
+          <!-- </ion-item-sliding> -->
+        </ion-list>
+      </div>
+      <div *ngIf="groupType === 'I'">
+        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item-sliding #slidingItem *ngFor="let o of uniqueItemCode">
+            <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+              <ion-grid class="ion-no-padding py-2 pl-2">
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                    <div class="font-bold">{{o}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div>For: {{getSoNumByItemCode(o)}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="6" class="ion-flex ion-margin-auto"><div class="font-bold">Item</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">SO Qty</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Picked Qty</div></ion-col>
+                </ion-row>
+                <ion-row class="mt-1" *ngFor="let l of getSoLineByItemCode(o)">
+                  <ion-col size="6" class="ion-flex ion-margin-auto">
+                    <ion-grid class="ion-no-padding">
+                      <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                          <div>{{l.itemCode}}</div>
+                          <span class="badge-green px-1 ion-text-wrap ion-flex my-auto ml-1" style="font-size: xx-small;" *ngIf="l.itemVariationXDescription"> {{l.itemVariationXDescription}}</span>
+                          <span class="badge-purple px-1 ion-text-wrap ion-flex my-auto ml-1" style="font-size: xx-small;" *ngIf="l.itemVariationYDescription"> {{l.itemVariationYDescription}}</span>
+                        </ion-col>
+                      </ion-row>
+                      <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                          <div style="font-size: xx-small" *ngIf="l.subRack">{{l.rack}} - {{l.subRack}}</div>
+                          <div style="font-size: xx-small" *ngIf="!l.subRack">{{l.rack}}</div>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{l.qtyRequest|number:'1.0'}}</div></ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{l.qtyPicked+l.qtyCurrent|number:'1.0'}}</div></ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-item>
+            <ion-item-options>
+              <ion-item-option color="danger" (click)="slidingItem.close(); deleteSo(o)"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        </ion-list>
+      </div>
+    </div>
+  </div>
+</ion-content>
+<!-- <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
+    Next
+  </ion-button>
+</ion-footer> -->
+<app-camera-scan-input [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>

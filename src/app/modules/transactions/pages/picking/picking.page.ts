@@ -6,9 +6,9 @@ import { CommonService } from '../../../../shared/services/common.service';
 import { PickingService } from '../../services/picking.service';
 import { FilterPage } from '../filter/filter.page';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { GoodsPickingList } from '../../models/picking';
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { MultiPickingList } from '../../models/picking';
 
 @Component({
   selector: 'app-picking',
@@ -17,7 +17,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 })
 export class PickingPage implements OnInit, ViewWillEnter {
 
-  objects: GoodsPickingList[] = [];
+  objects: MultiPickingList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -85,9 +85,9 @@ export class PickingPage implements OnInit, ViewWillEnter {
   async addObject() {
     try {
       if (this.objectService.hasWarehouseAgent()) {
-        this.navController.navigateForward('/transactions/picking/picking-sales-order');
+        this.navController.navigateForward('/transactions/picking/picking-header');
       } else {
-        this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1000);
+        this.toastService.presentToast('', 'Warehouse Agent not set.', 'top', 'danger', 1000);
       }
     } catch (e) {
       console.error(e);

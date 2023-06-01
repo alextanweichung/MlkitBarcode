@@ -11,7 +11,7 @@
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">      
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button (click)="popover.dismiss(); showNotificationHistoryModal()">
           <ion-label>
             <div>Notification History</div>
@@ -43,61 +43,63 @@
         <ion-label class="pl-2" color="dark">Pending Task</ion-label>
       </ion-list-header>      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item *ngIf="showQuotationReview && quotationReviewCount?.pending > 0" (click)="goToManagement('quotation', 'reviews')">
+        <ion-item *ngIf="showQuotationReview && dashboardData?.quotationReviewCount?.pending > 0" (click)="goToManagement('quotation', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Quotation Review</h3>
           </ion-label>
-          <ion-badge slot="end">{{quotationReviewCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.quotationReviewCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
-        <ion-item *ngIf="showQuotationApproval && quotationApprovalCount?.pending > 0" (click)="goToManagement('quotation', 'approvals')">
+        <ion-item *ngIf="showQuotationApproval && dashboardData?.quotationApprovalCount?.pending > 0" (click)="goToManagement('quotation', 'approvals')">
           <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Quotation Approval</h3>
           </ion-label>
-          <ion-badge slot="end">{{quotationApprovalCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.quotationApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
-        <ion-item *ngIf="showSalesOrderReview && salesOrderReviewCount?.pending > 0" (click)="goToManagement('sales-order', 'reviews')">
+        <ion-item *ngIf="showSalesOrderReview && dashboardData?.salesOrderReviewCount?.pending > 0" (click)="goToManagement('sales-order', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Sales Order Review</h3>
           </ion-label>
-          <ion-badge slot="end">{{salesOrderReviewCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.salesOrderReviewCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
-        <ion-item *ngIf="showSalesOrderApproval && salesOrderApprovalCount?.pending > 0" (click)="goToManagement('sales-order', 'approvals')">
+        <ion-item *ngIf="showSalesOrderApproval && dashboardData?.salesOrderApprovalCount?.pending > 0" (click)="goToManagement('sales-order', 'approvals')">
           <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Sales Order Approval</h3>
           </ion-label>
-          <ion-badge slot="end">{{salesOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.salesOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
-        <ion-item *ngIf="showPurchaseReqReview && purchaseReqReviewCount?.pending > 0" (click)="goToManagement('purchase-req', 'reviews')">
+
+        <ion-item *ngIf="showPurchaseReqReview && dashboardData?.purchaseReqReviewCount?.pending > 0" (click)="goToManagement('purchase-req', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Purchase Req Review</h3>
           </ion-label>
-          <ion-badge slot="end">{{purchaseReqReviewCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.purchaseReqReviewCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
-        <ion-item *ngIf="showPurchaseReqApproval && purchaseReqApprovalCount?.pending > 0" (click)="goToManagement('purchase-req', 'approvals')">
+        <ion-item *ngIf="showPurchaseReqApproval && dashboardData?.purchaseReqApprovalCount?.pending > 0" (click)="goToManagement('purchase-req', 'approvals')">
           <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Purchase Req Approval</h3>
           </ion-label>
-          <ion-badge slot="end">{{purchaseReqApprovalCount?.pending|number:'1.0'}}</ion-badge>
-        </ion-item>        
-        <ion-item *ngIf="showPurchaseOrderReview && purchaseOrderReviewCount?.pending > 0" (click)="goToManagement('purchase-order', 'reviews')">
+          <ion-badge slot="end">{{dashboardData?.purchaseReqApprovalCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+        
+        <ion-item *ngIf="showPurchaseOrderReview && dashboardData?.purchaseOrderReviewCount?.pending > 0" (click)="goToManagement('purchase-order', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Purchase Order Review</h3>
           </ion-label>
-          <ion-badge slot="end">{{purchaseOrderReviewCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.purchaseOrderReviewCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
-        <ion-item *ngIf="showPurchaseOrderApproval && purchaseOrderApprovalCount?.pending > 0" (click)="goToManagement('purchase-order', 'approvals')">
+        <ion-item *ngIf="showPurchaseOrderApproval && dashboardData?.purchaseOrderApprovalCount?.pending > 0" (click)="goToManagement('purchase-order', 'approvals')">
           <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Purchase Order Approval</h3>
           </ion-label>
-          <ion-badge slot="end">{{purchaseOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.purchaseOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
       </ion-list>
     </div>
@@ -112,14 +114,14 @@
           <ion-label>
             <h3>Quotation Issued</h3>
           </ion-label>
-          <ion-badge slot="end">{{quotationList|sum:'grandTotal'|number:'1.2-2'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.quotationList|sum:'grandTotal'|number:'1.2-2'}}</ion-badge>
         </ion-item>
         <ion-item *ngIf="showSalesOrder" (click)="goToTransaction('sales-order')">
           <ion-icon name="cart-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Sales Order Issued</h3>
           </ion-label>
-          <ion-badge slot="end">{{salesOrderList|sum:'grandTotal'|number:'1.2-2'}}</ion-badge>
+          <ion-badge slot="end">{{dashboardData?.salesOrderList|sum:'grandTotal'|number:'1.2-2'}}</ion-badge>
         </ion-item>
       </ion-list>
     </div>

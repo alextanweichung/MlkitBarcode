@@ -9,8 +9,8 @@ const routes: Routes = [
     component: PickingPage
   },
   {
-    path: 'picking-sales-order',
-    loadChildren: () => import('./picking-add/picking-sales-order/picking-sales-order.module').then( m => m.PickingSalesOrderPageModule)
+    path: 'picking-header',
+    loadChildren: () => import('./picking-add/picking-header/picking-header.module').then( m => m.PickingHeaderPageModule)
   },
   {
     path: 'picking-item',

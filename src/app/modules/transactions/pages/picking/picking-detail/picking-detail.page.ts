@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MultiPickingRoot } from '../../../models/picking';
 
 @Component({
   selector: 'app-picking-detail',
@@ -12,7 +13,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 export class PickingDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
-  object: any;
+  object: MultiPickingRoot;
 
   constructor(
     private route: ActivatedRoute,
@@ -41,10 +42,16 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
 
   }
 
+  uniqueSalesOrder: string[] = [];
   loadDetail() {
+    this.uniqueSalesOrder = []
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: picking-detail.page.ts:47 ~ PickingDetailPage ~ this.objectService.getObjectById ~ response:", response);
         this.object = response;
+        if (this.object.outstandingPickList && this.object.outstandingPickList.length > 0) {
+          this.uniqueSalesOrder = [...new Set(this.object.outstandingPickList.flatMap(r => r.salesOrderNum))];
+        }
       }, error => {
         throw error;
       })
@@ -52,5 +59,17 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
       console.error(e);
     }
   }
+
+  /* #region find outstanding item in this SO */
+
+  getItemOfSO(salesOrderNum: string) {
+    let find = this.object.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum);
+    if (find && find.length > 0) {
+      return find;
+    }
+    return null;
+  }
+
+  /* #endregion */
 
 }

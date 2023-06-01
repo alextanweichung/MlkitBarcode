@@ -9,7 +9,6 @@ import { MasterListDetails } from '../../models/master-list-details';
 export class ItemViewListFlatPage implements OnInit {
 
   @Input() isWithSo: boolean = true;
-  @Input() data: any;
   @Input() isPicking: boolean = false;
   @Input() isPacking: boolean = false;
   
