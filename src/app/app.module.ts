@@ -46,13 +46,13 @@ export function initializeFactory(init: InitializeAppService) {
             // set defaults here
             radius: 30,
             outerStrokeWidth: 5,
+            innerStrokeWidth: 3,
+            space: 2,
             titleFontSize: "15",
             outerStrokeColor: "#78C000",
             innerStrokeColor: "#C7E596",
             animation: false,
-            animationDuration: 500,
-            showSubtitle: false,
-            showInnerStroke: false
+            showSubtitle: false
         })
     ],
     providers: [

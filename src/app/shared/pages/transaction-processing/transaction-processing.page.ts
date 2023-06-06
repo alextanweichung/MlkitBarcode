@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { AlertController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { BulkConfirmReverse, TransactionProcessingDoc } from '../../models/transaction-processing';
+import { BulkConfirmReverse, TransactionProcessingCount, TransactionProcessingDoc } from '../../models/transaction-processing';
 import { TransactionProcessingService } from '../../services/transaction-processing.service';
 
 @Component({
@@ -29,7 +29,17 @@ export class TransactionProcessingPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.loadCounts();
+  }
 
+  transactionProcessingCount: TransactionProcessingCount = { pending: 0, completed: 0, total: 0, isAllowApprove: false };
+  loadCounts() {
+    this.objectService.getDocumentCount().subscribe(response => {
+      console.log("🚀 ~ file: transaction-processing.page.ts:37 ~ TransactionProcessingPage ~ this.objectService.getDocumentCount ~ response:", response)
+      this.transactionProcessingCount = response;
+    }, error => {
+      console.error(error);
+    })
   }
 
   async presentConfirmAlert(action: string, docId: number, docNum: string) {
@@ -110,42 +120,6 @@ export class TransactionProcessingPage implements OnInit {
           selectedSegment: this.selectedSegment
         }
       }
-      // if (this.parentType.toLowerCase() === 'quotation') {
-      //   navigationExtras = {
-      //     queryParams: {
-      //       objectId: docId,
-      //       processType: this.processType,
-      //       selectedSegment: this.selectedSegment
-      //     }
-      //   }
-      // }
-      // if (this.parentType.toLowerCase() === 'sales-order') {
-      //   navigationExtras = {
-      //     queryParams: {
-      //       objectId: docId,
-      //       processType: this.processType,
-      //       selectedSegment: this.selectedSegment
-      //     }
-      //   }
-      // }
-      // if (this.parentType.toLowerCase() === 'purchase-req') {
-      //   navigationExtras = {
-      //     queryParams: {
-      //       objectId: docId,
-      //       processType: this.processType,
-      //       selectedSegment: this.selectedSegment
-      //     }
-      //   }
-      // }
-      // if (this.parentType.toLowerCase() === 'purchase-order') {
-      //   navigationExtras = {
-      //     queryParams: {
-      //       objectId: docId,
-      //       processType: this.processType,
-      //       selectedSegment: this.selectedSegment
-      //     }
-      //   }
-      // }
       this.navController.navigateForward(`/transactions/${this.parentType.toLowerCase()}/${this.parentType.toLowerCase()}-detail`, navigationExtras);
     } catch (e) {
       console.error(e);

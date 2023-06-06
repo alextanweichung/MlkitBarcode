@@ -53,7 +53,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.itemInCart) {
-      this.computeQtyInCart();      
+      this.computeQtyInCart();
     }
   }
 
@@ -147,6 +147,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
               y.qtyInCart = this.itemInCart.filter(rr => rr.itemId === r.itemId).flatMap(rr => rr.variationDetails).flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
             })
           }
+        } else {
+          r.qtyInCart = 0;
         }
       })
     }

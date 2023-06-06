@@ -5,7 +5,7 @@
       <ion-col size="6" *ngFor="let item of availableItems">
         <ion-card class="m-1">
           <ion-badge class="overlapBadgeTopRight" *ngIf="item?.itemPricing?.discountExpression">
-            <div class="font-bold">
+            <div class="font-bold font-smaller">
               [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}
             </div>
           </ion-badge>
@@ -18,31 +18,29 @@
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
-              <ion-col>
+              <ion-col class="ion-flex ion-margin-auto font-smaller">
                 <div>{{item.description}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto" *ngIf="item?.qtyInCart > 0">
                 <ion-badge>
-                  <div class="ion-flex">[In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]</div>
+                  <div class="ion-flex font-smaller">[In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]</div>
                 </ion-badge>
               </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
+              <ion-col class="ion-flex ion-margin-auto justify-content-end font-smaller" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
                 Qty: 
                 <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{item.actualQty|number:'1.0'}}</div>
                 <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
-              <ion-col *ngIf="item?.unitPrice || item?.unitPriceExTax">
+              <ion-col class="ion-flex ion-margin-auto font-smaller" *ngIf="item?.unitPrice || item?.unitPriceExTax">
                 U/P: 
                 <div class="font-bold ml-1" *ngIf="objectHeader?.isDisplayTaxInclusive">{{item.unitPrice|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div class="font-bold ml-1" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
-            <!-- </ion-row> -->
-            <!-- <ion-row class="pb-1" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode"> -->
-              <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
+              <ion-col class="ion-flex ion-margin-auto justify-content-end font-smaller" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
                 N/P:
                 <div class="font-bold ml-1" *ngIf="objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPrice,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div class="font-bold ml-1" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPriceExTax,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
@@ -110,28 +108,28 @@
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
-              <ion-col>{{item.description}}</ion-col>
+              <ion-col class="ion-flex ion-margin-auto font-smaller">{{item.description}}</ion-col>
             </ion-row>
             <ion-row class="pb-1">
               <ion-col size="" class="ion-flex ion-margin-auto" *ngIf="item?.qtyInCart > 0">
                 <ion-badge>
-                  <div class="ion-flex">[In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]</div>
+                  <div class="ion-flex font-smaller">[In cart: <div class="font-bold ml-1">{{item?.qtyInCart|number:'1.0'}}</div>]</div>
                 </ion-badge>
               </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
+              <ion-col class="ion-flex ion-margin-auto justify-content-end font-smaller" *ngIf="(item?.actualQty !== null || item?.availableQty !== null) && showAvailQty">
                 Qty: 
                 <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{item.actualQty|number:'1.0'}}</div>
                 <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{item.availableQty|number:'1.0'}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
-              <ion-col class="ion-margin-auto">
+              <ion-col class="ion-flex ion-margin-auto font-smaller">
                 U/P: <div class="font-bold ml-2">{{item.unitPrice|number:'1.2-2'}}</div>
               </ion-col>
-              <ion-col size="auto" class="ion-margin-auto" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
+              <ion-col size="auto" class="ion-flex ion-margin-auto font-smaller" *ngIf="item?.itemPricing?.discountExpression || item?.itemPricing?.discountGroupCode">
                 DISC: <div class="font-bold ml-2">[{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}</div>
               </ion-col>
-              <ion-col class="ion-margin-auto justify-content-end">
+              <ion-col class="ion-flex ion-margin-auto justify-content-end font-smaller">
                 N/P:
                 <div class="font-bold ml-2" *ngIf="objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPrice,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 <div class="font-bold ml-2" *ngIf="!objectHeader?.isDisplayTaxInclusive">{{calculatNetPrice(item.unitPriceExTax,item?.itemPricing?.discountExpression)|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
@@ -160,10 +158,10 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-item button detail="false" class="no-ripple" *ngIf="selectedItem">
+      <ion-item button detail="false" class="no-ripple" *ngIf="selectedItem" lines="none">
         <ion-grid class="p-0">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto font-smaller">
               <div>{{selectedItem.itemCode}} - {{selectedItem.description}}</div>
             </ion-col>
           </ion-row>
@@ -174,19 +172,19 @@
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-margin-auto">
-                        <span class="badge-green px-1 mr-1 ion-margin-auto" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                        <span class="badge-purple px-1 mr-1 ion-margin-auto" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>                        
+                        <span class="badge-green px-1 mr-1 ion-margin-auto font-smaller" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                        <span class="badge-purple px-1 mr-1 ion-margin-auto font-smaller" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>                        
                       </ion-col>
                     </ion-row>
                     <ion-row class="pt-1">
-                      <ion-col class="ion-flex ion-margin-auto" *ngIf="isSalesOrder && showAvailQty">
+                      <ion-col class="ion-flex ion-margin-auto font-smaller" *ngIf="isSalesOrder && showAvailQty">
                         Qty:
                         <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-2">{{d.actualQty|number:'1.0'}}</div>
                         <div *ngIf="salesOrderQuantityControl === '0' ||  salesOrderQuantityControl === '2'" class="font-bold ml-2">{{d.availableQty|number:'1.0'}}</div>
                       </ion-col>
                       <ion-col class="ion-flex ion-margin-auto" *ngIf="d?.qtyInCart > 0">
                         <ion-badge>
-                          <div class="ion-flex">[In cart: <div class="font-bold ml-1">{{d?.qtyInCart|number:'1.0'}}</div>]</div>
+                          <div class="ion-flex font-smaller">[In cart: <div class="font-bold ml-1">{{d?.qtyInCart|number:'1.0'}}</div>]</div>
                         </ion-badge>
                       </ion-col>
                     </ion-row>

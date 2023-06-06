@@ -38,8 +38,7 @@
       <ion-label class="label-title">Pick Item</ion-label>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2">
-      
+  <div class="p-2">      
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.header.isWithSo">
       <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
         <circle-progress slot="start" [percent]="objectService.getProgressByItemCode(i)"></circle-progress>

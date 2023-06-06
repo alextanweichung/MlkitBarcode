@@ -432,39 +432,11 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
         this.objectService.validateBarcode(this.itemSearchValue).subscribe(async response => {
           this.itemSearchValue = null;
           if (response) {
-            const alert = await this.alertController.create({
-              cssClass: 'custom-alert',
-              backdropDismiss: false,
-              header: 'Enter Quantity',
-              inputs: [
-                {
-                  name: 'inputQty',
-                  type: 'number',
-                  placeholder: 'Enter Quantity',
-                  value: 1,
-                  min: 1
-                }
-              ],
-              buttons: [
-                {
-                  text: 'OK',
-                  role: 'confirm',
-                  cssClass: 'success',
-                  handler: async (data) => {
-                    if (this.objectService.header.isWithSo) {
-                      await this.runPickingEngine(response, Number(data.inputQty));
-                    } else {
-                      await this.insertPickingLineWithoutSo(response, Number(data.inputQty));
-                    }
-                  },
-                },
-                {
-                  text: 'Cancel',
-                  role: 'cancel'
-                },
-              ],
-            });
-            await alert.present();
+            if (this.objectService.header.isWithSo) {
+              await this.runPickingEngine(response, Number(1));
+            } else {
+              await this.insertPickingLineWithoutSo(response, Number(1));
+            }
           }
         }, error => {
           console.error(error);
@@ -482,46 +454,12 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast("Control Validation", "Please create carton before adding items.", "top", "warning", 1000);
       } else {
         if (event) {
-          const alert = await this.alertController.create({
-            cssClass: 'custom-alert',
-            backdropDismiss: false,
-            header: 'Enter Quantity',
-            inputs: [
-              {
-                name: 'inputQty',
-                type: 'number',
-                placeholder: 'Enter Quantity',
-                value: 1,
-                min: 1
-              }
-            ],
-            buttons: [
-              {
-                text: 'OK',
-                role: 'confirm',
-                cssClass: 'success',
-                handler: async (data) => {
-                  if (this.objectService.header.isWithSo) {
-                    await this.runPickingEngine(event, Number(data.inputQty));
-                  } else {
-                    await this.insertPickingLineWithoutSo(event, Number(data.inputQty));
-                  }
-                },
-              },
-              {
-                text: 'Cancel',
-                role: 'cancel'
-              },
-            ],
-          });
-          await alert.present();
+          if (this.objectService.header.isWithSo) {
+            await this.runPickingEngine(event, 1);
+          } else {
+            await this.insertPickingLineWithoutSo(event, 1);
+          }
         }
-
-        // if (this.objectService.header.isWithSo) {
-        //   await this.runPickingEngine(event, 1);
-        // } else {
-        //   await this.insertPickingLineWithoutSo(event, 1);
-        // }
       }
     } catch (e) {
       console.error(e);

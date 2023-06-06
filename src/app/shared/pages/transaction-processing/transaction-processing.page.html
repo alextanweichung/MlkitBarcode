@@ -39,10 +39,10 @@
           </ion-row>
         </ion-grid>
       </ion-item>
-      <ion-item-options side="start">
+      <ion-item-options side="start" *ngIf="transactionProcessingCount.isAllowApprove">
         <ion-item-option color="danger" (click)="presentConfirmAlert('REJECT', object.docId, object.docNum)"><ion-icon name="close-outline" slot="bottom"></ion-icon>Reject</ion-item-option>
       </ion-item-options>
-      <ion-item-options side="end">
+      <ion-item-options side="end" *ngIf="transactionProcessingCount.isAllowApprove">
         <ion-item-option color="success" (click)="presentConfirmAlert('CONFIRM', object.docId, object.docNum)"><ion-icon name="checkmark-outline" slot="bottom"></ion-icon>Approve</ion-item-option>
       </ion-item-options>
     </ion-item-sliding>    
@@ -78,7 +78,7 @@
           </ion-row>
         </ion-grid>
       </ion-item>
-      <ion-item-options side="end">
+      <ion-item-options side="end" *ngIf="transactionProcessingCount.isAllowApprove">
         <ion-item-option color="danger" (click)="presentConfirmAlert('REVERSE', object.docId, object.docNum)"><ion-icon name="arrow-undo-outline" slot="bottom"></ion-icon>Reverse</ion-item-option>
       </ion-item-options>
     </ion-item-sliding>    

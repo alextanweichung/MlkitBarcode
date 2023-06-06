@@ -327,7 +327,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     try {
       let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
       if (index > -1) {
-        this.objectService.itemInCart.splice(index, 1);
+        this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
       }
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)

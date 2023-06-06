@@ -1,4 +1,4 @@
-<input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter Item Code" (keydown)="handleKeyDown($event, itemSearchValue)">
+<input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter Item Code or Sku" (keydown)="handleKeyDown($event, itemSearchValue)">
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
