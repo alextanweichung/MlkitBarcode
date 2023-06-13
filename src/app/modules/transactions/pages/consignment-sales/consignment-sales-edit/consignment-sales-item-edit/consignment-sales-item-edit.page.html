@@ -4,16 +4,6 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
     </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="scanInput">
-      <ion-button (click)="toggleInputMode()">
-        <ion-icon slot="icon-only" name="list-outline"></ion-icon>
-      </ion-button>      
-    </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="!scanInput">
-      <ion-button (click)="toggleInputMode()">
-        <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen [hidden]="scanActive">
@@ -22,8 +12,9 @@
       <ion-label class="label-title">Item</ion-label>
     </ion-toolbar>
   </ion-header><div class="p-2">
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
-    <app-item-code-input-offline *ngIf="!scanInput" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" (onItemAdd)="onItemsAdd($event)"></app-item-code-input-offline>
+    
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding #slidingItem *ngFor="let line of object?.details; let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="highlight(inputNumWithoutSo)">
@@ -39,8 +30,8 @@
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{line.itemCode}}</div>
-                <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                <span class="badge-purple px-1 mr-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="objectService.itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="objectService.itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
               </ion-col>
             </ion-row>
             <ion-row>

@@ -13,7 +13,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-accordion-group #accordianGroup1 *ngIf="objectHeader?.isWithSo">
       <ion-accordion *ngFor="let salesOrder of packingSalesOrders;">
         <ion-item slot="header" color="light" (click)="setSelectedSo(salesOrder)">

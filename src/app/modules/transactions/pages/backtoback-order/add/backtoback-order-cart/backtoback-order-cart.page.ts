@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { BackToBackOrderHeader, BackToBackOrderRoot } from 'src/app/modules/transactions/models/backtoback-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -143,6 +143,10 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
         this.hideEditModal();
       }
+
+      if (this.selectedItem.isPricingApproval) {
+        this.objectService.header.isPricingApproval = true;
+      }
     }
   }
 
@@ -285,6 +289,21 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.objectService.header.shipAreaId = null;
         this.objectService.header.attention = null;
       }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
     } catch (e) {
       console.error(e);
     }

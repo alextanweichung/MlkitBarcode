@@ -18,7 +18,7 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
   selectedObject: TransferConfirmationRoot;
 
   constructor(
-    private objectService: TransferConfirmationService,
+    public objectService: TransferConfirmationService,
     private authService: AuthService,
     private configService: ConfigService,
     private toastService: ToastService,
@@ -64,27 +64,31 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
     })
   }
 
-  onItemAdd(event: TransactionDetail) {
-    let newLine: TransferConfirmationLine = {
-      interTransferLineId: 0,
-      interTransferVariationId: 0,
-      interTransferId: this.selectedObject.interTransferId,
-      sequence: 0,
-      itemId: event.itemId,
-      itemCode: event.itemCode,
-      itemSku: event.itemSku,
-      itemDesc: event.description,
-      xId: event.itemVariationXId,
-      xDesc: this.objectService.itemVariationXMasterList.find(r => r.id === event.itemVariationXId)?.description,
-      yId: event.itemVariationYId,
-      yDesc: this.objectService.itemVariationYMasterList.find(r => r.id === event.itemVariationYId)?.description,
-      barcode: event.itemBarcode,
-      qty: 0,
-      qtyReceive: 1,
-      isDeleted: false,
+  onItemAdd(event: TransactionDetail[]) {
+    if (event && event.length > 0) {
+      event.forEach(r => {
+        let newLine: TransferConfirmationLine = {
+          interTransferLineId: 0,
+          interTransferVariationId: 0,
+          interTransferId: this.selectedObject.interTransferId,
+          sequence: 0,
+          itemId: r.itemId,
+          itemCode: r.itemCode,
+          itemSku: r.itemSku,
+          itemDesc: r.description,
+          xId: r.itemVariationXId,
+          xDesc: this.objectService.itemVariationXMasterList.find(rr => rr.id === r.itemVariationXId)?.description,
+          yId: r.itemVariationYId,
+          yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
+          barcode: r.itemBarcode,
+          qty: 0,
+          qtyReceive: 1,
+          isDeleted: false,
+        }
+        this.selectedObject.line.forEach(r => (r.sequence ?? 0) + 1);
+        this.selectedObject.line.unshift(newLine);
+      })
     }
-    this.selectedObject.line.forEach(r => (r.sequence ?? 0) + 1);
-    this.selectedObject.line.unshift(newLine);
   }
 
   async deleteLine(rowIndex) {
@@ -175,7 +179,7 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
               itemSku: found_barcode.sku,
               itemBarcode: found_barcode.barcode
             }
-            this.onItemAdd(outputData);
+            this.onItemAdd([outputData]);
           } else {
             this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
           }

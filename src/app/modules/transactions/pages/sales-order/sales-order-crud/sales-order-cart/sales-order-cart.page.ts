@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { SalesOrderHeader, SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
+import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ShippingInfo, MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';

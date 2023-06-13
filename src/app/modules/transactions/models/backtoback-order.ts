@@ -83,6 +83,7 @@ export interface BackToBackOrderHeader {
   maxPrecisionTax: number
   /* #endregion */
   isCompleted: boolean
+  isPricingApproval: boolean
   posLocationId: any
   posLocationCode: any
   sequence: number

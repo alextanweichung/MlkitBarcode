@@ -121,9 +121,9 @@
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-flex ion-margin-auto">
-                        <div>
-                          <span class="badge-green px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                          <span class="badge-purple px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                        <div class="ion-flex">
+                          <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                          <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
                         </div>
                       </ion-col>
                     </ion-row>

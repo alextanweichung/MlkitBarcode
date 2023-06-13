@@ -231,8 +231,8 @@
             <div *ngFor="let vd of item.variationDetails">
               <ion-row *ngFor="let d of filter(vd.details)">
                 <ion-col size="auto" class="ion-flex ion-margin-auto">
-                  <span class="badge-green px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                  <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size: small;" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size: small;" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                 </ion-col>
                 <ion-col>
                   <div >{{d.qtyRequest|number:'1.0'}}</div>

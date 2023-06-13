@@ -6,10 +6,10 @@
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">{{line.itemCode}}</div>
-              <span class="badge-green px-1 mx-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationLineXId"> {{line.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
-              <span class="badge-green px-1 mx-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-              <span class="badge-purple px-1 mr-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationLineYId"> {{line.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
-              <span class="badge-purple px-1 mr-1 ion-flex" style="font-size: x-small;" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+              <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationLineXId"> {{line.itemVariationLineXId|idMapping:itemVariationXMasterList}}</span>
+              <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="itemVariationXMasterList.length > 0 && line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+              <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationLineYId"> {{line.itemVariationLineYId|idMapping:itemVariationYMasterList}}</span>
+              <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="itemVariationYMasterList.length > 0 && line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
             </ion-col>
             <ion-col class="ion-flex justify-content-end" *ngIf="isPicking" size="1">
               <ion-icon *ngIf="line.qtyRequest === (line.qtyPicked+ line.qtyPickedCurrent)" color="success" name="checkmark-circle"></ion-icon>

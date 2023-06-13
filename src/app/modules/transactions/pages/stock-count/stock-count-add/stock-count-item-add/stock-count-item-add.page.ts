@@ -132,8 +132,12 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
     }
   }
 
-  onItemAdd(event: TransactionDetail) {
-    this.addItemToLine(event);
+  onItemAdd(event: TransactionDetail[]) {
+    if (event && event.length > 0) {
+      event.forEach(r => {
+        this.addItemToLine(r);
+      })
+    }
   }
 
   async addItemToLine(trxLine: TransactionDetail) {

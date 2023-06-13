@@ -138,8 +138,8 @@
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">{{item.itemCode}}</div>
-              <span class="badge-green px-1 mx-1 ion-flex" *ngIf="objectService.itemVariationXMasterList.length > 0 && item.itemVariationXId"> {{item.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-              <span class="badge-purple px-1 ion-flex" *ngIf="objectService.itemVariationYMasterList.length > 0 && item.itemVariationYId"> {{item.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+              <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="objectService.itemVariationXMasterList.length > 0 && item.itemVariationXId"> {{item.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+              <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="objectService.itemVariationYMasterList.length > 0 && item.itemVariationYId"> {{item.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
             </ion-col>
           </ion-row>
           <ion-row>

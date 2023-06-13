@@ -153,11 +153,7 @@ export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
     }
   }
 
-  onItemAdd(event: TransactionDetail) {
-    this.addItemToLine(event);
-  }
-
-  onItemsAdd(event: TransactionDetail[]) {
+  onItemAdd(event: TransactionDetail[]) {
     if (event && event.length > 0) {
       event.forEach(r => {
         this.addItemToLine(r);
@@ -232,15 +228,6 @@ export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  /* #endregion */
-
-  /* #region input mode */
-
-  scanInput: boolean = true;
-  toggleInputMode() {
-    this.scanInput = !this.scanInput;
   }
 
   /* #endregion */

@@ -60,8 +60,8 @@
             <ion-col>
               <div>
                 {{item.itemCode}}
-                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
               </div>
             </ion-col>
           </ion-row>
