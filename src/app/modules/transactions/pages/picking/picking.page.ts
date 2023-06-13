@@ -61,6 +61,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
   loadObjects() {
     try {
       this.objectService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+        console.log("🚀 ~ file: picking.page.ts:72 ~ PickingPage ~ this.objectService.getObjectListByDate ~ response:", response)
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));

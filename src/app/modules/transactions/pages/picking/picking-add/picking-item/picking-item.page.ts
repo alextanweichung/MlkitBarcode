@@ -9,6 +9,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CurrentPickList, MultiPickingCarton, MultiPickingObject, MultiPickingOutstandingPickList, MultiPickingRoot, PickingLineVariation } from 'src/app/modules/transactions/models/picking';
+import { NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-picking-item',
@@ -19,7 +20,7 @@ import { CurrentPickList, MultiPickingCarton, MultiPickingObject, MultiPickingOu
 export class PickingItemPage implements OnInit, ViewWillEnter {
 
   systemWideEAN13IgnoreCheckDigit: boolean = false;
-  showVariation: boolean = false;
+  showItemList: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -78,7 +79,6 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
   /* #region picking engine */
 
   runPickingEngine(itemFound: TransactionDetail, inputQty: number) {
-    console.log("🚀 ~ file: picking-item.page.ts:81 ~ PickingItemPage ~ runPickingEngine ~ itemFound:", itemFound);
     if (itemFound) {
       let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku == itemFound.itemSku);
       if (outstandingLines.length > 0) {
@@ -107,7 +107,6 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
             }
             break;
         }
-        console.log("🚀 ~ file: picking-item.page.ts:114 ~ PickingItemPage ~ runPickingEngine ~ this.objectService.multiPickingObject:", this.objectService.multiPickingObject)
       } else {
         this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
         // this.barcodeScan.setInputFocus();
@@ -448,16 +447,20 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
-  async onItemAdd(event: TransactionDetail) {
+  async onItemAdd(event: TransactionDetail[]) {
     try {
       if (this.objectService.multiPickingObject.pickingCarton.length === 0) {
         this.toastService.presentToast("Control Validation", "Please create carton before adding items.", "top", "warning", 1000);
       } else {
         if (event) {
           if (this.objectService.header.isWithSo) {
-            await this.runPickingEngine(event, 1);
+            event.forEach(async r => {
+              await this.runPickingEngine(r, 1);
+            })
           } else {
-            await this.insertPickingLineWithoutSo(event, 1);
+            event.forEach(async r => {
+              await this.insertPickingLineWithoutSo(r, 1);
+            })
           }
         }
       }
@@ -552,6 +555,18 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
+  /* #region show variaton dialog */
+
+  selectedItem: TransactionDetail;
+  showDetails(item: any) {
+    if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
+      // this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
+    }
+  }
+
+  /* #endregion */
+
   /* #region image modal */
 
   isImageModalOpen: boolean = false;
@@ -639,50 +654,56 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
   /* #endregion */
 
   async nextStep() {
-    // try {
-    //   const alert = await this.alertController.create({
-    //     cssClass: 'custom-alert',
-    //     header: 'Are you sure to proceed?',
-    //     buttons: [
-    //       {
-    //         text: 'Confirm',
-    //         cssClass: 'success',
-    //         handler: async () => {
-    //           await this.insertObject();
-    //         },
-    //       },
-    //       {
-    //         text: 'Cancel',
-    //         role: 'cancel',
-    //         cssClass: 'cancel',
-    //       },
-    //     ],
-    //   });
-    //   await alert.present();
-    // } catch (e) {
-    //   console.error(e);
-    // }
+    try {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to proceed?',
+        buttons: [
+          {
+            text: 'Confirm',
+            cssClass: 'success',
+            handler: async () => {
+              await this.insertObject();
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'cancel',
+          },
+        ],
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   insertObject() {
-    // try {
-    //   let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
-    //   if (this.allowDocumentWithEmptyLine == "N") {
-    //     if (newObjectDto.details.length < 1) {
-    //       this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "danger", 1000);
-    //     }
-    //   }
-    //   this.objectService.insertObject(newObjectDto).subscribe(response => {
-    //     console.log("🚀 ~ file: picking-item.page.ts:427 ~ PickingItemPage ~ this.objectService.insertObject ~ response:", response)
-    //     if (response.status == 201) {
-    //       this.toastService.presentToast("Insert Complete", "New picking has been created.", "top", "success", 1000);
-    //     }
-    //   }, error => {
-    //     console.error(error);
-    //   });
-    // } catch (e) {
-    //   console.error(e);
-    // }
+    try {
+      let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
+      if (this.allowDocumentWithEmptyLine == "N") {
+        if (newObjectDto.details.length < 1) {
+          this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "danger", 1000);
+        }
+      }
+      this.objectService.insertObject(newObjectDto).subscribe(response => {
+        if (response.status == 201) {
+          let object = response.body as MultiPickingRoot;
+          this.toastService.presentToast("Insert Complete", "New picking has been created.", "top", "success", 1000);
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: object.header.multiPickingId
+            }
+          }
+          this.navController.navigateRoot("/transactions/picking/picking-detail", navigationExtras);
+        }
+      }, error => {
+        console.error(error);
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   previousStep() {
@@ -692,8 +713,6 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
-
-
     // this.modalController.dismiss(this.filters);
   }
 

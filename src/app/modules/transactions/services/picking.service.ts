@@ -89,6 +89,17 @@ export class PickingService {
     return [];
   }
 
+  getItemDescriptionByItemCode(itemCode: string): string {
+    if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
+      let description = '';
+      let found = this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode);
+      if (found) {
+        return found.description;
+      }
+    }
+    return null;
+  }
+
   getLocationByItemCode(itemCode: string): string {
     if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
       let location = '';

@@ -111,8 +111,8 @@ export interface PickingLineVariation {
 }
 
 export interface MultiPickingOutstandingPickList {
-  multiPickingOutstandingId: number
-  multiPickingId: number
+  multiPickingOutstandingId?: number
+  multiPickingId?: number
   itemId: number
   variationTypeCode: string
   itemVariationXId: any
@@ -122,24 +122,17 @@ export interface MultiPickingOutstandingPickList {
   description: any
   itemVariationXDescription: any
   itemVariationYDescription: any
-  rack: string
-  subRack: string
-  salesOrderId: number
-  salesOrderNum: string
-  salesOrderLineId: number
-  salesOrderVariationId: number
+  rack?: string
+  subRack?: string
+  salesOrderId?: number
+  salesOrderNum?: string
+  salesOrderLineId?: number
+  salesOrderVariationId?: number
   qtyRequest: number
-  qtyCommit: number
+  qtyCommit?: number
   qtyPicked: number
   qtyCurrent: number
-  sequence: number
-  createdById: number
-  createdBy: string
-  createdAt: string
-  modifiedById: any
-  modifiedBy: any
-  modifiedAt: any
-  deactivated: boolean
+  sequence?: number
 }
 
 export interface MultiPickingSORequest {

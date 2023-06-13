@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Detail</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="Back"></ion-back-button>
+      <ion-back-button text="Back" defaultHref="/transactions/picking"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -62,38 +62,30 @@
               <div class="font-bold">{{o}}</div>
             </ion-col>
           </ion-row>
-          <ion-row *ngFor="let i of getItemOfSO(o)" class="mt-2">
+          <ion-row *ngFor="let i of getItemOfSO(o); let ii = index" class="mt-2">
             <ion-grid class="ion-no-padding">
-              <ion-row>
-                <ion-col size="9" class="ion-flex ion-margin-auto">
-                  <div class="font-bold">{{i.itemCode}}</div>
-                  <span class="badge-green px-1 ml-1 mr-1" style="font-size: small;" *ngIf="i.itemVariationXId"> {{i.itemVariationXDescription}}</span>
-                  <span class="badge-purple px-1 mr-1" style="font-size: small;" *ngIf="i.itemVariationYId"> {{i.itemVariationYDescription}}</span>
+              <ion-row *ngIf="ii === 0">
+                <ion-col class="ion-flex ion-margin-auto">
+                  <div class="font-bold">Item</div>
                 </ion-col>
-                <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
-                  <ion-icon name="ellipse" [class]="i.qtyRequest === i.qtyCurrent?'color-success':'color-danger'"></ion-icon>
-                </ion-col>
-              </ion-row>
-              <ion-row>
-                <ion-col size="6" class="ion-flex ion-margin-auto">
-                  <div class="font-bold">Location</div>
-                </ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
                   <div class="font-bold">SO Qty</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
                   <div class="font-bold">Picked Qty</div>
                 </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col size="6" class="ion-flex ion-margin-auto">
-                  <div class="ion-flex" *ngIf="i.rack">{{i.rack}}</div>
-                  <div class="ion-flex" *ngIf="i.subRack">- {{i.subRack}}</div>
+                <ion-col class="ion-flex ion-margin-auto">
+                  <ion-icon name="ellipse" [class]="i.qtyRequest === i.qtyCurrent?'color-success':'color-danger'"></ion-icon>
+                  <div class=" ml-1 font-bold">{{i.itemCode}}</div>
+                  <span class="badge-green px-1 ml-1 ion-text-wrap ion-flex my-auto" style="font-size: xx-small;" *ngIf="i.itemVariationXId"> {{i.itemVariationXDescription}}</span>
+                  <span class="badge-purple px-1 ion-text-wrap ion-flex my-auto" style="font-size: xx-small;" *ngIf="i.itemVariationYId"> {{i.itemVariationYDescription}}</span>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
                   <div class="ion-flex">{{i.qtyRequest|number:'1.0'}}</div>
                 </ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
                   <div class="ion-flex">{{i.qtyCurrent|number:'1.0'}}</div>
                 </ion-col>
               </ion-row>

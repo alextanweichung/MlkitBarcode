@@ -1,9 +1,10 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
+import { MasterListDetails } from '../../models/master-list-details';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -12,9 +13,14 @@ import { TransactionDetail } from '../../models/transaction-detail';
 })
 export class BarcodeScanInputPage implements OnInit {
 
+  @Input() itemVariationXMasterList: MasterListDetails[] = [];
+  @Input() itemVariationYMasterList: MasterListDetails[] = [];
+
   moduleControl: ModuleControl[];
   systemWideEAN13IgnoreCheckDigit: boolean = false;
   systemWideScanningMethod: string;
+
+  selectedScanningMethod: string = "B";
 
   @Output() onItemAdd = new EventEmitter<any>();
 
@@ -29,7 +35,7 @@ export class BarcodeScanInputPage implements OnInit {
   }
 
   ionViewDidEnter(): void {
-    this.barcodeInput.nativeElement.focus();
+    // this.barcodeInput.nativeElement.focus();
   }
 
   loadModuleControl() {
@@ -48,7 +54,7 @@ export class BarcodeScanInputPage implements OnInit {
     })
   }
 
-  handleKeyDown(e: any, key: string) {
+  handleBarcodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
       let barcode = this.manipulateBarcodeCheckDigit(key);
       this.validateBarcode(barcode);
@@ -67,11 +73,11 @@ export class BarcodeScanInputPage implements OnInit {
     return itemBarcode;
   }
 
-  itemSearchValue: string;
+  barcodeSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
   async validateBarcode(barcode: string) {
     if (barcode) {
-      this.itemSearchValue = '';
+      this.barcodeSearchValue = '';
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
         if (found_barcode) {
@@ -82,7 +88,7 @@ export class BarcodeScanInputPage implements OnInit {
             description: found_item_master.itemDesc,
             variationTypeCode: found_item_master.varCd,
             discountGroupCode: found_item_master.discCd,
-            discountExpression: found_item_master.discPct+'%',
+            discountExpression: found_item_master.discPct + '%',
             taxId: found_item_master.taxId,
             taxCode: found_item_master.taxCd,
             taxPct: found_item_master.taxPct,
@@ -91,7 +97,7 @@ export class BarcodeScanInputPage implements OnInit {
               itemId: found_item_master.id,
               unitPrice: found_item_master.price,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: found_item_master.discPct+'%',
+              discountExpression: found_item_master.discPct + '%',
               discountPercent: found_item_master.discPct,
               discountGroupId: null,
               unitPriceMin: null,
@@ -106,7 +112,7 @@ export class BarcodeScanInputPage implements OnInit {
             itemCategoryId: found_item_master.catId,
             itemBarcodeTagId: found_barcode.id
           }
-          this.onItemAdd.emit(outputData);
+          this.onItemAdd.emit([outputData]);
         } else {
           this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
         }
@@ -114,7 +120,116 @@ export class BarcodeScanInputPage implements OnInit {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    this.barcodeInput.nativeElement.focus();
+    // this.barcodeInput.nativeElement.focus();
   }
+
+  /* #region item scan */
+
+  handleItemCodeKeyDown(e: any, key: string) {
+    if (e.keyCode === 13) {
+      this.validateItem(key);
+      e.preventDefault();
+    }
+  }
+
+  itemSearchValue: string;
+  availableItems: TransactionDetail[] = [];
+  @ViewChild('itemInput', { static: false }) itemInput: ElementRef;
+  async validateItem(searchValue: string) {
+    console.log("🚀 ~ file: barcode-scan-input.page.ts:139 ~ BarcodeScanInputPage ~ validateItem ~ searchValue:", searchValue)
+    if (searchValue) {
+      this.itemSearchValue = '';
+      this.availableItems = [];
+      let found_item_master = null;
+      let found_item_barcode = null;
+      if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
+        let found = await this.configService.item_Masters.filter(r => r.code.length > 0).find(r => r.code.toUpperCase() === searchValue.toUpperCase()); // if found by itemCode
+        if (found) {
+          found_item_master = await this.configService.item_Masters.find(r => found.id === r.id);
+        } else {
+          let found2 = await this.configService.item_Barcodes.filter(r => r.sku.length > 0).find(r => r.sku.toUpperCase() === searchValue.toUpperCase()); // if found by itemSku
+          if (found2) {
+            found_item_master = await this.configService.item_Masters.find(r => found2.id === r.id);
+          }
+        }
+        if (found_item_master) {
+          found_item_barcode = await this.configService.item_Barcodes.filter(r => r.itemId === found_item_master.id);
+        }
+        if (found_item_barcode) {
+          found_item_barcode.forEach(async r => {
+            if (this.availableItems.findIndex(rr => rr.itemSku === r.sku) < 0) {
+              let outputData: TransactionDetail = {
+                itemId: found_item_master.id,
+                itemCode: found_item_master.code,
+                description: found_item_master.itemDesc,
+                variationTypeCode: found_item_master.varCd,
+                discountGroupCode: found_item_master.discCd,
+                discountExpression: found_item_master.discPct + '%',
+                taxId: found_item_master.taxId,
+                taxCode: found_item_master.taxCd,
+                taxPct: found_item_master.taxPct,
+                qtyRequest: null,
+                itemPricing: {
+                  itemId: found_item_master.id,
+                  unitPrice: found_item_master.price,
+                  discountGroupCode: found_item_master.discCd,
+                  discountExpression: found_item_master.discPct + '%',
+                  discountPercent: found_item_master.discPct,
+                  discountGroupId: null,
+                  unitPriceMin: null,
+                  currencyId: null
+                },
+                itemVariationXId: r.xId,
+                itemVariationYId: r.yId,
+                itemSku: r.sku,
+                itemBarcode: r.barcode,
+                itemBrandId: found_item_master.brandId,
+                itemGroupId: found_item_master.groupId,
+                itemCategoryId: found_item_master.catId,
+                itemBarcodeTagId: r.id
+              }
+              await this.availableItems.push(outputData);
+            }
+          })
+        } else {
+          this.toastService.presentToast('No Item Found', '', 'top', 'danger', 1000);
+        }
+        if (this.availableItems.length > 0) {
+          if (this.availableItems.length === 1) {
+            this.onItemAdd.emit(this.availableItems);
+          } else {
+            this.showModal();
+          }
+        } else {
+          this.toastService.presentToast('No Item Found', '', 'top', 'danger', 1000);
+        }
+      } else {
+        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
+      }
+    }
+    console.log("🚀 ~ file: barcode-scan-input.page.ts:192 ~ BarcodeScanInputPage ~ validateItem ~ this.availableItems:", JSON.stringify(this.availableItems))
+    // this.barcodeInput.nativeElement.focus();
+  }
+
+  /* #region modal for user to select item */
+
+  isModalOpen: boolean = false;
+
+  showModal() {
+    this.isModalOpen = true;
+  }
+
+  hideModal() {
+    this.isModalOpen = false;
+  }
+
+  selectItems() {
+    this.onItemAdd.emit(this.availableItems.filter(r => r.isSelected));
+    this.hideModal();
+  }
+
+  /* #endregion */
+
+  /* #endregion */
 
 }

@@ -102,6 +102,8 @@ export class PickingHeaderPage implements OnInit {
   // outstandingPickList: MultiPickingOutstandingPickList[] = [];
   uniqueSo: string[] = [];
   uniqueItemCode: string[] = [];
+  uniqueSku: string[] = [];
+  uniqueItemSkuAndCode: Map<string, string> = new Map([]);
   validateSalesOrder(input: string) {
     if (input && input.length > 0) {
       this.itemSearchValue = null;
@@ -135,6 +137,10 @@ export class PickingHeaderPage implements OnInit {
             this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
             this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
             this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+            this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
+            this.uniqueSku.forEach(r => {
+              this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
+            })
           }
         }, error => {
           console.error(error);
@@ -193,8 +199,34 @@ export class PickingHeaderPage implements OnInit {
     return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum).flatMap(r => r.itemCode))];
   }
 
-  getSoLineByItemCode(itemCode: string) {
-    return this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode);
+  getSoLineByItemCode(itemCode: string): MultiPickingOutstandingPickList[] {    
+    let ret: MultiPickingOutstandingPickList[] = [];
+    let l = this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode);
+    if (l && l.length > 0) {
+      l.forEach(r => {
+        let y = [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode).flatMap(r => r.itemSku))];
+        y.forEach(rr => {
+          let t: MultiPickingOutstandingPickList = {
+            itemId: r.itemId,
+            itemCode: r.itemCode,
+            itemSku: r.itemSku,
+            description: r.description,
+            variationTypeCode: r.variationTypeCode,
+            itemVariationXId: r.itemVariationXId,
+            itemVariationXDescription: r.itemVariationXDescription,
+            itemVariationYId: r.itemVariationYId,
+            itemVariationYDescription: r.itemVariationYDescription,
+            qtyRequest: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyRequest).reduce((a, c) => Number(a) + Number(c), 0),
+            qtyCurrent: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyCurrent).reduce((a, c) => Number(a) + Number(c), 0),
+            qtyPicked: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyPicked).reduce((a, c) => Number(a) + Number(c), 0)
+          }
+          if (ret.findIndex(rr => rr.itemSku === t.itemSku) === -1) {
+            ret.push(t);
+          }
+        })
+      })
+    }
+    return ret;
   }
 
   getSoNumByItemCode(itemCode: string) {
@@ -205,8 +237,12 @@ export class PickingHeaderPage implements OnInit {
     return this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum && r.itemCode === itemCode).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
   }
 
+  getCurrentBySoItemCode(salesOrderNum: string, itemCode: string) {
+    return this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum && r.itemCode === itemCode).flatMap(r => r.qtyCurrent).reduce((a, c) => a + c, 0);
+  }
+
   getPickedBySoItemCode(salesOrderNum: string, itemCode: string) {
-    return this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum && r.itemCode === itemCode).flatMap(r => r.qtyPicked + r.qtyCurrent).reduce((a, c) => a + c, 0);
+    return this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum && r.itemCode === itemCode).flatMap(r => r.qtyPicked).reduce((a, c) => a + c, 0);
   }
 
   /* #endregion */
