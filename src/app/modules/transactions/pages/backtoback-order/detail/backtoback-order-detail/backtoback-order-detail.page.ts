@@ -7,7 +7,10 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -19,6 +22,8 @@ export class BacktobackOrderDetailPage implements OnInit {
 
   objectId: number
   object: BackToBackOrderRoot;
+  processType: string;
+  selectedSegment: string;
 
   constructor(
     private authService: AuthService,
@@ -32,8 +37,10 @@ export class BacktobackOrderDetailPage implements OnInit {
     try {
       this.route.queryParams.subscribe(params => {
         this.objectId = params['objectId'];
+        this.processType = params['processType'];
+        this.selectedSegment = params['selectedSegment'];
         if (!this.objectId) {
-          this.navController.navigateBack('/transactions/sales-order');
+          this.navController.navigateBack('/transactions/backtoback-order');
         }
       })
     } catch (e) {
@@ -43,7 +50,7 @@ export class BacktobackOrderDetailPage implements OnInit {
 
   ngOnInit() {
     if (!this.objectId) {
-      this.navController.navigateBack('/transactions/sales-order')
+      this.navController.navigateBack('/transactions/backtoback-order')
     } else {
       this.loadModuleControl();
       this.loadObject();
@@ -68,6 +75,7 @@ export class BacktobackOrderDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        this.loadWorkflow(this.object.header.backToBackOrderId);
       }, error => {
         throw error;
       })
@@ -75,6 +83,56 @@ export class BacktobackOrderDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  workFlowState: WorkFlowState[] = [];
+  trxChild: TrxChild[] = [];
+  loadWorkflow(objectId: number) {
+    this.workFlowState = [];
+    this.objectService.getWorkflow(objectId).subscribe(response => {
+      this.workFlowState = response;
+
+      this.objectService.getTrxChild(objectId).subscribe(response2 => {
+        this.trxChild = response2;
+        if (this.trxChild.length > 0) {
+          let trxTypes: string[] = this.trxChild.map(x => x.serviceName);
+          trxTypes = [...new Set(trxTypes)];
+          trxTypes.forEach(type => {
+            let relatedArray = this.trxChild.filter(x => x.serviceName == type);
+            let trxIds = relatedArray.map(x => x.trxId);
+            let trxNums = relatedArray.map(x => x.trxNum);
+            let trxDates = relatedArray.map(x => x.trxDate);
+            let routerLinks = relatedArray.map(x => x.routerLink);
+            if (type == 'SalesInvoice') {
+              type = 'Sales Invoice';
+            }
+            let newState: WorkFlowState = {
+              stateId: null,
+              title: type,
+              trxId: null,
+              trxIds: trxIds,
+              trxNum: null,
+              trxNums: trxNums,
+              trxDate: null,
+              trxDates: trxDates,
+              trxBy: null,
+              routerLink: null,
+              routerLinks: routerLinks,
+              icon: 'pi pi-star-fill',
+              stateType: 'TRANSACTION',
+              isCompleted: true,
+              sequence: null,
+              interval: null
+            }
+            this.workFlowState = [...this.workFlowState, newState]
+          })
+        }
+      }, error => {
+        console.log(error);
+      });
+    }, error => {
+      console.error(error);
+    })
   }
 
   editObject() {
@@ -136,6 +194,123 @@ export class BacktobackOrderDetailPage implements OnInit {
     try {
       this.popoverMenu.event = event;
       this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region approve reject */
+
+  async presentConfirmAlert(action: string) {
+    try {
+      if (this.processType && this.selectedSegment) {
+        const alert = await this.alertController.create({
+          cssClass: 'custom-alert',
+          backdropDismiss: false,
+          header: 'Are you sure to ' + action + ' ' + this.object.header.backToBackOrderNum + '?',
+          inputs: [
+            {
+              name: 'actionreason',
+              type: 'textarea',
+              placeholder: 'Please enter Reason',
+              value: ''
+            }
+          ],
+          buttons: [
+            {
+              text: 'OK',
+              role: 'confirm',
+              cssClass: 'success',
+              handler: (data) => {
+                if (action === 'REJECT' && this.processType) {
+                  if (!data.actionreason && data.actionreason.length === 0) {
+                    this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                    return false;
+                  } else {
+                    this.updateDoc(action, [this.object.header.backToBackOrderId.toString()], data.actionreason);
+                  }
+                } else {
+                  this.updateDoc(action, [this.object.header.backToBackOrderId.toString()], data.actionreason);
+                }
+              },
+            },
+            {
+              text: 'Cancel',
+              role: 'cancel'
+            },
+          ],
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  currentWorkflow: WorkFlowState;
+  nextWorkflow: WorkFlowState;
+  updateDoc(action: string, listOfDoc: string[], actionReason: string) {
+    try {
+      if (this.processType && this.selectedSegment) {
+        let bulkConfirmReverse: BulkConfirmReverse = {
+          status: action,
+          reason: actionReason,
+          docId: listOfDoc.map(i => Number(i))
+        }
+        try {
+          this.currentWorkflow = this.workFlowState[this.workFlowState.filter(r => r.isCompleted).length - 1];
+          this.nextWorkflow = this.workFlowState.find(r => r.trxId === null);
+          let workflowApiObject: string;
+          if (action.toUpperCase() === "CONFIRM" || action.toUpperCase() === "REJECT") {
+            switch (this.nextWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileBackToBackOrderReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileBackToBackOrderApprove";
+                break;
+              case "PRICINGAPPROVAL":
+                workflowApiObject = "MobileBackToBackOrderPricingApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          if (action.toUpperCase() === "REVERSE") {
+            switch (this.currentWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileBackToBackOrderReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileBackToBackOrderApprove";
+                break;
+              case "PRICINGAPPROVAL":
+                workflowApiObject = "MobileBackToBackOrderPricingApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
+            if (response.status == 204) {
+              this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
+              this.navController.back();
+            }
+          }, error => {
+            throw Error;
+          })
+        } catch (error) {
+          this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+        }
+      } else {
+        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+      }
     } catch (e) {
       console.error(e);
     }

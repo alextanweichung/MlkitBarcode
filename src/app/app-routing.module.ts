@@ -65,6 +65,15 @@ const routes: Routes = [
     path: 'managements/sales-order-approvals',
     loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
   },
+  // management-b2bo
+  {
+    path: 'managements/b2bo-reviews',
+    loadChildren: () => import('./modules/managements/pages/b2bo-reviews/b2bo-reviews.module').then( m => m.B2boReviewsPageModule)
+  },
+  {
+    path: 'managements/b2bo-approvals',
+    loadChildren: () => import('./modules/managements/pages/b2bo-approvals/b2bo-approvals.module').then( m => m.B2boApprovalsPageModule)
+  },
   // management-purchase-req
   {
     path: 'managements/purchase-req-reviews',
@@ -82,6 +91,16 @@ const routes: Routes = [
   {
     path: 'managements/purchase-order-approvals',
     loadChildren: () => import('./modules/managements/pages/purchase-order-approvals/purchase-order-approvals.module').then(m => m.PurchaseOrderApprovalsPageModule)
+  },
+  // management-pricing
+  {
+    path: 'managements/pricing-approvals',
+    loadChildren: () => import('./modules/managements/pages/pricing-approvals/pricing-approvals.module').then( m => m.PricingApprovalsPageModule)
+  },
+  // management-b2bopricing
+  {
+    path: 'managements/b2bopricing-approvals',
+    loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then( m => m.B2bopricingApprovalsPageModule)
   },
   // management-otp-configuration
   {

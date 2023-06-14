@@ -47,7 +47,6 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
     this.uniqueSalesOrder = []
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: picking-detail.page.ts:47 ~ PickingDetailPage ~ this.objectService.getObjectById ~ response:", response);
         this.object = response;
         if (this.object.outstandingPickList && this.object.outstandingPickList.length > 0) {
           this.uniqueSalesOrder = [...new Set(this.object.outstandingPickList.flatMap(r => r.salesOrderNum))];

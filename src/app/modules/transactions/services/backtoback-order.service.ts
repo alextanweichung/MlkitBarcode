@@ -11,6 +11,10 @@ import { HttpClient } from '@angular/common/http';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { BackToBackOrderHeader, BackToBackOrderList, BackToBackOrderRoot } from '../models/backtoback-order';
 import { format } from 'date-fns';
+import { map } from 'rxjs/operators';
+import { TrxChild } from 'src/app/shared/models/trx-child';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -192,5 +196,21 @@ export class BackToBackOrderService {
   // getStatus(salesOrderId: number) {
   //   return this.http.get<SalesOrderStatus>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/status/" + salesOrderId);
   // }
+
+  bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+  }
+
+  getWorkflow(objectId: number) {
+    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/workflow/" + objectId);
+  }
+
+  getTrxChild(objectId: number){
+    return this.http.get<TrxChild>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/child/" + objectId).pipe(
+      map((response: any) =>       
+        response.map((item: any) => item)   
+      )
+    );
+  }
 
 }

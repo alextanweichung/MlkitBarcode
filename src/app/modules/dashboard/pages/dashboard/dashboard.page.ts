@@ -25,11 +25,18 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   showSalesOrderReview: boolean = false;
   showSalesOrderApproval: boolean = false;
 
+  showBackToBackOrderReview: boolean = false;
+  showBackToBackOrderApproval: boolean = false;
+
   showPurchaseReqReview: boolean = false;
   showPurchaseReqApproval: boolean = false;
 
   showPurchaseOrderReview: boolean = false;
   showPurchaseOrderApproval: boolean = false;
+
+  showSalesOrderPricingApproval: boolean = false;
+
+  showBackToBackOrderPricingApproval: boolean = false;
   
   last_sync_datetime: Date;
 
@@ -63,10 +70,16 @@ export class DashboardPage implements OnInit, ViewDidEnter {
             this.showQuotationApproval = mPageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
             this.showSalesOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
             this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+
+            this.showBackToBackOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderRV) > -1;
+            this.showBackToBackOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderAP) > -1;
+
             this.showPurchaseReqReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;
             this.showPurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
             this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
             this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
+            this.showSalesOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
+            this.showBackToBackOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
           }
 
           let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction);

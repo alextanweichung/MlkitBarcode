@@ -31,28 +31,25 @@
             <div>Approval History</div>
           </ion-label>
         </ion-item>
-        <ion-item button (click)="popover.dismiss(); presentAlertViewPdf()">
+        <ion-item (click)="popover.dismiss(); presentAlertViewPdf()">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Download Pdf</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="processType && selectedSegment === 'pending'"
-          (click)="popover.dismiss(); presentConfirmAlert('CONFIRM')">
+        <ion-item *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('CONFIRM')">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approve</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="processType && selectedSegment === 'pending'"
-          (click)="popover.dismiss(); presentConfirmAlert('REJECT')">
+        <ion-item *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('REJECT')">
           <ion-icon name="close-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reject</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="processType && selectedSegment === 'completed'"
-          (click)="popover.dismiss(); presentConfirmAlert('REVERSE')">
+        <ion-item *ngIf="processType && selectedSegment === 'completed'" (click)="popover.dismiss(); presentConfirmAlert('REVERSE')">
           <ion-icon name="arrow-undo-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reverse</div>

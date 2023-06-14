@@ -20,7 +20,6 @@ export class TransactionProcessingService {
     @Inject('apiObject') private apiObject: string
   ) {
     this.apiObject = apiObject;
-    
   }  
 
   getDocumentCount() {

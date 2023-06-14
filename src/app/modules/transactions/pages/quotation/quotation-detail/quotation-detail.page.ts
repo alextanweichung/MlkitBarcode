@@ -11,6 +11,8 @@ import { QuotationRoot } from '../../../models/quotation';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 
 @Component({
   selector: 'app-quotation-detail',
@@ -78,6 +80,7 @@ export class QuotationDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        this.loadWorkflow(this.object.header.quotationId);
       }, error => {
         throw error;
       })
@@ -85,6 +88,21 @@ export class QuotationDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  workFlowState: WorkFlowState[] = [];
+  trxChild: TrxChild[] = [];
+  loadWorkflow(objectId: number) {
+    this.workFlowState = [];
+    this.objectService.getWorkflow(objectId).subscribe(response => {
+      if (response) {
+        this.workFlowState = response;
+      } else {
+        this.workFlowState = [];
+      }
+    }, error => {
+      console.error(error);
+    })
   }
 
   editObject() {
@@ -272,6 +290,8 @@ export class QuotationDetailPage implements OnInit {
     }
   }
 
+  currentWorkflow: WorkFlowState;
+  nextWorkflow: WorkFlowState;
   updateDoc(action: string, listOfDoc: string[], actionReason: string) {
     try {
       if (this.processType && this.selectedSegment) {
@@ -281,13 +301,42 @@ export class QuotationDetailPage implements OnInit {
           docId: listOfDoc.map(i => Number(i))
         }
         try {
-          this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileQuotationReview' : 'mobileQuotationApprove', bulkConfirmReverse).subscribe(async response => {
+          this.currentWorkflow = this.workFlowState[this.workFlowState.filter(r => r.isCompleted).length - 1];
+          this.nextWorkflow = this.workFlowState.find(r => r.trxId === null);
+          let workflowApiObject: string;
+          if (action.toUpperCase() === "CONFIRM" || action.toUpperCase() === "REJECT") {
+            switch (this.nextWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileQuotationReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileQuotationApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          if (action.toUpperCase() === "REVERSE") {
+            switch (this.currentWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileQuotationReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileQuotationApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
               this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
               this.navController.back();
             }
           }, error => {
-            throw error;
+            throw Error;
           })
         } catch (error) {
           this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);

@@ -270,7 +270,7 @@ export class SalesOrderDetailPage implements OnInit {
         const alert = await this.alertController.create({
           cssClass: 'custom-alert',
           backdropDismiss: false,
-          header: 'Are you sure to ' + action + ' ' + this.object.header.salesOrderId + '?',
+          header: 'Are you sure to ' + action + ' ' + this.object.header.salesOrderNum + '?',
           inputs: [
             {
               name: 'actionreason',
@@ -312,6 +312,8 @@ export class SalesOrderDetailPage implements OnInit {
     }
   }
 
+  currentWorkflow: WorkFlowState;
+  nextWorkflow: WorkFlowState;
   updateDoc(action: string, listOfDoc: string[], actionReason: string) {
     try {
       if (this.processType && this.selectedSegment) {
@@ -321,7 +323,42 @@ export class SalesOrderDetailPage implements OnInit {
           docId: listOfDoc.map(i => Number(i))
         }
         try {
-          this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileSalesOrderReview' : 'mobileSalesOrderApprove', bulkConfirmReverse).subscribe(async response => {
+          this.currentWorkflow = this.workFlowState[this.workFlowState.filter(r => r.isCompleted).length - 1];
+          this.nextWorkflow = this.workFlowState.find(r => r.trxId === null);
+          let workflowApiObject: string;
+          if (action.toUpperCase() === "CONFIRM" || action.toUpperCase() === "REJECT") {
+            switch (this.nextWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileSalesOrderReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileSalesOrderApprove";
+                break;
+              case "PRICINGAPPROVAL":
+                workflowApiObject = "MobilePricingApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          if (action.toUpperCase() === "REVERSE") {
+            switch (this.currentWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileSalesOrderReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileSalesOrderApprove";
+                break;
+              case "PRICINGAPPROVAL":
+                workflowApiObject = "MobilePricingApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
               this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
               this.navController.back();

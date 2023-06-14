@@ -29,13 +29,11 @@ export class PickingService {
   header: MultiPickingHeader;
   object: MultiPickingRoot;
   setHeader(header: MultiPickingHeader) {
-    console.log("🚀 ~ file: picking.service.ts:28 ~ PickingService ~ setHeader ~ header:", header)
     this.header = header;
   }
 
   multiPickingObject: MultiPickingObject = { outstandingPickList: [], pickingCarton: [] };
   setMultiPickingObject(object: MultiPickingObject) {
-    console.log("🚀 ~ file: picking.service.ts:40 ~ PickingService ~ setMultiPickingObject ~ object:", object)
     this.multiPickingObject = object;
   }
 

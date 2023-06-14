@@ -35,7 +35,6 @@ export class TransactionProcessingPage implements OnInit {
   transactionProcessingCount: TransactionProcessingCount = { pending: 0, completed: 0, total: 0, isAllowApprove: false };
   loadCounts() {
     this.objectService.getDocumentCount().subscribe(response => {
-      console.log("🚀 ~ file: transaction-processing.page.ts:37 ~ TransactionProcessingPage ~ this.objectService.getDocumentCount ~ response:", response)
       this.transactionProcessingCount = response;
     }, error => {
       console.error(error);

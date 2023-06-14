@@ -42,7 +42,7 @@
             <div style="width: 100%;" *ngFor="let vd of item.variationDetails">
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">
-                  <ion-col class="ion-margin-auto">
+                  <ion-col class="ion-flex ion-margin-auto">
                     <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
                     <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                   </ion-col>

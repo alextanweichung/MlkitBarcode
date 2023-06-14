@@ -14,6 +14,8 @@ import { Customer } from '../models/customer';
 import { QuotationHeader, QuotationList, QuotationRoot } from '../models/quotation';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { format } from 'date-fns';
+import { TrxChild } from 'src/app/shared/models/trx-child';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -185,4 +187,8 @@ export class QuotationService {
     return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
+  getWorkflow(objectId: number) {
+    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/workflow/" + objectId);
+  }
+  
 }

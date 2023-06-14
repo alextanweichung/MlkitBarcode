@@ -37,12 +37,13 @@
         <h6>{{memo?.header?.subject}}</h6>
       </ion-item>
     </ion-list>
-    <hr class="hr-medium">
-    <div *ngIf="showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseOrderReview || showPurchaseOrderApproval">
+    
+    <div *ngIf="showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseReqReview || showPurchaseReqApproval || showPurchaseOrderReview || showPurchaseOrderApproval || showSalesOrderPricingApproval || showBackToBackOrderPricingApproval">
       <ion-list-header>
         <ion-label class="pl-2" color="dark">Pending Task</ion-label>
       </ion-list-header>      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+
         <ion-item *ngIf="showQuotationReview && dashboardData?.quotationReviewCount?.pending > 0" (click)="goToManagement('quotation', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
@@ -57,6 +58,7 @@
           </ion-label>
           <ion-badge slot="end">{{dashboardData?.quotationApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
+
         <ion-item *ngIf="showSalesOrderReview && dashboardData?.salesOrderReviewCount?.pending > 0" (click)="goToManagement('sales-order', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
@@ -70,6 +72,21 @@
             <h3>Sales Order Approval</h3>
           </ion-label>
           <ion-badge slot="end">{{dashboardData?.salesOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+
+        <ion-item *ngIf="showBackToBackOrderReview && dashboardData?.backToBackOrderReviewCount?.pending > 0" (click)="goToManagement('b2bo', 'reviews')">
+          <ion-icon name="list-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Back To Back Order Review</h3>
+          </ion-label>
+          <ion-badge slot="end">{{dashboardData?.backToBackOrderReviewCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+        <ion-item *ngIf="showBackToBackOrderApproval && dashboardData?.backToBackOrderApprovalCount?.pending > 0" (click)="goToManagement('b2bo', 'approvals')">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Back To Back Order Approval</h3>
+          </ion-label>
+          <ion-badge slot="end">{{dashboardData?.backToBackOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
 
         <ion-item *ngIf="showPurchaseReqReview && dashboardData?.purchaseReqReviewCount?.pending > 0" (click)="goToManagement('purchase-req', 'reviews')">
@@ -101,9 +118,26 @@
           </ion-label>
           <ion-badge slot="end">{{dashboardData?.purchaseOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
+
+        <ion-item *ngIf="showSalesOrderPricingApproval && dashboardData?.salesOrderPricingApprovalCount?.pending > 0" (click)="goToManagement('pricing', 'approvals')">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Sales Order Pricing Approval</h3>
+          </ion-label>
+          <ion-badge slot="end">{{dashboardData?.salesOrderPricingApprovalCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+
+        <ion-item *ngIf="showBackToBackOrderPricingApproval && dashboardData?.b2bOrderPricingApprovalCount?.pending > 0" (click)="goToManagement('b2bopricing', 'approvals')">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>B2B Order Pricing Approval</h3>
+          </ion-label>
+          <ion-badge slot="end">{{dashboardData?.b2bOrderPricingApprovalCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+
       </ion-list>
     </div>
-    <hr class="hr-medium">
+    
     <div *ngIf="showQuotation || showSalesOrder">
       <ion-list-header>
         <ion-label class="pl-2" color="dark">Current Month Transaction</ion-label>

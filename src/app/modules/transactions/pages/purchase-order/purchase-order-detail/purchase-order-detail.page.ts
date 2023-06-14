@@ -231,7 +231,7 @@ export class PurchaseOrderDetailPage implements OnInit {
         docId: listOfDoc.map(i => Number(i))
       }
       try {
-        this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobilePurchaseOrderReview' : 'mobilePurchaseOrderApprove', bulkConfirmReverse).subscribe(async response => {
+        this.objectService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'MobilePurchaseOrderReview' : 'MobilePurchaseOrderApprove', bulkConfirmReverse).subscribe(async response => {
           if (response.status == 204) {
             this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
             this.navController.back();

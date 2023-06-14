@@ -136,7 +136,6 @@ export class BarcodeScanInputPage implements OnInit {
   availableItems: TransactionDetail[] = [];
   @ViewChild('itemInput', { static: false }) itemInput: ElementRef;
   async validateItem(searchValue: string) {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:139 ~ BarcodeScanInputPage ~ validateItem ~ searchValue:", searchValue)
     if (searchValue) {
       this.itemSearchValue = '';
       this.availableItems = [];
@@ -207,7 +206,6 @@ export class BarcodeScanInputPage implements OnInit {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:192 ~ BarcodeScanInputPage ~ validateItem ~ this.availableItems:", JSON.stringify(this.availableItems))
     // this.barcodeInput.nativeElement.focus();
   }
 

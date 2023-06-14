@@ -258,8 +258,7 @@ export class PickingHeaderPage implements OnInit {
     // })
     // await modal.present();
     // let { data } = await modal.onWillDismiss();
-    // if (data && data !== undefined) {
-    //   console.log("🚀 ~ file: picking-header.page.ts:227 ~ PickingHeaderPage ~ showDetail ~ data:", data)      
+    // if (data && data !== undefined) {  
     // }
   }
 

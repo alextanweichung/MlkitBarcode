@@ -24,11 +24,18 @@ export class ManagementPage implements OnInit {
   showSalesOrderReview: boolean = false;
   showSalesOrderApproval: boolean = false;
 
+  showBackToBackOrderReview: boolean = false;
+  showBackToBackOrderApproval: boolean = false;
+
   showPurchaseReqReview: boolean = false;
   showPurchaseReqApproval: boolean = false;
 
   showPurchaseOrderReview: boolean = false;
   showPurchaseOrderApproval: boolean = false;
+  
+  showSalesOrderPricingApproval: boolean = false;
+
+  showBackToBackOrderPricingApproval: boolean = false;
   
   showOtpConfig: boolean = false;
 
@@ -45,10 +52,18 @@ export class ManagementPage implements OnInit {
           this.showQuotationApproval = pageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
           this.showSalesOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
           this.showSalesOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+
+          this.showBackToBackOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.b2bOrderRV) > -1;
+          this.showBackToBackOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.b2bOrderAP) > -1;
+
           this.showPurchaseReqReview = pageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;
           this.showPurchaseReqApproval = pageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
           this.showPurchaseOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
           this.showPurchaseOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
+
+          this.showSalesOrderPricingApproval = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
+
+          this.showBackToBackOrderPricingApproval = pageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
           this.showOtpConfig = pageItems.findIndex(r => r.title === approvalAppCode.otpConfig) > -1;
         }
       })
