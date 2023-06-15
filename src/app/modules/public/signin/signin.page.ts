@@ -151,6 +151,7 @@ export class SigninPage implements OnInit, ViewWillEnter {
     } else {
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {
+        this.submit_attempt = false;
         await this.navController.navigateRoot('/dashboard');
         if (Capacitor.getPlatform() !== 'web') {
           this.configService.selected_sys_param.rememberMe = this.rememberMe;

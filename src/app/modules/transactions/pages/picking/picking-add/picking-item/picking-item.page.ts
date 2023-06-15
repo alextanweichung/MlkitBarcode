@@ -10,6 +10,7 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CurrentPickList, MultiPickingCarton, MultiPickingObject, MultiPickingOutstandingPickList, MultiPickingRoot, PickingLineVariation } from 'src/app/modules/transactions/models/picking';
 import { NavigationExtras } from '@angular/router';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 
 @Component({
   selector: 'app-picking-item',
@@ -19,6 +20,7 @@ import { NavigationExtras } from '@angular/router';
 })
 export class PickingItemPage implements OnInit, ViewWillEnter {
 
+  @ViewChild('barcodescaninput', { static: false }) barcodescaninput: BarcodeScanInputPage;
   systemWideEAN13IgnoreCheckDigit: boolean = false;
   showItemList: boolean = false;
 
@@ -35,7 +37,7 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     try {
-
+      this.barcodescaninput.setFocus();
     } catch (e) {
       console.error(e);
     }
@@ -605,46 +607,14 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
       if (event) {
         let itemFound = await this.validateBarcode(event);
         if (itemFound) {
-          const alert = await this.alertController.create({
-            cssClass: 'custom-alert',
-            backdropDismiss: false,
-            header: 'Enter Quantity',
-            inputs: [
-              {
-                name: 'inputQty',
-                type: 'number',
-                placeholder: 'Enter Quantity',
-                value: 1,
-                min: 1
-              }
-            ],
-            buttons: [
-              {
-                text: 'OK',
-                role: 'confirm',
-                cssClass: 'success',
-                handler: async (data) => {
-                  if (this.objectService.header.isWithSo) {
-                    await this.runPickingEngine(itemFound, Number(data.inputQty));
-                  } else {
-                    await this.insertPickingLineWithoutSo(itemFound, Number(data.inputQty));
-                  }
-                },
-              },
-              {
-                text: 'Cancel',
-                role: 'cancel'
-              },
-            ],
-          });
-          await alert.present();
+          if (this.objectService.header.isWithSo) {
+            await this.runPickingEngine(itemFound, 1);
+          } else {
+            await this.insertPickingLineWithoutSo(itemFound, 1);
+          }
+        } else {
+          this.toastService.presentToast("Item Not Found", "", "top", "warning", 1000);
         }
-
-        // if (this.objectService.header.isWithSo) {
-        //   await this.runPickingEngine(itemFound, 1);
-        // } else {
-        //   await this.insertPickingLineWithoutSo(itemFound, 1);
-        // }
       }
     } catch (e) {
       console.error(e);

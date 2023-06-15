@@ -5,6 +5,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { MasterListDetails } from '../../models/master-list-details';
+import { ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -29,13 +30,9 @@ export class BarcodeScanInputPage implements OnInit {
     private configService: ConfigService,
     private toastService: ToastService
   ) { }
-
+  
   ngOnInit() {
     this.loadModuleControl();
-  }
-
-  ionViewDidEnter(): void {
-    // this.barcodeInput.nativeElement.focus();
   }
 
   loadModuleControl() {
@@ -120,7 +117,7 @@ export class BarcodeScanInputPage implements OnInit {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    // this.barcodeInput.nativeElement.focus();
+    this.focusBarcodeSearch();
   }
 
   /* #region item scan */
@@ -206,7 +203,7 @@ export class BarcodeScanInputPage implements OnInit {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    // this.barcodeInput.nativeElement.focus();
+    this.focusItemSearch();
   }
 
   /* #region modal for user to select item */
@@ -227,6 +224,33 @@ export class BarcodeScanInputPage implements OnInit {
   }
 
   /* #endregion */
+
+  /* #endregion */
+
+  /* #region focus */
+
+  scanningMethodChanged() {
+    this.setFocus();
+  }
+  
+  setFocus() {
+    console.log("🚀 ~ file: barcode-scan-input.page.ts:238 ~ BarcodeScanInputPage ~ setFocus ~ this.selectedScanningMethod:", this.selectedScanningMethod)
+    if (this.selectedScanningMethod === "B") {
+      this.focusBarcodeSearch();
+    } else {
+      this.focusItemSearch();
+    }
+  }
+
+  focusBarcodeSearch() {
+    console.log("🚀 ~ file: barcode-scan-input.page.ts:243 ~ BarcodeScanInputPage ~ focusBarcodeSearch ~ this.barcodeInput:", this.barcodeInput)
+    this.barcodeInput.nativeElement.focus();
+  }
+
+  focusItemSearch() {
+    console.log("🚀 ~ file: barcode-scan-input.page.ts:248 ~ BarcodeScanInputPage ~ focusItemSearch ~ this.itemInput:", this.itemInput)
+    this.itemInput.nativeElement.focus();
+  }
 
   /* #endregion */
 
