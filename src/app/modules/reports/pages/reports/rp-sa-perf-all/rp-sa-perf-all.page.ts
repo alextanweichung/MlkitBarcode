@@ -40,6 +40,7 @@ export class RpSaPerfAllPage implements OnInit, ViewWillEnter {
       { prop: 'salesAgentName', name: 'SA Name', draggable: false },
       { prop: 'invoiceAmt', name: 'Invoice', draggable: false },
       { prop: 'cnAmount', name: 'Credit Note', draggable: false },
+      { prop: 'soAmount', name: 'SO Amount', draggable: false },
       { prop: 'netAmount', name: 'Net Amount', draggable: false }
     ]
   }
@@ -52,7 +53,7 @@ export class RpSaPerfAllPage implements OnInit, ViewWillEnter {
         this.reportService.getAllSalesPerformance(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
           this.objects = response;
           this.objects.forEach(r => {
-            r.netAmount = r.invoiceAmt + r.cnAmount;
+            r.netAmount = r.invoiceAmt + r.cnAmount + r.soAmount;
           })
         }, error => {
           throw error;

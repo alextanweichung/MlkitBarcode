@@ -10,5 +10,6 @@ export interface SalesAgentAllPerformanceObject {
   salesAgentName: string
   invoiceAmt: number
   cnAmount: number
+  soAmount: number
   netAmount: number
 }
