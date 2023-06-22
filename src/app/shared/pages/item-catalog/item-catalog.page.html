@@ -1,4 +1,4 @@
-<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
+<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (ionChange)="availableItems = []; startIndex = 0" (search)="availableItems = []; startIndex = 0; searchItem()" (keydown)="availableItems = []; startIndex = 0; onKeyDown($event)"></ion-searchbar>
 <div class="main-card">
   <ion-grid class="ion-no-padding" *ngIf="availableItems.length > 0">
     <ion-row *ngIf="showImage">
@@ -12,9 +12,9 @@
           <ion-img style="height: 120px" [src]="matchImage(item.itemId)"></ion-img>
           <ion-grid>
             <ion-row>
-              <ion-col class="ion-flex ion-margin-auto">
-                <div class="font-bold">{{item.itemCode}}</div>
-                <div class="font-bold ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+              <ion-col class="ion-flex ion-margin-auto ion-text-wrap">
+                <div class="font-bold" *ngIf="!item?.vendorItemCode">{{item.itemCode}}</div>
+                <div class="font-bold" *ngIf="item?.vendorItemCode">{{item.itemCode}} | {{item?.vendorItemCode}}</div>
               </ion-col>
             </ion-row>
             <ion-row class="pb-1">
@@ -147,6 +147,10 @@
   </ion-grid>
 </div>
 
+<ion-infinite-scroll (ionInfinite)="onIonInfinite($event)" threshold="30%">
+  <ion-infinite-scroll-content></ion-infinite-scroll-content>
+</ion-infinite-scroll>
+
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
   <ng-template>
     <ion-header>
@@ -171,7 +175,7 @@
                 <ion-col size="6" class="ion-flex ion-margin-auto">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
-                      <ion-col class="ion-margin-auto">
+                      <ion-col class="ion-flex ion-margin-auto">
                         <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
                         <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>                        
                       </ion-col>

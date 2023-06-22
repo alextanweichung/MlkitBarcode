@@ -29,7 +29,7 @@ export class SalesOrderHeaderPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private objectService: SalesOrderService,
+    public objectService: SalesOrderService,
     private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
@@ -92,9 +92,9 @@ export class SalesOrderHeaderPage implements OnInit {
   ngOnInit() {
     this.loadModuleControl();
     this.setDefaultValue();
-    this.bindCustomerList();
+    // this.bindCustomerList();
   }
-    
+  
   moduleControl: ModuleControl[];
   allowDocumentWithEmptyLine: string = "N";
   configSalesActivatePromotionEngine: boolean;
@@ -139,17 +139,17 @@ export class SalesOrderHeaderPage implements OnInit {
   }
 
   selectedCustomer: Customer;
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  bindCustomerList() {
-    this.objectService.customers.forEach(r => {
-      this.customerSearchDropdownList.push({
-        id: r.customerId,
-        code: r.customerCode,
-        oldCode: r.oldCustomerCode,
-        description: r.name
-      })
-    })
-  }
+  // customerSearchDropdownList: SearchDropdownList[] = [];
+  // bindCustomerList() {
+  //   this.objectService.customers.forEach(r => {
+  //     this.customerSearchDropdownList.push({
+  //       id: r.customerId,
+  //       code: r.customerCode,
+  //       oldCode: r.oldCustomerCode,
+  //       description: r.name
+  //     })
+  //   })
+  // }
 
   setDefaultValue() {
     try {

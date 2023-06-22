@@ -31,6 +31,10 @@ export class SearchItemService {
     return this.http.get<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId);
   }
 
+  getItemInfoByKeywordfortest(keyword: string, trxDate: string, keyId: number, locationId: number, startIndex: number, size: number) {
+    return this.http.get<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId + "/" + startIndex + "/" + size);
+  }
+
   getItemImageFile(keyword: string) {
     return this.http.get<ItemImage[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/itemList/imageFile/" + keyword, { context: background_load() });
   }

@@ -17,6 +17,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { map } from 'rxjs/operators';
 import { TrxChild } from 'src/app/shared/models/trx-child';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -71,8 +72,22 @@ export class SalesOrderService {
   async loadCustomer() {
     this.customers = await this.getCustomerList();
     await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+    this.bindCustomerList();
   }
 
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  bindCustomerList() {
+    this.customerSearchDropdownList = [];
+    this.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
+      })
+    })
+  }
+  
   /* #region  for insert */
 
   header: SalesOrderHeader;
@@ -129,7 +144,7 @@ export class SalesOrderService {
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/customer", { context: background_load() }).toPromise();
   }
 
   getPromotion(trxDate: string, customerId: number) {

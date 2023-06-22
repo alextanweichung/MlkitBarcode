@@ -28,7 +28,7 @@ export class QuotationHeaderPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private objectService: QuotationService,
+    public objectService: QuotationService,
     private commonService: CommonService,
     private toastService: ToastService,
     private navController: NavController,
@@ -89,7 +89,6 @@ export class QuotationHeaderPage implements OnInit {
   ngOnInit() {
     this.loadModuleControl();
     this.setDefaultValue();
-    this.bindCustomerList();
   }
 
   moduleControl: ModuleControl[];
@@ -136,17 +135,6 @@ export class QuotationHeaderPage implements OnInit {
   }
 
   selectedCustomer: Customer;
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  bindCustomerList() {
-    this.objectService.customers.forEach(r => {
-      this.customerSearchDropdownList.push({
-        id: r.customerId,
-        code: r.customerCode,
-        oldCode: r.oldCustomerCode,
-        description: r.name
-      })
-    })
-  }
 
   setDefaultValue() {
     try {

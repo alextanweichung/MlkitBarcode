@@ -28,7 +28,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private objectService: BackToBackOrderService,
+    public objectService: BackToBackOrderService,
     private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
@@ -91,21 +91,9 @@ export class BacktobackOrderHeaderPage implements OnInit {
   ngOnInit() {
     this.loadModuleControl();
     this.setDefaultValue();
-    this.bindCustomerList();
   }
 
   selectedCustomer: Customer;
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  bindCustomerList() {
-    this.objectService.customers.forEach(r => {
-      this.customerSearchDropdownList.push({
-        id: r.customerId,
-        code: r.customerCode,
-        oldCode: r.oldCustomerCode,
-        description: r.name
-      })
-    })
-  }
   
   moduleControl: ModuleControl[];
   allowDocumentWithEmptyLine: string = "N";

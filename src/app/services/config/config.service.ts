@@ -44,24 +44,24 @@ export class ConfigService {
       if (Capacitor.getPlatform() === 'web') {
         this.sys_parameter.push({
           Sys_ParameterId: 1,
-          apiUrl: 'https://localhost:44351/api/',
-          // apiUrl: 'https://idcp-demo.com/api/',
+          // apiUrl: 'https://localhost:44351/api/',
+          apiUrl: 'https://idcp-demo.com/api/',
           // apiUrl: 'https://idcp-testing.motorparts.asia/api/',
           // apiUrl: 'https://idcp.motorparts.asia/api/',
           // apiUrl: 'https://idcp-ararat.com:8081/api/',
           imgUrl: null,
           lastDownloadAt: null
         })
-        this.sys_parameter.push({
-          Sys_ParameterId: 2,
-          // apiUrl: 'https://localhost:44351/api/',
-          // apiUrl: 'https://idcp-demo.com/api/',
-          apiUrl: 'https://idcp-testing.motorparts.asia/api/',
-          // apiUrl: 'https://idcp.motorparts.asia/api/',
-          // apiUrl: 'https://idcp-ararat.com:8081/api/',
-          imgUrl: null,
-          lastDownloadAt: null
-        })
+        // this.sys_parameter.push({
+        //   Sys_ParameterId: 2,
+        //   // apiUrl: 'https://localhost:44351/api/',
+        //   // apiUrl: 'https://idcp-demo.com/api/',
+        //   apiUrl: 'https://idcp-testing.motorparts.asia/api/',
+        //   // apiUrl: 'https://idcp.motorparts.asia/api/',
+        //   // apiUrl: 'https://idcp-ararat.com:8081/api/',
+        //   imgUrl: null,
+        //   lastDownloadAt: null
+        // })
         // if (this.sys_parameter && this.sys_parameter.length === 1) {
           this.selected_sys_param = this.sys_parameter[0];
         // }

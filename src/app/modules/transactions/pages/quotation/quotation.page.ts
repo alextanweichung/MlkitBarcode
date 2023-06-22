@@ -43,7 +43,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();

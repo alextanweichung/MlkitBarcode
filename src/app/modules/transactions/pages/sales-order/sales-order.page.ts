@@ -11,6 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-sales-order',
@@ -46,7 +47,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
@@ -62,7 +63,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   /* #region  crud */
 
-  loadObjects() {
+  async loadObjects() {
     try {
       let obj: SalesSearchModal =  {
         dateStart: format(this.startDate, 'yyyy-MM-dd'),
@@ -76,7 +77,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
-      }, error => {
+      }, async error => {
         throw error;
       })
     } catch (error) {

@@ -16,6 +16,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { format } from 'date-fns';
 import { TrxChild } from 'src/app/shared/models/trx-child';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -72,6 +73,20 @@ export class QuotationService {
   async loadCustomer() {
     this.customers = await this.getCustomerList();    
     await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+    this.bindCustomerList();
+  }
+
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  bindCustomerList() {
+  this.customerSearchDropdownList = [];
+    this.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
+      })
+    })
   }
 
   /* #region  for insert */

@@ -14,6 +14,7 @@ import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
 
 @Component({
   selector: 'app-item-catalog',
@@ -40,6 +41,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   groupMasterList: MasterListDetails[] = [];
   categoryMasterList: MasterListDetails[] = [];
   salesOrderQuantityControl: string = "0";
+  itemListLoadSize: number;
 
   @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
 
@@ -61,19 +63,26 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     this.brandMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.groupMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.categoryMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    if (this.isSalesOrder) {
-      this.loadModuleControl();
-    }
+    this.loadModuleControl();
   }
 
   moduleControl: ModuleControl[] = [];
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
-      let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
-      if (salesOrderQuantityControl) {
-        this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
+      if (this.isSalesOrder) {
+        let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
+        if (salesOrderQuantityControl) {
+          this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
+        }
       }
+      let itemListLoadSize = this.moduleControl.find(x => x.ctrlName === "ItemListLoadSize")?.ctrlValue;
+      if (itemListLoadSize && Number(itemListLoadSize) > 0) {
+        this.itemListLoadSize = Number(itemListLoadSize);
+      } else{
+        this.itemListLoadSize = 10;
+      }
+      console.log("🚀 ~ file: item-catalog.page.ts:84 ~ ItemCatalogPage ~ loadModuleControl ~ this.itemListLoadSize:", this.itemListLoadSize)
     })
   }
 
@@ -87,27 +96,32 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     this.availableImages = [];
   }
 
+  startIndex: number = 0;
   searchItem() {
     let searchText = this.itemSearchText;
-    this.itemSearchText = '';
+    // this.itemSearchText = '';
     try {
       if (searchText && searchText.trim().length > 2) {
         if (Capacitor.getPlatform() !== 'web') {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeyword(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0).subscribe(response => {
-          this.availableItems = response;
-          if (this.availableItems && this.availableItems.length > 0) {
-            this.availableItems.forEach(r => {
+        this.searchItemService.getItemInfoByKeywordfortest(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
+          let rrr = response;
+          if (rrr && rrr.length > 0) {
+            rrr.forEach(r => {
               if (r.itemPricing !== null) {
                 this.assignTrxItemToDataLine(r)
               }
             })
             this.computeQtyInCart();
+          } else {
+            this.startIndex = this.availableItems.length;
           }
+          this.availableItems = [...this.availableItems, ...rrr];
           this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+          console.log("🚀 ~ file: item-catalog.page.ts:102 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeywordfortest ~ this.availableItems:", this.availableItems)
         })
-        this.loadImages(searchText);
+        this.loadImages(searchText); // todo : to handle load image based on availableItems
       } else {
         this.toastService.presentToast('Enter at least 3 characters to search', '', 'top', 'warning', 1000);
       }
@@ -115,6 +129,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  onIonInfinite(event) {
+    this.startIndex += this.itemListLoadSize;
+    this.searchItem();
+    setTimeout(() => {
+      (event as InfiniteScrollCustomEvent).target.complete();
+    }, 500);
   }
 
   loadImages(searchText) {
