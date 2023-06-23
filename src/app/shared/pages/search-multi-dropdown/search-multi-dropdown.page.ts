@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { IonSearchbar } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonSearchbar } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
 
 @Component({
@@ -16,7 +16,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
   @Input() showCode: boolean = false;
   @Input() searchDropdownList: SearchDropdownList[];
   @Output() onActionComplete: EventEmitter<SearchDropdownList[]> = new EventEmitter();
-  tempDropdownList: SearchDropdownList[];
+  tempDropdownList: SearchDropdownList[] = [];
   @Input() selectedIds: number[] = [];
   selected: SearchDropdownList[] = [];
   selectAll: boolean = false;
@@ -39,32 +39,37 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
   }
 
   searchText: string = '';
-  async keypress(event) {
+  async onKeyDown(event) {
     if (event.keyCode === 13) {
-      if (this.searchText.length > 0) {
-        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
-      } else {
-        this.tempDropdownList = this.searchDropdownList;
-      }
-    } else {
-      this.tempDropdownList = this.searchDropdownList;
+      this.searchItem();
     }
   }
 
+  searchItem() {
+    this.startIndex = 0;
+    this.tempDropdownList = []
+    this.assignToTemp(this.startIndex, this.size);
+  }
+
   resetFilter() {
-    this.tempDropdownList = this.searchDropdownList;
-  }  
+    this.searchText = "";
+    this.startIndex = 0;
+    this.tempDropdownList = [];
+    this.assignToTemp(this.startIndex, this.size);
+  }
 
   toggleSelectAll(event) {
-    this.selected = [];
+    this.selected
     if (this.selectAll) {
-      this.tempDropdownList.forEach(r => {
+      this.searchDropdownList.forEach(r => {
         r.checked = true;
       })
+      this.selected = [...this.searchDropdownList];
     } else {
-      this.tempDropdownList.forEach(r => {
+      this.searchDropdownList.forEach(r => {
         r.checked = false;
       })
+      this.selected = [];
     }
   }
   
@@ -73,7 +78,11 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
       if (this.selected.findIndex(r => r.id === object.id) > -1) {
         // already in
       } else {
-        this.selected.push(object);
+        if (this.selectAll) {
+          this.selected = [...this.searchDropdownList];
+        } else {
+          this.selected.push(object);
+        }
       }
     } else {
       this.selected.splice(this.selected.findIndex(r => r.id === object.id), 1);
@@ -86,11 +95,14 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
   isModalOpen: boolean = false;
   showModal() {
-    this.tempDropdownList = this.searchDropdownList;
+    this.startIndex = 0;
+    this.assignToTemp(this.startIndex, this.size);
     this.isModalOpen = true;
   }
 
   hideModal(object: SearchDropdownList[]) {
+    this.searchText = "";
+    this.tempDropdownList = [];
     this.onActionComplete.emit(object);
     this.isModalOpen = false;
   }
@@ -102,7 +114,31 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
   }
 
   apply() {
-    this.hideModal(this.tempDropdownList.filter(r => r.checked));
+    if (this.selectAll) {
+      this.hideModal(this.searchDropdownList);
+    } else{
+      this.hideModal(this.searchDropdownList.filter(r => r.checked));
+    }
+  }
+
+  startIndex: number = 0;
+  readonly size: number = 20;
+  onIonInfinite(event) {
+    this.startIndex += this.size;
+    if (this.searchDropdownList && this.startIndex <= this.searchDropdownList.length) {
+      this.assignToTemp(this.startIndex, this.size);
+    }    
+    setTimeout(() => {
+      (event as InfiniteScrollCustomEvent).target.complete();
+    }, 500);
+  }
+
+  assignToTemp(startIndex: number, size: number) {
+    if (this.searchText && this.searchText.length > 0) {
+      this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+    } else {
+      this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
+    }
   }
 
 }

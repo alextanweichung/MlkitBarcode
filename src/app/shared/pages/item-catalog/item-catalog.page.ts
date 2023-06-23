@@ -82,7 +82,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       } else{
         this.itemListLoadSize = 10;
       }
-      console.log("🚀 ~ file: item-catalog.page.ts:84 ~ ItemCatalogPage ~ loadModuleControl ~ this.itemListLoadSize:", this.itemListLoadSize)
     })
   }
 
@@ -119,7 +118,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           }
           this.availableItems = [...this.availableItems, ...rrr];
           this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
-          console.log("🚀 ~ file: item-catalog.page.ts:102 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeywordfortest ~ this.availableItems:", this.availableItems)
         })
         this.loadImages(searchText); // todo : to handle load image based on availableItems
       } else {

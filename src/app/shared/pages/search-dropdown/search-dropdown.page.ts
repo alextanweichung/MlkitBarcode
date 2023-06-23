@@ -44,7 +44,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    console.log("🚀 ~ file: search-dropdown.page.ts:46 ~ SearchDropdownPage ~ ngOnInit ~ this.searchDropdownList:", this.searchDropdownList);
+
   }
 
   bindFromMasterList() {
@@ -116,12 +116,10 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 
   assignToTemp(startIndex: number, size: number) {
     if (this.searchText && this.searchText.length > 0) {
-      console.log("🚀 ~ file: search-dropdown.page.ts:122 ~ SearchDropdownPage ~ assignToTemp ~ this.searchText:", this.searchText)
       this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
     } else {
       this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
     }
-    console.log("🚀 ~ file: search-dropdown.page.ts:114 ~ SearchDropdownPage ~ assignToTemp ~ this.tempDropdownList:", this.tempDropdownList)
   }
 
   startIndex: number = 0;

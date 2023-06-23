@@ -234,7 +234,6 @@ export class BarcodeScanInputPage implements OnInit {
   }
   
   setFocus() {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:238 ~ BarcodeScanInputPage ~ setFocus ~ this.selectedScanningMethod:", this.selectedScanningMethod)
     if (this.selectedScanningMethod === "B") {
       this.focusBarcodeSearch();
     } else {
@@ -243,12 +242,10 @@ export class BarcodeScanInputPage implements OnInit {
   }
 
   focusBarcodeSearch() {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:243 ~ BarcodeScanInputPage ~ focusBarcodeSearch ~ this.barcodeInput:", this.barcodeInput)
     this.barcodeInput.nativeElement.focus();
   }
 
   focusItemSearch() {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:248 ~ BarcodeScanInputPage ~ focusItemSearch ~ this.itemInput:", this.itemInput)
     this.itemInput.nativeElement.focus();
   }
 
