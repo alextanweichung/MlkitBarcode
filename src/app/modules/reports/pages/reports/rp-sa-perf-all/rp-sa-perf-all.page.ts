@@ -53,7 +53,7 @@ export class RpSaPerfAllPage implements OnInit, ViewWillEnter {
         this.reportService.getAllSalesPerformance(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
           this.objects = response;
           this.objects.forEach(r => {
-            r.netAmount = r.invoiceAmt + r.cnAmount + r.soAmount;
+            r.netAmount = r.invoiceAmt - r.cnAmount + r.soAmount;
           })
         }, error => {
           throw error;
