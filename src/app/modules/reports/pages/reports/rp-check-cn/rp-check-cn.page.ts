@@ -33,7 +33,6 @@ export class RpCheckCnPage implements OnInit {
   loadCustomers() {
     this.objectService.getCustomers().subscribe(async response => {
       this.customers = response;
-      this.customers = this.customers.filter(r => r.businessModelType === 'T');
       await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
       this.customers.forEach(r => {
         this.customerSearchDropdownList.push({
