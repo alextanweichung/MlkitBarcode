@@ -52,6 +52,7 @@ export function initializeFactory(init: InitializeAppService) {
             outerStrokeColor: "#78C000",
             innerStrokeColor: "#C7E596",
             animation: false,
+            animationDuration: 0,
             showSubtitle: false
         })
     ],

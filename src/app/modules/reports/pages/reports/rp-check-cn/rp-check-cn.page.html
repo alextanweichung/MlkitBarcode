@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Check CN</ion-title>
+    <ion-title>Check Credit Note</ion-title>
     <ion-buttons slot="start">
       <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
     </ion-buttons>
@@ -18,9 +18,9 @@
       [rows]="objects" 
       [rowHeight]="50" 
       [columnMode]="'force'">
-      <ngx-datatable-column prop="arCreditNoteNum" name="CN Num">
-        <ng-template let-row="row" ngx-datatable-cell-template>          
-          <div class="flex ion-text-wrap font-half-size div-link-button" (click)="presentAlertViewPdf(row.arCreditNoteId, row.arCreditNoteNum)"> {{row.arCreditNoteNum}}</div>
+      <ngx-datatable-column prop="docNum" name="Doc Num">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size div-link-button" (click)="presentAlertViewPdf(row.transactionType, row.docId, row.docNum)"> {{row.docNum}}</div>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column prop="postingDate" name="Date">

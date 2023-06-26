@@ -1,6 +1,7 @@
 export interface CheckCn {
-   arCreditNoteId: number
-   arCreditNoteNum: string
+   transactionType: string
+   docId: number
+   docNum: string
    postingDate: string
    customerCode: string
    customerName: string

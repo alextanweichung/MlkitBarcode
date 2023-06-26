@@ -53,7 +53,6 @@ export class RpSalesCustomerPage implements OnInit, ViewWillEnter {
   loadCustomers() {
     this.reportService.getCustomers().subscribe(async response => {
       this.customers = response;
-      this.customers = this.customers.filter(r => r.businessModelType === 'T');
       await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
       this.customers.forEach(r => {
         this.customerSearchDropdownList.push({

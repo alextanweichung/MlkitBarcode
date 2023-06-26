@@ -92,9 +92,9 @@ export class SigninPage implements OnInit, ViewWillEnter {
     }
     if (Capacitor.getPlatform() === 'web') {
       // this.signin_form.get('userEmail').setValue('kccon@idcp.my');
-      // this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+      this.signin_form.get('userEmail').setValue('aychia@idcp.my');
       // this.signin_form.get('password').setValue('String1234');
-      this.signin_form.get('userEmail').setValue('admin@idcp.my');
+      // this.signin_form.get('userEmail').setValue('admin@idcp.my');
       this.signin_form.get('password').setValue('i@Dmin7026');
     }
   }

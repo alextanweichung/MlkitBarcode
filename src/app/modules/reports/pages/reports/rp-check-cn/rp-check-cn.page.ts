@@ -74,7 +74,7 @@ export class RpCheckCnPage implements OnInit {
     }
   }
 
-  async presentAlertViewPdf(objectId: any, objectName: string) {
+  async presentAlertViewPdf(transactionType: string, docId: number, docNum: string) {
     try {
       const alert = await this.alertController.create({
         header: 'Download PDF?',
@@ -85,7 +85,7 @@ export class RpCheckCnPage implements OnInit {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.downloadPdf(Number(objectId), objectName);
+              await this.downloadPdf(transactionType, Number(docId), docNum);
             },
           },
           {
@@ -101,16 +101,16 @@ export class RpCheckCnPage implements OnInit {
     }
   }
 
-  async downloadPdf(objectId: number, objectName: string) {
+  async downloadPdf(transactionType: string, docId: number, docNum: string) {
     try {
       let paramModel: ReportParameterModel = {
-        appCode: 'FAAR004',
+        appCode: (transactionType.toUpperCase() === 'ARCN') ? 'FAAR004' : 'SMSC004',
         format: 'pdf',
-        documentIds: [Number(objectId)],
-        reportName: 'AR Credit Note'
+        documentIds: [Number(docId)],
+        reportName: (transactionType.toUpperCase() === 'ARCN') ? 'AR Credit Note' : 'Sales Return'
       }
       this.objectService.getPdf(paramModel).subscribe(async response => {
-        await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format);
+        await this.commonService.commonDownloadPdf(response, docNum + "." + paramModel.format);
       }, error => {
         throw error;
       })

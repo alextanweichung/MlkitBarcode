@@ -76,7 +76,7 @@ export class BarcodeScanInputPage implements OnInit {
     if (barcode) {
       this.barcodeSearchValue = '';
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
         if (found_barcode) {
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {

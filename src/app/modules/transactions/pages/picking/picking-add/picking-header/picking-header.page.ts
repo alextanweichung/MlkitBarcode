@@ -1,21 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, AlertController, IonPopover, IonSegment, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { MultiPickingOutstandingPickList, MultiPickingSORequest, MultiPickingSalesOrder } from 'src/app/modules/transactions/models/picking';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PickingItemPage } from '../picking-item/picking-item.page';
 
 @Component({
   selector: 'app-picking-header',
   templateUrl: './picking-header.page.html',
   styleUrls: ['./picking-header.page.scss'],
 })
-export class PickingHeaderPage implements OnInit {
+export class PickingHeaderPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
   loginUser: any;
@@ -33,6 +33,15 @@ export class PickingHeaderPage implements OnInit {
     private modalController: ModalController
   ) {
     this.newObjectForm();
+  }
+
+  @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
+  ionViewWillEnter(): void {
+    try {
+      this.barcodeInput.nativeElement.focus();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   ngOnInit() {

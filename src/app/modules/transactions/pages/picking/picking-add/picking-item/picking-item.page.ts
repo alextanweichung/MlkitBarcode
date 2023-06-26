@@ -661,6 +661,7 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
         if (response.status == 201) {
           let object = response.body as MultiPickingRoot;
           this.toastService.presentToast("Insert Complete", "New picking has been created.", "top", "success", 1000);
+          this.objectService.resetVariables();
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: object.header.multiPickingId
