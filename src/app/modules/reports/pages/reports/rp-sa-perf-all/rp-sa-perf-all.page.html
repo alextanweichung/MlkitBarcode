@@ -16,33 +16,34 @@
     <ngx-datatable *ngIf="objects && objects.length > 0"
       class="fullscreen material mt-2"
       [rows]="objects" 
-      [rowHeight]="50" 
+      [rowHeight]="'auto'" 
       [columns]="columns"
       [columnMode]="'force'"
-      [footerHeight]="50">
-      <ngx-datatable-column prop="salesAgentName" name="SA Name">
+      [footerHeight]="50"
+      [scrollbarH]="true">
+      <ngx-datatable-column prop="salesAgentName" name="SA Name" [width]="90">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.salesAgentName}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="invoiceAmt" name="Invoice">
+      <ngx-datatable-column prop="invoiceAmt" name="Invoice" [width]="90">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size ion-text-right">{{row.invoiceAmt|number:'1.2-2'}}</div>
+          <div class="flex ion-text-wrap font-half-size ion-text-right">{{row.invoiceAmt|number:'1.2-2'}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="cnAmount" name="Credit Note">
+      <ngx-datatable-column prop="cnAmount" name="Credit Note" [width]="90">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size ion-text-right"> {{row.cnAmount | number:'1.2-2'}}</div>
+          <div class="flex ion-text-wrap font-half-size ion-text-right"> {{row.cnAmount | number:'1.2-2'}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="soAmount" name="SO Amount">
+      <ngx-datatable-column prop="soAmount" name="SO Amount" [width]="90">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size ion-text-right"> {{row.soAmount | number:'1.2-2'}}</div>
+          <div class="flex ion-text-wrap font-half-size ion-text-right"> {{row.soAmount | number:'1.2-2'}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="netAmount" name="Net Amount">
+      <ngx-datatable-column prop="netAmount" name="Net Amount" [width]="90">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
+          <div class="flex ion-text-wrap font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-footer>
