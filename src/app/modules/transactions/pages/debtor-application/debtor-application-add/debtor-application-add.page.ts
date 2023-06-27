@@ -190,6 +190,7 @@ export class DebtorApplicationAddPage implements OnInit {
   }
 
   insertObject() {
+    console.log("🚀 ~ file: debtor-application-add.page.ts:194 ~ DebtorApplicationAddPage ~ this.objectService.insertObject ~ this.objectForm.getRawValue():", this.objectForm.getRawValue())
     this.objectService.insertObject(this.objectForm.getRawValue()).subscribe(response => {
       if (response.status === 201) {
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);

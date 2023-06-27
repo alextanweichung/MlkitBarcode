@@ -41,13 +41,13 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     try {
       this.barcodeInput.nativeElement.focus();
-      Keyboard.addListener('keyboardDidShow', () => {
-        this.isButtonVisible = false;
-      })
+      // Keyboard.addListener('keyboardWillShow', () => {
+      //   this.isButtonVisible = false;
+      // })
   
-      Keyboard.addListener('keyboardDidHide', () => {
-        this.isButtonVisible = true;
-      });
+      // Keyboard.addListener('keyboardDidHide', () => {
+      //   this.isButtonVisible = true;
+      // });
     } catch (e) {
       console.error(e);
     }

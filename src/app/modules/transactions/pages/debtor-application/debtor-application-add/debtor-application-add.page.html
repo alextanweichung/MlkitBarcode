@@ -51,12 +51,13 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Phone Number</ion-label>
-          <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Phone Number" formControlName="billPhone"></ion-input>
+          <ion-input inputmode="numeric" type="text" enterkeyhint="next" placeholder="Phone Number" formControlName="billPhone"></ion-input>
         </ion-item>
         <app-search-dropdown title="State" optionLabel="description" [masterDropdownList]="objectService.stateMasterList" [selectedId]="objectForm?.controls?.billStateId?.value" (onActionComplete)="onBillStateSelected($event)"></app-search-dropdown>
       </ion-list>
-      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-list-header class="ion-list-header-small ion-flex">
         <ion-label>Shipping Address</ion-label>
+        <ion-button size="small" (click)="applyToShipping()">Copy From Billing</ion-button>
       </ion-list-header>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
@@ -74,7 +75,7 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Phone Number</ion-label>
-          <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Phone Number" formControlName="shipPhone"></ion-input>
+          <ion-input inputmode="numeric" type="text" enterkeyhint="next" placeholder="Phone Number" formControlName="shipPhone"></ion-input>
         </ion-item>
         <app-search-dropdown title="State" optionLabel="description" [masterDropdownList]="objectService.stateMasterList" [selectedId]="objectForm?.controls?.shipStateId?.value" (onActionComplete)="onShipStateSelected($event)"></app-search-dropdown>
       </ion-list>

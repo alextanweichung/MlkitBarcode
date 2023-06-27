@@ -111,7 +111,7 @@ export class BarcodeScanInputPage implements OnInit {
           }
           this.onItemAdd.emit([outputData]);
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+          this.toastService.presentToast('Barcode Not Found', '', 'top', 'danger', 1000);
         }
       } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
@@ -197,7 +197,7 @@ export class BarcodeScanInputPage implements OnInit {
             this.showModal();
           }
         } else {
-          this.toastService.presentToast('No Item Found', '', 'top', 'danger', 1000);
+          this.toastService.presentToast('Item Not Found', '', 'top', 'danger', 1000);
         }
       } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);

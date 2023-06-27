@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -18,7 +18,7 @@ import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/ba
   styleUrls: ['./picking-item.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'mobilePicking' }]
 })
-export class PickingItemPage implements OnInit, ViewWillEnter {
+export class PickingItemPage implements OnInit, ViewDidEnter {
 
   @ViewChild('barcodescaninput', { static: false }) barcodescaninput: BarcodeScanInputPage;
   systemWideEAN13IgnoreCheckDigit: boolean = false;
@@ -35,7 +35,7 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
     private modalController: ModalController
   ) { }
 
-  ionViewWillEnter(): void {
+  ionViewDidEnter(): void {
     try {
       this.barcodescaninput.setFocus();
     } catch (e) {
