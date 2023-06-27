@@ -140,13 +140,13 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
   assignItemFoundToNewLine(itemFound: any, inputQty: number) {
     let newLine: CurrentPickList = {
       multiPickingLineId: 0,
-      multiPickingId: 0,
+      multiPickingId: this.objectService.header.multiPickingId,
       itemId: itemFound.itemId,
       itemCode: itemFound.itemCode,
-      itemVariationXId: itemFound.itemVariationLineXId, // temp for web testing itemFound.itemVariationXId,
-      itemVariationYId: itemFound.itemVariationLineYId, // temp for web testing itemFound.itemVariationYId,
-      itemVariationXDescription: itemFound.itemVariationLineXDescription, // temp for web testing this.objectService.itemVariationXMasterList.find(r => r.id === itemFound.itemVariationXId)?.description,
-      itemVariationYDescription: itemFound.itemVariationLineYDescription, // temp for web testing this.objectService.itemVariationYMasterList.find(r => r.id === itemFound.itemVariationYId)?.description,
+      itemVariationXId: itemFound.itemVariationXId,
+      itemVariationYId: itemFound.itemVariationYId,
+      itemVariationXDescription: this.objectService.itemVariationXMasterList.find(r => r.id === itemFound.itemVariationXId)?.description,
+      itemVariationYDescription: this.objectService.itemVariationYMasterList.find(r => r.id === itemFound.itemVariationYId)?.description,
       itemSku: itemFound.itemSku,
       itemUomId: itemFound.itemUomId,
       itemBarcode: itemFound.itemBarcode,
@@ -624,6 +624,7 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
   /* #endregion */
 
   async nextStep() {
+    console.log("🚀 ~ file: picking-item.page.ts:637 ~ PickingItemPage ~ handler: ~ this.objectService.header:", this.objectService.header)
     try {
       const alert = await this.alertController.create({
         cssClass: 'custom-alert',
@@ -633,7 +634,11 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
             text: 'Confirm',
             cssClass: 'success',
             handler: async () => {
-              await this.insertObject();
+              if (this.objectService.header.multiPickingId === 0) {
+                await this.insertObject();
+              } else {
+                await this.updateObject();
+              }
             },
           },
           {
@@ -652,15 +657,47 @@ export class PickingItemPage implements OnInit, ViewWillEnter {
   insertObject() {
     try {
       let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
+      console.log("🚀 ~ file: picking-item.page.ts:660 ~ PickingItemPage ~ insertObject ~ newObjectDto:", newObjectDto)
       if (this.allowDocumentWithEmptyLine == "N") {
         if (newObjectDto.details.length < 1) {
           this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "danger", 1000);
+          return;
         }
       }
       this.objectService.insertObject(newObjectDto).subscribe(response => {
         if (response.status == 201) {
           let object = response.body as MultiPickingRoot;
           this.toastService.presentToast("Insert Complete", "New picking has been created.", "top", "success", 1000);
+          this.objectService.resetVariables();
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: object.header.multiPickingId
+            }
+          }
+          this.navController.navigateRoot("/transactions/picking/picking-detail", navigationExtras);
+        }
+      }, error => {
+        console.error(error);
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  updateObject() {
+    try {
+      let updateObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
+      console.log("🚀 ~ file: picking-item.page.ts:689 ~ PickingItemPage ~ updateObject ~ objectDto:", updateObjectDto)
+      if (this.allowDocumentWithEmptyLine === "N") {
+        if (updateObjectDto.details.length < 1) {
+          this.toastService.presentToast("Update Failed", "System unable to insert document without item line.", "top", "danger", 1000);
+          return;
+        }
+      }
+      this.objectService.updateObject(updateObjectDto).subscribe(response => {
+        if (response.status == 201) {
+          let object = response.body as MultiPickingRoot;
+          this.toastService.presentToast("Update Complete", "Picking has been updated.", "top", "success", 1000);
           this.objectService.resetVariables();
           let navigationExtras: NavigationExtras = {
             queryParams: {

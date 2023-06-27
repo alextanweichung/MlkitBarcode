@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { IonPopover, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MultiPickingRoot } from '../../../models/picking';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-picking-detail',
@@ -20,7 +21,8 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
     private navController: NavController,
     private modalController: ModalController,
     private toastService: ToastService,
-    public objectService: PickingService
+    public objectService: PickingService,
+    private commonService: CommonService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -48,6 +50,7 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
         if (this.object.outstandingPickList && this.object.outstandingPickList.length > 0) {
           this.uniqueSalesOrder = [...new Set(this.object.outstandingPickList.flatMap(r => r.salesOrderNum))];
         }
@@ -58,6 +61,21 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
       console.error(e);
     }
   }
+  
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
 
   /* #region find outstanding item in this SO */
 
@@ -70,5 +88,18 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
+
+  editObject() {
+    console.log("🚀 ~ file: picking-detail.page.ts:91 ~ PickingDetailPage ~ editObject ~ this.object:", this.object)
+    this.objectService.object = this.object;
+    this.objectService.setHeader(this.object.header);
+    this.objectService.multiPickingObject = { outstandingPickList: this.object.outstandingPickList, pickingCarton: this.object.details };
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.header.multiPickingId
+      }
+    }
+    this.navController.navigateRoot('/transactions/picking/picking-item', navigationExtras);
+  }
 
 }

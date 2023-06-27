@@ -9,6 +9,8 @@ import { AlertController } from '@ionic/angular';
 })
 export class CameraScanInputPage implements OnInit {
 
+  isButtonVisible: boolean = true;
+
   @Input() scanActive: boolean;
   @Input() systemWideEAN13IgnoreCheckDigit: boolean;
   @Output() onCameraStatusChanged = new EventEmitter<boolean>();
@@ -19,6 +21,7 @@ export class CameraScanInputPage implements OnInit {
   ) { }
 
   ngOnInit() {
+
   }
 
   /* #region  barcode scanner */

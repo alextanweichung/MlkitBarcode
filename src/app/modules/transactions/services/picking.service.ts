@@ -41,7 +41,7 @@ export class PickingService {
     this.object = object;
   }
 
-  removeCustomer() {
+  removeHeader() {
     this.header = null;
   }
 
@@ -54,7 +54,7 @@ export class PickingService {
   }
 
   resetVariables() {
-    this.removeCustomer();
+    this.removeHeader();
     this.removeMultiPickingObject();
     this.removePickingSummary();
   }
@@ -277,6 +277,10 @@ export class PickingService {
 
   insertObject(object: MultiPickingRoot) {
     return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking", object, httpObserveHeader);
+  }
+
+  updateObject(object: MultiPickingRoot) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking", object, httpObserveHeader);
   }
 
   getItemImage(itemId: number) {

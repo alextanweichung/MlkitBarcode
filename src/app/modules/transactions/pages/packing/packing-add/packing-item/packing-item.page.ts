@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, AlertController, IonAccordionGroup } from '@ionic/angular';
 import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingRoot, GoodsPackingSummary } from 'src/app/modules/transactions/models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
@@ -7,8 +6,6 @@ import { PackingService } from 'src/app/modules/transactions/services/packing.se
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';

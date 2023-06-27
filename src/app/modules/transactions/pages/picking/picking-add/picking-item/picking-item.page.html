@@ -24,7 +24,7 @@
             <div>Delete Carton</div>
           </ion-label>
         </ion-item>
-        <ion-item>
+        <ion-item (click)="popover.dismiss()">
           <ion-label><div>Show Item List</div></ion-label>
           <ion-checkbox [(ngModel)]="showItemList"></ion-checkbox>
         </ion-item>
@@ -120,7 +120,7 @@
 
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-    Insert
+    {{(objectService.header.multiPickingId??0 )=== 0 ? 'Insert' : 'Update'}}
   </ion-button>
 </ion-footer>
 <app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>

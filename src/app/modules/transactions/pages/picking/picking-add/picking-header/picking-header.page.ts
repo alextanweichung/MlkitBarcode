@@ -7,19 +7,21 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-picking-header',
   templateUrl: './picking-header.page.html',
-  styleUrls: ['./picking-header.page.scss'],
+  styleUrls: ['./picking-header.page.scss']
 })
 export class PickingHeaderPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
   loginUser: any;
   warehouseAgentId: number
+
+  isButtonVisible: boolean = true;
 
   constructor(
     private authService: AuthService,
@@ -39,6 +41,13 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     try {
       this.barcodeInput.nativeElement.focus();
+      Keyboard.addListener('keyboardDidShow', () => {
+        this.isButtonVisible = false;
+      })
+  
+      Keyboard.addListener('keyboardDidHide', () => {
+        this.isButtonVisible = true;
+      });
     } catch (e) {
       console.error(e);
     }
@@ -53,6 +62,11 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
     }
     this.loadModuleControl();
     this.setDefaultValue();
+
+    if (this.objectService.header && this.objectService.header.multiPickingId > 0) {
+      this.objectForm.patchValue(this.objectService.object.header);
+      this.loadExisitingSO(this.objectService.object.outstandingPickList.flatMap(r => r.salesOrderNum));
+    }
   }
 
   moduleControl: ModuleControl[];
@@ -78,6 +92,47 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
         }
       }
     })
+  }
+
+  loadExisitingSO(salesOrderNums: string[]) {
+    let request: MultiPickingSORequest = {
+      salesOrderNums: salesOrderNums,
+      warehouseAgentId: this.warehouseAgentId
+    }
+    this.objectService.getSOHeader(request).subscribe(response => {
+      if (response.status === 200) {
+        let so = response.body[0] as MultiPickingSalesOrder;
+        console.log("🚀 ~ file: picking-header.page.ts:94 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ so:", so)
+        if (so === undefined) {
+          this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
+          return;
+        }
+        // checking for picking, refer to base system
+        if (this.selectedSalesOrders.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedSalesOrders[0].locationId != so.locationId) {
+          this.toastService.presentToast("", "Not allow to combine sales order with different origin location.", "top", "warning", 1000);
+          return;
+        }
+        if (this.selectedSalesOrders.length > 0 && this.selectedSalesOrders[0].customerId != so.customerId) {
+          this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
+          return;
+        }
+        this.selectedSalesOrders.unshift(so);
+        console.log("🚀 ~ file: picking-header.page.ts:110 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.selectedSalesOrders:", this.selectedSalesOrders)
+        if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
+          this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId });
+        }
+        // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
+        console.log("🚀 ~ file: picking-header.page.ts:115 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPickingObject.outstandingPickList:", this.objectService.multiPickingObject.outstandingPickList)
+        this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
+        this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+        this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
+        this.uniqueSku.forEach(r => {
+          this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
+        })
+      }
+    }, error => {
+      console.error(error);
+    });
   }
 
   setDefaultValue() {
@@ -126,6 +181,7 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
         this.objectService.getSOHeader(request).subscribe(response => {
           if (response.status === 200) {
             let so = response.body[0] as MultiPickingSalesOrder;
+            console.log("🚀 ~ file: picking-header.page.ts:133 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ so:", so)
             if (so === undefined) {
               this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
               return;
@@ -140,10 +196,16 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
               return;
             }
             this.selectedSalesOrders.unshift(so);
+            console.log("🚀 ~ file: picking-header.page.ts:188 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.selectedSalesOrders:", this.selectedSalesOrders)
             if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
               this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId });
             }
             this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
+            this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
+              if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
+              r.multiPickingId = this.objectForm.controls.multiPickingId.value;
+            })
+            console.log("🚀 ~ file: picking-header.page.ts:193 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPickingObject.outstandingPickList:", this.objectService.multiPickingObject.outstandingPickList)
             this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
             this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
             this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
@@ -261,14 +323,6 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
   async showDetail() {
     this.objectService.setHeader(this.objectForm.getRawValue());
     this.navController.navigateForward("/transactions/picking/picking-item");
-    // const modal = await this.modalController.create({
-    //   component: PickingItemPage,
-    //   canDismiss: true
-    // })
-    // await modal.present();
-    // let { data } = await modal.onWillDismiss();
-    // if (data && data !== undefined) {  
-    // }
   }
 
   /* #endregion */
@@ -371,20 +425,14 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
   newObjectForm() {
     try {
       this.objectForm = this.formBuilder.group({
-        pickingId: [0],
-        pickingNum: [null],
+        multiPickingId: [0],
+        multiPickingNum: [null],
         trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
         locationId: [null, [Validators.required]],
         toLocationId: [null],
         customerId: [null, [Validators.required]],
         typeCode: [null],
         warehouseAgentId: [JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId],
-        pickingUDField1: [null],
-        pickingUDField2: [null],
-        pickingUDField3: [null],
-        pickingUDOption1: [null],
-        pickingUDOption2: [null],
-        pickingUDOption3: [null],
         deactivated: [null],
         workFlowTransactionId: [null],
         masterUDGroup1: [null],
@@ -467,8 +515,6 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
         return;
       }
       this.objectService.setHeader(this.objectForm.getRawValue());
-      // this.objectService.setChoosenSalesOrders(this.selectedSalesOrders);
-      // this.objectService.setMultiPickingObject({outstandingPickList: this.outstandingPickList, pickingCarton: this.objectService.multiPickingObject?.pickingCarton??[]});
       this.navController.navigateForward("/transactions/picking/picking-item");
     } catch (e) {
       console.error(e);
