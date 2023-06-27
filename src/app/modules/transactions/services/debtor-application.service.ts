@@ -99,4 +99,15 @@ export class DebtorApplicationService {
     return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/deleteFile/" + keyId, httpObserveHeader);
   }
 
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/exportPdf",
+      {
+        "appCode": appCode,
+        "format": format,
+        "documentIds": [documentId],
+        "reportName": reportName??null
+      },
+      { responseType: "blob" });
+  }
+
 }

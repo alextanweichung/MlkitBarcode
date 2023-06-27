@@ -157,4 +157,48 @@ export class DebtorApplicationDetailPage implements OnInit {
     }
   }
 
+  /* #region download pdf */
+
+  async presentAlertViewPdf(reportName: string) {
+    try {
+      const alert = await this.alertController.create({
+        header: 'Download PDF?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf(reportName);
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async downloadPdf(reportName: string) {
+    try {
+      this.objectService.downloadPdf("FAAR006", "pdf", this.object.header.customerPreId, reportName).subscribe(response => {
+        let filename = this.object.header.name + ".pdf";
+        this.commonService.commonDownloadPdf(response, filename);
+      }, error => {
+        console.log(error);
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
 }

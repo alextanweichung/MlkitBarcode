@@ -19,6 +19,12 @@
             <div>Current Status</div>
           </ion-label>
         </ion-item>
+        <ion-item (click)="popover.dismiss(); presentAlertViewPdf('Debtor Application')">
+          <ion-icon name="download-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Debtor App.</div>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ng-template>
