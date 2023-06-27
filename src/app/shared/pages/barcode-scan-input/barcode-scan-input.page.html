@@ -24,9 +24,9 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableItems">
+        <ion-item detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableItems">
           <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
-          <ion-grid class="ion-no-padding py-2 pl-2" (click)="item.isSelected = !item.isSelected">
+          <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div>{{item.itemCode}} - {{item.description}}</div>
