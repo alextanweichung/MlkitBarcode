@@ -49,6 +49,7 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
     this.uniqueSalesOrder = []
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: picking-detail.page.ts:52 ~ PickingDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
         if (this.object.outstandingPickList && this.object.outstandingPickList.length > 0) {

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { MultiPickingOutstandingPickList, MultiPickingSORequest, MultiPickingSalesOrder } from 'src/app/modules/transactions/models/picking';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -15,7 +15,7 @@ import { Keyboard } from '@capacitor/keyboard';
   templateUrl: './picking-header.page.html',
   styleUrls: ['./picking-header.page.scss']
 })
-export class PickingHeaderPage implements OnInit, ViewWillEnter {
+export class PickingHeaderPage implements OnInit, ViewDidEnter {
 
   objectForm: FormGroup;
   loginUser: any;
@@ -38,7 +38,7 @@ export class PickingHeaderPage implements OnInit, ViewWillEnter {
   }
 
   @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
-  ionViewWillEnter(): void {
+  ionViewDidEnter(): void {
     try {
       this.barcodeInput.nativeElement.focus();
       // Keyboard.addListener('keyboardWillShow', () => {
