@@ -40,8 +40,8 @@
   </ion-header>
   <div class="p-2">
 
-    <!-- <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input> -->
-    <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)">
+    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+    <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.header.isWithSo && showItemList">
       <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
