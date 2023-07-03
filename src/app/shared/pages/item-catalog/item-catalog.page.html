@@ -1,4 +1,7 @@
-<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (ionChange)="availableItems = []; startIndex = 0" (search)="availableItems = []; startIndex = 0; searchItem()" (keydown)="availableItems = []; startIndex = 0; onKeyDown($event)"></ion-searchbar>
+<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItems = []; startIndex = 0" (search)="searchItem(searchbar.value)"></ion-searchbar>
+
+<!-- <input #barcodeInput class="p-2 ion-flex ion-text-center" [type]="'text'" enterkeyhint="search" [(ngModel)]="itemSearchText" placeholder="Search for Item" (onchange)="availableItems = []; startIndex = 0" (onfocus)="highlight(barcodeInput)" (keydown)="availableItems = []; startIndex = 0; onKeyDown($event)"> -->
+
 <div class="main-card">
   <ion-grid class="ion-no-padding" *ngIf="availableItems.length > 0">
     <ion-row *ngIf="showImage">
@@ -145,6 +148,11 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  
+  <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!availableItems || availableItems?.length === 0">
+    <ion-label>Nothing found!</ion-label>
+  </ion-list-header>
+  
 </div>
 
 <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)" threshold="30%">

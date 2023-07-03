@@ -96,15 +96,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   startIndex: number = 0;
-  searchItem() {
-    let searchText = this.itemSearchText;
-    // this.itemSearchText = '';
+  searchItem(searchText: string) {
+    this.itemSearchText = searchText;
     try {
-      if (searchText && searchText.trim().length > 2) {
+      if (this.itemSearchText && this.itemSearchText.trim().length > 2) {
         if (Capacitor.getPlatform() !== 'web') {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeywordfortest(searchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
+        this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
           let rrr = response;
           if (rrr && rrr.length > 0) {
             rrr.forEach(r => {
@@ -119,7 +118,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           this.availableItems = [...this.availableItems, ...rrr];
           this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
         })
-        this.loadImages(searchText); // todo : to handle load image based on availableItems
+        this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
       } else {
         this.toastService.presentToast('Enter at least 3 characters to search', '', 'top', 'warning', 1000);
       }
@@ -131,7 +130,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   onIonInfinite(event) {
     this.startIndex += this.itemListLoadSize;
-    this.searchItem();
+    this.searchItem(this.itemSearchText);
     setTimeout(() => {
       (event as InfiniteScrollCustomEvent).target.complete();
     }, 500);
@@ -147,7 +146,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   onKeyDown(event) {
     if (event.keyCode === 13) {
-      this.searchItem();
+      this.searchItem(this.itemSearchText);
       event.preventDefault();
     }
   }
