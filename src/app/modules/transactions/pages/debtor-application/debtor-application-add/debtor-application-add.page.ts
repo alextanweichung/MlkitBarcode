@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DebtorApplicationService } from '../../../services/debtor-application.service';
 import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
-import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-debtor-application-add',
@@ -26,8 +26,19 @@ export class DebtorApplicationAddPage implements OnInit {
   }
 
   ngOnInit() {
-    
+    this.setDefaultValue();
   }
+
+  defaultCountry: MasterListDetails = null;
+  setDefaultValue() {
+    this.defaultCountry = null;
+    if (this.objectService.countryMasterList && this.objectService.countryMasterList.length > 0) {
+      let defaultCountry = this.objectService.countryMasterList.find(r => r.isPrimary);
+      if (defaultCountry) {
+        this.defaultCountry = defaultCountry;
+      }
+    }
+  }  
 
   newObjectForm() {
     let loginUser = JSON.parse(localStorage.getItem('loginUser'));
