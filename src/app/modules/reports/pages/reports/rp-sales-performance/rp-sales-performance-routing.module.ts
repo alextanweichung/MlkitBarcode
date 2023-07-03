@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { RpSaPerfAllPage } from './rp-sa-perf-all.page';
+import { RpSalesPerformancePage } from './rp-sales-performance';
 
 const routes: Routes = [
   {
     path: '',
-    component: RpSaPerfAllPage
+    component: RpSalesPerformancePage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class RpSaPerfAllPageRoutingModule {}
+export class RpSalesPerformancePageRoutingModule {}

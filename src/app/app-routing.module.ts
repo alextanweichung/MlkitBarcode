@@ -244,8 +244,8 @@ const routes: Routes = [
     loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then( m => m.RpSalesCustomerPageModule)
   },
   {
-    path: 'reports/rp-sa-perf-all',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-perf-all/rp-sa-perf-all.module').then( m => m.RpSaPerfAllPageModule)
+    path: 'reports/rp-sales-performance',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-performance/rp-sales-performance.module').then( m => m.RpSalesPerformancePageModule)
   },
   {
     path: 'reports/rp-check-qoh',

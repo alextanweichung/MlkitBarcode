@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { RpSaPerfAllPageRoutingModule } from './rp-sa-perf-all-routing.module';
+import { RpSalesPerformancePageRoutingModule } from './rp-sales-performance-routing.module';
 
-import { RpSaPerfAllPage } from './rp-sa-perf-all.page';
+import { RpSalesPerformancePage } from './rp-sales-performance';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { CalendarInputPageModule } from '../../../../../shared/pages/calendar-input/calendar-input.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
@@ -16,11 +16,11 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    RpSaPerfAllPageRoutingModule,
+    RpSalesPerformancePageRoutingModule,
     NgxDatatableModule,
     CalendarInputPageModule,
     SumModule
   ],
-  declarations: [RpSaPerfAllPage]
+  declarations: [RpSalesPerformancePage]
 })
-export class RpSaPerfAllPageModule {}
+export class RpSalesPerformancePageModule {}

@@ -7,11 +7,11 @@ import { ToastService } from '../../../../../services/toast/toast.service';
 import { format } from 'date-fns';
 
 @Component({
-  selector: 'app-rp-sa-perf-all',
-  templateUrl: './rp-sa-perf-all.page.html',
-  styleUrls: ['./rp-sa-perf-all.page.scss'],
+  selector: 'app-rp-sales-performance',
+  templateUrl: './rp-sales-performance.page.html',
+  styleUrls: ['./rp-sales-performance.page.scss'],
 })
-export class RpSaPerfAllPage implements OnInit, ViewWillEnter {
+export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
 
   objects: SalesAgentAllPerformanceObject[] = [];
 
