@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { format } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -7,9 +7,10 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstanding, DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AlertController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { CreditInfoDetails } from 'src/app/shared/models/credit-info';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { SelectionType } from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'app-debtor-latest-outstanding',
@@ -75,7 +76,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
 
   loadDebtorReport() {
     let obj: DebtorOutstandingRequest = {
-      customerId: this.customerIds??[],
+      customerId: this.customerIds ?? [],
       trxDate: format(this.trxDate, 'yyyy-MM-dd'),
       isOverdueOnly: this.isOverdueOnly
     }
@@ -112,7 +113,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
             cssClass: 'success',
             role: 'confirm',
             handler: async () => {
-              await this.downloadPdf(object);
+              await this.downloadPdf([object]);
             },
           },
           {
@@ -128,20 +129,24 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     }
   }
 
-  async downloadPdf(object: DebtorOutstanding) {
-    if (object) {
+  async downloadPdf(object: DebtorOutstanding[]) {
+    if (object && object.length > 0) {
       let paramModel: ReportParameterModel = {
         appCode: 'FAMS002',
         format: 'pdf',
-        documentIds: [object.customerId],
+        documentIds: object.flatMap(r => r.customerId),
         reportName: 'Debtor Statement',
         customReportParam: {
-          parameter1: object.customerId,
+          parameter1: object.flatMap(r => r.customerId),
           statementDate: this.trxDate
         }
       }
       this.objectService.getPdf(paramModel).subscribe(async response => {
-        await this.commonService.commonDownloadPdf(response, object.customerName + "." + paramModel.format);
+        if (object && object.length === 1) {
+          await this.commonService.commonDownloadPdf(response, object[0].customerName + "." + paramModel.format);
+        } else {
+          await this.commonService.commonDownloadPdf(response, "Debtor_Statements." + paramModel.format);
+        }
       }, error => {
         console.log(error);
       })
@@ -173,9 +178,68 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
       console.error(e);
     }
   }
-  
+
   hideItemModal() {
     this.displayModal = false;
   }
+  
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+  
+  /* #region select all */
+
+  SelectionType = SelectionType;
+  selected = [];
+  onSelect(event) {
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:187 ~ DebtorLatestOutstandingPage ~ onSelect ~ event:", event)
+    this.selected.splice(0, this.selected.length);
+    this.selected.push(...event.selected);
+  }
+
+  onActivate(event) {
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:191 ~ DebtorLatestOutstandingPage ~ onActivate ~ event:", event)
+  }
+
+  async printAllAlert() {
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:211 ~ DebtorLatestOutstandingPage ~ printAllAlert ~ this.selected:", this.selected)
+    try {
+      const alert = await this.alertController.create({
+        header: `Download ${this.selected.length} PDF?`,
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf(this.selected);
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
 
 }
