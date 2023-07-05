@@ -198,7 +198,7 @@
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object.details" (click)="showDetails(item)">
+      <ion-item [ngClass]="{'color-warning': item.isPricingApproval }" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object.details" (click)="showDetails(item)">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -234,8 +234,8 @@
                   <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
                   <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                 </ion-col>
-                <ion-col>
-                  <div >{{d.qtyRequest|number:'1.0'}}</div>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <div>{{d.qtyRequest|number:'1.0'}}</div>
                 </ion-col>
               </ion-row>
             </div>

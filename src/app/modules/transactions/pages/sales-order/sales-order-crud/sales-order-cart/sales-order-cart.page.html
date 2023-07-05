@@ -18,7 +18,7 @@
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
       <ion-item-sliding #slidingItem *ngFor="let item of objectService.itemInCart; let i = index">
-        <ion-item class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
+        <ion-item [ngClass]="{'color-warning': item.isPricingApproval }" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
@@ -132,6 +132,79 @@
     </ion-row>
   </ion-grid>
 </ion-footer>
+
+<!-- extra info e.g. remark, addr -->
+<ion-modal [isOpen]="isExtraInfoModal" (didDismiss)="isExtraInfoModal = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Add. Info</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideExtraInfo()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="p-2">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item>
+            <ion-label position="stacked">Remark</ion-label>
+            <ion-textarea [(ngModel)]="objectService.header.remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Ship Method</ion-label>
+            <ion-select interface="action-sheet" [(ngModel)]="objectService.header.shipMethodId" placeholder="Select Ship Method">
+              <ion-select-option *ngFor="let s of objectService.shipMethodMasterList" [value]="s.id">{{s.description}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+          <ion-label>Delivery Address</ion-label>
+        </ion-list-header>        
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item>
+            <ion-label position="stacked">Address List</ion-label>
+            <ion-select interface="action-sheet" placeholder="Select Address" [(ngModel)]="selectedAddress" (ionChange)="onAddressSelected()">
+              <ion-select-option *ngFor="let a of availableAddress" [value]="a">{{a.description}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Address</ion-label>
+            <ion-textarea [(ngModel)]="objectService.header.shipAddress" [autoGrow]="true" placeholder="Enter Address"></ion-textarea>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Postcode</ion-label>
+            <ion-input [(ngModel)]="objectService.header.shipPostCode" placeholder="Enter Postcode"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Phone</ion-label>
+            <ion-input [(ngModel)]="objectService.header.shipPhone" inputmode="numeric" placeholder="Enter Phone"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input [(ngModel)]="objectService.header.shipEmail" inputmode="email" placeholder="Enter Email"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Fax</ion-label>
+            <ion-input [(ngModel)]="objectService.header.shipFax" inputmode="numeric" placeholder="Enter Fax"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Area</ion-label>
+            <ion-select interface="action-sheet" [(ngModel)]="objectService.header.shipAreaId" placeholder="Select Area">
+              <ion-select-option *ngFor="let a of objectService.areaMasterList" [value]="a.id">{{a.description}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Attention</ion-label>
+            <ion-input [(ngModel)]="objectService.header.attention" placeholder="Enter Attention"></ion-input>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- change line price, disc, disc code, qty -->
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
@@ -235,76 +308,7 @@
     </ion-footer>
   </ng-template>
 </ion-modal>
-<!-- extra info e.g. remark, addr -->
-<ion-modal [isOpen]="isExtraInfoModal" (didDismiss)="isExtraInfoModal = false">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Add. Info</ion-title>
-        <ion-buttons slot="start">
-          <ion-button (click)="hideExtraInfo()">Done</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <div class="p-2">
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item>
-            <ion-label position="stacked">Remark</ion-label>
-            <ion-textarea [(ngModel)]="objectService.header.remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Ship Method</ion-label>
-            <ion-select interface="action-sheet" [(ngModel)]="objectService.header.shipMethodId" placeholder="Select Ship Method">
-              <ion-select-option *ngFor="let s of objectService.shipMethodMasterList" [value]="s.id">{{s.description}}</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-list>
-        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-          <ion-label>Delivery Address</ion-label>
-        </ion-list-header>        
-        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item>
-            <ion-label position="stacked">Address List</ion-label>
-            <ion-select interface="action-sheet" placeholder="Select Address" [(ngModel)]="selectedAddress" (ionChange)="onAddressSelected()">
-              <ion-select-option *ngFor="let a of availableAddress" [value]="a">{{a.description}}</ion-select-option>
-            </ion-select>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Address</ion-label>
-            <ion-textarea [(ngModel)]="objectService.header.shipAddress" [autoGrow]="true" placeholder="Enter Address"></ion-textarea>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Postcode</ion-label>
-            <ion-input [(ngModel)]="objectService.header.shipPostCode" placeholder="Enter Postcode"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Phone</ion-label>
-            <ion-input [(ngModel)]="objectService.header.shipPhone" inputmode="numeric" placeholder="Enter Phone"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Email</ion-label>
-            <ion-input [(ngModel)]="objectService.header.shipEmail" inputmode="email" placeholder="Enter Email"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Fax</ion-label>
-            <ion-input [(ngModel)]="objectService.header.shipFax" inputmode="numeric" placeholder="Enter Fax"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Area</ion-label>
-            <ion-select interface="action-sheet" [(ngModel)]="objectService.header.shipAreaId" placeholder="Select Area">
-              <ion-select-option *ngFor="let a of objectService.areaMasterList" [value]="a.id">{{a.description}}</ion-select-option>
-            </ion-select>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Attention</ion-label>
-            <ion-input [(ngModel)]="objectService.header.attention" placeholder="Enter Attention"></ion-input>
-          </ion-item>
-        </ion-list>
-      </div>
-    </ion-content>
-  </ng-template>
-</ion-modal>
+
 <!-- for isPricingApproval -->
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>

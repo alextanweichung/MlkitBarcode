@@ -18,7 +18,7 @@
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
       <ion-item-sliding *ngFor="let item of objectService.itemInCart; let i = index">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
+        <ion-item [ngClass]="{'color-warning': item.isPricingApproval }" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
