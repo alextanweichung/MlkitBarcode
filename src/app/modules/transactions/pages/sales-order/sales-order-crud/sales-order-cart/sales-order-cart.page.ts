@@ -480,6 +480,8 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         header: this.objectService.header,
         details: this.objectService.itemInCart
       }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      console.log("🚀 ~ file: sales-order-cart.page.ts:483 ~ SalesOrderCartPage ~ insertObject ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
@@ -497,6 +499,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       header: this.objectService.header,
       details: this.objectService.itemInCart
     }
+    trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
     this.objectService.updateObject(trxDto).subscribe(response => {
       this.objectService.setObject((response.body as SalesOrderRoot));
       this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
@@ -516,6 +519,18 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     event.getInputElement().then(r => {
       r.select();
     })
+  }
+
+  checkPricingApprovalLines(trxDto: SalesOrderRoot, trxLineArray: TransactionDetail[]) {
+    let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
+    filteredData = filteredData.filter(x => !x.isPromoImpactApplied);
+    if (filteredData.length > 0) {
+      filteredData.forEach(x => { x.isPricingApproval = true });
+      trxDto.header.isPricingApproval = true;
+    } else {
+      trxDto.header.isPricingApproval = false;
+    }
+    return trxDto;
   }
 
   /* #endregion */

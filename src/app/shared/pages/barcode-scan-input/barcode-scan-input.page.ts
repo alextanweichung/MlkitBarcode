@@ -5,7 +5,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { MasterListDetails } from '../../models/master-list-details';
-import { ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -34,6 +34,14 @@ export class BarcodeScanInputPage implements OnInit {
   ngOnInit() {
     this.loadModuleControl();
   }
+  
+  showKeyboard(event) {
+    event.preventDefault();
+    this.barcodeInput.nativeElement.focus();
+    setTimeout(async () => {
+      await Keyboard.show();
+    }, 100);
+  }
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
@@ -56,6 +64,7 @@ export class BarcodeScanInputPage implements OnInit {
       let barcode = this.manipulateBarcodeCheckDigit(key);
       this.validateBarcode(barcode);
       e.preventDefault();
+      this.setFocus();
     }
   }
 
@@ -111,13 +120,12 @@ export class BarcodeScanInputPage implements OnInit {
           }
           this.onItemAdd.emit([outputData]);
         } else {
-          this.toastService.presentToast('Barcode Not Found', '', 'top', 'danger', 1000);
+          this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
         }
       } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    this.focusBarcodeSearch();
   }
 
   /* #region item scan */
@@ -126,6 +134,7 @@ export class BarcodeScanInputPage implements OnInit {
     if (e.keyCode === 13) {
       this.validateItem(key);
       e.preventDefault();
+      this.setFocus();
     }
   }
 
@@ -203,7 +212,6 @@ export class BarcodeScanInputPage implements OnInit {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
-    this.focusItemSearch();
   }
 
   /* #region modal for user to select item */

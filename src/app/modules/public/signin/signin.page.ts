@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -17,7 +17,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
   templateUrl: './signin.page.html',
   styleUrls: ['./signin.page.scss'],
 })
-export class SigninPage implements OnInit, ViewWillEnter {
+export class SigninPage implements OnInit, ViewDidEnter {
 
   current_year: number = new Date().getFullYear();
   currentVersion: string;
@@ -50,21 +50,25 @@ export class SigninPage implements OnInit, ViewWillEnter {
     });
   }
 
-  ionViewWillEnter(): void {
+  ionViewDidEnter(): void {
     this.companyNames = new Map([]);
     if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
       this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
     }
   }
 
+  ionViewWillEnter(): void {
+    
+  }
+
   companyNames: Map<string, string> = new Map([]);
   ngOnInit() {
     if (Capacitor.getPlatform() === 'web') {
       // this.signin_form.get('userEmail').setValue('kccon@idcp.my');
-      // this.signin_form.get('userEmail').setValue('aychia@idcp.my');
-      // this.signin_form.get('password').setValue('String1234');
-      this.signin_form.get('userEmail').setValue('admin@idcp.my');
-      this.signin_form.get('password').setValue('i@Dmin7026');
+      this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+      this.signin_form.get('password').setValue('String1234');
+      // this.signin_form.get('userEmail').setValue('admin@idcp.my');
+      // this.signin_form.get('password').setValue('i@Dmin7026');
     } else {
       this.setSelectedParam();
     }

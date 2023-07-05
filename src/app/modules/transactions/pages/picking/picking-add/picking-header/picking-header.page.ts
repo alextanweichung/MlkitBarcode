@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { MultiPickingOutstandingPickList, MultiPickingSORequest, MultiPickingSalesOrder } from 'src/app/modules/transactions/models/picking';
@@ -15,7 +15,7 @@ import { Keyboard } from '@capacitor/keyboard';
   templateUrl: './picking-header.page.html',
   styleUrls: ['./picking-header.page.scss']
 })
-export class PickingHeaderPage implements OnInit, ViewDidEnter {
+export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
 
   objectForm: FormGroup;
   loginUser: any;
@@ -37,20 +37,25 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
     this.newObjectForm();
   }
 
+  ngOnDestroy(): void {
+    Keyboard.removeAllListeners();
+  }
+
   @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
   ionViewDidEnter(): void {
     try {
       this.barcodeInput.nativeElement.focus();
-      // Keyboard.addListener('keyboardWillShow', () => {
-      //   this.isButtonVisible = false;
-      // })
-  
-      // Keyboard.addListener('keyboardDidHide', () => {
-      //   this.isButtonVisible = true;
-      // });
     } catch (e) {
       console.error(e);
     }
+  }
+  
+  showKeyboard(event) {
+    event.preventDefault();
+    this.barcodeInput.nativeElement.focus();
+    setTimeout(async () => {
+      await Keyboard.show();
+    }, 100);
   }
 
   ngOnInit() {
@@ -104,7 +109,7 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
         let so = response.body[0] as MultiPickingSalesOrder;
         console.log("🚀 ~ file: picking-header.page.ts:94 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ so:", so)
         if (so === undefined) {
-          this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
+          this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
           return;
         }
         // checking for picking, refer to base system
@@ -153,8 +158,9 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
   itemSearchValue: string;
   handleSoKeyDown(e) {
     if (e.keyCode === 13) {
-      this.validateSalesOrder(this.itemSearchValue);
       e.preventDefault();
+      this.barcodeInput.nativeElement.focus();
+      this.validateSalesOrder(this.itemSearchValue);
     }
   }
 
@@ -181,9 +187,8 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
         this.objectService.getSOHeader(request).subscribe(response => {
           if (response.status === 200) {
             let so = response.body[0] as MultiPickingSalesOrder;
-            console.log("🚀 ~ file: picking-header.page.ts:133 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ so:", so)
             if (so === undefined) {
-              this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
+              this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
               return;
             }
             // checking for picking, refer to base system
@@ -196,7 +201,6 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
               return;
             }
             this.selectedSalesOrders.unshift(so);
-            console.log("🚀 ~ file: picking-header.page.ts:188 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.selectedSalesOrders:", this.selectedSalesOrders)
             if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
               this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId });
             }
@@ -205,7 +209,6 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
               if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
               r.multiPickingId = this.objectForm.controls.multiPickingId.value;
             })
-            console.log("🚀 ~ file: picking-header.page.ts:193 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPickingObject.outstandingPickList:", this.objectService.multiPickingObject.outstandingPickList)
             this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
             this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
             this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
@@ -218,7 +221,7 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
         });
       }
     } else {
-      this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
+      this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
     }
   }
 
@@ -270,7 +273,7 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
     return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum).flatMap(r => r.itemCode))];
   }
 
-  getSoLineByItemCode(itemCode: string): MultiPickingOutstandingPickList[] {    
+  getSoLineByItemCode(itemCode: string): MultiPickingOutstandingPickList[] {
     let ret: MultiPickingOutstandingPickList[] = [];
     let l = this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode);
     if (l && l.length > 0) {
@@ -465,10 +468,11 @@ export class PickingHeaderPage implements OnInit, ViewDidEnter {
     }
   }
 
-  async onDoneScanning(event) {
+  onDoneScanning(event) {
     try {
       if (event) {
-        await this.validateSalesOrder(event);
+        this.barcodeInput.nativeElement.focus();
+        this.validateSalesOrder(event);
       }
     } catch (e) {
       console.error(e);

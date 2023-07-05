@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController } from '@ionic/angular';
 
@@ -7,7 +14,7 @@ import { AlertController } from '@ionic/angular';
   templateUrl: './camera-scan-input.page.html',
   styleUrls: ['./camera-scan-input.page.scss'],
 })
-export class CameraScanInputPage implements OnInit {
+export class CameraScanInputPage implements OnInit, OnDestroy {
 
   isButtonVisible: boolean = true;
 
@@ -18,10 +25,15 @@ export class CameraScanInputPage implements OnInit {
 
   constructor(
     private alertController: AlertController
-  ) { }
+  ) {}
+
+  ngOnDestroy(): void {
+    // this.keyboard.onKeyboardWillShow().unsubscribe();
+    // this.keyboard.onKeyboardWillHide().unsubscribe();
+  }
 
   ngOnInit() {
-
+    
   }
 
   /* #region  barcode scanner */
@@ -60,22 +72,22 @@ export class CameraScanInputPage implements OnInit {
         resolve(true);
       } else if (status.denied) {
         const alert = await this.alertController.create({
-          header: "No permission",
-          message: "Please allow camera access in your setting",
+          header: 'No permission',
+          message: 'Please allow camera access in your setting',
           buttons: [
             {
-              text: "Open Settings",
+              text: 'Open Settings',
               handler: () => {
                 BarcodeScanner.openAppSettings();
                 resolve(false);
-              }
+              },
             },
             {
-              text: "No",
-              role: "cancel"
+              text: 'No',
+              role: 'cancel',
             },
-          ]
-        })
+          ],
+        });
         await alert.present();
       } else {
         resolve(false);
@@ -89,7 +101,13 @@ export class CameraScanInputPage implements OnInit {
     this.onCameraStatusChanged.emit(false);
   }
 
+  showButton() {
+    this.isButtonVisible = true;
+  }
+
+  hideButton() { 
+    this.isButtonVisible = false;
+  }
+
   /* #endregion */
-
-
 }

@@ -79,6 +79,9 @@ export interface QuotationHeader {
   maxPrecision: number
   maxPrecisionTax: number
   /* #endregion */
+
+  isPricingApproval?: boolean
+  
   sequence: number
   createdById: number
   createdBy: string

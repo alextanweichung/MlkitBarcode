@@ -96,7 +96,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   startIndex: number = 0;
-  searchItem(searchText: string) {
+  searchItem(searchText: string, newSearch: boolean) {
+    if (newSearch) {
+      this.availableItems = [];
+    }
     this.itemSearchText = searchText;
     try {
       if (this.itemSearchText && this.itemSearchText.trim().length > 2) {
@@ -130,7 +133,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   onIonInfinite(event) {
     this.startIndex += this.itemListLoadSize;
-    this.searchItem(this.itemSearchText);
+    this.searchItem(this.itemSearchText, false);
     setTimeout(() => {
       (event as InfiniteScrollCustomEvent).target.complete();
     }, 500);
@@ -146,7 +149,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   onKeyDown(event) {
     if (event.keyCode === 13) {
-      this.searchItem(this.itemSearchText);
+      this.searchItem(this.itemSearchText, true);
       event.preventDefault();
     }
   }

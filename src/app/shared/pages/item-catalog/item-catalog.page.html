@@ -1,4 +1,4 @@
-<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItems = []; startIndex = 0" (search)="searchItem(searchbar.value)"></ion-searchbar>
+<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItems = []; startIndex = 0" (search)="searchItem(searchbar.value, true)"></ion-searchbar>
 
 <!-- <input #barcodeInput class="p-2 ion-flex ion-text-center" [type]="'text'" enterkeyhint="search" [(ngModel)]="itemSearchText" placeholder="Search for Item" (onchange)="availableItems = []; startIndex = 0" (onfocus)="highlight(barcodeInput)" (keydown)="availableItems = []; startIndex = 0; onKeyDown($event)"> -->
 

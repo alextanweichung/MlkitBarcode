@@ -121,7 +121,7 @@ export class StockCountItemAddPage implements OnInit, ViewWillEnter {
             }
             this.addItemToLine(outputData);
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
           }
         } else {
           this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);

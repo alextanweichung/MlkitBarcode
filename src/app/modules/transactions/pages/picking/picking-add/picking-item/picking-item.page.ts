@@ -413,7 +413,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             }
             return outputData;
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
           }
         }
       }

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationHeader, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -135,6 +135,10 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
       this.hideEditModal();
     }
+
+    if (this.selectedItem.isPricingApproval) {
+      this.objectService.header.isPricingApproval = true;
+    }
   }
 
   async cancelChanges() {
@@ -260,6 +264,21 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         this.objectService.header.shipAreaId = null;
         this.objectService.header.attention = null;
       }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
     } catch (e) {
       console.error(e);
     }
@@ -439,6 +458,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         header: this.objectService.header,
         details: this.objectService.itemInCart
       }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      console.log("🚀 ~ file: quotation-cart.page.ts:462 ~ QuotationCartPage ~ insertObject ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as QuotationRoot))
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
@@ -456,6 +477,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       header: this.objectService.header,
       details: this.objectService.itemInCart
     }
+    trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+    console.log("🚀 ~ file: quotation-cart.page.ts:481 ~ QuotationCartPage ~ updateObject ~ trxDto:", trxDto)
     this.objectService.updateObject(trxDto).subscribe(response => {
       this.objectService.setObject((response.body as QuotationRoot));
       this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
@@ -475,6 +498,18 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     event.getInputElement().then(r => {
       r.select();
     })
+  }
+
+  checkPricingApprovalLines(trxDto: QuotationRoot, trxLineArray: TransactionDetail[]) {
+    let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
+    filteredData = filteredData.filter(x => !x.isPromoImpactApplied);
+    if (filteredData.length > 0) {
+      filteredData.forEach(x => { x.isPricingApproval = true });
+      trxDto.header.isPricingApproval = true;
+    } else {
+      trxDto.header.isPricingApproval = false;
+    }
+    return trxDto;
   }
 
   /* #endregion */

@@ -79,7 +79,8 @@ export class QuotationHeaderPage implements OnInit {
         remark: [null],
         isHomeCurrency: [null],
         maxPrecision: [null],
-        maxPrecisionTax: [null]
+        maxPrecisionTax: [null],
+        isPricingApproval: [false]
       });
     } catch (e) {
       console.error(e);

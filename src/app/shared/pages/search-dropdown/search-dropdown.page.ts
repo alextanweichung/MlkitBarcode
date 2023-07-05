@@ -46,6 +46,10 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   ngOnInit() {
 
   }
+  
+  setFocus() {
+    this.searchBar.setFocus();
+  }
 
   bindFromMasterList() {
     if (this.masterDropdownList && this.masterDropdownList.length > 0) {

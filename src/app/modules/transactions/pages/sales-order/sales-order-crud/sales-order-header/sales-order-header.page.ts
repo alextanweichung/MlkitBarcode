@@ -82,7 +82,8 @@ export class SalesOrderHeaderPage implements OnInit {
         isHomeCurrency: [null],
         maxPrecision: [null],
         maxPrecisionTax: [null],
-        isOpeningBalance: [false]
+        isOpeningBalance: [false],
+        isPricingApproval: [false]
       });
     } catch (e) {
       console.error(e);
@@ -169,6 +170,7 @@ export class SalesOrderHeaderPage implements OnInit {
     try {
       if (event && event !== undefined) {
         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
+        console.log("🚀 ~ file: sales-order-header.page.ts:172 ~ SalesOrderHeaderPage ~ onCustomerSelected ~ lookupValue:", lookupValue)
         if (lookupValue != undefined) {
           this.objectService.removeItems();
           this.objectForm.patchValue({ customerId: lookupValue.id });

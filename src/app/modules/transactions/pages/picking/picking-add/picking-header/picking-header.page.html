@@ -39,7 +39,20 @@
           <ion-label>Group By Item</ion-label>
         </ion-segment-button>
       </ion-segment>
-      <input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" [ngModelOptions]="{standalone:true}" placeholder="Enter or Scan Sales Order" (keydown)="handleSoKeyDown($event)">
+      
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col class="ion-flex ion-margin-auto" size="10">
+            <input #barcodeInput hideKeyboard class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" [ngModelOptions]="{standalone:true}" placeholder="Enter or Scan Sales Order" (keydown)="handleSoKeyDown($event)">
+          </ion-col>
+          <ion-col class="ion-flex ion-margin-auto justify-content-end">
+            <ion-button size="small" fill="clear" (click)="showKeyboard($event)">
+              <i slot="icon-only" class="fas fa-keyboard"></i>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="selectedSalesOrders && selectedSalesOrders.length > 0">
         <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
           <ion-grid class="ion-no-padding py-2 pl-2">
@@ -145,4 +158,4 @@
     Next
   </ion-button>
 </ion-footer> -->
-<app-camera-scan-input *ngIf="isButtonVisible && isWithSo ==='true'" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+<app-camera-scan-input #cameraScanInput *ngIf="isButtonVisible && isWithSo ==='true'" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>

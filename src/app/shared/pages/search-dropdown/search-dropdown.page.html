@@ -23,7 +23,7 @@
   <ion-input *ngIf="!selected" [placeholder]="'Select ' + title" readonly></ion-input>
 </ion-item>
 
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidPresent)="setFocus()">
   <ng-template>
     <ion-header>
       <ion-toolbar>

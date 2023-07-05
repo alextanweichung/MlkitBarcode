@@ -142,7 +142,7 @@ export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
             }
             this.addItemToLine(outputData);
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', '', 'top', 'danger', 1000);
           }
         } else {
   

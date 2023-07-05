@@ -97,6 +97,7 @@ export class SalesOrderService {
     this.header = header;
     // load promotion first after customer confirmed or whenever header changed.
     this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), 'yyyy-MM-dd'), this.header.customerId);
+    console.log("🚀 ~ file: sales-order.service.ts:100 ~ SalesOrderService ~ setHeader ~ this.promotionMaster:", this.promotionMaster)
   }
 
   setChoosenItems(items: TransactionDetail[]) {

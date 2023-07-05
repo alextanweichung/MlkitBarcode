@@ -161,7 +161,7 @@ export class PackingItemPage implements OnInit {
             }
             this.addItemToSo(outputData);
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
           }
         }
       }

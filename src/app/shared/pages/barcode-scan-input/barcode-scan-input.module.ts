@@ -8,6 +8,7 @@ import { BarcodeScanInputPageRoutingModule } from './barcode-scan-input-routing.
 
 import { BarcodeScanInputPage } from './barcode-scan-input.page';
 import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
+import { HideKeyboardDirective } from '../../utilities/hide-keyboard.directive';
 
 @NgModule({
   imports: [
@@ -20,6 +21,6 @@ import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
   exports: [
     BarcodeScanInputPage
   ],
-  declarations: [BarcodeScanInputPage]
+  declarations: [BarcodeScanInputPage, HideKeyboardDirective]
 })
 export class BarcodeScanInputPageModule {}
