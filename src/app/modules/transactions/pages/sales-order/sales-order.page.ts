@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { SalesOrderList } from '../../models/sales-order';
+import { SalesOrderList, SalesOrderRoot } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
@@ -11,7 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { LoadingService } from 'src/app/services/loading/loading.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-sales-order',
@@ -46,15 +46,16 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
+    this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
-    this.loadObjects();
     this.bindCustomerList();
     this.bindSalesAgentList();
+    this.loadObjects();
   }
 
   ngOnInit() {
@@ -72,7 +73,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         salesAgentId: this.salesAgentIds
       }
       this.objectService.getObjectListByDate(obj).subscribe(async response => {
-        this.objects = response;
+        this.objects = [...this.objects, ...response];
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
@@ -81,7 +82,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         throw error;
       })
     } catch (error) {
-      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+      this.toastService.presentToast('', 'Error loading object.', 'top', 'danger', 1000);
     }
   }
 
@@ -120,7 +121,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
     try {
       if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward('/transactions/sales-order/sales-order-header');
-      } else {        
+      } else {
         this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
       }
     } catch (e) {
@@ -234,7 +235,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
     try {
       let navigationExtras: NavigationExtras = {
         queryParams: {
-          objectId: objectId
+          objectId: objectId,
         }
       }
       this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);

@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { dbConfig, draftDb_Tables, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
+import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
-import { Draft_Transactions, TransactionType } from 'src/app/shared/models/draft-transaction';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
@@ -158,41 +157,6 @@ export class ConfigService {
       return this.item_Barcodes;
     } catch (e) {
       console.error(e);
-    }
-  }
-
-  /* #endregion */
-
-  /* #region  */
-
-  async insertDraftTransaction(object: any, trx_type: TransactionType) {
-    let json = JSON.stringify(object);
-    let data: Draft_Transactions = {
-      DRAFT_TRANSACTIONSId: uuidv4(),
-      transaction_type: trx_type,
-      json_data: json
-    }
-    await this.commonQueryService.insert(data, draftDb_Tables.draft_Transactions, dbConfig.draftdb);
-  }
-  
-  async updateDraftTransaction(object: any, draftId: string, trx_type: TransactionType) {
-    let json = JSON.stringify(object);
-    let data: Draft_Transactions = {
-      DRAFT_TRANSACTIONSId: draftId,
-      transaction_type: trx_type,
-      json_data: json      
-    }
-    console.log("🚀 ~ file: config.service.ts:185 ~ ConfigService ~ updateDraftTransaction ~ data:", JSON.stringify(data))
-    await this.commonQueryService.update(data, draftDb_Tables.draft_Transactions, dbConfig.draftdb);
-  }
-
-  async loadDraftTransaction(trx_type: TransactionType): Promise<Draft_Transactions[]> {
-    let ret = await this.commonQueryService.selectAll(draftDb_Tables.draft_Transactions, dbConfig.draftdb) as Draft_Transactions[];
-    console.log("🚀 ~ file: config.service.ts:179 ~ ConfigService ~ loadDraftTransaction ~ ret:", JSON.stringify(ret))
-    if (ret === null) {
-      return [];
-    } else {
-      return await ret.filter(r => r.transaction_type === trx_type);
     }
   }
 

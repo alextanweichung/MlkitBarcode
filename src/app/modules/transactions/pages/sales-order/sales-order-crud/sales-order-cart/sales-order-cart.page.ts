@@ -97,6 +97,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       })
       this.authService.precisionList$.subscribe(precision => {
         this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+        console.log("🚀 ~ file: sales-order-cart.page.ts:100 ~ SalesOrderCartPage ~ loadModuleControl ~ this.precisionSales:", this.precisionSales)
         this.precisionTax = precision.find(x => x.precisionCode == "TAX");
       })
     } catch (e) {
@@ -444,14 +445,14 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     try {
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
-          header: 'Are you sure to proceed?',
+          header: "Are you sure to proceed?",
           buttons: [
             {
               text: 'OK',
               cssClass: 'success',
               role: 'confirm',
               handler: async () => {
-                if (this.objectService.header.salesOrderId) {
+                if (this.objectService.header.salesOrderId > 0) {
                   await this.updateObject();
                 } else {
                   await this.insertObject();
@@ -474,14 +475,13 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  insertObject() {
+  async insertObject() {
     try {
       let trxDto: SalesOrderRoot = {
         header: this.objectService.header,
         details: this.objectService.itemInCart
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      console.log("🚀 ~ file: sales-order-cart.page.ts:483 ~ SalesOrderCartPage ~ insertObject ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
@@ -494,10 +494,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  updateObject() {
+  async updateObject() {
     let trxDto: SalesOrderRoot = {
       header: this.objectService.header,
-      details: this.objectService.itemInCart
+      details: this.objectService.itemInCart,
     }
     trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
     this.objectService.updateObject(trxDto).subscribe(response => {

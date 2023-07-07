@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { AlertController, IonPopover, NavController } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -18,7 +18,7 @@ import { TrxChild } from 'src/app/shared/models/trx-child';
   templateUrl: './sales-order-detail.page.html',
   styleUrls: ['./sales-order-detail.page.scss']
 })
-export class SalesOrderDetailPage implements OnInit {
+export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number
   object: SalesOrderRoot;
@@ -39,22 +39,24 @@ export class SalesOrderDetailPage implements OnInit {
         this.objectId = params['objectId'];
         this.processType = params['processType'];
         this.selectedSegment = params['selectedSegment'];
-        if (!this.objectId) {
-          this.navController.navigateBack('/transactions/sales-order');
-        }
       })
     } catch (e) {
       console.error(e);
     }
   }
 
+  ionViewWillEnter(): void {
+    
+  }
+
   ngOnInit() {
-    if (!this.objectId) {
-      this.navController.navigateBack('/transactions/sales-order')
-    } else {
-      this.loadModuleControl();
+    if (this.objectId > 0) {
       this.loadObject();
+    } else {
+      this.toastService.presentToast('', 'Invalid Sales Order.', 'top', 'warning', 1000);
+      this.navController.navigateBack('/transactions/sales-order');
     }
+    this.loadModuleControl();
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -75,13 +77,20 @@ export class SalesOrderDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        if (this.object.header.isHomeCurrency) {
+          this.object.header.maxPrecision = this.precisionSales.localMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.localMax
+        } else {
+          this.object.header.maxPrecision = this.precisionSales.foreignMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
+        }
         this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
         throw error;
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+      this.toastService.presentToast('Error', 'Sales Order', 'top', 'danger', 1000);
     }
   }
 

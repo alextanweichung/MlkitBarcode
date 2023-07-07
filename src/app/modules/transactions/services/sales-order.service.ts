@@ -28,7 +28,7 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class SalesOrderService {
-  
+
   promotionMaster: PromotionMaster[] = [];
 
   fullMasterList: MasterList[] = [];
@@ -48,7 +48,7 @@ export class SalesOrderService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    
+
   }
 
   async loadRequiredMaster() {
@@ -87,7 +87,7 @@ export class SalesOrderService {
       })
     })
   }
-  
+
   /* #region  for insert */
 
   header: SalesOrderHeader;
@@ -190,7 +190,7 @@ export class SalesOrderService {
         "appCode": appCode,
         "format": format,
         "documentIds": [documentId],
-        "reportName": reportName??null
+        "reportName": reportName ?? null
       },
       { responseType: "blob" });
   }
@@ -207,10 +207,10 @@ export class SalesOrderService {
     return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/workflow/" + objectId);
   }
 
-  getTrxChild(objectId: number){
+  getTrxChild(objectId: number) {
     return this.http.get<TrxChild>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/child/" + objectId).pipe(
-      map((response: any) =>       
-        response.map((item: any) => item)   
+      map((response: any) =>
+        response.map((item: any) => item)
       )
     );
   }
