@@ -14,7 +14,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class CommonService {
-  
+
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
@@ -23,7 +23,7 @@ export class CommonService {
     private file: File,
     private androidPermissions: AndroidPermissions
   ) {
-    
+
   }
 
   /* #region common service */
@@ -46,7 +46,7 @@ export class CommonService {
 
   syncInbound() {
     try {
-      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster").toPromise();      
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster").toPromise();
     } catch (e) {
       console.error(e);
     }
@@ -69,7 +69,7 @@ export class CommonService {
       let today = this.getTodayDate();
       let firstDoy = new Date(new Date().getUTCFullYear(), 0, 1, 0, 0, 0);
       firstDoy.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-      return firstDoy;      
+      return firstDoy;
     } catch (e) {
       console.error(e);
     }
@@ -96,8 +96,8 @@ export class CommonService {
     }
   }
 
-  getDateWithoutTimeZone(inputDate: Date): Date{
-    let newDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(),0,0,0)
+  getDateWithoutTimeZone(inputDate: Date): Date {
+    let newDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(), 0, 0, 0)
     newDate.setMinutes(newDate.getMinutes() - newDate.getTimezoneOffset())
     return newDate;
   }
@@ -118,7 +118,7 @@ export class CommonService {
     try {
       let outputDate = new Date(inputDate);
       //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
-      return outputDate;      
+      return outputDate;
     } catch (e) {
       console.error(e);
     }
@@ -297,7 +297,7 @@ export class CommonService {
   computeAmtInclTax(amount: number, taxPct: number) {
     try {
       let amtInclTax = amount * (1 + (taxPct / 100));
-      return amtInclTax;      
+      return amtInclTax;
     } catch (e) {
       console.error(e);
     }
@@ -332,13 +332,13 @@ export class CommonService {
       let discExpression = trxLine.discountExpression;
       let quantity = trxLine.qtyRequest;
       let subTotal;
-  
+
       if (isItemPriceTaxInclusive) {
         subTotal = unitPrice * quantity;
       } else {
         subTotal = unitPriceExTax * quantity;
       }
-  
+
       //To split the expression with multi level discount, for eg. (10%/5%/3%)
       if (discExpression != "" && discExpression != null) {
         let splittedDisc = discExpression.split(/[+/]/g);
@@ -410,7 +410,7 @@ export class CommonService {
         receiptLine.discountGroupCode = receiptLine.oriDiscountGroupCode;
         receiptLine.discountExpression = receiptLine.oriDiscountExpression;
       }
-      return receiptLine;      
+      return receiptLine;
     } catch (e) {
       console.error(e);
     }
@@ -430,8 +430,8 @@ export class CommonService {
             if (!result.hasPermission) {
               this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
                 async result => {
-                  this.file.checkFile(this.file.externalRootDirectory + "/Download", object.filesName+object.filesType).then((isExist) => {
-                    this.file.writeExistingFile(this.file.externalRootDirectory + "/Download", object.filesName+object.filesType, file).then(async () => {
+                  this.file.checkFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType).then((isExist) => {
+                    this.file.writeExistingFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType, file).then(async () => {
                       if (mimeType) {
                         this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                       }
@@ -440,7 +440,7 @@ export class CommonService {
                       await this.loadingService.dismissLoading();
                     });
                   }).catch((error) => {
-                    this.file.writeFile(this.file.externalRootDirectory + "/Download", object.filesName+object.filesType, file, { replace: true}).then(async () => {
+                    this.file.writeFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType, file, { replace: true }).then(async () => {
                       if (mimeType) {
                         this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                       }
@@ -452,19 +452,19 @@ export class CommonService {
                 }
               );
             } else {
-              this.file.checkFile(this.file.externalRootDirectory + "/Download", object.filesName+object.filesType).then((isExist) => {
-                this.file.writeExistingFile(this.file.externalRootDirectory + "/Download", object.filesName+object.filesType, file).then(async () => {
+              this.file.checkFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType).then((isExist) => {
+                this.file.writeExistingFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType, file).then(async () => {
                   if (mimeType) {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
+                    await this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                   }
                   await this.loadingService.dismissLoading();
                 }).catch(async (error) => {
                   await this.loadingService.dismissLoading();
                 });
               }).catch((error) => {
-                this.file.writeFile(this.file.externalRootDirectory + "/Download", object.filesName+object.filesType, file, { replace: true}).then(async () => {
+                this.file.writeFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType, file, { replace: true }).then(async () => {
                   if (mimeType) {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
+                    await this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                   }
                   await this.loadingService.dismissLoading();
                 }).catch(async (error) => {
@@ -475,9 +475,9 @@ export class CommonService {
           }
         )
       } else if (Capacitor.getPlatform() === 'ios') {
-        this.file.writeFile(this.file.tempDirectory, object.filesName+object.filesType, file, { replace: true }).then(async () => {
+        this.file.writeFile(this.file.tempDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
           if (mimeType) {
-            this.opener.open(this.file.tempDirectory + object.filesName+object.filesType, mimeType);
+            await this.opener.open(this.file.tempDirectory + object.filesName + object.filesType, mimeType);
           }
           await this.loadingService.dismissLoading();
         }).catch(async (error) => {
@@ -520,30 +520,39 @@ export class CommonService {
         return "application/json";
       case ".TXT":
         return "text/plain";
-      default: 
+      default:
         return null;
     }
   }
 
-  async commonDownloadPdf(file: Blob, filename: string) {
+  async commonDownloadPdf(file: Blob, filename: string) { // this filename already with extensions
     try {
       await this.loadingService.showLoading("Downloading");
       if (Capacitor.getPlatform() === 'android') {
-        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+        console.log("🚀 ~ file: common.service.ts:533 ~ CommonService ~ this.file.checkDir ~ this.file.externalRootDirectory:", this.file.externalRootDirectory)
+        this.file.checkDir(this.file.externalRootDirectory, "Download").then((results) => {
+          console.log("🚀 ~ file: common.service.ts:533 ~ CommonService ~ this.file.checkDir ~ results:", JSON.stringify(results))
+        }).catch((error) => {
+          console.log(JSON.stringify(error));
+        })
+
+        await this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
           async result => {
             if (!result.hasPermission) {
-              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
+              await this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
                 async result => {
-                  this.file.checkFile(this.file.externalRootDirectory + "/Download", filename).then((isExist) => {
-                    this.file.writeExistingFile(this.file.externalRootDirectory + "/Download", filename, file).then(async () => {
-                      this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                  await this.file.checkFile(this.file.externalRootDirectory + "/Download/", filename).then(async (isExist) => {
+                    console.log("🚀 ~ file: common.service.ts:545 ~ CommonService ~ awaitthis.file.checkFile ~ isExist:", JSON.stringify(isExist));
+                    await this.file.writeExistingFile(this.file.externalRootDirectory + "/Download/", filename, file).then(async () => {
+                      await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
                       await this.loadingService.dismissLoading();
                     }).catch(async (error) => {
                       await this.loadingService.dismissLoading();
                     });
-                  }).catch((error) => {
-                    this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true}).then(async () => {
-                      this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+                  }).catch(async (error) => {
+                    console.log("🚀 ~ file: common.service.ts:553 ~ CommonService ~ awaitthis.file.checkFile ~ error:", JSON.stringify(error))
+                    await this.file.writeFile(this.file.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
+                      await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
                       await this.loadingService.dismissLoading();
                     }).catch(async (error) => {
                       await this.loadingService.dismissLoading();
@@ -552,16 +561,18 @@ export class CommonService {
                 }
               );
             } else {
-              this.file.checkFile(this.file.externalRootDirectory + "/Download", filename).then((isExist) => {
-                this.file.writeExistingFile(this.file.externalRootDirectory + "/Download", filename, file).then(async () => {
-                  this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+              await this.file.checkFile(this.file.externalRootDirectory + "/Download/", filename).then(async (isExist) => {
+                console.log("🚀 ~ file: common.service.ts:564 ~ CommonService ~ awaitthis.file.checkFile ~ isExist:", JSON.stringify(isExist));
+                await this.file.writeExistingFile(this.file.externalRootDirectory + "/Download/", filename, file).then(async () => {
+                  await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
                   await this.loadingService.dismissLoading();
                 }).catch(async (error) => {
                   await this.loadingService.dismissLoading();
                 });
-              }).catch((error) => {
-                this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true}).then(async () => {
-                  this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+              }).catch(async (error) => {
+                console.log("🚀 ~ file: common.service.ts:572 ~ CommonService ~ awaitthis.file.checkFile ~ error:", JSON.stringify(error))
+                await this.file.writeFile(this.file.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
+                  await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
                   await this.loadingService.dismissLoading();
                 }).catch(async (error) => {
                   await this.loadingService.dismissLoading();
@@ -571,8 +582,8 @@ export class CommonService {
           }
         )
       } else if (Capacitor.getPlatform() === 'ios') {
-        this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
-          this.opener.open(this.file.tempDirectory + filename, "application/pdf");
+        await this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.tempDirectory + filename, "application/pdf");
           await this.loadingService.dismissLoading();
         }).catch(async (error) => {
           await this.loadingService.dismissLoading();

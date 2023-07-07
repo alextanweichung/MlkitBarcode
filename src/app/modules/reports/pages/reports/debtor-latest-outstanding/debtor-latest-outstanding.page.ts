@@ -81,6 +81,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
       isOverdueOnly: this.isOverdueOnly
     }
     this.objectService.getDebtorOutstanding(obj).subscribe(response => {
+      console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:84 ~ DebtorLatestOutstandingPage ~ this.objectService.getDebtorOutstanding ~ response:", response)
       this.objects = response;
       this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
     }, error => {
@@ -103,6 +104,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   async presentAlertViewPdf(object: DebtorOutstanding) {
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:107 ~ DebtorLatestOutstandingPage ~ presentAlertViewPdf ~ object:", object)
     try {
       const alert = await this.alertController.create({
         header: 'Download PDF?',
@@ -130,6 +132,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   async downloadPdf(object: DebtorOutstanding[]) {
+    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:135 ~ DebtorLatestOutstandingPage ~ downloadPdf ~ object:", object)
     if (object && object.length > 0) {
       let paramModel: ReportParameterModel = {
         appCode: 'FAMS002',
