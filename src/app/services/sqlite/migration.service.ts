@@ -66,6 +66,14 @@ DROP TABLE IF EXISTS Item_Master;
 DROP TABLE IF EXISTS Item_Barcode; 
 `;
 
+export const create_draft_transaction: string = `
+CREATE TABLE IF NOT EXISTS DRAFT_TRANSACTIONS ( 
+  DRAFT_TRANSACTIONSId TEXT PRIMARY KEY, 
+  transaction_type VARCHAR(100), 
+  json_data TEXT 
+) 
+`;
+
 @Injectable()
 export class MigrationService {
 
@@ -77,6 +85,7 @@ export class MigrationService {
     // await this.addSystemParamCol();
     await this.deleteInboundTables();
     await this.createInboundTables();
+    // await this.createDraftTrxTable();
   }
 
   async createSystemParamTable(): Promise<void> {
@@ -94,22 +103,6 @@ export class MigrationService {
     await this.sqliteService.closeConnection(dbConfig.idcpcore);
     console.log(`after closeConnection`);
   }
-
-  // async addSystemParamCol(): Promise<void> {
-  //   console.log(`going to create a connection`)
-  //   const db = await this.sqliteService.createConnection(dbConfig.idcpcore, false, "no-encryption", 1);
-  //   console.log(`db ${JSON.stringify(db)}`);
-
-  //   await db.open();
-  //   console.log(`after db.open`);
-
-  //   console.log(`query ${sys_Parameter_Table}`);
-  //   const ret: any = await db.execute(sys_Parameter_Table);
-  //   console.log(`ret: ${JSON.stringify(ret)}`);
-
-  //   await this.sqliteService.closeConnection(dbConfig.idcpcore);
-  //   console.log(`after closeConnection`);
-  // }
 
   async deleteInboundTables(): Promise<void> {
     console.log(`going to create a connection`)
@@ -144,6 +137,22 @@ export class MigrationService {
     console.log(`ret: ${JSON.stringify(ret2)}`);
 
     await this.sqliteService.closeConnection(dbConfig.inbounddb);
+    console.log(`after closeConnection`);
+  }
+
+  async createDraftTrxTable(): Promise<void> {
+    console.log(`going to create a connection`)
+    const db = await this.sqliteService.createConnection(dbConfig.draftdb, false, "no-encryption", 1);
+    console.log(`db ${JSON.stringify(db)}`);
+
+    await db.open();
+    console.log(`after db.open`);
+    
+    console.log(`query ${create_draft_transaction}`);
+    const ret: any = await db.execute(create_draft_transaction);
+    console.log(`ret: ${JSON.stringify(ret)}`);
+
+    await this.sqliteService.closeConnection(dbConfig.draftdb);
     console.log(`after closeConnection`);
   }
 
