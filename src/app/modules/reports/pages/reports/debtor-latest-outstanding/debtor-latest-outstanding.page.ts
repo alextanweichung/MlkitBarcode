@@ -144,6 +144,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
           statementDate: this.trxDate
         }
       }
+      console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:148 ~ DebtorLatestOutstandingPage ~ this.objectService.getPdf ~ paramModel:", paramModel)
       this.objectService.getPdf(paramModel).subscribe(async response => {
         if (object && object.length === 1) {
           await this.commonService.commonDownloadPdf(response, object[0].customerName + "." + paramModel.format);

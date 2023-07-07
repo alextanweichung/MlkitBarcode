@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
+import { dbConfig, draftDb_Tables, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
+import { Draft_Transactions, TransactionType } from 'src/app/shared/models/draft-transaction';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +40,8 @@ export class ConfigService {
     }
   }
 
+  /* #region sys_parameter */
+
   async load() {
     try {
       // for web development
@@ -49,6 +53,7 @@ export class ConfigService {
           // apiUrl: 'https://idcp-testing.motorparts.asia/api/',
           // apiUrl: 'https://idcp-testing.umaracing.com/api/',
           // apiUrl: 'https://idcp.motorparts.asia/api/',
+          // apiUrl: 'https://idcp.umaracing.com/api/',
           // apiUrl: 'https://idcp-ararat.com:8081/api/',
           imgUrl: null,
           lastDownloadAt: null
@@ -64,7 +69,7 @@ export class ConfigService {
         //   lastDownloadAt: null
         // })
         // if (this.sys_parameter && this.sys_parameter.length === 1) {
-          this.selected_sys_param = this.sys_parameter[0];
+        this.selected_sys_param = this.sys_parameter[0];
         // }
       }
       else { // live
@@ -80,7 +85,7 @@ export class ConfigService {
     }
   }
 
-  async insert(object: Sys_Parameter) {
+  async insert_Sys_Parameter(object: Sys_Parameter) {
     try {
       let sys_parameter: Sys_Parameter = {
         Sys_ParameterId: object.Sys_ParameterId,
@@ -96,7 +101,7 @@ export class ConfigService {
     }
   }
 
-  async update(object: Sys_Parameter) {
+  async update_Sys_Parameter(object: Sys_Parameter) {
     try {
       await this.commonQueryService.update(object, "Sys_Parameter", dbConfig.idcpcore);
     } catch (e) {
@@ -104,13 +109,17 @@ export class ConfigService {
     }
   }
 
-  async deleteSys_Param() {
+  async delete_Sys_Parameter() {
     try {
       await this.commonQueryService.delete(this.selected_sys_param, "Sys_Parameter", dbConfig.idcpcore);
     } catch (e) {
       console.error(e);
     }
   }
+
+  /* #endregion */
+
+  /* #region inbound */
 
   async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
     try {
@@ -126,7 +135,7 @@ export class ConfigService {
     try {
       let obj = this.selected_sys_param;
       obj.lastDownloadAt = new Date;
-      await this.update(obj);
+      await this.update_Sys_Parameter(obj);
     } catch (e) {
       console.log(JSON.stringify(e));
     }
@@ -151,5 +160,42 @@ export class ConfigService {
       console.error(e);
     }
   }
+
+  /* #endregion */
+
+  /* #region  */
+
+  async insertDraftTransaction(object: any, trx_type: TransactionType) {
+    let json = JSON.stringify(object);
+    let data: Draft_Transactions = {
+      DRAFT_TRANSACTIONSId: uuidv4(),
+      transaction_type: trx_type,
+      json_data: json
+    }
+    await this.commonQueryService.insert(data, draftDb_Tables.draft_Transactions, dbConfig.draftdb);
+  }
+  
+  async updateDraftTransaction(object: any, draftId: string, trx_type: TransactionType) {
+    let json = JSON.stringify(object);
+    let data: Draft_Transactions = {
+      DRAFT_TRANSACTIONSId: draftId,
+      transaction_type: trx_type,
+      json_data: json      
+    }
+    console.log("🚀 ~ file: config.service.ts:185 ~ ConfigService ~ updateDraftTransaction ~ data:", JSON.stringify(data))
+    await this.commonQueryService.update(data, draftDb_Tables.draft_Transactions, dbConfig.draftdb);
+  }
+
+  async loadDraftTransaction(trx_type: TransactionType): Promise<Draft_Transactions[]> {
+    let ret = await this.commonQueryService.selectAll(draftDb_Tables.draft_Transactions, dbConfig.draftdb) as Draft_Transactions[];
+    console.log("🚀 ~ file: config.service.ts:179 ~ ConfigService ~ loadDraftTransaction ~ ret:", JSON.stringify(ret))
+    if (ret === null) {
+      return [];
+    } else {
+      return await ret.filter(r => r.transaction_type === trx_type);
+    }
+  }
+
+  /* #endregion */
 
 }

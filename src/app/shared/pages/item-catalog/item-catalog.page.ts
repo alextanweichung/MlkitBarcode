@@ -114,12 +114,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                 this.assignTrxItemToDataLine(r)
               }
             })
-            this.computeQtyInCart();
           } else {
             this.startIndex = this.availableItems.length;
           }
           this.availableItems = [...this.availableItems, ...rrr];
           this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+          this.computeQtyInCart();
         })
         this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
       } else {
@@ -174,6 +174,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         }
       })
     }
+    console.log("🚀 ~ file: item-catalog.page.ts:164 ~ ItemCatalogPage ~ computeQtyInCart ~ this.availableItems:", this.availableItems)
   }
 
   browseBy: string[];
@@ -196,6 +197,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   /* #region  unit price, tax, discount */
 
   assignTrxItemToDataLine(item: TransactionDetail) {
+    console.log("🚀 ~ file: item-catalog.page.ts:201 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ this.maxPrecision:", this.maxPrecision)
     if (this.useTax) {
       if (this.isItemPriceTaxInclusive) {
         item.unitPrice = item.itemPricing.unitPrice;

@@ -230,7 +230,7 @@ export class CommonQueryService<T> {
 
       for (const key of cols.keys()) {
         if (key.toLowerCase() === (table.toLowerCase() + "id")) {
-          primaryKey += ` ${key} = ${cols.get(key)}`;
+          primaryKey += ` ${key} = '${cols.get(key)}'`;
         } else {
           switch (this.getColType(cols.get(key))) {
             case "number":
@@ -421,6 +421,11 @@ export class CommonQueryService<T> {
       console.error(e);
     }
   }
+
+  /* #endregion */
+
+  /* #region  */
+
 
   /* #endregion */
 

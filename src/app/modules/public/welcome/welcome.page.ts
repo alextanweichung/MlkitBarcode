@@ -109,7 +109,7 @@ export class WelcomePage implements OnInit, AfterContentChecked {
                 username: '',
                 password: ''
               }
-              await this.configService.insert(config).then(async response => {
+              await this.configService.insert_Sys_Parameter(config).then(async response => {
                 this.navController.navigateRoot('/signin');
               }).catch(async error => {
                 this.toastService.presentToast(error.message, '', 'top', 'danger', 1000);

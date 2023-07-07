@@ -116,7 +116,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
               role: 'confirm',
               handler: async () => {
                 if (this.configService.selected_sys_param) {
-                  await this.configService.deleteSys_Param();
+                  await this.configService.delete_Sys_Parameter();
                   await this.configService.load();
                   await this.signin_form.patchValue({ apiUrl: this.configService.selected_sys_param.apiUrl });
                   await this.setSelectedParam();
@@ -170,7 +170,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
             this.configService.selected_sys_param.username = '';
             this.configService.selected_sys_param.password = '';
           }
-          await this.configService.update(this.configService.selected_sys_param);
+          await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
           try {
             // download item master
             let response = await this.commonService.syncInbound();
