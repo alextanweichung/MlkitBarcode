@@ -40,8 +40,6 @@
     <ion-content>
       <div class="p-2">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none" *ngIf="tempDropdownList.length > 0">
-
-
           <ion-item button detail="false" *ngFor="let item of tempDropdownList" (click)="chooseThis(item)">
             <div slot="start">
               <ion-grid class="ion-no-padding">

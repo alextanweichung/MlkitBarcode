@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { RpSalesPerformancePageRoutingModule } from './rp-sales-performance-routing.module';
 
-import { RpSalesPerformancePage } from './rp-sales-performance';
+import { RpSalesPerformancePage } from './rp-sales-performance.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { CalendarInputPageModule } from '../../../../../shared/pages/calendar-input/calendar-input.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';

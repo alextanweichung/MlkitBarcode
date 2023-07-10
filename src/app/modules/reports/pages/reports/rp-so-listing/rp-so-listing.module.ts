@@ -8,6 +8,8 @@ import { RpSoListingPageRoutingModule } from './rp-so-listing-routing.module';
 
 import { RpSoListingPage } from './rp-so-listing.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
+import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 
 @NgModule({
   imports: [
@@ -15,7 +17,9 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
     FormsModule,
     IonicModule,
     RpSoListingPageRoutingModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    SearchMultiDropdownPageModule,
+    CalendarInputPageModule
   ],
   declarations: [RpSoListingPage]
 })

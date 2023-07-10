@@ -12,14 +12,14 @@
       <ion-button (click)="apply()">
         Apply
       </ion-button>
-    </ion-buttons>    
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content>
   <div class="p-2">
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label class="pl-2">Transaction Date</ion-label>
-    </ion-list-header>    
+    </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item>
         <ion-label>
@@ -40,25 +40,44 @@
         <ion-input readonly slot="end" type="text" placeholder="Date to" class="ion-text-right ion-no-padding-end" (click)="toggleDateTo()" [(ngModel)]="date_to"></ion-input>
       </ion-item>
       <ion-datetime #ionDateTo class="animate__animated animate__fadeIn" *ngIf="date_to_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onDateToSelect($event)" [value]="endDate.toISOString()" [preferWheel]="true">
-      <ion-buttons slot="buttons">
-        <ion-button color="danger" (click)="ionDateTo.cancel(); date_to_active=false">Cancel</ion-button>
-        <ion-button color="primary" (click)="ionDateTo.confirm()">Done</ion-button>
-      </ion-buttons>
+        <ion-buttons slot="buttons">
+          <ion-button color="danger" (click)="ionDateTo.cancel(); date_to_active=false">Cancel</ion-button>
+          <ion-button color="primary" (click)="ionDateTo.confirm()">Done</ion-button>
+        </ion-buttons>
       </ion-datetime>
-    </ion-list>    
+    </ion-list>
+
     <div *ngIf="customerFilter">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label class="pl-2">Customer</ion-label>
       </ion-list-header>
-      <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <app-search-multi-dropdown #appsMultiDropdown title="Customer" [showHeaderLabel]="false" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)" [selectedIds]="selectedCustomerId"></app-search-multi-dropdown>
-    </div>    
+      </ion-list>
+    </div>
+
     <div *ngIf="salesAgentFilter">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label class="pl-2">Sales Agent</ion-label>
       </ion-list-header>
-      <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
-      <app-search-multi-dropdown title="Sales Agent" [showHeaderLabel]="false" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="salesAgentList" (onActionComplete)="onSalesAgentSelected($event)" [selectedIds]="selectedSalesAgentId"></app-search-multi-dropdown>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <app-search-multi-dropdown title="Sales Agent" [showHeaderLabel]="false" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="salesAgentList"
+        (onActionComplete)="onSalesAgentSelected($event)" [selectedIds]="selectedSalesAgentId"></app-search-multi-dropdown>
+      </ion-list>
+    </div>
+
+    <div *ngIf="useDraft">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label class="pl-2">Other</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item>
+          <ion-label>
+            <div>Show Draft Only</div>
+          </ion-label>
+          <ion-checkbox [(ngModel)]="showDraftOnly"></ion-checkbox>
+        </ion-item>
+      </ion-list>
     </div>
   </div>
 </ion-content>

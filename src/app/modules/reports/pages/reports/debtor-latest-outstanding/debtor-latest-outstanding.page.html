@@ -32,7 +32,7 @@
 <ion-content>
   <div class="p-2" style="overflow:auto">
     <ion-list class="list-custom" lines="none">
-      <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"  [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>      
+      <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"  [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>
       <ion-item class="ion-flex ion-flex-center" lines="none">
         <ion-checkbox slot="end" [(ngModel)]="isOverdueOnly"></ion-checkbox>
         <ion-label>

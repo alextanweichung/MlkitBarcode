@@ -14,6 +14,9 @@ export interface SalesOrderList {
   otherAmountCount: number
   deactivated: boolean
   createdById: number
+  
+  isDraft: boolean
+  draftTransactionId: number
 }
 
 export interface SalesOrderRoot {

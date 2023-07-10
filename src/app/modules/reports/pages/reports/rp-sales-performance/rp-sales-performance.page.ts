@@ -76,4 +76,23 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
     }
   }
 
+  calculateSummaryValue(columnProp: string): number {
+    console.log("🚀 ~ file: rp-sales-performance.page.ts:80 ~ RpSalesPerformancePage ~ calculateSummaryValue ~ columnProp:", columnProp)
+    let summaryValue = 0;
+    if (columnProp !== 'salesAgentName') {
+      // Calculate summary value for 'age' column
+      const ages = this.objects.map((item) => item[columnProp]);
+      summaryValue = ages.reduce((acc, age) => acc + age, 0);
+    }
+    // Add more conditions for other columns if needed
+    return summaryValue;
+  }
+
+  // customSummaryFunc = (cells: any[]) => {
+  //   console.log("🚀 ~ file: rp-sales-performance.page.ts:80 ~ RpSalesPerformancePage ~ cells:", cells)
+  //   // Custom summary calculation logic
+  //   const sum = cells.reduce((total, cell) => total + cell, 0);
+  //   return `Total: ${sum}`;
+  // };
+
 }

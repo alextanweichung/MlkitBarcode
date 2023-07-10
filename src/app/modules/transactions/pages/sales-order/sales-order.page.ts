@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DoCheck, IterableDiffers, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonPopover, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList, SalesOrderRoot } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
@@ -11,16 +11,19 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { Capacitor } from '@capacitor/core';
+import { DraftTransactionService } from 'src/app/shared/services/draft-transaction.service';
+import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 
 @Component({
   selector: 'app-sales-order',
   templateUrl: './sales-order.page.html',
   styleUrls: ['./sales-order.page.scss']
 })
-export class SalesOrderPage implements OnInit, ViewWillEnter {
+export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
+  private objectDiffer: any;
   objects: SalesOrderList[] = [];
+  draftObjects: DraftTransaction[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -35,27 +38,48 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
     private authService: AuthService,
     private commonService: CommonService,
     private objectService: SalesOrderService,
+    private draftObjectService: DraftTransactionService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private differs: IterableDiffers
   ) {
     // reload all masterlist whenever user enter listing
     this.objectService.loadRequiredMaster();
+    this.objectDiffer = this.differs.find(this.objects).create();
+  }
+
+  ngDoCheck(): void {
+    const objectChanges = this.objectDiffer.diff(this.objects);
+    if (objectChanges) {
+      this.bindUniqueGrouping();
+    }
   }
 
   ionViewWillEnter(): void {
+    this.objectService.resetVariables();
     this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      console.log("🚀 ~ file: sales-order.page.ts:55 ~ SalesOrderPage ~ ionViewWillEnter ~ this.startDate:", this.startDate)
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
+      console.log("🚀 ~ file: sales-order.page.ts:59 ~ SalesOrderPage ~ ionViewWillEnter ~ this.endDate:", this.endDate)
     }
     this.bindCustomerList();
     this.bindSalesAgentList();
-    this.loadObjects();
+  }
+
+  ionViewDidEnter(): void {
+    if (this.showDraftOnly) {
+      this.loadDraftObjects();
+    } else {
+      this.loadObjects();
+      this.loadDraftObjects();
+    }
   }
 
   ngOnInit() {
@@ -66,7 +90,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   async loadObjects() {
     try {
-      let obj: SalesSearchModal =  {
+      let obj: SalesSearchModal = {
         dateStart: format(this.startDate, 'yyyy-MM-dd'),
         dateEnd: format(this.endDate, 'yyyy-MM-dd'),
         customerId: this.customerIds,
@@ -74,15 +98,47 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
       }
       this.objectService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = [...this.objects, ...response];
-        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-        this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-        await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, async error => {
         throw error;
       })
     } catch (error) {
       this.toastService.presentToast('', 'Error loading object.', 'top', 'danger', 1000);
+    }
+  }
+
+  loadDraftObjects() {
+    try {
+      this.draftObjectService.getObjects("SALESORDER").subscribe(async response => {
+        this.draftObjects = response;
+        for (let index = 0; index < this.draftObjects.length; index++) {
+          const element = this.draftObjects[index];
+          let objRoot: SalesOrderRoot = JSON.parse(element.jsonData);
+          objRoot.header = this.commonService.convertObjectAllDateType(objRoot.header);
+          let obj: SalesOrderList = {
+            salesOrderId: objRoot.header.salesOrderId,
+            salesOrderNum: element.draftTransactionNum,
+            trxDate: objRoot.header.trxDate,
+            customerName: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.description,
+            salesAgentName: await this.objectService.salesAgentMasterList.find(r => r.id === objRoot.header.salesAgentId)?.description,
+            countryDescription: null,
+            currencyCode: await this.objectService.currencyMasterList.find(r => r.id === objRoot.header.currencyId)?.code,
+            grandTotal: objRoot.details.flatMap(r => r.subTotal).reduce((a, c) => a + c, 0),
+            qty: objRoot.details.flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0),
+            otherAmountCount: objRoot.otherAmount?.length,
+            deactivated: objRoot.header.deactivated,
+            createdById: objRoot.header.createdById,
+            isDraft: true,
+            draftTransactionId: element.draftTransactionId
+          }
+          this.objects = [...this.objects, obj];
+        }
+        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+      }, async error => {
+        throw error;
+      })
+    } catch (error) {
+      this.toastService.presentToast('', 'Error loading draft object.', 'top', 'danger', 1000);
     }
   }
 
@@ -111,6 +167,12 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
         description: r.description
       })
     })
+  }
+
+  async bindUniqueGrouping() {
+    let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
+    this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
+    await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
   }
 
   /* #endregion */
@@ -201,6 +263,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
+  showDraftOnly: boolean = false;
   async filter() {
     try {
       const modal = await this.modalController.create({
@@ -213,29 +276,41 @@ export class SalesOrderPage implements OnInit, ViewWillEnter {
           selectedCustomerId: this.customerIds,
           salesAgentFilter: true,
           salesAgentList: this.salesAgentDropdownList,
-          selectedSalesAgentId: this.salesAgentIds
+          selectedSalesAgentId: this.salesAgentIds,
+          useDraft: true,
+          showDraftOnly: this.showDraftOnly
         },
         canDismiss: true
       })
       await modal.present();
       let { data } = await modal.onWillDismiss();
       if (data && data !== undefined) {
+        this.objects = [];
+        this.uniqueGrouping = [];
         this.startDate = new Date(data.startDate);
         this.endDate = new Date(data.endDate);
         this.customerIds = data.customerIds;
         this.salesAgentIds = data.salesAgentIds;
-        this.loadObjects();
+        this.showDraftOnly = data.showDraftOnly ?? false;
+        if (data.showDraftOnly) {
+          this.loadDraftObjects();
+        } else {
+          this.loadObjects();
+          this.loadDraftObjects();
+        }
       }
     } catch (e) {
       console.error(e);
     }
   }
 
-  goToDetail(objectId: number) {
+  goToDetail(objectId: number, isDraft: boolean, draftTransactionId: number) {
     try {
       let navigationExtras: NavigationExtras = {
         queryParams: {
           objectId: objectId,
+          isDraft: isDraft,
+          draftTransactionId: draftTransactionId
         }
       }
       this.navController.navigateForward('/transactions/sales-order/sales-order-detail', navigationExtras);

@@ -3,28 +3,41 @@ import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportSOListing } from '../../../models/rp-so-listing';
 import { ReportsService } from '../../../services/reports.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ViewWillEnter } from '@ionic/angular';
+import { Customer } from 'src/app/modules/transactions/models/customer';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-rp-so-listing',
   templateUrl: './rp-so-listing.page.html',
   styleUrls: ['./rp-so-listing.page.scss'],
 })
-export class RpSoListingPage implements OnInit {
+export class RpSoListingPage implements OnInit, ViewWillEnter {
 
+  customers: Customer[] = [];
+  customerSearchDropdownList: SearchDropdownList[] = [];
   objects: ReportSOListing[] = [];
+  isOverdueOnly: boolean = false;
 
   data: any;
   columns: any;
 
   constructor(
-    private reportService: ReportsService,
+    private objectService: ReportsService,
     private commonService: CommonService,
     private alertController: AlertController
   ) { }
 
+  ionViewWillEnter(): void {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
+  }
+
   ngOnInit() {
-    this.loadObjects();
+    this.loadCustomers();
     this.columns = [
       { prop: 'issuedDate', name: 'Issued Date', draggable: false },
       { prop: 'debtorCode', name: 'Debtor Code', draggable: false },
@@ -39,15 +52,47 @@ export class RpSoListingPage implements OnInit {
     ]
   }
 
-  loadObjects() {
-    try {
-      this.reportService.getSOListing().subscribe(response => {
-        this.objects = response;
-      }, error => {
-        throw error;
+  loadCustomers() {
+    this.objectService.getCustomers().subscribe(async response => {
+      this.customers = response;
+      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+      this.customers.forEach(r => {
+        this.customerSearchDropdownList.push({
+          id: r.customerId,
+          code: r.customerCode,
+          oldCode: r.oldCustomerCode,
+          description: r.name
+        })
       })
-    } catch (e) {
-      console.error(e);
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  loadObjects() {
+    let obj: DebtorOutstandingRequest = { // sharing same report request parameter
+      customerId: this.customerIds ?? [],
+      trxDate: format(this.trxDate, 'yyyy-MM-dd'),
+      isOverdueOnly: this.isOverdueOnly
+    }
+    this.objectService.getSOListing(obj).subscribe(response => {
+      this.objects = response;
+    }, error => {
+      throw error;
+    })
+  }
+
+  customerIds: number[];
+  onCustomerSelected(event: any[]) {
+    if (event && event !== undefined) {
+      this.customerIds = event.flatMap(r => r.id);
+    }
+  }
+
+  trxDate: Date = null;
+  onDateSelected(event) {
+    if (event) {
+      this.trxDate = event;
     }
   }
 
@@ -60,7 +105,7 @@ export class RpSoListingPage implements OnInit {
         documentIds: [Number(objectId)],
         reportName: 'Sales Order'
       }
-      this.reportService.getPdf(paramModel).subscribe(async response => {
+      this.objectService.getPdf(paramModel).subscribe(async response => {
         await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format).then((ret) => {
           this.error = ret;
         }).catch(error => {
@@ -137,7 +182,7 @@ export class RpSoListingPage implements OnInit {
       documentIds: [Number(objectId)],
       reportName: 'Delivery Order'
     }
-    this.reportService.getPdf(paramModel).subscribe(async response => {
+    this.objectService.getPdf(paramModel).subscribe(async response => {
       await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format);
     }, error => {
       throw error;

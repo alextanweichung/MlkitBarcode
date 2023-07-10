@@ -31,8 +31,8 @@ export class ReportsService {
     return this.http.post<DebtorOutstanding[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/lastOutstanding", object);
   }
 
-  getSOListing() {
-    return this.http.get<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing");
+  getSOListing(object: DebtorOutstandingRequest) {
+    return this.http.post<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing", object);
   }
 
   getSAPerformance() {

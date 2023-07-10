@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
@@ -12,6 +12,8 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { TrxChild } from 'src/app/shared/models/trx-child';
+import { DraftTransactionService } from 'src/app/shared/services/draft-transaction.service';
+import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -20,16 +22,21 @@ import { TrxChild } from 'src/app/shared/models/trx-child';
 })
 export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
-  objectId: number
+  objectId: any;
   object: SalesOrderRoot;
   processType: string;
   selectedSegment: string;
+
+  isDraft: boolean = false;
+  draftTransactionId: number;
+  draftObject: DraftTransaction;
 
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
     public objectService: SalesOrderService,
+    private draftObjectService: DraftTransactionService,
     private alertController: AlertController,
     private toastService: ToastService,
     private commonService: CommonService
@@ -39,6 +46,13 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         this.objectId = params['objectId'];
         this.processType = params['processType'];
         this.selectedSegment = params['selectedSegment'];
+
+        this.isDraft = params['isDraft'];
+        console.log("🚀 ~ file: sales-order-detail.page.ts:47 ~ SalesOrderDetailPage ~ this.isDraft:", this.isDraft)
+        if (this.isDraft) {
+          this.draftTransactionId = params['draftTransactionId'];
+          console.log("🚀 ~ file: sales-order-detail.page.ts:50 ~ SalesOrderDetailPage ~ this.draftTransactionId:", this.draftTransactionId)
+        }
       })
     } catch (e) {
       console.error(e);
@@ -46,12 +60,14 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
-    
+
   }
 
   ngOnInit() {
-    if (this.objectId > 0) {
+    if (this.objectId && this.objectId > 0) {
       this.loadObject();
+    } else if (this.isDraft && this.draftTransactionId && this.draftTransactionId > 0) {
+      this.loadDraftObject();
     } else {
       this.toastService.presentToast('', 'Invalid Sales Order.', 'top', 'warning', 1000);
       this.navController.navigateBack('/transactions/sales-order');
@@ -85,6 +101,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
           this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
         }
         this.loadWorkflow(this.object.header.salesOrderId);
+        this.objectService.setHeader(this.object.header);
+        this.objectService.setChoosenItems(this.object.details);
       }, error => {
         throw error;
       })
@@ -144,9 +162,26 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     })
   }
 
+  loadDraftObject() {
+    this.draftObjectService.getObject(this.draftTransactionId).subscribe(response => {
+      this.draftObject = response;
+      this.object = JSON.parse(this.draftObject.jsonData) as SalesOrderRoot;
+      this.object.header.salesOrderNum = this.draftObject.draftTransactionNum;
+      this.isDraft = true;
+      this.objectService.setHeader(this.object.header);
+      this.objectService.setChoosenItems(this.object.details);
+      this.objectService.setDraftObject(this.draftObject);
+    }, error => {
+      console.error(error);
+    })
+  }
+
   editObject() {
     this.objectService.setHeader(this.object.header);
     this.objectService.setChoosenItems(this.object.details);
+    if (this.isDraft) {
+      this.objectService.setDraftObject(this.draftObject);
+    }
     let navigationExtras: NavigationExtras = {
       queryParams: {
         objectId: this.object.header.salesOrderId
@@ -273,7 +308,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
   /* #region approve reject */
 
-  async presentConfirmAlert(action: string) {
+  async presentApprovalAlert(action: string) {
     try {
       if (this.processType && this.selectedSegment) {
         const alert = await this.alertController.create({
@@ -400,6 +435,82 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /* #endregion */
+
+  /* #region from draft to confirm so */
+
+  async presentConfirmAlert() {
+    try {
+      if (this.objectService.itemInCart.length > 0) {
+        const alert = await this.alertController.create({
+          header: "Are you sure to proceed?",
+          subHeader: "This will delete Draft & Generate SO",
+          buttons: [
+            {
+              text: 'OK',
+              cssClass: 'success',
+              role: 'confirm',
+              handler: async () => {
+                  await this.insertObject();
+              },
+            },
+            {
+              text: 'Cancel',
+              cssClass: 'cancel',
+              role: 'cancel'
+            },
+          ],
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async insertObject() {
+    try {
+      let trxDto: SalesOrderRoot = {
+        header: this.objectService.header,
+        details: this.objectService.itemInCart
+      }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      trxDto.header.salesOrderNum = null; // always default to null when insert
+      if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
+        this.draftObjectService.toggleObject(this.objectService.draftObject.draftTransactionId).subscribe(response => {
+          if (response.status === 204) {
+
+          }
+        }, error => {
+          console.error(error);
+        })
+      }
+      this.objectService.insertObject(trxDto).subscribe(response => {
+        this.objectService.setObject((response.body as SalesOrderRoot));
+        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
+      }, error => {
+        throw error;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  checkPricingApprovalLines(trxDto: SalesOrderRoot, trxLineArray: TransactionDetail[]) {
+    let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
+    filteredData = filteredData.filter(x => !x.isPromoImpactApplied);
+    if (filteredData.length > 0) {
+      filteredData.forEach(x => { x.isPricingApproval = true });
+      trxDto.header.isPricingApproval = true;
+    } else {
+      trxDto.header.isPricingApproval = false;
+    }
+    return trxDto;
   }
 
   /* #endregion */

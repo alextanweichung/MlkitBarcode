@@ -19,49 +19,55 @@
             <div>Edit</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="!(object.isWorkFlowDone??false)" (click)="popover.dismiss(); toggleObject();">
+        <ion-item *ngIf="!(object?.isWorkFlowDone??false) && isDraft" (click)="popover.dismiss(); presentConfirmAlert();">
+          <ion-icon name="checkmark-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Confirm</div>
+          </ion-label>
+        </ion-item>
+        <ion-item *ngIf="!(object.isWorkFlowDone??false) && !isDraft" (click)="popover.dismiss(); toggleObject();">
           <ion-icon [name]="object.header.deactivated ? 'checkmark-circle-outline' : 'close-circle-outline'" slot="end"></ion-icon>
           <ion-label>
             <div>{{object.header.deactivated?'Enable':'Disable'}}</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); showHistoryModal()">
+        <ion-item *ngIf="!isDraft" (click)="popover.dismiss(); showHistoryModal()">
           <ion-icon name="time-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approval History</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="object.isWorkFlowDone??false" (click)="popover.dismiss(); presentAlertViewPdf('Sales Order')">
+        <ion-item *ngIf="object.isWorkFlowDone??false && !isDraft" (click)="popover.dismiss(); presentAlertViewPdf('Sales Order')">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Sales Order</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); presentAlertViewPdf('Proforma Invoice')">
+        <ion-item *ngIf="!isDraft" (click)="popover.dismiss(); presentAlertViewPdf('Proforma Invoice')">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Proforma Invoice</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); showStatus()">
+        <ion-item *ngIf="!isDraft" (click)="popover.dismiss(); showStatus()">
           <ion-icon name="reader-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Status</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('CONFIRM')">
+        <ion-item *ngIf="processType && selectedSegment === 'pending' && !isDraft" (click)="popover.dismiss(); presentApprovalAlert('CONFIRM')">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Approve</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('REJECT')">
+        <ion-item *ngIf="processType && selectedSegment === 'pending' && !isDraft" (click)="popover.dismiss(); presentApprovalAlert('REJECT')">
           <ion-icon name="close-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reject</div>
           </ion-label>
         </ion-item>
-        <ion-item *ngIf="processType && selectedSegment === 'completed'" (click)="popover.dismiss(); presentConfirmAlert('REVERSE')">
+        <ion-item *ngIf="processType && selectedSegment === 'completed' && !isDraft" (click)="popover.dismiss(); presentApprovalAlert('REVERSE')">
           <ion-icon name="arrow-undo-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Reverse</div>

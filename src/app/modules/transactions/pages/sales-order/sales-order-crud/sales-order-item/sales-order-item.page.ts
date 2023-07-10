@@ -300,7 +300,9 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       if (role === 'confirm') {
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: this.objectService.header.salesOrderId
+            objectId: this.objectService.header.salesOrderId,
+            isDraft: this.objectService.isDraft,
+            draftTransactionId: this.objectService.draftObject ? this.objectService.draftObject.draftTransactionId : null
           }
         }
         this.navController.navigateRoot('/transactions/sales-order/sales-order-detail', navigationExtras);

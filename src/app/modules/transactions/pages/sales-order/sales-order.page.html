@@ -18,13 +18,9 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ng-container *ngIf="!objects || objects?.length === 0">
-      <p>
-        <ion-text color="tertiary">
-          <h3>Nothing found!</h3>
-        </ion-text>
-      </p>
-    </ng-container>
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
+      <ion-label>Nothing found!</ion-label>
+    </ion-list-header>
     <ng-container *ngIf="objects?.length > 0">
       <div *ngFor="let m of uniqueGrouping">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
@@ -32,12 +28,13 @@
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
           <ion-item-sliding #slidingItem *ngFor="let object of getObjects(m)">
-            <ion-item [button]="false" [detail]="false" class="ion-no-padding" (click)="goToDetail(object.salesOrderId)" lines="full">
+            <ion-item [button]="false" [detail]="false" class="ion-no-padding" (click)="goToDetail(object.salesOrderId, object.isDraft, object.draftTransactionId)" lines="full">
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
                   <ion-col class="ion-flex ion-margin-auto font-bold">
-                    {{object.salesOrderNum}} 
-                    <ion-icon class="ion-flex ml-2" name="ellipse" [class]="object.deactivated?'color-danger':'color-success'"></ion-icon>
+                    <ion-icon class="ion-flex mr-2" name="ellipse" [class]="object.deactivated?'color-danger':'color-success'"></ion-icon>
+                    <div class="ion-flex mr-2">{{object.salesOrderNum}}</div>
+                    <span class="badge-green ion-text-wrap ion-flex my-auto" *ngIf="object.isDraft"> DRAFT</span>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
                 </ion-row>
@@ -46,7 +43,9 @@
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.salesAgentName}}</ion-col>
                 </ion-row>
                 <ion-row *ngIf="object.otherAmountCount && object.otherAmountCount > 0">
-                  <ion-col class="ion-flex ion-margin-auto"><ion-icon name="star" class="ion-flex" color="success"></ion-icon><div class="ion-flex ion-text-wrap ml-1">Charges Assigned</div>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <ion-icon class="ion-flex mr-2" name="star" color="success"></ion-icon>
+                    <div class="ion-flex ion-text-wrap">Charges Assigned</div>
                   </ion-col>
                 </ion-row>
               </ion-grid>

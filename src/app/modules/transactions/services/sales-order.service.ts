@@ -18,6 +18,7 @@ import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { map } from 'rxjs/operators';
 import { TrxChild } from 'src/app/shared/models/trx-child';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -47,9 +48,7 @@ export class SalesOrderService {
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) {
-
-  }
+  ) { }
 
   async loadRequiredMaster() {
     await this.loadMasterList();
@@ -108,6 +107,13 @@ export class SalesOrderService {
     this.object = object;
   }
 
+  isDraft: boolean = false;
+  draftObject: DraftTransaction;
+  setDraftObject(draftObject: DraftTransaction) {
+    this.isDraft = true;
+    this.draftObject = draftObject;
+  }
+
   removeCustomer() {
     this.header = null;
   }
@@ -120,10 +126,16 @@ export class SalesOrderService {
     this.object = null;
   }
 
+  removeDraftObject() {
+    this.isDraft = false;
+    this.draftObject = null;
+  }
+
   resetVariables() {
     this.removeCustomer();
     this.removeItems();
     this.removeObject();
+    this.removeDraftObject();
   }
 
   hasSalesAgent(): boolean {

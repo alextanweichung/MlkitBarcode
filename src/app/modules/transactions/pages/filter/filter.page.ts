@@ -27,6 +27,9 @@ export class FilterPage implements OnInit {
   salesAgentFilter: boolean = false;
   salesAgentList: SearchDropdownList[] = [];
 
+  useDraft: boolean = false;
+  showDraftOnly: boolean = true;
+
   constructor(
     private commonService: CommonService,
     private modalController: ModalController
@@ -93,11 +96,11 @@ export class FilterPage implements OnInit {
   apply() {
     // Add filter logic here...
     // ...
-    if (this.customerFilter || this.salesAgentFilter) {
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId };
-    } else {
-      this.filters = { startDate: this.startDate, endDate: this.endDate };
-    }
+    // if (this.customerFilter || this.salesAgentFilter) {
+    this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly };
+    // } else {
+    //   this.filters = { startDate: this.startDate, endDate: this.endDate };
+    // }
 
     // Dismiss modal and apply filters
     this.modalController.dismiss(this.filters);

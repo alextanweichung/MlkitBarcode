@@ -4,12 +4,14 @@ import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order'
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { DraftTransactionService } from 'src/app/shared/services/draft-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 
 @Component({
@@ -26,6 +28,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   constructor(
     private authService: AuthService,
     public objectService: SalesOrderService,
+    private draftObjectService: DraftTransactionService,
     private commonService: CommonService,
     private promotionEngineService: PromotionEngineService,
     private toastService: ToastService,
@@ -446,6 +449,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
           header: "Are you sure to proceed?",
+          subHeader: (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) ? "This will delete Draft & Generate SO" : "",
           buttons: [
             {
               text: 'OK',
@@ -482,6 +486,16 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         details: this.objectService.itemInCart
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      trxDto.header.salesOrderNum = null; // always default to null when insert
+      if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
+        this.draftObjectService.toggleObject(this.objectService.draftObject.draftTransactionId).subscribe(response => {
+          if (response.status === 204) {
+
+          }
+        }, error => {
+          console.error(error);
+        })
+      }
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
@@ -509,6 +523,95 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     });
   } catch(e) {
     console.error(e);
+  }
+
+  /* #endregion */
+
+  /* #region draft step */
+
+  async nextStepDraft() {
+    try {
+      if (this.objectService.itemInCart.length > 0) {
+        const alert = await this.alertController.create({
+          header: "Save as Draft?",
+          buttons: [
+            {
+              text: 'OK',
+              cssClass: 'success',
+              role: 'confirm',
+              handler: async () => {
+                if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
+                  await this.updateObjectAsDraft();
+                } else {
+                  await this.insertObjectAsDraft();
+                }
+              },
+            },
+            {
+              text: 'Cancel',
+              cssClass: 'cancel',
+              role: 'cancel'
+            },
+          ],
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  
+  insertObjectAsDraft() {
+    try {
+      let trxDto: SalesOrderRoot = {
+        header: this.objectService.header,
+        details: this.objectService.itemInCart
+      }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      let object: DraftTransaction = {
+        draftTransactionId: 0,
+        draftTransactionNum: null,
+        transactionType: "SALESORDER",
+        jsonData: JSON.stringify(trxDto)
+      }
+
+      this.draftObjectService.insertObject(object).subscribe(response => {
+        let ret: DraftTransaction = response.body as DraftTransaction;
+        let soObj = JSON.parse(ret.jsonData) as SalesOrderRoot;
+        soObj.header.salesOrderNum = ret.draftTransactionNum;
+        this.objectService.setObject(soObj);
+        this.toastService.presentToast('Insert Draft Complete', '', 'top', 'success', 1000);
+        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
+      }, error => {
+        throw error;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  updateObjectAsDraft() {
+    try {
+      let trxDto: SalesOrderRoot = {
+        header: this.objectService.header,
+        details: this.objectService.itemInCart
+      }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      this.objectService.draftObject.jsonData = JSON.stringify(trxDto);
+      this.draftObjectService.updateObject(this.objectService.draftObject).subscribe(response => {
+        console.log("🚀 ~ file: sales-order-cart.page.ts:592 ~ SalesOrderCartPage ~ this.draftObjectService.insertObject ~ response:", response)
+        let ret: DraftTransaction = response.body as DraftTransaction
+        this.objectService.setObject(JSON.parse(ret.jsonData) as SalesOrderRoot);
+        this.toastService.presentToast('Update Draft Complete', '', 'top', 'success', 1000);
+        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
+      }, error => {
+        throw error;
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
