@@ -84,20 +84,20 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
 
   countSum(field: string) {
     let sum = 0;
-    switch(field) {
-      case "invoiceAmt":
-        sum = this.objects.flatMap(r => r.invoiceAmt).reduce((total, cell) => total + cell, 0);
-        break;
-        case "cnAmount":
-          sum = this.objects.flatMap(r => r.cnAmount).reduce((total, cell) => total + cell, 0);
-          break;
-          case "soAmount":
-            sum = this.objects.flatMap(r => r.soAmount).reduce((total, cell) => total + cell, 0);
-            break;
-            case "netAmount":
-              sum = this.objects.flatMap(r => r.netAmount).reduce((total, cell) => total + cell, 0);
-              break;
-    }
+    // switch(field) {
+    //   case "invoiceAmt":
+        sum = this.objects.flatMap(r => r[field]).reduce((total, cell) => total + cell, 0);
+        // break;
+        // case "cnAmount":
+        //   sum = this.objects.flatMap(r => r.cnAmount).reduce((total, cell) => total + cell, 0);
+        //   break;
+        //   case "soAmount":
+        //     sum = this.objects.flatMap(r => r.soAmount).reduce((total, cell) => total + cell, 0);
+        //     break;
+        //     case "netAmount":
+        //       sum = this.objects.flatMap(r => r.netAmount).reduce((total, cell) => total + cell, 0);
+        //       break;
+    // }
     return Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
   }
