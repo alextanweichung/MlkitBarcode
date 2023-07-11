@@ -76,23 +76,30 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
     }
   }
 
-  calculateSummaryValue(columnProp: string): number {
-    console.log("🚀 ~ file: rp-sales-performance.page.ts:80 ~ RpSalesPerformancePage ~ calculateSummaryValue ~ columnProp:", columnProp)
-    let summaryValue = 0;
-    if (columnProp !== 'salesAgentName') {
-      // Calculate summary value for 'age' column
-      const ages = this.objects.map((item) => item[columnProp]);
-      summaryValue = ages.reduce((acc, age) => acc + age, 0);
-    }
-    // Add more conditions for other columns if needed
-    return summaryValue;
-  }
+  sampleFunc(cells: any[]) {
+    // Custom summary calculation logic
+    const sum = cells.reduce((total, cell) => total + cell, 0);
+    return Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
 
-  // customSummaryFunc = (cells: any[]) => {
-  //   console.log("🚀 ~ file: rp-sales-performance.page.ts:80 ~ RpSalesPerformancePage ~ cells:", cells)
-  //   // Custom summary calculation logic
-  //   const sum = cells.reduce((total, cell) => total + cell, 0);
-  //   return `Total: ${sum}`;
-  // };
+  countSum(field: string) {
+    let sum = 0;
+    switch(field) {
+      case "invoiceAmt":
+        sum = this.objects.flatMap(r => r.invoiceAmt).reduce((total, cell) => total + cell, 0);
+        break;
+        case "cnAmount":
+          sum = this.objects.flatMap(r => r.cnAmount).reduce((total, cell) => total + cell, 0);
+          break;
+          case "soAmount":
+            sum = this.objects.flatMap(r => r.soAmount).reduce((total, cell) => total + cell, 0);
+            break;
+            case "netAmount":
+              sum = this.objects.flatMap(r => r.netAmount).reduce((total, cell) => total + cell, 0);
+              break;
+    }
+    return Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+  }
 
 }
