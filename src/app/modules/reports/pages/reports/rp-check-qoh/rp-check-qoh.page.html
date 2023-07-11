@@ -7,11 +7,9 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  
+<ion-content>  
   <div class="p-2">
-    <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="searchText" (ionFocus)="highlight(searchbar)" (search)="search()" (keydown)="onKeyDown($event)"></ion-searchbar>
-
+    <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (search)="search(searchbar.value, true)" (ionChange)="itemSearchText=''; objects=[]; realObject=[];"></ion-searchbar>
     <div class="prefix-css" *ngIf="realObject && realObject.length > 0">
       <ngx-datatable
       class="fullscreen material mt-2"
@@ -20,14 +18,10 @@
       [columns]="columns"
       [columnMode]="'force'" 
       [scrollbarH]="true">
-        <ngx-datatable-column prop="itemCode" name="Stock Code" [width]="100">
+        <ngx-datatable-column prop="itemCode" name="Stock" [width]="100">
           <ng-template let-row="row" ngx-datatable-cell-template>
-            <div class="flex ion-text-wrap font-half-size">{{row.itemCode}}</div>
-          </ng-template>
-        </ngx-datatable-column>
-        <ngx-datatable-column prop="itemDescription" name="Description" [width]="120">
-          <ng-template let-row="row" ngx-datatable-cell-template>
-            <div class="flex ion-text-wrap font-half-size">{{row.itemDescription}}</div>
+            <div class="flex ion-text-wrap font-half-size">
+              <div class="font-bold">{{row.itemCode}}</div> - {{row.itemDescription}}</div>
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column prop="qoh" name="QOH" [width]="70">
@@ -35,7 +29,7 @@
             <div class="flex ion-text-wrap font-half-size">{{row.qoh|number:'1.0'}}</div>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="price" name="Segment" [width]="80">
+        <ngx-datatable-column prop="price" name="Segment">
           <ng-template ngx-datatable-header-template>
             <div class="flex ion-text-wrap font-half-size">Price</div>
           </ng-template>
@@ -44,8 +38,6 @@
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>
-
     </div>
   </div>
-
 </ion-content>

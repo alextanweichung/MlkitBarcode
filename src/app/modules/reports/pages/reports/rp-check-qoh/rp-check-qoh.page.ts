@@ -34,14 +34,14 @@ export class RpCheckQohPage implements OnInit {
     ]
   }
 
-  searchText: string = '';
-  searchTextChanged() {
-    this.objects = [];
-  }
-
-  search() {
-    let searchText = this.searchText;
-    this.searchText = '';
+  itemSearchText: string;
+  search(searchText, newSearch: boolean = false) {
+    console.log("🚀 ~ file: rp-check-qoh.page.ts:43 ~ RpCheckQohPage ~ search ~ searchText:", searchText)
+    if (newSearch) {
+      this.objects = [];
+      this.realObject = [];
+    }
+    this.itemSearchText = searchText;
     try {
       if (searchText && searchText.trim().length > 2) {
         if (Capacitor.getPlatform() !== 'web') {
@@ -79,13 +79,6 @@ export class RpCheckQohPage implements OnInit {
         price: price
       })
     })
-  }
-
-  onKeyDown(event) {
-    if (event.keyCode === 13) {
-      this.search();
-      event.preventDefault();
-    }
   }
 
   highlight(event) {
