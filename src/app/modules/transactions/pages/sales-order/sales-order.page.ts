@@ -38,7 +38,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     private authService: AuthService,
     private commonService: CommonService,
     private objectService: SalesOrderService,
-    private draftObjectService: DraftTransactionService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
@@ -109,7 +108,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   loadDraftObjects() {
     try {
-      this.draftObjectService.getObjects("SALESORDER").subscribe(async response => {
+      this.objectService.getDraftObjects().subscribe(async response => {
         this.draftObjects = response;
         for (let index = 0; index < this.draftObjects.length; index++) {
           const element = this.draftObjects[index];

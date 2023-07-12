@@ -28,7 +28,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   constructor(
     private authService: AuthService,
     public objectService: SalesOrderService,
-    private draftObjectService: DraftTransactionService,
     private commonService: CommonService,
     private promotionEngineService: PromotionEngineService,
     private toastService: ToastService,
@@ -488,7 +487,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       trxDto.header.salesOrderNum = null; // always default to null when insert
       if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
-        this.draftObjectService.toggleObject(this.objectService.draftObject.draftTransactionId).subscribe(response => {
+        this.objectService.toggleDraftObject(this.objectService.draftObject.draftTransactionId).subscribe(response => {
           if (response.status === 204) {
 
           }
@@ -577,7 +576,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         jsonData: JSON.stringify(trxDto)
       }
 
-      this.draftObjectService.insertObject(object).subscribe(response => {
+      this.objectService.insertDraftObject(object).subscribe(response => {
         let ret: DraftTransaction = response.body as DraftTransaction;
         let soObj = JSON.parse(ret.jsonData) as SalesOrderRoot;
         soObj.header.salesOrderNum = ret.draftTransactionNum;
@@ -600,8 +599,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       this.objectService.draftObject.jsonData = JSON.stringify(trxDto);
-      this.draftObjectService.updateObject(this.objectService.draftObject).subscribe(response => {
-        console.log("🚀 ~ file: sales-order-cart.page.ts:592 ~ SalesOrderCartPage ~ this.draftObjectService.insertObject ~ response:", response)
+      this.objectService.updateDraftObject(this.objectService.draftObject).subscribe(response => {
         let ret: DraftTransaction = response.body as DraftTransaction
         this.objectService.setObject(JSON.parse(ret.jsonData) as SalesOrderRoot);
         this.toastService.presentToast('Update Draft Complete', '', 'top', 'success', 1000);

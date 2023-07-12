@@ -18,25 +18,24 @@ export class DraftTransactionService {
     private configService: ConfigService
   ) { }
 
-  getObjects(type: string) {
-    return this.http.get<DraftTransaction[]>(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction/type/" + type.toUpperCase());
-  }
+  // getObjects(type: string) {
+  //   return this.http.get<DraftTransaction[]>(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction/type/" + type.toUpperCase());
+  // }
 
-  getObject(objectId) {
-    return this.http.get<DraftTransaction>(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction/" + objectId);
-  }
+  // getObject(objectId) {
+  //   return this.http.get<DraftTransaction>(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction/" + objectId);
+  // }
 
-  insertObject(object: DraftTransaction) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction", object, httpObserveHeader);
-  }
+  // insertObject(object: DraftTransaction) {
+  //   return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction", object, httpObserveHeader);
+  // }
 
-  updateObject(object: DraftTransaction) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction", object, httpObserveHeader);
-  }
+  // updateObject(object: DraftTransaction) {
+  //   return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction", object, httpObserveHeader);
+  // }
 
-  toggleObject(objectId: number) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction/deactivate/" + objectId, null, httpObserveHeader);
-
-  }
+  // toggleObject(objectId: number) {
+  //   return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDraftTransaction/deactivate/" + objectId, null, httpObserveHeader);
+  // }
 
 }

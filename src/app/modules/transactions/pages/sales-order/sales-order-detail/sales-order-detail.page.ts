@@ -36,7 +36,6 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     private route: ActivatedRoute,
     private navController: NavController,
     public objectService: SalesOrderService,
-    private draftObjectService: DraftTransactionService,
     private alertController: AlertController,
     private toastService: ToastService,
     private commonService: CommonService
@@ -163,7 +162,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   }
 
   loadDraftObject() {
-    this.draftObjectService.getObject(this.draftTransactionId).subscribe(response => {
+    this.objectService.getDraftObject(this.draftTransactionId).subscribe(response => {
       this.draftObject = response;
       this.object = JSON.parse(this.draftObject.jsonData) as SalesOrderRoot;
       this.object.header.salesOrderNum = this.draftObject.draftTransactionNum;
@@ -481,7 +480,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       trxDto.header.salesOrderNum = null; // always default to null when insert
       if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
-        this.draftObjectService.toggleObject(this.objectService.draftObject.draftTransactionId).subscribe(response => {
+        this.objectService.toggleDraftObject(this.objectService.draftObject.draftTransactionId).subscribe(response => {
           if (response.status === 204) {
 
           }

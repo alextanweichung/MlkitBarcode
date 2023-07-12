@@ -96,7 +96,6 @@ export class SalesOrderService {
     this.header = header;
     // load promotion first after customer confirmed or whenever header changed.
     this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), 'yyyy-MM-dd'), this.header.customerId);
-    console.log("🚀 ~ file: sales-order.service.ts:100 ~ SalesOrderService ~ setHeader ~ this.promotionMaster:", this.promotionMaster)
   }
 
   setChoosenItems(items: TransactionDetail[]) {
@@ -226,5 +225,29 @@ export class SalesOrderService {
       )
     );
   }
+
+  /* #region draft */
+
+  getDraftObjects() {
+    return this.http.get<DraftTransaction[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft");
+  }
+
+  getDraftObject(objectId) {
+    return this.http.get<DraftTransaction>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft/" + objectId);
+  }
+
+  insertDraftObject(object: DraftTransaction) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft", object, httpObserveHeader);
+  }
+
+  updateDraftObject(object: DraftTransaction) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft", object, httpObserveHeader);
+  }
+
+  toggleDraftObject(objectId: number) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft/deactivate/" + objectId, null, httpObserveHeader);
+  }
+
+  /* #endregion */
 
 }
