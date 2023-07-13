@@ -244,8 +244,8 @@ export class SalesOrderService {
     return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft", object, httpObserveHeader);
   }
 
-  toggleDraftObject(objectId: number) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft/deactivate/" + objectId, null, httpObserveHeader);
+  confirmDraftObject(objectId: number, object: SalesOrderRoot) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft/confirm/", { draftTransactionId: objectId, object: object }, httpObserveHeader);
   }
 
   /* #endregion */

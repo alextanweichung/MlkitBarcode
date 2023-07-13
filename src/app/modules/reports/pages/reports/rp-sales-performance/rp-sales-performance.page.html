@@ -48,8 +48,6 @@
           <div class="flex ion-text-wrap font-half-size ion-text-right"> {{row.netAmount | number:'1.2-2'}}</div>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-footer>
-      </ngx-datatable-footer>
     </ngx-datatable>
     <ng-template #invoiceAmtSum let-value="value">
       <div class="flex ion-text-wrap ion-text-right">{{countSum("invoiceAmt")}}</div>
