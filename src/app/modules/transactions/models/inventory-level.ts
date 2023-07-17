@@ -41,6 +41,7 @@ export interface InnerIVDetail {
   itemVariationYDescription: string
   itemSku: string
   qty?: number
+  openQty?: number
 }
 
 export interface ItemPriceBySegment {

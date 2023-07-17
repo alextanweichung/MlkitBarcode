@@ -1,6 +1,6 @@
 <ion-header collapse="fade" [translucent]="true">
   <ion-toolbar>
-    <ion-title>Inventory Level</ion-title>
+    <ion-title>Inv. Level - Trading</ion-title>
     <ion-buttons slot="start">
       <ion-back-button text="Back" defaultHref="/others"></ion-back-button>
     </ion-buttons>
@@ -25,7 +25,7 @@
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-label class="label-title">Inventory Level</ion-label>
+      <ion-label class="label-title">Inv. Level - Trading</ion-label>
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
@@ -81,15 +81,8 @@
           <div class="ion-flex ion-margin-auto" [ngClass]="{'color-danger': (item.qty < 0), 'color-warning': (item.qty == 0) }">
             {{item.qty | number:'1.0'}}
           </div>
-          <div class="ion-flex ion-margin-auto" *ngIf="loginUser.loginUserType === 'P' && item.transitQty > 0">
-            <!-- Retail -->
-            <div class="badge-purple font-bold px-2 py-1 w-full flex justify-content-center" style="height:2rem">
-              In Transit Qty: {{item.transitQty|number:'1.0'}} | Current Qty: {{item.qty - item.transitQty|number:'1.0'}}
-            </div>
-          </div>
-          <div class="ion-flex ion-margin-auto" *ngIf="loginUser.loginUserType === 'B'">
-            <!-- Trading -->
-            <div class="badge-purple font-bold px-2 py-1 w-full flex justify-content-center" style="height:2rem">
+          <div class="ion-flex ion-margin-auto">
+            <div class="badge-purple font-bold px-2 py-1 w-full flex justify-content-center" style="font-size: medium; height:2rem">
               Available Qty: {{item.qty - item.openQty|number:'1.0'}}
             </div>
           </div>
@@ -122,7 +115,7 @@
                 {{row.itemVariationXDescription}}
               </td>
               <td class="p-1 font-half-size ion-text-right" *ngFor="let rowColumn of row.variationDetails">
-                <div [ngClass]="{'color-danger': (rowColumn.qty < 0), 'color-warning': (rowColumn.qty == 0) }">{{rowColumn.qty | number: '1.0-0'}}</div>
+                <div [ngClass]="{'color-danger': ((rowColumn.qty - rowColumn.openQty) < 0), 'color-warning': ((rowColumn.qty - rowColumn.openQty) == 0) }">{{(rowColumn.qty - rowColumn.openQty) | number: '1.0-0'}}</div>
               </td>
             </tr>
           </table>

@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { InventoryLevelPage } from './inventory-level.page';
+import { InventoryLevelRetailPage } from './inventory-level-retail.page';
 
-describe('InventoryLevelPage', () => {
-  let component: InventoryLevelPage;
-  let fixture: ComponentFixture<InventoryLevelPage>;
+describe('InventoryLevelRetailPage', () => {
+  let component: InventoryLevelRetailPage;
+  let fixture: ComponentFixture<InventoryLevelRetailPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ InventoryLevelPage ],
+      declarations: [ InventoryLevelRetailPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(InventoryLevelPage);
+    fixture = TestBed.createComponent(InventoryLevelRetailPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

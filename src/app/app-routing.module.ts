@@ -191,11 +191,17 @@ const routes: Routes = [
     path: 'transactions/stock-count/stock-count-detail',
     loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then(m => m.StockCountDetailPageModule)
   },
-  // transaction-inventory-level
+  // transaction-inventory-level-trading
   {
-    path: 'transactions/inventory-level',
-    loadChildren: () => import('./modules/transactions/pages/inventory-level/inventory-level.module').then(m => m.InventoryLevelPageModule)
+    path: 'transactions/inventory-level-trading',
+    loadChildren: () => import('./modules/transactions/pages/inventory-level-trading/inventory-level-trading.module').then(m => m.InventoryLevelTradingPageModule)
   },
+  // transaction-inventory-level-retail
+  {
+    path: 'transactions/inventory-level-retail',
+    loadChildren: () => import('./modules/transactions/pages/inventory-level-retail/inventory-level-retail.module').then( m => m.InventoryLevelRetailPageModule)
+  },
+
   // transaction-cash-deposit
   {
     path: 'transactions/cash-deposit',
@@ -329,7 +335,6 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
-
 
 
 ];

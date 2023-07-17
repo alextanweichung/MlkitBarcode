@@ -16,7 +16,8 @@ export class TransactionsPage implements OnInit {
   showPacking: boolean = false;
   showConsignmentSales: boolean = false;
   showStockCount: boolean = false;
-  showInventoryLevel: boolean = false;
+  showInventoryLevelTrading: boolean = false;
+  showInventoryLevelRetail: boolean = false;
   showCashDeposit: boolean = false;
   showTruckLoading: boolean = false;
   showInterTransfer: boolean = false;
@@ -39,7 +40,8 @@ export class TransactionsPage implements OnInit {
           this.showPacking = pageItems.findIndex(r => r.title === trxAppCode.mobilePacking) > -1;
           this.showConsignmentSales = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignment) > -1;
           this.showStockCount = pageItems.findIndex(r => r.title === trxAppCode.mobileStockCount) > -1;
-          this.showInventoryLevel = pageItems.findIndex(r => r.title === trxAppCode.mobileInventoryLevel) > -1;
+          this.showInventoryLevelTrading = pageItems.findIndex(r => r.title === trxAppCode.mobileInventoryLevelTrading) > -1;
+          this.showInventoryLevelRetail = pageItems.findIndex(r => r.title === trxAppCode.mobileInventoryLevelRetail) > -1;
           this.showCashDeposit = pageItems.findIndex(r => r.title === trxAppCode.mobileCashDepo) > -1;
           this.showTruckLoading = pageItems.findIndex(r => r.title === trxAppCode.mobileTruckLoading) > -1;
           this.showInterTransfer = pageItems.findIndex(r => r.title === trxAppCode.mobileInterTransfer) > -1;

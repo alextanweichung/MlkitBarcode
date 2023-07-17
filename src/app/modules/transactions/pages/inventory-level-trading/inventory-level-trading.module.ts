@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { InventoryLevelPageRoutingModule } from './inventory-level-routing.module';
+import { InventoryLevelTradingPageRoutingModule } from './inventory-level-trading-routing.module';
 
-import { InventoryLevelPage } from './inventory-level.page';
+import { InventoryLevelTradingPage } from './inventory-level-trading.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
@@ -15,10 +15,10 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     CommonModule,
     FormsModule,
     IonicModule,
-    InventoryLevelPageRoutingModule,
+    InventoryLevelTradingPageRoutingModule,
     SearchDropdownPageModule,
     IdMappingModule
   ],
-  declarations: [InventoryLevelPage]
+  declarations: [InventoryLevelTradingPage]
 })
-export class InventoryLevelPageModule {}
+export class InventoryLevelTradingPageModule {}

@@ -7,15 +7,13 @@ import { InventoryLevel, InventoryVariationLevel, ItemPriceBySegment } from '../
 import { InventoryLevelService } from '../../services/inventory-level.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { LoginUser } from 'src/app/services/auth/login-user';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-inventory-level',
-  templateUrl: './inventory-level.page.html',
-  styleUrls: ['./inventory-level.page.scss'],
+  templateUrl: './inventory-level-trading.page.html',
+  styleUrls: ['./inventory-level-trading.page.scss'],
 })
-export class InventoryLevelPage implements OnInit {
+export class InventoryLevelTradingPage implements OnInit {
 
   @ViewChild('accordionGroup', { static: false }) accordionGroup: IonAccordionGroup;
 
@@ -118,6 +116,7 @@ export class InventoryLevelPage implements OnInit {
         this.itemInfo = lookUpItem;
         // if (this.selectedViewOptions === 'item') {
         this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
+          console.log("🚀 ~ file: inventory-level-trading.page.ts:119 ~ InventoryLevelTradingPage ~ this.objectService.getInventoryLevelByItem ~ response:", response)
           this.inventoryLevel = response;
           // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
@@ -129,6 +128,7 @@ export class InventoryLevelPage implements OnInit {
         // } else {
         if (lookUpItem.variationTypeCode !== '0')
           this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
+            console.log("🚀 ~ file: inventory-level-trading.page.ts:131 ~ InventoryLevelTradingPage ~ this.objectService.getInventoryLevelByVariation ~ response:", response)
             this.inventoryLevelVariation = response;
             // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
             this.computeLocationList();
@@ -154,11 +154,15 @@ export class InventoryLevelPage implements OnInit {
       this.selectedLocation = 'all';
       if (this.selectedViewOptions === 'item') {
         this.inventoryLevel.forEach(r => {
-          this.locationMasterList.push({ label: r.locationDescription, value: r.locationCode });
+          if (this.objectService.locationMasterList.filter(rr => rr.attribute11 === "1").findIndex(rr => rr.code.toUpperCase() === r.locationCode) > -1) {
+            this.locationMasterList.push({ label: r.locationDescription, value: r.locationCode });
+          }
         })
       } else {
         this.inventoryLevelVariation.forEach(r => {
-          this.locationMasterList.push({ label: r.locationDescription, value: r.locationCode });
+          if (this.objectService.locationMasterList.filter(rr => rr.attribute11 === "1").findIndex(rr => rr.code.toUpperCase() === r.locationCode) > -1) {
+            this.locationMasterList.push({ label: r.locationDescription, value: r.locationCode });
+          }
         })
       }
     } catch (e) {

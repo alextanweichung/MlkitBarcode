@@ -54,12 +54,18 @@
             <h3>Stock Count</h3>
           </ion-label>
         </ion-item>
-        <ion-item button routerLink="inventory-level" *ngIf="showInventoryLevel">
+        <ion-item button routerLink="inventory-level-trading" *ngIf="showInventoryLevelTrading">
           <ion-icon name="file-tray-full-outline" slot="start"></ion-icon>
           <ion-label>
-            <h3>Inventory Level</h3>
+            <h3>Inventory Level - Trading</h3>
           </ion-label>
-        </ion-item>        
+        </ion-item>
+        <ion-item button routerLink="inventory-level-retail" *ngIf="showInventoryLevelRetail">
+          <ion-icon name="file-tray-full-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Inventory Level - Retail</h3>
+          </ion-label>
+        </ion-item>
         <ion-item button routerLink="cash-deposit" *ngIf="showCashDeposit">
           <ion-icon name="cash-outline" slot="start"></ion-icon>
           <ion-label>
