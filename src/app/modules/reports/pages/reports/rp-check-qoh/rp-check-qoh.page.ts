@@ -48,6 +48,7 @@ export class RpCheckQohPage implements OnInit {
           Keyboard.hide();
         }
         this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
+          console.log("🚀 ~ file: rp-check-qoh.page.ts:51 ~ RpCheckQohPage ~ this.objectService.getCheckQoh ~ response:", response)
           this.objects = response;
           this.massageData();
           this.toastService.presentToast('Search Complete', `${this.objects.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
@@ -75,10 +76,11 @@ export class RpCheckQohPage implements OnInit {
       this.realObject.push({
         itemCode: r.itemCode,
         itemDescription: r.itemDescription,
-        qoh: r.inventoryLevel.reduce((a, c) => a + c.qty, 0),
+        qoh: r.inventoryLevel.reduce((a, c) => a + (c.qty - c.openQty), 0),
         price: price
       })
     })
+    console.log("🚀 ~ file: rp-check-qoh.page.ts:81 ~ RpCheckQohPage ~ massageData ~ this.realObject:", this.realObject)
   }
 
   highlight(event) {
