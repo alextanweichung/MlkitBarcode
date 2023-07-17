@@ -66,6 +66,7 @@ export class SalesOrderService {
     this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.bindSalesAgentList();
   }
 
   async loadCustomer() {
@@ -83,6 +84,17 @@ export class SalesOrderService {
         code: r.customerCode,
         oldCode: r.oldCustomerCode,
         description: r.name
+      })
+    })
+  }
+
+  salesAgentDropdownList: SearchDropdownList[] = [];
+  bindSalesAgentList() {
+    this.salesAgentMasterList.forEach(r => {
+      this.salesAgentDropdownList.push({
+        id: r.id,
+        code: r.code,
+        description: r.description
       })
     })
   }

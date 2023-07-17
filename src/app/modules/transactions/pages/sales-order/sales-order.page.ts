@@ -1,6 +1,6 @@
-import { Component, DoCheck, IterableDiffers, OnInit, ViewChild } from '@angular/core';
+import { Component, DoCheck, IterableDiffers, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, IonPopover, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList, SalesOrderRoot } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
@@ -8,10 +8,7 @@ import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
 import { format } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { Customer } from '../../models/customer';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { DraftTransactionService } from 'src/app/shared/services/draft-transaction.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 
 @Component({
@@ -32,7 +29,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   uniqueGrouping: Date[] = [];
 
-  salesAgentDropdownList: SearchDropdownList[] = [];
 
   constructor(
     private authService: AuthService,
@@ -62,14 +58,10 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
-      console.log("🚀 ~ file: sales-order.page.ts:55 ~ SalesOrderPage ~ ionViewWillEnter ~ this.startDate:", this.startDate)
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
-      console.log("🚀 ~ file: sales-order.page.ts:59 ~ SalesOrderPage ~ ionViewWillEnter ~ this.endDate:", this.endDate)
     }
-    this.bindCustomerList();
-    this.bindSalesAgentList();
   }
 
   ionViewDidEnter(): void {
@@ -143,30 +135,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   getObjects(date: Date) {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-  }
-
-  selectedCustomer: Customer;
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  bindCustomerList() {
-    this.objectService.customers.forEach(r => {
-      this.customerSearchDropdownList.push({
-        id: r.customerId,
-        code: r.customerCode,
-        oldCode: r.oldCustomerCode,
-        description: r.name
-      })
-    })
-  }
-
-  bindSalesAgentList() {
-    this.objectService.salesAgentMasterList.forEach(r => {
-      this.salesAgentDropdownList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-  }
+  }  
 
   async bindUniqueGrouping() {
     let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
@@ -271,10 +240,10 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
           startDate: this.startDate,
           endDate: this.endDate,
           customerFilter: true,
-          customerList: this.customerSearchDropdownList,
+          customerList: this.objectService.customerSearchDropdownList,
           selectedCustomerId: this.customerIds,
           salesAgentFilter: true,
-          salesAgentList: this.salesAgentDropdownList,
+          salesAgentList: this.objectService.salesAgentDropdownList,
           selectedSalesAgentId: this.salesAgentIds,
           useDraft: true,
           showDraftOnly: this.showDraftOnly
@@ -284,6 +253,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       await modal.present();
       let { data } = await modal.onWillDismiss();
       if (data && data !== undefined) {
+        console.log("🚀 ~ file: sales-order.page.ts:287 ~ SalesOrderPage ~ filter ~ data:", data)
         this.objects = [];
         this.uniqueGrouping = [];
         this.startDate = new Date(data.startDate);

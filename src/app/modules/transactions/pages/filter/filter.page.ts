@@ -35,7 +35,7 @@ export class FilterPage implements OnInit {
     private modalController: ModalController
   ) { }
 
-  ngOnInit() {    
+  ngOnInit() {
     this.date_from = format(parseISO(this.startDate.toISOString()), 'MMM d, yyyy');
     this.date_to = format(parseISO(this.endDate.toISOString()), 'MMM d, yyyy');
   }
@@ -70,6 +70,7 @@ export class FilterPage implements OnInit {
 
   selectedCustomerId: number[] = [];
   onCustomerSelected(event) {
+    this.selectedCustomerId = [];
     if (event) {
       event.forEach(r => {
         this.selectedCustomerId.push(r.id)
@@ -79,6 +80,7 @@ export class FilterPage implements OnInit {
 
   selectedSalesAgentId: number[] = [];
   onSalesAgentSelected(event) {
+    this.selectedSalesAgentId = [];
     if (event) {
       event.forEach(r => {
         this.selectedSalesAgentId.push(r.id);
