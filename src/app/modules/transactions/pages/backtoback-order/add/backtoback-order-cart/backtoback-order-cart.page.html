@@ -18,7 +18,7 @@
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
       <ion-item-sliding *ngFor="let item of objectService.itemInCart; let i = index">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
+        <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
@@ -157,18 +157,18 @@
           </ion-item>
           <ion-item>
             <ion-label><div>Unit Price</div></ion-label>
-            <ion-input *ngIf="objectService.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [disabled]='restrictTrxFields["unitPrice"] && !selectedItem.isPricingApproval'></ion-input>
-            <ion-input *ngIf="!objectService.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [disabled]='restrictTrxFields["unitPriceExTax"] && !selectedItem.isPricingApproval'></ion-input>
+            <ion-input *ngIf="objectService.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [disabled]='restrictTrxFields["unitPrice"]'></ion-input>
+            <ion-input *ngIf="!objectService.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [disabled]='restrictTrxFields["unitPriceExTax"]'></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>
-            <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode'] && !selectedItem.isPricingApproval">
+            <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']">
               <ion-select-option *ngFor="let s of objectService.discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Expr.</div></ion-label>
-            <ion-input #discExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" (ionBlur)="computeAllAmount(selectedItem)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression'] && !selectedItem.isPricingApproval"></ion-input>
+            <ion-input #discExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" (ionBlur)="computeAllAmount(selectedItem)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression']"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Amt.</div></ion-label>
@@ -311,7 +311,7 @@
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item>
           <ion-label><div>Pricing Approval</div></ion-label>
-          <ion-checkbox [(ngModel)]="selectedItem.isPricingApproval"></ion-checkbox>
+          <ion-checkbox [(ngModel)]="selectedItem.isPricingApproval" (ionChange)="onPricingApprovalSwitch($event)"></ion-checkbox>
         </ion-item>
       </ion-list>
     </ion-content>

@@ -72,6 +72,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
+  orderingPriceApprovalEnabledFields: string = "0"
   salesOrderQuantityControl: string = "0";
   configSalesActivatePromotionEngine: boolean;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -94,6 +95,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         if (salesOrderQuantityControl) {
           this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
         }
+        let priceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
+        if (priceApprovalEnabledFields) {
+          this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
+        }
       }, error => {
         throw error;
       })
@@ -109,16 +114,31 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   // restrictFields: any = {};
   restrictTrxFields: any = {};
+  originalRestrictTrxFields: any = {};
   loadRestrictColumms() {
     try {
       let restrictedObject = {};
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
+        let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
+        // apiData.forEach(element => {
+        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
+        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
+        //       restrictedObject[ctrl] = true;
+        //     }
+        //   });
+        // });
+        // if (!this.authService.isAdmin && this.systemWideDisableDocumentNumber) {
+        //   restrictedObject['salesOrderNum'] = true;
+        // }
+        // this.restrictFields = restrictedObject;  
+  
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
         });
         this.restrictTrxFields = restrictedTrx;
+        this.originalRestrictTrxFields = JSON.parse(JSON.stringify(this.restrictTrxFields));
       })
     } catch (e) {
       console.error(e);
@@ -625,6 +645,56 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       trxDto.header.isPricingApproval = false;
     }
     return trxDto;
+  }
+
+  onPricingApprovalSwitch(event: any) {
+    if (event.detail.checked) {
+      switch (this.orderingPriceApprovalEnabledFields) {
+        case "0":
+          if (this.restrictTrxFields.unitPrice) {
+            this.restrictTrxFields.unitPrice = false;
+          }
+          if (this.restrictTrxFields.unitPriceExTax) {
+            this.restrictTrxFields.unitPriceExTax = false;
+          }
+          if (this.restrictTrxFields.discountExpression) {
+            this.restrictTrxFields.discountExpression = false;
+          }
+          if (this.restrictTrxFields.discountGroupCode) {
+            this.restrictTrxFields.discountGroupCode = false;
+          }
+          break;
+        case "1":
+          if (this.restrictTrxFields.unitPrice) {
+            this.restrictTrxFields.unitPrice = false;
+          }
+          if (this.restrictTrxFields.unitPriceExTax) {
+            this.restrictTrxFields.unitPriceExTax = false;
+          }
+          break;
+        case "2":
+          if (this.restrictTrxFields.discountExpression) {
+            this.restrictTrxFields.discountExpression = false;
+          }
+          if (this.restrictTrxFields.discountGroupCode) {
+            this.restrictTrxFields.discountGroupCode = false;
+          }
+          break;
+      }
+    } else {
+      if (this.restrictTrxFields.unitPrice == false) {
+        this.restrictTrxFields.unitPrice = true;
+      }
+      if (this.restrictTrxFields.unitPriceExTax == false) {
+        this.restrictTrxFields.unitPriceExTax = true;
+      }
+      if (this.restrictTrxFields.discountExpression == false) {
+        this.restrictTrxFields.discountExpression = true;
+      }
+      if (this.restrictTrxFields.discountGroupCode == false) {
+        this.restrictTrxFields.discountGroupCode = true;
+      }
+    }
   }
 
   /* #endregion */

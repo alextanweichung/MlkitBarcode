@@ -74,7 +74,7 @@
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object.details" (click)="showDetails(item)">
+      <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object.details" (click)="showDetails(item)">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">

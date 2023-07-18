@@ -68,6 +68,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     }
   }
 
+  orderingPriceApprovalEnabledFields: string = "0"
   configSalesActivatePromotionEngine: boolean;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -85,6 +86,10 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         } else {
           this.configSalesActivatePromotionEngine = false;
         }
+        let priceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
+        if (priceApprovalEnabledFields) {
+          this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
+        }
       }, error => {
         throw error;
       })
@@ -99,17 +104,32 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   // restrictFields: any = {};
   restrictTrxFields: any = {};
+  originalRestrictTrxFields: any = {};
   loadRestrictColumms() {
     try {
       let restrictedObject = {};
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
+        let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "Quotation").map(y => y.fieldName);
+        // apiData.forEach(element => {
+        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
+        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
+        //       restrictedObject[ctrl] = true;
+        //     }
+        //   });
+        // });
+        // if (!this.authService.isAdmin && this.systemWideDisableDocumentNumber) {
+        //   restrictedObject['quotationNum'] = true;
+        // }
+        // this.restrictFields = restrictedObject;  
+  
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "QuotationLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
         });
         this.restrictTrxFields = restrictedTrx;
-      })      
+        this.originalRestrictTrxFields = JSON.parse(JSON.stringify(this.restrictTrxFields));
+      })
     } catch (e) {
       console.error(e);
     }
@@ -459,7 +479,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         details: this.objectService.itemInCart
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      console.log("🚀 ~ file: quotation-cart.page.ts:462 ~ QuotationCartPage ~ insertObject ~ trxDto:", trxDto)
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as QuotationRoot))
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
@@ -478,7 +497,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       details: this.objectService.itemInCart
     }
     trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-    console.log("🚀 ~ file: quotation-cart.page.ts:481 ~ QuotationCartPage ~ updateObject ~ trxDto:", trxDto)
     this.objectService.updateObject(trxDto).subscribe(response => {
       this.objectService.setObject((response.body as QuotationRoot));
       this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
@@ -510,6 +528,56 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       trxDto.header.isPricingApproval = false;
     }
     return trxDto;
+  }
+
+  onPricingApprovalSwitch(event: any) {
+    if (event.detail.checked) {
+      switch (this.orderingPriceApprovalEnabledFields) {
+        case "0":
+          if (this.restrictTrxFields.unitPrice) {
+            this.restrictTrxFields.unitPrice = false;
+          }
+          if (this.restrictTrxFields.unitPriceExTax) {
+            this.restrictTrxFields.unitPriceExTax = false;
+          }
+          if (this.restrictTrxFields.discountExpression) {
+            this.restrictTrxFields.discountExpression = false;
+          }
+          if (this.restrictTrxFields.discountGroupCode) {
+            this.restrictTrxFields.discountGroupCode = false;
+          }
+          break;
+        case "1":
+          if (this.restrictTrxFields.unitPrice) {
+            this.restrictTrxFields.unitPrice = false;
+          }
+          if (this.restrictTrxFields.unitPriceExTax) {
+            this.restrictTrxFields.unitPriceExTax = false;
+          }
+          break;
+        case "2":
+          if (this.restrictTrxFields.discountExpression) {
+            this.restrictTrxFields.discountExpression = false;
+          }
+          if (this.restrictTrxFields.discountGroupCode) {
+            this.restrictTrxFields.discountGroupCode = false;
+          }
+          break;
+      }
+    } else {
+      if (this.restrictTrxFields.unitPrice == false) {
+        this.restrictTrxFields.unitPrice = true;
+      }
+      if (this.restrictTrxFields.unitPriceExTax == false) {
+        this.restrictTrxFields.unitPriceExTax = true;
+      }
+      if (this.restrictTrxFields.discountExpression == false) {
+        this.restrictTrxFields.discountExpression = true;
+      }
+      if (this.restrictTrxFields.discountGroupCode == false) {
+        this.restrictTrxFields.discountGroupCode = true;
+      }
+    }
   }
 
   /* #endregion */
