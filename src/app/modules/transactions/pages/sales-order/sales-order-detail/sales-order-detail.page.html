@@ -19,6 +19,12 @@
             <div>Edit</div>
           </ion-label>
         </ion-item>
+        <ion-item *ngIf="isDraft" (click)="popover.dismiss(); presentDeleteDraftAlert();">
+          <ion-icon name="trash-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Delete</div>
+          </ion-label>
+        </ion-item>
         <ion-item *ngIf="!(object?.isWorkFlowDone??false) && isDraft" (click)="popover.dismiss(); presentConfirmAlert();">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>

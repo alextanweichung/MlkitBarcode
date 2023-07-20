@@ -260,6 +260,10 @@ export class SalesOrderService {
     return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft/confirm/", { draftTransactionId: objectId, object: object }, httpObserveHeader);
   }
 
+  deleteDraftObject(objectId: number) {
+    return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/draft/" + objectId, httpObserveHeader);
+  }
+
   /* #endregion */
 
 }

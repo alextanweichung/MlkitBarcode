@@ -127,14 +127,14 @@
       <ion-col>
         <ion-grid class="ion-no-padding">
           <ion-row>
-            <ion-col>
-              <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-                Confirm 
+            <ion-col *ngIf="objectService.header && objectService.header.salesOrderId === 0">
+              <ion-button class="ion-margin" expand="block" size="default" color="warning" (click)="nextStepDraft()">
+                Save as Draft 
               </ion-button>
             </ion-col>
-            <ion-col *ngIf="objectService.header && objectService.header.salesOrderId === 0">
-              <ion-button class="ion-margin" expand="block" size="default" (click)="nextStepDraft()">
-                Save as Draft 
+            <ion-col>
+              <ion-button class="ion-margin" expand="block" size="default" color="success" (click)="nextStep()">
+                Confirm 
               </ion-button>
             </ion-col>
           </ion-row>

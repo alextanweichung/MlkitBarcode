@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
@@ -12,7 +12,6 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { TrxChild } from 'src/app/shared/models/trx-child';
-import { DraftTransactionService } from 'src/app/shared/services/draft-transaction.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 
 @Component({
@@ -452,7 +451,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
               cssClass: 'success',
               role: 'confirm',
               handler: async () => {
-                  await this.insertObject();
+                await this.insertObject();
               },
             },
             {
@@ -480,7 +479,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       trxDto.header.salesOrderNum = null; // always default to null when insert
       if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
-        this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(response => {          
+        this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(response => {
           this.objectService.setObject((response.body as SalesOrderRoot));
           this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
           this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
@@ -503,6 +502,47 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       trxDto.header.isPricingApproval = false;
     }
     return trxDto;
+  }
+
+  /* #endregion */
+
+  /* #region delete draft */
+
+  async presentDeleteDraftAlert() {
+    try {
+      const alert = await this.alertController.create({
+        header: "Are you sure to proceed?",
+        subHeader: "This will delete Draft",
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.deleteDraft();
+            },
+          },
+          {
+            text: 'Cancel',
+            cssClass: 'cancel',
+            role: 'cancel'
+          },
+        ],
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  deleteDraft() {
+    this.objectService.deleteDraftObject(this.draftTransactionId).subscribe(response => {
+      if (response.status === 204) {
+        this.navController.navigateRoot("/transactions/sales-order");
+      }
+    }, error => {
+      console.error(error);
+    })
   }
 
   /* #endregion */
