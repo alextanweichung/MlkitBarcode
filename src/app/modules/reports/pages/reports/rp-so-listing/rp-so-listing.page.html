@@ -8,16 +8,16 @@
 </ion-header>
 <ion-content>
   <div class="p-2">
-    <ion-list class="list-custom" lines="none">
+    <!-- <ion-list class="list-custom" lines="none">
       <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"  [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>
       <ion-item class="ion-flex ion-flex-center" lines="none">
         <ion-checkbox slot="end" [(ngModel)]="isOverdueOnly"></ion-checkbox>
         <ion-label>
           <div class="ion-text-small">Overdue Only</div>
         </ion-label>
-      </ion-item>      
+      </ion-item>
       <app-calendar-input title="Statement Date" [date_value]="trxDate" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
-    </ion-list>
+    </ion-list> -->
     <ion-button class="pt-2" expand="block" size="default" (click)="loadObjects()">Search</ion-button>
     <ngx-datatable *ngIf="objects && objects.length > 0"
     class="fullscreen material mt-2"
