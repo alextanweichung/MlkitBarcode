@@ -76,7 +76,6 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       isOverdueOnly: this.isOverdueOnly
     }
     this.objectService.getSOListing(obj).subscribe(response => {
-      console.log("🚀 ~ file: rp-so-listing.page.ts:79 ~ RpSoListingPage ~ this.objectService.getSOListing ~ response:", response)
       this.objects = response;
     }, error => {
       throw error;
