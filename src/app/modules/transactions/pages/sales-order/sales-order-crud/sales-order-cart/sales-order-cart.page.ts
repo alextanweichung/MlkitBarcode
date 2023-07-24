@@ -514,6 +514,14 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         }, error => {
           console.error(error);
         })
+      } else {
+        this.objectService.insertObject(trxDto).subscribe(response => {
+          this.objectService.setObject((response.body as SalesOrderRoot));
+          this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+          this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');          
+        }, error => {
+          console.error(error);
+        })
       }
     } catch (e) {
       console.error(e);
