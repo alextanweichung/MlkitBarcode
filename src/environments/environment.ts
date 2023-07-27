@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  version: '15.0.15'
+  version: '15.0.16'
 };
 
 /*
