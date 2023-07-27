@@ -25,8 +25,7 @@
     [rowHeight]="'auto'" 
     [columns]="columns"
     [columnMode]="'force'" 
-    [footerHeight]="50"
-    [limit]="12"
+    [footerHeight]="0"
     [scrollbarH]="true">
       <ngx-datatable-column prop="issuedDate" name="Issued Date" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
@@ -58,9 +57,14 @@
           <div class="font-half-size div-link-button" (click)="presentAlertViewPdf(row.salesOrderId, row.salesOrderNum, 'SO')"> {{row.salesOrderNum}}</div>
         </ng-template>
       </ngx-datatable-column>
+      <ngx-datatable-column prop="salesInvoiceIds" name="Sales Invoice" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size div-link-button" (click)="showDialogOrDownload(row.salesInvoiceIds, 'SI')"> {{row.salesInvoices?.replace('|', ', ')}}</div>
+        </ng-template>
+      </ngx-datatable-column>
       <ngx-datatable-column prop="deliveryOrderIds" name="Delivery Order" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <div class="font-half-size div-link-button" (click)="showDialogOrDownload(row.deliveryOrderIds)"> {{row.deliveryOrders?.replace('|', ', ')}}</div>
+          <div class="font-half-size div-link-button" (click)="showDialogOrDownload(row.deliveryOrderIds, 'DO')"> {{row.deliveryOrders?.replace('|', ', ')}}</div>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column prop="delivered" name="Delivered" [width]="100">
@@ -76,31 +80,31 @@
     </ngx-datatable>
   </div>
 </ion-content>
-<ion-modal [isOpen]="doDialog" (didDismiss)="doDialog = false">
+<ion-modal [isOpen]="printChildDialog" (didDismiss)="printChildDialog = false; childType = ''">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Delivery Orders</ion-title>
+        <ion-title>Available Documents</ion-title>
         <ion-buttons slot="start">
-          <ion-button (click)="hideDoDialog()">Done</ion-button>
+          <ion-button (click)="hidePrintChildDialog()">Done</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <div class="p-2">
         {{error|json}}
-        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="!deliveryOrderObject">
-          <ion-label>Delivery Orders not available.</ion-label>
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="!printObj">
+          <ion-label>Documents not available.</ion-label>
         </ion-list-header>
         <ion-list class="list-custom" lines="none">          
-          <ion-item button="false" *ngFor="let dOrder of deliveryOrderObject">
+          <ion-item button="false" *ngFor="let print of printObj">
             <ion-grid class="p-1">
               <ion-row>
                 <ion-col class="ion-margin-auto">
-                  <div>{{dOrder.split('|')[0]}}</div>
+                  <div>{{print.split('|')[0]}}</div>
                 </ion-col>
                 <ion-col>
-                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="presentAlertViewPdf(dOrder.split('|')[1], dOrder.split('|')[0], 'DO')">Download</ion-button></div>
+                  <div class="ion-text-right"><ion-button fill="clear" size="small" (click)="presentAlertViewPdf(print.split('|')[1], print.split('|')[0], childType)">Download</ion-button></div>
                 </ion-col>
               </ion-row>
             </ion-grid>

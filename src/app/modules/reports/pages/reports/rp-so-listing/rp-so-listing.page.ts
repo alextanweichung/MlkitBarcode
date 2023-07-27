@@ -8,6 +8,7 @@ import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { format } from 'date-fns';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-rp-so-listing',
@@ -27,7 +28,8 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
   constructor(
     private objectService: ReportsService,
     private commonService: CommonService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastService: ToastService
   ) { }
 
   ionViewWillEnter(): void {
@@ -46,6 +48,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       // { prop: 'onlineOrder', name: 'Online Order', draggable: false },
       { prop: 'orderStatus', name: 'Order Status', draggable: false },
       { prop: 'salesOrderNum', name: 'Sales Order', draggable: false },
+      { prop: 'salesInvoiceIds', name: 'Sales Invoice', draggable: false },
       { prop: 'deliveryOrderIds', name: 'Delivery Order', draggable: false },
       { prop: 'delivered', name: 'Delivered', draggable: false },
       { prop: 'netAmount', name: 'Net Amount', draggable: false }
@@ -120,59 +123,81 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     }
   }
 
-  doDialog: boolean = false;
-  deliveryOrderObject: string[] = [];
-  async showDialogOrDownload(deliveryOrders: string) {
-    this.deliveryOrderObject = []
+  printChildDialog: boolean = false;
+  printObj: string[] = [];
+  childType: string = "";
+  async showDialogOrDownload(objs: string, type: string) {
+    this.printObj = [];
+    this.childType = type;
     try {
-      this.deliveryOrderObject = deliveryOrders.split(';');
-      if (this.deliveryOrderObject && this.deliveryOrderObject.length === 1) {
-        await this.presentAlertViewPdf(Number(this.deliveryOrderObject[0].split('|')[1]), this.deliveryOrderObject[0].split('|')[0], 'DO');
+      this.printObj = objs.split(';');
+      if (this.printObj && this.printObj.length === 1) {
+        await this.presentAlertViewPdf(Number(this.printObj[0].split('|')[1]), this.printObj[0].split('|')[0], type);
       } else {
-        this.showDoDialog();
+        this.showPrintChildDialog();
       }
     } catch (e) {
       console.error(e);
     }
   }
 
-  showDoDialog() {
-    this.doDialog = true;
+  showPrintChildDialog() {
+    this.printChildDialog = true;
   }
 
-  hideDoDialog() {
-    this.doDialog = false;
+  hidePrintChildDialog() {
+    this.printChildDialog = false;
   }
 
   async presentAlertViewPdf(objectId: any, objectName: string, type: string) {
     try {
-      const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
-        buttons: [
-          {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
-            handler: async () => {
-              if (type === 'SO') {
-                await this.downloadPdf(Number(objectId), objectName);
-              } else {
-                await this.downloadDOPdf(Number(objectId), objectName);
-              }
+      if (type && type.length > 0) {
+        const alert = await this.alertController.create({
+          header: 'Download PDF?',
+          message: '',
+          buttons: [
+            {
+              text: 'OK',
+              cssClass: 'success',
+              role: 'confirm',
+              handler: async () => {
+                if (type === 'SO') {
+                  await this.downloadPdf(Number(objectId), objectName);
+                } else if (type === 'SI') {
+                  await this.downloadSIPdf(Number(objectId), objectName);  
+                } else {
+                  await this.downloadDOPdf(Number(objectId), objectName);
+                }
+              },
             },
-          },
-          {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
-          },
-        ]
-      });
-      await alert.present();
+            {
+              cssClass: 'cancel',
+              text: 'Cancel',
+              role: 'cancel'
+            },
+          ]
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast("Doc Type Missing", "Please contact adminstrator.", "top", "warning", 1000);
+      }
     } catch (e) {
       console.error(e);
     }
+  }
+  
+  downloadSIPdf(objectId: number, objectName: string) {
+    let paramModel: ReportParameterModel = {
+      appCode: 'SMSC003',
+      format: 'pdf',
+      documentIds: [Number(objectId)],
+      reportName: 'Sales Invoice'
+    }
+    this.objectService.getPdf(paramModel).subscribe(async response => {
+      await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format);
+    }, error => {
+      throw error;
+    })
   }
 
   downloadDOPdf(objectId: number, objectName: string) {

@@ -9,6 +9,8 @@ export interface ReportSOListing {
    salesOrderId: number
    deliveryOrders: string
    deliveryOrderIds: string
+   salesInvoices: string
+   salesInvoiceIds: string
    delivered: string
    netAmount: number
  }
