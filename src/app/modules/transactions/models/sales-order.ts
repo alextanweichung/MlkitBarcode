@@ -88,6 +88,9 @@ export interface SalesOrderHeader {
 
   isPricingApproval?: boolean
   
+  isPriority?: boolean
+  isPriorityDate?: Date
+  
   sequence: number
   createdById: number
   createdBy: string

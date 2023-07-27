@@ -705,6 +705,14 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  /* #endregion */
+  /* #endregion */ 
+
+  updateIsPriorityDate() {
+    if (this.objectService.header.isPriority) {
+      this.objectService.header.isPriorityDate = this.commonService.convertUtcDate(new Date());      
+    } else {
+      this.objectService.header.isPriorityDate = null
+    }
+  }
 
 }
