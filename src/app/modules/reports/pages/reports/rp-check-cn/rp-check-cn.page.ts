@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportsService } from '../../../services/reports.service';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CheckCn, CheckCnRequest } from '../../../models/rp-check-cn';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonPopover } from '@ionic/angular';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { SelectionType } from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'app-rp-check-cn',
@@ -118,5 +119,101 @@ export class RpCheckCnPage implements OnInit {
       console.error(e);
     }
   }
+  
+  /* #region more action popover */
 
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+  
+  /* #region select all */
+
+  SelectionType = SelectionType;
+  selected = [];
+  
+  onSelect(event) {
+    this.selected.splice(0, this.selected.length);
+    this.selected.push(...event.selected);
+  }
+
+  onActivate(event) {
+
+  }
+
+  async printAllAlert() {
+    console.log("🚀 ~ file: rp-check-cn.page.ts:154 ~ RpCheckCnPage ~ printAllAlert ~ this.selected:", this.selected)
+    try {
+      const alert = await this.alertController.create({
+        header: `Download ${this.selected.length} PDF?`,
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadMultiplePdf(this.selected);
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  async downloadMultiplePdf(objects: CheckCn[]) {
+    try {
+      // appCode: (transactionType.toUpperCase() === 'ARCN') ? 'FAAR004' : 'SMSC004',
+      // reportName: (transactionType.toUpperCase() === 'ARCN') ? 'AR Credit Note' : 'Sales Return'
+
+      if (objects.filter(r => r.transactionType.toUpperCase() === 'ARCN').length > 0) {
+        let paramModel: ReportParameterModel = {
+          appCode: 'FAAR004',
+          format: 'pdf',
+          documentIds: objects.filter(r => r.transactionType.toUpperCase() === 'ARCN').flatMap(r => r.docId),
+          reportName: 'AR Credit Note'
+        }
+        this.objectService.getPdf(paramModel).subscribe(async response => {
+          await this.commonService.commonDownloadPdf(response, "ARCreditNote." + paramModel.format);
+        }, error => {
+          throw error;
+        })
+      }
+
+      if (objects.filter(r => r.transactionType.toUpperCase() === 'SR').length > 0) {        
+        let paramModel: ReportParameterModel = {
+          appCode: 'SMSC004',
+          format: 'pdf',
+          documentIds: objects.filter(r => r.transactionType.toUpperCase() === 'SR').flatMap(r => r.docId),
+          reportName: 'Sales Return'
+        }
+        this.objectService.getPdf(paramModel).subscribe(async response => {
+          await this.commonService.commonDownloadPdf(response, "SalesReturn." + paramModel.format);
+        }, error => {
+          throw error;
+        })
+      }
+
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+  
 }

@@ -35,7 +35,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
       this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
     }
     if (changes.selectedId || changes.searchDropdownList) {
-      if (this.selectedId) {
+      if (this.selectedId !== null) {
         this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
       } else {
         this.selected = null;

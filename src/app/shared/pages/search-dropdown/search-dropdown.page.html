@@ -1,7 +1,7 @@
 
 <ion-item (click)="showModal()" [disabled]="disabled" lines="none">
   <ion-label class="font-bold" position="stacked">{{title}}</ion-label>
-  <div *ngIf="selected">
+  <div *ngIf="selected && selected?.oldCode">
     <ion-grid class="ion-no-padding">
       <ion-row class="mt-2">
         <ion-col class="ion-flex ion-margin-auto">
@@ -16,6 +16,18 @@
       <ion-row class="my-2">
         <ion-col class="ion-margin-auto">
           <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div *ngIf="selected && !selected?.oldCode">
+    <ion-grid class="ion-no-padding">
+      <ion-row class="my-2">
+        <ion-col class="ion-flex ion-margin-auto">
+          <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code">
+            <div>{{selected?.code}}</div>
+          </ion-badge>
+          <div class="my-auto ml-2">{{selected?.[optionLabel]}}</div>
         </ion-col>
       </ion-row>
     </ion-grid>

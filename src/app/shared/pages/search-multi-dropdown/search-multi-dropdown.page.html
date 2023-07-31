@@ -1,5 +1,5 @@
 <ion-item (click)="showModal()" lines="none">
-  <ion-label position="stacked"> {{title}}</ion-label>
+  <ion-label position="stacked" class="font-bold"> {{title}}</ion-label>
   <ion-input [placeholder]="'Select ' + title" [value]="selected.length > 0 ? (selected.length + ' selected') : undefined" readonly clearInput="true"></ion-input>
 </ion-item>
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">

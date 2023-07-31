@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportSOListing } from '../../../models/rp-so-listing';
@@ -9,11 +9,14 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { DatePipe } from '@angular/common';
+import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 
 @Component({
   selector: 'app-rp-so-listing',
   templateUrl: './rp-so-listing.page.html',
   styleUrls: ['./rp-so-listing.page.scss'],
+  providers: [DatePipe]
 })
 export class RpSoListingPage implements OnInit, ViewWillEnter {
 
@@ -21,6 +24,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
   customerSearchDropdownList: SearchDropdownList[] = [];
   objects: ReportSOListing[] = [];
   isOverdueOnly: boolean = false;
+  dateRangeSearchDropdownList: SearchDropdownList[] = [];
 
   data: any;
   columns: any;
@@ -29,7 +33,8 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     private objectService: ReportsService,
     private commonService: CommonService,
     private alertController: AlertController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private datePipe: DatePipe
   ) { }
 
   ionViewWillEnter(): void {
@@ -53,6 +58,17 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       { prop: 'delivered', name: 'Delivered', draggable: false },
       { prop: 'netAmount', name: 'Net Amount', draggable: false }
     ]
+    this.dateRangeSearchDropdownList = [];
+    this.dateRangeSearchDropdownList.push(
+      { id: 0, code: "T", description: `Today (${format(this.commonService.getTodayDate(), 'dd/MM/yyyy')})` },
+      { id: 1, code: "7", description: `Last 7 Days (${format(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7), 'dd/MM/yyyy')})` },
+      { id: 2, code: "30", description: `Last 30 Days (${format(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() -30), 'dd/MM/yyyy')})` },
+      { id: 3, code: "60", description: `Last 60 Days (${format(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() -60), 'dd/MM/yyyy')})` },
+      { id: 4, code: "90", description: `Last 90 Days (${format(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() -90), 'dd/MM/yyyy')})` },
+      { id: 5, code: "180", description: `Last 180 Days (${format(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() -180), 'dd/MM/yyyy')})` },
+      { id: 6, code: "C", description: 'Custom Range' }
+    )
+    this.onDateRangeChanged({ id: 2 });
   }
 
   loadCustomers() {
@@ -76,7 +92,8 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     let obj: DebtorOutstandingRequest = { // sharing same report request parameter
       customerId: this.customerIds ?? [],
       trxDate: format(this.trxDate, 'yyyy-MM-dd'),
-      isOverdueOnly: this.isOverdueOnly
+      isOverdueOnly: this.isOverdueOnly,
+      trxDateFrom: this.trxDateFrom ? format(this.trxDateFrom, 'yyyy-MM-dd') : null
     }
     this.objectService.getSOListing(obj).subscribe(response => {
       this.objects = response;
@@ -92,10 +109,52 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     }
   }
 
+  trxDateFrom: Date = null
+  onDateFromSelected(event){
+    if (event) {
+      this.trxDateFrom = event;
+    }
+  }
+
   trxDate: Date = null;
   onDateSelected(event) {
     if (event) {
       this.trxDate = event;
+    }
+  }
+
+  @ViewChild("datefrom", { static: false }) datefrom: CalendarInputPage;
+  @ViewChild("dateto", { static: false }) dateto: CalendarInputPage;
+
+  selectedDateRangeId = 2;
+  onDateRangeChanged(event) {
+    if (event) {
+      this.selectedDateRangeId = event.id;
+      this.trxDateFrom = null;
+      switch (this.selectedDateRangeId) {
+        case 0:
+          this.trxDate = this.commonService.getTodayDate();
+          break;
+        case 1:
+          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7));
+          break;
+        case 2:
+          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
+          break;
+        case 3:
+          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 60));
+          break;
+        case 4:
+          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 90));
+          break;
+        case 5:
+          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 180));
+          break;
+        case 6:
+          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
+          this.trxDate = this.commonService.getTodayDate();
+          break;
+      }
     }
   }
 
