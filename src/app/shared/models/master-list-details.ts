@@ -20,6 +20,7 @@ export interface MasterListDetails {
    sequence?: number;
    isPrimary: boolean;
    deactivated?: number;
+   historyInfo?: HistoryInfo[]
 }
 
 export interface ShippingInfo {
@@ -34,3 +35,13 @@ export interface ShippingInfo {
    fax: string
    areaId: number
 }
+
+export interface HistoryInfo {
+   effectiveDate: Date
+   keyId: number
+   salesAgentId?: number
+   procurementAgentId?: number
+   currencyId?:number
+   rate?:number
+ }
+ 

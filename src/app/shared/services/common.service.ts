@@ -9,6 +9,8 @@ import { TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { AnnouncementFile } from 'src/app/modules/dashboard/models/dashboard';
 import { environment } from 'src/environments/environment';
+import { UntypedFormGroup } from '@angular/forms';
+import { MasterListDetails } from '../models/master-list-details';
 
 @Injectable({
   providedIn: 'root'
@@ -619,6 +621,29 @@ export class CommonService {
 
   toFirstCharLowerCase(str: string) {
     return str.charAt(0).toLowerCase() + str.slice(1);
+  }
+
+  /* #endregion */
+
+  /* #region get latest sales agent */
+
+  lookUpSalesAgent(objectForm: UntypedFormGroup, customerMasterList: MasterListDetails[]) {
+    var lookupValue = customerMasterList?.find(e => e.id == objectForm.get('customerId').value);
+    if (lookupValue != undefined) {
+      if (lookupValue.historyInfo && lookupValue.historyInfo.length > 0) {
+        lookupValue.historyInfo.sort(function (a, b) {
+          return new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime();
+        });
+        let salesAgent = lookupValue.historyInfo.find(x => {
+          return new Date(objectForm.get('trxDate').value).getTime() >= new Date(x.effectiveDate).getTime()
+        })
+        if (salesAgent) {
+          objectForm.patchValue({ salesAgentId: parseFloat(salesAgent.salesAgentId.toString()) })
+        } else {
+          objectForm.patchValue({ salesAgentId: parseFloat(lookupValue.attribute1) })
+        }
+      }
+    }
   }
 
   /* #endregion */

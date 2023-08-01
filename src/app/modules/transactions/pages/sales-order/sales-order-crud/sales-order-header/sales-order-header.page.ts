@@ -170,7 +170,6 @@ export class SalesOrderHeaderPage implements OnInit {
     try {
       if (event && event !== undefined) {
         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
-        console.log("🚀 ~ file: sales-order-header.page.ts:172 ~ SalesOrderHeaderPage ~ onCustomerSelected ~ lookupValue:", lookupValue)
         if (lookupValue != undefined) {
           this.objectService.removeItems();
           this.objectForm.patchValue({ customerId: lookupValue.id });
@@ -190,6 +189,9 @@ export class SalesOrderHeaderPage implements OnInit {
             isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false, 
             isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false 
           });
+       
+          this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
+
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
             this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);

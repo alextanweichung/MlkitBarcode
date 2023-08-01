@@ -174,6 +174,9 @@ export class QuotationHeaderPage implements OnInit {
             isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
             isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
           });
+       
+          this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
+          
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
             this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);

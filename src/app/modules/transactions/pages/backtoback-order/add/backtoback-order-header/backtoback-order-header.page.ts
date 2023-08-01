@@ -224,6 +224,8 @@ export class BacktobackOrderHeaderPage implements OnInit {
       if (!ignoreCurrencyRate) {
         this.objectForm.patchValue({ currencyId: parseFloat(lookupValue.attribute4) });
       }
+       
+      this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
       this.onCurrencySelected(this.objectForm.controls.currencyId.value);
       if (lookupValue.attribute5 == "T") {
         this.objectForm.controls.toLocationId.clearValidators();
