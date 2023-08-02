@@ -12,19 +12,34 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+    <ion-list-header class="ion-list-header-small ion-flex">
       <ion-label class="pl-2">
-        <div>{{companyInfo?.name}}</div>
+        <div class="font-bold">{{companyInfo?.name}}</div>
       </ion-label>
     </ion-list-header>
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+    <ion-list-header class="ion-list-header-small ion-flex">
       <ion-label class="pl-2">
         <div>Signed in as: {{loginName}} ({{loginEmail}})</div>
       </ion-label>
     </ion-list-header>
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+    <ion-list-header class="ion-list-header-small ion-flex">
       <ion-label class="pl-2">
         <div>User Type: {{userType}}</div>
+      </ion-label>
+    </ion-list-header>
+    <ion-list-header class="ion-list-header-small ion-flex" *ngIf="loginUser.procurementAgentId && procurementAgentMasterList && procurementAgentMasterList.length > 0">
+      <ion-label class="pl-2">
+        <div>Procurement Agent: {{loginUser.procurementAgentId|idMapping:procurementAgentMasterList}}</div>
+      </ion-label>
+    </ion-list-header>
+    <ion-list-header class="ion-list-header-small ion-flex" *ngIf="loginUser.warehouseAgentId && warehouseAgentMasterList && warehouseAgentMasterList.length > 0">
+      <ion-label class="pl-2">
+        <div>Warehouse Agent: {{loginUser.warehouseAgentId|idMapping:warehouseAgentMasterList}}</div>
+      </ion-label>
+    </ion-list-header>
+    <ion-list-header class="ion-list-header-small ion-flex" *ngIf="loginUser.salesAgentId && salesAgentMasterList && salesAgentMasterList.length > 0">
+      <ion-label class="pl-2">
+        <div>Sales Agent: {{loginUser.salesAgentId|idMapping:salesAgentMasterList}}</div>
       </ion-label>
     </ion-list-header>
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">

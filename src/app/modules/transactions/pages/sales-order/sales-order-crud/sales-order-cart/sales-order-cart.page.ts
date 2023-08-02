@@ -11,7 +11,6 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { DraftTransactionService } from 'src/app/shared/services/draft-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 
 @Component({
@@ -24,6 +23,8 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   moduleControl: ModuleControl[] = [];
   promotionEngineApplicable: boolean = true;
   useTax: boolean = false;
+
+  submit_attempt: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -132,7 +133,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         //   restrictedObject['salesOrderNum'] = true;
         // }
         // this.restrictFields = restrictedObject;  
-  
+
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
@@ -174,15 +175,27 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
       return;
     } else {
-      if ((this.selectedItem.qtyRequest ?? 0) <= 0) {
-        this.toastService.presentToast("Invalid Qty", "", "top", "warning", 1000);
+      let hasQtyError: boolean = false;
+      let totalQty: number = 0;
+      if (this.selectedItem.variationTypeCode === "0") {
+        hasQtyError = (this.selectedItem.qtyRequest ?? 0) <= 0;
+      } else {
+        this.selectedItem.variationDetails.forEach(r => {
+          r.details.forEach(rr => {
+            totalQty += (rr.qtyRequest ?? 0)
+          })
+        })
+        hasQtyError = totalQty <= 0;
+      }
+      if (hasQtyError) {
+        this.toastService.presentToast("Error", "Invalid Quantity.", "top", "warning", 1000);
       } else {
         this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
         this.hideEditModal();
-      }
 
-      if (this.selectedItem.isPricingApproval) {
-        this.objectService.header.isPricingApproval = true;
+        if (this.selectedItem.isPricingApproval) {
+          this.objectService.header.isPricingApproval = true;
+        }
       }
     }
   }
@@ -228,8 +241,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
           this.selectedItem.variationDetails.forEach(x => {
             x.details.forEach(y => {
               if (y.qtyRequest && y.qtyRequest < 0) {
-                y.qtyRequest = 1;
-                this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
+                this.toastService.presentToast('Error', 'Invalid Quantity.', 'top', 'warning', 1000);
               }
               totalQty = totalQty + y.qtyRequest;
             });
@@ -465,6 +477,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
+      this.submit_attempt = true;
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
           header: "Are you sure to proceed?",
@@ -485,16 +498,23 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             {
               text: 'Cancel',
               cssClass: 'cancel',
-              role: 'cancel'
+              role: 'cancel',
+              handler: async () => {
+                this.submit_attempt = false;
+              }
             },
           ],
         });
         await alert.present();
       } else {
+        this.submit_attempt = false;
         this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
       }
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
@@ -518,7 +538,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         this.objectService.insertObject(trxDto).subscribe(response => {
           this.objectService.setObject((response.body as SalesOrderRoot));
           this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-          this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');          
+          this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
         }, error => {
           console.error(error);
         })
@@ -529,20 +549,27 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   }
 
   async updateObject() {
-    let trxDto: SalesOrderRoot = {
-      header: this.objectService.header,
-      details: this.objectService.itemInCart,
+    try {
+      let trxDto: SalesOrderRoot = {
+        header: this.objectService.header,
+        details: this.objectService.itemInCart,
+      }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      this.objectService.updateObject(trxDto).subscribe(response => {
+        this.submit_attempt = false;
+        this.objectService.setObject((response.body as SalesOrderRoot));
+        this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
+        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
+      }, error => {
+        this.submit_attempt = false;
+        throw error;
+      });
+    } catch (e) {
+      this.submit_attempt = false;
+      console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
-    trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-    this.objectService.updateObject(trxDto).subscribe(response => {
-      this.objectService.setObject((response.body as SalesOrderRoot));
-      this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
-      this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
-    }, error => {
-      throw error;
-    });
-  } catch(e) {
-    console.error(e);
   }
 
   /* #endregion */
@@ -551,6 +578,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   async nextStepDraft() {
     try {
+      this.submit_attempt = true;
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
           header: "Save as Draft?",
@@ -570,19 +598,24 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             {
               text: 'Cancel',
               cssClass: 'cancel',
-              role: 'cancel'
+              role: 'cancel',
+              handler: async () => {
+                this.submit_attempt = false;
+              }
             },
           ],
         });
         await alert.present();
       } else {
+        this.submit_attempt = false;
         this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
       }
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
     }
   }
-  
+
   insertObjectAsDraft() {
     try {
       let trxDto: SalesOrderRoot = {
@@ -598,6 +631,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       }
 
       this.objectService.insertDraftObject(object).subscribe(response => {
+        this.submit_attempt = false;
         let ret: DraftTransaction = response.body as DraftTransaction;
         let soObj = JSON.parse(ret.jsonData) as SalesOrderRoot;
         soObj.header.salesOrderNum = ret.draftTransactionNum;
@@ -605,10 +639,14 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast('Insert Draft Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
       }, error => {
+        this.submit_attempt = false;
         throw error;
       });
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
@@ -621,15 +659,20 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       this.objectService.draftObject.jsonData = JSON.stringify(trxDto);
       this.objectService.updateDraftObject(this.objectService.draftObject).subscribe(response => {
+        this.submit_attempt = false;
         let ret: DraftTransaction = response.body as DraftTransaction
         this.objectService.setObject(JSON.parse(ret.jsonData) as SalesOrderRoot);
         this.toastService.presentToast('Update Draft Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
       }, error => {
+        this.submit_attempt = false;
         throw error;
       });
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
@@ -705,11 +748,11 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  /* #endregion */ 
+  /* #endregion */
 
   updateIsPriorityDate() {
     if (this.objectService.header.isPriority) {
-      this.objectService.header.isPriorityDate = this.commonService.convertUtcDate(new Date());      
+      this.objectService.header.isPriorityDate = this.commonService.convertUtcDate(new Date());
     } else {
       this.objectService.header.isPriorityDate = null
     }

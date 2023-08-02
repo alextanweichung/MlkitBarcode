@@ -92,6 +92,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   }
 
   async onItemAdded(event: TransactionDetail) {
+    console.log("🚀 ~ file: quotation-item.page.ts:95 ~ QuotationItemPage ~ onItemAdded ~ event:", event)
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignTrxItemToDataLine(trxLine);

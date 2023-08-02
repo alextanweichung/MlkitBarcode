@@ -50,12 +50,12 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          finished = true;
       }
       
-      setTimeout(async () => {
+      setTimeout(() => {
          if (!finished) {
-            await this.loadingService.showLoading('Loading');
+            this.loadingService.showLoading('Loading');
             // this.spinner.show('sp1');
          }
-      }, 800);
+      }, 100);
 
       return next.handle(authReq).pipe(
          catchError(error => {
@@ -106,9 +106,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
             return throwError(error);
          }),
          //Clear spinner
-         finalize(async () => {
+         finalize(() => {
             finished = true;
-            await this.loadingService.dismissLoading();
+            this.loadingService.dismissLoading();
             // this.spinner.hide('sp1');
          })
       );

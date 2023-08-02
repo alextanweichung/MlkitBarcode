@@ -141,12 +141,15 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
           statementDate: this.trxDate
         }
       }
-      this.objectService.getPdf(paramModel).subscribe(async response => {
+      let timestart = new Date();
+      await this.objectService.getPdf(paramModel).subscribe(async response => {
+        let timeend = new Date();
         if (object && object.length === 1) {
           await this.commonService.commonDownloadPdf(response, object[0].customerName + "." + paramModel.format);
         } else {
           await this.commonService.commonDownloadPdf(response, "Debtor_Statements." + paramModel.format);
         }
+        this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), 'top', 'success', 1000);
       }, error => {
         console.log(error);
       })
@@ -203,17 +206,15 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   SelectionType = SelectionType;
   selected = [];
   onSelect(event) {
-    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:187 ~ DebtorLatestOutstandingPage ~ onSelect ~ event:", event)
     this.selected.splice(0, this.selected.length);
     this.selected.push(...event.selected);
   }
 
   onActivate(event) {
-    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:191 ~ DebtorLatestOutstandingPage ~ onActivate ~ event:", event)
+    
   }
 
   async printAllAlert() {
-    console.log("🚀 ~ file: debtor-latest-outstanding.page.ts:211 ~ DebtorLatestOutstandingPage ~ printAllAlert ~ this.selected:", this.selected)
     try {
       const alert = await this.alertController.create({
         header: `Download ${this.selected.length} PDF?`,

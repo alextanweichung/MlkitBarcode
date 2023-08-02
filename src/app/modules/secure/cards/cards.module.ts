@@ -10,6 +10,7 @@ import { CardsPage } from './cards.page';
 
 // Swiper
 import { SwiperModule } from 'swiper/angular';
+import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { SwiperModule } from 'swiper/angular';
     FormsModule,
     IonicModule,
     CardsPageRoutingModule,
-    SwiperModule
+    SwiperModule,
+    IdMappingModule
   ],
   declarations: [CardsPage]
 })

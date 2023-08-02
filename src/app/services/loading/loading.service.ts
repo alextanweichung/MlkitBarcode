@@ -14,7 +14,8 @@ export class LoadingService {
   ) { }
 
   async showLoading(message: string = 'Loading') {
-    if (!this.isShowing && !this.loading) {
+    console.log("🚀 ~ file: loading.service.ts:18 ~ LoadingService ~ showLoading ~ this.loading:", this.loading)
+    if (!this.isShowing && (this.loading === undefined || this.loading === null)) {
       this.isShowing = true;
       this.loading = await this.loadingController.create({
         cssClass: 'default-loading',
@@ -32,7 +33,7 @@ export class LoadingService {
     }
   }
 
-  async dismissLoading() {    
+  dismissLoading() {    
     this.isShowing = false;
     this.loading?.dismiss();
   }

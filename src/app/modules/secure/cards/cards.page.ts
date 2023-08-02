@@ -9,6 +9,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import { environment } from 'src/environments/environment';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -48,13 +49,14 @@ export class CardsPage implements OnInit, AfterContentChecked {
     this.currentVersion = environment.version;
   }
 
+  loginUser: any;
   ngOnInit(): void {
-    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    if (loginUser.loginUserType === 'B') {
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (this.loginUser.loginUserType === 'B') {
       this.userType = "Base User";
-    } else if (loginUser.loginUserType === 'C') {
+    } else if (this.loginUser.loginUserType === 'C') {
       this.userType = "Consignment User";
-    } else if (loginUser.loginUserType === 'P') {
+    } else if (this.loginUser.loginUserType === 'P') {
       this.userType = "POS User";
     }
     this.authService.currentUserToken$.subscribe(obj => {
@@ -69,6 +71,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
     }, error => {
       console.log(error);
     })
+    this.loadMasterList();
   }
 
   ngAfterContentChecked(): void {
@@ -76,6 +79,19 @@ export class CardsPage implements OnInit, AfterContentChecked {
       this.swiper.updateSwiper({});
     }
     this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
+  }
+
+  procurementAgentMasterList: MasterListDetails[] = [];
+  warehouseAgentMasterList: MasterListDetails[] = [];
+  salesAgentMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.commonService.getAgentsMasterList().subscribe(response => {
+      this.procurementAgentMasterList = response.filter(x => x.objectName == 'ProcurementAgent' && x.details != null).flatMap(src => src.details);      
+      this.warehouseAgentMasterList = response.filter(x => x.objectName == 'WarehouseAgent' && x.details != null).flatMap(src => src.details);      
+      this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent' && x.details != null).flatMap(src => src.details);
+    }, error => {
+      console.error(error);
+    })
   }
 
   // Sync

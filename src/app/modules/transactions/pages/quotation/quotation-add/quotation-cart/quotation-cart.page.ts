@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { QuotationHeader, QuotationRoot } from 'src/app/modules/transactions/models/quotation';
+import { QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -122,7 +122,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         //   restrictedObject['quotationNum'] = true;
         // }
         // this.restrictFields = restrictedObject;  
-  
+
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "QuotationLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
@@ -152,12 +152,28 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
       return;
     } else {
-      this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-      this.hideEditModal();
-    }
+      let hasQtyError: boolean = false;
+      let totalQty: number = 0;
+      if (this.selectedItem.variationTypeCode === "0") {
+        hasQtyError = (this.selectedItem.qtyRequest??0) <= 0;
+      } else {
+        this.selectedItem.variationDetails.forEach(r => {
+          r.details.forEach(rr => {
+            totalQty += (rr.qtyRequest??0)
+          })
+        })
+        hasQtyError = totalQty <= 0;
+      }
+      if (hasQtyError) {
+        this.toastService.presentToast("Error", "Invalid Quantity.", "top", "warning", 1000);
+      } else {
+        this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+        this.hideEditModal();
 
-    if (this.selectedItem.isPricingApproval) {
-      this.objectService.header.isPricingApproval = true;
+        if (this.selectedItem.isPricingApproval) {
+          this.objectService.header.isPricingApproval = true;
+        }
+      }
     }
   }
 
@@ -179,7 +195,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             text: 'Cancel',
             role: 'cancel',
             handler: () => {
-  
+
             }
           },
         ],
@@ -214,8 +230,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
           this.selectedItem.variationDetails.forEach(x => {
             x.details.forEach(y => {
               if (y.qtyRequest && y.qtyRequest < 0) {
-                y.qtyRequest = 1;
-                this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
+                this.toastService.presentToast('Error', 'Invalid Quantity.', 'top', 'warning', 1000);
               }
               totalQty = totalQty + y.qtyRequest;
             });
@@ -326,7 +341,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             text: 'Cancel',
             role: 'cancel',
             handler: () => {
-  
+
             }
           },
         ],
@@ -377,7 +392,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     try {
       trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision);
     } catch (e) {
-      console.error(e); 
+      console.error(e);
     }
   }
 
@@ -391,7 +406,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
           trxLine.discountExpression = discPct + "%";
         }
         this.computeAllAmount(trxLine);
-      }      
+      }
     } catch (e) {
       console.error(e);
     }
@@ -402,17 +417,17 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   computeAllAmount(trxLine: TransactionDetail) {
     try {
       if (trxLine.qtyRequest <= 0) {
-        trxLine.qtyRequest = 1;
-        this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
-      }
-      this.computeDiscTaxAmount(trxLine);
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, true)
+        this.toastService.presentToast('Error', 'Invalid Quantity.', 'top', 'warning', 1000);
+      } else {
+        this.computeDiscTaxAmount(trxLine);
+        if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+          this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, true)
+        }
       }
     } catch (e) {
       console.error(e);
     }
-  }  
+  }
 
   getPromoDesc(promoEventId: number) {
     if (this.promotionMaster.length > 0) {

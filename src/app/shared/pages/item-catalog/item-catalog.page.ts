@@ -356,15 +356,17 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       })
     }
     this.selectedItem.qtyRequest = totalQty;
-    // count total in cart
-    this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + totalQty;
-    // count variation in cart
-    this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
-      x.details.forEach(y => {
-        y.qtyInCart = (y.qtyInCart??0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+    if (totalQty > 0) {
+      // count total in cart
+      this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + totalQty;
+      // count variation in cart
+      this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
+        x.details.forEach(y => {
+          y.qtyInCart = (y.qtyInCart??0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+        })
       })
-    })
-    this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+      this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+    }
     this.hideModal();
   }
 

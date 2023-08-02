@@ -11,6 +11,7 @@ import { AnnouncementFile } from 'src/app/modules/dashboard/models/dashboard';
 import { environment } from 'src/environments/environment';
 import { UntypedFormGroup } from '@angular/forms';
 import { MasterListDetails } from '../models/master-list-details';
+import { MasterList } from '../models/master-list';
 
 @Injectable({
   providedIn: 'root'
@@ -57,6 +58,14 @@ export class CommonService {
   saveVersion() {
     try {
       return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/mobileVersion/" + environment.version, null)
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  getAgentsMasterList() {
+    try {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/masterlist");
     } catch (e) {
       console.error(e);
     }
