@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 import { UntypedFormGroup } from '@angular/forms';
 import { MasterListDetails } from '../models/master-list-details';
 import { MasterList } from '../models/master-list';
+import { format } from 'date-fns';
 
 @Injectable({
   providedIn: 'root'
@@ -432,7 +433,7 @@ export class CommonService {
   /* #region download */
 
   async commonDownload(file: Blob, object: AnnouncementFile) {
-    let mimeType = await this.getMimeType(object.filesType);
+    let mimeType = this.getMimeType(object.filesType);
     try {
       await this.loadingService.showLoading("Downloading");
       if (Capacitor.getPlatform() === 'android') {
@@ -446,18 +447,18 @@ export class CommonService {
                       if (mimeType) {
                         this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                       }
-                      await this.loadingService.dismissLoading();
+                      this.loadingService.dismissLoading();
                     }).catch(async (error) => {
-                      await this.loadingService.dismissLoading();
+                      this.loadingService.dismissLoading();
                     });
                   }).catch((error) => {
                     this.file.writeFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType, file, { replace: true }).then(async () => {
                       if (mimeType) {
                         this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                       }
-                      await this.loadingService.dismissLoading();
+                      this.loadingService.dismissLoading();
                     }).catch(async (error) => {
-                      await this.loadingService.dismissLoading();
+                      this.loadingService.dismissLoading();
                     });
                   })
                 }
@@ -468,18 +469,18 @@ export class CommonService {
                   if (mimeType) {
                     await this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                   }
-                  await this.loadingService.dismissLoading();
+                  this.loadingService.dismissLoading();
                 }).catch(async (error) => {
-                  await this.loadingService.dismissLoading();
+                  this.loadingService.dismissLoading();
                 });
               }).catch((error) => {
                 this.file.writeFile(this.file.externalRootDirectory + "/Download", object.filesName + object.filesType, file, { replace: true }).then(async () => {
                   if (mimeType) {
                     await this.opener.open(this.file.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
                   }
-                  await this.loadingService.dismissLoading();
+                  this.loadingService.dismissLoading();
                 }).catch(async (error) => {
-                  await this.loadingService.dismissLoading();
+                  this.loadingService.dismissLoading();
                 });
               })
             }
@@ -490,9 +491,9 @@ export class CommonService {
           if (mimeType) {
             await this.opener.open(this.file.tempDirectory + object.filesName + object.filesType, mimeType);
           }
-          await this.loadingService.dismissLoading();
+          this.loadingService.dismissLoading();
         }).catch(async (error) => {
-          await this.loadingService.dismissLoading();
+          this.loadingService.dismissLoading();
         })
       } else {
         const url = window.URL.createObjectURL(file);
@@ -502,10 +503,10 @@ export class CommonService {
         window.document.body.appendChild(link);
         link.click();
         link.remove();
-        await this.loadingService.dismissLoading();
+        this.loadingService.dismissLoading();
       }
     } catch (e) {
-      await this.loadingService.dismissLoading();
+      this.loadingService.dismissLoading();
       console.error(e);
     }
   }
@@ -538,66 +539,78 @@ export class CommonService {
 
   async commonDownloadPdf(file: Blob, filename: string) { // this filename already with extensions
     try {
+      filename = filename.replace(" ", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
+      console.log("🚀 ~ file: common.service.ts:543 ~ CommonService ~ commonDownloadPdf ~ filename:", filename)      
       await this.loadingService.showLoading("Downloading");
       if (Capacitor.getPlatform() === 'android') {
-        console.log("🚀 ~ file: common.service.ts:533 ~ CommonService ~ this.file.checkDir ~ this.file.externalRootDirectory:", this.file.externalRootDirectory)
         this.file.checkDir(this.file.externalRootDirectory, "Download").then((results) => {
-          console.log("🚀 ~ file: common.service.ts:533 ~ CommonService ~ this.file.checkDir ~ results:", JSON.stringify(results))
         }).catch((error) => {
           console.log(JSON.stringify(error));
         })
 
-        await this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-          async result => {
-            if (!result.hasPermission) {
-              await this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                async result => {
-                  await this.file.checkFile(this.file.externalRootDirectory + "/Download/", filename).then(async (isExist) => {
-                    console.log("🚀 ~ file: common.service.ts:545 ~ CommonService ~ awaitthis.file.checkFile ~ isExist:", JSON.stringify(isExist));
-                    await this.file.writeExistingFile(this.file.externalRootDirectory + "/Download/", filename, file).then(async () => {
-                      await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                      await this.loadingService.dismissLoading();
-                    }).catch(async (error) => {
-                      await this.loadingService.dismissLoading();
-                    });
-                  }).catch(async (error) => {
-                    console.log("🚀 ~ file: common.service.ts:553 ~ CommonService ~ awaitthis.file.checkFile ~ error:", JSON.stringify(error))
-                    await this.file.writeFile(this.file.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
-                      await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                      await this.loadingService.dismissLoading();
-                    }).catch(async (error) => {
-                      await this.loadingService.dismissLoading();
-                    });
-                  })
-                }
-              );
-            } else {
-              await this.file.checkFile(this.file.externalRootDirectory + "/Download/", filename).then(async (isExist) => {
-                console.log("🚀 ~ file: common.service.ts:564 ~ CommonService ~ awaitthis.file.checkFile ~ isExist:", JSON.stringify(isExist));
-                await this.file.writeExistingFile(this.file.externalRootDirectory + "/Download/", filename, file).then(async () => {
-                  await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                  await this.loadingService.dismissLoading();
-                }).catch(async (error) => {
-                  await this.loadingService.dismissLoading();
-                });
-              }).catch(async (error) => {
-                console.log("🚀 ~ file: common.service.ts:572 ~ CommonService ~ awaitthis.file.checkFile ~ error:", JSON.stringify(error))
-                await this.file.writeFile(this.file.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
-                  await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                  await this.loadingService.dismissLoading();
-                }).catch(async (error) => {
-                  await this.loadingService.dismissLoading();
-                });
-              })
-            }
+        let readPermission: boolean = false;
+        let writePermission: boolean = false;
+        let managePermission: boolean = false;
+        await this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(async result => {
+          console.log("🚀 ~ file: common.service.ts:566 ~ CommonService ~ awaitthis.androidPermissions.checkPermission ~ result:", JSON.stringify(result))
+          if (!result.hasPermission) {
+            await this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(result => {
+              if (result.hasPermission) {
+                writePermission = true;
+              }
+            }).catch(error => {
+              writePermission = false;
+            })
+          } else {
+            writePermission = true;
           }
-        )
+        })
+        await this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE).then(async result => {
+          console.log("🚀 ~ file: common.service.ts:580 ~ CommonService ~ awaitthis.androidPermissions.checkPermission ~ result:", JSON.stringify(result))
+          if (!result.hasPermission) {
+            await this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE).then(result => {
+              if (result.hasPermission) {
+                readPermission = true;
+              }
+            }).catch(error => {
+              writePermission = false;              
+            })
+          } else {
+            readPermission = true;
+          }
+        })
+        await this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.MANAGE_EXTERNAL_STORAGE).then(async result => {
+          console.log("🚀 ~ file: common.service.ts:594 ~ CommonService ~ awaitthis.androidPermissions.checkPermission ~ result:", JSON.stringify(result))
+          if (!result.hasPermission) {
+            await this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.MANAGE_EXTERNAL_STORAGE).then(result => {
+              if (result.hasPermission) {
+                managePermission = true;
+              }
+            }).catch(error => {
+              managePermission = false;              
+            })
+          } else {
+            managePermission = true;
+          }
+        })
+
+        if (readPermission && writePermission) {
+          await this.file.writeFile(this.file.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
+            await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
+            this.loadingService.dismissLoading();
+          }).catch(async (error) => {
+            console.log("🚀 ~ file: common.service.ts:601 ~ CommonService ~ awaitthis.file.writeFile ~ error:", JSON.stringify(error))
+            this.loadingService.dismissLoading();
+          })
+        } else {
+          console.log("Permission not allow");
+        }
       } else if (Capacitor.getPlatform() === 'ios') {
         await this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
           await this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-          await this.loadingService.dismissLoading();
+          this.loadingService.dismissLoading();
         }).catch(async (error) => {
-          await this.loadingService.dismissLoading();
+          this.loadingService.dismissLoading();
         })
       } else {
         const url = window.URL.createObjectURL(file);
@@ -607,10 +620,10 @@ export class CommonService {
         window.document.body.appendChild(link);
         link.click();
         link.remove();
-        await this.loadingService.dismissLoading();
+        this.loadingService.dismissLoading();
       }
     } catch (e) {
-      await this.loadingService.dismissLoading();
+      this.loadingService.dismissLoading();
       console.error(e);
     }
   }
