@@ -1,3 +1,4 @@
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
@@ -540,11 +541,15 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
           this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
           this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
         }, error => {
+          this.submit_attempt = false;
           console.error(error);
         })
       }
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
@@ -556,7 +561,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       this.objectService.updateObject(trxDto).subscribe(response => {
-        this.submit_attempt = false;
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');

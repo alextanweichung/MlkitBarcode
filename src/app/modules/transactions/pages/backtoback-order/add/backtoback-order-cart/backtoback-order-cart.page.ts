@@ -23,6 +23,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   promotionEngineApplicable: boolean = true;
   useTax: boolean = false;
 
+  submit_attempt: boolean = false;
+
   constructor(
     private authService: AuthService,
     public objectService: BackToBackOrderService,
@@ -493,6 +495,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
+      this.submit_attempt = true;
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
           header: 'Are you sure to proceed?',
@@ -512,16 +515,23 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
             {
               text: 'Cancel',
               cssClass: 'cancel',
-              role: 'cancel'
+              role: 'cancel',
+              handler: async () => {
+                this.submit_attempt = false;
+              }
             },
           ],
         });
         await alert.present();
       } else {
+        this.submit_attempt = false;
         this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
       }
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {      
+      this.submit_attempt = false;
     }
   }
 
@@ -538,10 +548,14 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-summary');
       }, error => {
+        this.submit_attempt = false;
         throw error;
       });
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {      
+      this.submit_attempt = false;
     }
   }
 
@@ -558,10 +572,14 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-summary');
       }, error => {
+        this.submit_attempt = false;
         throw error;
       });
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 

@@ -23,6 +23,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
 
+  submit_attempt: boolean = false;
+
   constructor(
     private authService: AuthService,
     public objectService: QuotationService,
@@ -456,6 +458,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
+      this.submit_attempt = true;
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
           header: 'Are you sure to proceed?',
@@ -474,16 +477,24 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             },
             {
               text: 'Cancel',
-              role: 'cancel'
+              cssClass: 'cancel',
+              role: 'cancel',
+              handler: async () => {
+                this.submit_attempt = false;
+              }
             },
           ],
         });
         await alert.present();
       } else {
+        this.submit_attempt = false;
         this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
       }
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
@@ -499,28 +510,38 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
         this.navController.navigateRoot('/transactions/quotation/quotation-summary');
       }, error => {
+        this.submit_attempt = false;
         throw error;
       });
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {      
+      this.submit_attempt = false;
     }
   }
 
   updateObject() {
-    let trxDto: QuotationRoot = {
-      header: this.objectService.header,
-      details: this.objectService.itemInCart
+    try {
+      let trxDto: QuotationRoot = {
+        header: this.objectService.header,
+        details: this.objectService.itemInCart
+      }
+      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      this.objectService.updateObject(trxDto).subscribe(response => {
+        this.objectService.setObject((response.body as QuotationRoot));
+        this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
+        this.navController.navigateRoot('/transactions/quotation/quotation-summary');
+      }, error => {
+        this.submit_attempt = false;
+        throw error;
+      });
+    } catch (e) {
+      this.submit_attempt = false;
+      console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
-    trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-    this.objectService.updateObject(trxDto).subscribe(response => {
-      this.objectService.setObject((response.body as QuotationRoot));
-      this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
-      this.navController.navigateRoot('/transactions/quotation/quotation-summary');
-    }, error => {
-      throw error;
-    });
-  } catch(e) {
-    console.error(e);
   }
 
   /* #endregion */
