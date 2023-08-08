@@ -1,10 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DebtorApplicationRoot } from '../../../models/debtor-application';
 import { DebtorApplicationService } from '../../../services/debtor-application.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
 
 @Component({
   selector: 'app-debtor-application-detail',
@@ -15,6 +16,8 @@ export class DebtorApplicationDetailPage implements OnInit {
 
   objectId: number
   object: DebtorApplicationRoot;
+  workflowState: WorkFlowState[] = [];
+  editable: boolean = false;
 
   constructor(
     public objectService: DebtorApplicationService,
@@ -48,6 +51,7 @@ export class DebtorApplicationDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        this.loadWorkflow(this.object.header.customerPreId);
       }, error => {
         throw error;
       })
@@ -55,6 +59,16 @@ export class DebtorApplicationDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  loadWorkflow(objectId) {
+    this.objectService.getWorkflow(objectId).subscribe(response => {
+      this.workflowState = response;
+      console.log("🚀 ~ file: debtor-application-detail.page.ts:67 ~ DebtorApplicationDetailPage ~ this.objectService.getWorkflow ~ this.workflowState:", this.workflowState)
+      this.editable = !this.workflowState.find(r => r.stateType === "REVIEW")?.isCompleted // if review or approve not complete meaning can edit;
+    }, error => {
+      console.error(error);
+    })
   }
 
   /* #region more action popover */
@@ -73,20 +87,20 @@ export class DebtorApplicationDetailPage implements OnInit {
   /* #endregion */
 
   showStatus() {
-    this.objectService.getWorkflow(this.object.header.customerPreId).subscribe(response => {
-      if (response.length === 0) {
-        this.toastService.presentToast('Doc Status', 'No workflow found.', 'top', 'success', 2000);
+    if (this.workflowState.length === 0) {
+      this.toastService.presentToast('Doc Status', 'No workflow found.', 'top', 'success', 2000);
+    } else {
+      let currenctStatus = this.workflowState.filter(r => !r.isCompleted).sort((a, b) => a.sequence - b.sequence)[0];
+      if (currenctStatus && currenctStatus.title) {
+        this.toastService.presentToast('Doc Status', 'Pending ' + currenctStatus.title, 'top', 'success', 2000);
       } else {
-        let currenctStatus = response.filter(r => !r.isCompleted).sort((a,b) => a.sequence-b.sequence)[0].title;
-        this.toastService.presentToast('Doc Status', 'Pending ' + currenctStatus, 'top', 'success', 2000);
+        this.toastService.presentToast("Doc Status", "Workflow completed, debtor generated.", 'top', 'success', 1000);
       }
-    }, error => {
-      console.error(error);
-    })
+    }
   }
-  
+
   file: any;
-  @ViewChild("fileInput", {static:false}) fileInput: ElementRef;
+  @ViewChild("fileInput", { static: false }) fileInput: ElementRef;
   onFileChange(fileChangeEvent) {
     this.file = fileChangeEvent.target.files[0];
   }
@@ -197,6 +211,19 @@ export class DebtorApplicationDetailPage implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /* #endregion */
+
+  /* #region edit object */
+
+  editObject() {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.header.customerPreId
+      }
+    }
+    this.navController.navigateRoot('/transactions/debtor-application/debtor-application-edit', navigationExtras);
   }
 
   /* #endregion */

@@ -15,7 +15,13 @@ const routes: Routes = [
   {
     path: 'debtor-application-add',
     loadChildren: () => import('./debtor-application-add/debtor-application-add.module').then( m => m.DebtorApplicationAddPageModule)
+  },
+  {
+    path: 'debtor-application-edit',
+    loadChildren: () => import('./debtor-application-edit/debtor-application-edit.module').then( m => m.DebtorApplicationEditPageModule)
   }
+
+
 ];
 
 @NgModule({

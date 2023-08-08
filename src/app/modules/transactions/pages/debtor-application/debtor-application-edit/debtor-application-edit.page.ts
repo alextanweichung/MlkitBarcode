@@ -1,21 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { DebtorApplicationService } from '../../../services/debtor-application.service';
-import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActionSheetController, NavController, AlertController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { DebtorApplicationService } from '../../../services/debtor-application.service';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-debtor-application-add',
-  templateUrl: './debtor-application-add.page.html',
-  styleUrls: ['./debtor-application-add.page.scss'],
+  selector: 'app-debtor-application-edit',
+  templateUrl: './debtor-application-edit.page.html',
+  styleUrls: ['./debtor-application-edit.page.scss'],
 })
-export class DebtorApplicationAddPage implements OnInit {
+export class DebtorApplicationEditPage implements OnInit {
 
+  objectId: number;
   objectForm: FormGroup;
 
   constructor(
+    private route: ActivatedRoute,
     public objectService: DebtorApplicationService,
+    private commonService: CommonService,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private alertController: AlertController,
@@ -23,21 +27,22 @@ export class DebtorApplicationAddPage implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.newObjectForm();
+    this.route.queryParams.subscribe(params => {
+      this.objectId = params['objectId'];
+      if (!this.objectId) {
+        this.navController.navigateBack('/transactions/debtor-application');
+      }
+    })
   }
 
   ngOnInit() {
-    this.setDefaultValue();
-  }
-
-  defaultCountry: MasterListDetails = null;
-  setDefaultValue() {
-    this.defaultCountry = null;
-    if (this.objectService.countryMasterList && this.objectService.countryMasterList.length > 0) {
-      let defaultCountry = this.objectService.countryMasterList.find(r => r.isPrimary);
-      if (defaultCountry) {
-        this.defaultCountry = defaultCountry;
-      }
-    }
+    this.objectService.getObjectById(this.objectId).subscribe(response => {
+      let object = response;
+      let objectHeader = this.commonService.convertObjectAllDateType(object.header);
+      this.objectForm.patchValue(objectHeader);
+    }, error => {
+      console.error(error);
+    })
   }
 
   newObjectForm() {
@@ -146,7 +151,7 @@ export class DebtorApplicationAddPage implements OnInit {
     });
   }
 
-  async cancelInsert() {
+  async cancelUpdate() {    
     try {
       const actionSheet = await this.actionSheetController.create({
         header: 'Are you sure to cancel?',
@@ -165,7 +170,16 @@ export class DebtorApplicationAddPage implements OnInit {
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
       if (role === 'confirm') {
-        this.navController.navigateBack('/transactions/debtor-application');
+        try {
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: this.objectId
+            }
+          }
+          this.navController.navigateRoot('/transactions/debtor-application/debtor-application-detail', navigationExtras);
+        } catch (e) {
+          console.error(e);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -183,7 +197,7 @@ export class DebtorApplicationAddPage implements OnInit {
               cssClass: 'success',
               role: 'confirm',
               handler: async () => {
-                await this.insertObject();
+                await this.updateObject();
               },
             },
             {
@@ -200,11 +214,20 @@ export class DebtorApplicationAddPage implements OnInit {
     }
   }
 
-  insertObject() {
-    this.objectService.insertObject(this.objectForm.getRawValue()).subscribe(response => {
+  updateObject() {
+    this.objectService.updateObject(this.objectForm.getRawValue()).subscribe(response => {
       if (response.status === 201) {
-        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/debtor-application');
+        this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
+        try {
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: this.objectId
+            }
+          }
+          this.navController.navigateRoot('/transactions/debtor-application/debtor-application-detail', navigationExtras);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }, error => {
       console.error(error);

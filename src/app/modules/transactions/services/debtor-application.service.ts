@@ -78,6 +78,10 @@ export class DebtorApplicationService {
   insertObject(object: DebtorApplicationHeader) {
     return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication", object, httpObserveHeader);
   }
+
+  updateObject(object: DebtorApplicationHeader) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication", object, httpObserveHeader);
+  }
   
   getMasterList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/masterlist").toPromise();
