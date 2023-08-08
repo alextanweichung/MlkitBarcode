@@ -16,7 +16,7 @@
           <div class="ion-text-small font-bold">Overdue Only</div>
         </ion-label>
       </ion-item>
-      <app-search-dropdown title="Date" optionLabel="description" [searchDropdownList]="dateRangeSearchDropdownList" [selectedId]="selectedDateRangeId" (onActionComplete)="onDateRangeChanged($event)"></app-search-dropdown>
+      <app-search-dropdown title="SO Date" optionLabel="description" [searchDropdownList]="dateRangeSearchDropdownList" [selectedId]="selectedDateRangeId" (onActionComplete)="onDateRangeChanged($event)"></app-search-dropdown>
       <ion-grid class="ion-no-padding" *ngIf="selectedDateRangeId === 6" >
         <ion-row>
           <ion-col class="ion-margin-auto" *ngIf="!dateto?.date_active">
