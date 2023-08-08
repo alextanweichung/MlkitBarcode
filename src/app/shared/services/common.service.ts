@@ -34,7 +34,7 @@ export class CommonService {
 
   getCompanyProfile() {
     try {
-      return this.http.get(this.configService.selected_sys_param.apiUrl + "account/companyName");
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "account/companyInfo");
     } catch (e) {
       console.error(e);
     }
@@ -42,7 +42,7 @@ export class CommonService {
 
   getCompanyProfileByUrl(apiUrl) {
     try {
-      return this.http.get(apiUrl + "account/companyName").toPromise().then(r => { return r['name'] });
+      return this.http.get(apiUrl + "account/companyInfo").toPromise().then(r => { return r['name'] });
     } catch (e) {
       console.error(e);
     }

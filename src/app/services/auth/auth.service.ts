@@ -266,7 +266,7 @@ export class AuthService {
   }
 
   getCompanyName() {
-    return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "account/CompanyName");
+    return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "account/companyInfo");
   }
 
   forgotPassword(passwordResetRequest: ForgotPasswordRequest) {
