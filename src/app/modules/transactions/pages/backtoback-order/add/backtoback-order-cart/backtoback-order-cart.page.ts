@@ -360,7 +360,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   /* #region  delete item */
 
-  async presentDeleteItemAlert(data: TransactionDetail) {
+  async presentDeleteItemAlert(data: TransactionDetail, index: number) {
     try {
       const alert = await this.alertController.create({
         cssClass: 'custom-alert',
@@ -371,7 +371,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
             role: 'confirm',
             cssClass: 'danger',
             handler: () => {
-              this.removeItemById(data);
+              this.removeItem(data, index);
             },
           },
           {
@@ -389,12 +389,13 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  removeItemById(data: TransactionDetail) {
+  removeItem(data: TransactionDetail, index: number) {
     try {
-      let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
-      if (index > -1) {
-        this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
-      }
+      this.objectService.itemInCart.splice(index,1);
+      // let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
+      // if (index > -1) {
+      //   this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
+      // }
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
       }
