@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { ConsignmentSalesRoot } from '../../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../../services/consignment-sales.service';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-consignment-sales-detail',
@@ -21,7 +22,9 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     private route: ActivatedRoute,
     private authService: AuthService,
     public objectService: ConsignmentSalesService,
-    private navController: NavController
+    private navController: NavController,
+    private commonService: CommonService,
+    private alertController: AlertController
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -75,5 +78,64 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
   }
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region download pdf */
+
+  async presentAlertViewPdf() {
+    try {
+      const alert = await this.alertController.create({
+        header: 'Download PDF?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf();
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async downloadPdf() {
+    try {
+      this.objectService.downloadPdf("SMCS001", "pdf", this.object.header.consignmentSalesId, "Mobile Ticketing").subscribe(response => {
+        let filename = this.object.header.consignmentSalesNum + ".pdf";
+        this.commonService.commonDownloadPdf(response, filename);
+      }, error => {
+        console.log(error);
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
 
 }

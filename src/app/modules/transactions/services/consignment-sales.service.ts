@@ -116,4 +116,15 @@ export class ConsignmentSalesService {
     return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales", object, httpObserveHeader);
   }
 
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/exportPdf",
+      {
+        "appCode": appCode,
+        "format": format,
+        "documentIds": [documentId],
+        "reportName": reportName ?? null
+      },
+      { responseType: "blob" });
+  }
+
 }

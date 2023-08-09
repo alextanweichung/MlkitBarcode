@@ -4,13 +4,36 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/transactions/consignment-sales"></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="primary">
+    <ion-buttons slot="end">
+      <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="primary">
       <ion-button (click)="edit()">
         <ion-icon slot="icon-only" name="create-outline"></ion-icon>
       </ion-button>
-    </ion-buttons>
+    </ion-buttons> -->
   </ion-toolbar>
 </ion-header>
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item (click)="popover.dismiss(); edit()">
+          <ion-icon name="create-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Edit</div>
+          </ion-label>
+        </ion-item>
+        <ion-item (click)="popover.dismiss(); presentAlertViewPdf()">
+          <ion-icon name="download-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Ticketing</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 <ion-content fullscreen>
   <ion-header collapse="condense">
     <ion-toolbar>
