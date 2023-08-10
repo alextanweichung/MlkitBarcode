@@ -40,7 +40,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   brandMasterList: MasterListDetails[] = [];
   groupMasterList: MasterListDetails[] = [];
   categoryMasterList: MasterListDetails[] = [];
-  salesOrderQuantityControl: string = "0";
+  salesOrderQuantityControl: string = "0";  
+  systemWideBlockConvertedCode: boolean = false;
   itemListLoadSize: number;
 
   @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
@@ -70,18 +71,28 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
+
       if (this.isSalesOrder) {
         let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
         if (salesOrderQuantityControl) {
           this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
         }
       }
+
       let itemListLoadSize = this.moduleControl.find(x => x.ctrlName === "ItemListLoadSize")?.ctrlValue;
       if (itemListLoadSize && Number(itemListLoadSize) > 0) {
         this.itemListLoadSize = Number(itemListLoadSize);
-      } else{
+      } else {
         this.itemListLoadSize = 10;
       }
+
+      let blockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")
+      if (blockConvertedCode) {
+        this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
+      } else {
+        this.systemWideBlockConvertedCode = false;
+      }
+      
     })
   }
 
@@ -279,9 +290,11 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   addToCart(data: TransactionDetail) {
-    this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
-    this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
-    data.qtyRequest = 0;
+    if (!this.validateNewItemConversion(data)) {
+      this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
+      this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
+      data.qtyRequest = 0;
+    }
   }
 
   /* #endregion */
@@ -348,26 +361,28 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   addVariationToCart() {
     var totalQty = 0;
-    if (this.selectedItem.variationDetails) {
-      this.selectedItem.variationDetails.forEach(x => {
-        x.details.forEach(y => {
-          totalQty = totalQty + y.qtyRequest;
-        });
-      })
-    }
-    this.selectedItem.qtyRequest = totalQty;
-    if (totalQty > 0) {
-      // count total in cart
-      this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + totalQty;
-      // count variation in cart
-      this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
-        x.details.forEach(y => {
-          y.qtyInCart = (y.qtyInCart??0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+    if (!this.validateNewItemConversion(this.selectedItem)) {
+      if (this.selectedItem.variationDetails) {
+        this.selectedItem.variationDetails.forEach(x => {
+          x.details.forEach(y => {
+            totalQty = totalQty + y.qtyRequest;
+          });
         })
-      })
-      this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+      }
+      this.selectedItem.qtyRequest = totalQty;
+      if (totalQty > 0) {
+        // count total in cart
+        this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + totalQty;
+        // count variation in cart
+        this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
+          x.details.forEach(y => {
+            y.qtyInCart = (y.qtyInCart ?? 0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+          })
+        })
+        this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+      }
+      this.hideModal();
     }
-    this.hideModal();
   }
 
   /* #endregion */
@@ -378,6 +393,28 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     event.getInputElement().then(r => {
       r.select();
     })
+  }
+
+  /* #endregion */
+
+  /* #region validate new item id */
+
+  validateNewItemConversion(found: TransactionDetail) {
+    if (found.newItemId && found.newItemEffectiveDate && this.commonService.convertUtcDate(found.newItemEffectiveDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
+      let newItemCode = this.configService.item_Masters.find(x => x.id == found.newItemId);
+      if (newItemCode) {
+        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newItemEffectiveDate), 'dd/MM/yyyy')}`, 'top', 'warning', 1750);
+        if (this.systemWideBlockConvertedCode) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   /* #endregion */

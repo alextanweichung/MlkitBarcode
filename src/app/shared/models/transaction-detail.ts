@@ -116,6 +116,9 @@ export interface TransactionDetail {
   categoryId?: number;
   deptId?: number;
   oriDiscId?: number;
+
+  newItemId?: number;
+  newItemEffectiveDate?: Date
 }
 
 export interface ItemPricing {

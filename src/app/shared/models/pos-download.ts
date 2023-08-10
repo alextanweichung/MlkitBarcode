@@ -2,6 +2,8 @@ export interface PDItemMaster {
    id: number
    code: string
    itemDesc: string
+   newId: number
+   newDate: Date
    brandId: number
    brandCd: string
    brandDesc: string

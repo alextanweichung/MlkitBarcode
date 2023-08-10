@@ -47,12 +47,12 @@ export class B2bopricingApprovalsPage implements OnInit, ViewWillEnter {
       this.transactionProcessingService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') : null), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
         this.pendingObjects = response.filter(r => !r.isComplete);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast('', 'Search Complete', 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         throw Error;
       })
     } catch (error) {
-      this.toastService.presentToast('Error loading objects', '', 'top', 'danger', 1000);
+      this.toastService.presentToast('', 'Error loading objects', 'top', 'danger', 1000);
     }
   }
 

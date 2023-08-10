@@ -108,7 +108,7 @@ export class ItemCartPage implements OnInit {
   async removeItemById(item: TransactionDetail) {
     this.itemInCart = JSON.parse(JSON.stringify(this.itemInCart.filter(r => r.itemId !== item.itemId)));
     this.onItemInCartDeleteCompleted.emit(this.itemInCart);
-    this.toastService.presentToast('Delete successful', 'Item has been removed from cart.', 'top', 'success', 1000);
+    this.toastService.presentToast('', 'Item has been removed from cart.', 'top', 'success', 1000);
   }  
 
   async presentDeleteItemVariationAlert(trxLine: TransactionDetail, item: InnerVariationDetail) {

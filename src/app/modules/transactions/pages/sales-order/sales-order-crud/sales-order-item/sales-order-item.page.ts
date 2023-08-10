@@ -110,7 +110,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       this.objectService.itemInCart.unshift(trxLine);
       await this.computeAllAmount(this.objectService.itemInCart[0]);
       await this.assignSequence();
-      this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
+      this.toastService.presentToast('', 'Item Added to Cart', 'top', 'success', 1000);
     } catch (e) {
       console.error(e);
     }

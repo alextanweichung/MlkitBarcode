@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS Item_Master (
   id INTEGER, 
   code VARCHAR(100), 
   itemDesc VARCHAR(100), 
+  newId INTEGER, 
+  newDate DATE, 
   brandId INTEGER, 
   brandCd VARCHAR(20), 
   brandDesc VARCHAR(100), 

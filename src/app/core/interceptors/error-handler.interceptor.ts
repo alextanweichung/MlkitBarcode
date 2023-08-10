@@ -55,7 +55,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
             this.loadingService.showLoading('Loading');
             // this.spinner.show('sp1');
          }
-      }, 100);
+      }, 800);
 
       return next.handle(authReq).pipe(
          catchError(error => {

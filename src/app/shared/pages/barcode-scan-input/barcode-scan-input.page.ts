@@ -6,6 +6,9 @@ import { ModuleControl } from '../../models/module-control';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { MasterListDetails } from '../../models/master-list-details';
 import { Keyboard } from '@capacitor/keyboard';
+import { PDItemMaster } from '../../models/pos-download';
+import { CommonService } from '../../services/common.service';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -20,6 +23,7 @@ export class BarcodeScanInputPage implements OnInit {
   moduleControl: ModuleControl[];
   systemWideEAN13IgnoreCheckDigit: boolean = false;
   systemWideScanningMethod: string;
+  systemWideBlockConvertedCode: boolean = false;
 
   selectedScanningMethod: string = "B";
 
@@ -28,16 +32,17 @@ export class BarcodeScanInputPage implements OnInit {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
+    private commonService: CommonService,
     private toastService: ToastService
   ) { }
-  
+
   ngOnInit() {
     this.loadModuleControl();
   }
-  
+
   showKeyboard(event) {
     event.preventDefault();
-    this.barcodeInput.nativeElement.focus();
+    this.setFocus();
     setTimeout(async () => {
       await Keyboard.show();
     }, 100);
@@ -46,14 +51,24 @@ export class BarcodeScanInputPage implements OnInit {
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
+
       let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
       if (ignoreCheckdigit != undefined) {
         this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
+
       let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
       if (scanningMethod != undefined) {
         this.systemWideScanningMethod = scanningMethod.ctrlValue;
       }
+
+      let blockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")
+      if (blockConvertedCode) {
+        this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
+      } else {
+        this.systemWideBlockConvertedCode = false;
+      }
+      
     }, error => {
       console.log(error);
     })
@@ -79,6 +94,8 @@ export class BarcodeScanInputPage implements OnInit {
     return itemBarcode;
   }
 
+  /* #region scan */
+
   barcodeSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
   async validateBarcode(barcode: string) {
@@ -88,6 +105,7 @@ export class BarcodeScanInputPage implements OnInit {
         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
         if (found_barcode) {
           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+          console.log("🚀 ~ file: barcode-scan-input.page.ts:103 ~ BarcodeScanInputPage ~ validateBarcode ~ found_item_master:", JSON.stringify(found_item_master))
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,
             itemCode: found_item_master.code,
@@ -118,7 +136,9 @@ export class BarcodeScanInputPage implements OnInit {
             itemCategoryId: found_item_master.catId,
             itemBarcodeTagId: found_barcode.id
           }
-          this.onItemAdd.emit([outputData]);
+          if (!this.validateNewItemConversion(found_item_master)) {
+            this.onItemAdd.emit([outputData]);
+          }
         } else {
           this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
         }
@@ -127,8 +147,6 @@ export class BarcodeScanInputPage implements OnInit {
       }
     }
   }
-
-  /* #region item scan */
 
   handleItemCodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
@@ -201,9 +219,13 @@ export class BarcodeScanInputPage implements OnInit {
         }
         if (this.availableItems.length > 0) {
           if (this.availableItems.length === 1) {
-            this.onItemAdd.emit(this.availableItems);
+            if (!this.validateNewItemConversion(found_item_master)) {
+              this.onItemAdd.emit(this.availableItems);
+            }
           } else {
-            this.showModal();
+            if (!this.validateNewItemConversion(found_item_master)) {
+              this.showModal();
+            }
           }
         } else {
           this.toastService.presentToast('Item Not Found', '', 'top', 'danger', 1000);
@@ -213,6 +235,8 @@ export class BarcodeScanInputPage implements OnInit {
       }
     }
   }
+
+  /* #endregion */
 
   /* #region modal for user to select item */
 
@@ -233,14 +257,14 @@ export class BarcodeScanInputPage implements OnInit {
 
   /* #endregion */
 
-  /* #endregion */
-
   /* #region focus */
 
   scanningMethodChanged() {
-    this.setFocus();
+    setTimeout(() => {
+      this.setFocus();
+    }, 100);
   }
-  
+
   setFocus() {
     if (this.selectedScanningMethod === "B") {
       this.focusBarcodeSearch();
@@ -255,6 +279,28 @@ export class BarcodeScanInputPage implements OnInit {
 
   focusItemSearch() {
     this.itemInput.nativeElement.focus();
+  }
+
+  /* #endregion */
+
+  /* #region validate new item id */
+
+  validateNewItemConversion(found: PDItemMaster) {
+    if (found.newId && found.newDate && this.commonService.convertUtcDate(found.newDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
+      let newItemCode = this.configService.item_Masters.find(x => x.id == found.newId);
+      if (newItemCode) {
+        this.toastService.presentToast("Converted Code Detected", `Item ${found.code} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newDate), 'dd/MM/yyyy')}`, 'top', 'warning', 1750);
+        if (this.systemWideBlockConvertedCode) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   /* #endregion */
