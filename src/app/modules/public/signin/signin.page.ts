@@ -67,7 +67,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
       // this.signin_form.get('userEmail').setValue('kccon@idcp.my');
       this.signin_form.get('userEmail').setValue('aychia@idcp.my');
       // this.signin_form.get('userEmail').setValue('wayne@idcp.my');
-      this.signin_form.get('password').setValue('String1234');
+      this.signin_form.get('password').setValue('Dev9999');
       // this.signin_form.get('userEmail').setValue('admin@idcp.my');
       // this.signin_form.get('password').setValue('i@Dmin7026');
     } else {

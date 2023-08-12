@@ -22,6 +22,7 @@ import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { NgCircleProgressModule } from 'ng-circle-progress';
+import { NgxSpinnerModule } from "ngx-spinner";
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();
@@ -33,6 +34,7 @@ export function initializeFactory(init: InitializeAppService) {
     ],
     imports: [
         BrowserModule,
+        NgxSpinnerModule,
         IonicModule.forRoot({ mode: 'ios' }),
         ReactiveFormsModule,
         AppRoutingModule,

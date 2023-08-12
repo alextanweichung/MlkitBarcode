@@ -39,8 +39,12 @@
                   <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge><div class="ion-text-right">{{object.currencyCode}} {{object.grandTotal|number:'1.2'}}</div></ion-badge></ion-col>
                 </ion-row>
                 <ion-row>
-                  <ion-col class="ion-flex ion-margin-auto">{{object.customerName}}</ion-col>
-                  <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.salesAgentName}}</ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <ion-badge>{{object.customerCode}}</ion-badge>
+                    <div class="ion-flex ml-2">{{object.customerName}}</div>
+                    <div class="ion-flex ion-margin-auto justify-content-end">{{object.salesAgentName}}</div>
+                  </ion-col>
+                  <!-- <ion-col class="ion-flex ion-margin-auto justify-content-end"></ion-col> -->
                 </ion-row>
                 <ion-row *ngIf="object.otherAmountCount && object.otherAmountCount > 0">
                   <ion-col class="ion-flex ion-margin-auto">

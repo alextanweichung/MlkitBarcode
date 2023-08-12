@@ -5,6 +5,7 @@ export interface SalesOrderList {
   salesOrderId: number
   salesOrderNum: string
   trxDate: string
+  customerCode: string
   customerName: string
   salesAgentName: string
   countryDescription: string

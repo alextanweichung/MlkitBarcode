@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
-// import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);
 
@@ -26,8 +26,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    constructor(
       private router: Router,
       private toastService: ToastService,
-      private loadingService: LoadingService
-      // private spinner: NgxSpinnerService
+      private loadingService: LoadingService,
+      private spinner: NgxSpinnerService
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {
@@ -52,8 +52,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       
       setTimeout(() => {
          if (!finished) {
-            this.loadingService.showLoading('Loading');
-            // this.spinner.show('sp1');
+            // this.loadingService.showLoading('Loading');
+            this.spinner.show('sp1');
          }
       }, 800);
 
@@ -108,8 +108,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            this.loadingService.dismissLoading();
-            // this.spinner.hide('sp1');
+            // this.loadingService.dismissLoading();
+            this.spinner.hide('sp1');
          })
       );
    }

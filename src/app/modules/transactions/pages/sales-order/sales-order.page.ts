@@ -88,6 +88,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
         salesAgentId: this.salesAgentIds
       }
       this.objectService.getObjectListByDate(obj).subscribe(async response => {
+        console.log("🚀 ~ file: sales-order.page.ts:96 ~ SalesOrderPage ~ this.objectService.getObjectListByDate ~ response:", response)
         this.objects = [...this.objects, ...response];
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, async error => {
@@ -110,6 +111,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
             salesOrderId: objRoot.header.salesOrderId,
             salesOrderNum: element.draftTransactionNum,
             trxDate: objRoot.header.trxDate,
+            customerCode: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.code,
             customerName: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.description,
             salesAgentName: await this.objectService.salesAgentMasterList.find(r => r.id === objRoot.header.salesAgentId)?.description,
             countryDescription: null,
