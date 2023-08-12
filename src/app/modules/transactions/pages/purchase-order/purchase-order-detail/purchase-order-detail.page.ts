@@ -5,7 +5,6 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PurchaseOrderLine, PurchaseOrderRoot } from '../../../models/purchase-order';
 import { PurchaseOrderService } from '../../../services/purchase-order.service';
-import { Capacitor } from '@capacitor/core';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';

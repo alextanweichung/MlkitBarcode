@@ -36,6 +36,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          });
          return next.handle(authReq);
       }
+      // static ɵcmp: i0.ɵɵComponentDeclaration<NgxSpinnerComponent, "ngx-spinner", never, { "bdColor": "bdColor"; "size": "size"; "color": "color"; "type": "type"; "fullScreen": "fullScreen"; "name": "name"; "zIndex": "zIndex"; "template": "template"; "showSpinner": "showSpinner"; "disableAnimation": "disableAnimation"; }, {}, never, ["*"]>;
       
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
       const authReq = request.clone({

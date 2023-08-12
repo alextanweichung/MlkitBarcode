@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
@@ -106,6 +105,13 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        if (this.object.header.isHomeCurrency) {
+          this.object.header.maxPrecision = this.precisionSales.localMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.localMax
+        } else {
+          this.object.header.maxPrecision = this.precisionSales.foreignMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
+        }
       }, error => {
         throw error;
       })
