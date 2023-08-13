@@ -44,7 +44,9 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
   @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
   ionViewDidEnter(): void {
     try {
-      this.barcodeInput.nativeElement.focus();
+      if (this.isWithSo) {
+        this.barcodeInput?.nativeElement.focus();
+      }
     } catch (e) {
       console.error(e);
     }
@@ -324,6 +326,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
   /* #region detail modal */
 
   async showDetail() {
+    console.log("🚀 ~ file: picking-header.page.ts:330 ~ PickingHeaderPage ~ showDetail ~ this.objectForm.getRawValue():", this.objectForm.getRawValue())
     this.objectService.setHeader(this.objectForm.getRawValue());
     this.navController.navigateForward("/transactions/picking/picking-item");
   }
@@ -518,6 +521,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
         this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
         return;
       }
+      console.log("🚀 ~ file: picking-header.page.ts:522 ~ PickingHeaderPage ~ nextStep ~ this.objectForm.getRawValue():", this.objectForm.getRawValue())
       this.objectService.setHeader(this.objectForm.getRawValue());
       this.navController.navigateForward("/transactions/picking/picking-item");
     } catch (e) {

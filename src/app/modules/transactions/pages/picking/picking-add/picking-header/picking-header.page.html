@@ -23,14 +23,21 @@
         <ion-label>Without SO</ion-label>
       </ion-segment-button>
     </ion-segment>
-    <div class="mt-2" *ngIf="isWithSo === 'false'">
+    <div class="mt-2" *ngIf="isWithSo === 'false'" [formGroup]="objectForm">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
         <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
         <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
+        
+        <ion-item lines="none">
+          <ion-label class="font-bold" position="stacked">Remark</ion-label>
+          <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
+        </ion-item>
+
       </ion-list>
     </div>
     <div *ngIf="isWithSo === 'true'">
+
       <ion-segment [(ngModel)]="groupType" (ionChange)="groupTypeChanged($event)" *ngIf="selectedSalesOrders && selectedSalesOrders.length > 0">
         <ion-segment-button value="S">
           <ion-label>Group By Sales Order</ion-label>
@@ -53,24 +60,32 @@
         </ion-row>
       </ion-grid>
 
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="selectedSalesOrders && selectedSalesOrders.length > 0">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
-          <ion-grid class="ion-no-padding py-2 pl-2">
-            <ion-row>
-              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Customer</div></ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedCustomerId|idMapping:objectService.customerMasterList}}</div></ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Origin Location</div></ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedLocationId|idMapping:objectService.locationMasterList}}</div></ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Destination Location</div></ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedToLocationId|idMapping:objectService.locationMasterList}}</div></ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-item>
-      </ion-list>
+      <div *ngIf="selectedSalesOrders && selectedSalesOrders.length > 0">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+            <ion-grid class="ion-no-padding py-2 pl-2">
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Customer</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedCustomerId|idMapping:objectService.customerMasterList}}</div></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Origin Location</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedLocationId|idMapping:objectService.locationMasterList}}</div></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Destination Location</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{selectedToLocationId|idMapping:objectService.locationMasterList}}</div></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+        <ion-list class="list-custom animate__animated animate__fadeIn ion-no-padding" lines="none" [formGroup]="objectForm">
+          <ion-item class="ion-no-padding pl-2" lines="none">
+            <ion-label class="font-bold" position="stacked">Remark</ion-label>
+            <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
+          </ion-item>
+        </ion-list>
+      </div>
       <div *ngIf="groupType === 'S'">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <!-- <ion-item-sliding #slidingItem *ngFor="let o of uniqueSo"> -->
