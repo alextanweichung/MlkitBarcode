@@ -75,6 +75,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   loadDebtorReport() {
+    this.selected = [];
     let obj: DebtorOutstandingRequest = {
       customerId: this.customerIds ?? [],
       trxDate: format(this.trxDate, 'yyyy-MM-dd'),

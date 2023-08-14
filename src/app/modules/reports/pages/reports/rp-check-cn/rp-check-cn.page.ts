@@ -59,6 +59,7 @@ export class RpCheckCnPage implements OnInit {
 
   objects: CheckCn[] = [];
   loadReport() {
+    this.selected = [];
     this.objects = [];
     let obj: CheckCnRequest = {
       customerIds: this.customerIds
