@@ -573,7 +573,7 @@ export class CommonService {
                 readPermission = true;
               }
             }).catch(error => {
-              writePermission = false;              
+              readPermission = false;              
             })
           } else {
             readPermission = true;
@@ -594,7 +594,15 @@ export class CommonService {
           }
         })
 
+        console.log("🚀 ~ file: common.service.ts:599 ~ CommonService ~ awaitthis.file.writeFile ~ this.file.externalRootDirectory:", this.file.externalRootDirectory)
+        await this.file.checkDir(this.file.externalRootDirectory, "Download").then((result) => {
+          console.log("🚀 ~ file: common.service.ts:599 ~ CommonService ~ awaitthis.file.checkDir ~ result:", JSON.stringify(result))
+        }).catch((error) => {
+          console.log("🚀 ~ file: common.service.ts:601 ~ CommonService ~ awaitthis.file.checkDir ~ error:", JSON.stringify(error))          
+        })
+        
         if (readPermission && writePermission) {
+          
           await this.file.writeFile(this.file.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
             await this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
             this.loadingService.dismissLoading();

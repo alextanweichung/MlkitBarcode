@@ -17,6 +17,7 @@ export class InitializeAppService {
     private migrationService: MigrationService) { }
 
   async initializeApp() {
+    console.log("🚀 ~ file: initialize.app.service.ts:20 ~ InitializeAppService ~ initializeApp ~ initializeApp:")
     await this.sqliteService.initializePlugin().then(async (ret) => {
       try {
         //execute startup queries
@@ -25,6 +26,7 @@ export class InitializeAppService {
           await this.configService.load();
         }
       } catch (error) {
+        console.log("🚀 ~ file: initialize.app.service.ts:29 ~ InitializeAppService ~ awaitthis.sqliteService.initializePlugin ~ error:", JSON.stringify(error))
         throw Error(`initializeAppError: ${error}`);
       }
     });

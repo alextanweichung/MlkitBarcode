@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ViewDidEnter } from '@ionic/angular';
-import { format, parseISO } from 'date-fns';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { IonDatetime, ViewDidEnter } from '@ionic/angular';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-calendar-input',
@@ -11,6 +11,7 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
 
   @Input() title: string = 'Date';
   defaultDate: Date = new Date();
+  @Input() maxDateToday: boolean = false;
   @Input() labelPosition = 'stacked';
   @Input() presentation = 'date';
   @Output() onDateSelected: EventEmitter<Date> = new EventEmitter();
@@ -18,11 +19,15 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
   date_active: boolean = false;
   date_display: string;
   date_value_for_ion_calendar: Date;
+  today: Date;
   @Input() date_value: Date;
+
+  @ViewChild('ionDateTime', {static:false}) ionDateTime: IonDatetime
 
   constructor() { }
 
   ionViewDidEnter(): void {
+    console.log("🚀 ~ file: calendar-input.page.ts:29 ~ CalendarInputPage ~ ionViewDidEnter ~ ionViewDidEnter:")
     if (!this.date_value) {
       if (this.presentation === 'date-time') {
         this.date_value = new Date(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), this.defaultDate.getHours(), this.defaultDate.getMinutes(), 0);
@@ -38,6 +43,7 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log("🚀 ~ file: calendar-input.page.ts:61 ~ CalendarInputPage ~ ngOnChanges ~ ngOnChanges:")
     if (changes.date_value) {
       if (this.date_value) {
         if (this.presentation === 'date-time') {
@@ -54,6 +60,8 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
   }
 
   ngOnInit() {
+    this.today = new Date(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), 0, 0, 0);
+    this.today.setMinutes(this.today.getMinutes() - this.today.getTimezoneOffset());
   }
 
   // Toggle date from
@@ -91,5 +99,4 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
     this.date_value_for_ion_calendar.setMinutes(this.date_value_for_ion_calendar.getMinutes() - this.date_value_for_ion_calendar.getTimezoneOffset());
     this.date_display = this.presentation === 'date-time' ? format(this.date_value, 'dd/MM/yyyy hh:mm aa') : format(this.date_value, 'dd/MM/yyyy');
   }
-
 }

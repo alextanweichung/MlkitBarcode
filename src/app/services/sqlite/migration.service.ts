@@ -75,6 +75,7 @@ export class MigrationService {
   }
 
   async migrate(): Promise<any> {
+    console.log("🚀 ~ file: migration.service.ts:78 ~ MigrationService ~ migrate ~ migrate:")
     await this.createSystemParamTable();
     // await this.addSystemParamCol();
     await this.deleteInboundTables();
@@ -82,6 +83,7 @@ export class MigrationService {
   }
 
   async createSystemParamTable(): Promise<void> {
+    console.log("🚀 ~ file: migration.service.ts:86 ~ MigrationService ~ createSystemParamTable ~ createSystemParamTable:")
     console.log(`going to create a connection`)
     const db = await this.sqliteService.createConnection(dbConfig.idcpcore, false, "no-encryption", 1);
     console.log(`db ${JSON.stringify(db)}`);

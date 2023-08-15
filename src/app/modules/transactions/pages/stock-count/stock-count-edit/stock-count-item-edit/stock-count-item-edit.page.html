@@ -45,8 +45,8 @@
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="ion-flex">
                   {{line.itemCode}}
-                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                 </div>
               </ion-col>
             </ion-row>
