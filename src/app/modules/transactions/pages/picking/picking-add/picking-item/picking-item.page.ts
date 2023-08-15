@@ -330,11 +330,13 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                 if (this.objectService.header.isWithSo) {
                   this.resetOutstandingListQuantityCurrent(item);
                   let pickingCartonTag = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
-                  let rowIndex = pickingCartonTag.pickList.findIndex(x => x == item);
+                  // let rowIndex = pickingCartonTag.pickList.findIndex(x => x == item);
                   pickingCartonTag.pickList.splice(rowIndex, 1);
                   pickingCartonTag.pickList = [...pickingCartonTag.pickList];
                 } else {
-                  this.objectService.multiPickingObject.pickingCarton = this.objectService.multiPickingObject.pickingCarton.filter(r => Number(r.cartonNum) !== Number(this.selectedCartonNum)).splice(rowIndex, 1);
+                  let pickingCartonTag = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
+                  pickingCartonTag.pickList.splice(rowIndex, 1);
+                  pickingCartonTag.pickList = [...pickingCartonTag.pickList];
                 }
               },
             },

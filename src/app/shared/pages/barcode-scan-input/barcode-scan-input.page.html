@@ -21,19 +21,51 @@
   </ion-row>
 </ion-grid>
 
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+<ion-modal [isOpen]="itemModalOpen" (didDismiss)="itemModalOpen = false">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Item List</ion-title>
+        <ion-title>Items</ion-title>
         <ion-buttons slot="start">
-          <ion-button (click)="hideModal()">Cancel</ion-button>
+          <ion-button (click)="hideItemModel()">Cancel</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-item detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableItems">
+        <ion-item detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableItemmmm" (click)="showVariations(item)">
+          <!-- <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox> -->
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div>{{item.itemCode}} - {{item.description}}</div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </div>
+    </ion-content>
+    <!-- <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+      <ion-button class="ion-margin" expand="block" (click)="selectItem()">
+        Select Item(s)
+      </ion-button>
+    </ion-footer> -->
+  </ng-template>
+</ion-modal>
+
+<ion-modal [isOpen]="variationModalOpen" (didDismiss)="variationModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Variations</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideVariationModel()">Cancel</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="p-2">
+        <ion-item detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableVariationsByItemId">
           <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -52,8 +84,8 @@
       </div>
     </ion-content>
     <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-      <ion-button class="ion-margin" expand="block" (click)="selectItems()">
-        Select Item(s)
+      <ion-button class="ion-margin" expand="block" (click)="addVariations()">
+        Add Item(s)
       </ion-button>
     </ion-footer>
   </ng-template>
