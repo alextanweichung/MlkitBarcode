@@ -16,31 +16,31 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Information</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full" *ngIf="stockCountRoot">
+    <ion-list class="list-custom" lines="full" *ngIf="objectRoot">
       <ion-item>
         <ion-label>
           <p>Doc Number</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.inventoryCountNum}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectRoot.header.inventoryCountNum}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Trx Date</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectRoot.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Location</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectRoot.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" *ngFor="let item of stockCountRoot.details" class="no-ripple ion-no-padding">
+      <ion-item button detail="false" *ngFor="let item of objectRoot.details" class="no-ripple ion-no-padding">
         <ion-grid class="p-2 ion-no-padding">
           <ion-row>
             <ion-col>

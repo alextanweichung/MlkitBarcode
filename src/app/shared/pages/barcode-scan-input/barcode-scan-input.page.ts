@@ -1,14 +1,14 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ModuleControl } from '../../models/module-control';
-import { TransactionDetail } from '../../models/transaction-detail';
 import { MasterListDetails } from '../../models/master-list-details';
-import { Keyboard } from '@capacitor/keyboard';
+import { ModuleControl } from '../../models/module-control';
 import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
+import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
-import { format } from 'date-fns';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -166,6 +166,7 @@ export class BarcodeScanInputPage implements OnInit {
       this.itemSearchValue = '';
       this.availableItemmmm = [];
       this.availableVariations = [];
+      this.availableVariationsByItemId = [];
       let found_item_master: PDItemMaster[] = [];
       let found_item_barcode: PDItemBarcode[] = [];
       if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
@@ -268,6 +269,7 @@ export class BarcodeScanInputPage implements OnInit {
         //   } else {
         //     if (!this.validateNewItemConversion(found_item_master)) {
         if (found_item_master && found_item_master.length === 1) {
+          this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id);
           this.showVariationModal();
         } else {
           this.showItemModal();
@@ -300,7 +302,19 @@ export class BarcodeScanInputPage implements OnInit {
   showVariations(item: TransactionDetail) {
     this.availableVariationsByItemId = [];
     if (item.variationTypeCode === "0") {
-      this.onItemAdd.emit([item]);
+      if (item) {
+        let found = this.configService.item_Masters.find(r => r.id === item.itemId);
+        if (found) {
+          if (!this.validateNewItemConversion(found)) {
+            this.onItemAdd.emit([item]);
+          }
+        }
+        else {
+          this.onItemAdd.emit([item]);
+        }
+      } else {
+        this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
+      }
       this.hideItemModel();
     }
     else {
@@ -323,7 +337,21 @@ export class BarcodeScanInputPage implements OnInit {
   }
 
   addVariations() {
-    this.onItemAdd.emit(this.availableVariations.filter(r => r.isSelected));
+    let found = this.availableVariationsByItemId.filter(r => r.isSelected)
+    if (found.length > 0) {
+      let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]);
+      if (found_item_master) {
+        if (!this.validateNewItemConversion(found_item_master[0])) {
+          this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
+        }
+      }
+      else {
+        this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
+      }
+    }
+    else {
+      this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
+    }
     this.hideItemModel();
     this.hideVariationModel();
   }

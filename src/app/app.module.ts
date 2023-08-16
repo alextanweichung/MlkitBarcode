@@ -18,11 +18,9 @@ import { MigrationService } from './services/sqlite/migration.service';
 import { DetailService } from './services/sqlite/detail.service';
 import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { File } from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgxSpinnerModule } from "ngx-spinner";
+import { HideKeyboardDirective } from './shared/utilities/hide-keyboard.directive';
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();
@@ -56,9 +54,6 @@ export function initializeFactory(init: InitializeAppService) {
         })
     ],
     providers: [
-        File,
-        FileOpener,
-        AndroidPermissions,
         SQLiteService,
         DetailService,
         DatabaseService,

@@ -223,6 +223,10 @@ const routes: Routes = [
     path: 'transactions/debtor-application',
     loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then( m => m.DebtorApplicationPageModule)
   },
+  {
+    path: 'transactions/stock-replenish',
+    loadChildren: () => import('./modules/transactions/pages/stock-replenish/stock-replenish.module').then( m => m.StockReplenishPageModule)
+  },
 
 
 
@@ -316,10 +320,6 @@ const routes: Routes = [
     loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then(m => m.ItemAddListFlatPageModule)
   },
   {
-    path: 'item-view-list-flat',
-    loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then(m => m.ItemViewListFlatPageModule)
-  },
-  {
     path: 'item-catalog',
     loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then(m => m.ItemCatalogPageModule)
   },
@@ -335,6 +335,7 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
 
 
 ];

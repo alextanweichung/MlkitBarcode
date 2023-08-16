@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { File } from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+// import { File } from '@awesome-cordova-plugins/file';
+// import { FileOpener } from '@awesome-cordova-plugins/file-opener';
+// import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions';
 import { IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -15,7 +15,7 @@ import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/a
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
-  providers: [File, FileOpener, AndroidPermissions]
+  // providers: [File, FileOpener, AndroidPermissions]
 })
 export class DashboardPage implements OnInit, ViewDidEnter {
 

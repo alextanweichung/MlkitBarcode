@@ -12,6 +12,7 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { HideKeyboardDirective } from 'src/app/shared/utilities/hide-keyboard.directive';
+import HideKeyboardModule from 'src/app/shared/utilities/hide-keyboard.module';
 
 @NgModule({
   imports: [
@@ -24,7 +25,8 @@ import { HideKeyboardDirective } from 'src/app/shared/utilities/hide-keyboard.di
     CameraScanInputPageModule,
     IdMappingModule,
     NgCircleProgressModule,
+    HideKeyboardModule
   ],
-  declarations: [PickingHeaderPage, HideKeyboardDirective]
+  declarations: [PickingHeaderPage]
 })
 export class PickingHeaderPageModule {}

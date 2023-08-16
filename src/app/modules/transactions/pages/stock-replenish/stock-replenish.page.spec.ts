@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { ItemViewListFlatPage } from './item-view-list-flat.page';
+import { StockReplenishPage } from './stock-replenish.page';
 
-describe('ItemViewListFlatPage', () => {
-  let component: ItemViewListFlatPage;
-  let fixture: ComponentFixture<ItemViewListFlatPage>;
+describe('StockReplenishPage', () => {
+  let component: StockReplenishPage;
+  let fixture: ComponentFixture<StockReplenishPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemViewListFlatPage ],
+      declarations: [ StockReplenishPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ItemViewListFlatPage);
+    fixture = TestBed.createComponent(StockReplenishPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

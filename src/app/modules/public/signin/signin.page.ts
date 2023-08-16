@@ -10,7 +10,6 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 @Component({
   selector: 'app-signin',
@@ -34,8 +33,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
     private alertController: AlertController,
-    private navController: NavController,
-    private androidPermission: AndroidPermissions
+    private navController: NavController
   ) {
     this.currentVersion = environment.version;
     this.newForm();

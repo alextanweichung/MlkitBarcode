@@ -7,7 +7,6 @@ import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/t
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
