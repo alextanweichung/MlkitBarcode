@@ -109,7 +109,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
     this.objectService.getSOHeader(request).subscribe(response => {
       if (response.status === 200) {
         let so = response.body[0] as MultiPickingSalesOrder;
-        console.log("🚀 ~ file: picking-header.page.ts:94 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ so:", so)
         if (so === undefined) {
           this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
           return;
@@ -124,12 +123,10 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
           return;
         }
         this.selectedSalesOrders.unshift(so);
-        console.log("🚀 ~ file: picking-header.page.ts:110 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.selectedSalesOrders:", this.selectedSalesOrders)
         if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
           this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId });
         }
         // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
-        console.log("🚀 ~ file: picking-header.page.ts:115 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPickingObject.outstandingPickList:", this.objectService.multiPickingObject.outstandingPickList)
         this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
         this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
         this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
@@ -326,7 +323,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
   /* #region detail modal */
 
   async showDetail() {
-    console.log("🚀 ~ file: picking-header.page.ts:330 ~ PickingHeaderPage ~ showDetail ~ this.objectForm.getRawValue():", this.objectForm.getRawValue())
     this.objectService.setHeader(this.objectForm.getRawValue());
     this.navController.navigateForward("/transactions/picking/picking-item");
   }
@@ -521,7 +517,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
         this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
         return;
       }
-      console.log("🚀 ~ file: picking-header.page.ts:522 ~ PickingHeaderPage ~ nextStep ~ this.objectForm.getRawValue():", this.objectForm.getRawValue())
       this.objectService.setHeader(this.objectForm.getRawValue());
       this.navController.navigateForward("/transactions/picking/picking-item");
     } catch (e) {

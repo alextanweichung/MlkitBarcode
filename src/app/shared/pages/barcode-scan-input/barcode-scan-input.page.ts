@@ -105,7 +105,6 @@ export class BarcodeScanInputPage implements OnInit {
         let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
         if (found_barcode) {
           let found_item_master = this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-          console.log("🚀 ~ file: barcode-scan-input.page.ts:103 ~ BarcodeScanInputPage ~ validateBarcode ~ found_item_master:", JSON.stringify(found_item_master))
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,
             itemCode: found_item_master.code,
@@ -161,7 +160,6 @@ export class BarcodeScanInputPage implements OnInit {
   availableVariations: TransactionDetail[] = [];
   @ViewChild('itemInput', { static: false }) itemInput: ElementRef;
   validateItem(searchValue: string) {
-    console.log("🚀 ~ file: barcode-scan-input.page.ts:163 ~ BarcodeScanInputPage ~ validateItem ~ searchValue:", searchValue)
     if (searchValue) {
       this.itemSearchValue = '';
       this.availableItemmmm = [];
@@ -184,10 +182,7 @@ export class BarcodeScanInputPage implements OnInit {
 
           found_item_master.forEach(r => {
             if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
-              console.log("🚀 ~ file: barcode-scan-input.page.ts:221 ~ BarcodeScanInputPage ~ validateItem ~ r:", JSON.stringify(r))
-              console.log("🚀 ~ file: barcode-scan-input.page.ts:187 ~ BarcodeScanInputPage ~ validateItem ~ r.varCd:", r.varCd)
               let t = found_item_barcode.find(rr => rr.itemId === r.id);
-              console.log("🚀 ~ file: barcode-scan-input.page.ts:188 ~ BarcodeScanInputPage ~ validateItem ~ t:", JSON.stringify(t))
               let outputData: TransactionDetail = {
                 itemId: r.id,
                 itemCode: r.code,

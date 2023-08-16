@@ -77,7 +77,6 @@ export class ToastService { //implements OnDestroy {
   }
 
   async presentToast(header: string, message: string, position: any, color: string, duration: number, showSearchResult: boolean = false, icon?: string) {
-    console.log("🚀 ~ file: toast.service.ts:80 ~ presentToast ~ message:", message)
     if (!icon) {
       switch (color) {
         case 'success':

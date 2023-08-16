@@ -151,7 +151,6 @@ export class RpCheckCnPage implements OnInit {
   }
 
   async printAllAlert() {
-    console.log("🚀 ~ file: rp-check-cn.page.ts:154 ~ RpCheckCnPage ~ printAllAlert ~ this.selected:", this.selected)
     try {
       const alert = await this.alertController.create({
         header: `Download ${this.selected.length} PDF?`,

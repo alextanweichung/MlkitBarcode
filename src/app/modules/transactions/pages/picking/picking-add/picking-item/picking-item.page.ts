@@ -626,7 +626,6 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
   /* #endregion */
 
   async nextStep() {
-    console.log("🚀 ~ file: picking-item.page.ts:637 ~ PickingItemPage ~ handler: ~ this.objectService.header:", this.objectService.header)
     try {
       const alert = await this.alertController.create({
         cssClass: 'custom-alert',
@@ -659,7 +658,6 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
   insertObject() {
     try {
       let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
-      console.log("🚀 ~ file: picking-item.page.ts:660 ~ PickingItemPage ~ insertObject ~ newObjectDto:", newObjectDto)
       if (this.allowDocumentWithEmptyLine == "N") {
         if (newObjectDto.details.length < 1) {
           this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "danger", 1000);
@@ -689,7 +687,6 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
   updateObject() {
     try {
       let updateObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
-      console.log("🚀 ~ file: picking-item.page.ts:689 ~ PickingItemPage ~ updateObject ~ objectDto:", updateObjectDto)
       if (this.allowDocumentWithEmptyLine === "N") {
         if (updateObjectDto.details.length < 1) {
           this.toastService.presentToast("Update Failed", "System unable to insert document without item line.", "top", "danger", 1000);

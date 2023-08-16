@@ -1,11 +1,11 @@
-
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { NavigationExtras } from '@angular/router';
+import { AlertController, NavController, IonPopover } from '@ionic/angular';
+import { ViewWillEnter } from '@ionic/angular/types/ionic-lifecycle-hooks';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
-import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
+import { StockReplenishService } from 'src/app/modules/transactions/services/stock-replenish.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
@@ -15,11 +15,11 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 
 @Component({
-  selector: 'app-sales-order-cart',
-  templateUrl: './sales-order-cart.page.html',
-  styleUrls: ['./sales-order-cart.page.scss'],
+  selector: 'app-stock-replenish-cart',
+  templateUrl: './stock-replenish-cart.page.html',
+  styleUrls: ['./stock-replenish-cart.page.scss'],
 })
-export class SalesOrderCartPage implements OnInit, ViewWillEnter {
+export class StockReplenishCartPage implements OnInit, ViewWillEnter {
 
   moduleControl: ModuleControl[] = [];
   promotionEngineApplicable: boolean = true;
@@ -29,7 +29,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   constructor(
     private authService: AuthService,
-    public objectService: SalesOrderService,
+    public objectService: StockReplenishService,
     private commonService: CommonService,
     private promotionEngineService: PromotionEngineService,
     private toastService: ToastService,
@@ -65,7 +65,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
           this.availableAddress = this.objectService.locationMasterList.filter(r => r.id === this.objectService.header.toLocationId).flatMap(r => r.shippingInfo);
         }
       }
-      if (this.objectService.header.salesOrderId === 0) { // only do this when new sales-order
+      if (this.objectService.header.salesOrderId === 0) { // only do this when new stock-replenish
         this.selectedAddress = this.availableAddress.find(r => r.isPrimary);
         this.onAddressSelected();
       }
@@ -122,18 +122,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
         let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
-        // apiData.forEach(element => {
-        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
-        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
-        //       restrictedObject[ctrl] = true;
-        //     }
-        //   });
-        // });
-        // if (!this.authService.isAdmin && this.systemWideDisableDocumentNumber) {
-        //   restrictedObject['salesOrderNum'] = true;
-        // }
-        // this.restrictFields = restrictedObject;  
-
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
@@ -153,7 +141,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   selectedIndex: number;
   showEditModal(data: TransactionDetail, rowIndex: number) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
-    // this.selectedItem = data;
     this.selectedIndex = rowIndex;
     this.isModalOpen = true;
   }
@@ -373,7 +360,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   removeItem(data: TransactionDetail, index: number) {
     try {
-      this.objectService.itemInCart.splice(index,1);
+      this.objectService.itemInCart.splice(index, 1);
       // let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
       // if (index > -1) {
       //   this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
@@ -470,7 +457,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/sales-order/sales-order-item');
+      this.navController.navigateBack('/transactions/stock-replenish/stock-replenish-item');
     } catch (e) {
       console.error(e);
     }
@@ -482,7 +469,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       if (this.objectService.itemInCart.length > 0) {
         const alert = await this.alertController.create({
           header: "Are you sure to proceed?",
-          subHeader: (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) ? "This will delete Draft & Generate SO" : "",
+          subHeader: "",
           buttons: [
             {
               text: 'OK',
@@ -527,24 +514,20 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
       trxDto.header.salesOrderNum = null; // always default to null when insert
-      if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
-        this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(response => {
-          this.objectService.setObject((response.body as SalesOrderRoot));
-          this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-          this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
-        }, error => {
-          console.error(error);
-        })
-      } else {
-        this.objectService.insertObject(trxDto).subscribe(response => {
-          this.objectService.setObject((response.body as SalesOrderRoot));
-          this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-          this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
-        }, error => {
-          this.submit_attempt = false;
-          console.error(error);
-        })
-      }
+      this.objectService.insertObject(trxDto).subscribe(response => {
+        this.objectService.setObject((response.body as SalesOrderRoot));
+        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: this.objectService.object.header.salesOrderId,
+          }
+        }
+        this.navController.navigateForward('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
+      }, error => {
+        this.submit_attempt = false;
+        console.error(error);
+      })
     } catch (e) {
       this.submit_attempt = false;
       console.error(e);
@@ -563,111 +546,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       this.objectService.updateObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
-      }, error => {
-        this.submit_attempt = false;
-        throw error;
-      });
-    } catch (e) {
-      this.submit_attempt = false;
-      console.error(e);
-    } finally {
-      this.submit_attempt = false;
-    }
-  }
-
-  /* #endregion */
-
-  /* #region draft step */
-
-  async nextStepDraft() {
-    try {
-      this.submit_attempt = true;
-      if (this.objectService.itemInCart.length > 0) {
-        const alert = await this.alertController.create({
-          header: "Save as Draft?",
-          buttons: [
-            {
-              text: 'OK',
-              cssClass: 'success',
-              role: 'confirm',
-              handler: async () => {
-                if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
-                  await this.updateObjectAsDraft();
-                } else {
-                  await this.insertObjectAsDraft();
-                }
-              },
-            },
-            {
-              text: 'Cancel',
-              cssClass: 'cancel',
-              role: 'cancel',
-              handler: async () => {
-                this.submit_attempt = false;
-              }
-            },
-          ],
-        });
-        await alert.present();
-      } else {
-        this.submit_attempt = false;
-        this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
-      }
-    } catch (e) {
-      this.submit_attempt = false;
-      console.error(e);
-    }
-  }
-
-  insertObjectAsDraft() {
-    try {
-      let trxDto: SalesOrderRoot = {
-        header: this.objectService.header,
-        details: this.objectService.itemInCart
-      }
-      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      let object: DraftTransaction = {
-        draftTransactionId: 0,
-        draftTransactionNum: null,
-        transactionType: "SALESORDER",
-        jsonData: JSON.stringify(trxDto)
-      }
-
-      this.objectService.insertDraftObject(object).subscribe(response => {
-        this.submit_attempt = false;
-        let ret: DraftTransaction = response.body as DraftTransaction;
-        let soObj = JSON.parse(ret.jsonData) as SalesOrderRoot;
-        soObj.header.salesOrderNum = ret.draftTransactionNum;
-        this.objectService.setObject(soObj);
-        this.toastService.presentToast('Insert Draft Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
-      }, error => {
-        this.submit_attempt = false;
-        throw error;
-      });
-    } catch (e) {
-      this.submit_attempt = false;
-      console.error(e);
-    } finally {
-      this.submit_attempt = false;
-    }
-  }
-
-  updateObjectAsDraft() {
-    try {
-      let trxDto: SalesOrderRoot = {
-        header: this.objectService.header,
-        details: this.objectService.itemInCart
-      }
-      trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      this.objectService.draftObject.jsonData = JSON.stringify(trxDto);
-      this.objectService.updateDraftObject(this.objectService.draftObject).subscribe(response => {
-        this.submit_attempt = false;
-        let ret: DraftTransaction = response.body as DraftTransaction
-        this.objectService.setObject(JSON.parse(ret.jsonData) as SalesOrderRoot);
-        this.toastService.presentToast('Update Draft Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
+        this.navController.navigateRoot('/transactions/stock-replenish/stock-replenish-summary');
       }, error => {
         this.submit_attempt = false;
         throw error;

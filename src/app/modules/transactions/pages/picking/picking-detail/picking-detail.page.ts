@@ -49,7 +49,6 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
     this.uniqueSalesOrder = []
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: picking-detail.page.ts:52 ~ PickingDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
         if (this.object.outstandingPickList && this.object.outstandingPickList.length > 0) {
@@ -91,7 +90,6 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
   /* #endregion */
 
   editObject() {
-    console.log("🚀 ~ file: picking-detail.page.ts:91 ~ PickingDetailPage ~ editObject ~ this.object:", this.object)
     this.objectService.object = this.object;
     this.objectService.setHeader(this.object.header);
     this.objectService.multiPickingObject = { outstandingPickList: this.object.outstandingPickList, pickingCarton: this.object.details };

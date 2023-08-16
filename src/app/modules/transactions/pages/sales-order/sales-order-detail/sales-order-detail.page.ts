@@ -46,10 +46,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         this.selectedSegment = params['selectedSegment'];
 
         this.isDraft = params['isDraft'];
-        console.log("🚀 ~ file: sales-order-detail.page.ts:47 ~ SalesOrderDetailPage ~ this.isDraft:", this.isDraft)
         if (this.isDraft) {
           this.draftTransactionId = params['draftTransactionId'];
-          console.log("🚀 ~ file: sales-order-detail.page.ts:50 ~ SalesOrderDetailPage ~ this.draftTransactionId:", this.draftTransactionId)
         }
       })
     } catch (e) {

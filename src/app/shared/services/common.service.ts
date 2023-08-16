@@ -535,7 +535,6 @@ export class CommonService {
   async commonDownloadPdf(file: Blob, filename: string) { // this filename already with extensions
     try {
       filename = filename.replace(" ", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
-      console.log("🚀 ~ file: common.service.ts:543 ~ CommonService ~ commonDownloadPdf ~ filename:", filename)
       await this.loadingService.showLoading("Downloading");
       if (Capacitor.getPlatform() === 'android') {
         File.checkDir(File.externalRootDirectory, "Download").then((results) => {
@@ -547,7 +546,6 @@ export class CommonService {
         let writePermission: boolean = false;
         let managePermission: boolean = false;
         await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(async result => {
-          console.log("🚀 ~ file: common.service.ts:566 ~ CommonService ~ awaitAndroidPermissions.checkPermission ~ result:", JSON.stringify(result))
           if (!result.hasPermission) {
             await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(result => {
               if (result.hasPermission) {
@@ -561,7 +559,6 @@ export class CommonService {
           }
         })
         await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.READ_EXTERNAL_STORAGE).then(async result => {
-          console.log("🚀 ~ file: common.service.ts:580 ~ CommonService ~ awaitAndroidPermissions.checkPermission ~ result:", JSON.stringify(result))
           if (!result.hasPermission) {
             await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.READ_EXTERNAL_STORAGE).then(result => {
               if (result.hasPermission) {
@@ -575,7 +572,6 @@ export class CommonService {
           }
         })
         await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.MANAGE_EXTERNAL_STORAGE).then(async result => {
-          console.log("🚀 ~ file: common.service.ts:594 ~ CommonService ~ awaitAndroidPermissions.checkPermission ~ result:", JSON.stringify(result))
           if (!result.hasPermission) {
             await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.MANAGE_EXTERNAL_STORAGE).then(result => {
               if (result.hasPermission) {
@@ -589,20 +585,11 @@ export class CommonService {
           }
         })
 
-        console.log("🚀 ~ file: common.service.ts:599 ~ CommonService ~ awaitFile.writeFile ~ File.externalRootDirectory:", File.externalRootDirectory)
-        await File.checkDir(File.externalRootDirectory, "Download").then((result) => {
-          console.log("🚀 ~ file: common.service.ts:599 ~ CommonService ~ awaitFile.checkDir ~ result:", JSON.stringify(result))
-        }).catch((error) => {
-          console.log("🚀 ~ file: common.service.ts:601 ~ CommonService ~ awaitFile.checkDir ~ error:", JSON.stringify(error))
-        })
-
         if (readPermission && writePermission) {
-
           await File.writeFile(File.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
             await FileOpener.open(File.externalRootDirectory + "/Download/" + filename, "application/pdf");
             this.loadingService.dismissLoading();
           }).catch(async (error) => {
-            console.log("🚀 ~ file: common.service.ts:601 ~ CommonService ~ awaitFile.writeFile ~ error:", JSON.stringify(error))
             this.loadingService.dismissLoading();
           })
         } else {

@@ -26,7 +26,6 @@ export class InitializeAppService {
           await this.configService.load();
         }
       } catch (error) {
-        console.log("🚀 ~ file: initialize.app.service.ts:29 ~ InitializeAppService ~ awaitthis.sqliteService.initializePlugin ~ error:", JSON.stringify(error))
         throw Error(`initializeAppError: ${error}`);
       }
     });

@@ -20,7 +20,6 @@ export class SQLiteService {
      * Plugin Initialization
      */
     initializePlugin(): Promise<boolean> {
-        console.log("🚀 ~ file: sqlite.service.ts:23 ~ SQLiteService ~ initializePlugin ~ initializePlugin:")
         return new Promise (resolve => {
             this.platform = Capacitor.getPlatform();
             if(this.platform === 'ios' || this.platform === 'android') this.native = true;

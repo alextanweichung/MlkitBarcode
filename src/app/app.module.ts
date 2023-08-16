@@ -20,7 +20,6 @@ import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.inter
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgxSpinnerModule } from "ngx-spinner";
-import { HideKeyboardDirective } from './shared/utilities/hide-keyboard.directive';
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();

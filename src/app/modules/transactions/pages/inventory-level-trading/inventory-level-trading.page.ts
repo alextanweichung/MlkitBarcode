@@ -116,7 +116,6 @@ export class InventoryLevelTradingPage implements OnInit {
         this.itemInfo = lookUpItem;
         // if (this.selectedViewOptions === 'item') {
         this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
-          console.log("🚀 ~ file: inventory-level-trading.page.ts:119 ~ InventoryLevelTradingPage ~ this.objectService.getInventoryLevelByItem ~ response:", response)
           this.inventoryLevel = response;
           // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
           this.computeLocationList();
@@ -128,7 +127,6 @@ export class InventoryLevelTradingPage implements OnInit {
         // } else {
         if (lookUpItem.variationTypeCode !== '0')
           this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
-            console.log("🚀 ~ file: inventory-level-trading.page.ts:131 ~ InventoryLevelTradingPage ~ this.objectService.getInventoryLevelByVariation ~ response:", response)
             this.inventoryLevelVariation = response;
             // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
             this.computeLocationList();

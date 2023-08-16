@@ -29,7 +29,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   uniqueGrouping: Date[] = [];
 
-
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
@@ -88,7 +87,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
         salesAgentId: this.salesAgentIds
       }
       this.objectService.getObjectListByDate(obj).subscribe(async response => {
-        console.log("🚀 ~ file: sales-order.page.ts:96 ~ SalesOrderPage ~ this.objectService.getObjectListByDate ~ response:", response)
         this.objects = [...this.objects, ...response];
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, async error => {
@@ -255,7 +253,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       await modal.present();
       let { data } = await modal.onWillDismiss();
       if (data && data !== undefined) {
-        console.log("🚀 ~ file: sales-order.page.ts:287 ~ SalesOrderPage ~ filter ~ data:", data)
         this.objects = [];
         this.uniqueGrouping = [];
         this.startDate = new Date(data.startDate);

@@ -64,7 +64,6 @@ export class DebtorApplicationDetailPage implements OnInit {
   loadWorkflow(objectId) {
     this.objectService.getWorkflow(objectId).subscribe(response => {
       this.workflowState = response;
-      console.log("🚀 ~ file: debtor-application-detail.page.ts:67 ~ DebtorApplicationDetailPage ~ this.objectService.getWorkflow ~ this.workflowState:", this.workflowState)
       this.editable = !this.workflowState.find(r => r.stateType === "REVIEW")?.isCompleted // if review or approve not complete meaning can edit;
     }, error => {
       console.error(error);

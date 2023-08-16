@@ -27,7 +27,6 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
   constructor() { }
 
   ionViewDidEnter(): void {
-    console.log("🚀 ~ file: calendar-input.page.ts:29 ~ CalendarInputPage ~ ionViewDidEnter ~ ionViewDidEnter:")
     if (!this.date_value) {
       if (this.presentation === 'date-time') {
         this.date_value = new Date(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), this.defaultDate.getHours(), this.defaultDate.getMinutes(), 0);
@@ -43,7 +42,6 @@ export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("🚀 ~ file: calendar-input.page.ts:61 ~ CalendarInputPage ~ ngOnChanges ~ ngOnChanges:")
     if (changes.date_value) {
       if (this.date_value) {
         if (this.presentation === 'date-time') {

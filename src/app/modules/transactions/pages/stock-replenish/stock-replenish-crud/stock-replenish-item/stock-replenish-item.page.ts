@@ -1,35 +1,31 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
-import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
-import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
+import { ViewWillEnter, NavController, ActionSheetController, IonPopover } from '@ionic/angular';
+import { StockReplenishService } from 'src/app/modules/transactions/services/stock-replenish.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { ItemCartPage } from 'src/app/shared/pages/item-cart/item-cart.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
-  selector: 'app-quotation-item',
-  templateUrl: './quotation-item.page.html',
-  styleUrls: ['./quotation-item.page.scss'],
-  providers: [DatePipe, SearchItemService, { provide: 'apiObject', useValue: 'mobileQuotation' }]
+  selector: 'app-stock-replenish-item',
+  templateUrl: './stock-replenish-item.page.html',
+  styleUrls: ['./stock-replenish-item.page.scss'],
+  providers: [DatePipe, SearchItemService, { provide: "apiObject", useValue: "MobileStockReplenish" }]
 })
-export class QuotationItemPage implements OnInit, ViewWillEnter {
+export class StockReplenishItemPage implements OnInit, ViewWillEnter {
 
   moduleControl: ModuleControl[] = [];
   useTax: boolean = false;
 
-  @ViewChild('itemCatalog', { static: false }) itemCatalog: ItemCartPage;
-
   constructor(
     private authService: AuthService,
-    public objectService: QuotationService,
+    public objectService: StockReplenishService,
     private navController: NavController,
     private commonService: CommonService,
     private toastService: ToastService,
@@ -37,7 +33,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   ) {
     try {
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
-        this.navController.navigateBack('/transactions/quotation/quotation-header');
+        this.navController.navigateBack('/transactions/stock-replenish/stock-replenish-header');
       }
     } catch (e) {
       console.error(e);
@@ -47,7 +43,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     try {
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
-        this.navController.navigateBack('/transactions/quotation/quotation-header');
+        this.navController.navigateBack('/transactions/stock-replenish/stock-replenish-header');
       } else {
         this.componentsLoad();
       }
@@ -57,6 +53,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
+
   }
 
   componentsLoad() {
@@ -85,13 +82,23 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       this.authService.precisionList$.subscribe(precision => {
         this.precisionSales = precision.find(x => x.precisionCode == "SALES");
         this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })      
+      })
     } catch (e) {
       console.error(e);
     }
   }
 
+  // itemInCart: TransactionDetail[] = [];
   async onItemAdded(event: TransactionDetail) {
+    if (event.variationTypeCode === '0') {
+      if (event.qtyRequest === null || event.qtyRequest === undefined || event.qtyRequest === 0) {
+        return;
+      }
+    } else {
+      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest ?? 0 !== 0)).length === 0) {
+        return;
+      }
+    }
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignTrxItemToDataLine(trxLine);
@@ -103,7 +110,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       this.objectService.itemInCart.unshift(trxLine);
       await this.computeAllAmount(this.objectService.itemInCart[0]);
       await this.assignSequence();
-      this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
+      this.toastService.presentToast('', 'Item Added to Cart', 'top', 'success', 1000);
     } catch (e) {
       console.error(e);
     }
@@ -123,7 +130,31 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   toggleShowImage() {
     this.showImage = !this.showImage;
   }
-  
+
+  /* #endregion */
+
+  /* #region toggle show available qty */
+
+  showAvailQty: boolean = false;
+  toggleShowAvailQty() {
+    this.showAvailQty = !this.showAvailQty;
+  }
+
+  /* #endregion */
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   /* #endregion */
 
   /* #region  tax handle here */
@@ -142,7 +173,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   getVariationSum(trxLine: TransactionDetail) {
     try {
       if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
-        trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
+        trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest && r.qtyRequest > 0).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
       }
     } catch (e) {
       console.error(e);
@@ -161,7 +192,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
-      this.computeDiscTaxAmount(trxLine);      
+      this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
     }
@@ -176,10 +207,10 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     }
   }
 
-  assignTrxItemToDataLine(trxLine: TransactionDetail) {
+  assignTrxItemToDataLine(trxLine: TransactionDetail): TransactionDetail {
     try {
       trxLine.lineId = 0;
-      trxLine.headerId = this.objectService.header.quotationId;
+      trxLine.headerId = this.objectService.header.salesOrderId;
       if (this.useTax) {
         if (this.objectService.header.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
@@ -196,7 +227,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
       trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.header.maxPrecision);
       trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.header.maxPrecision);
-      
+
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
@@ -233,7 +264,8 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.navController.navigateForward('/transactions/quotation/quotation-cart');
+      // this.objectService.setChoosenItems(this.objectService.itemInCart);
+      this.navController.navigateForward('/transactions/stock-replenish/stock-replenish-cart');
     } catch (e) {
       console.error(e);
     }
@@ -241,7 +273,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/quotation/quotation-header');
+      this.navController.navigateBack('/transactions/stock-replenish/stock-replenish-header');
     } catch (e) {
       console.error(e);
     }
@@ -268,10 +300,12 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       if (role === 'confirm') {
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: this.objectService.header.quotationId
+            objectId: this.objectService.header.salesOrderId,
+            isDraft: this.objectService.isDraft,
+            draftTransactionId: this.objectService.draftObject ? this.objectService.draftObject.draftTransactionId : null
           }
         }
-        this.navController.navigateRoot('/transactions/quotation/quotation-detail', navigationExtras);
+        this.navController.navigateRoot('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
       }
     } catch (e) {
       console.error(e);

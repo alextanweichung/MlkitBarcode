@@ -14,7 +14,6 @@ export class LoadingService {
   ) { }
 
   async showLoading(message: string = 'Loading') {
-    console.log("🚀 ~ file: loading.service.ts:18 ~ LoadingService ~ showLoading ~ this.loading:", this.loading)
     if (!this.isShowing && (this.loading === undefined || this.loading === null)) {
       this.isShowing = true;
       this.loading = await this.loadingController.create({

@@ -185,7 +185,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         }
       })
     }
-    console.log("🚀 ~ file: item-catalog.page.ts:164 ~ ItemCatalogPage ~ computeQtyInCart ~ this.availableItems:", this.availableItems)
   }
 
   browseBy: string[];
@@ -208,7 +207,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   /* #region  unit price, tax, discount */
 
   assignTrxItemToDataLine(item: TransactionDetail) {
-    console.log("🚀 ~ file: item-catalog.page.ts:201 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ this.maxPrecision:", this.maxPrecision)
     if (this.useTax) {
       if (this.isItemPriceTaxInclusive) {
         item.unitPrice = item.itemPricing.unitPrice;
