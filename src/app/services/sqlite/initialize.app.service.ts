@@ -17,7 +17,6 @@ export class InitializeAppService {
     private migrationService: MigrationService) { }
 
   async initializeApp() {
-    console.log("🚀 ~ file: initialize.app.service.ts:20 ~ InitializeAppService ~ initializeApp ~ initializeApp:")
     await this.sqliteService.initializePlugin().then(async (ret) => {
       try {
         //execute startup queries

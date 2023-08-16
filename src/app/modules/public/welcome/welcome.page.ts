@@ -46,7 +46,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit() {
-    console.log("🚀 ~ file: welcome.page.ts:49 ~ WelcomePage ~ ngOnInit ~ ngOnInit:")
     Keyboard.addListener('keyboardWillShow', () => {
       this.showImage = false;
     })
@@ -57,7 +56,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
   }
 
   ngAfterContentChecked(): void {
-    console.log("🚀 ~ file: welcome.page.ts:60 ~ WelcomePage ~ ngAfterContentChecked ~ ngAfterContentChecked:")
     if (this.swiper) {
       this.swiper.updateSwiper({});
     }
@@ -95,7 +93,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
 
   activationCode: string[] = [];
   async getStarted() {
-    console.log("🚀 ~ file: welcome.page.ts:96 ~ WelcomePage ~ getStarted ~ getStarted:")
     if (this.activationCode.length > 0 && this.activationCode.filter(r => r !== null && r !== ' ').length === 6) {
       try {
         this.configService.getApiUrl(this.activationCode.join('')).subscribe(async response => {
@@ -123,7 +120,6 @@ export class WelcomePage implements OnInit, AfterContentChecked {
           this.toastService.presentToast('Invalid activation code', '', 'top', 'danger', 1000);
         })
       } catch (error) {
-        console.log("🚀 ~ file: welcome.page.ts:124 ~ WelcomePage ~ getStarted ~ error:", JSON.stringify(error))
       }
     } else {
       this.toastService.presentToast('Please enter valid activation code', '', 'top', 'danger', 1000);

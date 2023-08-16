@@ -157,7 +157,6 @@ export class StockReplenishHeaderPage implements OnInit {
     try {
       if (event && event !== undefined) {
         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
-        console.log("🚀 ~ file: stock-replenish-header.page.ts:160 ~ StockReplenishHeaderPage ~ onCustomerSelected ~ lookupValue:", lookupValue)
         if (lookupValue != undefined) {
           this.objectService.removeItems();
           this.objectForm.patchValue({ customerId: lookupValue.id });

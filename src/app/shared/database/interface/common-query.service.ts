@@ -85,12 +85,8 @@ export class CommonQueryService<T> {
   }
 
   load(object, table, database) {
-    console.log("🚀 ~ file: common-query.service.ts:88 ~ CommonQueryService<T> ~ load ~ database:", database)
-    console.log("🚀 ~ file: common-query.service.ts:88 ~ CommonQueryService<T> ~ load ~ table:", table)
-    console.log("🚀 ~ file: common-query.service.ts:88 ~ CommonQueryService<T> ~ load ~ object:", object)
     try {
       let cols = this.getAllColsWithValue(object);
-      console.log("🚀 ~ file: common-query.service.ts:90 ~ CommonQueryService<T> ~ load ~ cols:", JSON.stringify(cols))
       let sql = '';
       let primaryKey = '';
 
@@ -102,7 +98,6 @@ export class CommonQueryService<T> {
         }
       }
 
-      console.log("🚀 ~ file: common-query.service.ts:102 ~ CommonQueryService<T> ~ load ~ sql:", sql)
       sql = sql.substring(0, sql.length - 1).trimStart();
       primaryKey = primaryKey.trimStart();
 
@@ -110,15 +105,12 @@ export class CommonQueryService<T> {
         let sqlcmd: string =
           `SELECT * FROM ${table} `;
         let ret: DBSQLiteValues = await db.query(sqlcmd);
-        console.log("🚀 ~ file: common-query.service.ts:111 ~ CommonQueryService<T> ~ returnthis._databaseService.executeQuery<any> ~ sqlcmd:", sqlcmd)
-        console.log("🚀 ~ file: common-query.service.ts:113 ~ CommonQueryService<T> ~ returnthis._databaseService.executeQuery<any> ~ ret:", JSON.stringify(ret))
         if (ret.values.length > 0) {
           return ret.values as Object[]
         }
         return null;
       }, database)
     } catch (e) {
-      console.log("🚀 ~ file: common-query.service.ts:120 ~ CommonQueryService<T> ~ load ~ e:", e)
       console.error(e);
     }
   }
@@ -253,10 +245,10 @@ export class CommonQueryService<T> {
         }
       }
 
-      console.log("🚀 ~ file: common-query.service.ts:250 ~ CommonQueryService<T> ~ update ~ sql:", sql)
+
       sql = sql.substring(0, sql.length - 1).trimStart();
       primaryKey = primaryKey.trimStart();
-
+      
       return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let sqlcmd: string = `UPDATE ${table} SET ${sql} WHERE ${primaryKey}`;
         let ret: any = await db.run(sqlcmd);
@@ -294,7 +286,6 @@ export class CommonQueryService<T> {
         }
       }
 
-      console.log("🚀 ~ file: common-query.service.ts:291 ~ CommonQueryService<T> ~ delete ~ sql:", sql)
       sql = sql.substring(0, sql.length - 1).trimStart();
       primaryKey = primaryKey.trimStart();
 

@@ -75,7 +75,6 @@ export class MigrationService {
   }
 
   async migrate(): Promise<any> {
-    console.log("🚀 ~ file: migration.service.ts:78 ~ MigrationService ~ migrate ~ migrate:")
     await this.createSystemParamTable();
     // await this.addSystemParamCol();
     await this.deleteInboundTables();

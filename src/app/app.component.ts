@@ -25,17 +25,14 @@ export class AppComponent {
     private navController: NavController,
     private pushNotications: NotificationsService
   ) {
-    console.log("🚀 ~ file: app.component.ts:22 ~ AppComponent ~ constructor:")
     this.initializeApp();
   }
 
   // Initialize app
   initializeApp() {
-  console.log("🚀 ~ file: app.component.ts:33 ~ AppComponent ~ initializeApp ~ initializeApp:")
 
     // Wait until platform is ready
     this.platform.ready().then(async () => {
-      console.log("🚀 ~ file: app.component.ts:33 ~ AppComponent ~ initializeApp ~ initializeApp platform ready:")
       await this.configService.load();
       
       if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {

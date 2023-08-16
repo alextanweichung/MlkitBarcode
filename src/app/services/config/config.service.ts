@@ -41,7 +41,6 @@ export class ConfigService {
   /* #region sys_parameter */
 
   async load() {
-    console.log("🚀 ~ file: config.service.ts:44 ~ ConfigService ~ load ~ load:")
     try {
     // for web development
       if (Capacitor.getPlatform() === 'web') {
@@ -81,7 +80,6 @@ export class ConfigService {
         }
       }
     } catch (e) {
-      console.log("🚀 ~ file: config.service.ts:84 ~ ConfigService ~ load ~ e:", e)
       console.error(e);
     }
   }
