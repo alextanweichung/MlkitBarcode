@@ -45,7 +45,7 @@ export class StockReplenishHeaderPage implements OnInit {
         salesOrderNum: [null],
         salesAgentId: [null],
         trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
-        typeCode: ['R'],
+        typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],
         shipPostCode: [null],
@@ -137,11 +137,10 @@ export class StockReplenishHeaderPage implements OnInit {
 
   onLocationSelected(event) {
     if (event) {
-      this.objectForm.patchValue({ locationId: event.id });
+      this.objectForm.patchValue({ toLocationId: event.id });
       // find customer from locationId from customerMasterList
       if (this.objectService.customerMasterList && this.objectService.customerMasterList.length > 0) {
         let found = this.objectService.customerMasterList.filter(r => r.attributeArray1.includes(event.id));
-        console.log("🚀 ~ file: stock-replenish-header.page.ts:144 ~ StockReplenishHeaderPage ~ onLocationSelected ~ found:", found)
         if (found && found.length > 0) {
           this.onCustomerSelected({ id: found[0].id });
         }
@@ -155,10 +154,10 @@ export class StockReplenishHeaderPage implements OnInit {
   creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
   availableAddress: ShippingInfo[] = [];
   onCustomerSelected(event) {
-    console.log("🚀 ~ file: stock-replenish-header.page.ts:158 ~ StockReplenishHeaderPage ~ onCustomerSelected ~ event:", event)
     try {
       if (event && event !== undefined) {
         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
+        console.log("🚀 ~ file: stock-replenish-header.page.ts:160 ~ StockReplenishHeaderPage ~ onCustomerSelected ~ lookupValue:", lookupValue)
         if (lookupValue != undefined) {
           this.objectService.removeItems();
           this.objectForm.patchValue({ customerId: lookupValue.id });
@@ -174,7 +173,7 @@ export class StockReplenishHeaderPage implements OnInit {
             countryId: parseFloat(lookupValue.attribute3),
             currencyId: parseFloat(lookupValue.attribute4),
             locationId: parseFloat(lookupValue.attribute6),
-            toLocationId: null,
+            // toLocationId: null,
             isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
             isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
           });
@@ -184,14 +183,14 @@ export class StockReplenishHeaderPage implements OnInit {
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
             this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);
-            this.objectForm.controls.toLocationId.clearValidators();
-            this.objectForm.controls.toLocationId.updateValueAndValidity();
+            // this.objectForm.controls.toLocationId.clearValidators();
+            // this.objectForm.controls.toLocationId.updateValueAndValidity();
           } else {
             this.availableAddress = [];
           }
-          if (lookupValue.attributeArray1.length == 1) {
-            this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
-          }
+          // if (lookupValue.attributeArray1.length == 1) {
+          //   this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
+          // }
           //Auto map object type code
           if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
             this.objectForm.patchValue({ typeCode: 'S' });

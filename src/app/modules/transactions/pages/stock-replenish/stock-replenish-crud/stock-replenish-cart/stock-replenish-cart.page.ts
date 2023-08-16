@@ -523,7 +523,7 @@ export class StockReplenishCartPage implements OnInit, ViewWillEnter {
             objectId: this.objectService.object.header.salesOrderId,
           }
         }
-        this.navController.navigateForward('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
+        this.navController.navigateRoot('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
       }, error => {
         this.submit_attempt = false;
         console.error(error);
@@ -546,7 +546,12 @@ export class StockReplenishCartPage implements OnInit, ViewWillEnter {
       this.objectService.updateObject(trxDto).subscribe(response => {
         this.objectService.setObject((response.body as SalesOrderRoot));
         this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/stock-replenish/stock-replenish-summary');
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: this.objectService.object.header.salesOrderId,
+          }
+        }
+        this.navController.navigateRoot('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
       }, error => {
         this.submit_attempt = false;
         throw error;
