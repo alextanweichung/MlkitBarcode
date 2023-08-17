@@ -45,7 +45,7 @@ export class PurchaseOrderReviewsPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.transactionProcessingService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') : null), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
+      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
         this.pendingObjects = response.filter(r => !r.isComplete);
         this.completedObjects = response.filter(r => r.isComplete);
         this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
