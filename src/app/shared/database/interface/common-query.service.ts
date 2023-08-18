@@ -86,20 +86,20 @@ export class CommonQueryService<T> {
 
   load(object, table, database) {
     try {
-      let cols = this.getAllColsWithValue(object);
-      let sql = '';
-      let primaryKey = '';
+      // let cols = this.getAllColsWithValue(object);
+      // let sql = '';
+      // let primaryKey = '';
 
-      for (const key of cols.keys()) {
-        if (key.toLowerCase() === (table.toLowerCase() + "id")) {
-          primaryKey += ` ${key} = ${cols.get(key)}`;
-        } else {
-          sql += ` ${key},`;
-        }
-      }
+      // for (const key of cols.keys()) {
+      //   if (key.toLowerCase() === (table.toLowerCase() + "id")) {
+      //     primaryKey += ` ${key} = ${cols.get(key)}`;
+      //   } else {
+      //     sql += ` ${key},`;
+      //   }
+      // }
 
-      sql = sql.substring(0, sql.length - 1).trimStart();
-      primaryKey = primaryKey.trimStart();
+      // sql = sql.substring(0, sql.length - 1).trimStart();
+      // primaryKey = primaryKey.trimStart();
 
       return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let sqlcmd: string =

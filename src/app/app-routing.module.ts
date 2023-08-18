@@ -227,6 +227,11 @@ const routes: Routes = [
     path: 'transactions/stock-replenish',
     loadChildren: () => import('./modules/transactions/pages/stock-replenish/stock-replenish.module').then( m => m.StockReplenishPageModule)
   },
+  {
+    path: 'transactions/consignment-count',
+    loadChildren: () => import('./modules/transactions/pages/consignment-count/consignment-count.module').then( m => m.ConsignmentCountPageModule)
+  },
+
 
 
 

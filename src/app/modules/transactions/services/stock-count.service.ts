@@ -18,14 +18,10 @@ const httpObserveHeader = {
 })
 export class StockCountService {
 
-  
-
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) {
-    
-  }
+  ) { }
 
   async loadRequiredMaster() {
     await this.loadMasterList();

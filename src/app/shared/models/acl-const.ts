@@ -19,7 +19,8 @@ export const trxAppCode = {
    mobileInterTransfer: 'MATRIT',
    mobileTransferConfirmation: 'MATRTC',
    mobileDebtorApp: 'MATRDA',
-   mobileStockReplenish: 'MATRSP'
+   mobileStockReplenish: 'MATRSP',
+   mobileConsignmentCount: 'MATRCC'
 }
 
 export const approvalAppCode = {
