@@ -18,55 +18,52 @@ export interface InterTransferList {
  }
  
  export interface InterTransferHeader {
-   interTransferId: number
-   interTransferNum: string
-   trxDate: string
-   trxDateTime: string
-   typeCode: string
-   shipAddress: any
-   shipPostCode: any
-   shipPhone: any
-   shipFax: any
-   shipEmail: any
-   shipAreaId: any
-   shipMethodId: number
-   attention: any
-   locationId: number
-   toLocationId: number
-   workFlowTransactionId: number
-   interTransferUDField1: any
-   interTransferUDField2: any
-   interTransferUDField3: any
-   interTransferUDOption1: any
-   interTransferUDOption2: any
-   interTransferUDOption3: any
-   masterUDGroup1: any
-   masterUDGroup2: any
-   masterUDGroup3: any
-   printCount: any
-   externalDocNum: any
-   sourceType: string
-   isCompleted: boolean
-   transferOutId: any
-   transferOutNum: any
-   packingId: any
-   packingNum: any
-   multiPackingId: any
-   multiPackingNum: any
-   parentObject: any
-   receivedAt: any
-   receivedBy: any
-   remark: any
-   totalCarton: any
-   completedAppCode: any
-   sequence: any
-   createdById: number
-   createdBy: string
-   createdAt: string
-   modifiedById: number
-   modifiedBy: string
-   modifiedAt: string
-   deactivated: boolean
+  interTransferId: number
+  interTransferNum: string
+  trxDate: string
+  trxDateTime: string
+  typeCode: string
+  shipAddress: string
+  shipPostCode: string
+  shipPhone: string
+  shipFax: string
+  shipEmail: string
+  shipStateId: number
+  shipAreaId: number
+  shipMethodId: number
+  attention: string
+  locationId: number
+  toLocationId: number
+  workFlowTransactionId: number
+  interTransferUDField1: string
+  interTransferUDField2: string
+  interTransferUDField3: string
+  interTransferUDOption1: number
+  interTransferUDOption2: number
+  interTransferUDOption3: number
+  masterUDGroup1: number
+  masterUDGroup2: number
+  masterUDGroup3: number
+  printCount: number
+  externalDocNum: string
+  sourceType: string
+  isCompleted: boolean
+  transferOutId: number
+  transferOutNum: string
+  packingId: number
+  packingNum: string
+  multiPackingId: number
+  multiPackingNum: string
+  parentObject: string
+  receivedAt: Date
+  receivedBy: string
+  remark: string
+  totalCarton: number
+  completedAppCode: string
+  completedAt: Date
+  ackDate: Date
+  grnNum: string
+  sequence: number
  }
 
  export interface TransferConfirmationRoot {
@@ -78,8 +75,8 @@ export interface InterTransferList {
   locationId: number
   toLocationId: number
   sourceType: string
-  transferOutId: any
-  transferOutNum: any
+  transferOutId: number
+  transferOutNum: string
   deactivated: boolean
   isCompleted: boolean
   createdBy: string
@@ -102,6 +99,7 @@ export interface TransferConfirmationLine {
   yDesc: string
   barcode: string
   qty: number
-  qtyReceive: any
-  isDeleted: any
+  qtyReceive: number
+  isDeleted: boolean
+  
 }

@@ -34,7 +34,9 @@ export class InterTransferHeaderPage implements OnInit {
       toLocationId: [null, [Validators.required]],
       shipMethodId: [null],
       typeCode: ["IL", [Validators.required]],
-      sourceType: ['M']
+      sourceType: ['M'],
+      totalCarton: [null],
+      grnNum: [null]
     })
     this.objectForm.controls.typeCode.disable();
     this.objectForm.controls.typeCode.updateValueAndValidity();
