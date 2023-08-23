@@ -231,6 +231,10 @@ const routes: Routes = [
     path: 'transactions/consignment-count',
     loadChildren: () => import('./modules/transactions/pages/consignment-count/consignment-count.module').then( m => m.ConsignmentCountPageModule)
   },
+  {
+    path: 'transactions/inbound-scan',
+    loadChildren: () => import('./modules/transactions/pages/inbound-scan/inbound-scan.module').then( m => m.InboundScanPageModule)
+  },
 
 
 
@@ -340,6 +344,8 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
+
 
 
 

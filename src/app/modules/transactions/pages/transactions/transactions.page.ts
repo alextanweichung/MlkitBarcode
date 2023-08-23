@@ -25,6 +25,7 @@ export class TransactionsPage implements OnInit {
   showDebtorApplication: boolean = false;
   showStockReplenish: boolean = false;
   showConsignmentCount: boolean = false;
+  showInboundScan: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -51,6 +52,7 @@ export class TransactionsPage implements OnInit {
           this.showDebtorApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileDebtorApp) > -1;
           this.showStockReplenish = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReplenish) > -1;
           this.showConsignmentCount = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignmentCount) > -1;
+          this.showInboundScan = pageItems.findIndex(r => r.title === trxAppCode.mobileInboundScan) > -1;
         }
       })
     } catch (e) {

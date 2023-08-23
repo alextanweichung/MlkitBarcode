@@ -108,6 +108,12 @@
             <h3>Consignment Count</h3>
           </ion-label>
         </ion-item>
+        <ion-item button routerLink="inbound-scan" *ngIf="showInboundScan">
+          <!-- <ion-icon name="receipt-outline" slot="start"></ion-icon> -->
+          <ion-label>
+            <h3>Inbound Scan</h3>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </ng-container>
   </div>
