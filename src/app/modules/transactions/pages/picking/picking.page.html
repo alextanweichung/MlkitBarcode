@@ -18,13 +18,9 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ng-container *ngIf="!objects || objects?.length === 0">
-      <p>
-        <ion-text color="tertiary">
-          <h3>Nothing found!</h3>
-        </ion-text>
-      </p>
-    </ng-container>
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
+      <ion-label>Nothing found!</ion-label>
+    </ion-list-header>
     <ng-container *ngIf="objects?.length > 0">
       <div *ngFor="let m of uniqueGrouping">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">

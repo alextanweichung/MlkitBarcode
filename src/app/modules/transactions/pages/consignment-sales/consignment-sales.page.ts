@@ -39,7 +39,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     try {
       if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
+        this.startDate = this.commonService.getFirstDayOfTodayMonth();
       }
       if (!this.endDate) {
         this.endDate = this.commonService.getTodayDate();

@@ -63,7 +63,7 @@ export class PurchaseReqReviewsPage implements OnInit, ViewWillEnter {
 
   async filter() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     const modal = await this.modalController.create({
       component: FilterPage,

@@ -32,6 +32,9 @@ export class QuotationReviewsPage implements OnInit, ViewWillEnter {
 
   // make sure refresh when back to this
   ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
@@ -47,12 +50,12 @@ export class QuotationReviewsPage implements OnInit, ViewWillEnter {
       this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
         this.pendingObjects = response.filter(r => !r.isComplete);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast('', 'Search Complete', 'top', 'success', 1000, this.authService.showSearchResult);
       }, error => {
         console.log(error);
       })
     } catch (error) {
-      this.toastService.presentToast('Error loading', '', 'top', 'danger', 1000);
+      this.toastService.presentToast('', 'Error Loading', 'top', 'danger', 1000);
     }
   }
 
@@ -62,7 +65,7 @@ export class QuotationReviewsPage implements OnInit, ViewWillEnter {
 
   async filter() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     const modal = await this.modalController.create({
       component: FilterPage,

@@ -20,9 +20,7 @@ export class PickingService {
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) {
-
-  }
+  ) { }
 
   /* #region store as one set data for each picking */
 

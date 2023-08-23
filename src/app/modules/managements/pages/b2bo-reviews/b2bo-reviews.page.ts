@@ -32,6 +32,9 @@ export class B2boReviewsPage implements OnInit, ViewWillEnter {
 
   // make sure refresh when back to this page
   ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
@@ -52,7 +55,7 @@ export class B2boReviewsPage implements OnInit, ViewWillEnter {
         throw Error;
       })      
     } catch (error) {
-      this.toastService.presentToast('', 'Error loading objects', 'top', 'danger', 1000);
+      this.toastService.presentToast('', 'Error Loading', 'top', 'danger', 1000);
     }
   }
 
@@ -62,7 +65,7 @@ export class B2boReviewsPage implements OnInit, ViewWillEnter {
 
   async filter() {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     const modal = await this.modalController.create({
       component: FilterPage,
