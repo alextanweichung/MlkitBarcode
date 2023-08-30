@@ -32,6 +32,9 @@ export class PurchaseReqReviewsPage implements OnInit, ViewWillEnter {
 
   // make sure refresh when back to this page
   ionViewWillEnter(): void {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
