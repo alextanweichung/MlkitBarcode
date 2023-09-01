@@ -137,7 +137,7 @@ export class QuotationService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/masterlist", { context: background_load() }).toPromise();
   }
 
   getStaticLovList() {
@@ -149,7 +149,7 @@ export class QuotationService {
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/customer", { context: background_load() }).toPromise();
   }
   
   getPromotion(trxDate: string, customerId: number) {

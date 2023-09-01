@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import { BackToBackOrderHeader } from 'src/app/modules/transactions/models/backtoback-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -34,6 +33,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
     private toastService: ToastService,
     private actionSheetController: ActionSheetController
   ) {
+    this.objectService.loadRequiredMaster();
     try {
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-header');

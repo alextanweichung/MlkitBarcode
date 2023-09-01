@@ -31,6 +31,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
     private toastService: ToastService,
     private actionSheetController: ActionSheetController
   ) {
+    this.objectService.loadRequiredMaster();
     try {
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/sales-order/sales-order-header');

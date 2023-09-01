@@ -34,6 +34,7 @@ export class BacktobackOrderDetailPage implements OnInit {
     private toastService: ToastService,
     private commonService: CommonService
   ) {
+    this.objectService.loadRequiredMaster();
     try {
       this.route.queryParams.subscribe(params => {
         this.objectId = params['objectId'];

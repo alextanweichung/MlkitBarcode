@@ -37,6 +37,7 @@ export class SalesOrderHeaderPage implements OnInit {
     private formBuilder: UntypedFormBuilder,
     private modalController: ModalController
   ) {
+    this.objectService.loadRequiredMaster();
     this.newForm();
   }
 

@@ -145,15 +145,15 @@ export class BackToBackOrderService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/masterlist", { context: background_load() }).toPromise();
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/staticLov").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/staticLov", { context: background_load() }).toPromise();
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/customer").toPromise();
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/customer", { context: background_load() }).toPromise();
   }
 
   getPromotion(trxDate: string, customerId: number) {

@@ -9,7 +9,6 @@ import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -35,6 +34,7 @@ export class QuotationHeaderPage implements OnInit {
     private formBuilder: FormBuilder,
     private actionSheetController: ActionSheetController
   ) {
+    this.objectService.loadRequiredMaster();
     this.newForm();
   }
 

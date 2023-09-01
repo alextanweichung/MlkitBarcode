@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
-import { QuotationHeader } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -35,6 +34,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     private toastService: ToastService,
     private actionSheetController: ActionSheetController
   ) {
+    this.objectService.loadRequiredMaster();
     try {
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/quotation/quotation-header');

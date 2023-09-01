@@ -4,7 +4,6 @@ import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { QuotationRoot } from '../../../models/quotation';
@@ -35,6 +34,7 @@ export class QuotationDetailPage implements OnInit {
     private navController: NavController,
     private alertController: AlertController
   ) {
+    this.objectService.loadRequiredMaster();
     try {
       this.route.queryParams.subscribe(params => {
         this.objectId = params['objectId'];

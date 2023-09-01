@@ -34,6 +34,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     private alertController: AlertController,
     private navController: NavController
   ) {
+    this.objectService.loadRequiredMaster();
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
     }

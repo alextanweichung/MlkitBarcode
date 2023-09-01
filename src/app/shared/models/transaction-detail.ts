@@ -25,7 +25,7 @@ export interface TransactionDetail {
   unitPrice?: number
   unitPriceExTax?: number
   discountGroupCode?: any
-  discountExpression?: any
+  discountExpression?: string
 
   oriUnitPrice?: number
   oriUnitPriceExTax?: number
