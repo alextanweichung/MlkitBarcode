@@ -25,15 +25,20 @@ export class AppComponent {
     private navController: NavController,
     private pushNotications: NotificationsService
   ) {
+    console.log(`app-root here`);
     this.initializeApp();
   }
 
   // Initialize app
   initializeApp() {
-
+    console.log(`initializeApp`);
     // Wait until platform is ready
-    this.platform.ready().then(async () => {
+    this.platform.ready().then(async () => {      
+      console.log("🚀 ~ file: app.component.ts:67 ~ AppComponent ~ this.platform.ready ~ this.platform.ready: after")
+      
+      console.log("🚀 ~ file: app.component.ts:40 ~ AppComponent ~ this.platform.ready ~ this.configService.load: before load")
       await this.configService.load();
+      console.log("🚀 ~ file: app.component.ts:40 ~ AppComponent ~ this.platform.ready ~ this.configService.load: after load")
       
       if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
         this.navController.navigateRoot('/signin');
@@ -58,9 +63,11 @@ export class AppComponent {
 
       // Fake timeout since we do not load any data
       setTimeout(async () => {
-
         // Hide SplashScreen
-        await SplashScreen.hide();
+        // await SplashScreen.hide();
+        SplashScreen.hide({
+          fadeOutDuration: 1000
+        })
       }, 2000);
     });
   }

@@ -85,32 +85,22 @@ export class CommonQueryService<T> {
   }
 
   load(object, table, database) {
+    console.log(`table: ${JSON.stringify(table)}`);
+    console.log(`database: ${JSON.stringify(database)}`);
     try {
-      // let cols = this.getAllColsWithValue(object);
-      // let sql = '';
-      // let primaryKey = '';
-
-      // for (const key of cols.keys()) {
-      //   if (key.toLowerCase() === (table.toLowerCase() + "id")) {
-      //     primaryKey += ` ${key} = ${cols.get(key)}`;
-      //   } else {
-      //     sql += ` ${key},`;
-      //   }
-      // }
-
-      // sql = sql.substring(0, sql.length - 1).trimStart();
-      // primaryKey = primaryKey.trimStart();
-
       return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let sqlcmd: string =
           `SELECT * FROM ${table} `;
         let ret: DBSQLiteValues = await db.query(sqlcmd);
-        if (ret.values.length > 0) {
+        console.log(`sqlcmd: ${JSON.stringify(sqlcmd)}`);
+        console.log(`ret: ${JSON.stringify(ret)}`);
+        if (ret && ret.values.length > 0) {
           return ret.values as Object[]
         }
         return null;
       }, database)
     } catch (e) {
+      console.log(`e: ${JSON.stringify(e)}`);
       console.error(e);
     }
   }

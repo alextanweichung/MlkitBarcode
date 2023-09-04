@@ -170,6 +170,8 @@ export class SigninPage implements OnInit, ViewDidEnter {
             this.configService.selected_sys_param.password = '';
           }
           await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
+          
+          // sync item master and item barcode
           try {
             // download item master
             let response = await this.commonService.syncInbound();

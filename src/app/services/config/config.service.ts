@@ -41,13 +41,14 @@ export class ConfigService {
   /* #region sys_parameter */
 
   async load() {
+    console.log("🚀 ~ file: config.service.ts:44 ~ ConfigService ~ load ~ in load:")
     try {
     // for web development
       if (Capacitor.getPlatform() === 'web') {
         this.sys_parameter.push({
           Sys_ParameterId: 1,
-          apiUrl: 'https://localhost:44351/api/',
-          // apiUrl: 'https://idcp-demo.com/api/',
+          // apiUrl: 'https://localhost:44351/api/',
+          apiUrl: 'https://idcp-demo.com/api/',
           // apiUrl: 'https://idcp-testing.motorparts.asia/api/',
           // apiUrl: 'https://idcp-testing.umaracing.com/api/',
           // apiUrl: 'https://idcp.motorparts.asia/api/',
@@ -72,7 +73,9 @@ export class ConfigService {
         // }
       }
       else { // live
+        console.log("🚀 ~ file: config.service.ts:76 ~ ConfigService ~ load ~ live load:")
         this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
+        console.log(`sys_parameter: ${JSON.stringify(this.sys_parameter)}`);
         if (this.sys_parameter && this.sys_parameter.length === 1) {
           this.selected_sys_param = this.sys_parameter[0];
         } else {
@@ -80,6 +83,7 @@ export class ConfigService {
         }
       }
     } catch (e) {
+      console.log(`e: ${JSON.stringify(e)}`);
       console.error(e);
     }
   }

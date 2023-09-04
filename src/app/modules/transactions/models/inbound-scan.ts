@@ -37,7 +37,7 @@ export interface InboundScanHeader {
   sequence: number
 }
 
-export interface InboundScanDetails {
+export interface InboundScanDetailWithDoc {
   documentId: number
   documentNum: string
   outstandingScanList: InboundScanOutstandingScanList[]
@@ -99,4 +99,46 @@ export interface InboundScanCurrentScanList {
   warehouseAgentId: number
   warehouseAgentName: string
   deactivated: boolean
+}
+
+export interface InboundScanDocRoot {
+  header: InboundScanDocHeader
+  details: InboundScanDocDetail[]
+  inboundHistory: InboundHistory[]
+}
+
+export interface InboundScanDocHeader {
+  interTransferId: number
+  interTransferNum: string
+  trxDate: string
+  typeCode: string
+  fromLocationId: number
+  toLocationId: number
+  fromLocation: string
+  toLocation: string
+  customerId: number
+  customerCode: string
+  customerName: string
+}
+
+export interface InboundScanDocDetail {
+  interTransferId: number
+  interTransferLineId: number
+  itemId: number
+  description: string
+  itemVariationXId: number
+  itemVariationYId: number
+  itemSku: string
+  itemVariationTypeCode: string
+  itemCode: string
+  itemVariationXDescription: string
+  itemVariationYDescription: string
+  qtyRequest: number
+  qtyCommit: number
+  qtyScanned: number
+}
+
+export interface InboundHistory {  
+  inboundScanId: number
+  inboundScanNum: string
 }

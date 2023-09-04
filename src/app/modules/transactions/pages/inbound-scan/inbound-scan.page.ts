@@ -80,7 +80,7 @@ export class InboundScanPage implements OnInit {
   async addObject() {
     try {
       if (this.objectService.hasWarehouseAgent()) {
-        this.navController.navigateForward('/transactions/picking/picking-header');
+        this.navController.navigateForward('/transactions/inbound-scan/inbound-scan-header');
       } else {
         this.toastService.presentToast('', 'Warehouse Agent not set.', 'top', 'danger', 1000);
       }

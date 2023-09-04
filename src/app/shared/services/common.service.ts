@@ -51,6 +51,14 @@ export class CommonService {
     }
   }
 
+  syncInboundConsignment(locationCode: string, trxDate: string) {
+    try {
+      return this.http.get(this.configService.selected_sys_param.apiUrl + `MobileDownload/itemMaster/${locationCode}/${trxDate}`).toPromise();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   saveVersion() {
     try {
       return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/mobileVersion/" + environment.version, null)

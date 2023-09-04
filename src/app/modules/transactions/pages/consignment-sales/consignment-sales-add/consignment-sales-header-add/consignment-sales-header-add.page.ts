@@ -5,6 +5,8 @@ import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angu
 import { format } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -23,6 +25,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     private authService: AuthService,
     public objectService: ConsignmentSalesService,
     private commonService: CommonService,
+    private configService: ConfigService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private formBuilder: FormBuilder
@@ -47,6 +50,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
       customerId: [null],
       locationId: [null],
       toLocationId: [null, [Validators.required]],
+      toLocationCode: [null, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
       salesAgentId: [null],
@@ -172,12 +176,13 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
   }
 
   onLocationChanged(event) {
+    console.log("🚀 ~ file: consignment-sales-header-add.page.ts:179 ~ ConsignmentSalesHeaderAddPage ~ onLocationChanged ~ event:", JSON.stringify(event));
     if (event) {
       let customerId = this.objectService.locationList.find(r => r.locationId === event.id)?.customerId;
       if (customerId) {
         this.onCustomerChanged(customerId)
       }
-      this.objectForm.patchValue({ toLocationId: event.id });
+      this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
     }
   }
 
@@ -208,23 +213,30 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     }
   }
 
-  nextStep() {
+  async nextStep() {
     try {
-      this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
-        if (response) {
-          let navigationExtras: NavigationExtras = {
-            queryParams: {
-              objectId: response.header.consignmentSalesId
+      if (this.objectForm.valid) {
+        // let rrrrr = await this.commonService.syncInboundConsignment(this.objectForm.controls.toLocationCode.value, format(this.objectForm.controls.trxDate.value, 'yyyy-MM-dd'));
+        // let itemMaster: PDItemMaster[] = rrrrr['itemMaster'];
+        // let itemBarcode: PDItemBarcode[] = rrrrr['itemBarcode'];
+        // await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+        this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
+          if (response) {
+            let navigationExtras: NavigationExtras = {
+              queryParams: {
+                objectId: response.header.consignmentSalesId
+              }
             }
+            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
+          } else {
+            this.objectService.setHeader(this.objectForm.value);
+            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
           }
-          this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
-        } else {
-          this.objectService.setHeader(this.objectForm.value);
-          this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
-        }
-      }, error => {
-        throw error;
-      })
+        }, error => {
+          throw error;
+        })
+      }
     } catch (e) {
       console.error(e);
     }

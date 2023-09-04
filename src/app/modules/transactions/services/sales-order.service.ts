@@ -57,15 +57,15 @@ export class SalesOrderService {
 
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
-    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
-    this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == "DiscountGroup").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details);
+    this.areaMasterList = this.fullMasterList.filter(x => x.objectName == "Area").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == "Currency").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.bindSalesAgentList();
   }
 
@@ -107,7 +107,7 @@ export class SalesOrderService {
   async setHeader(header: SalesOrderHeader) {
     this.header = header;
     // load promotion first after customer confirmed or whenever header changed.
-    this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), 'yyyy-MM-dd'), this.header.customerId);
+    this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), "yyyy-MM-dd"), this.header.customerId);
   }
 
   setChoosenItems(items: TransactionDetail[]) {
@@ -150,7 +150,7 @@ export class SalesOrderService {
   }
 
   hasSalesAgent(): boolean {
-    let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
+    let salesAgentId = JSON.parse(localStorage.getItem("loginUser"))?.salesAgentId;
     if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
       return false;
     }
@@ -172,7 +172,7 @@ export class SalesOrderService {
   }
 
   getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + 'MobileSalesOrder/promotion/' + trxDate + '/' + customerId).toPromise();
+    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/promotion/" + trxDate + "/" + customerId).toPromise();
   }
 
   getFullItemList() {
@@ -204,7 +204,7 @@ export class SalesOrderService {
   }
 
   getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + 'MobileSalesOrder/creditInfo/' + customerId);
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/creditInfo/" + customerId);
   }
 
   downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
@@ -219,7 +219,7 @@ export class SalesOrderService {
   }
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + "/bulkUpdate", bulkConfirmReverse, httpObserveHeader);
   }
 
   getStatus(objectId: number) {
