@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { ConfigService } from 'src/app/services/config/config.service';
-import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -25,9 +23,9 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     private authService: AuthService,
     public objectService: ConsignmentSalesService,
     private commonService: CommonService,
-    private configService: ConfigService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
+    private alertController: AlertController,
     private formBuilder: FormBuilder
   ) {
     if (!this.trxDate) {
@@ -49,7 +47,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
-      toLocationId: [null, [Validators.required]],
+      toLocationId: [this.objectService.locationList.find(r => r.isPrimary).locationId, [Validators.required]],
       toLocationCode: [null, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
@@ -59,8 +57,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
       isDisplayTaxInclusive: [null],
       maxPrecision: [null],
       maxPrecisionTax: [null],
-      sourceType: ['M'],
-      typeCode: ['S'],
+      sourceType: ["M"],
+      typeCode: ["S"],
       businessModelType: [null]
     })
   }
@@ -138,8 +136,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
           this.objectForm.patchValue({
             salesAgentId: parseFloat(lookupValue.attribute1),
             currencyId: parseFloat(lookupValue.attribute4),
-            isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
-            isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
+            isItemPriceTaxInclusive: lookupValue.attribute8 == "1" ? true : false,
+            isDisplayTaxInclusive: lookupValue.attribute9 == "1" ? true : false
           });
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
@@ -175,38 +173,55 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
     }
   }
 
-  onLocationChanged(event) {
-    console.log("🚀 ~ file: consignment-sales-header-add.page.ts:179 ~ ConsignmentSalesHeaderAddPage ~ onLocationChanged ~ event:", JSON.stringify(event));
+  async onLocationChanged(event) {
     if (event) {
-      let customerId = this.objectService.locationList.find(r => r.locationId === event.id)?.customerId;
-      if (customerId) {
-        this.onCustomerChanged(customerId)
-      }
-      this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
+      const alert = await this.alertController.create({
+        cssClass: "custom-alert",
+        header: "Are you sure to change?",
+        subHeader: "Changing location required to sync price.",
+        buttons: [{
+          text: "Proceed",
+          cssClass: "success",
+          handler: async () => {
+            let customerId = this.objectService.locationList.find(r => r.locationId === event.id)?.customerId;
+            if (customerId) {
+              this.onCustomerChanged(customerId)
+            }
+            this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
+            await this.objectService.refreshLocalDb(event.code);
+          },
+        },
+        {
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel"
+        }]
+      });
+      await alert.present();
     }
   }
 
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        subHeader: 'Changes made will be discard.',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
       await actionSheet.present();  
       const { role } = await actionSheet.onWillDismiss();  
-      if (role === 'confirm') {
+      if (role === "confirm") {
         this.objectService.resetVariables();
-        this.navController.navigateBack('/transactions/consignment-sales');
+        this.navController.navigateBack("/transactions/consignment-sales");
       }
     } catch (e) {
       console.error(e);
@@ -216,22 +231,17 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
   async nextStep() {
     try {
       if (this.objectForm.valid) {
-        // let rrrrr = await this.commonService.syncInboundConsignment(this.objectForm.controls.toLocationCode.value, format(this.objectForm.controls.trxDate.value, 'yyyy-MM-dd'));
-        // let itemMaster: PDItemMaster[] = rrrrr['itemMaster'];
-        // let itemBarcode: PDItemBarcode[] = rrrrr['itemBarcode'];
-        // await this.configService.syncInboundData(itemMaster, itemBarcode);
-
-        this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
+        this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), "yyyy-MM-dd"), this.objectForm.controls.toLocationId.value).subscribe(response => {
           if (response) {
             let navigationExtras: NavigationExtras = {
               queryParams: {
                 objectId: response.header.consignmentSalesId
               }
             }
-            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
+            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item-edit", navigationExtras);
           } else {
             this.objectService.setHeader(this.objectForm.value);
-            this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
+            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item-add");
           }
         }, error => {
           throw error;

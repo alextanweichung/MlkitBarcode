@@ -41,4 +41,5 @@ export interface ConsignmentSalesLocation {
   locationCode: string
   locationDescription: string
   customerId: number
+  isPrimary: boolean
 }

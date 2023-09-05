@@ -4,6 +4,9 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot } from '../models/consignment-sales';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { format } from 'date-fns';
+import { PDItemMaster, PDItemBarcode } from 'src/app/shared/models/pos-download';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -17,6 +20,7 @@ export class ConsignmentSalesService {
   
   constructor(
     private http: HttpClient,
+    private commonService: CommonService,
     private configService: ConfigService
   ) { 
     
@@ -49,6 +53,18 @@ export class ConsignmentSalesService {
     await this.loadMasterList();
     await this.loadStaticLov();
     await this.loadConsignmentLocation();
+    // for testing
+    this.locationList.find(r => r.locationId === 10073).isPrimary = true;
+    if (this.locationList.filter(r => r.isPrimary).length > 0) {
+      this.refreshLocalDb(this.locationList.find(r => r.isPrimary).locationCode);
+    }
+  }
+
+  async refreshLocalDb(locationCode: string) {
+    let rrrrr = await this.commonService.syncInboundConsignment(locationCode, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), 'yyyy-MM-dd'));
+    let itemMaster: PDItemMaster[] = rrrrr['itemMaster'];
+    let itemBarcode: PDItemBarcode[] = rrrrr['itemBarcode'];
+    await this.configService.syncInboundData(itemMaster, itemBarcode);
   }
 
   fullMasterList: MasterList[] = [];
@@ -77,8 +93,8 @@ export class ConsignmentSalesService {
   locationList: ConsignmentSalesLocation[] = [];
   async loadConsignmentLocation() {
     this.locationList = await this.getConsignmentLocation();
+    console.log("🚀 ~ file: consignment-sales.service.ts:80 ~ ConsignmentSalesService ~ loadConsignmentLocation ~ this.locationList:", this.locationList)
   }
-
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/masterList").toPromise();
