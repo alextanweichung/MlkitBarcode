@@ -48,7 +48,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
       customerId: [null],
       locationId: [null],
       toLocationId: [this.objectService.locationList.find(r => r.isPrimary).locationId, [Validators.required]],
-      toLocationCode: [null, [Validators.required]],
+      toLocationCode: [this.objectService.locationList.find(r => r.isPrimary).locationCode, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
       salesAgentId: [null],
