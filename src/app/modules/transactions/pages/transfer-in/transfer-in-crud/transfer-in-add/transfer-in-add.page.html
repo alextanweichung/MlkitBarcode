@@ -1,0 +1,60 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Transfer In</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Transfer In</ion-label>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="p-2">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <app-search-dropdown title="Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="selectedLocation.locationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
+    </ion-list>
+      
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Pending Doc.</ion-label>
+    </ion-list-header>
+
+    <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
+      <ion-item button class="ion-no-padding no-ripple" *ngFor="let o of pendingObject" (click)="selectDoc(o)">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> Doc. Num.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{o.interTransferNum}}
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> Doc. Date</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{o.trxDate|date:"dd/MM/yyyy"}}
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> From Location</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{o.locationId|idMapping:objectService.locationMasterList}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+
+  </div>
+  
+</ion-content>

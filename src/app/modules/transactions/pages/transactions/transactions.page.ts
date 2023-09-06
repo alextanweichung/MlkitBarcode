@@ -28,6 +28,7 @@ export class TransactionsPage implements OnInit {
   showInboundScan: boolean = false;
   showStockReorder: boolean = false;
   showTransferOut: boolean = false;
+  showTransferIn: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -57,6 +58,7 @@ export class TransactionsPage implements OnInit {
           this.showInboundScan = pageItems.findIndex(r => r.title === trxAppCode.mobileInboundScan) > -1;
           this.showStockReorder = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReorder) > -1;
           this.showTransferOut = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferOut) > -1;
+          this.showTransferIn = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferIn) > -1;
         }
       })
     } catch (e) {

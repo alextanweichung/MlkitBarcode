@@ -5,7 +5,7 @@ import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
-import { TransferOutRoot, TransferOutLine, TransferOutList } from "../models/transfer-out";
+import { TransferInRoot, TransferInLine, TransferInList } from "../models/transfer-in";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -16,7 +16,7 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 
-export class TransferOutService {
+export class TransferInService {
 
   fullMasterList: MasterList[] = [];
   interTransferTypeList: MasterListDetails[] = [];
@@ -37,7 +37,6 @@ export class TransferOutService {
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
-    this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "W");
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
   }
@@ -49,18 +48,18 @@ export class TransferOutService {
 
   /* #region  for insert */
 
-  header: TransferOutRoot;
-  itemInCart: TransferOutLine[] = [];
-  object: TransferOutRoot;
-  async setHeader(header: TransferOutRoot) {
+  header: TransferInRoot;
+  itemInCart: TransferInLine[] = [];
+  object: TransferInRoot;
+  async setHeader(header: TransferInRoot) {
     this.header = header;
   }
 
-  setChoosenItems(items: TransferOutLine[]) {
+  setChoosenItems(items: TransferInLine[]) {
     this.itemInCart = JSON.parse(JSON.stringify(items));
   }
 
-  setObject(object: TransferOutRoot) {
+  setObject(object: TransferInRoot) {
     this.object = object;
   }
 
@@ -85,40 +84,40 @@ export class TransferOutService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/masterlist").toPromise();
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/masterlist").toPromise();
   }
 
   getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/consignmentLocation").toPromise();
+    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/consignmentLocation").toPromise();
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/staticLov");
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/staticLov");
+  }
+
+  getPendingList(locationCode: string) {
+   return this.http.get<TransferInRoot[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferIn/pending/${locationCode}`);
   }
 
   getObjectList(dateStart: string, dateEnd: string) {
-    return this.http.get<TransferOutList[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferOut/toList/${dateStart}/${dateEnd}`);
+    return this.http.get<TransferInList[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferIn/tilist/${dateStart}/${dateEnd}`);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<TransferOutRoot>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/" + objectId);
+    return this.http.get<TransferInRoot>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/" + objectId);
   }
 
-  insertObject(object: TransferOutRoot) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileTransferOut", object, httpObserveHeader);
-  }
-
-  updateObject(object: TransferOutRoot) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileTransferOut", object, httpObserveHeader);
+  updateObject(object: TransferInRoot) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileTransferIn", object, httpObserveHeader);
   }
 
   completeObject(objectId: number) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileTransferOut/generateDocument/${objectId}`, null, httpObserveHeader)
+    return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileTransferIn/generateDocument/${objectId}`, null, httpObserveHeader)
   }
 
   // for web testing 
   validateBarcode(barcode: string) {
-    return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/itemByBarcode/" + barcode);
+    return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/itemByBarcode/" + barcode);
   }
 
 }

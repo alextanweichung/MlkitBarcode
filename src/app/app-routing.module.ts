@@ -243,6 +243,11 @@ const routes: Routes = [
     path: 'transactions/transfer-out',
     loadChildren: () => import('./modules/transactions/pages/transfer-out/transfer-out.module').then( m => m.TransferOutPageModule)
   },
+  {
+    path: 'transactions/transfer-in',
+    loadChildren: () => import('./modules/transactions/pages/transfer-in/transfer-in.module').then( m => m.TransferInPageModule)
+  },
+
 
 
   
