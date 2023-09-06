@@ -41,7 +41,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     try {
       if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTodayMonth();
+        this.startDate = this.commonService.getTodayDate();
       }
       if (!this.endDate) {
         this.endDate = this.commonService.getTodayDate();
