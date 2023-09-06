@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
-import { StockReorderLine, StockReorderRoot } from 'src/app/modules/transactions/models/stock-reorder';
-import { StockReorderService } from 'src/app/modules/transactions/services/stock-reorder.service';
+import { NavController, ActionSheetController, AlertController } from '@ionic/angular';
+import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
+import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -14,19 +14,19 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
-  selector: 'app-stock-reorder-add',
-  templateUrl: './stock-reorder-add.page.html',
-  styleUrls: ['./stock-reorder-add.page.scss'],
+  selector: 'app-transfer-out-add',
+  templateUrl: './transfer-out-add.page.html',
+  styleUrls: ['./transfer-out-add.page.scss'],
 })
-export class StockReorderAddPage implements OnInit {
+export class TransferOutAddPage implements OnInit {
 
   objectForm: UntypedFormGroup;
-  objectLine: StockReorderLine[] = [];
+  objectLine: TransferOutLine[] = [];
   
   systemWideEAN13IgnoreCheckDigit: boolean = false;
 
   constructor(
-    public objectService: StockReorderService,
+    public objectService: TransferOutService,
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
@@ -42,16 +42,17 @@ export class StockReorderAddPage implements OnInit {
   newObjectForm() {
     let primaryLocationIndex = this.objectService.locationList.findIndex(r => r.isPrimary);
     this.objectForm = this.formBuilder.group({
-      stockReorderId: [0],
-      stockReorderNum: [null],
+      transferOutId: [0],
+      transferOutNum: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-      typeCode: ["T"],
+      typeCode: ["IL"],
       locationId: [(primaryLocationIndex > -1 ? this.objectService.locationList[primaryLocationIndex].locationId : null), [Validators.required]],
+      toLocationId: [null, [Validators.required]],
       deactivated: [false],
       isCompleted: [false],
       sourceType: ["M"],
-      salesOrderId: [null],
-      salesOrderNum: [null],
+      interTransferNum: [null],
+      totalCarton: [null],
       remark: [null],
       workFlowTransactionId: [null]
     })
@@ -80,12 +81,12 @@ export class StockReorderAddPage implements OnInit {
     })
   }
 
-  locationSearchDropdownList: SearchDropdownList[] = [];
+  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
   bindLocationList() {
-    this.locationSearchDropdownList = [];
+    this.consignmentLocationSearchDropdownList = [];
     try {
       this.objectService.locationList.forEach(r => {
-        this.locationSearchDropdownList.push({
+        this.consignmentLocationSearchDropdownList.push({
           id: r.locationId,
           code: r.locationCode,
           description: r.locationDescription
@@ -102,6 +103,12 @@ export class StockReorderAddPage implements OnInit {
     }
   }
 
+  onToLocationChanged(event: any) {
+    if (event) {
+      this.objectForm.patchValue({ toLocationId: event.id });
+    }
+  }
+
   /* #region barcode & check so */
 
   async validateBarcode(barcode: string) {
@@ -111,10 +118,10 @@ export class StockReorderAddPage implements OnInit {
           let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
           if (found_barcode) {
             let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-            let outputData: StockReorderLine = {
+            let outputData: TransferOutLine = {
               id: 0,
               uuid: uuidv4(),
-              stockReorderId: this.objectForm.controls.stockReorderId.value,
+              transferOutId: this.objectForm.controls.transferOutId.value,
               sequence: 0,
               itemId: found_item_master.id,
               itemCode: found_item_master.code,
@@ -145,10 +152,10 @@ export class StockReorderAddPage implements OnInit {
     try {
       if (event) {
         event.forEach(async r => {
-          let outputData: StockReorderLine = {
+          let outputData: TransferOutLine = {
             id: 0,
             uuid: uuidv4(),
-            stockReorderId: this.objectForm.controls.stockReorderId.value,
+            transferOutId: this.objectForm.controls.transferOutId.value,
             sequence: 0,
             itemId: r.itemId,
             itemCode: r.itemCode,
@@ -205,7 +212,7 @@ export class StockReorderAddPage implements OnInit {
 
   /* #endregion */
 
-  insertIntoLine(event: StockReorderLine) {
+  insertIntoLine(event: TransferOutLine) {
     if (event) {
       if (this.objectLine !== null && this.objectLine.length > 0) {
         if (this.objectLine[0].itemSku === event.itemSku) {
@@ -219,7 +226,7 @@ export class StockReorderAddPage implements OnInit {
     }
   }
 
-  async deleteLine(rowIndex: number, event: StockReorderLine) {
+  async deleteLine(rowIndex: number, event: TransferOutLine) {
     const alert = await this.alertController.create({
       cssClass: "custom-alert",
       header: "Are you sure to delete?",
@@ -268,7 +275,7 @@ export class StockReorderAddPage implements OnInit {
 
       if (role === "confirm") {
         this.objectService.resetVariables();
-        this.navController.navigateBack("/transactions/stock-reorder");
+        this.navController.navigateBack("/transactions/transfer-out");
       }
     } catch (e) {
       console.error(e);
@@ -301,20 +308,20 @@ export class StockReorderAddPage implements OnInit {
   }
 
   insertObject() {
-    let insertObject: StockReorderRoot;
+    let insertObject: TransferOutRoot;
     insertObject = this.objectForm.getRawValue();
     insertObject.line = this.objectLine;
     if (insertObject.line !== null && insertObject.line.length > 0) {
       this.objectService.insertObject(insertObject).subscribe(response => {
         if (response.status === 201) {
           this.toastService.presentToast("", "Stock Reorder created", "top", "success", 1000);
-          let objectId = (response.body as StockReorderRoot).stockReorderId;
+          let objectId = (response.body as TransferOutRoot).transferOutId;
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: objectId
             }
           }
-          this.navController.navigateRoot("/transactions/stock-reorder/stock-reorder-detail", navigationExtras);
+          this.navController.navigateRoot("/transactions/transfer-out/transfer-out-detail", navigationExtras);
         }
       }, error => {
         console.error(error);
@@ -344,10 +351,10 @@ export class StockReorderAddPage implements OnInit {
       this.objectService.validateBarcode(this.itemSearchValue).subscribe(async response => {
         this.itemSearchValue = null;
         if (response) {
-          let outputData: StockReorderLine = {
+          let outputData: TransferOutLine = {
             id: 0,
             uuid: uuidv4(),
-            stockReorderId: this.objectForm.controls.stockReorderId.value,
+            transferOutId: this.objectForm.controls.transferOutId.value,
             sequence: 0,
             itemId: response.itemId,
             itemCode: response.itemCode,

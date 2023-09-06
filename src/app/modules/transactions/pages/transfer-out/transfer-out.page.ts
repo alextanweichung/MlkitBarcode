@@ -5,19 +5,19 @@ import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { StockReorderList } from '../../models/stock-reorder';
-import { StockReorderService } from '../../services/stock-reorder.service';
+import { TransferOutList } from '../../models/transfer-out';
+import { TransferOutService } from '../../services/transfer-out.service';
 import { FilterPage } from '../filter/filter.page';
 
 @Component({
-  selector: 'app-stock-reorder',
-  templateUrl: './stock-reorder.page.html',
-  styleUrls: ['./stock-reorder.page.scss'],
+  selector: 'app-transfer-out',
+  templateUrl: './transfer-out.page.html',
+  styleUrls: ['./transfer-out.page.scss'],
 })
-export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
+export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
   private objectDiffer: any;
-  objects: StockReorderList[] = [];
+  objects: TransferOutList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -29,7 +29,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
-    private objectService: StockReorderService,
+    private objectService: TransferOutService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
@@ -73,8 +73,8 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
   async loadObjects() {
     try {
       this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
+        console.log("🚀 ~ file: transfer-out.page.ts:81 ~ TransferOutPage ~ this.objectService.getObjectList ~ response:", response)
         this.objects = response;
-        console.log("🚀 ~ file: stock-reorder.page.ts:77 ~ StockReorderPage ~ this.objectService.getObjectList ~ this.objects:", this.objects)
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, async error => {
         throw error;
@@ -99,7 +99,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
   /* #region add */
 
   async addObject() {
-    this.navController.navigateForward('/transactions/stock-reorder/stock-reorder-add');
+    this.navController.navigateForward('/transactions/transfer-out/transfer-out-add');
   }
 
   // Select action
@@ -110,7 +110,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
         cssClass: 'custom-action-sheet',
         buttons: [
           {
-            text: 'Add Stock Reorder',
+            text: 'Add Transfer Out',
             icon: 'document-outline',
             handler: () => {
               this.addObject();
@@ -161,7 +161,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/stock-reorder/stock-reorder-detail', navigationExtras);
+      this.navController.navigateForward('/transactions/transfer-out/transfer-out-detail', navigationExtras);
     } catch (e) {
       console.error(e);
     }

@@ -120,6 +120,11 @@
             <h3>Stock Reorder</h3>
           </ion-label>
         </ion-item>
+        <ion-item button routerLink="transfer-out" *ngIf="showTransferOut">
+          <ion-label>
+            <h3>Transfer Out</h3>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </ng-container>
   </div>

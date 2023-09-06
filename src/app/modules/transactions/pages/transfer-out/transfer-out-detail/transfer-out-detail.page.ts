@@ -1,28 +1,28 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ViewWillEnter, NavController, AlertController, IonPopover, ActionSheetController } from '@ionic/angular';
-import { StockReorderLine, StockReorderRoot } from 'src/app/modules/transactions/models/stock-reorder';
-import { StockReorderService } from 'src/app/modules/transactions/services/stock-reorder.service';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { ViewWillEnter, NavController, ActionSheetController, AlertController, IonPopover } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { TransferOutRoot, TransferOutLine } from '../../../models/transfer-out';
+import { TransferOutService } from '../../../services/transfer-out.service';
 
 @Component({
-  selector: 'app-stock-reorder-detail',
-  templateUrl: './stock-reorder-detail.page.html',
-  styleUrls: ['./stock-reorder-detail.page.scss'],
+  selector: 'app-transfer-out-detail',
+  templateUrl: './transfer-out-detail.page.html',
+  styleUrls: ['./transfer-out-detail.page.scss'],
 })
-export class StockReorderDetailPage implements OnInit, ViewWillEnter {
+export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
-  object: StockReorderRoot;
+  object: TransferOutRoot;
   
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
     private navController: NavController,
-    public objectService: StockReorderService,
+    public objectService: TransferOutService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private toastService: ToastService,
@@ -45,8 +45,8 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
     if (this.objectId && this.objectId > 0) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('', 'Invalid Stock Reorder.', 'top', 'warning', 1000);
-      this.navController.navigateBack('/transactions/stock-reorder');
+      this.toastService.presentToast('', 'Invalid Transfer Out.', 'top', 'warning', 1000);
+      this.navController.navigateBack('/transactions/transfer-out');
     }
     this.loadModuleControl();
   }
@@ -75,7 +75,7 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error', 'Stock Reorder', 'top', 'danger', 1000);
+      this.toastService.presentToast('Error', 'Transfer Out', 'top', 'danger', 1000);
     }
   }
 
@@ -105,12 +105,21 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
   completeObject() {
     this.objectService.completeObject(this.objectId).subscribe(response => {
       if (response.status === 204) {
-        this.toastService.presentToast("", "Sales Order generated", "top", "success", 1000);
+        this.toastService.presentToast("", "Inter Transfer generated", "top", "success", 1000);
         this.loadObject();
       }
     }, error => {
       console.error(error);
     })
+  }
+
+  editObject() {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.transferOutId
+      }
+    }
+    this.navController.navigateRoot('/transactions/transfer-out/transfer-out-edit', navigationExtras);
   }
 
   /* #region more action popover */
@@ -128,7 +137,7 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
-  filter(details: StockReorderLine[]) {
+  filter(details: TransferOutLine[]) {
     try {
       return details.filter(r => r.lineQty > 0);
     } catch (e) {

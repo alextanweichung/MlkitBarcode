@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Detail</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="Back" defaultHref="/transactions/stock-reorder"></ion-back-button>
+      <ion-back-button text="Back" defaultHref="/transactions/transfer-out"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end" *ngIf="!object?.isCompleted">
       <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
@@ -13,6 +13,12 @@
   <ng-template>
     <ion-content class="p-2">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item (click)="popover.dismiss(); editObject()">
+          <ion-icon name="create-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Edit</div>
+          </ion-label>
+        </ion-item>
         <ion-item (click)="popover.dismiss(); completeObjectAlert()">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
@@ -41,11 +47,11 @@
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">SO. Num.</div>
+              <div class="font-bold">IT. Num.</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div class="ion-flex">
-                {{object.salesOrderNum}}
+                {{object.interTransferNum}}
               </div>
             </ion-col>
           </ion-row>
@@ -53,10 +59,10 @@
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">Doc. Num.</div>
             </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+          <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div class="ion-flex">
                 <ion-icon class="ion-flex mr-2" name="ellipse" [class]="object.isCompleted?'color-success':'color-danger'"></ion-icon>
-                {{object.stockReorderNum}}
+                {{object.transferOutNum}}
               </div>
             </ion-col>
           </ion-row>
@@ -74,6 +80,22 @@
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{object.locationId|idMapping:objectService.locationMasterList}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">To Location</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.toLocationId|idMapping:objectService.locationMasterList}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Total Carton</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.totalCarton|number:'1.0'}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

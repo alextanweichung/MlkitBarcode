@@ -23,6 +23,7 @@ export const trxAppCode = {
    mobileConsignmentCount: "MATRCC",
    mobileInboundScan: "MATRIS",
    mobileStockReorder: "MATRSR",
+   mobileTransferOut: "MATRTO",
 }
 
 export const approvalAppCode = {
