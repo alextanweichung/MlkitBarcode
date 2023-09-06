@@ -521,38 +521,40 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
     let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku == item.itemSku);
     let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemSku == item.itemSku);
     let rowIndex = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList.findIndex(x => x == item);
-    let inputQty: number = item.qtyPicked - this.clonedQty[rowIndex].qtyPicked
-    if (outstandingLines.length > 0) {
-      let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
-      let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
-      let osTotalQtyCurrent = outstandingLines.reduce((sum, current) => sum + current.qtyCurrent, 0);
-      let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPicked - osTotalQtyCurrent;
-      switch (this.pickingQtyControl) {
-        //No control
-        case "N":
-          this.resetOutstandingListQuantityCurrent(item);
-          this.computePickingAssignment(item.qtyPicked, outstandingLines, pickListLines);
-          break;
-        //Not allow pack quantity more than SO quantity
-        case "Y":
-          if (osTotalAvailableQty >= inputQty) {
+    let inputQty: number = item.qtyPicked - this.clonedQty[rowIndex].qtyPicked;
+    if (this.objectService.header.isWithSo) {
+      if (outstandingLines.length > 0) {
+        let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
+        let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
+        let osTotalQtyCurrent = outstandingLines.reduce((sum, current) => sum + current.qtyCurrent, 0);
+        let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPicked - osTotalQtyCurrent;
+        switch (this.pickingQtyControl) {
+          //No control
+          case "N":
             this.resetOutstandingListQuantityCurrent(item);
             this.computePickingAssignment(item.qtyPicked, outstandingLines, pickListLines);
-            let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyCurrent, 0);
-            let totalQtyPacked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
-            let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
-            if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
-              this.toastService.presentToast("Control Validation", "Scanning for selected SO is completed.", "top", "success", 1000);
+            break;
+          //Not allow pack quantity more than SO quantity
+          case "Y":
+            if (osTotalAvailableQty >= inputQty) {
+              this.resetOutstandingListQuantityCurrent(item);
+              this.computePickingAssignment(item.qtyPicked, outstandingLines, pickListLines);
+              let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyCurrent, 0);
+              let totalQtyPacked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
+              let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
+              if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
+                this.toastService.presentToast("Control Validation", "Scanning for selected SO is completed.", "top", "success", 1000);
+              }
+            } else {
+              this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList[rowIndex] = this.clonedQty[rowIndex];
+              this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList = [...this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList];
+              this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
             }
-          } else {
-            this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList[rowIndex] = this.clonedQty[rowIndex];
-            this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList = [...this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList];
-            this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
-          }
-          break;
+            break;
+        }
+      } else {
+        this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
       }
-    } else {
-      this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
     }
     delete this.clonedQty[rowIndex];
   }

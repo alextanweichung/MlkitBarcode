@@ -4,21 +4,20 @@ import { ViewWillEnter, ViewDidEnter, ActionSheetController, AlertController, Mo
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { StockReorderList } from '../../models/stock-reorder';
+import { StockReorderService } from '../../services/stock-reorder.service';
 import { FilterPage } from '../filter/filter.page';
-import { StockReplenishService } from '../../services/stock-replenish.service';
-import { SalesOrderList } from '../../models/sales-order';
 
 @Component({
-  selector: 'app-stock-replenish',
-  templateUrl: './stock-replenish.page.html',
-  styleUrls: ['./stock-replenish.page.scss'],
+  selector: 'app-stock-reorder',
+  templateUrl: './stock-reorder.page.html',
+  styleUrls: ['./stock-reorder.page.scss'],
 })
-export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
+export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
   private objectDiffer: any;
-  objects: SalesOrderList[] = [];
+  objects: StockReorderList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -30,7 +29,7 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
-    private objectService: StockReplenishService,
+    private objectService: StockReorderService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
@@ -69,17 +68,11 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
 
   }
 
-  /* #region  crud */
+  /* #region crud */
 
   async loadObjects() {
     try {
-      let obj: SalesSearchModal = {
-        dateStart: format(this.startDate, 'yyyy-MM-dd'),
-        dateEnd: format(this.endDate, 'yyyy-MM-dd'),
-        customerId: this.customerIds,
-        salesAgentId: this.salesAgentIds
-      }
-      this.objectService.getObjectListByDate(obj).subscribe(async response => {
+      this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
       }, async error => {
@@ -102,18 +95,10 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
 
   /* #endregion */
 
-  /* #region  add quotation */
+  /* #region add */
 
   async addObject() {
-    try {
-      if (this.objectService.hasSalesAgent()) {
-        this.navController.navigateForward('/transactions/stock-replenish/stock-replenish-header');
-      } else {
-        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    this.navController.navigateForward('/transactions/stock-reorder/stock-reorder-add');
   }
 
   // Select action
@@ -124,7 +109,7 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
         cssClass: 'custom-action-sheet',
         buttons: [
           {
-            text: 'Add Stock Replenish',
+            text: 'Add Stock Reorder',
             icon: 'document-outline',
             handler: () => {
               this.addObject();
@@ -143,52 +128,7 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
   }
 
   /* #endregion */
-
-  /* #region download pdf */
-
-  async presentAlertViewPdf(doc) {
-    try {
-      const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
-        buttons: [
-          {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
-            handler: async () => {
-              await this.downloadPdf(doc);
-            },
-          },
-          {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
-          },
-        ]
-      });
-      await alert.present();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async downloadPdf(doc) {
-    try {
-      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId, 'Proforma Invoice').subscribe(response => {
-        let filename = doc.salesOrderNum + ".pdf";
-        this.commonService.commonDownloadPdf(response, filename);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  /* #endregion */
-
-  showDraftOnly: boolean = false;
+  
   async filter() {
     try {
       const modal = await this.modalController.create({
@@ -196,14 +136,6 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
         componentProps: {
           startDate: this.startDate,
           endDate: this.endDate,
-          customerFilter: false,
-          // customerList: this.objectService.customerSearchDropdownList,
-          selectedCustomerId: this.customerIds,
-          salesAgentFilter: true,
-          salesAgentList: this.objectService.salesAgentDropdownList,
-          selectedSalesAgentId: this.salesAgentIds,
-          useDraft: false,
-          showDraftOnly: this.showDraftOnly
         },
         canDismiss: true
       })
@@ -214,9 +146,6 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
         this.uniqueGrouping = [];
         this.startDate = new Date(data.startDate);
         this.endDate = new Date(data.endDate);
-        this.customerIds = data.customerIds;
-        this.salesAgentIds = data.salesAgentIds;
-        this.showDraftOnly = data.showDraftOnly ?? false;
         this.loadObjects();
       }
     } catch (e) {
@@ -224,16 +153,14 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
     }
   }
 
-  goToDetail(objectId: number, isDraft: boolean, draftTransactionId: number) {
+  goToDetail(objectId: number) {
     try {
       let navigationExtras: NavigationExtras = {
         queryParams: {
-          objectId: objectId,
-          isDraft: isDraft,
-          draftTransactionId: draftTransactionId
+          objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
+      this.navController.navigateForward('/transactions/stock-reorder/stock-reorder-detail', navigationExtras);
     } catch (e) {
       console.error(e);
     }

@@ -235,7 +235,10 @@ const routes: Routes = [
     path: 'transactions/inbound-scan',
     loadChildren: () => import('./modules/transactions/pages/inbound-scan/inbound-scan.module').then( m => m.InboundScanPageModule)
   },
-
+  {
+    path: 'transactions/stock-reorder',
+    loadChildren: () => import('./modules/transactions/pages/stock-reorder/stock-reorder.module').then( m => m.StockReorderPageModule)
+  },
 
 
 
@@ -344,6 +347,8 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
+
 
 
 

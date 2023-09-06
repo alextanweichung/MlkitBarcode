@@ -72,6 +72,7 @@ export class InventoryLevelTradingPage implements OnInit {
       }, error => {
         throw error;
       })
+      console.log("🚀 ~ file: inventory-level-trading.page.ts:71 ~ InventoryLevelTradingPage ~ this.objectService.getItemList ~ this.itemSearchDropdownList:", this.itemSearchDropdownList)
     } catch (e) {
       console.error(e);
     }

@@ -63,9 +63,9 @@ export class SigninPage implements OnInit, ViewDidEnter {
   ngOnInit() {
     if (Capacitor.getPlatform() === 'web') {
       // this.signin_form.get('userEmail').setValue('kccon@idcp.my');
-      this.signin_form.get('userEmail').setValue('aychia@idcp.my');
+      this.signin_form.get('userEmail').setValue('aychiacon@idcp.my');
       // this.signin_form.get('userEmail').setValue('wayne@idcp.my');
-      this.signin_form.get('password').setValue('Dev9999');
+      this.signin_form.get('password').setValue('Dev8888');
       // this.signin_form.get('userEmail').setValue('admin@idcp.my');
       // this.signin_form.get('password').setValue('i@Dmin7026');
     } else {

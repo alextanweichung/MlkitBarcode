@@ -10,21 +10,21 @@ export interface TransactionDetail {
   vendorItemCode?: string
   description?: string
   extendedDescription?: string
-  shortDescription?: any
+  shortDescription?: string
   itemUomId?: number
-  itemUomCode?: any
+  itemUomCode?: string
   currencyRate?: number
   /* #region for mobile only */
   qtyInCart?: number
   /* #endregion */
   qtyRequest?: number
-  qtyApproved?: any
-  qtyCommit?: any
-  tempQtyCommit?: any
-  qtyReceive?: any
+  qtyApproved?: number
+  qtyCommit?: number
+  tempQtyCommit?: number
+  qtyReceive?: number
   unitPrice?: number
   unitPriceExTax?: number
-  discountGroupCode?: any
+  discountGroupCode?: string
   discountExpression?: string
 
   oriUnitPrice?: number
@@ -35,10 +35,10 @@ export interface TransactionDetail {
 
   itemGroupInfo?: ItemGroupInfo
 
-  discountAmt?: any
-  discountAmtExTax?: any
+  discountAmt?: number
+  discountAmtExTax?: number
   taxId?: number
-  taxCode?: any
+  taxCode?: string
   taxPct?: number
   taxAmt?: number
   taxInclusive?: boolean
@@ -52,45 +52,47 @@ export interface TransactionDetail {
   localSubTotalExTax?: number
   localTaxableAmt?: number
   discountAmtMaxPrecision?: number
-  taxAmtMaxPrecision?: any
+  taxAmtMaxPrecision?: number
   subTotalMaxPrecision?: number
   subTotalExTaxMaxPrecision?: number
-  etaDate?: any
+  etaDate?: Date
   remark?: string
   overrideFlag?: number
-  lineUDDate?: any
-  masterUDGroup1?: any
-  masterUDGroup2?: any
-  masterUDGroup3?: any
-  parentId?: any
-  parentLineId?: any
-  parentNum?: any
+  lineUDDate?: Date
+  masterUDGroup1?: number
+  masterUDGroup2?: number
+  masterUDGroup3?: number
+  parentId?: number
+  parentLineId?: number
+  parentNum?: string
   variationTypeCode?: string
-  itemVariationRatioId?: any
-  itemVariationRatioCode?: any
-  actualQty?: any
-  openQty?: any
-  availableQty?: any
+  itemVariationRatioId?: number
+  itemVariationRatioCode?: string
+  actualQty?: number
+  openQty?: number
+  availableQty?: number
   variationDetails?: VariationDetail[]
   variationX?: number[]
   variationY?: number[]
   itemPricing?: ItemPricing
-  direction?: any
+  direction?: string
   priceListLine?: any
-  itemVariationXId?: any
-  itemVariationYId?: any
-  itemSku?: any
-  itemBarcode?: any
-  cartonNum?: any
+  itemVariationXId?: number
+  itemVariationLineXId?: number
+  itemVariationYId?: number
+  itemVariationLineYId?: number
+  itemSku?: string
+  itemBarcode?: string
+  cartonNum?: number
   glAccountId?: number
-  glAccountCode?: any
-  glLedgerLineId?: any
-  localAmount?: any
-  localAmountTax?: any
+  glAccountCode?: string
+  glLedgerLineId?: number
+  localAmount?: number
+  localAmountTax?: number
   uuid?: any
-  promoEventId?: any
-  isPromoImpactApplied?: any
-  discountedUnitPrice?: any
+  promoEventId?: number
+  isPromoImpactApplied?: boolean
+  discountedUnitPrice?: number
   /* #region  for stock-count */
   itemBrandId?: number
   itemGroupId?: number
@@ -104,9 +106,9 @@ export interface TransactionDetail {
   createdById?: number
   createdBy?: string
   createdAt?: string
-  modifiedById?: any
-  modifiedBy?: any
-  modifiedAt?: any
+  modifiedById?: number
+  modifiedBy?: string
+  modifiedAt?: Date
   deactivated?: boolean
   promoImpactedQty?: number;
   promoImpactedType?: string;

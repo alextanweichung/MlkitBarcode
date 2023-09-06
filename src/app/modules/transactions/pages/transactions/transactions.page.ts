@@ -26,6 +26,7 @@ export class TransactionsPage implements OnInit {
   showStockReplenish: boolean = false;
   showConsignmentCount: boolean = false;
   showInboundScan: boolean = false;
+  showStockReorder: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -53,6 +54,7 @@ export class TransactionsPage implements OnInit {
           this.showStockReplenish = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReplenish) > -1;
           this.showConsignmentCount = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignmentCount) > -1;
           this.showInboundScan = pageItems.findIndex(r => r.title === trxAppCode.mobileInboundScan) > -1;
+          this.showStockReorder = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReorder) > -1;
         }
       })
     } catch (e) {

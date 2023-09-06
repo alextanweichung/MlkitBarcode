@@ -34,7 +34,7 @@ export class ToastService { //implements OnDestroy {
         filter(x => x.length > 0),
         concatMap(x => this.present({
           header: x[0].header,
-          message: x.map(i => i.message).join('<br/><br/>'),
+          message: x.map(i => i.message).join("<br/><br/>"),
           duration: x[0].duration,
           color: x[0].color,
           icon: x[0].icon
@@ -60,38 +60,37 @@ export class ToastService { //implements OnDestroy {
       header: x.header,
       message: x.message,
       duration: x.duration,
-      position: 'top',
+      position: "top",
       color: x.color,
       buttons: [
         {
-          text: 'OK',
-          role: 'cancel'
+          text: "Ok",
+          role: "cancel"
         }
       ],
     });
 
     await toast.present();
     const t = await toast.onDidDismiss();
-    console.log('didDismiss:', t);
     return true;
   }
 
   async presentToast(header: string, message: string, position: any, color: string, duration: number, showSearchResult: boolean = false, icon?: string) {
     if (!icon) {
       switch (color) {
-        case 'success':
-          icon = 'checkmark-outline';
+        case "success":
+          icon = "checkmark-outline";
           break;
-        case 'medium':
-        case 'warning':
-          icon = 'information-circle-outline';
+        case "medium":
+        case "warning":
+          icon = "information-circle-outline";
           break;
-        case 'danger':
-          icon = 'warning-outline';
+        case "danger":
+          icon = "warning-outline";
           break;
       }
     }    
-    if (!showSearchResult && header === 'Search Complete') {
+    if (!showSearchResult && header === "Search Complete") {
 
     } else {
       this.toastSubject.next({
@@ -102,21 +101,6 @@ export class ToastService { //implements OnDestroy {
         icon
       })
     }
-    // const toast = await this.toastController.create({
-    //   header: header,
-    //   message: message,
-    //   duration: duration,
-    //   position: position,
-    //   color: color,
-    //   icon: icon,
-    //   buttons: [
-    //     {
-    //       text: 'Close',
-    //       role: 'cancel',
-    //       handler: () => { toast.dismiss(); }
-    //     }
-    //   ]
-    // });
   }
 
 }

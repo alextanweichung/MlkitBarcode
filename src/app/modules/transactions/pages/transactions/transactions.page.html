@@ -114,6 +114,12 @@
             <h3>Inbound Scan</h3>
           </ion-label>
         </ion-item> -->
+        <ion-item button routerLink="stock-reorder" *ngIf="showStockReorder">
+          <ion-icon name="cart-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Stock Reorder</h3>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </ng-container>
   </div>

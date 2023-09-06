@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 })
 export class CalendarInputPage implements OnInit, OnChanges, ViewDidEnter {
 
+  @Input() disabled: boolean = false;
   @Input() title: string = 'Date';
   defaultDate: Date = new Date();
   @Input() maxDateToday: boolean = false;

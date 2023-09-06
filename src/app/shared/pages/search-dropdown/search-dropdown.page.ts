@@ -26,8 +26,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 
   constructor(
     private toastService: ToastService
-  ) {
-  }
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.masterDropdownList) {
@@ -52,6 +51,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   bindFromMasterList() {
+    console.log("🚀 ~ file: search-dropdown.page.ts:55 ~ SearchDropdownPage ~ bindFromMasterList ~ this.masterDropdownList:", this.masterDropdownList)
     if (this.masterDropdownList && this.masterDropdownList.length > 0) {
       this.masterDropdownList.forEach(r => {
         this.searchDropdownList.push({
@@ -119,8 +119,9 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   assignToTemp(startIndex: number, size: number) {
+    this.tempDropdownList = [];
     if (this.searchText && this.searchText.length > 0) {
-      this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+      this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code?.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description?.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
     } else {
       this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
     }

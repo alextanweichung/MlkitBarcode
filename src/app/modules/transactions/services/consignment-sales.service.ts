@@ -53,8 +53,6 @@ export class ConsignmentSalesService {
     await this.loadMasterList();
     await this.loadStaticLov();
     await this.loadConsignmentLocation();
-    // for testing
-    this.locationList.find(r => r.locationId === 10073).isPrimary = true;
     if (this.locationList.filter(r => r.isPrimary).length > 0) {
       this.refreshLocalDb(this.locationList.find(r => r.isPrimary).locationCode);
     }
