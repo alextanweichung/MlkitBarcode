@@ -9,7 +9,6 @@ import { CommonService } from './common.service';
 })
 export class PromotionEngineService {
 
-
   constructor(private commonService: CommonService) {
   }
 
@@ -49,7 +48,6 @@ export class PromotionEngineService {
       if (event.excludeItemList) {
         excludeItemList = event.excludeItemList.map(x => x.itemId);
       }
-      //Default the check result to true in case validation not required
       if (eventItemType == "S" && event.itemList) {
         impactItemList = event.itemList.filter(x => x.isImpactOnly).map(x => x.itemId);
         eventItemList = event.itemList.filter(x => !x.isImpactOnly).map(x => x.itemId);
