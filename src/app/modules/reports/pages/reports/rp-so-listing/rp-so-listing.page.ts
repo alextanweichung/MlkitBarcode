@@ -133,22 +133,22 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       this.trxDateFrom = null;
       switch (this.selectedDateRangeId) {
         case 0:
-          this.trxDate = this.commonService.getTodayDate();
+          this.trxDateFrom = this.commonService.getTodayDate();
           break;
         case 1:
-          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7));
+          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7));
           break;
         case 2:
-          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
+          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
           break;
         case 3:
-          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 60));
+          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 60));
           break;
         case 4:
-          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 90));
+          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 90));
           break;
         case 5:
-          this.trxDate = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 180));
+          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 180));
           break;
         case 6:
           this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));

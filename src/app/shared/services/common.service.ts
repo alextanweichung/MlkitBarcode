@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, QueryList } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { File } from '@awesome-cordova-plugins/file';
-import { FileOpener } from '@awesome-cordova-plugins/file-opener';
-import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
@@ -22,7 +22,10 @@ export class CommonService {
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private file: File,
+    private opener: FileOpener,
+    private androidPermissions: AndroidPermissions
   ) { }
 
   /* #region common service */
@@ -440,59 +443,17 @@ export class CommonService {
     try {
       await this.loadingService.showLoading("Downloading");
       if (Capacitor.getPlatform() === 'android') {
-        AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-          async result => {
-            if (!result.hasPermission) {
-              AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                async result => {
-                  File.checkFile(File.externalRootDirectory + "/Download", object.filesName + object.filesType).then((isExist) => {
-                    File.writeExistingFile(File.externalRootDirectory + "/Download", object.filesName + object.filesType, file).then(async () => {
-                      if (mimeType) {
-                        FileOpener.open(File.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
-                      }
-                      this.loadingService.dismissLoading();
-                    }).catch(async (error) => {
-                      this.loadingService.dismissLoading();
-                    });
-                  }).catch((error) => {
-                    File.writeFile(File.externalRootDirectory + "/Download", object.filesName + object.filesType, file, { replace: true }).then(async () => {
-                      if (mimeType) {
-                        FileOpener.open(File.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
-                      }
-                      this.loadingService.dismissLoading();
-                    }).catch(async (error) => {
-                      this.loadingService.dismissLoading();
-                    });
-                  })
-                }
-              );
-            } else {
-              File.checkFile(File.externalRootDirectory + "/Download", object.filesName + object.filesType).then((isExist) => {
-                File.writeExistingFile(File.externalRootDirectory + "/Download", object.filesName + object.filesType, file).then(async () => {
-                  if (mimeType) {
-                    await FileOpener.open(File.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
-                  }
-                  this.loadingService.dismissLoading();
-                }).catch(async (error) => {
-                  this.loadingService.dismissLoading();
-                });
-              }).catch((error) => {
-                File.writeFile(File.externalRootDirectory + "/Download", object.filesName + object.filesType, file, { replace: true }).then(async () => {
-                  if (mimeType) {
-                    await FileOpener.open(File.externalRootDirectory + "/Download/" + object.filesName + object.filesType, mimeType);
-                  }
-                  this.loadingService.dismissLoading();
-                }).catch(async (error) => {
-                  this.loadingService.dismissLoading();
-                });
-              })
-            }
-          }
-        )
+        await this.file.writeFile(this.file.externalApplicationStorageDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.externalApplicationStorageDirectory + object.filesName + object.filesType, "application/pdf");
+          this.loadingService.dismissLoading();
+        }).catch(async (error) => {
+          console.log(`this.file.writeFile ${JSON.stringify(error)}`);
+          this.loadingService.dismissLoading();
+        })
       } else if (Capacitor.getPlatform() === 'ios') {
-        File.writeFile(File.tempDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
+        this.file.writeFile(this.file.tempDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
           if (mimeType) {
-            await FileOpener.open(File.tempDirectory + object.filesName + object.filesType, mimeType);
+            await this.opener.open(this.file.tempDirectory + object.filesName + object.filesType, mimeType);
           }
           this.loadingService.dismissLoading();
         }).catch(async (error) => {
@@ -542,70 +503,19 @@ export class CommonService {
 
   async commonDownloadPdf(file: Blob, filename: string) { // this filename already with extensions
     try {
-      filename = filename.replace(" ", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
       await this.loadingService.showLoading("Downloading");
+      filename = filename.replace(" ", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
       if (Capacitor.getPlatform() === 'android') {
-        File.checkDir(File.externalRootDirectory, "Download").then((results) => {
-        }).catch((error) => {
-          console.log(JSON.stringify(error));
+        await this.file.writeFile(this.file.externalApplicationStorageDirectory, filename, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.externalApplicationStorageDirectory + filename, "application/pdf");
+          this.loadingService.dismissLoading();
+        }).catch(async (error) => {
+          console.log(`this.file.writeFile ${JSON.stringify(error)}`);
+          this.loadingService.dismissLoading();
         })
-
-        let readPermission: boolean = false;
-        let writePermission: boolean = false;
-        let managePermission: boolean = false;
-        await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(async result => {
-          if (!result.hasPermission) {
-            await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(result => {
-              if (result.hasPermission) {
-                writePermission = true;
-              }
-            }).catch(error => {
-              writePermission = false;
-            })
-          } else {
-            writePermission = true;
-          }
-        })
-        await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.READ_EXTERNAL_STORAGE).then(async result => {
-          if (!result.hasPermission) {
-            await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.READ_EXTERNAL_STORAGE).then(result => {
-              if (result.hasPermission) {
-                readPermission = true;
-              }
-            }).catch(error => {
-              readPermission = false;
-            })
-          } else {
-            readPermission = true;
-          }
-        })
-        await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.MANAGE_EXTERNAL_STORAGE).then(async result => {
-          if (!result.hasPermission) {
-            await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.MANAGE_EXTERNAL_STORAGE).then(result => {
-              if (result.hasPermission) {
-                managePermission = true;
-              }
-            }).catch(error => {
-              managePermission = false;
-            })
-          } else {
-            managePermission = true;
-          }
-        })
-
-        if (readPermission && writePermission) {
-          await File.writeFile(File.externalRootDirectory + "/Download/", filename, file, { replace: true }).then(async () => {
-            await FileOpener.open(File.externalRootDirectory + "/Download/" + filename, "application/pdf");
-            this.loadingService.dismissLoading();
-          }).catch(async (error) => {
-            this.loadingService.dismissLoading();
-          })
-        } else {
-          console.log("Permission not allow");
-        }
       } else if (Capacitor.getPlatform() === 'ios') {
-        await File.writeFile(File.tempDirectory, filename, file, { replace: true }).then(async () => {
-          await FileOpener.open(File.tempDirectory + filename, "application/pdf");
+        await this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.tempDirectory + filename, "application/pdf");
           this.loadingService.dismissLoading();
         }).catch(async (error) => {
           this.loadingService.dismissLoading();

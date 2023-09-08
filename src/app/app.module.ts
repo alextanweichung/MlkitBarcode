@@ -20,6 +20,9 @@ import { ErrorHandlerInterceptor } from './core/interceptors/error-handler.inter
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgxSpinnerModule } from "ngx-spinner";
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();
@@ -53,6 +56,9 @@ export function initializeFactory(init: InitializeAppService) {
         })
     ],
     providers: [
+        File,
+        FileOpener,
+        AndroidPermissions,
         SQLiteService,
         DetailService,
         DatabaseService,

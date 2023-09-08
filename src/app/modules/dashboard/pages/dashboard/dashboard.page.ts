@@ -1,7 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-// import { File } from '@awesome-cordova-plugins/file';
-// import { FileOpener } from '@awesome-cordova-plugins/file-opener';
-// import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions';
 import { IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -14,8 +11,7 @@ import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/a
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss'],
-  // providers: [File, FileOpener, AndroidPermissions]
+  styleUrls: ['./dashboard.page.scss']
 })
 export class DashboardPage implements OnInit, ViewDidEnter {
 
@@ -65,6 +61,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
       this.authService.menuModel$.subscribe(obj => {
         if (obj) {
           let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.approval);
+          console.log("🚀 ~ file: dashboard.page.ts:68 ~ DashboardPage ~ ngOnInit ~ mPageItems:", mPageItems)
           if (mPageItems) {
             this.showQuotationReview = mPageItems.findIndex(r => r.title === approvalAppCode.quotationRV) > -1;
             this.showQuotationApproval = mPageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
@@ -79,7 +76,9 @@ export class DashboardPage implements OnInit, ViewDidEnter {
             this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
             this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
             this.showSalesOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
+            console.log("🚀 ~ file: dashboard.page.ts:83 ~ DashboardPage ~ ngOnInit ~ this.showSalesOrderPricingApproval:", this.showSalesOrderPricingApproval)
             this.showBackToBackOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
+            console.log("🚀 ~ file: dashboard.page.ts:85 ~ DashboardPage ~ ngOnInit ~ this.showBackToBackOrderPricingApproval:", this.showBackToBackOrderPricingApproval)
           }
 
           let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction);
@@ -100,6 +99,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
     try {
       this.dashboardService.getDashboard().subscribe(response => {
         this.dashboardData = response;
+        console.log("🚀 ~ file: dashboard.page.ts:104 ~ DashboardPage ~ this.dashboardService.getDashboard ~ this.dashboardData:", this.dashboardData)
       }, error => {
         throw error;
       })

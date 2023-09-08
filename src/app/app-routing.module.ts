@@ -247,6 +247,10 @@ const routes: Routes = [
     path: 'transactions/transfer-in',
     loadChildren: () => import('./modules/transactions/pages/transfer-in/transfer-in.module').then( m => m.TransferInPageModule)
   },
+  {
+    path: 'transactions/transfer-in-scanning',
+    loadChildren: () => import('./modules/transactions/pages/transfer-in-scanning/transfer-in-scanning.module').then( m => m.TransferInScanningPageModule)
+  },
 
 
 
@@ -355,6 +359,7 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
 
 
 
