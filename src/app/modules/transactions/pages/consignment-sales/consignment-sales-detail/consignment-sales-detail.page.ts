@@ -2,11 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { ConsignmentSalesRoot } from '../../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../../services/consignment-sales.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-consignment-sales-detail',
@@ -24,7 +24,8 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     public objectService: ConsignmentSalesService,
     private navController: NavController,
     private commonService: CommonService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastService: ToastService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -85,6 +86,41 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
   }
+
+  async completeObjectAlert() {
+    const alert = await this.alertController.create({
+      header: "Are you sure to proceed?",
+      cssClass: "custom-action-sheet",
+      buttons: [
+        {
+          text: "Yes",
+          role: "confirm",
+          cssClass: "success",
+          handler: async () => {
+            this.completeObject();
+          },
+        },
+        {
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel",
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  completeObject() {
+    this.objectService.completeObject(this.objectId).subscribe(response => {
+      if (response.status === 204) {
+        this.toastService.presentToast("", "Consignment Sales updated", "top", "success", 1000);
+        this.loadObject();
+      }
+    }, error => {
+      console.error(error);
+    })
+  }
+
 
   /* #region more action popover */
 

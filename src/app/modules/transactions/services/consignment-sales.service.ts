@@ -7,6 +7,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { format } from 'date-fns';
 import { PDItemMaster, PDItemBarcode } from 'src/app/shared/models/pos-download';
+import { Capacitor } from '@capacitor/core';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -53,15 +54,15 @@ export class ConsignmentSalesService {
     await this.loadMasterList();
     await this.loadStaticLov();
     await this.loadConsignmentLocation();
-    if (this.locationList.filter(r => r.isPrimary).length > 0) {
+    if (Capacitor.getPlatform() !== "web" && this.locationList.filter(r => r.isPrimary).length > 0) {
       this.refreshLocalDb(this.locationList.find(r => r.isPrimary).locationCode);
     }
   }
 
   async refreshLocalDb(locationCode: string) {
-    let rrrrr = await this.commonService.syncInboundConsignment(locationCode, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), 'yyyy-MM-dd'));
-    let itemMaster: PDItemMaster[] = rrrrr['itemMaster'];
-    let itemBarcode: PDItemBarcode[] = rrrrr['itemBarcode'];
+    let rrrrr = await this.commonService.syncInboundConsignment(locationCode, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+    let itemMaster: PDItemMaster[] = rrrrr["itemMaster"];
+    let itemBarcode: PDItemBarcode[] = rrrrr["itemBarcode"];
     await this.configService.syncInboundData(itemMaster, itemBarcode);
   }
 
@@ -75,13 +76,13 @@ export class ConsignmentSalesService {
   discountGroupMasterList: MasterListDetails[] = [];
   async loadMasterList() {    
     this.fullMasterList = await this.getMasterList();
-    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == "Currency").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == "DiscountGroup").flatMap(src => src.details).filter(y => y.deactivated == 0);
   }
 
   loadStaticLov() {
@@ -91,7 +92,6 @@ export class ConsignmentSalesService {
   locationList: ConsignmentSalesLocation[] = [];
   async loadConsignmentLocation() {
     this.locationList = await this.getConsignmentLocation();
-    console.log("🚀 ~ file: consignment-sales.service.ts:80 ~ ConsignmentSalesService ~ loadConsignmentLocation ~ this.locationList:", this.locationList)
   }
 
   getMasterList() {
@@ -139,6 +139,10 @@ export class ConsignmentSalesService {
         "reportName": reportName ?? null
       },
       { responseType: "blob" });
+  }
+
+  completeObject(objectId: number) {    
+    return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileConsignmentSales/complete/${objectId}`, null, httpObserveHeader)
   }
 
 }

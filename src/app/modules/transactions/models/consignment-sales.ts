@@ -8,6 +8,7 @@ export interface ConsignmentSalesList {
   locationDesc: string
   toLocationDesc: string
   deactivated: boolean
+  isEntryCompleted: boolean
 }
 
 export interface ConsignmentSalesRoot {
@@ -34,6 +35,7 @@ export interface ConsignmentSalesHeader {
   isDisplayTaxInclusive: boolean
   maxPrecision: number
   maxPrecisionTax: number
+  isEntryCompleted: boolean
 }
 
 export interface ConsignmentSalesLocation {

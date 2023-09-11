@@ -68,6 +68,7 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
+        console.log("🚀 ~ file: transfer-out-detail.page.ts:71 ~ TransferOutDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         // this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
