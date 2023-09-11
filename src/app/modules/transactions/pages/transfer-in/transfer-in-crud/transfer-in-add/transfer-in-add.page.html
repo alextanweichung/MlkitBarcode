@@ -17,7 +17,7 @@
 
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <app-search-dropdown title="Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="selectedLocation.locationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
+      <app-search-dropdown title="Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="selectedLocation?.locationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
     </ion-list>
       
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">

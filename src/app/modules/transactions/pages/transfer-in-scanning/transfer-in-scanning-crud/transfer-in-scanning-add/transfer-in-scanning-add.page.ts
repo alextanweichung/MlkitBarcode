@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, ActionSheetController, AlertController } from '@ionic/angular';
 import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
-import { TransferInRoot } from 'src/app/modules/transactions/models/transfer-in';
-import { TransferInService } from 'src/app/modules/transactions/services/transfer-in.service';
+import { TransferInScanningRoot } from 'src/app/modules/transactions/models/transfer-in-scanning';
+import { TransferInScanningService } from 'src/app/modules/transactions/services/transfer-in-scanning.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -10,17 +10,18 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-transfer-in-add',
-  templateUrl: './transfer-in-add.page.html',
-  styleUrls: ['./transfer-in-add.page.scss'],
+  selector: 'app-transfer-in-scanning-add',
+  templateUrl: './transfer-in-scanning-add.page.html',
+  styleUrls: ['./transfer-in-scanning-add.page.scss'],
 })
-export class TransferInAddPage implements OnInit {
+export class TransferInScanningAddPage implements OnInit {
 
   selectedLocation: ConsignmentSalesLocation = null;
-  pendingObject: TransferInRoot[] = [];
+  selectedPendingDoc: TransferInScanningRoot = null;
+  pendingObject: TransferInScanningRoot[] = [];
 
   constructor(
-    public objectService: TransferInService,
+    public objectService: TransferInScanningService,
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
@@ -45,6 +46,7 @@ export class TransferInAddPage implements OnInit {
     if (this.selectedLocation) {
       this.objectService.getPendingList(this.selectedLocation.locationCode).subscribe(response => {
         this.pendingObject = response;
+        this.bindPendingList();
       }, error => {
         console.error(error);
       })
@@ -67,22 +69,34 @@ export class TransferInAddPage implements OnInit {
     }
   }
 
+  pendingDocSearchDropdownList: SearchDropdownList[] = [];
+  bindPendingList() {
+    this.pendingDocSearchDropdownList = [];
+    try {
+      this.pendingObject.forEach(r => {
+        this.pendingDocSearchDropdownList.push({
+          id: r.interTransferId,
+          code: r.interTransferNum.substring(0, 2),
+          description: r.interTransferNum
+        })
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   onLocationChanged(event: any) {
     if (event) {
+      this.selectedPendingDoc = null;
       this.selectedLocation = this.objectService.locationList.find(r => r.locationId === event.id);
       this.loadPendingList();
     }
   }
 
-  selectDoc(object: TransferInRoot) {
-    object.line.forEach(r => {
-      if (r.qtyReceive === null) {
-        r.qtyReceive = r.qty;
-      }
-    })
-    console.log("🚀 ~ file: transfer-in-add.page.ts:103 ~ TransferInAddPage ~ selectDoc ~ object:", object)
-    this.objectService.setObject(object);
-    this.navController.navigateForward("/transactions/transfer-in/transfer-in-item");
+  onPendingDocChanged(event: any) {
+    if (event) {
+      this.selectedPendingDoc = this.pendingObject.find(r => r.interTransferId === event.id);
+    }
   }
 
   async cancelInsert() {
@@ -107,11 +121,16 @@ export class TransferInAddPage implements OnInit {
 
       if (role === "confirm") {
         this.objectService.resetVariables();
-        this.navController.navigateBack("/transactions/transfer-in");
+        this.navController.navigateBack("/transactions/transfer-in-scanning");
       }
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async nextStep() {
+    this.objectService.setObject(this.selectedPendingDoc);
+    this.navController.navigateForward("/transactions/transfer-in-scanning/transfer-in-scanning-item");    
   }
 
 }

@@ -46,6 +46,12 @@
           </ion-row>
         </ion-grid>
       </ion-item>
+
+      <ion-item button [detail]="false" class="ion-no-padding no-ripple pl-2">
+        <ion-label position="stacked" class="font-bold">Remark</ion-label>
+        <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" [(ngModel)]="objectService.object.remark"></ion-textarea>
+      </ion-item>
+
     </ion-list>
       
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
@@ -53,7 +59,7 @@
     </ion-list-header>
 
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
-    <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
+    <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)">
 
     <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
       <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
@@ -62,17 +68,14 @@
             <ion-col size="8"class="ion-flex ion-margin-auto">
               <div class="ion-flex my-auto font-bold">Item</div>
             </ion-col>
-            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+            <ion-col size="4" class="ion-flex ion-margin-auto justify-content-center">
               <div class="ion-flex my-auto font-bold">Quantity</div>
             </ion-col>
-            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-              <div class="ion-flex my-auto font-bold text-align-center">Received Qty</div>
-            </ion-col>
           </ion-row>
-        </ion-grid>        
+        </ion-grid>
       </ion-item>
 
-      <ion-item-sliding #slidingItem *ngFor="let l of objectService.object.line let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let l of getInsertedLine() let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="highlight(qtyInput)">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -99,16 +102,13 @@
                   </ion-row>
                 </ion-grid>
               </ion-col>
-              <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
-                <div class="ion-flex my-auto">{{l.qty}}</div>
-              </ion-col>
-              <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">                
-                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="l.qtyReceive" (ionFocus)="highlight(qtyInput)" placeholder="0"></ion-input>
+              <ion-col size="4" class="ion-flex ion-margin-auto justify-content-center">
+                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="l.lineQty" (ionFocus)="highlight(qtyInput)" (ionBlur)="qtyOnBlur(i,qtyInput.value)" placeholder="0"></ion-input>
               </ion-col>
             </ion-row>
           </ion-grid>
         </ion-item>
-        <ion-item-options *ngIf="l.qty === 0">
+        <ion-item-options>
           <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i, l);"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
         </ion-item-options>
       </ion-item-sliding>

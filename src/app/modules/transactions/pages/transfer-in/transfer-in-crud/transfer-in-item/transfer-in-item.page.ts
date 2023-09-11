@@ -161,8 +161,6 @@ export class TransferInItemPage implements OnInit {
     await alert.present();
   }
 
-  /* #region steps */
-
   /* #region camera scanner */
 
   scanActive: boolean = false;
@@ -281,7 +279,7 @@ export class TransferInItemPage implements OnInit {
   updateObject() {
     this.objectService.updateObject(this.objectService.object).subscribe(response => {
       if (response.status === 204) {
-        this.toastService.presentToast("", "Stock Reorder created", "top", "success", 1000);
+        this.toastService.presentToast("", "Inter Transfer updated", "top", "success", 1000);
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectService.object.interTransferId
