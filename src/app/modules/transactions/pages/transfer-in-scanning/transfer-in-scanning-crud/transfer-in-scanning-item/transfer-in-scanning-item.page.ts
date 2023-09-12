@@ -432,14 +432,15 @@ export class TransferInScanningItemPage implements OnInit {
     this.objectService.insertObject(insertObject).subscribe(response => {
       console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:433 ~ TransferInScanningItemPage ~ this.objectService.insertObject ~ response:", response)
       if (response.status === 201) {
+        let obj = (response.body as TransferInScanningRoot)
         this.toastService.presentToast("", "Transfer In Scanning created", "top", "success", 1000);
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: this.objectService.object.interTransferId
+            objectId: obj.transferInScanningId
           }
         }
         this.objectService.resetVariables();
-        this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning", navigationExtras);
+        this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-detail", navigationExtras);
       }
     }, error => {
       console.error(error);
