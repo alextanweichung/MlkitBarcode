@@ -45,7 +45,7 @@ export class StockReorderAddPage implements OnInit {
       stockReorderId: [0],
       stockReorderNum: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-      typeCode: ["T"],
+      typeCode: ["C"],
       locationId: [(primaryLocationIndex > -1 ? this.objectService.locationList[primaryLocationIndex].locationId : null), [Validators.required]],
       deactivated: [false],
       isCompleted: [false],

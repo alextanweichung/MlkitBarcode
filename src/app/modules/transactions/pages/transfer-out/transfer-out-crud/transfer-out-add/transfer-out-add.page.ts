@@ -45,7 +45,7 @@ export class TransferOutAddPage implements OnInit {
       transferOutId: [0],
       transferOutNum: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-      typeCode: ["IL"],
+      typeCode: ["C"],
       locationId: [(primaryLocationIndex > -1 ? this.objectService.locationList[primaryLocationIndex].locationId : null), [Validators.required]],
       toLocationId: [null, [Validators.required]],
       deactivated: [false],

@@ -200,11 +200,11 @@ export class TransferInScanningItemPage implements OnInit {
         if (this.objectService.object.line[index].uuid === null) {
           this.objectService.object.line[index].uuid = event.uuid;
         }
-        if ((this.objectService.object.line[index].qtyReceive + 1) > this.objectService.object.line[index].lineQty) {
-          this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
-        } else {
-          this.objectService.object.line[index].qtyReceive = (this.objectService.object.line[index].qtyReceive??0) + 1;
-        }
+        // if (this.objectService.object.line[index].lineQty !== null && (this.objectService.object.line[index].qtyReceive + 1) > this.objectService.object.line[index].lineQty) {
+        //   this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
+        // } else {
+          this.objectService.object.line[index].lineQty = event.lineQty;
+        // }
       } else {
         this.objectService.object.line.unshift(event);
       }
@@ -221,7 +221,13 @@ export class TransferInScanningItemPage implements OnInit {
           role: "confirm",
           cssClass: "danger",
           handler: async () => {
-            this.objectService.object.line.splice(rowIndex, 1);
+            let lineToDelete = this.objectService.object.line[rowIndex];
+            if (lineToDelete !== null && (lineToDelete.interTransferId !== null || lineToDelete.interTransferId > 0)) {
+              this.objectService.object.line[rowIndex].uuid = null;
+              this.objectService.object.line[rowIndex].lineQty = null;
+            } else {
+              this.objectService.object.line.splice(rowIndex, 1);
+            }
           },
         },
         {
@@ -285,7 +291,7 @@ export class TransferInScanningItemPage implements OnInit {
       //   this.objectService.object.line[rowIndex].qtyReceive = this.objectService.object.line[rowIndex].lineQty;
       //   this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
       // } else {
-        this.objectService.object.line[rowIndex].qtyReceive = Number(qty);
+        this.objectService.object.line[rowIndex].lineQty = Number(qty);
       // }
     }
   }
@@ -405,7 +411,7 @@ export class TransferInScanningItemPage implements OnInit {
       interTransferNum: this.objectService.object.interTransferNum,
       trxDate: this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()),
       trxDateTime: null,
-      typeCode: "T",
+      typeCode: "C",
       locationId: this.objectService.object.locationId,
       locationDesc: null,
       toLocationId: this.objectService.object.toLocationId,
@@ -418,12 +424,13 @@ export class TransferInScanningItemPage implements OnInit {
       remark: this.objectService.object.remark,
       workFlowTransactionId: null,
       interTransferQty: null,
-      line: this.objectService.object.line,
+      line: this.objectService.object.line.filter(r => r.uuid !== null),
       transferAdjustment: null    
     }    
     console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:351 ~ TransferInScanningItemPage ~ insertObject ~ insertObject:", insertObject)
     
     this.objectService.insertObject(insertObject).subscribe(response => {
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:433 ~ TransferInScanningItemPage ~ this.objectService.insertObject ~ response:", response)
       if (response.status === 201) {
         this.toastService.presentToast("", "Transfer In Scanning created", "top", "success", 1000);
         let navigationExtras: NavigationExtras = {

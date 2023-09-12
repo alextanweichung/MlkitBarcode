@@ -87,7 +87,7 @@ export class TransferInScanningEditPage implements OnInit {
           if (found_barcode) {
             let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
             if (found_item_master) {
-              let itemExistInLine = this.objectService.object.line.find(r => r.itemSku === found_barcode.sku);
+              let itemExistInLine = this.object.line.find(r => r.itemSku === found_barcode.sku);
               if (itemExistInLine) {
                 let outputData: TransferInScanningLine = {
                   id: 0,
@@ -156,7 +156,7 @@ export class TransferInScanningEditPage implements OnInit {
     try {
       if (event) {
         event.forEach(async r => {
-          let itemExistInLine = this.objectService.object.line.find(rr => rr.itemSku === r.itemSku);
+          let itemExistInLine = this.object.line.find(rr => rr.itemSku === r.itemSku);
           if (itemExistInLine) {
             let outputData: TransferInScanningLine = {
               id: 0,
@@ -219,18 +219,14 @@ export class TransferInScanningEditPage implements OnInit {
 
   insertIntoLine(event: TransferInScanningLine) {
     if (event) {
-      if (this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
-        let index = this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku);
-        if (this.objectService.object.line[index].uuid === null) {
-          this.objectService.object.line[index].uuid = event.uuid;
+      if (this.object.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
+        let index = this.object.line.findIndex(r => r.itemSku === event.itemSku);
+        if (this.object.line[index].uuid === null) {
+          this.object.line[index].uuid = event.uuid;
         }
-        if ((this.objectService.object.line[index].qtyReceive + 1) > this.objectService.object.line[index].lineQty) {
-          this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
-        } else {
-          this.objectService.object.line[index].qtyReceive = (this.objectService.object.line[index].qtyReceive??0) + 1;
-        }
+        this.object.line[index].lineQty = (this.object.line[index].lineQty??0) + 1;
       } else {
-        this.objectService.object.line.push(event);
+        this.object.line.unshift(event);
       }
     }
   }
@@ -245,7 +241,7 @@ export class TransferInScanningEditPage implements OnInit {
           role: "confirm",
           cssClass: "danger",
           handler: async () => {
-            this.objectService.object.line.splice(rowIndex, 1);
+            this.object.line.splice(rowIndex, 1);
           },
         },
         {
@@ -305,7 +301,7 @@ export class TransferInScanningEditPage implements OnInit {
       //   this.object.line[rowIndex].qtyReceive = this.object.line[rowIndex].lineQty;
       //   this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
       // } else {
-        this.object.line[rowIndex].qtyReceive = Number(qty);
+        this.object.line[rowIndex].lineQty = Number(qty);
       // }
     }
   }
@@ -331,7 +327,7 @@ export class TransferInScanningEditPage implements OnInit {
       this.objectService.validateBarcode(this.itemSearchValue).subscribe(async response => {
         this.itemSearchValue = null;
         if (response) {
-          let itemExistInLine = this.objectService.object.line.find(rr => rr.itemSku === response.itemSku);
+          let itemExistInLine = this.object.line.find(rr => rr.itemSku === response.itemSku);
           if (itemExistInLine) {
             let outputData: TransferInScanningLine = {
               id: 0,
