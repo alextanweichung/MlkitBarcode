@@ -84,12 +84,14 @@ export class CalendarInputPage implements OnInit, OnChanges {
   resetControl() {
     this.date_active = false;
     this.defaultDate = new Date();
-    this.date_display = this.presentation === 'date-time' ? format(this.defaultDate, 'dd/MM/yyyy hh:mm aa') : format(this.defaultDate, 'dd/MM/yyyy');
     if (this.presentation === 'date-time') {
-      this.date_value = new Date(Date.UTC(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), this.defaultDate.getHours(), this.defaultDate.getMinutes(), 0));
+      this.date_value_here = new Date(Date.UTC(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), this.defaultDate.getHours(), this.defaultDate.getMinutes(), 0));
     } else {
-      this.date_value = new Date(Date.UTC(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), 0, 0, 0));
+      this.date_value_here = new Date(Date.UTC(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), 0, 0, 0));
     }
+    this.date_value = this.defaultDate;
+    this.date_display = this.presentation === 'date-time' ? format(this.defaultDate, 'dd/MM/yyyy hh:mm aa') : format(this.defaultDate, 'dd/MM/yyyy');
     this.onDateSelected.emit(this.date_value);
   }
+  
 }

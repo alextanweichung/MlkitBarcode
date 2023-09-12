@@ -11,6 +11,7 @@ import { AlertController, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.page';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-otp-configuration',
@@ -172,6 +173,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   onDateSelected(event: Date) {
     if (event) {
       this.expiryDate = event;
+      console.log("🚀 ~ file: otp-configuration.page.ts:175 ~ OtpConfigurationPage ~ onDateSelected ~ this.expiryDate:", this.expiryDate)
     }
   }
 
@@ -184,6 +186,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   generateOtp() {
     if (this.selectedApp && this.selectedUser && this.selectedValidity) {
       let t = this.transformObjectToDto();
+      console.log("🚀 ~ file: otp-configuration.page.ts:188 ~ OtpConfigurationPage ~ generateOtp ~ t:", t)
       this.otpConfigService.insertOtp(t).subscribe(async response => {
         if (response.status == 201) {
           this.generatedOtpCode = response.body['header'].otpCode;
@@ -228,7 +231,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     this.selectedValidity = null;
     this.appsDropdown.clearSelected();
     this.appsMultiDropdown.clearSelected();
-    this.calendar.resetControl();
+    this.expiryDate = new Date();
     this.checkboxValue = true;
     this.remark = null;
   }
@@ -280,7 +283,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
         otpCode: null,
         userId: this.selectedUser,
         validity: this.selectedValidity,
-        expiredAt: this.expiryDate,
+        expiredAt: this.checkboxValue ? null : format(this.expiryDate, "dd/MM/yyyy HH:mm:ss"),
         status: null,
         remark: this.remark
       },

@@ -91,6 +91,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
   clearSelected() {
     this.selected = [];
+    this.searchDropdownList.forEach(r => r.checked = false);
   }
 
   isModalOpen: boolean = false;
