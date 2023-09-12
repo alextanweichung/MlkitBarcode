@@ -31,7 +31,9 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   selectedUser: any;
   selectedValidity: any;
   selectedApp: any;
-  expiryDate: Date = null;
+
+  expiryDate: Date = this.commonService.getTodayDate();
+  remark: string = null;
 
   checkboxValue: boolean = true;
 
@@ -228,6 +230,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     this.appsMultiDropdown.clearSelected();
     this.calendar.resetControl();
     this.checkboxValue = true;
+    this.remark = null;
   }
 
   copyMessage(val: string) {
@@ -277,8 +280,9 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
         otpCode: null,
         userId: this.selectedUser,
         validity: this.selectedValidity,
-        expiredAt: null,
-        status: null
+        expiredAt: this.expiryDate,
+        status: null,
+        remark: this.remark
       },
       details: otpLineArray
     };

@@ -8,8 +8,9 @@ export interface OtpDTO {
     otpCode: string
     userId: number
     validity: string
-    expiredAt: string
+    expiredAt: Date
     status: string
+    remark: string
   }
   
   export interface OtpLine {

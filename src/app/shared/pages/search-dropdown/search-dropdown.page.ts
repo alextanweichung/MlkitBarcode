@@ -51,7 +51,6 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   bindFromMasterList() {
-    console.log("🚀 ~ file: search-dropdown.page.ts:55 ~ SearchDropdownPage ~ bindFromMasterList ~ this.masterDropdownList:", this.masterDropdownList)
     if (this.masterDropdownList && this.masterDropdownList.length > 0) {
       this.masterDropdownList.forEach(r => {
         this.searchDropdownList.push({
