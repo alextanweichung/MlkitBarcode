@@ -25,7 +25,7 @@
       <div *ngFor="let m of uniqueGrouping">
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
-        </ion-list-header>        
+        </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item button detail="false" *ngFor="let object of getObjects(m)" class="ion-no-padding" (click)="goToDetail(object.consignmentSalesId)">
             <ion-grid class="ion-no-padding py-2 pl-2">
