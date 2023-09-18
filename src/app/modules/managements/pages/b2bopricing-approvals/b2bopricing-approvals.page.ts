@@ -12,7 +12,7 @@ import { TransactionProcessingService } from 'src/app/shared/services/transactio
   selector: 'app-b2bopricing-approvals',
   templateUrl: './b2bopricing-approvals.page.html',
   styleUrls: ['./b2bopricing-approvals.page.scss'],
-  providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'MobileBackToBackOrderPricingApprove' }]
+  providers: [TransactionProcessingService, { provide: "apiObject", useValue: "MobileBackToBackOrderPricingApprove" }]
 })
 export class B2bopricingApprovalsPage implements OnInit, ViewWillEnter {
 
@@ -47,15 +47,15 @@ export class B2bopricingApprovalsPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
-        this.pendingObjects = response.filter(r => !r.isComplete);
+      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd"), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(response => {
+        this.pendingObjects = response.filter(r => !r.isComplete && !r.deactivated);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('', 'Search Complete', 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         throw Error;
       })
     } catch (error) {
-      this.toastService.presentToast('', 'Error Loading', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error Loading", "top", "danger", 1000);
     }
   }
 

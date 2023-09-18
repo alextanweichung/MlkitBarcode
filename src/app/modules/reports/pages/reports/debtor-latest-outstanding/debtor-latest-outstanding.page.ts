@@ -78,12 +78,12 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     this.selected = [];
     let obj: DebtorOutstandingRequest = {
       customerId: this.customerIds ?? [],
-      trxDate: format(this.trxDate, 'yyyy-MM-dd'),
+      trxDate: format(this.trxDate, "yyyy-MM-dd"),
       isOverdueOnly: this.isOverdueOnly
     }
     this.objectService.getDebtorOutstanding(obj).subscribe(response => {
       this.objects = response;
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+      this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
     }, error => {
       console.log(error);
     })
@@ -106,21 +106,21 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf(object: DebtorOutstanding) {
     try {
       const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
+        header: "Download PDF?",
+        message: "",
         buttons: [
           {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
             handler: async () => {
               await this.downloadPdf([object]);
             },
           },
           {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
           },
         ]
       });
@@ -133,10 +133,10 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   async downloadPdf(object: DebtorOutstanding[]) {
     if (object && object.length > 0) {
       let paramModel: ReportParameterModel = {
-        appCode: 'FAMS002',
-        format: 'pdf',
+        appCode: "FAMS002",
+        format: "pdf",
         documentIds: object.flatMap(r => r.customerId),
-        reportName: 'Debtor Statement',
+        reportName: "Debtor Statement",
         customReportParam: {
           parameter1: object.flatMap(r => r.customerId),
           statementDate: this.trxDate
@@ -150,26 +150,26 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
         } else {
           await this.commonService.commonDownloadPdf(response, "Debtor_Statements." + paramModel.format);
         }
-        this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), 'top', 'success', 1000);
+        this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), "top", "success", 1000);
       }, error => {
         console.log(error);
       })
     } else {
-      this.toastService.presentToast('Invalid Key Id', 'Please contact adminstrator.', 'top', 'danger', 1000);
+      this.toastService.presentToast("Invalid Key Id", "Please contact adminstrator.", "top", "danger", 1000);
     }
   }
 
 
   loadCreditInfo(customerId: number) {
     this.objectService.getCreditInfo(customerId).subscribe(response => {
-      this.displayDetails(response.outstanding, 'Outstanding Amount');
+      this.displayDetails(response.outstanding, "Outstanding Amount");
     }, error => {
       console.error(error);
     })
   }
 
   displayModal: boolean = false;
-  creditInfoType: string = '';
+  creditInfoType: string = "";
   tableValue: CreditInfoDetails[] = [];
   creditCols: any[] = [];
   displayDetails(tableValue: CreditInfoDetails[], infoType: string) {
@@ -190,7 +190,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -219,20 +219,20 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     try {
       const alert = await this.alertController.create({
         header: `Download ${this.selected.length} PDF?`,
-        message: '',
+        message: "",
         buttons: [
           {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
             handler: async () => {
               await this.downloadPdf(this.selected);
             },
           },
           {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
           },
         ]
       });

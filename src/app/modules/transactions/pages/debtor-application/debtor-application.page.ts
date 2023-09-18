@@ -43,7 +43,7 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
       let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.createdAt))))];
       this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
       await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+      this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
     }, error => {
       console.error(error);
     })
@@ -60,7 +60,7 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/debtor-application/debtor-application-detail', navigationExtras);
+      this.navController.navigateForward("/transactions/debtor-application/debtor-application-detail", navigationExtras);
     } catch (e) {
       console.error(e);
     }
@@ -69,20 +69,20 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add Debtor App.',
-            icon: 'document-outline',
+            text: "Add Debtor App.",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }]
       });
       await actionSheet.present();
@@ -95,10 +95,10 @@ export class DebtorApplicationPage implements OnInit, ViewWillEnter {
   async addObject() {
     try {
       if (this.objectService.hasSalesAgent()) {
-        this.navController.navigateForward('/transactions/debtor-application/debtor-application-add');
+        this.navController.navigateForward("/transactions/debtor-application/debtor-application-add");
       }
       else {
-        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Sales Agent not set.", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);

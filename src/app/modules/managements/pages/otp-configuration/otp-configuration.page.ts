@@ -42,11 +42,11 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   validitySerachDropdownList: SearchDropdownList[] = [];
   appsSearchDropdownList: SearchDropdownList[] = [];
 
-  @ViewChild('usersDropdown', { static: false }) usersDropdown: SearchDropdownPage;
-  @ViewChild('validityDropdown', { static: false }) validityDropdown: SearchDropdownPage;
-  @ViewChild('appsDropdown', { static: false }) appsDropdown: SearchDropdownPage;
-  @ViewChild('appsMultiDropdown', { static: false }) appsMultiDropdown: SearchMultiDropdownPage;
-  @ViewChild('calendar', { static: false }) calendar: CalendarInputPage;
+  @ViewChild("usersDropdown", { static: false }) usersDropdown: SearchDropdownPage;
+  @ViewChild("validityDropdown", { static: false }) validityDropdown: SearchDropdownPage;
+  @ViewChild("appsDropdown", { static: false }) appsDropdown: SearchDropdownPage;
+  @ViewChild("appsMultiDropdown", { static: false }) appsMultiDropdown: SearchMultiDropdownPage;
+  @ViewChild("calendar", { static: false }) calendar: CalendarInputPage;
 
   constructor(
     private toastService: ToastService,
@@ -91,7 +91,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     })
 
     this.otpConfigService.getStaticLov().subscribe(response => {
-      this.lovStatics = response.filter(x => x.objectName == 'OtpValidity' && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.lovStatics = response.filter(x => x.objectName == "OtpValidity" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })
@@ -114,9 +114,9 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: this.generatedOtpCode,
-      subHeader: 'New OTP generated.',
+      subHeader: "New OTP generated.",
       buttons: [{
-        text: 'Copy',
+        text: "Copy",
         handler: () => {
           this.copyMessage(this.generatedOtpCode);
         },
@@ -154,14 +154,14 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   }
 
   onAppChanged(event) {
-    if (this.selectedValidity && this.selectedValidity === 'SINGLE') {
+    if (this.selectedValidity && this.selectedValidity === "SINGLE") {
       if (event) {
         this.selectedApp = event.code;
       } else {
         this.selectedApp = null
       }
     }
-    if (this.selectedValidity && this.selectedValidity === 'MULTIPLE') {
+    if (this.selectedValidity && this.selectedValidity === "MULTIPLE") {
       if (event && event.length > 0) {
         this.selectedApp = event.flatMap(r => r.code);
       } else {
@@ -173,7 +173,6 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   onDateSelected(event: Date) {
     if (event) {
       this.expiryDate = event;
-      console.log("🚀 ~ file: otp-configuration.page.ts:175 ~ OtpConfigurationPage ~ onDateSelected ~ this.expiryDate:", this.expiryDate)
     }
   }
 
@@ -186,21 +185,20 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   generateOtp() {
     if (this.selectedApp && this.selectedUser && this.selectedValidity) {
       let t = this.transformObjectToDto();
-      console.log("🚀 ~ file: otp-configuration.page.ts:188 ~ OtpConfigurationPage ~ generateOtp ~ t:", t)
       this.otpConfigService.insertOtp(t).subscribe(async response => {
         if (response.status == 201) {
-          this.generatedOtpCode = response.body['header'].otpCode;
+          this.generatedOtpCode = response.body["header"].otpCode;
           await this.presentAlert();
-          this.toastService.presentToast('Success', 'New OTP has been created.', 'top', 'success', 1000);
+          this.toastService.presentToast("Success", "New OTP has been created.", "top", "success", 1000);
           this.resetOtpInputFields();
         }
       }, error => {
         console.log(error);
-        this.toastService.presentToast('Error', 'Please insert all fields.', 'top', 'danger', 1000);
+        this.toastService.presentToast("Error", "Please insert all fields.", "top", "danger", 1000);
       })
     }
     else {
-      this.toastService.presentToast('Error', 'Please insert all fields.', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error", "Please insert all fields.", "top", "danger", 1000);
     }
   }
 
@@ -237,16 +235,16 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   }
 
   copyMessage(val: string) {
-    const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
+    const selBox = document.createElement("textarea");
+    selBox.style.position = "fixed";
+    selBox.style.left = "0";
+    selBox.style.top = "0";
+    selBox.style.opacity = "0";
     selBox.value = val;
     document.body.appendChild(selBox);
     selBox.focus();
     selBox.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(selBox);
   }
 

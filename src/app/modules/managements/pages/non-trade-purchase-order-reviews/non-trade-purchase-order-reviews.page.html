@@ -1,0 +1,21 @@
+<ion-header collapse="fade" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Non Trade PO Reviews</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/managements"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="filter()">
+        <ion-icon slot="icon-only" name="filter"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Non Trade PO Reviews</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <app-transaction-processing [pendingObjects]="pendingObjects" [completedObjects]="completedObjects" (onObjectUpdated)="onObjectUpdated($event)" parentType="Non-Trade-Purchase-Order" processType="REVIEWS"></app-transaction-processing>
+</ion-content>

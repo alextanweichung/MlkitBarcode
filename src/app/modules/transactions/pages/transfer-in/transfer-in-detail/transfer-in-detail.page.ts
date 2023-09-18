@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { ViewWillEnter, NavController, ActionSheetController, AlertController, IonPopover } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ViewWillEnter, NavController, ActionSheetController, AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TransferInRoot, TransferInLine } from '../../../models/transfer-in';
+import { TransferInRoot } from '../../../models/transfer-in';
 import { TransferInService } from '../../../services/transfer-in.service';
 
 @Component({
@@ -30,7 +29,7 @@ export class TransferInDetailPage implements OnInit, ViewWillEnter {
   ) {
     try {
       this.route.queryParams.subscribe(params => {
-        this.objectId = params['objectId'];
+        this.objectId = params["objectId"];
       })
     } catch (e) {
       console.error(e);
@@ -45,8 +44,8 @@ export class TransferInDetailPage implements OnInit, ViewWillEnter {
     if (this.objectId && this.objectId > 0) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('', 'Invalid Transfer In.', 'top', 'warning', 1000);
-      this.navController.navigateBack('/transactions/transfer-in');
+      this.toastService.presentToast("", "Invalid Transfer In.", "top", "warning", 1000);
+      this.navController.navigateBack("/transactions/transfer-in");
     }
     this.loadModuleControl();
   }
@@ -56,21 +55,20 @@ export class TransferInDetailPage implements OnInit, ViewWillEnter {
       
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
     }
   }
 
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: transfer-in-detail.page.ts:66 ~ TransferInDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
       }, error => {
         throw error;
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error', 'Transfer In', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error", "Transfer In", "top", "danger", 1000);
     }
   }
   

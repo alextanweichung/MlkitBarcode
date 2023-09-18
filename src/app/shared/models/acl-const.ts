@@ -41,6 +41,8 @@ export const approvalAppCode = {
    b2bOrderRV: "MAB2BRV",
    b2bOrderAP: "MAB2BAP",
    b2bOrderPricingAP: "MAB2BPAP",
+   nonTradePORV: "MANTPORV",
+   nonTradePVAP: "MANTPOAP",
    otpConfig: "MAMAOTP",
 }
 

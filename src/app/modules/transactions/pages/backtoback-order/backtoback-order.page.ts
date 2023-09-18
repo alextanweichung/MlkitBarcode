@@ -62,17 +62,17 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.objectService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+      this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })
     } catch (error) {
-      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error loading object", "", "top", "danger", 1000);
     }
   }
 
@@ -110,9 +110,9 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   async addObject() {
     try {
       if (this.objectService.hasSalesAgent()) {
-        this.navController.navigateForward('/transactions/backtoback-order/backtoback-order-header');
+        this.navController.navigateForward("/transactions/backtoback-order/backtoback-order-header");
       } else {
-        this.toastService.presentToast('System Error', 'Sales Agent not set.', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Sales Agent not set.", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -123,20 +123,20 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add B2B Order',
-            icon: 'document-outline',
+            text: "Add B2B Order",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }]
       });
       await actionSheet.present();
@@ -152,21 +152,21 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   // async presentAlertViewPdf(doc) {
   //   try {
   //     const alert = await this.alertController.create({
-  //       header: 'Download PDF?',
-  //       message: '',
+  //       header: "Download PDF?",
+  //       message: "",
   //       buttons: [
   //         {
-  //           text: 'OK',
-  //           cssClass: 'success',
-  //           role: 'confirm',
+  //           text: "OK",
+  //           cssClass: "success",
+  //           role: "confirm",
   //           handler: async () => {
   //             await this.downloadPdf(doc);
   //           },
   //         },
   //         {
-  //           cssClass: 'cancel',
-  //           text: 'Cancel',
-  //           role: 'cancel'
+  //           cssClass: "cancel",
+  //           text: "Cancel",
+  //           role: "cancel"
   //         },
   //       ]
   //     });
@@ -222,7 +222,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/backtoback-order/backtoback-order-detail', navigationExtras);
+      this.navController.navigateForward("/transactions/backtoback-order/backtoback-order-detail", navigationExtras);
     } catch (e) {
       console.error(e);
     }

@@ -66,8 +66,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     } else if (this.isDraft && this.draftTransactionId && this.draftTransactionId > 0) {
       this.loadDraftObject();
     } else {
-      this.toastService.presentToast('', 'Invalid Sales Order.', 'top', 'warning', 1000);
-      this.navController.navigateBack('/transactions/sales-order');
+      this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
+      this.navController.navigateBack("/transactions/sales-order");
     }
     this.loadModuleControl();
   }
@@ -82,7 +82,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
     }
   }
 
@@ -90,7 +90,6 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: sales-order-detail.page.ts:93 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ this.object:", this.object)
         if (this.object.header.isHomeCurrency) {
           this.object.header.maxPrecision = this.precisionSales.localMax;
           this.object.header.maxPrecisionTax = this.precisionTax.localMax
@@ -106,7 +105,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error', 'Sales Order', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error", "Sales Order", "top", "danger", 1000);
     }
   }
 
@@ -128,8 +127,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
             let trxNums = relatedArray.map(x => x.trxNum);
             let trxDates = relatedArray.map(x => x.trxDate);
             let routerLinks = relatedArray.map(x => x.routerLink);
-            if (type == 'SalesInvoice') {
-              type = 'Sales Invoice';
+            if (type == "SalesInvoice") {
+              type = "Sales Invoice";
             }
             let newState: WorkFlowState = {
               stateId: null,
@@ -143,8 +142,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
               trxBy: null,
               routerLink: null,
               routerLinks: routerLinks,
-              icon: 'pi pi-star-fill',
-              stateType: 'TRANSACTION',
+              icon: "pi pi-star-fill",
+              stateType: "TRANSACTION",
               isCompleted: true,
               sequence: null,
               interval: null
@@ -185,7 +184,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         objectId: this.object.header.salesOrderId
       }
     }
-    this.navController.navigateRoot('/transactions/sales-order/sales-order-cart', navigationExtras);
+    this.navController.navigateRoot("/transactions/sales-order/sales-order-cart", navigationExtras);
   }
 
   toggleObject() {
@@ -250,21 +249,21 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf(reportName: string) {
     try {
       const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
+        header: "Download PDF?",
+        message: "",
         buttons: [
           {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
             handler: async () => {
               await this.downloadPdf(reportName);
             },
           },
           {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
           },
         ]
       });
@@ -292,7 +291,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -310,26 +309,26 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     try {
       if (this.processType && this.selectedSegment) {
         const alert = await this.alertController.create({
-          cssClass: 'custom-alert',
+          cssClass: "custom-alert",
           backdropDismiss: false,
-          header: 'Are you sure to ' + action + ' ' + this.object.header.salesOrderNum + '?',
+          header: "Are you sure to " + action + " " + this.object.header.salesOrderNum + "?",
           inputs: [
             {
-              name: 'actionreason',
-              type: 'textarea',
-              placeholder: 'Please enter Reason',
-              value: ''
+              name: "actionreason",
+              type: "textarea",
+              placeholder: "Please enter Reason",
+              value: ""
             }
           ],
           buttons: [
             {
-              text: 'OK',
-              role: 'confirm',
-              cssClass: 'success',
+              text: "OK",
+              role: "confirm",
+              cssClass: "success",
               handler: (data) => {
-                if (action === 'REJECT' && this.processType) {
+                if (action === "REJECT" && this.processType) {
                   if (!data.actionreason && data.actionreason.length === 0) {
-                    this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                    this.toastService.presentToast("Please enter reason", "", "top", "danger", 1000);
                     return false;
                   } else {
                     this.updateDoc(action, [this.object.header.salesOrderId.toString()], data.actionreason);
@@ -340,14 +339,14 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
               },
             },
             {
-              text: 'Cancel',
-              role: 'cancel'
+              text: "Cancel",
+              role: "cancel"
             },
           ],
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Something went wrong, please contact Adminstrator", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -409,10 +408,10 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
             throw Error;
           })
         } catch (error) {
-          this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+          this.toastService.presentToast("Update error", "", "top", "danger", 1000);
         }
       } else {
-        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Something went wrong, please contact Adminstrator", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -426,7 +425,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   showStatus() {
     try {
       this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
-        this.toastService.presentToast('Doc Status', response.currentStatus, 'top', 'success', 2000);
+        this.toastService.presentToast("Doc Status", response.currentStatus, "top", "success", 2000);
       }, error => {
         throw error;
       })
@@ -447,23 +446,23 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
           subHeader: "This will delete Draft & Generate SO",
           buttons: [
             {
-              text: 'OK',
-              cssClass: 'success',
-              role: 'confirm',
+              text: "OK",
+              cssClass: "success",
+              role: "confirm",
               handler: async () => {
                 await this.insertObject();
               },
             },
             {
-              text: 'Cancel',
-              cssClass: 'cancel',
-              role: 'cancel'
+              text: "Cancel",
+              cssClass: "cancel",
+              role: "cancel"
             },
           ],
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
+        this.toastService.presentToast("Error!", "Please add at least 1 item to continue", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -481,8 +480,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
         this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(response => {
           this.objectService.setObject((response.body as SalesOrderRoot));
-          this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-          this.navController.navigateRoot('/transactions/sales-order/sales-order-summary');
+          this.toastService.presentToast("Insert Complete", "", "top", "success", 1000);
+          this.navController.navigateRoot("/transactions/sales-order/sales-order-summary");
         }, error => {
           console.error(error);
         })
@@ -515,17 +514,17 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         subHeader: "This will delete Draft",
         buttons: [
           {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
             handler: async () => {
               await this.deleteDraft();
             },
           },
           {
-            text: 'Cancel',
-            cssClass: 'cancel',
-            role: 'cancel'
+            text: "Cancel",
+            cssClass: "cancel",
+            role: "cancel"
           },
         ],
       });

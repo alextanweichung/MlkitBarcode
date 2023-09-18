@@ -29,8 +29,7 @@ export class InboundScanHeaderPage implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.route.queryParams.subscribe(params => {
-      this.objectId = params['objectId']??0;
-      console.log("🚀 ~ file: inbound-scan-header.page.ts:33 ~ InboundScanHeaderPage ~ params['objectId']:", params['objectId'])
+      this.objectId = params["objectId"]??0;
     })
     this.newObjectForm();
   }
@@ -66,11 +65,11 @@ export class InboundScanHeaderPage implements OnInit {
     }, 100);
   }
 
-  @ViewChild('segment', { static: false }) segment: IonSegment;
-  isWithDoc: string = 'true';
+  @ViewChild("segment", { static: false }) segment: IonSegment;
+  isWithDoc: string = "true";
   async isWithDocChanged(event) {
     try {
-      if (event.detail.value === 'true') {
+      if (event.detail.value === "true") {
         this.objectForm.patchValue({ isWithDoc: true });
       } else {
         this.objectForm.patchValue({ isWithDoc: false });
@@ -188,7 +187,7 @@ export class InboundScanHeaderPage implements OnInit {
       childId: [null],
       childNum: [null],
       childDocType: [null],
-      warehouseAgentId: [JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId],
+      warehouseAgentId: [JSON.parse(localStorage.getItem("loginUser"))?.warehouseAgentId],
       inboundScanUDField1: [null],
       inboundScanUDField2: [null],
       inboundScanUDField3: [null],
@@ -198,7 +197,7 @@ export class InboundScanHeaderPage implements OnInit {
       masterUDGroup1: [null],
       masterUDGroup2: [null],
       masterUDGroup3: [null],
-      sourceType: ['M'],
+      sourceType: ["M"],
       businessModelType: [null],
       isWithDoc: [null],
       docType: [null],
@@ -243,7 +242,6 @@ export class InboundScanHeaderPage implements OnInit {
   /* #region detail modal */
 
   async showDetail() {
-    console.log("🚀 ~ file: inbound-scan-header.page.ts:246 ~ InboundScanHeaderPage ~ showDetail ~ this.objectId:", this.objectId)
     if (this.objectId === 0) {
       this.objectService.setObject({ header: this.objectForm.getRawValue(), details: [] });
     }
@@ -257,22 +255,22 @@ export class InboundScanHeaderPage implements OnInit {
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        subHeader: 'Changes made will be discard.',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
-      if (role === 'confirm') {
+      if (role === "confirm") {
         this.objectService.resetVariables();
         this.navController.navigateBack("/transactions/inbound-scan");
       }

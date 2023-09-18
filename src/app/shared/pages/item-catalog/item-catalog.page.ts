@@ -61,9 +61,9 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.brandMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.groupMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.categoryMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.brandMasterList = this.fullMasterList.filter(x => x.objectName == "ItemBrand").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.groupMasterList = this.fullMasterList.filter(x => x.objectName == "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.categoryMasterList = this.fullMasterList.filter(x => x.objectName == "ItemCategory").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.loadModuleControl();
   }
 
@@ -114,10 +114,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     this.itemSearchText = searchText;
     try {
       if (this.itemSearchText && this.itemSearchText.trim().length > 2) {
-        if (Capacitor.getPlatform() !== 'web') {
+        if (Capacitor.getPlatform() !== "web") {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), 'yyyy-MM-dd'), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
+        this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), "yyyy-MM-dd"), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
           let rrr = response;
           if (rrr && rrr.length > 0) {
             rrr.forEach(r => {
@@ -129,12 +129,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.startIndex = this.availableItems.length;
           }
           this.availableItems = [...this.availableItems, ...rrr];
-          this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+          this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
           this.computeQtyInCart();
         })
         this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
       } else {
-        this.toastService.presentToast('Enter at least 3 characters to search', '', 'top', 'warning', 1000);
+        this.toastService.presentToast("Enter at least 3 characters to search", "", "top", "warning", 1000);
       }
       this.onBrowseModeChanged();
     } catch (e) {
@@ -165,7 +165,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     }
   }
 
-  browseMode: string = 'brand';
+  browseMode: string = "brand";
   onBrowseModeChanged() {
     this.browseBy = [];
   }
@@ -175,7 +175,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       this.availableItems.forEach(r => {
         if (this.itemInCart.findIndex(rr => rr.itemId === r.itemId) > -1) {
           r.qtyInCart = this.itemInCart.filter(rr => rr.itemId === r.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
-          if (r.variationTypeCode === '1' || r.variationTypeCode === '2') {
+          if (r.variationTypeCode === "1" || r.variationTypeCode === "2") {
             r.variationDetails.flatMap(x => x.details).forEach(y => {
               y.qtyInCart = this.itemInCart.filter(rr => rr.itemId === r.itemId).flatMap(rr => rr.variationDetails).flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
             })
@@ -229,7 +229,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     if (discountExpression != "" && discountExpression != null) {
       let splittedDisc = discountExpression.split(/[+/]/g);
       splittedDisc.forEach(x => {
-        if (x.includes('%')) {
+        if (x.includes("%")) {
           let currentdiscPct = parseFloat(x) / 100;
           let currentDiscAmt = price * currentdiscPct;
           price = price - currentDiscAmt;
@@ -254,31 +254,31 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   isValidQty(data: TransactionDetail) {
-    if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
+    if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
       }
-    } else if (this.isSalesOrder && this.salesOrderQuantityControl == '2') {
+    } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
       if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
       }
     }
   }
 
   increaseQty(data: TransactionDetail) {
-    if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
+    if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
       } else {
         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
-    } else if (this.isSalesOrder && this.salesOrderQuantityControl == '2') {
+    } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
       if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
       } else {
         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
@@ -310,8 +310,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   itemVariationYMasterList: MasterListDetails[] = [];
   showModal(data: TransactionDetail) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.isModalOpen = true;
   }
 
@@ -324,31 +324,31 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   isValidVariationQty(data: InnerVariationDetail) {
-    if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
+    if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
       }
-    } else if (this.isSalesOrder && this.salesOrderQuantityControl == '2') {
+    } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
       if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
       }
     }
   }
 
   increaseVariationQty(data: InnerVariationDetail) {
-    if (this.isSalesOrder && this.salesOrderQuantityControl == '1') {
+    if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
       if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
       } else {
         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
-    } else if (this.isSalesOrder && this.salesOrderQuantityControl == '2') {
+    } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
       if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
         data.qtyRequest = null;
-        this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+        this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
       } else {
         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
@@ -401,7 +401,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     if (found.newItemId && found.newItemEffectiveDate && this.commonService.convertUtcDate(found.newItemEffectiveDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
       let newItemCode = this.configService.item_Masters.find(x => x.id == found.newItemId);
       if (newItemCode) {
-        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newItemEffectiveDate), 'dd/MM/yyyy')}`, 'top', 'warning', 1750);
+        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1750);
         if (this.systemWideBlockConvertedCode) {
           return true;
         } else {

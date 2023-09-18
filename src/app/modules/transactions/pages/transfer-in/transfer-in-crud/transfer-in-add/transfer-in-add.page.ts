@@ -80,7 +80,6 @@ export class TransferInAddPage implements OnInit {
         r.qtyReceive = r.qty;
       }
     })
-    console.log("🚀 ~ file: transfer-in-add.page.ts:103 ~ TransferInAddPage ~ selectDoc ~ object:", object)
     this.objectService.setObject(object);
     this.navController.navigateForward("/transactions/transfer-in/transfer-in-item");
   }

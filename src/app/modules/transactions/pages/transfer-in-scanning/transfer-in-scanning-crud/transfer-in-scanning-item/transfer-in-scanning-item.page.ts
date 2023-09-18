@@ -30,7 +30,6 @@ export class TransferInScanningItemPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:30 ~ TransferInScanningItemPage ~ ngOnInit ~ this.objectService.object:", this.objectService.object)
     this.loadModuleControl();
   }
 
@@ -427,10 +426,8 @@ export class TransferInScanningItemPage implements OnInit {
       line: this.objectService.object.line.filter(r => r.uuid !== null),
       transferAdjustment: null    
     }    
-    console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:351 ~ TransferInScanningItemPage ~ insertObject ~ insertObject:", insertObject)
     
     this.objectService.insertObject(insertObject).subscribe(response => {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:433 ~ TransferInScanningItemPage ~ this.objectService.insertObject ~ response:", response)
       if (response.status === 201) {
         let obj = (response.body as TransferInScanningRoot)
         this.toastService.presentToast("", "Transfer In Scanning created", "top", "success", 1000);

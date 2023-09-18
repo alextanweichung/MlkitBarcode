@@ -45,19 +45,19 @@ export class ItemCatalogWithoutPricePage implements OnInit {
 
   searchItem() {
     let searchText = this.itemSearchText;
-    this.itemSearchText = '';
+    this.itemSearchText = "";
     try {
       if (searchText && searchText.trim().length > 2) {
-        if (Capacitor.getPlatform() !== 'web') {
+        if (Capacitor.getPlatform() !== "web") {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoWithoutPrice(searchText, format(new Date(), 'yyyy-MM-dd')).subscribe(response => {
+        this.searchItemService.getItemInfoWithoutPrice(searchText, format(new Date(), "yyyy-MM-dd")).subscribe(response => {
           this.availableItems = response;
-          this.toastService.presentToast('Search Complete', `${this.availableItems.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+          this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
         })
         this.loadImages(searchText);
       } else {
-        this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
+        this.toastService.presentToast("Enter at least 3 characters to start searching", "", "top", "warning", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -119,8 +119,8 @@ export class ItemCatalogWithoutPricePage implements OnInit {
   itemVariationYMasterList: MasterListDetails[] = [];
   showModal(data: TransactionDetail) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.isModalOpen = true;
   }
 

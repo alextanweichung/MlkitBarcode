@@ -33,24 +33,20 @@ export class AppComponent {
   initializeApp() {
     console.log(`initializeApp`);
     // Wait until platform is ready
-    this.platform.ready().then(async () => {      
-      console.log("🚀 ~ file: app.component.ts:67 ~ AppComponent ~ this.platform.ready ~ this.platform.ready: after")
-      
-      console.log("🚀 ~ file: app.component.ts:40 ~ AppComponent ~ this.platform.ready ~ this.configService.load: before load")
+    this.platform.ready().then(async () => {
       await this.configService.load();
-      console.log("🚀 ~ file: app.component.ts:40 ~ AppComponent ~ this.platform.ready ~ this.configService.load: after load")
-      
+
       if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
-        this.navController.navigateRoot('/signin');
+        this.navController.navigateRoot("/signin");
       } else {
-        this.navController.navigateRoot('/welcome');
+        this.navController.navigateRoot("/welcome");
       }
 
-      // If we're on a mobile platform (iOS / Android), not web
-      if (Capacitor.getPlatform() !== 'web') {
+      // If we"re on a mobile platform (iOS / Android), not web
+      if (Capacitor.getPlatform() !== "web") {
         // this.pushNotications.initPush();
         await OneSignalInit();
-        
+
         this.platform.backButton.unsubscribe();
         // Set StatusBar style (dark / light)
         await StatusBar.setStyle({ style: Style.Dark });
@@ -79,14 +75,14 @@ function OneSignalInit() {
 
   // NOTE: Update the setAppId value below with your OneSignal AppId.
   OneSignal.setAppId("18607f67-a6dc-44cb-ac02-91770a58a695");
-  OneSignal.setNotificationOpenedHandler(function(jsonData) {
-      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+  OneSignal.setNotificationOpenedHandler(function (jsonData) {
+    console.log("notificationOpenedCallback: " + JSON.stringify(jsonData));
   });
 
   // Prompts the user for notification permissions.
   //    * Since this shows a generic native prompt, we recommend instead using an In-App Message to prompt for notification permission (See step 7) to better communicate to your users what notifications they will get.
-  OneSignal.promptForPushNotificationsWithUserResponse(function(accepted) {
-      console.log("User accepted notifications: " + accepted);
+  OneSignal.promptForPushNotificationsWithUserResponse(function (accepted) {
+    console.log("User accepted notifications: " + accepted);
   });
 }
 

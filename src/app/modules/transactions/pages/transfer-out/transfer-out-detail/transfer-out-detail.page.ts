@@ -30,7 +30,7 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
   ) {
     try {
       this.route.queryParams.subscribe(params => {
-        this.objectId = params['objectId'];
+        this.objectId = params["objectId"];
       })
     } catch (e) {
       console.error(e);
@@ -45,8 +45,8 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
     if (this.objectId && this.objectId > 0) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('', 'Invalid Transfer Out.', 'top', 'warning', 1000);
-      this.navController.navigateBack('/transactions/transfer-out');
+      this.toastService.presentToast("", "Invalid Transfer Out.", "top", "warning", 1000);
+      this.navController.navigateBack("/transactions/transfer-out");
     }
     this.loadModuleControl();
   }
@@ -61,14 +61,13 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
     }
   }
 
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: transfer-out-detail.page.ts:71 ~ TransferOutDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         // this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
@@ -76,13 +75,13 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
       })
     } catch (e) {
       console.error(e);
-      this.toastService.presentToast('Error', 'Transfer Out', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error", "Transfer Out", "top", "danger", 1000);
     }
   }
 
   async completeObjectAlert() {
     const alert = await this.alertController.create({
-      header: 'Are you sure to proceed?',
+      header: "Are you sure to proceed?",
       cssClass: "custom-action-sheet",
       buttons: [
         {
@@ -94,9 +93,9 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
           },
         },
         {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'cancel',
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel",
         },
       ],
     });
@@ -120,13 +119,13 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
         objectId: this.object.transferOutId
       }
     }
-    this.navController.navigateRoot('/transactions/transfer-out/transfer-out-edit', navigationExtras);
+    this.navController.navigateRoot("/transactions/transfer-out/transfer-out-edit", navigationExtras);
   }
 
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;

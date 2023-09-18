@@ -75,12 +75,12 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {        
         this.objects = response;
         this.objects = this.objects.filter(r => r.isCompleted);
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
         throw error;
       })
     } catch (error) {
-      this.toastService.presentToast('', 'Error loading object.', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
     }
   }
 
@@ -99,27 +99,27 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
   /* #region add */
 
   async addObject() {
-    this.navController.navigateForward('/transactions/transfer-in/transfer-in-add');
+    this.navController.navigateForward("/transactions/transfer-in/transfer-in-add");
   }
 
   // Select action
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add Transfer In',
-            icon: 'document-outline',
+            text: "Add Transfer In",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }]
       });
       await actionSheet.present();
@@ -161,7 +161,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/transfer-in/transfer-in-detail', navigationExtras);
+      this.navController.navigateForward("/transactions/transfer-in/transfer-in-detail", navigationExtras);
     } catch (e) {
       console.error(e);
     }

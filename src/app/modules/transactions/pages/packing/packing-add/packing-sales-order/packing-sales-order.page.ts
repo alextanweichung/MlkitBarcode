@@ -68,7 +68,7 @@ export class PackingSalesOrderPage implements OnInit {
         if (this.selectedCustomer) {
           this.objectForm.patchValue({ businessModelType: this.selectedCustomer.attribute5 });
   
-          if (this.objectForm.controls.businessModelType.value === 'R' || this.objectForm.controls.businessModelType.value === 'C') {
+          if (this.objectForm.controls.businessModelType.value === "R" || this.objectForm.controls.businessModelType.value === "C") {
             
           } else {
             this.objectForm.patchValue({ isWithSo: true });
@@ -93,16 +93,16 @@ export class PackingSalesOrderPage implements OnInit {
   
           //Auto map object type code
           if (this.selectedCustomer.attribute5 == "T" || this.selectedCustomer.attribute5 == "F") {
-            this.objectForm.patchValue({ typeCode: 'S' });
-            this.objectForm.controls['typeCode'].disable();
+            this.objectForm.patchValue({ typeCode: "S" });
+            this.objectForm.controls["typeCode"].disable();
           } else {
-            this.objectForm.patchValue({ typeCode: 'T' });
-            this.objectForm.controls['typeCode'].disable();
+            this.objectForm.patchValue({ typeCode: "T" });
+            this.objectForm.controls["typeCode"].disable();
           }
   
           if (this.selectedCustomer.attribute5 === "T") {
             // handle location
-            // this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === 'W');
+            // this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === "W");
             if (this.selectedCustomer !== undefined) {
               this.objectForm.patchValue({ locationId: parseFloat(this.selectedCustomer.attribute6) });
             }
@@ -129,10 +129,10 @@ export class PackingSalesOrderPage implements OnInit {
     }
   }
 
-  @ViewChild('segment', { static: false }) segment: IonSegment;
+  @ViewChild("segment", { static: false }) segment: IonSegment;
   async isWithSoChanged(event) {
     try {
-      if (event.detail.value === 'withSo') {
+      if (event.detail.value === "withSo") {
         this.objectForm.patchValue({ isWithSo: true });
         // await this.onCustomerSelected({ id: this.customerId });
       } else {
@@ -153,12 +153,12 @@ export class PackingSalesOrderPage implements OnInit {
       if (customerId) {
         this.objectService.getSoByCustomer(customerId).subscribe(response => {
           this.availableSalesOrders = response;
-          this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
+          this.toastService.presentToast("Search Complete", "", "top", "success", 1000, this.authService.showSearchResult);
         }, error => {
           console.log(error);
         })
       } else {
-        this.toastService.presentToast('Customer cannot be null', '', 'top', 'danger', 1000);
+        this.toastService.presentToast("Customer cannot be null", "", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -172,12 +172,12 @@ export class PackingSalesOrderPage implements OnInit {
       if (customerId && locationId) {
         this.objectService.getSoByCustomerLocation(customerId, locationId).subscribe(response => {
           this.availableSalesOrders = response;
-          this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000, this.authService.showSearchResult);
+          this.toastService.presentToast("Search Complete", "", "top", "success", 1000, this.authService.showSearchResult);
         }, error => {
           console.log(error);
         })
       } else {
-        this.toastService.presentToast('Customer & Location cannot be null', '', 'top', 'danger', 1000);
+        this.toastService.presentToast("Customer & Location cannot be null", "", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -204,26 +204,26 @@ export class PackingSalesOrderPage implements OnInit {
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        subHeader: 'Changes made will be discard.',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
       await actionSheet.present();
   
       const { role } = await actionSheet.onWillDismiss();
   
-      if (role === 'confirm') {
+      if (role === "confirm") {
         this.objectService.resetVariables();
-        this.navController.navigateBack('/transactions/packing');
+        this.navController.navigateBack("/transactions/packing");
       }
     } catch (e) {
       console.error(e);
@@ -233,16 +233,16 @@ export class PackingSalesOrderPage implements OnInit {
   nextStep() {
     try {
       if (!this.objectForm.valid) {
-        this.toastService.presentToast('Something went wrong.', '', 'top', 'danger', 1000);
+        this.toastService.presentToast("Something went wrong.", "", "top", "danger", 1000);
         return;
       }
       if (this.objectForm.controls.isWithSo.value && this.selectedSOs.length === 0) {
-        this.toastService.presentToast('Select at least 1 SO', '', 'top', 'danger', 1000);
+        this.toastService.presentToast("Select at least 1 SO", "", "top", "danger", 1000);
         return;
       }
       this.objectService.setHeader(this.objectForm.getRawValue());
       this.objectService.setChoosenSalesOrders(this.selectedSOs);
-      this.navController.navigateForward('/transactions/packing/packing-item');
+      this.navController.navigateForward("/transactions/packing/packing-item");
     } catch (e) {
       console.error(e);
     }
@@ -260,7 +260,7 @@ export class PackingSalesOrderPage implements OnInit {
         toLocationId: [null],
         customerId: [null, [Validators.required]],
         typeCode: [null],
-        warehouseAgentId: [JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId],
+        warehouseAgentId: [JSON.parse(localStorage.getItem("loginUser"))?.warehouseAgentId],
         packingUDField1: [null],
         packingUDField2: [null],
         packingUDField3: [null],
@@ -274,7 +274,7 @@ export class PackingSalesOrderPage implements OnInit {
         masterUDGroup3: [null],
         businessModelType: [null],
         isWithSo: [true],
-        sourceType: ['M'],
+        sourceType: ["M"],
         remark: [null]
       });
     } catch (e) {

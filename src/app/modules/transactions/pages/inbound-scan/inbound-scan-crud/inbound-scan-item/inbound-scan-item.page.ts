@@ -24,7 +24,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
     private navController: NavController
   ) { }
 
-  @ViewChild('barcodescaninput', { static: false }) barcodescaninput: BarcodeScanInputPage;
+  @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
   ionViewDidEnter(): void {
     try {
       this.barcodescaninput.setFocus();
@@ -73,7 +73,6 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
     scanHistory: []
   };
   transformDoc() {
-    console.log("🚀 ~ file: inbound-scan-item.page.ts:75 ~ InboundScanItemPage ~ transformDoc ~ this.objectService.object:", this.objectService.object)
     if (this.objectService.object.header.isWithDoc) {
       if (this.objectService.doc != null) {
         let x = this.objectService.doc;
@@ -134,9 +133,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
     let qtyAvailable: boolean = true;
     let scanListIndex: number;
 
-    console.log("🚀 ~ file: inbound-scan-item.page.ts:163 ~ InboundScanItemPage ~ this.docDetailObject.outstandingScanList.forEach ~ :", this.docDetailObject.outstandingScanList)
-
-    //Loop docDetailObject and look for item with same SKU. If Item is found, set the itemAvailable flag to 'Y' and increase the qtyScanned counter
+    //Loop docDetailObject and look for item with same SKU. If Item is found, set the itemAvailable flag to "Y" and increase the qtyScanned counter
     this.docDetailObject.outstandingScanList.forEach((element, index) => {
       if (element.itemSku === itemFound.itemSku) {
         itemAvailable = true;
@@ -150,7 +147,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
           }
         } else {
           //For Sales Return, can only scan for those item in the document              
-          if (this.objectService.object.header.isWithDoc && this.objectService.object.header.typeCode === 'S') {
+          if (this.objectService.object.header.isWithDoc && this.objectService.object.header.typeCode === "S") {
             if ((element.qtyScanned + element.qtyScannedCurrent + inputQty) <= element.qtyRequest) {
               element.qtyScannedCurrent = element.qtyScannedCurrent + inputQty;
             } else {
@@ -224,7 +221,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -238,7 +235,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/inbound-scan/inbound-scan-header');
+      this.navController.navigateBack("/transactions/inbound-scan/inbound-scan-header");
     } catch (e) {
       console.error(e);
     }
@@ -250,7 +247,6 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
   handleKeyDown(event) {
     if (event.keyCode === 13) {
       this.objectService.validateBarcode(this.itemSearchValue).subscribe(async response => {
-        console.log("🚀 ~ file: inbound-scan-item.page.ts:262 ~ InboundScanItemPage ~ this.objectService.validateBarcode ~ response:", response)
         this.itemSearchValue = null;
         if (response) {
           if (this.objectService.object.header.isWithDoc) {

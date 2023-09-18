@@ -25,7 +25,6 @@ export class InboundScanService {
   object: InboundScanRoot;
   setObject(object: InboundScanRoot) {
     this.object = object;
-    console.log("🚀 ~ file: inbound-scan.service.ts:28 ~ InboundScanService ~ setObject ~ this.object:", this.object)
   }
 
   doc: InboundScanDocRoot;

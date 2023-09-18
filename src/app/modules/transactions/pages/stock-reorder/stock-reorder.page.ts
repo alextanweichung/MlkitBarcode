@@ -74,13 +74,12 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
     try {
       this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
-        console.log("🚀 ~ file: stock-reorder.page.ts:77 ~ StockReorderPage ~ this.objectService.getObjectList ~ this.objects:", this.objects)
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
         throw error;
       })
     } catch (error) {
-      this.toastService.presentToast('', 'Error loading object.', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
     }
   }
 
@@ -99,27 +98,27 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
   /* #region add */
 
   async addObject() {
-    this.navController.navigateForward('/transactions/stock-reorder/stock-reorder-add');
+    this.navController.navigateForward("/transactions/stock-reorder/stock-reorder-add");
   }
 
   // Select action
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add Stock Reorder',
-            icon: 'document-outline',
+            text: "Add Stock Reorder",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }]
       });
       await actionSheet.present();
@@ -161,7 +160,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/stock-reorder/stock-reorder-detail', navigationExtras);
+      this.navController.navigateForward("/transactions/stock-reorder/stock-reorder-detail", navigationExtras);
     } catch (e) {
       console.error(e);
     }

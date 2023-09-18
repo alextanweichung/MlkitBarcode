@@ -22,15 +22,15 @@ export class RpCheckQohPage implements OnInit {
     private objectService: ReportsService,
     private toastService: ToastService
   ) {
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    this.loginUser = JSON.parse(localStorage.getItem("loginUser"));
   }
 
   ngOnInit() {
     this.columns = [
-      { prop: 'itemCode', name: 'Stock Code', draggable: false },
-      { prop: 'itemDescription', name: 'Description', draggable: false },
-      { prop: 'qoh', name: 'QOH', draggable: false },
-      { prop: 'price', name: 'Price', draggable: false }
+      { prop: "itemCode", name: "Stock Code", draggable: false },
+      { prop: "itemDescription", name: "Description", draggable: false },
+      { prop: "qoh", name: "QOH", draggable: false },
+      { prop: "price", name: "Price", draggable: false }
     ]
   }
 
@@ -43,16 +43,16 @@ export class RpCheckQohPage implements OnInit {
     this.itemSearchText = searchText;
     try {
       if (searchText && searchText.trim().length > 2) {
-        if (Capacitor.getPlatform() !== 'web') {
+        if (Capacitor.getPlatform() !== "web") {
           Keyboard.hide();
         }
         this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
           this.objects = response;
           this.massageData();
-          this.toastService.presentToast('Search Complete', `${this.objects.length} item(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+          this.toastService.presentToast("Search Complete", `${this.objects.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
         })
       } else {
-        this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'warning', 1000);
+        this.toastService.presentToast("Enter at least 3 characters to start searching", "", "top", "warning", 1000);
       }
     } catch (e) {
       console.error(e);

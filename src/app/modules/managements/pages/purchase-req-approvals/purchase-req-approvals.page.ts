@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
   selector: 'app-purchase-req-approvals',
   templateUrl: './purchase-req-approvals.page.html',
   styleUrls: ['./purchase-req-approvals.page.scss'],
-  providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'mobilePurchaseReqApprove' }]
+  providers: [TransactionProcessingService, { provide: "apiObject", useValue: "mobilePurchaseReqApprove" }]
 })
 export class PurchaseReqApprovalsPage implements OnInit, ViewWillEnter {
 
@@ -47,15 +47,15 @@ export class PurchaseReqApprovalsPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
-        this.pendingObjects = response.filter(r => !r.isComplete);
+      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd"), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(response => {
+        this.pendingObjects = response.filter(r => !r.isComplete && !r.deactivated);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('', 'Search Complete', 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         console.log(error);
       })
     } catch (error) {
-      this.toastService.presentToast('', 'Error Loading', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error Loading", "top", "danger", 1000);
     }
   }
 

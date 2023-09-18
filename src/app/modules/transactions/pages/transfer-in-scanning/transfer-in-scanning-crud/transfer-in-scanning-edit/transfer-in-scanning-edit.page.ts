@@ -33,7 +33,7 @@ export class TransferInScanningEditPage implements OnInit {
     private route: ActivatedRoute
   ) {
     this.route.queryParams.subscribe(params => {
-      this.objectId = params['objectId'];
+      this.objectId = params["objectId"];
       if (this.objectId === null || this.objectId === undefined) {
         this.toastService.presentToast("", "Invalid ObjectId", "top", "danger", 1000);
         this.navController.navigateRoot("/transactions/transfer-in-scanning");
@@ -69,7 +69,6 @@ export class TransferInScanningEditPage implements OnInit {
   loadObject() {
     if (this.objectId) {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: transfer-in-scanning-edit.page.ts:49 ~ TransferInScanningEditPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
       }, error => {
         throw error;
@@ -418,7 +417,7 @@ export class TransferInScanningEditPage implements OnInit {
             objectId: this.objectId
           }
         }
-        this.navController.navigateRoot('/transactions/transfer-in-scanning/transfer-in-scanning-detail', navigationExtras);
+        this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-detail", navigationExtras);
       }
     } catch (e) {
       console.error(e);
@@ -451,9 +450,7 @@ export class TransferInScanningEditPage implements OnInit {
   }
 
   updateObject() {
-    console.log("🚀 ~ file: transfer-in-scanning-edit.page.ts:333 ~ TransferInScanningEditPage ~ updateObject ~ this.object:", this.object)
     this.objectService.updateObject(this.object).subscribe(response => {
-      console.log("🚀 ~ file: transfer-in-scanning-edit.page.ts:335 ~ TransferInScanningEditPage ~ this.objectService.insertObject ~ response:", response)
       if (response.status === 204) {
         this.toastService.presentToast("", "Transfer In Scanning updated", "top", "success", 1000);
         let navigationExtras: NavigationExtras = {
@@ -462,7 +459,7 @@ export class TransferInScanningEditPage implements OnInit {
           }
         }
         this.objectService.resetVariables();
-        this.navController.navigateRoot('/transactions/transfer-in-scanning/transfer-in-scanning-detail', navigationExtras);
+        this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-detail", navigationExtras);
       }
     }, error => {
       console.error(error);
@@ -474,7 +471,7 @@ export class TransferInScanningEditPage implements OnInit {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;

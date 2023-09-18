@@ -41,30 +41,29 @@ export class ConfigService {
   /* #region sys_parameter */
 
   async load() {
-    console.log("🚀 ~ file: config.service.ts:44 ~ ConfigService ~ load ~ in load:")
     try {
     // for web development
-      if (Capacitor.getPlatform() === 'web') {
+      if (Capacitor.getPlatform() === "web") {
         this.sys_parameter.push({
           Sys_ParameterId: 1,
-          apiUrl: 'https://localhost:44351/api/',
-          // apiUrl: 'https://idcp-demo.com/api/',
-          // apiUrl: 'https://idcp-testing.motorparts.asia/api/',
-          // apiUrl: 'https://idcp-testing.umaracing.com/api/',
-          // apiUrl: 'https://idcp.motorparts.asia/api/',
-          // apiUrl: 'https://idcp.umaracing.com/api/',
-          // apiUrl: 'https://idcp-ararat.com:8081/api/',
-          // apiUrl: 'https://idcp.rcb.com/api/',
+          apiUrl: "https://localhost:44351/api/",
+          // apiUrl: "https://idcp-demo.com/api/",
+          // apiUrl: "https://idcp-testing.motorparts.asia/api/",
+          // apiUrl: "https://idcp-testing.umaracing.com/api/",
+          // apiUrl: "https://idcp.motorparts.asia/api/",
+          // apiUrl: "https://idcp.umaracing.com/api/",
+          // apiUrl: "https://idcp-ararat.com:8081/api/",
+          // apiUrl: "https://idcp.rcb.com/api/",
           imgUrl: null,
           lastDownloadAt: null
         })
         // this.sys_parameter.push({
         //   Sys_ParameterId: 2,
-        //   // apiUrl: 'https://localhost:44351/api/',
-        //   // apiUrl: 'https://idcp-demo.com/api/',
-        //   apiUrl: 'https://idcp-testing.motorparts.asia/api/',
-        //   // apiUrl: 'https://idcp.motorparts.asia/api/',
-        //   // apiUrl: 'https://idcp-ararat.com:8081/api/',
+        //   // apiUrl: "https://localhost:44351/api/",
+        //   // apiUrl: "https://idcp-demo.com/api/",
+        //   apiUrl: "https://idcp-testing.motorparts.asia/api/",
+        //   // apiUrl: "https://idcp.motorparts.asia/api/",
+        //   // apiUrl: "https://idcp-ararat.com:8081/api/",
         //   imgUrl: null,
         //   lastDownloadAt: null
         // })
@@ -73,7 +72,6 @@ export class ConfigService {
         // }
       }
       else { // live
-        console.log("🚀 ~ file: config.service.ts:76 ~ ConfigService ~ load ~ live load:")
         this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
         console.log(`sys_parameter: ${JSON.stringify(this.sys_parameter)}`);
         if (this.sys_parameter && this.sys_parameter.length === 1) {
@@ -128,10 +126,10 @@ export class ConfigService {
     try {
       await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
       this.item_Masters = itemMasters;
-      console.log('done sync item master')
+      console.log("done sync item master")
       await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
       this.item_Barcodes = itemBarcodes;
-      console.log('done sync item barcode')
+      console.log("done sync item barcode")
     } catch (e) {
       console.error(e);
     }

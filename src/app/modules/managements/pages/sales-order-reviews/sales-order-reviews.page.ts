@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
   selector: 'app-sales-order-pending-review',
   templateUrl: './sales-order-reviews.page.html',
   styleUrls: ['./sales-order-reviews.page.scss'],
-  providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'mobileSalesOrderReview' }]
+  providers: [TransactionProcessingService, { provide: "apiObject", useValue: "mobileSalesOrderReview" }]
 })
 export class SalesOrderReviewsPage implements OnInit, ViewWillEnter {
 
@@ -47,15 +47,15 @@ export class SalesOrderReviewsPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.objectService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd') : null), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
-        this.pendingObjects = response.filter(r => !r.isComplete);
+      this.objectService.getProcessingDocumentByDateRange((this.startDate ? format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd") : null), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(response => {
+        this.pendingObjects = response.filter(r => !r.isComplete && !r.deactivated);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('', 'Search Complete', 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         throw Error;
       })      
     } catch (error) {
-      this.toastService.presentToast('', 'Error Loading', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error Loading", "top", "danger", 1000);
     }
   }
 

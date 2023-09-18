@@ -52,7 +52,6 @@ export class TransferInScanningDetailPage implements OnInit, ViewWillEnter {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: transfer-in-scanning-detail.page.ts:58 ~ TransferInScanningDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
       }, error => {
         throw error;

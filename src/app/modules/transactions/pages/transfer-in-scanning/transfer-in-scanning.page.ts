@@ -72,13 +72,12 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     try {
       this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {        
         this.objects = response;
-        console.log("🚀 ~ file: transfer-in-scanning.page.ts:75 ~ TransferInScanningPage ~ this.objectService.getObjectList ~ this.objects:", this.objects)
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000, this.authService.showSearchResult);
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
         throw error;
       })
     } catch (error) {
-      this.toastService.presentToast('', 'Error loading object.', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
     }
   }
 
@@ -97,27 +96,27 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
   /* #region add */
 
   async addObject() {
-    this.navController.navigateForward('/transactions/transfer-in-scanning/transfer-in-scanning-add');
+    this.navController.navigateForward("/transactions/transfer-in-scanning/transfer-in-scanning-add");
   }
 
   // Select action
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add Transfer In Scanning',
-            icon: 'document-outline',
+            text: "Add Transfer In Scanning",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }]
       });
       await actionSheet.present();
@@ -159,7 +158,7 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/transfer-in-scanning/transfer-in-scanning-detail', navigationExtras);
+      this.navController.navigateForward("/transactions/transfer-in-scanning/transfer-in-scanning-detail", navigationExtras);
     } catch (e) {
       console.error(e);
     }

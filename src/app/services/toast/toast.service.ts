@@ -90,7 +90,7 @@ export class ToastService { //implements OnDestroy {
           break;
       }
     }    
-    if (!showSearchResult && header === "Search Complete") {
+    if (!showSearchResult && (header === "Search Complete" || message === "Search Complete")) {
 
     } else {
       this.toastSubject.next({

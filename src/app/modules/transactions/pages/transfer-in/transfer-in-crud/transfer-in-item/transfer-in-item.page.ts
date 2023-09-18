@@ -29,7 +29,6 @@ export class TransferInItemPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log("🚀 ~ file: transfer-in-item.page.ts:23 ~ TransferInItemPage ~ ngOnInit ~ this.objectService.object:", this.objectService.object)
     this.loadModuleControl();
   }
 
