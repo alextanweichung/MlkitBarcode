@@ -7,6 +7,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentSalesList } from '../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../services/consignment-sales.service';
 import { FilterPage } from '../filter/filter.page';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-consignment-sales',
@@ -23,18 +24,22 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   uniqueGrouping: Date[] = [];
 
   constructor(
+    private authService: AuthService,
     private commonService: CommonService,
-    private consignmentSalesService: ConsignmentSalesService,
+    private objectService: ConsignmentSalesService,
     private actionSheetController: ActionSheetController,
     private modalController: ModalController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) { 
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
       if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
+        this.startDate = this.commonService.getFirstDayOfTodayMonth();
       }
       if (!this.endDate) {
         this.endDate = this.commonService.getTodayDate();
@@ -53,12 +58,12 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
-      this.consignmentSalesService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(async response => {
+      this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })
@@ -76,12 +81,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   /* #region  add other sales */
 
   async addObject() {
-    // let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
-    // if (salesAgentId === 0 || salesAgentId === undefined) {
-    //   this.toastService.presentToast('Error', 'Sales Agent not set', 'top', 'danger', 1000);
-    // } else {
-      this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-header-add');
-    // }
+    this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-header-add");
   }
 
   /* #endregion */
@@ -95,16 +95,12 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
           endDate: this.endDate
         },
         canDismiss: true
-      })
-  
-      await modal.present();
-  
-      let { data } = await modal.onWillDismiss();
-  
+      })  
+      await modal.present();  
+      let { data } = await modal.onWillDismiss();  
       if (data && data !== undefined) {
         this.startDate = new Date(data.startDate);
-        this.endDate = new Date(data.endDate);
-  
+        this.endDate = new Date(data.endDate);  
         this.loadObjects();
       }
     } catch (e) {
@@ -116,20 +112,20 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add Consignment Sales',
-            icon: 'document-outline',
+            text: "Add Consignment Sales",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }
         ]
       });
@@ -145,7 +141,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
         objectId: objectId
       }
     }
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-detail', navigationExtras);
+    this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
   }
 
 }

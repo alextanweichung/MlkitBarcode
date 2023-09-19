@@ -4,7 +4,7 @@ import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import jwt_decode, { JwtPayload } from "jwt-decode";
 import { ConfigService } from '../config/config.service';
-import { CustomToken, LoginRequest, LoginUser, TokenRequest } from './login-user';
+import { CustomToken, ForgotPasswordRequest, LoginRequest, LoginUser, ResetPassword, TokenRequest } from './login-user';
 import { NavController } from '@ionic/angular';
 import { MenuHierarchy } from './menu-hierarchy';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -22,14 +22,15 @@ const httpObserveHeader = {
 })
 export class AuthService {
 
-  baseUrl: string;
   isDebug: string = 'False';
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
+  showSearchResult: boolean = false;
   restrictedColumn: RestrictedColumn[];
   moduleControlConfig: ModuleControl[];
   model: MenuItem[];
   precisionList: PrecisionList[];
+
   // dashboardItem: MenuItem;
 
   // 1 is the size of buffer
@@ -60,18 +61,14 @@ export class AuthService {
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: auth.service.ts:64 ~ AuthService ~ apiUrl:")
-    let apiUrl = configService.sys_parameter?.apiUrl;
-    this.baseUrl = apiUrl;
-
-    if (!this.isTokenExpired()) {
-      this.buildAllObjects();
-    }
+    // if (!this.isTokenExpired()) {
+    //   this.buildAllObjects();
+    // }
   }
 
   // Sign in
   async signIn(loginModel: LoginRequest) {
-    return this.http.post(this.baseUrl + "account/login", loginModel).pipe(
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "account/login", loginModel).pipe(
       map((response: LoginUser) => {
         const loginUser = response;
         if (loginUser.token !== null) {
@@ -91,7 +88,7 @@ export class AuthService {
   updatePlayerId(loginUser: LoginUser) {
     let user = this.getDecodedToken(loginUser.token);
     if (loginUser.playerId !== localStorage.getItem("player_Id")) {
-      this.http.put(this.baseUrl + "MobileDownload/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
+      this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
       }, error => {
         console.log(error);
       });
@@ -99,7 +96,7 @@ export class AuthService {
   }
 
   refreshToken(tokenRequest: TokenRequest) {
-    return this.http.post(this.baseUrl + 'account/refreshToken', tokenRequest).pipe(
+    return this.http.post(this.configService.selected_sys_param.apiUrl + 'account/refreshToken', tokenRequest).pipe(
       map((response: LoginUser) => {
         const loginUser = response;
         if (loginUser.token != null) {
@@ -182,7 +179,7 @@ export class AuthService {
   }
 
   getMenuHierachy() {
-    return this.http.get<MenuHierarchy[]>(this.baseUrl + 'account/menu').pipe(
+    return this.http.get<MenuHierarchy[]>(this.configService.selected_sys_param.apiUrl + 'account/menu').pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -194,7 +191,7 @@ export class AuthService {
   }
 
   getRestrictedColumn() {
-    return this.http.get<RestrictedColumn[]>(this.baseUrl + 'account/restrictedColumns').pipe(
+    return this.http.get<RestrictedColumn[]>(this.configService.selected_sys_param.apiUrl + 'account/restrictedColumns').pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -206,7 +203,7 @@ export class AuthService {
   }
 
   getModuleControl() {
-    return this.http.get<ModuleControl[]>(this.baseUrl + 'account/frontEndModuleControl').pipe(
+    return this.http.get<ModuleControl[]>(this.configService.selected_sys_param.apiUrl + 'account/frontEndModuleControl').pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -214,11 +211,15 @@ export class AuthService {
   }
 
   getPrecisionList() {
-    return this.http.get<PrecisionList[]>(this.baseUrl + 'account/precision');
+    return this.http.get<PrecisionList[]>(this.configService.selected_sys_param.apiUrl + 'account/precision');
   }
 
   setModuleControl(item: any) {
     this.moduleControlSubject.next(item);
+    let showSearchResult = item.find(x => x.ctrlName === "ShowSearchResult");
+    if (showSearchResult) {
+      this.showSearchResult = (showSearchResult.ctrlValue === '0') ? false : true;
+    } 
   }
 
   setPrecisionList(item: any) {
@@ -248,25 +249,32 @@ export class AuthService {
   }
 
   // Sign out
-  async signOut() {
-
-    // ...
+  async signOut(isAddNew: boolean = false) {
     localStorage.removeItem('loginUser');
-    // localStorage.removeItem('rpParameters');
     this.currentUserSource.next(null);
     this.currentUserTokenSource.next(null);
     this.menuItemSubject.next(null);
     this.precisionListSubject.next(null);
     this.isLoggedIn = false;
     this.isAdmin = false;
-    // ...
-
-    // Navigate to sign-in
-    this.navController.navigateRoot('/signin');
+    if (isAddNew) {
+      this.navController.navigateRoot('/welcome');
+    } else {
+      // Navigate to sign-in
+      this.navController.navigateRoot('/signin');
+    }
   }
 
   getCompanyName() {
-    return this.http.get<any>(this.baseUrl + "account/CompanyName");
+    return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "account/companyInfo");
+  }
+
+  forgotPassword(passwordResetRequest: ForgotPasswordRequest) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + 'account/forgotPassword', passwordResetRequest, httpObserveHeader);
+  }
+
+  resetPassword(passwordResetDto: ResetPassword) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + 'account/resetPassword', passwordResetDto, httpObserveHeader);
   }
 
 }

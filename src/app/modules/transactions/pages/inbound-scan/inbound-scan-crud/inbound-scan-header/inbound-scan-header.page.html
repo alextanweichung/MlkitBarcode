@@ -1,0 +1,100 @@
+<ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
+  <ion-toolbar>
+    <ion-title>Inbound Scan</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelInsert()">
+        <ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen [hidden]="scanActive">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Multi Picking</ion-label>
+    </ion-toolbar>
+  </ion-header>
+  <div class="p-2">
+    <ion-segment [(ngModel)]="isWithDoc" (ionChange)="isWithDocChanged($event)">
+      <ion-segment-button value="true">
+        <ion-label>With Doc</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="false">
+        <ion-label>Without Doc</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <div class="mt-2" *ngIf="isWithDoc === 'false'" [formGroup]="objectForm">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <!-- <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
+        <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
+        <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
+        <ion-item lines="none">
+          <ion-label class="font-bold" position="stacked">Remark</ion-label>
+          <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
+        </ion-item> -->
+      </ion-list>
+    </div>
+    <div *ngIf="isWithDoc === 'true'">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col class="ion-flex ion-margin-auto" size="10">
+            <input #barcodeInput hideKeyboard class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="docSearchValue" [ngModelOptions]="{standalone:true}" placeholder="Enter or Scan Doc" (keydown)="handleDocSearchKeyDown($event)">
+          </ion-col>
+          <ion-col class="ion-flex ion-margin-auto justify-content-end">
+            <ion-button size="small" fill="clear" (click)="showKeyboard($event)">
+              <i slot="icon-only" class="fas fa-keyboard"></i>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <div *ngIf="selectedDoc">
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+            <ion-grid class="ion-no-padding py-2 pl-2">
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">From Customer</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{objectForm.controls.fromCustomerId.value|idMapping:objectService.customerMasterList}}</div></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Origin Location</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{objectForm.controls.fromLocationId.value|idMapping:objectService.locationMasterList}}</div></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Destination Location</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{objectForm.controls.toLocationId.value|idMapping:objectService.locationMasterList}}</div></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+        <ion-list class="list-custom animate__animated animate__fadeIn ion-no-padding" lines="none" [formGroup]="objectForm">
+          <ion-item class="ion-no-padding pl-2" lines="none">
+            <ion-label class="font-bold" position="stacked">Remark</ion-label>
+            <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
+          </ion-item>
+        </ion-list>
+
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showDetail()">
+            <ion-grid class="ion-no-padding py-2 pl-2">
+              <ion-row>
+                <ion-col size="6" class="ion-flex ion-margin-auto"><div class="font-bold">Item</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Doc Qty</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Scanned Qty</div></ion-col>
+              </ion-row>
+              <ion-row class="mt-1" *ngFor="let d of selectedDoc.details">
+                <ion-col size="6" class="ion-flex ion-margin-auto">
+                  <div>{{d.itemCode}}</div>
+                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 ml-1" *ngIf="d.itemVariationXId"> {{d.itemVariationXDescription}}</span>
+                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 ml-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYDescription}}</span>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{d.qtyRequest|number:'1.0'}}</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div>{{d.qtyScanned|number:'1.0'}}</div></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
+  </div>
+</ion-content>

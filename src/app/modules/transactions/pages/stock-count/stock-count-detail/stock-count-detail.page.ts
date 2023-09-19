@@ -14,13 +14,13 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
 
-  inventoryCount: StockCountRoot;
+  object: StockCountRoot;
   scannedItems: StockCountItem[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private navController: NavController,
-    private stockCountService: StockCountService
+    public objectService: StockCountService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -34,33 +34,16 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
   }
   
   ngOnInit() {
-    this.loadMasterList();
-  }
-
-  locationMasterList: MasterListDetails[] = [];
-  zoneMasterList: MasterListDetails[] = [];
-  rackMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.stockCountService.getMasterList().subscribe(response => {
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.zoneMasterList = response.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.rackMasterList = response.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
+    
   }
 
   loadObject() {
     try {
       this.scannedItems = [];
-      this.stockCountService.getInventoryCount(this.objectId).subscribe(response => {
-        this.inventoryCount = response;
-        this.inventoryCount.details.forEach(r => {
-          let barcodeTag = this.inventoryCount.barcodeTag.find(rr => rr.itemSku === r.itemSku);
+      this.objectService.getInventoryCount(this.objectId).subscribe(response => {
+        this.object = response;
+        this.object.details.forEach(r => {
+          let barcodeTag = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku);
           this.scannedItems.push({
             itemId: r.itemId,
             itemCode: barcodeTag.itemCode,

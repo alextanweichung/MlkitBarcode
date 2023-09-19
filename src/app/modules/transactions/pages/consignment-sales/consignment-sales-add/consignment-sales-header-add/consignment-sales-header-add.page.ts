@@ -1,42 +1,54 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
-import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-consignment-sales-header-add',
   templateUrl: './consignment-sales-header-add.page.html',
   styleUrls: ['./consignment-sales-header-add.page.scss'],
 })
-export class ConsignmentSalesHeaderAddPage implements OnInit {
+export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
+  trxDate: Date = null;
 
   constructor(
     private authService: AuthService,
-    private objectService: ConsignmentSalesService,
+    public objectService: ConsignmentSalesService,
+    private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
+    private alertController: AlertController,
     private formBuilder: FormBuilder
   ) {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
     this.newObjectForm();
+  }
+
+  ionViewWillEnter(): void {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
   }
 
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
       consignmentSalesId: [0],
       consignmentSalesNum: [null],
-      trxDate: [null, [Validators.required]],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
-      toLocationId: [null, [Validators.required]],
+      toLocationId: [this.objectService.locationList.find(r => r.isPrimary)?.locationId, [Validators.required]],
+      toLocationCode: [this.objectService.locationList.find(r => r.isPrimary)?.locationCode, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
       salesAgentId: [null],
@@ -45,16 +57,16 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
       isDisplayTaxInclusive: [null],
       maxPrecision: [null],
       maxPrecisionTax: [null],
-      sourceType: ['M'],
-      typeCode: ['S'],
+      sourceType: ["M"],
+      typeCode: ["S"],
       businessModelType: [null]
     })
   }
 
   ngOnInit() {
     this.loadModuleControl();
-    this.loadConsignmentLocation();
-    this.loadMasterList();
+    this.bindLocationList();
+    this.bindMasterList();
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -70,44 +82,10 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     }
   }
 
-  locationList: ConsignmentSalesLocation[] = [];
-  loadConsignmentLocation() {
-    try {
-      this.objectService.getConsignmentLocation().subscribe(response => {
-        this.locationList = response;
-        this.mapLocationList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  salesAgentMasterList: MasterListDetails[] = [];
-  customerMasterList: MasterListDetails[] = [];
-  // locationMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.attribute5 === "C").filter(y => y.deactivated == 0);
-        // this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.mapMasterListSearchDropdownList();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   locationSearchDropdownList: SearchDropdownList[] = [];
-  mapLocationList() {
+  bindLocationList() {
     try {
-      this.locationList.forEach(r => {
+      this.objectService.locationList.forEach(r => {
         this.locationSearchDropdownList.push({
           id: r.locationId,
           code: r.locationCode,
@@ -121,16 +99,16 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
 
   customerSearchDropdownList: SearchDropdownList[] = [];
   salesAgentSearchDropdownList: SearchDropdownList[] = [];
-  mapMasterListSearchDropdownList() {
+  bindMasterList() {
     try {
-      this.customerMasterList.forEach(r => {
+      this.objectService.customerMasterList.forEach(r => {
         this.customerSearchDropdownList.push({
           id: r.id,
           code: r.code,
           description: r.description
         })
       })
-      this.salesAgentMasterList.forEach(r => {
+      this.objectService.salesAgentMasterList.forEach(r => {
         this.salesAgentSearchDropdownList.push({
           id: r.id,
           code: r.code,
@@ -151,15 +129,15 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
   onCustomerChanged(customerId: number) {
     try {
       if (customerId) {
-        let lookupValue = this.customerMasterList.find(r => r.id === customerId);
+        let lookupValue = this.objectService.customerMasterList.find(r => r.id === customerId);
         if (lookupValue) {
           this.objectForm.patchValue({ customerId: lookupValue.id });
           this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
           this.objectForm.patchValue({
             salesAgentId: parseFloat(lookupValue.attribute1),
             currencyId: parseFloat(lookupValue.attribute4),
-            isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
-            isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
+            isItemPriceTaxInclusive: lookupValue.attribute8 == "1" ? true : false,
+            isDisplayTaxInclusive: lookupValue.attribute9 == "1" ? true : false
           });
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
@@ -176,7 +154,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
   onCurrencySelected(event) {
     try {
       if (event) {
-        var lookupValue = this.currencyMasterList?.find(e => e.id == event);
+        var lookupValue = this.objectService.currencyMasterList?.find(e => e.id == event);
         if (lookupValue != undefined) {
           this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
           if (lookupValue.attribute2 == "Y") {
@@ -195,61 +173,80 @@ export class ConsignmentSalesHeaderAddPage implements OnInit {
     }
   }
 
-  onLocationChanged(event) {
+  async onLocationChanged(event) {
     if (event) {
-      let customerId = this.locationList.find(r => r.locationId === event.id)?.customerId;
-      if (customerId) {
-        this.onCustomerChanged(customerId)
-      }
-      this.objectForm.patchValue({ toLocationId: event.id });
+      const alert = await this.alertController.create({
+        cssClass: "custom-alert",
+        header: "Are you sure to change?",
+        subHeader: "Changing location required to sync price.",
+        buttons: [{
+          text: "Proceed",
+          cssClass: "success",
+          handler: async () => {
+            let customerId = this.objectService.locationList.find(r => r.locationId === event.id)?.customerId;
+            if (customerId) {
+              this.onCustomerChanged(customerId)
+            }
+            this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
+            await this.objectService.refreshLocalDb(event.code);
+          },
+        },
+        {
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel"
+        }]
+      });
+      await alert.present();
     }
   }
 
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
-      await actionSheet.present();
-  
-      const { role } = await actionSheet.onWillDismiss();
-  
-      if (role === 'confirm') {
+      await actionSheet.present();  
+      const { role } = await actionSheet.onWillDismiss();  
+      if (role === "confirm") {
         this.objectService.resetVariables();
-        this.navController.navigateBack('/transactions/consignment-sales');
+        this.navController.navigateBack("/transactions/consignment-sales");
       }
     } catch (e) {
       console.error(e);
     }
   }
 
-  nextStep() {
+  async nextStep() {
     try {
-      this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), 'yyyy-MM-dd'), this.objectForm.controls.toLocationId.value).subscribe(response => {
-        if (response) { // todo : remove this as in future same criteria will only have 1 record or none.        
-          let navigationExtras: NavigationExtras = {
-            queryParams: {
-              objectId: response.header.consignmentSalesId
+      if (this.objectForm.valid) {
+        this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), "yyyy-MM-dd"), this.objectForm.controls.toLocationId.value).subscribe(response => {
+          if (response) {
+            let navigationExtras: NavigationExtras = {
+              queryParams: {
+                objectId: response.header.consignmentSalesId
+              }
             }
+            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item-edit", navigationExtras);
+          } else {
+            this.objectService.setHeader(this.objectForm.value);
+            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item-add");
           }
-          this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
-        } else {
-          this.objectService.setHeader(this.objectForm.value);
-          this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-add');
-        }
-      }, error => {
-        throw error;
-      })
+        }, error => {
+          throw error;
+        })
+      }
     } catch (e) {
       console.error(e);
     }

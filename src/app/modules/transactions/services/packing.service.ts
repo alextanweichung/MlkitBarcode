@@ -6,6 +6,7 @@ import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingList, GoodsPackingRoot, GoodsPackingSummary } from '../models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from '../models/packing-sales-order';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -16,15 +17,37 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class PackingService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) { 
-    console.log("🚀 ~ file: packing.service.ts:27 ~ PackingService ~ apiUrl:")
-    this.baseUrl = configService.sys_parameter.apiUrl;
+  ) {
+    
+  }
+
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadStaticLov();
+  }
+
+  fullMasterList: MasterList[] = [];
+  customerMasterList: MasterListDetails[] = [];
+  itemUomMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  locationMasterList: MasterListDetails[] = [];
+  warehouseAgentMasterList: MasterListDetails[] = [];
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+  }
+
+  async loadStaticLov() {
+
   }
 
   header: GoodsPackingHeader;
@@ -79,39 +102,39 @@ export class PackingService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePacking/masterList");
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePacking/masterList").toPromise();
   }
 
   getStaticLov() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePacking/staticLov");
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePacking/staticLov");
   }
 
   getObjectList() {
-    return this.http.get<GoodsPackingList[]>(this.baseUrl + "MobilePacking/gpList");
+    return this.http.get<GoodsPackingList[]>(this.configService.selected_sys_param.apiUrl + "MobilePacking/gpList");
   }
 
   getObjectListByDate(startDate: Date, endDate: Date) {
-    return this.http.get<GoodsPackingList[]>(this.baseUrl + "MobilePacking/listing/" + format(startDate, 'yyyy-MM-dd') + "/" + format(endDate, 'yyyy-MM-dd'));
+    return this.http.get<GoodsPackingList[]>(this.configService.selected_sys_param.apiUrl + "MobilePacking/listing/" + format(startDate, 'yyyy-MM-dd') + "/" + format(endDate, 'yyyy-MM-dd'));
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<any>(this.baseUrl + "MobilePacking/" + objectId);
+    return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "MobilePacking/" + objectId);
   }
 
   getSoByCustomer(customerId: number) {
-    return this.http.get<PackingSalesOrderRoot[]>(this.baseUrl + "MobilePacking/fromSO/customer/" + customerId);
+    return this.http.get<PackingSalesOrderRoot[]>(this.configService.selected_sys_param.apiUrl + "MobilePacking/fromSO/customer/" + customerId);
   }
 
   getSoByCustomerLocation(customerId: number, toLocationId: number){
-    return this.http.get<PackingSalesOrderRoot[]>(this.baseUrl + "MobilePacking/fromSo/customer/" + customerId + "/" + toLocationId);
+    return this.http.get<PackingSalesOrderRoot[]>(this.configService.selected_sys_param.apiUrl + "MobilePacking/fromSo/customer/" + customerId + "/" + toLocationId);
   }
 
   insertPacking(object: GoodsPackingRoot) {
-    return this.http.post(this.baseUrl + "MobilePacking", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobilePacking", object, httpObserveHeader);
   }
 
   getItemInfoByBarcode(barcode: string) {
-    return this.http.get<ItemBarcodeModel>(this.baseUrl + "MobilePacking/item/" + barcode);
+    return this.http.get<ItemBarcodeModel>(this.configService.selected_sys_param.apiUrl + "MobilePacking/item/" + barcode);
   }
   
 }

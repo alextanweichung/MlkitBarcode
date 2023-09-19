@@ -10,6 +10,7 @@ import { PickingItemPage } from './picking-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
+import { NgCircleProgressModule } from 'ng-circle-progress';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
     ItemPageRoutingModule,
     BarcodeScanInputPageModule,
     ItemAddListFlatPageModule,
-    CameraScanInputPageModule
+    CameraScanInputPageModule,
+    NgCircleProgressModule
   ],
   declarations: [PickingItemPage]
 })

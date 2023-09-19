@@ -9,7 +9,7 @@ import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-quotation-header',
@@ -27,12 +27,14 @@ export class QuotationHeaderPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private quotationService: QuotationService,
+    public objectService: QuotationService,
+    private commonService: CommonService,
     private toastService: ToastService,
     private navController: NavController,
     private formBuilder: FormBuilder,
     private actionSheetController: ActionSheetController
   ) {
+    this.objectService.loadRequiredMaster();
     this.newForm();
   }
 
@@ -42,7 +44,7 @@ export class QuotationHeaderPage implements OnInit {
         quotationId: [0],
         quotationNum: [null],
         salesAgentId: [null],
-        trxDate: [new Date()],
+        trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
         typeCode: [null],
         customerId: [null, [Validators.required]],
         shipAddress: [null, [Validators.maxLength(500)]],
@@ -77,7 +79,8 @@ export class QuotationHeaderPage implements OnInit {
         remark: [null],
         isHomeCurrency: [null],
         maxPrecision: [null],
-        maxPrecisionTax: [null]
+        maxPrecisionTax: [null],
+        isPricingApproval: [false]
       });
     } catch (e) {
       console.error(e);
@@ -86,8 +89,7 @@ export class QuotationHeaderPage implements OnInit {
 
   ngOnInit() {
     this.loadModuleControl();
-    this.loadCustomerList();
-    this.loadMasterList();
+    this.setDefaultValue();
   }
 
   moduleControl: ModuleControl[];
@@ -133,54 +135,11 @@ export class QuotationHeaderPage implements OnInit {
     }
   }
 
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  shipMethodMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.quotationService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.currencyMasterList = response.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.setDefaultValue();
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
-    }
-  }
-
-  customers: Customer[] = [];
   selectedCustomer: Customer;
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  loadCustomerList() {
-    try {
-      this.quotationService.getCustomerList().subscribe(async response => {
-        this.customers = response;
-        this.customers = this.customers.filter(r => r.businessModelType === 'T');
-        await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-        this.customers.forEach(r => {
-          this.customerSearchDropdownList.push({
-            id: r.customerId,
-            code: r.customerCode,
-            description: r.name
-          })
-        })
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
 
   setDefaultValue() {
     try {
-      let defaultShipMethod = this.shipMethodMasterList.find(r => r.isPrimary);
+      let defaultShipMethod = this.objectService.shipMethodMasterList.find(r => r.isPrimary);
       if (defaultShipMethod) {
         this.objectForm.patchValue({ shipMethodId: defaultShipMethod.id });
       }
@@ -195,13 +154,13 @@ export class QuotationHeaderPage implements OnInit {
   onCustomerSelected(event) {
     try {
       if (event && event !== undefined) {
-        var lookupValue = this.customerMasterList?.find(e => e.id === event.id);
+        var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
         if (lookupValue != undefined) {
-          this.quotationService.removeItems();
+          this.objectService.removeItems();
           this.objectForm.patchValue({ customerId: lookupValue.id });
           this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
           if (lookupValue.attributeArray1.length > 0) {
-            this.selectedCustomerLocationList = this.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
+            this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
           } else {
             this.selectedCustomerLocationList = [];
           }
@@ -215,9 +174,12 @@ export class QuotationHeaderPage implements OnInit {
             isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false,
             isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false
           });
+       
+          this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
+          
           this.onCurrencySelected(lookupValue.attribute4);
           if (lookupValue.attribute5 == "T") {
-            this.availableAddress = this.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);
+            this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);
             this.objectForm.controls.toLocationId.clearValidators();
             this.objectForm.controls.toLocationId.updateValueAndValidity();
           } else {
@@ -234,7 +196,7 @@ export class QuotationHeaderPage implements OnInit {
           }
         }
         if (!this.disableTradeTransactionGenerateGL) {
-          this.quotationService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
+          this.objectService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
             if (response) {
               this.creditInfo = response;
             }
@@ -249,7 +211,7 @@ export class QuotationHeaderPage implements OnInit {
   onCurrencySelected(event: any) {
     try {
       if (event) {
-        var lookupValue = this.currencyMasterList?.find(e => e.id == event);
+        var lookupValue = this.objectService.currencyMasterList?.find(e => e.id == event);
         if (lookupValue != undefined) {
           this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
           if (lookupValue.attribute2 == "Y") {
@@ -290,6 +252,7 @@ export class QuotationHeaderPage implements OnInit {
     try {
       const actionSheet = await this.actionSheetController.create({
         header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
         cssClass: 'custom-action-sheet',
         buttons: [
           {
@@ -304,7 +267,7 @@ export class QuotationHeaderPage implements OnInit {
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
       if (role === 'confirm') {
-        this.quotationService.resetVariables();
+        this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/quotation');
       }
     } catch (e) {
@@ -314,7 +277,7 @@ export class QuotationHeaderPage implements OnInit {
 
   async nextStep() {
     try {
-      await this.quotationService.setHeader(this.objectForm.value);
+      await this.objectService.setHeader(this.objectForm.value);
       this.navController.navigateForward('/transactions/quotation/quotation-item');
     } catch (e) {
       console.error(e);

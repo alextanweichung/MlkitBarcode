@@ -6,12 +6,13 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
 import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-sales-order-pending',
   templateUrl: './sales-order-approvals.page.html',
   styleUrls: ['./sales-order-approvals.page.scss'],
-  providers: [TransactionProcessingService, { provide: 'apiObject', useValue: 'mobileSalesOrderApprove' }]
+  providers: [TransactionProcessingService, { provide: "apiObject", useValue: "mobileSalesOrderApprove" }]
 })
 export class SalesOrderPendingApproval implements OnInit, ViewWillEnter {
 
@@ -22,6 +23,7 @@ export class SalesOrderPendingApproval implements OnInit, ViewWillEnter {
   endDate: Date;
 
   constructor(
+    private authService: AuthService,
     private transactionProcessingService: TransactionProcessingService,
     private toastService: ToastService,
     private modalController: ModalController,
@@ -31,7 +33,7 @@ export class SalesOrderPendingApproval implements OnInit, ViewWillEnter {
   // make sure refresh when back to this page
   ionViewWillEnter(): void {
     if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
@@ -40,26 +42,20 @@ export class SalesOrderPendingApproval implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTheYear();
-    }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-    this.loadObjects();
+    
   }
 
   loadObjects() {
     try {
-      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), 'yyyy-MM-dd'), format(parseISO(this.endDate.toISOString()), 'yyyy-MM-dd')).subscribe(response => {
-        this.pendingObjects = response.filter(r => !r.isComplete);
+      this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd"), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(response => {
+        this.pendingObjects = response.filter(r => !r.isComplete && !r.deactivated);
         this.completedObjects = response.filter(r => r.isComplete);
-        this.toastService.presentToast('Search Complete', '', 'top', 'success', 1000);
+        this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         throw Error;
       })
     } catch (error) {
-      this.toastService.presentToast('Error loading objects', '', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "Error Loading", "top", "danger", 1000);
     }
   }
 
@@ -68,6 +64,9 @@ export class SalesOrderPendingApproval implements OnInit, ViewWillEnter {
   }
 
   async filter() {
+    if (!this.startDate) {
+      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    }
     const modal = await this.modalController.create({
       component: FilterPage,
       componentProps: {

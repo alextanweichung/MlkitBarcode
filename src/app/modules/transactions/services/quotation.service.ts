@@ -11,7 +11,12 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
-import { QuotationHeader, QuotationList, QuotationRoot, QuotationSummary } from '../models/quotation';
+import { QuotationHeader, QuotationList, QuotationRoot } from '../models/quotation';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { format } from 'date-fns';
+import { TrxChild } from 'src/app/shared/models/trx-child';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -23,31 +28,84 @@ const httpObserveHeader = {
 })
 export class QuotationService {
 
-  baseUrl: string;
+  
+  
+  promotionMaster: PromotionMaster[] = [];
+
+  fullMasterList: MasterList[] = [];
+  customerMasterList: MasterListDetails[] = [];
+  discountGroupMasterList: MasterListDetails[] = [];
+  itemVariationXMasterList: MasterListDetails[] = [];
+  itemVariationYMasterList: MasterListDetails[] = [];
+  shipMethodMasterList: MasterListDetails[] = [];
+  locationMasterList: MasterListDetails[] = [];
+  areaMasterList: MasterListDetails[] = [];
+  currencyMasterList: MasterListDetails[] = [];
+  salesAgentMasterList: MasterListDetails[] = [];
+
+  customers: Customer[] = [];
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: quotation.service.ts:33 ~ QuotationService ~ apiUrl:")
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
+  }
+
+  async loadRequiredMaster() {
+    await this.loadMasterList();
+    await this.loadCustomer();
+  }
+
+  async loadMasterList() {
+    this.fullMasterList = await this.getMasterList();
+    this.customerMasterList = this.fullMasterList.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details);
+    this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
+  }
+
+  async loadCustomer() {
+    this.customers = await this.getCustomerList();    
+    await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+    this.bindCustomerList();
+  }
+
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  bindCustomerList() {
+  this.customerSearchDropdownList = [];
+    this.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
+      })
+    })
   }
 
   /* #region  for insert */
 
   header: QuotationHeader;
   itemInCart: TransactionDetail[] = [];
-  quotationSummary: QuotationSummary;
-  setHeader(header: QuotationHeader) {
+  object: QuotationRoot;
+  async setHeader(header: QuotationHeader) {
     this.header = header;
+    // load promotion first after customer confirmed or whenever header changed.
+    this.promotionMaster = await this.getPromotion(format(new Date(this.header.trxDate), 'yyyy-MM-dd'), this.header.customerId);
   }
 
   setChoosenItems(items: TransactionDetail[]) {
     this.itemInCart = JSON.parse(JSON.stringify(items));
   }
 
-  setQuotationSummary(qs: QuotationSummary) {
-    this.quotationSummary = qs;
+  setObject(object: QuotationRoot) {
+    this.object = object;
   }
 
   removeCustomer() {
@@ -58,14 +116,14 @@ export class QuotationService {
     this.itemInCart = [];
   }
 
-  removeSummary() {
-    this.quotationSummary = null;
+  removeObject() {
+    this.object = null;
   }
 
   resetVariables() {
     this.removeCustomer();
     this.removeItems();
-    this.removeSummary();
+    this.removeObject();
   }
 
   hasSalesAgent(): boolean {
@@ -79,15 +137,11 @@ export class QuotationService {
   /* #endregion */
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/masterlist").pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/masterlist", { context: background_load() }).toPromise();
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobileQuotation/staticLov").pipe(
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/staticLov").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -95,39 +149,47 @@ export class QuotationService {
   }
 
   getCustomerList() {
-    return this.http.get<Customer[]>(this.baseUrl + "MobileQuotation/customer");
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/customer", { context: background_load() }).toPromise();
   }
   
   getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.baseUrl + 'MobileQuotation/promotion/' + trxDate + '/' + customerId);
+    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + 'MobileQuotation/promotion/' + trxDate + '/' + customerId).toPromise();
   }
 
   getFullItemList() {
-    return this.http.get<ItemList[]>(this.baseUrl + "MobileQuotation/item/itemList", { context: background_load() });
+    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/item/itemList", { context: background_load() });
   }
 
   getObjectList() {
-    return this.http.get<QuotationList[]>(this.baseUrl + "MobileQuotation/qtlist");
+    return this.http.get<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/qtlist");
   }
 
   getObjectListByDate(searchObject: SalesSearchModal) {
-    return this.http.post<QuotationList[]>(this.baseUrl + "MobileQuotation/listing", searchObject);
+    return this.http.post<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/listing", searchObject);
   }
 
   getObjectById(objectId: number) {
-    return this.http.get<QuotationRoot>(this.baseUrl + "MobileQuotation/" + objectId);
+    return this.http.get<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/" + objectId);
   }
 
   insertObject(object: QuotationRoot) {
-    return this.http.post(this.baseUrl + "MobileQuotation", object, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
+  }
+
+  updateObject(object: QuotationRoot) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
+  }
+
+  toggleObject(objectId: number) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileQuotation/deactivate/" + objectId, null, httpObserveHeader);
   }
 
   getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.baseUrl + 'MobileQuotation/creditInfo/' + customerId);
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + 'MobileQuotation/creditInfo/' + customerId);
   }
 
   downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
-    return this.http.post(this.baseUrl + "MobileQuotation/exportPdf", 
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation/exportPdf", 
     {
       "appCode": appCode,
       "format": format,
@@ -137,7 +199,11 @@ export class QuotationService {
   }
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
+  getWorkflow(objectId: number) {
+    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/workflow/" + objectId);
+  }
+  
 }

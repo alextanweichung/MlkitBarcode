@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sales by Debtor</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="p-2">
+    <ion-list class="list-custom" lines="none">
+      <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"  [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>
+      <app-calendar-input title="Start Date" [date_value]="startDate" (onDateSelected)="onStartDateSelected($event)"></app-calendar-input>
+      <app-calendar-input title="End Date" [date_value]="endDate" (onDateSelected)="onEndDateSelected($event)"></app-calendar-input>
+    </ion-list>
+    <ion-button class="pt-2" expand="block" size="default" [disabled]="!startDate||!endDate" (click)="loadReport()">Search</ion-button>
+    <ngx-datatable *ngIf="objects && objects.length > 0"
+      class="material mt-2"
+      [rows]="objects" 
+      [rowHeight]="'auto'" 
+      [columns]="columns"
+      [columnMode]="'force'"
+      [footerHeight]="50">
+      <ngx-datatable-column prop="customerCode" name="Debtor Code">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.customerCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="customerName" name="Debtor Name">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.customerName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="trxMonth" name="Trx Month">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.trxMonth}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="salesAmount" name="Sales Amount">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="font-half-size ion-text-right"> {{row.salesAmount | number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-footer>
+        <ng-template
+          ngx-datatable-footer-template
+          let-rowCount="rowCount"
+          let-pageSize="pageSize"
+          let-selectedCount="selectedCount"
+          let-curPage="curPage"
+          let-offset="offset">
+          <div class="p-2 w-full">
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">Total Sales: </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">{{objects|sum:'salesAmount'|number:'1.0'}}</ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+        </ng-template>
+      </ngx-datatable-footer>
+    </ngx-datatable>
+  </div>
+</ion-content>

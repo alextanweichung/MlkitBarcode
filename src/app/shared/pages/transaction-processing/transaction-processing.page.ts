@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { AlertController, NavController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { BulkConfirmReverse, TransactionProcessingDoc } from '../../models/transaction-processing';
+import { BulkConfirmReverse, TransactionProcessingCount, TransactionProcessingDoc } from '../../models/transaction-processing';
 import { TransactionProcessingService } from '../../services/transaction-processing.service';
 
 @Component({
@@ -22,14 +22,23 @@ export class TransactionProcessingPage implements OnInit {
   @Input() selectedSegment: string = 'pending';
 
   constructor(
-    private transactionProcessingService: TransactionProcessingService,
+    private objectService: TransactionProcessingService,
     private navController: NavController,
     private alertController: AlertController,
     private toastService: ToastService
   ) { }
 
   ngOnInit() {
+    this.loadCounts();
+  }
 
+  transactionProcessingCount: TransactionProcessingCount = { pending: 0, completed: 0, total: 0, isAllowApprove: false };
+  loadCounts() {
+    this.objectService.getDocumentCount().subscribe(response => {
+      this.transactionProcessingCount = response;
+    }, error => {
+      console.error(error);
+    })
   }
 
   async presentConfirmAlert(action: string, docId: number, docNum: string) {
@@ -42,7 +51,7 @@ export class TransactionProcessingPage implements OnInit {
           {
             name: 'actionreason',
             type: 'textarea',
-            placeholder: 'Please enter Reason',
+            placeholder: 'Please Enter Reason',
             value: ''
           }
         ],
@@ -54,7 +63,7 @@ export class TransactionProcessingPage implements OnInit {
             handler: (data) => {
               if (action === 'REJECT' && this.processType === 'APPROVALS') {
                 if (!data.actionreason && data.actionreason.length === 0) {
-                  this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                  this.toastService.presentToast('Please Enter reason', '', 'top', 'danger', 1000);
                   return false;
                 } else {
                   this.updateDoc(action, [docId.toString()], data.actionreason);
@@ -84,7 +93,7 @@ export class TransactionProcessingPage implements OnInit {
         docId: listOfDoc.map(i => Number(i))
       }
       try {
-        this.transactionProcessingService.bulkUpdateDocumentStatus(bulkConfirmReverse).subscribe(async response => {
+        this.objectService.bulkUpdateDocumentStatus(bulkConfirmReverse).subscribe(async response => {
           if (response.status == 204) {
             this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
             this.onObjectUpdated.emit(listOfDoc.map(i => Number(i))[0]);
@@ -103,31 +112,11 @@ export class TransactionProcessingPage implements OnInit {
   async openDetail(docId: number) {
     try {
       let navigationExtras: NavigationExtras;
-      if (this.parentType.toLowerCase() === 'quotation') {
-        navigationExtras = {
-          queryParams: {
-            objectId: docId,
-            processType: this.processType,
-            selectedSegment: this.selectedSegment
-          }
-        }
-      }
-      if (this.parentType.toLowerCase() === 'sales-order') {
-        navigationExtras = {
-          queryParams: {
-            objectId: docId,
-            processType: this.processType,
-            selectedSegment: this.selectedSegment
-          }
-        }
-      }
-      if (this.parentType.toLowerCase() === 'purchase-order') {
-        navigationExtras = {
-          queryParams: {
-            objectId: docId,
-            processType: this.processType,
-            selectedSegment: this.selectedSegment
-          }
+      navigationExtras = {
+        queryParams: {
+          objectId: docId,
+          processType: this.processType,
+          selectedSegment: this.selectedSegment
         }
       }
       this.navController.navigateForward(`/transactions/${this.parentType.toLowerCase()}/${this.parentType.toLowerCase()}-detail`, navigationExtras);

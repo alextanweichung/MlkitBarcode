@@ -8,7 +8,8 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
-import { LoadingService } from 'src/app/services/loading/loading.service';
+import { environment } from 'src/environments/environment';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -34,23 +35,28 @@ export class CardsPage implements OnInit, AfterContentChecked {
   loginName: string;
   loginEmail: string;
   userType: string;
+  current_year: number = new Date().getFullYear();
+  currentVersion: string;
 
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
-    private loadingService: LoadingService,
+    // private loadingService: LoadingService,
     private commonService: CommonService
-  ) { }
+  ) {
+    this.currentVersion = environment.version;
+  }
 
+  loginUser: any;
   ngOnInit(): void {
-    let loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    if (loginUser.loginUserType === 'B') {
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (this.loginUser.loginUserType === 'B') {
       this.userType = "Base User";
-    } else if (loginUser.loginUserType === 'C') {
+    } else if (this.loginUser.loginUserType === 'C') {
       this.userType = "Consignment User";
-    } else if (loginUser.loginUserType === 'P') {
+    } else if (this.loginUser.loginUserType === 'P') {
       this.userType = "POS User";
     }
     this.authService.currentUserToken$.subscribe(obj => {
@@ -65,32 +71,65 @@ export class CardsPage implements OnInit, AfterContentChecked {
     }, error => {
       console.log(error);
     })
+    this.loadMasterList();
   }
 
   ngAfterContentChecked(): void {
     if (this.swiper) {
       this.swiper.updateSwiper({});
     }
-    this.last_sync_datetime = this.configService.sys_parameter.lastDownloadAt;
+    this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
+  }
+
+  procurementAgentMasterList: MasterListDetails[] = [];
+  warehouseAgentMasterList: MasterListDetails[] = [];
+  salesAgentMasterList: MasterListDetails[] = [];
+  loadMasterList() {
+    this.commonService.getAgentsMasterList().subscribe(response => {
+      this.procurementAgentMasterList = response.filter(x => x.objectName == 'ProcurementAgent' && x.details != null).flatMap(src => src.details);      
+      this.warehouseAgentMasterList = response.filter(x => x.objectName == 'WarehouseAgent' && x.details != null).flatMap(src => src.details);      
+      this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent' && x.details != null).flatMap(src => src.details);
+    }, error => {
+      console.error(error);
+    })
   }
 
   // Sync
   async sync() {
     if (Capacitor.getPlatform() !== 'web') {
       try {
-        await this.loadingService.showLoading("Syncing Offline Table");
         let response = await this.commonService.syncInbound();
         let itemMaster: PDItemMaster[] = response['itemMaster'];
         let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
-        // await this.configService.loadItemMaster();
-        // await this.configService.loadItemBarcode();
-        await this.loadingService.dismissLoading();
       } catch (error) {
-        await this.loadingService.dismissLoading();
         this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
       }
     }
+  }
+
+  async addNewActivation() {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'New Activation?',
+      subHeader: "You'll be signed out to do this!",
+      buttons: [
+        {
+          text: 'Sign-out',
+          cssClass: 'danger',
+          handler: async () => {
+            this.authService.signOut(true);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel'
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   async signOut() {

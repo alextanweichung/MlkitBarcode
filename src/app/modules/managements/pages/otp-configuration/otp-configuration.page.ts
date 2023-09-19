@@ -7,17 +7,18 @@ import { OtpService } from '../../services/otp.service';
 import { App } from 'src/app/shared/models/app';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.page';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-otp-configuration',
   templateUrl: './otp-configuration.page.html',
   styleUrls: ['./otp-configuration.page.scss'],
 })
-export class OtpConfigurationPage implements OnInit {
+export class OtpConfigurationPage implements OnInit, ViewWillEnter {
 
   lovStatics: MasterListDetails[] = [];
   apps: App[] = [];
@@ -31,7 +32,9 @@ export class OtpConfigurationPage implements OnInit {
   selectedUser: any;
   selectedValidity: any;
   selectedApp: any;
-  expiryDate: Date;
+
+  expiryDate: Date = this.commonService.getTodayDate();
+  remark: string = null;
 
   checkboxValue: boolean = true;
 
@@ -39,11 +42,11 @@ export class OtpConfigurationPage implements OnInit {
   validitySerachDropdownList: SearchDropdownList[] = [];
   appsSearchDropdownList: SearchDropdownList[] = [];
 
-  @ViewChild('usersDropdown', { static: false }) usersDropdown: SearchDropdownPage;
-  @ViewChild('validityDropdown', { static: false }) validityDropdown: SearchDropdownPage;
-  @ViewChild('appsDropdown', { static: false }) appsDropdown: SearchDropdownPage;
-  @ViewChild('appsMultiDropdown', { static: false }) appsMultiDropdown: SearchMultiDropdownPage;
-  @ViewChild('calendar', { static: false }) calendar: CalendarInputPage;
+  @ViewChild("usersDropdown", { static: false }) usersDropdown: SearchDropdownPage;
+  @ViewChild("validityDropdown", { static: false }) validityDropdown: SearchDropdownPage;
+  @ViewChild("appsDropdown", { static: false }) appsDropdown: SearchDropdownPage;
+  @ViewChild("appsMultiDropdown", { static: false }) appsMultiDropdown: SearchMultiDropdownPage;
+  @ViewChild("calendar", { static: false }) calendar: CalendarInputPage;
 
   constructor(
     private toastService: ToastService,
@@ -51,6 +54,12 @@ export class OtpConfigurationPage implements OnInit {
     private commonService: CommonService,
     private alertController: AlertController,
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.expiryDate) {
+      this.expiryDate = this.commonService.getTodayDate();
+    }
+  }
 
   ngOnInit() {
     this.loadUsers();
@@ -73,7 +82,7 @@ export class OtpConfigurationPage implements OnInit {
       this.users.forEach(r => {
         this.userSearchDropDownList.push({
           id: r.userId,
-          code: null,
+          code: r.userName[0],
           description: r.userName
         })
       })
@@ -82,14 +91,7 @@ export class OtpConfigurationPage implements OnInit {
     })
 
     this.otpConfigService.getStaticLov().subscribe(response => {
-      this.lovStatics = response.filter(x => x.objectName == 'OtpValidity' && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.lovStatics.forEach(r => {
-        this.validitySerachDropdownList.push({
-          id: r.id,
-          code: r.code,
-          description: r.description
-        })
-      })
+      this.lovStatics = response.filter(x => x.objectName == "OtpValidity" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0);
     }, error => {
       console.log(error);
     })
@@ -112,9 +114,9 @@ export class OtpConfigurationPage implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: this.generatedOtpCode,
-      subHeader: 'New OTP generated.',
+      subHeader: "New OTP generated.",
       buttons: [{
-        text: 'Copy',
+        text: "Copy",
         handler: () => {
           this.copyMessage(this.generatedOtpCode);
         },
@@ -152,14 +154,14 @@ export class OtpConfigurationPage implements OnInit {
   }
 
   onAppChanged(event) {
-    if (this.selectedValidity && this.selectedValidity === 'SINGLE') {
+    if (this.selectedValidity && this.selectedValidity === "SINGLE") {
       if (event) {
         this.selectedApp = event.code;
       } else {
         this.selectedApp = null
       }
     }
-    if (this.selectedValidity && this.selectedValidity === 'MULTIPLE') {
+    if (this.selectedValidity && this.selectedValidity === "MULTIPLE") {
       if (event && event.length > 0) {
         this.selectedApp = event.flatMap(r => r.code);
       } else {
@@ -185,18 +187,18 @@ export class OtpConfigurationPage implements OnInit {
       let t = this.transformObjectToDto();
       this.otpConfigService.insertOtp(t).subscribe(async response => {
         if (response.status == 201) {
-          this.generatedOtpCode = response.body['header'].otpCode;
+          this.generatedOtpCode = response.body["header"].otpCode;
           await this.presentAlert();
-          this.toastService.presentToast('Success', 'New OTP has been created.', 'top', 'success', 1000);
+          this.toastService.presentToast("Success", "New OTP has been created.", "top", "success", 1000);
           this.resetOtpInputFields();
         }
       }, error => {
         console.log(error);
-        this.toastService.presentToast('Error', 'Please insert all fields.', 'top', 'danger', 1000);
+        this.toastService.presentToast("Error", "Please insert all fields.", "top", "danger", 1000);
       })
     }
     else {
-      this.toastService.presentToast('Error', 'Please insert all fields.', 'top', 'danger', 1000);
+      this.toastService.presentToast("Error", "Please insert all fields.", "top", "danger", 1000);
     }
   }
 
@@ -227,21 +229,22 @@ export class OtpConfigurationPage implements OnInit {
     this.selectedValidity = null;
     this.appsDropdown.clearSelected();
     this.appsMultiDropdown.clearSelected();
-    this.calendar.resetControl();
+    this.expiryDate = new Date();
     this.checkboxValue = true;
+    this.remark = null;
   }
 
   copyMessage(val: string) {
-    const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
+    const selBox = document.createElement("textarea");
+    selBox.style.position = "fixed";
+    selBox.style.left = "0";
+    selBox.style.top = "0";
+    selBox.style.opacity = "0";
     selBox.value = val;
     document.body.appendChild(selBox);
     selBox.focus();
     selBox.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(selBox);
   }
 
@@ -278,8 +281,9 @@ export class OtpConfigurationPage implements OnInit {
         otpCode: null,
         userId: this.selectedUser,
         validity: this.selectedValidity,
-        expiredAt: null,
-        status: null
+        expiredAt: this.checkboxValue ? null : format(this.expiryDate, "dd/MM/yyyy HH:mm:ss"),
+        status: null,
+        remark: this.remark
       },
       details: otpLineArray
     };

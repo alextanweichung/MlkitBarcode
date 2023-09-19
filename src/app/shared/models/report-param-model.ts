@@ -7,6 +7,6 @@ export interface ReportParameterModel {
 }
 
 export interface CustomReportParamModel {
-   parameter1: number
+   parameter1: number[]
    statementDate: Date
 }

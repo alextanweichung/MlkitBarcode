@@ -14,6 +14,8 @@ export interface PromotionMaster {
    endDate: Date,
    line?: PromotionLine[],
    itemList?: PromotionItemList[]
+   groupList?: PromotionGroupList[],
+   excludeItemList?:PromotionExcludeItemList[]
 }
 
 export interface PromotionLine {
@@ -49,4 +51,18 @@ export interface PromotionItemInfo {
    itemCode: string
    description: string
    impactOnly?: any
+}
+
+export interface PromotionGroupList {
+    promoEventGroupListId: number, 
+    promoEventId: number,
+    eventGroupId: number,
+    eventGroupCode: string
+}
+
+export interface PromotionExcludeItemList {
+    promoEventExItemListId: number, 
+    promoEventId: number,
+    itemId: number
+    itemCode: string
 }

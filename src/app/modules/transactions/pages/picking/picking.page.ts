@@ -6,8 +6,9 @@ import { CommonService } from '../../../../shared/services/common.service';
 import { PickingService } from '../../services/picking.service';
 import { FilterPage } from '../filter/filter.page';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { GoodsPickingList } from '../../models/picking';
 import { format } from 'date-fns';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { MultiPickingList } from '../../models/picking';
 
 @Component({
   selector: 'app-picking',
@@ -16,25 +17,31 @@ import { format } from 'date-fns';
 })
 export class PickingPage implements OnInit, ViewWillEnter {
 
-  objects: GoodsPickingList[] = [];
+  objects: MultiPickingList[] = [];
 
   startDate: Date;
   endDate: Date;
 
+  uniqueGrouping: Date[] = [];
+
   constructor(
+    private authService: AuthService,
     private commonService: CommonService,
     private configService: ConfigService,
-    private goodsPickingService: PickingService,
+    private objectService: PickingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private toastService: ToastService
-  ) { }
+  ) {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+  }
 
   ionViewWillEnter(): void {
     try {
       if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
+        this.startDate = this.commonService.getTodayDate();
       }
       if (!this.endDate) {
         this.endDate = this.commonService.getTodayDate();
@@ -46,26 +53,19 @@ export class PickingPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    try {
-      if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTheYear();
-      }
-      if (!this.endDate) {
-        this.endDate = this.commonService.getTodayDate();
-      }
-      this.loadObjects();
-    } catch (e) {
-      console.error(e);
-    }
+
   }
 
   /* #region  crud */
 
   loadObjects() {
     try {
-      this.goodsPickingService.getObjectListByDate(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+      this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
+        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
+        this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
+        await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
         throw error;
       })
@@ -74,16 +74,20 @@ export class PickingPage implements OnInit, ViewWillEnter {
     }
   }
 
+  getObjects(date: Date) {
+    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
+  }
+
   /* #endregion */
 
-  /* #region  add goods picking */
+  /* #region add goods picking */
 
   async addObject() {
     try {
-      if (this.goodsPickingService.hasWarehouseAgent()) {
-        this.navController.navigateForward('/transactions/picking/picking-sales-order');
+      if (this.objectService.hasWarehouseAgent()) {
+        this.navController.navigateForward("/transactions/picking/picking-header");
       } else {
-        this.toastService.presentToast('Warehouse Agent not set.', '', 'top', 'danger', 1000);
+        this.toastService.presentToast("", "Warehouse Agent not set.", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -94,20 +98,20 @@ export class PickingPage implements OnInit, ViewWillEnter {
   async selectAction() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Choose an action',
-        cssClass: 'custom-action-sheet',
+        header: "Choose an action",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Add Picking',
-            icon: 'document-outline',
+            text: "Add Picking",
+            icon: "document-outline",
             handler: () => {
               this.addObject();
             }
           },
           {
-            text: 'Cancel',
-            icon: 'close',
-            role: 'cancel'
+            text: "Cancel",
+            icon: "close",
+            role: "cancel"
           }]
       });
       await actionSheet.present();
@@ -147,7 +151,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
           objectId: objectId
         }
       }
-      this.navController.navigateForward('/transactions/picking/picking-detail', navigationExtras);
+      this.navController.navigateForward("/transactions/picking/picking-detail", navigationExtras);
     } catch (e) {
       console.error(e);
     }

@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { ConsignmentSalesRoot } from '../../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../../services/consignment-sales.service';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-consignment-sales-detail',
@@ -20,8 +21,11 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   constructor(
     private route: ActivatedRoute,
     private authService: AuthService,
-    private consignmentSalesService: ConsignmentSalesService,
-    private navController: NavController
+    public objectService: ConsignmentSalesService,
+    private navController: NavController,
+    private commonService: CommonService,
+    private alertController: AlertController,
+    private toastService: ToastService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -36,10 +40,6 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   ngOnInit() {
     this.loadModuleControl();
-    this.loadMasterList();
-    if (this.objectId) {
-      this.loadObject();
-    }
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -59,31 +59,17 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
   }
 
-  customerMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  salesAgentMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.consignmentSalesService.getMasterList().subscribe(response => {
-        this.customerMasterList = response.filter(x => x.objectName == 'Customer').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   loadObject() {
     try {
-      this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        if (this.object.header.isHomeCurrency) {
+          this.object.header.maxPrecision = this.precisionSales.localMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.localMax
+        } else {
+          this.object.header.maxPrecision = this.precisionSales.foreignMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
+        }
       }, error => {
         throw error;
       })
@@ -100,5 +86,99 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
   }
+
+  async completeObjectAlert() {
+    const alert = await this.alertController.create({
+      header: "Are you sure to proceed?",
+      cssClass: "custom-action-sheet",
+      buttons: [
+        {
+          text: "Yes",
+          role: "confirm",
+          cssClass: "success",
+          handler: async () => {
+            this.completeObject();
+          },
+        },
+        {
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel",
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  completeObject() {
+    this.objectService.completeObject(this.objectId).subscribe(response => {
+      if (response.status === 204) {
+        this.toastService.presentToast("", "Consignment Sales updated", "top", "success", 1000);
+        this.loadObject();
+      }
+    }, error => {
+      console.error(error);
+    })
+  }
+
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region download pdf */
+
+  async presentAlertViewPdf() {
+    try {
+      const alert = await this.alertController.create({
+        header: 'Download PDF?',
+        message: '',
+        buttons: [
+          {
+            text: 'OK',
+            cssClass: 'success',
+            role: 'confirm',
+            handler: async () => {
+              await this.downloadPdf();
+            },
+          },
+          {
+            cssClass: 'cancel',
+            text: 'Cancel',
+            role: 'cancel'
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async downloadPdf() {
+    try {
+      this.objectService.downloadPdf("SMCS001", "pdf", this.object.header.consignmentSalesId, "Mobile Ticketing").subscribe(response => {
+        let filename = this.object.header.consignmentSalesNum + ".pdf";
+        this.commonService.commonDownloadPdf(response, filename);
+      }, error => {
+        console.log(error);
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
 
 }

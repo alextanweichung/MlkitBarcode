@@ -1,6 +1,6 @@
-export interface GoodsPickingList {
-  pickingId: number
-  pickingNum: string
+export interface MultiPickingList {
+  multiPickingId: number
+  multiPickingNum: string
   trxDate: string
   locationCode: string
   locationDescription: string
@@ -10,63 +10,137 @@ export interface GoodsPickingList {
   createdById: number
 }
 
-export interface GoodsPickingRoot {
-  header: GoodsPickingHeader
-  details?: GoodsPickingLine[]
+export interface MultiPickingRoot {
+  header: MultiPickingHeader
+  details: MultiPickingCarton[]
+  outstandingPickList: MultiPickingOutstandingPickList[]
+  attachmentFile?: any[]
+  comment?: any[]
+  otp?: any
 }
 
-export interface GoodsPickingHeader {
-  pickingId: number
-  pickingNum: string
-  trxDate: Date
-  locationId: number
-  toLocationId: number
-  customerId: number
+export interface MultiPickingHeader {
+  multiPickingId: number
+  multiPickingNum: string
+  trxDate: string
+  groupType: string
   warehouseAgentId: number
-  pickingUDField1?: string
-  pickingUDField2?: string
-  pickingUDField3?: string
-  pickingUDOption1?: number
-  pickingUDOption2?: number
-  pickingUDOption3?: number
-  deactivated?: boolean,
-  workFlowTransactionId?: number
-  createdBy?: string
-  createdAt?: Date
-  masterUDGroup1?: number
-  masterUDGroup2?: number
-  masterUDGroup3?: number
-  businessModelType: string
-  sourceType: string
+  externalDocNum: any
+  masterUDGroup1: any
+  masterUDGroup2: any
+  masterUDGroup3: any
+  locationId: number
+  workFlowTransactionId: any
+  customerId: number
   typeCode: string
+  trxDateTime: string
+  printCount: number
+  toLocationId: number
+  businessModelType: string
   isWithSo: boolean
-  remark: string
+  sourceType: string
+  remark: any
+  totalCarton: number
+  childId: any
+  childNum: any
+  sequence: number
+  createdById: number
+  createdBy: string
+  createdAt: string
+  modifiedById: any
+  modifiedBy: any
+  modifiedAt: any
+  deactivated: boolean
 }
 
-export interface GoodsPickingLine {
-  pickingLineId?: number
-  pickingId?: number
-  salesOrderId: number
+export interface MultiPickingCarton {
+  cartonNum: number
+  pickList: CurrentPickList[]
+}
+
+export interface CurrentPickList {
+  multiPickingId: number
+  multiPickingLineId: number
   itemId: number
-  itemVariationXId?: number
-  itemVariationYId?: number
+  itemCode: string
+  itemVariationXId: any
+  itemVariationYId: any
+  itemVariationXDescription: any
+  itemVariationYDescription: any
+  itemUomId: number
   itemSku: string
   itemBarcode: string
-  itemUomId?: number
-  qtyRequest: number
-  soRowIndex?: number
+  description: string
   sequence: number
-  lineUDDate?: Date
-  masterUDGroup1?: number
-  masterUDGroup2?: number
-  masterUDGroup3?: number
+  qtyPicked: number
+  lineUDDate: any
+  masterUDGroup1: any
+  masterUDGroup2: any
+  masterUDGroup3: any
   locationId: number
-  deactivated?: boolean
+  cartonNum: number
+  deactivated: boolean
+  variations: PickingLineVariation[]
 }
 
-export interface PickingSummary {
-  pickingNum: string
-  customerId: number
+export interface MultiPickingSalesOrder {
+  salesOrderId: number
+  salesOrderNum: string
+  trxDate: string
   locationId: number
-  trxDate: Date
+  locationDesc: string
+  customerId: number
+  customerDesc: string
+  toLocationId: any
+  toLocationDesc: any
+  currencyId: number
+  currencyDesc: string
+  businessModelType: string
+  line: MultiPickingOutstandingPickList[]
+}
+
+export interface PickingLineVariation {
+  multiPickingLineDetailsId?: number
+  multiPickingLineId?: number
+  multiPickingId?: number
+  salesOrderId: number
+  salesOrderLineId: number
+  salesOrderVariationId: number
+  qtyPicked: number
+  sequence?: number
+}
+
+export interface MultiPickingOutstandingPickList {
+  multiPickingOutstandingId?: number
+  multiPickingId?: number
+  itemId: number
+  variationTypeCode: string
+  itemVariationXId: any
+  itemVariationYId: any
+  itemCode: string
+  itemSku: string
+  description: any
+  itemVariationXDescription: any
+  itemVariationYDescription: any
+  rack?: string
+  subRack?: string
+  salesOrderId?: number
+  salesOrderNum?: string
+  salesOrderLineId?: number
+  salesOrderVariationId?: number
+  qtyRequest: number
+  qtyCommit?: number
+  qtyPicked: number
+  qtyCurrent: number
+  sequence?: number
+}
+
+export interface MultiPickingSORequest {
+  salesOrderNums: string[]
+  warehouseAgentId: number
+}
+
+export interface MultiPickingObject {
+    outstandingPickList: MultiPickingOutstandingPickList[],
+    pickingCarton: MultiPickingCarton[];
 }

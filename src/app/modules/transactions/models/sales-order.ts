@@ -5,21 +5,19 @@ export interface SalesOrderList {
   salesOrderId: number
   salesOrderNum: string
   trxDate: string
+  customerCode: string
   customerName: string
   salesAgentName: string
   countryDescription: string
   currencyCode: string
   grandTotal: number
   qty: number
+  otherAmountCount: number
   deactivated: boolean
   createdById: number
-}
 
-export interface SalesOrderSummary {
-  salesOrderNum: string
-  customerName: string
-  totalQuantity: number
-  totalAmount: number
+  isDraft: boolean
+  draftTransactionId: number
 }
 
 export interface SalesOrderRoot {
@@ -28,6 +26,8 @@ export interface SalesOrderRoot {
   barcodeTag?: any
   otp?: any
   approvalHistory?: ApprovalHistory[]
+  isWorkFlowDone?: boolean
+  otherAmount?: OtherAmount[]
 }
 
 export interface SalesOrderHeader {
@@ -37,30 +37,32 @@ export interface SalesOrderHeader {
   trxDateTime: string
   typeCode: string
   sourceType: string
+  status: string
   customerId: number
   businessModelType: string
   salesAgentId: number
-  shipAddress: any
-  shipPostCode: any
-  shipPhone: any
-  shipFax: any
-  shipEmail: any
+  shipAddress: string
+  shipPostCode: string
+  shipPhone: string
+  shipFax: string
+  shipEmail: string
+  shipStateId: number
   shipAreaId: number
   shipMethodId: number
-  attention: any
+  attention: string
   locationId: number
-  toLocationId: any
+  toLocationId: number
   termPeriodId: number
   workFlowTransactionId: number
   countryId: number
   currencyId: number
   currencyRate: number
   salesOrderUDField1: any
-  salesOrderUDField2: any
-  salesOrderUDField3: any
-  salesOrderUDOption1: any
-  salesOrderUDOption2: any
-  salesOrderUDOption3: any
+  salesOrderUDField2: string
+  salesOrderUDField3: string
+  salesOrderUDOption1: number
+  salesOrderUDOption2: number
+  salesOrderUDOption3: number
   totalGrossAmt: number
   totalDiscAmt: number
   totalTaxAmt: number
@@ -72,25 +74,48 @@ export interface SalesOrderHeader {
   localGrandTotal: number
   localGrandTotalExTax: number
   printCount: number
-  externalDocNum: any
-  masterUDGroup1: any
-  masterUDGroup2: any
-  masterUDGroup3: any
+  externalDocNum: string
+  masterUDGroup1: string
+  masterUDGroup2: string
+  masterUDGroup3: string
   remark: string
-  isOpeningBalance: boolean
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean
+  isClosed: boolean
+  isOpeningBalance: boolean
+  isPricingApproval: boolean
+  isTrackerComplete: boolean
+  trackerCompleteDate: Date
+  closeRemark: string
+  isPriority: boolean
+  isPriorityDate: Date
+  deliveryDate: Date
+  orderLifeCycle: string
+
   /* #region  special to pass in precision */
   maxPrecision: number
   maxPrecisionTax: number
   /* #endregion */
+
   sequence: number
   createdById: number
   createdBy: string
   createdAt: string
-  modifiedById: any
-  modifiedBy: any
-  modifiedAt: any
+  modifiedById: number
+  modifiedBy: string
+  modifiedAt: Date
   deactivated: boolean
+}
+
+export interface OtherAmount {
+  lineId: number
+  headerId: number
+  amountCode: string
+  amountDescription: string
+  amountExpression: string
+  currentSubtotal: number
+  totalAmount: number
+  cumulativeAmount: number
+  sequence: number
 }

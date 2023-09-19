@@ -1,9 +1,14 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { MasterListDetails } from '../../models/master-list-details';
 import { ModuleControl } from '../../models/module-control';
+import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
+import { CommonService } from '../../services/common.service';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -12,15 +17,22 @@ import { TransactionDetail } from '../../models/transaction-detail';
 })
 export class BarcodeScanInputPage implements OnInit {
 
+  @Input() itemVariationXMasterList: MasterListDetails[] = [];
+  @Input() itemVariationYMasterList: MasterListDetails[] = [];
+
   moduleControl: ModuleControl[];
   systemWideEAN13IgnoreCheckDigit: boolean = false;
   systemWideScanningMethod: string;
+  systemWideBlockConvertedCode: boolean = false;
+
+  selectedScanningMethod: string = "B";
 
   @Output() onItemAdd = new EventEmitter<any>();
 
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
+    private commonService: CommonService,
     private toastService: ToastService
   ) { }
 
@@ -28,31 +40,46 @@ export class BarcodeScanInputPage implements OnInit {
     this.loadModuleControl();
   }
 
-  ionViewDidEnter(): void {
-    this.barcodeInput.nativeElement.focus();
+  showKeyboard(event) {
+    event.preventDefault();
+    this.setFocus();
+    setTimeout(async () => {
+      await Keyboard.show();
+    }, 100);
   }
 
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
+
       let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
       if (ignoreCheckdigit != undefined) {
         this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
       }
+
       let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
       if (scanningMethod != undefined) {
         this.systemWideScanningMethod = scanningMethod.ctrlValue;
       }
+
+      let blockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")
+      if (blockConvertedCode) {
+        this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
+      } else {
+        this.systemWideBlockConvertedCode = false;
+      }
+
     }, error => {
       console.log(error);
     })
   }
 
-  handleKeyDown(e: any, key: string) {
+  handleBarcodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
       let barcode = this.manipulateBarcodeCheckDigit(key);
       this.validateBarcode(barcode);
       e.preventDefault();
+      this.setFocus();
     }
   }
 
@@ -67,22 +94,24 @@ export class BarcodeScanInputPage implements OnInit {
     return itemBarcode;
   }
 
-  itemSearchValue: string;
+  /* #region scan */
+
+  barcodeSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
   async validateBarcode(barcode: string) {
     if (barcode) {
-      this.itemSearchValue = '';
+      this.barcodeSearchValue = '';
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-        let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+        let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
         if (found_barcode) {
-          let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+          let found_item_master = this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
           let outputData: TransactionDetail = {
             itemId: found_item_master.id,
             itemCode: found_item_master.code,
             description: found_item_master.itemDesc,
             variationTypeCode: found_item_master.varCd,
             discountGroupCode: found_item_master.discCd,
-            discountExpression: found_item_master.discPct+'%',
+            discountExpression: found_item_master.discPct + '%',
             taxId: found_item_master.taxId,
             taxCode: found_item_master.taxCd,
             taxPct: found_item_master.taxPct,
@@ -91,8 +120,11 @@ export class BarcodeScanInputPage implements OnInit {
               itemId: found_item_master.id,
               unitPrice: found_item_master.price,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: found_item_master.discPct+'%',
-              discountPercent: found_item_master.discPct
+              discountExpression: found_item_master.discPct + '%',
+              discountPercent: found_item_master.discPct,
+              discountGroupId: null,
+              unitPriceMin: null,
+              currencyId: null
             },
             itemVariationXId: found_barcode.xId,
             itemVariationYId: found_barcode.yId,
@@ -103,15 +135,270 @@ export class BarcodeScanInputPage implements OnInit {
             itemCategoryId: found_item_master.catId,
             itemBarcodeTagId: found_barcode.id
           }
-          this.onItemAdd.emit(outputData);
+          if (!this.validateNewItemConversion(found_item_master)) {
+            this.onItemAdd.emit([outputData]);
+          }
         } else {
-          this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+          this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
         }
       } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
     }
+  }
+
+  handleItemCodeKeyDown(e: any, key: string) {
+    if (e.keyCode === 13) {
+      this.validateItem(key);
+      e.preventDefault();
+      this.setFocus();
+    }
+  }
+
+  itemSearchValue: string;
+  availableItemmmm: TransactionDetail[] = [];
+  availableVariations: TransactionDetail[] = [];
+  @ViewChild('itemInput', { static: false }) itemInput: ElementRef;
+  validateItem(searchValue: string) {
+    if (searchValue) {
+      this.itemSearchValue = '';
+      this.availableItemmmm = [];
+      this.availableVariations = [];
+      this.availableVariationsByItemId = [];
+      let found_item_master: PDItemMaster[] = [];
+      let found_item_barcode: PDItemBarcode[] = [];
+      if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
+        let found = this.configService.item_Masters.filter(r => r.code.length > 0).filter(r => r.code.toUpperCase().includes(searchValue.toUpperCase())); // if found by itemCode
+        if (found && found.length > 0) {
+          found_item_master = this.configService.item_Masters.filter(r => found.flatMap(rr => rr.id).includes(r.id));
+        } else {
+          let found2 = this.configService.item_Barcodes.filter(r => r.sku.length > 0).filter(r => r.sku.toUpperCase().includes(searchValue.toUpperCase())); // if found by itemSku
+          if (found2) {
+            found_item_master = this.configService.item_Masters.filter(r => found2.flatMap(rr => rr.id).includes(r.id));
+          }
+        }
+        if (found_item_master && found_item_master.length > 0) {
+          found_item_barcode = this.configService.item_Barcodes.filter(r => found_item_master.flatMap(rr => rr.id).includes(r.itemId));
+
+          found_item_master.forEach(r => {
+            if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
+              let t = found_item_barcode.find(rr => rr.itemId === r.id);
+              let outputData: TransactionDetail = {
+                itemId: r.id,
+                itemCode: r.code,
+                description: r.itemDesc,
+                variationTypeCode: r.varCd,
+                discountGroupCode: r.discCd,
+                discountExpression: r.discPct + '%',
+                taxId: r.taxId,
+                taxCode: r.taxCd,
+                taxPct: r.taxPct,
+                qtyRequest: null,
+                itemPricing: {
+                  itemId: r.id,
+                  unitPrice: r.price,
+                  discountGroupCode: r.discCd,
+                  discountExpression: r.discPct + '%',
+                  discountPercent: r.discPct,
+                  discountGroupId: null,
+                  unitPriceMin: null,
+                  currencyId: null
+                },
+                // itemVariationXId: r.xId,
+                // itemVariationYId: r.yId,
+                itemSku: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.sku : null,
+                itemBarcode: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.barcode : null,
+                itemBrandId: r.brandId,
+                itemGroupId: r.groupId,
+                itemCategoryId: r.catId
+              }
+              this.availableItemmmm.push(outputData);
+            }
+          })
+        }
+
+        if (found_item_barcode && found_item_barcode.length > 0) {
+          found_item_barcode.forEach(async r => {
+            if (this.availableVariations.findIndex(rr => rr.itemSku === r.sku) < 0) {
+              let outputData: TransactionDetail = {
+                itemId: r.itemId,
+                itemCode: found_item_master.find(rr => rr.id === r.itemId)?.code,
+                description: found_item_master.find(rr => rr.id === r.itemId)?.itemDesc,
+                variationTypeCode: found_item_master.find(rr => rr.id === r.itemId)?.varCd,
+                discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
+                discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + '%',
+                taxId: found_item_master.find(rr => rr.id === r.itemId)?.taxId,
+                taxCode: found_item_master.find(rr => rr.id === r.itemId)?.taxCd,
+                taxPct: found_item_master.find(rr => rr.id === r.itemId)?.taxPct,
+                qtyRequest: null,
+                itemPricing: {
+                  itemId: found_item_master.find(rr => rr.id === r.itemId)?.id,
+                  unitPrice: found_item_master.find(rr => rr.id === r.itemId)?.price,
+                  discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
+                  discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + '%',
+                  discountPercent: found_item_master.find(rr => rr.id === r.itemId)?.discPct,
+                  discountGroupId: null,
+                  unitPriceMin: null,
+                  currencyId: null
+                },
+                itemVariationXId: r.xId,
+                itemVariationYId: r.yId,
+                itemSku: r.sku,
+                itemBarcode: r.barcode,
+                itemBrandId: found_item_master.find(rr => rr.id === r.itemId)?.brandId,
+                itemGroupId: found_item_master.find(rr => rr.id === r.itemId)?.groupId,
+                itemCategoryId: found_item_master.find(rr => rr.id === r.itemId)?.catId,
+                itemBarcodeTagId: r.id
+              }
+              this.availableVariations.push(outputData);
+            }
+          })
+        } else {
+          this.toastService.presentToast('No Item Found', '', 'top', 'danger', 1000);
+        }
+        // if (this.availableItems.length > 0) {
+        //   if (this.availableItems.length === 1) {
+        //     if (!this.validateNewItemConversion(found_item_master)) {
+        //       this.onItemAdd.emit(this.availableItems);
+        //     }
+        //   } else {
+        //     if (!this.validateNewItemConversion(found_item_master)) {
+        if (found_item_master && found_item_master.length === 1) {
+          this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id);
+          this.showVariationModal();
+        } else {
+          this.showItemModal();
+        }
+        //     }
+        //   }
+        // } else {
+        //   this.toastService.presentToast('Item Not Found', '', 'top', 'danger', 1000);
+        // }
+      } else {
+        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
+      }
+    }
+  }
+
+  /* #endregion */
+
+  /* #region modal for user to select item (if more than 1 item found when they search) */
+
+  itemModalOpen: boolean = false;
+  showItemModal() {
+    this.itemModalOpen = true;
+  }
+
+  hideItemModel() {
+    this.itemModalOpen = false;
+  }
+
+  availableVariationsByItemId: TransactionDetail[] = [];
+  showVariations(item: TransactionDetail) {
+    this.availableVariationsByItemId = [];
+    if (item.variationTypeCode === "0") {
+      if (item) {
+        let found = this.configService.item_Masters.find(r => r.id === item.itemId);
+        if (found) {
+          if (!this.validateNewItemConversion(found)) {
+            this.onItemAdd.emit([item]);
+          }
+        }
+        else {
+          this.onItemAdd.emit([item]);
+        }
+      } else {
+        this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
+      }
+      this.hideItemModel();
+    }
+    else {
+      this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === item.itemId);
+      this.showVariationModal();
+    }
+  }
+
+  /* #endregion */
+
+  /* #region modal for user to select item variation (final layer) */
+
+  variationModalOpen: boolean = false;
+  showVariationModal() {
+    this.variationModalOpen = true;
+  }
+
+  hideVariationModel() {
+    this.variationModalOpen = false;
+  }
+
+  addVariations() {
+    let found = this.availableVariationsByItemId.filter(r => r.isSelected)
+    if (found.length > 0) {
+      let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]);
+      if (found_item_master) {
+        if (!this.validateNewItemConversion(found_item_master[0])) {
+          this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
+        }
+      }
+      else {
+        this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
+      }
+    }
+    else {
+      this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
+    }
+    this.hideItemModel();
+    this.hideVariationModel();
+  }
+
+  /* #endregion */
+
+  /* #region focus */
+
+  scanningMethodChanged() {
+    setTimeout(() => {
+      this.setFocus();
+    }, 100);
+  }
+
+  setFocus() {
+    if (this.selectedScanningMethod === "B") {
+      this.focusBarcodeSearch();
+    } else {
+      this.focusItemSearch();
+    }
+  }
+
+  focusBarcodeSearch() {
     this.barcodeInput.nativeElement.focus();
   }
+
+  focusItemSearch() {
+    this.itemInput.nativeElement.focus();
+  }
+
+  /* #endregion */
+
+  /* #region validate new item id */
+
+  validateNewItemConversion(found: PDItemMaster) {
+    if (found.newId && found.newDate && this.commonService.convertUtcDate(found.newDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
+      let newItemCode = this.configService.item_Masters.find(x => x.id == found.newId);
+      if (newItemCode) {
+        this.toastService.presentToast("Converted Code Detected", `Item ${found.code} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newDate), 'dd/MM/yyyy')}`, 'top', 'warning', 1750);
+        if (this.systemWideBlockConvertedCode) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  /* #endregion */
 
 }

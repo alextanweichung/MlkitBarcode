@@ -13,34 +13,34 @@
     </ion-toolbar>
   </ion-header>  
   <div class="p-2">
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Information</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full" *ngIf="stockCountRoot">
+    <ion-list class="list-custom" lines="full" *ngIf="objectRoot">
       <ion-item>
         <ion-label>
           <p>Doc Number</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.inventoryCountNum}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectRoot.header.inventoryCountNum}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Trx Date</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectRoot.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <p>Location</p>
         </ion-label>
-        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{stockCountRoot.header.locationId|idMapping:locationMasterList}}"></ion-input>
+        <ion-input readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{objectRoot.header.locationId|idMapping:objectService.locationMasterList}}"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-list-header class="ion-list-header-small">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" *ngFor="let item of stockCountRoot.details" class="no-ripple ion-no-padding">
+      <ion-item button detail="false" *ngFor="let item of objectRoot.details" class="no-ripple ion-no-padding">
         <ion-grid class="p-2 ion-no-padding">
           <ion-row>
             <ion-col>
@@ -51,8 +51,8 @@
             <ion-col>
               <div>
                 {{item.itemCode}}
-                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size: x-small;" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
               </div>
             </ion-col>
           </ion-row>

@@ -22,6 +22,7 @@ export interface TransactionProcessingCount {
   pending: number;
   completed: number;
   total: number;
+  isAllowApprove: boolean
 }
 
 export interface BulkConfirmReverse {

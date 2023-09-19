@@ -19,8 +19,10 @@ export class DatabaseService {
    * @returns any type you want to receive from the callback function.
    */
   async executeQuery<T>(callback: SQLiteDBConnectionCallback<T>, databaseName: string): Promise<T> {
+    console.log(`databaseName: ${JSON.stringify(databaseName)}`);
     try {
       let isConnection = await this.sqlite.isConnection(databaseName);
+      console.log(`isConnection: ${JSON.stringify(isConnection)}`);
       if (isConnection.result) {
         let db = await this.sqlite.retrieveConnection(databaseName);
         return await callback(db);

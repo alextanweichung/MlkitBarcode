@@ -1,44 +1,71 @@
-import { Component, OnInit } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { format } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { DebtorOutstanding } from '../../../models/debtor-outstanding';
+import { DebtorOutstanding, DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { AlertController, IonPopover, ViewWillEnter } from '@ionic/angular';
+import { CreditInfoDetails } from 'src/app/shared/models/credit-info';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { SelectionType } from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'app-debtor-latest-outstanding',
   templateUrl: './debtor-latest-outstanding.page.html',
   styleUrls: ['./debtor-latest-outstanding.page.scss']
 })
-export class DebtorLatestOutstandingPage implements OnInit {
+export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
 
   customers: Customer[] = [];
   customerSearchDropdownList: SearchDropdownList[] = [];
   objects: DebtorOutstanding[] = [];
+  isOverdueOnly: boolean = false;
+
+  data: any;
+  columns: any;
 
   constructor(
-    private reportService: ReportsService,
+    private authService: AuthService,
+    private objectService: ReportsService,
     private toastService: ToastService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private alertController: AlertController,
   ) { }
+
+  ionViewWillEnter(): void {
+    if (!this.trxDate) {
+      this.trxDate = this.commonService.getTodayDate();
+    }
+  }
 
   ngOnInit() {
     this.loadCustomers();
+    this.columns = [
+      { prop: 'customerName', name: 'Customer', draggable: false },
+      { prop: 'salesAgentName', name: 'SA', draggable: false },
+      { prop: 'currencyCode', name: 'Currency', draggable: false },
+      { prop: 'balance', name: 'Outstanding', draggable: false }
+    ]
+    this.creditCols = [
+      { prop: 'trxDate', name: 'Trx Date', draggable: false },
+      { prop: 'overdueDay', name: 'O/D Day', draggable: false },
+      { prop: 'docNum', name: 'Doc. Number', draggable: false },
+      { prop: 'amount', name: 'Amount', draggable: false }
+    ]
   }
 
   loadCustomers() {
-    this.reportService.getCustomers().subscribe(async response => {
+    this.objectService.getCustomers().subscribe(async response => {
       this.customers = response;
-      this.customers = this.customers.filter(r => r.businessModelType === 'T');
       await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
       this.customers.forEach(r => {
         this.customerSearchDropdownList.push({
           id: r.customerId,
           code: r.customerCode,
+          oldCode: r.oldCustomerCode,
           description: r.name
         })
       })
@@ -48,48 +75,173 @@ export class DebtorLatestOutstandingPage implements OnInit {
   }
 
   loadDebtorReport() {
-    if (this.customerId && this.trxDate) {
-      this.reportService.getDebtorOutstanding(this.customerId, format(this.trxDate, 'yyyy-MM-dd')).subscribe(response => {
-        this.objects = response;
-        this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 1000);
-      }, error => {
-        console.log(error);
-      })
-    } else {
-      this.toastService.presentToast('Invalid Search', '', 'top', 'danger', 1000);
+    this.selected = [];
+    let obj: DebtorOutstandingRequest = {
+      customerId: this.customerIds ?? [],
+      trxDate: format(this.trxDate, "yyyy-MM-dd"),
+      isOverdueOnly: this.isOverdueOnly
     }
+    this.objectService.getDebtorOutstanding(obj).subscribe(response => {
+      this.objects = response;
+      this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+    }, error => {
+      console.log(error);
+    })
   }
 
-  customerId: number;
-  onCustomerSelected(event) {
+  customerIds: number[];
+  onCustomerSelected(event: any[]) {
     if (event && event !== undefined) {
-      this.customerId = event.id;
+      this.customerIds = event.flatMap(r => r.id);
     }
   }
 
-  trxDate: Date;
+  trxDate: Date = null;
   onDateSelected(event) {
     if (event) {
       this.trxDate = event;
     }
   }
 
-  async downloadPdf() {
-    let paramModel: ReportParameterModel = {
-      appCode: 'FAAR005',
-      format: 'pdf',
-      documentIds: [],
-      reportName: 'Debtor Statement',
-      customReportParam: {
-        parameter1: this.customerId,
-        statementDate: this.trxDate
-      }
+  async presentAlertViewPdf(object: DebtorOutstanding) {
+    try {
+      const alert = await this.alertController.create({
+        header: "Download PDF?",
+        message: "",
+        buttons: [
+          {
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
+            handler: async () => {
+              await this.downloadPdf([object]);
+            },
+          },
+          {
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
     }
-    this.reportService.getPdf(paramModel).subscribe(async response => {
-      await this.commonService.commonDownloadPdf(response, paramModel.reportName + "." + paramModel.format);
+  }
+
+  async downloadPdf(object: DebtorOutstanding[]) {
+    if (object && object.length > 0) {
+      let paramModel: ReportParameterModel = {
+        appCode: "FAMS002",
+        format: "pdf",
+        documentIds: object.flatMap(r => r.customerId),
+        reportName: "Debtor Statement",
+        customReportParam: {
+          parameter1: object.flatMap(r => r.customerId),
+          statementDate: this.trxDate
+        }
+      }
+      let timestart = new Date();
+      await this.objectService.getPdf(paramModel).subscribe(async response => {
+        let timeend = new Date();
+        if (object && object.length === 1) {
+          await this.commonService.commonDownloadPdf(response, object[0].customerName + "." + paramModel.format);
+        } else {
+          await this.commonService.commonDownloadPdf(response, "Debtor_Statements." + paramModel.format);
+        }
+        this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), "top", "success", 1000);
+      }, error => {
+        console.log(error);
+      })
+    } else {
+      this.toastService.presentToast("Invalid Key Id", "Please contact adminstrator.", "top", "danger", 1000);
+    }
+  }
+
+
+  loadCreditInfo(customerId: number) {
+    this.objectService.getCreditInfo(customerId).subscribe(response => {
+      this.displayDetails(response.outstanding, "Outstanding Amount");
     }, error => {
-      console.log(error);
+      console.error(error);
     })
   }
+
+  displayModal: boolean = false;
+  creditInfoType: string = "";
+  tableValue: CreditInfoDetails[] = [];
+  creditCols: any[] = [];
+  displayDetails(tableValue: CreditInfoDetails[], infoType: string) {
+    try {
+      this.displayModal = true;
+      this.creditInfoType = infoType;
+      this.tableValue = [];
+      this.tableValue = [...tableValue];
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  hideItemModal() {
+    this.displayModal = false;
+  }
+  
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+  
+  /* #region select all */
+
+  SelectionType = SelectionType;
+  selected = [];
+  onSelect(event) {
+    this.selected.splice(0, this.selected.length);
+    this.selected.push(...event.selected);
+  }
+
+  onActivate(event) {
+    
+  }
+
+  async printAllAlert() {
+    try {
+      const alert = await this.alertController.create({
+        header: `Download ${this.selected.length} PDF?`,
+        message: "",
+        buttons: [
+          {
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
+            handler: async () => {
+              await this.downloadPdf(this.selected);
+            },
+          },
+          {
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
 
 }

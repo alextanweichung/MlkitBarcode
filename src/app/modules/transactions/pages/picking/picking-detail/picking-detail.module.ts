@@ -8,7 +8,6 @@ import { PickingDetailPageRoutingModule } from './picking-detail-routing.module'
 
 import { PickingDetailPage } from './picking-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
-import { ItemViewListFlatPageModule } from 'src/app/shared/pages/item-view-list-flat/item-view-list-flat.module';
 
 @NgModule({
   imports: [
@@ -16,8 +15,7 @@ import { ItemViewListFlatPageModule } from 'src/app/shared/pages/item-view-list-
     FormsModule,
     IonicModule,
     PickingDetailPageRoutingModule,
-    IdMappingModule,
-    ItemViewListFlatPageModule
+    IdMappingModule
   ],
   declarations: [PickingDetailPage]
 })

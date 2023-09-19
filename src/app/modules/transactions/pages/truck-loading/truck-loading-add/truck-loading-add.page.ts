@@ -21,7 +21,7 @@ export class TruckLoadingAddPage implements OnInit {
   lineObjects: TruckLoadingDetail[] = [];
 
   constructor(
-    private objectService: TruckLoadingService,
+    public objectService: TruckLoadingService,
     private formBuilder: FormBuilder,
     private commonService: CommonService,
     private toastService: ToastService,
@@ -35,46 +35,14 @@ export class TruckLoadingAddPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMasterList();
-    this.loadStaticLov();
-  }
-
-  shipMethodMasterList: MasterListDetails[] = [];
-  vendorMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.shipMethodMasterList = response.filter(x => x.objectName == 'ShipMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.vendorMasterList = response.filter(x => x.objectName == 'Vendor').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  truckLoadingType: MasterListDetails[] = [];
-  loadStaticLov() {
-    try {
-      this.objectService.getStaticLov().subscribe(response => {
-        this.truckLoadingType = response.filter(x => x.objectName == 'TruckLoadingType').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        if (this.truckLoadingType.findIndex(r => r.isPrimary) > -1) {
-          this.objectForm.patchValue({ typeCode: this.truckLoadingType.find(r => r.isPrimary).code });
-        }
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
+    
   }
 
   newObjectForm() {
     this.objectForm = this.formBuilder.group({
       truckLoadingId: 0,
       truckLoadingNum: [null],
-      trxDate: [new Date],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
       typeCode: [null, [Validators.required]],
       vendorId: [null, [Validators.required]],
       plateNumber: [null],
@@ -217,6 +185,7 @@ export class TruckLoadingAddPage implements OnInit {
     try {
       const actionSheet = await this.actionSheetController.create({
         header: 'Are you sure to cancel?',
+        subHeader: 'Changes made will be discard.',
         cssClass: 'custom-action-sheet',
         buttons: [
           {

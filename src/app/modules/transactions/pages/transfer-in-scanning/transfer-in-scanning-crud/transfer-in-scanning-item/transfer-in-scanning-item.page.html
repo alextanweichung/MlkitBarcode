@@ -1,0 +1,127 @@
+<ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
+  <ion-toolbar>
+    <ion-title>Details</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-label class="label-title">Details</ion-label>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="p-2">
+
+    <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
+      <ion-item button [detail]="false" class="ion-no-padding no-ripple">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> Doc. Num.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{objectService.object.interTransferNum}}
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> Doc. Date</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{objectService.object.trxDate|date:"dd/MM/yyyy"}}
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> From Location</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{objectService.object.locationId|idMapping:objectService.locationMasterList}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+
+      <ion-item button [detail]="false" class="ion-no-padding no-ripple pl-2">
+        <ion-label position="stacked" class="font-bold">Remark</ion-label>
+        <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" [(ngModel)]="objectService.object.remark"></ion-textarea>
+      </ion-item>
+
+    </ion-list>
+      
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Line</ion-label>
+    </ion-list-header>
+
+    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+    <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
+
+    <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col size="8"class="ion-flex ion-margin-auto">
+              <div class="ion-flex my-auto font-bold">Item</div>
+            </ion-col>
+            <ion-col size="4" class="ion-flex ion-margin-auto justify-content-center">
+              <div class="ion-flex my-auto font-bold">Quantity</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+
+      <ion-item-sliding #slidingItem *ngFor="let l of getInsertedLine() let i = index">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="highlight(qtyInput)">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col size="8">
+                <ion-grid class="ion-no-padding">
+                  <ion-row>
+                    <ion-col class="ion-flex ion-margin-auto">
+                      <div class="font-bold">{{l.itemCode}}</div>
+                      <div class="ion-flex">
+                        <span class="badge-green ion-text-wrap ion-flex my-auto px-1" *ngIf="l.xDesc"> {{l.xDesc}}</span>
+                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="l.yDesc"> {{l.yDesc}}</span>
+                      </div>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="ion-flex ion-margin-auto">
+                      <div class="ion-flex my-auto">{{l.itemDesc}}</div>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="ion-flex ion-margin-auto">
+                      <div class="ion-flex my-auto">{{l.barcode}}</div>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-col>
+              <ion-col size="4" class="ion-flex ion-margin-auto justify-content-center">
+                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="l.lineQty" (ionFocus)="highlight(qtyInput)" (ionBlur)="qtyOnBlur(i,qtyInput.value)" placeholder="0"></ion-input>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+        <ion-item-options>
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i, l);"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+
+    </ion-list>
+
+  </div>
+
+</ion-content>
+
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
+    Insert
+  </ion-button>
+</ion-footer>
+<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>

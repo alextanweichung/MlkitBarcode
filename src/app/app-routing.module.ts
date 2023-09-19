@@ -24,6 +24,11 @@ const routes: Routes = [
     loadChildren: () => import('./modules/public/signin/signin.module').then(m => m.SigninPageModule),
     // canActivate: [PublicGuard] // Prevent for signed in users
   },
+  {
+    path: 'forget-password',
+    loadChildren: () => import('./modules/public/forget-password/forget-password.module').then( m => m.ForgetPasswordPageModule)
+  },
+
 
 
 
@@ -60,6 +65,24 @@ const routes: Routes = [
     path: 'managements/sales-order-approvals',
     loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
   },
+  // management-b2bo
+  {
+    path: 'managements/b2bo-reviews',
+    loadChildren: () => import('./modules/managements/pages/b2bo-reviews/b2bo-reviews.module').then( m => m.B2boReviewsPageModule)
+  },
+  {
+    path: 'managements/b2bo-approvals',
+    loadChildren: () => import('./modules/managements/pages/b2bo-approvals/b2bo-approvals.module').then( m => m.B2boApprovalsPageModule)
+  },
+  // management-purchase-req
+  {
+    path: 'managements/purchase-req-reviews',
+    loadChildren: () => import('./modules/managements/pages/purchase-req-reviews/purchase-req-reviews.module').then( m => m.PurchaseReqReviewsPageModule)
+  },
+  {
+    path: 'managements/purchase-req-approvals',
+    loadChildren: () => import('./modules/managements/pages/purchase-req-approvals/purchase-req-approvals.module').then( m => m.PurchaseReqApprovalsPageModule)
+  },
   // management-purchase-order  
   {
     path: 'managements/purchase-order-reviews',
@@ -68,6 +91,24 @@ const routes: Routes = [
   {
     path: 'managements/purchase-order-approvals',
     loadChildren: () => import('./modules/managements/pages/purchase-order-approvals/purchase-order-approvals.module').then(m => m.PurchaseOrderApprovalsPageModule)
+  },
+  {
+    path: 'managements/non-trade-purchase-order-reviews',
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-reviews/non-trade-purchase-order-reviews.module').then( m => m.NonTradePurchaseOrderReviewsPageModule)
+  },
+  {
+    path: 'managements/non-trade-purchase-order-approvals',
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-approvals/non-trade-purchase-order-approvals.module').then( m => m.NonTradePurchaseOrderApprovalsPageModule)
+  },
+  // management-pricing
+  {
+    path: 'managements/pricing-approvals',
+    loadChildren: () => import('./modules/managements/pages/pricing-approvals/pricing-approvals.module').then( m => m.PricingApprovalsPageModule)
+  },
+  // management-b2bopricing
+  {
+    path: 'managements/b2bopricing-approvals',
+    loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then( m => m.B2bopricingApprovalsPageModule)
   },
   // management-otp-configuration
   {
@@ -106,6 +147,16 @@ const routes: Routes = [
   {
     path: 'transactions/sales-order/sales-order-detail',
     loadChildren: () => import('./modules/transactions/pages/sales-order/sales-order-detail/sales-order-detail.module').then(m => m.SalesOrderDetailPageModule)
+  },
+  // transaction-backtoback-order
+  {
+    path: 'transactions/backtoback-order',
+    loadChildren: () => import('./modules/transactions/pages/backtoback-order/backtoback-order.module').then( m => m.BackToBackOrderPageModule)
+  },
+  // transaction-purchase-req
+  {
+    path: 'transactions/purchase-req/purchase-req-detail',
+    loadChildren: () => import('./modules/transactions/pages/purchase-req/purchase-req-detail/purchase-req-detail.module').then( m => m.PurchaseReqDetailPageModule)
   },
   // transactions-purchase-order
   {
@@ -148,11 +199,17 @@ const routes: Routes = [
     path: 'transactions/stock-count/stock-count-detail',
     loadChildren: () => import('./modules/transactions/pages/stock-count/stock-count-detail/stock-count-detail.module').then(m => m.StockCountDetailPageModule)
   },
-  // transaction-check-balance
+  // transaction-inventory-level-trading
   {
-    path: 'transactions/check-balance',
-    loadChildren: () => import('./modules/transactions/pages/check-balance/check-balance.module').then(m => m.CheckBalancePageModule)
+    path: 'transactions/inventory-level-trading',
+    loadChildren: () => import('./modules/transactions/pages/inventory-level-trading/inventory-level-trading.module').then(m => m.InventoryLevelTradingPageModule)
   },
+  // transaction-inventory-level-retail
+  {
+    path: 'transactions/inventory-level-retail',
+    loadChildren: () => import('./modules/transactions/pages/inventory-level-retail/inventory-level-retail.module').then( m => m.InventoryLevelRetailPageModule)
+  },
+
   // transaction-cash-deposit
   {
     path: 'transactions/cash-deposit',
@@ -162,6 +219,55 @@ const routes: Routes = [
     path: 'transactions/truck-loading',
     loadChildren: () => import('./modules/transactions/pages/truck-loading/truck-loading.module').then(m => m.TruckLoadingPageModule)
   },
+  {
+    path: 'transactions/inter-transfer',
+    loadChildren: () => import('./modules/transactions/pages/inter-transfer/inter-transfer.module').then( m => m.InterTransferPageModule)
+  },
+  {
+    path: 'transactions/transfer-confirmation',
+    loadChildren: () => import('./modules/transactions/pages/transfer-confirmation/transfer-confirmation.module').then( m => m.TransferConfirmationPageModule)
+  },
+  {
+    path: 'transactions/debtor-application',
+    loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then( m => m.DebtorApplicationPageModule)
+  },
+  {
+    path: 'transactions/stock-replenish',
+    loadChildren: () => import('./modules/transactions/pages/stock-replenish/stock-replenish.module').then( m => m.StockReplenishPageModule)
+  },
+  {
+    path: 'transactions/consignment-count',
+    loadChildren: () => import('./modules/transactions/pages/consignment-count/consignment-count.module').then( m => m.ConsignmentCountPageModule)
+  },
+  {
+    path: 'transactions/inbound-scan',
+    loadChildren: () => import('./modules/transactions/pages/inbound-scan/inbound-scan.module').then( m => m.InboundScanPageModule)
+  },
+  {
+    path: 'transactions/stock-reorder',
+    loadChildren: () => import('./modules/transactions/pages/stock-reorder/stock-reorder.module').then( m => m.StockReorderPageModule)
+  },
+  {
+    path: 'transactions/transfer-out',
+    loadChildren: () => import('./modules/transactions/pages/transfer-out/transfer-out.module').then( m => m.TransferOutPageModule)
+  },
+  {
+    path: 'transactions/transfer-in',
+    loadChildren: () => import('./modules/transactions/pages/transfer-in/transfer-in.module').then( m => m.TransferInPageModule)
+  },
+  {
+    path: 'transactions/transfer-in-scanning',
+    loadChildren: () => import('./modules/transactions/pages/transfer-in-scanning/transfer-in-scanning.module').then( m => m.TransferInScanningPageModule)
+  },
+  {
+    path: 'transactions/non-trade-purchase-order/non-trade-purchase-order-detail',
+    loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-order/non-trade-purchase-order-detail/non-trade-purchase-order-detail.module').then( m => m.NonTradePurchaseOrderDetailPageModule)
+  },
+
+
+
+  
+
 
 
 
@@ -180,9 +286,22 @@ const routes: Routes = [
     loadChildren: () => import('./modules/reports/pages/reports/rp-so-listing/rp-so-listing.module').then(m => m.RpSoListingPageModule)
   },
   {
-    path: 'reports/rp-sa-performance-listing',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-sa-performance-listing/rp-sa-performance-listing.module').then(m => m.RpSaPerformanceListingPageModule)
+    path: 'reports/rp-sales-customer',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then( m => m.RpSalesCustomerPageModule)
   },
+  {
+    path: 'reports/rp-sales-performance',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-performance/rp-sales-performance.module').then( m => m.RpSalesPerformancePageModule)
+  },
+  {
+    path: 'reports/rp-check-qoh',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then( m => m.RpCheckQohPageModule)
+  },
+  {
+    path: 'reports/rp-check-cn',
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then( m => m.RpCheckCnPageModule)
+  },
+
 
 
 
@@ -237,12 +356,12 @@ const routes: Routes = [
     loadChildren: () => import('./shared/pages/item-add-list-flat/item-add-list-flat.module').then(m => m.ItemAddListFlatPageModule)
   },
   {
-    path: 'item-view-list-flat',
-    loadChildren: () => import('./shared/pages/item-view-list-flat/item-view-list-flat.module').then(m => m.ItemViewListFlatPageModule)
-  },
-  {
     path: 'item-catalog',
     loadChildren: () => import('./shared/pages/item-catalog/item-catalog.module').then(m => m.ItemCatalogPageModule)
+  },
+  {
+    path: 'item-catalog-without-price',
+    loadChildren: () => import('./shared/pages/item-catalog-without-price/item-catalog-without-price.module').then( m => m.ItemCatalogWithoutPricePageModule)
   },
   {
     path: 'camera-scan-input',
@@ -252,6 +371,8 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
+
 
 ];
 @NgModule({

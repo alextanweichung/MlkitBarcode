@@ -13,7 +13,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-accordion-group #accordianGroup1 *ngIf="objectHeader?.isWithSo">
       <ion-accordion *ngFor="let salesOrder of packingSalesOrders;">
         <ion-item slot="header" color="light" (click)="setSelectedSo(salesOrder)">
@@ -21,14 +21,14 @@
         </ion-item>
         <div slot="content">
           <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <app-item-add-list-flat [line]="soLine" [isPacking]="true" qtyField="qtyPackedCurrent" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" *ngFor="let soLine of salesOrder?.details; let i = index" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
+            <app-item-add-list-flat [line]="soLine" [isPacking]="true" qtyField="qtyPackedCurrent" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" *ngFor="let soLine of salesOrder?.details; let i = index" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
           </ion-list>
         </div>
       </ion-accordion>
     </ion-accordion-group>
     <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="!objectHeader?.isWithSo && packingSalesOrders.length > 0">
       <ion-item-sliding *ngFor="let soLine of packingSalesOrders[0]?.details; let i = index">
-        <app-item-add-list-flat [line]="soLine" [isPacking]="true" qtyField="qtyPackedCurrent" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
+        <app-item-add-list-flat [line]="soLine" [isPacking]="true" qtyField="qtyPackedCurrent" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
         <ion-item-options>
           <ion-item-option color="danger" (click)="deleteSoLine(i)">Delete</ion-item-option>
         </ion-item-options>

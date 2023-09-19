@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Item Catalogue</ion-title>
-    <ion-buttons slot="start">
+    <ion-title>Item</ion-title>
+    <ion-buttons slot="start" *ngIf="objectService.header.quotationId === 0">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="start" *ngIf="objectService.header.quotationId > 0">
+      <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
     <ion-buttons slot="primary" *ngIf="!showImage">
       <ion-button (click)="toggleShowImage()">Grid</ion-button>
@@ -12,10 +15,9 @@
     </ion-buttons>
   </ion-toolbar>  
 </ion-header>
-
 <ion-content>
   <div class="p-2">
-    <app-item-catalog #itemCatalog [keyId]="objectHeader.customerId" [locationId]="objectHeader.locationId" [fullMasterList]="fullMasterList" [useTax]="useTax" [isItemPriceTaxInclusive]="objectHeader.isItemPriceTaxInclusive" [maxPrecision]="objectHeader.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage"></app-item-catalog>
+    <app-item-catalog [keyId]="objectService.header.customerId" [locationId]="objectService.header.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectService.header" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="objectService.header.isItemPriceTaxInclusive" [maxPrecision]="objectService.header.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="false" [itemInCart]="objectService.itemInCart"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
@@ -23,7 +25,7 @@
     <ion-row>
       <ion-col>
         <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-          View Cart ({{itemInCart.length|number:'1.0'}})
+          View Cart ({{objectService.itemInCart.length|number:'1.0'}})
         </ion-button>
       </ion-col>
     </ion-row>

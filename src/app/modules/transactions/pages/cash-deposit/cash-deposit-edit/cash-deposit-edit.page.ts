@@ -14,6 +14,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { CashDeposit } from '../../../models/cash-deposit';
 import { CashDepositService } from '../../../services/cash-deposit.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -41,7 +42,7 @@ export class CashDepositEditPage implements OnInit {
     private toastService: ToastService,
     private commonService: CommonService,
     private formBuilder: FormBuilder,
-    private objectService: CashDepositService,
+    public objectService: CashDepositService,
     private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
@@ -64,29 +65,37 @@ export class CashDepositEditPage implements OnInit {
       depositFileId: [null],
       depositSlipNum: [null],
       paymentMethodId: [null, [Validators.required]],
+      customerId: [null],
       sequence: [0]
     })
   }
 
   ngOnInit() {
-    this.loadMasterList();
     this.loadModuleControl();
+    this.bindCustomerList();
     if (this.objectId) {
       this.loadObject();
     }
   }
 
-  paymentMethodMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.objectService.getMasterList().subscribe(response => {
-        this.paymentMethodMasterList = response.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
+  customerSearchDropdownList: SearchDropdownList[] = [];
+  bindCustomerList() {
+    this.objectService.customers.forEach(r => {
+      this.customerSearchDropdownList.push({
+        id: r.customerId,
+        code: r.customerCode,
+        oldCode: r.oldCustomerCode,
+        description: r.name
       })
-    } catch (e) {
-      console.error(e);
-    }
+    })
+  }
+
+  onCustomerSelected(event) {
+    this.objectForm.patchValue({ customerId: event.id });
+  }
+
+  onPaymentMethodSelected(event) {
+    this.objectForm.patchValue({ paymentMethodId: event.id });
   }
 
   loadObject() {
@@ -383,6 +392,12 @@ export class CashDepositEditPage implements OnInit {
 
   /* #endregion */
 
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
   async removeDir() {
     try {
       await Filesystem.rmdir({
@@ -428,7 +443,7 @@ export class CashDepositEditPage implements OnInit {
 
   async nextStep() {
     try {
-      if (this.objectForm.valid && this.images.length === 1) {
+      if (this.objectForm.valid) {
         const alert = await this.alertController.create({
           header: 'Are you sure to proceed?',
           buttons: [
@@ -449,7 +464,7 @@ export class CashDepositEditPage implements OnInit {
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('Error', 'Please fill required fields & attach 1 file to continue', 'top', 'danger', 2000);
+        this.toastService.presentToast('Error', 'Please fill required fields.', 'top', 'danger', 2000);
       }
     } catch (e) {
       console.error(e);

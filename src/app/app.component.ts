@@ -25,29 +25,30 @@ export class AppComponent {
     private navController: NavController,
     private pushNotications: NotificationsService
   ) {
+    console.log(`app-root here`);
     this.initializeApp();
   }
 
   // Initialize app
   initializeApp() {
-
+    console.log(`initializeApp`);
     // Wait until platform is ready
     this.platform.ready().then(async () => {
       await this.configService.load();
-      
-      if (this.configService.sys_parameter) {
-        this.navController.navigateRoot('/signin');
+
+      if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
+        this.navController.navigateRoot("/signin");
       } else {
-        this.navController.navigateRoot('/welcome');
+        this.navController.navigateRoot("/welcome");
       }
 
-      // If we're on a mobile platform (iOS / Android), not web
-      if (Capacitor.getPlatform() !== 'web') {
+      // If we"re on a mobile platform (iOS / Android), not web
+      if (Capacitor.getPlatform() !== "web") {
         // this.pushNotications.initPush();
         await OneSignalInit();
-        
+
         this.platform.backButton.unsubscribe();
-        // Set StatusBar style (dark / light)p
+        // Set StatusBar style (dark / light)
         await StatusBar.setStyle({ style: Style.Dark });
         await BarcodeScanner.checkPermission({ force: true });
       }
@@ -58,9 +59,11 @@ export class AppComponent {
 
       // Fake timeout since we do not load any data
       setTimeout(async () => {
-
         // Hide SplashScreen
-        await SplashScreen.hide();
+        // await SplashScreen.hide();
+        SplashScreen.hide({
+          fadeOutDuration: 1000
+        })
       }, 2000);
     });
   }
@@ -72,14 +75,14 @@ function OneSignalInit() {
 
   // NOTE: Update the setAppId value below with your OneSignal AppId.
   OneSignal.setAppId("18607f67-a6dc-44cb-ac02-91770a58a695");
-  OneSignal.setNotificationOpenedHandler(function(jsonData) {
-      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+  OneSignal.setNotificationOpenedHandler(function (jsonData) {
+    console.log("notificationOpenedCallback: " + JSON.stringify(jsonData));
   });
 
   // Prompts the user for notification permissions.
   //    * Since this shows a generic native prompt, we recommend instead using an In-App Message to prompt for notification permission (See step 7) to better communicate to your users what notifications they will get.
-  OneSignal.promptForPushNotificationsWithUserResponse(function(accepted) {
-      console.log("User accepted notifications: " + accepted);
+  OneSignal.promptForPushNotificationsWithUserResponse(function (accepted) {
+    console.log("User accepted notifications: " + accepted);
   });
 }
 

@@ -12,28 +12,23 @@ const httpObserveHeader = {
 @Injectable({
   providedIn: 'root'
 })
-export class DashboardService {
-
-  baseUrl: string;
+export class DashboardService {  
   
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) {
-    console.log("🚀 ~ file: dashboard.service.ts:26 ~ DashboardService ~ this.configService.sys_parameter:", JSON.stringify(this.configService.sys_parameter))
-    this.baseUrl = this.configService.sys_parameter?.apiUrl;
-  }
+  ) { }
 
   getDashboard() {
-    return this.http.get<Dashboard>(this.baseUrl + 'account/mobileDashboard')
+    return this.http.get<Dashboard>(this.configService.selected_sys_param.apiUrl + 'account/mobileDashboard')
   }
 
   downloadFiles(fileId: number) {
-    return this.http.get(this.baseUrl + "account/dashboard/file/" + fileId, { responseType: 'blob' });
+    return this.http.get(this.configService.selected_sys_param.apiUrl + "account/dashboard/file/" + fileId, { responseType: 'blob' });
   }
 
   loadNotificationHistory() {
-    return this.http.get<NotificationHistory[]>(this.baseUrl + "account/notificationHistory");
+    return this.http.get<NotificationHistory[]>(this.configService.selected_sys_param.apiUrl + "account/notificationHistory");
   }
   
 }

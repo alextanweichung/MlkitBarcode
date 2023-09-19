@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentSalesRoot } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -20,7 +18,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './consignment-sales-item-edit.page.html',
   styleUrls: ['./consignment-sales-item-edit.page.scss'],
 })
-export class ConsignmentSalesItemEditPage implements OnInit {
+export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
 
   objectId: number;
   object: ConsignmentSalesRoot;
@@ -34,21 +32,25 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     private actionSheetController: ActionSheetController,
     private commonService: CommonService,
     private configService: ConfigService,
-    private consignmentSalesService: ConsignmentSalesService,
+    public objectService: ConsignmentSalesService,
   ) {
+    
+  }
+
+  ionViewWillEnter(): void {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
-  }
-
-  ngOnInit() {
-    this.loadMasterList();
-    this.loadModuleControl();
     if (this.objectId) {
       this.loadObject();
     } else {
-      this.toastService.presentToast('Something went wrong!', 'Invalid ObjectId', 'top', 'danger', 1000);
+      this.toastService.presentToast('Something went wrong!', 'Invalid Objectss', 'top', 'danger', 1000);
     }
+  }
+
+  ngOnInit() {
+    this.loadModuleControl();
+    this.loadRestrictColumms();
   }
 
   moduleControl: ModuleControl[] = [];
@@ -82,17 +84,17 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     }
   }
 
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  loadMasterList() {
+  restrictTrxFields: any = {};
+  loadRestrictColumms() {
     try {
-      this.consignmentSalesService.getMasterList().subscribe(response => {
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.discountGroupMasterList = response.filter(x => x.objectName == 'DiscountGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
+      let restrictedObject = {};
+      let restrictedTrx = {};
+      this.authService.restrictedColumn$.subscribe(obj => {  
+        let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "ConsignmentSalesLine").map(y => y.fieldName);
+        trxDataColumns.forEach(element => {
+          restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
+        });
+        this.restrictTrxFields = restrictedTrx;
       })
     } catch (e) {
       console.error(e);
@@ -101,8 +103,15 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   loadObject() {
     try {
-      this.consignmentSalesService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        if (this.object.header.isHomeCurrency) {
+          this.object.header.maxPrecision = this.precisionSales.localMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.localMax
+        } else {
+          this.object.header.maxPrecision = this.precisionSales.foreignMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
+        }
       }, error => {
         throw error;
       })
@@ -111,8 +120,12 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     }
   }  
 
-  onItemAdd(event: TransactionDetail) {
-    this.addItemToDetails(event);
+  onItemAdd(event: TransactionDetail[]) {
+    if (event && event.length > 0) {
+      event.forEach(r => {
+        this.addItemToDetails(r);
+      })
+    }
   }
 
   async addItemToDetails(trxLine: TransactionDetail) {
@@ -126,13 +139,32 @@ export class ConsignmentSalesItemEditPage implements OnInit {
         trxLine.qtyRequest = 1;
         trxLine.locationId = this.object.header.toLocationId;
         trxLine.sequence = 0;
-        trxLine = this.assignLineUnitPrice(trxLine);
+        this.assignTrxItemToDataLine(trxLine);
         await this.object.details.unshift(trxLine);
         await this.computeAllAmount(this.object.details[0]);
       }
     } catch (e) {
       console.error(e);
     }
+  }
+
+  assignTrxItemToDataLine(item: TransactionDetail) {
+    if (this.useTax) {
+      if (this.object.header.isItemPriceTaxInclusive) {
+        item.unitPrice = item.itemPricing.unitPrice;
+        item.unitPriceExTax = this.commonService.computeAmtExclTax(item.itemPricing.unitPrice, item.taxPct);
+      } else {
+        item.unitPrice = this.commonService.computeAmtInclTax(item.itemPricing.unitPrice, item.taxPct);
+        item.unitPriceExTax = item.itemPricing.unitPrice;
+      }
+    } else {
+      item.unitPrice = item.itemPricing.unitPrice;
+      item.unitPriceExTax = item.itemPricing.unitPrice;
+    }
+    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
+    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
+    item.oriUnitPrice = item.unitPrice;
+    item.oriUnitPriceExTax = item.unitPriceExTax;
   }
 
   async validateBarcode(barcode: string) {
@@ -158,7 +190,10 @@ export class ConsignmentSalesItemEditPage implements OnInit {
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
+                discountPercent: found_item_master.discPct,
+                discountGroupId: null,
+                unitPriceMin: null,
+                currencyId: null
               },
               itemVariationXId: found_barcode.xId,
               itemVariationYId: found_barcode.yId,
@@ -167,7 +202,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
             }
             this.addItemToDetails(outputData);
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
           }
         } else {
   
@@ -213,7 +248,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
   discountGroupCodeChanged(line: TransactionDetail) {
     try {
       if (line.discountGroupCode) {
-        let lookupValue = this.discountGroupMasterList.find(r => r.code === line.discountGroupCode);
+        let lookupValue = this.objectService.discountGroupMasterList.find(r => r.code === line.discountGroupCode);
         if (lookupValue) {
           if (lookupValue.attribute1 === "0") {
             line.discountExpression = null;
@@ -244,18 +279,11 @@ export class ConsignmentSalesItemEditPage implements OnInit {
     }
   }
 
-  /* #region  price, tax, discount handle here */
-
-  promotionEngineApplicable: boolean = true;
-  configSalesActivatePromotionEngine: boolean;
-  disablePromotionCheckBox: boolean = false;
-  async computeAllAmount(trxLine: TransactionDetail) {
-    await this.computeDiscTaxAmount(trxLine);
-  }
+  /* #region  unit price, tax, discount */
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.object.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -264,40 +292,40 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
-      this.computeDiscTaxAmount(trxLine);
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.object.header.maxPrecision);
+      this.computeDiscTaxAmount(trxLine);       
     } catch (e) {
       console.error(e);
     }
   }
 
-  async computeDiscTaxAmount(trxLine: TransactionDetail) {
+  computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.object.header.isItemPriceTaxInclusive, this.object.header.isDisplayTaxInclusive, this.maxPrecision);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.object.header.isItemPriceTaxInclusive, this.object.header.isDisplayTaxInclusive, this.object.header.maxPrecision);
     } catch (e) {
       console.error(e);
     }
   }
 
-  assignLineUnitPrice(trxLine: TransactionDetail) {
+  onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
     try {
-      if (this.useTax) {
-        if (this.object.header.isItemPriceTaxInclusive) {
-          trxLine.unitPrice = trxLine.itemPricing.unitPrice;
-          trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+      let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
+      if (discPct) {
+        if (discPct == "0") {
+          trxLine.discountExpression = null;
         } else {
-          trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
-          trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
+          trxLine.discountExpression = discPct + "%";
         }
-      } else {
-        trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
-        trxLine.unitPrice = trxLine.itemPricing.unitPrice;
+        this.computeAllAmount(trxLine);
       }
-      trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
-      trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.maxPrecision);
-      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.maxPrecision);
-      return trxLine;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  computeAllAmount(data: TransactionDetail) {
+    try {
+      this.computeDiscTaxAmount(data);
     } catch (e) {
       console.error(e);
     }
@@ -323,26 +351,79 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   /* #endregion */
 
-  /* #region  modal to edit line detail */  
+  /* #region  modal to edit line detail */
 
-  selectedItem: TransactionDetail;
-  async showLineDetails(trxLine: TransactionDetail) {
-    try {
-      this.selectedItem = trxLine;
-      await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.object.header.isItemPriceTaxInclusive, this.object.header.isDisplayTaxInclusive, this.maxPrecision);
-      this.showItemModal();
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // selectedItem: TransactionDetail;
+  // async showLineDetails(trxLine: TransactionDetail) {
+  //   try {
+  //     this.selectedItem = JSON.parse(JSON.stringify(data));
+  //     await this.commonService.computeDiscTaxAmount(this.selectedItem, this.useTax, this.object.header.isItemPriceTaxInclusive, this.object.header.isDisplayTaxInclusive, this.maxPrecision);
+  //     this.showEditModal();
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   isModalOpen: boolean = false;
-  showItemModal() {
+  selectedItem: TransactionDetail;
+  selectedIndex: number;
+  showEditModal(data: TransactionDetail, rowIndex: number) {
+    this.selectedItem = JSON.parse(JSON.stringify(data));
+    // this.selectedItem = data;
+    this.selectedIndex = rowIndex;
     this.isModalOpen = true;
   }
 
-  hideItemModal() {
+  hideEditModal() {
     this.isModalOpen = false;
+  }
+
+  onModalHide() {
+    this.selectedIndex = null;
+    this.selectedItem = null;
+  }
+
+  saveChanges() {
+    if (this.selectedIndex === null || this.selectedIndex === undefined) {
+      this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
+      return;
+    } else {
+      if ((this.selectedItem.qtyRequest ?? 0) <= 0) {
+        this.toastService.presentToast("Invalid Qty", "", "top", "warning", 1000);
+      } else {
+        this.object.details[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+        this.hideEditModal();
+      }
+    }
+  }
+
+  async cancelChanges() {
+    try {
+      const alert = await this.alertController.create({
+        cssClass: 'custom-alert',
+        header: 'Are you sure to discard changes?',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm',
+            cssClass: 'success',
+            handler: () => {
+              this.isModalOpen = false;
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+  
+            }
+          },
+        ],
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
@@ -365,7 +446,7 @@ export class ConsignmentSalesItemEditPage implements OnInit {
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
       if (role === 'confirm') {
-        this.consignmentSalesService.resetVariables();
+        this.objectService.resetVariables();
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectId
@@ -411,9 +492,9 @@ export class ConsignmentSalesItemEditPage implements OnInit {
 
   updateObject() {
     try {
-      this.consignmentSalesService.updateObject(this.object).subscribe(response => {
+      this.objectService.updateObject(this.object).subscribe(response => {
         if (response.status === 204) {
-          this.toastService.presentToast('Update Complete', 'Consignment Sales Updated', 'top', 'success', 1000);
+          this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: this.objectId

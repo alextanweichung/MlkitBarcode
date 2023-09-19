@@ -33,3 +33,10 @@ export interface CustomToken {
    exp: number,
    iat: number
 }
+
+export interface ResetPassword {
+   password: string;
+   confirmPassword: string;
+   userEmail: string;
+   token: string;
+}

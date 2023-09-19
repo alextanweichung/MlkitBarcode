@@ -10,6 +10,7 @@ export interface OtpDTO {
     validity: string
     expiredAt: string
     status: string
+    remark: string
   }
   
   export interface OtpLine {

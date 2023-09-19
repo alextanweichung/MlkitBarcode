@@ -1,41 +1,72 @@
+<ion-header collapse="fade" [translucent]="true">  
+  <ion-toolbar></ion-toolbar>
+</ion-header>
 <ion-content>
-  
-  <div class="ion-padding ion-full-height ion-flex ion-flex-center">
-
+  <div class="mt-5 ion-flex ion-margin-auto justify-content-end">
+    <ion-button (click)="showPopover($event)" fill="clear"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
+  </div>
+  <div class="p-2 ion-flex ion-flex-center">
     <div class="logo-container">
-      <h1 class="logo-placeholder">{{companyName}}</h1>
-      <p>Login to your account.</p>
+      <ion-img src="../../../../assets/idcp/logo-idcp.svg" style="width: 50%" class="animate__animated animate__fadeInDown ion-flex ion-margin-auto" alt="iDCP Logo"></ion-img>
+      <p *ngIf="configService.selected_sys_param">{{mapCompanyName(configService.selected_sys_param.apiUrl)}}</p>
+      <p class="mt-2 font-size-small">Login to your account</p>
     </div>
-
-    <form class="form-default" [formGroup]="signin_form">
-      <ion-list class="item-card-list" lines="none">
+    <ion-list class="item-card-list" lines="none">
+      <form class="form-default" [formGroup]="signin_form">
+        <ion-item *ngIf="configService.sys_parameter && configService.sys_parameter.length > 1">
+          <ion-label color="tertiary" position="stacked">Company</ion-label>
+          <ion-select interface="action-sheet" placeholder="Company" formControlName="apiUrl" (ionChange)="setSelectedParam()">
+            <ion-select-option *ngFor="let s of configService.sys_parameter" [value]="s.apiUrl">{{mapCompanyName(s.apiUrl)}}</ion-select-option>
+          </ion-select>
+        </ion-item>
         <ion-item>
           <ion-label color="tertiary" position="stacked">Email</ion-label>
           <ion-input formControlName="userEmail" type="email" autocomplete="off" placeholder="Your email address"></ion-input>
         </ion-item>
-        <ion-item class="ion-margin-top-small">
+        <ion-item>
           <ion-label color="tertiary" position="stacked">Password</ion-label>
           <ion-input formControlName="password" type="password" placeholder="Your password"></ion-input>
         </ion-item>
-      </ion-list>
-    </form>
-
-    <ion-item class="ion-flex ion-flex-center" lines="none">
-      <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
-      <ion-label>
-        <div class="ion-text-small">Remember Me!</div></ion-label>
-    </ion-item>
-
-    <ion-button class="ion-margin-top" type="submit" expand="block" color="primary" (click)="signIn()">
-      Sign in
-    </ion-button>
-
+      </form>
+      <ion-item class="ion-flex ion-flex-center" lines="none">
+        <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
+        <ion-label>
+          <div class="ion-text-small">Remember Me!</div>
+        </ion-label>
+      </ion-item>
+      <ion-button class="ion-margin-top px-3" type="submit" expand="block" color="primary" [disabled]="submit_attempt || !signin_form.valid" (click)="signIn()">
+        Sign in
+      </ion-button>
+    </ion-list>
+    <div class="ion-text-center ion-margin-top">
+      <ion-text color="medium" (click)="forgetPassword($event)">
+        <small>forget password?</small>
+      </ion-text>
+    </div>
     <div class="ion-text-center ion-margin-top">
       <ion-text color="medium">
         <small>&copy; {{current_year}} iDCP Systems Sdn Bhd v{{currentVersion}}</small>
       </ion-text>
     </div>
-
   </div>
-
 </ion-content>
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">      
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" (click)="popover.dismiss(); addNewActivation();">
+          <ion-icon name="add-circle-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Activate Company</div>
+          </ion-label>
+        </ion-item>
+        <ion-item *ngIf="configService.sys_parameter.length > 1" button detail="false" (click)="popover.dismiss(); deleteAlert();">
+          <ion-icon name="trash-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Delete this</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>

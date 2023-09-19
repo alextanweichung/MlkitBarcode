@@ -8,6 +8,7 @@ import { ConsignmentSalesSummaryPageRoutingModule } from './consignment-sales-su
 
 import { ConsignmentSalesSummaryPage } from './consignment-sales-summary.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     ConsignmentSalesSummaryPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    SumModule
   ],
   declarations: [ConsignmentSalesSummaryPage]
 })

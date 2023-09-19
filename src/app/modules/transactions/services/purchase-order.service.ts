@@ -15,15 +15,12 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class PurchaseOrderService {
-
-  baseUrl: string;
-
+  
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: purchase-order.service.ts:26 ~ PurchaseOrderService ~ apiUrl:")
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   unflattenDtoDetail(purchaseOrder: PurchaseOrderRoot): PurchaseOrderDto {
@@ -97,7 +94,7 @@ export class PurchaseOrderService {
   }
 
   getMasterList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePurchaseOrder/masterlist").pipe(
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePurchaseOrder/masterlist").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -105,7 +102,7 @@ export class PurchaseOrderService {
   }
 
   getStaticLovList() {
-    return this.http.get<MasterList[]>(this.baseUrl + "MobilePurchaseOrder/staticLov").pipe(
+    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobilePurchaseOrder/staticLov").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -113,19 +110,19 @@ export class PurchaseOrderService {
   }  
 
   getPurchaseOrderDetail(purchaseOrderId: number) {
-    return this.http.get<any>(this.baseUrl + "MobilePurchaseOrder/" + purchaseOrderId);
+    return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "MobilePurchaseOrder/" + purchaseOrderId);
   }
   
   getReviewDocumentCount() {
-    return this.http.get<TransactionProcessingCount>(this.baseUrl + 'MobilePurchaseOrderReview/count');
+    return this.http.get<TransactionProcessingCount>(this.configService.selected_sys_param.apiUrl + 'MobilePurchaseOrderReview/count');
   }
   
   getApprovalDocumentCount() {
-    return this.http.get<TransactionProcessingCount>(this.baseUrl + 'MobilePurchaseOrderApprove/count');
+    return this.http.get<TransactionProcessingCount>(this.configService.selected_sys_param.apiUrl + 'MobilePurchaseOrderApprove/count');
   }
 
   downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
-    return this.http.post(this.baseUrl + "MobilePurchaseOrder/exportPdf", 
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobilePurchaseOrder/exportPdf", 
     {
       "appCode": appCode,
       "format": format,
@@ -135,7 +132,7 @@ export class PurchaseOrderService {
   }
 
   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.baseUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + '/bulkUpdate', bulkConfirmReverse, httpObserveHeader);
   }
 
 }

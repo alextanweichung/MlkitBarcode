@@ -37,8 +37,7 @@ export class GeneralSalesListPage implements OnInit {
 
   ngOnInit() {
     if (Capacitor.getPlatform() !== 'web') {
-      // this.configService.loadItemMaster();
-      // this.configService.loadItemBarcode();
+      
     }
   }
 
@@ -86,7 +85,10 @@ export class GeneralSalesListPage implements OnInit {
                     unitPrice: r.price,
                     discountGroupCode: r.discCd,
                     discountExpression: r.discPct + '%',
-                    discountPercent: r.discPct
+                    discountPercent: r.discPct,
+                    discountGroupId: null,
+                    unitPriceMin: null,
+                    currencyId: null
                   }
                 })
               } else {
@@ -137,7 +139,10 @@ export class GeneralSalesListPage implements OnInit {
                     unitPrice: r.price,
                     discountGroupCode: r.discCd,
                     discountExpression: r.discPct + '%',
-                    discountPercent: r.discPct
+                    discountPercent: r.discPct,
+                    discountGroupId: null,
+                    unitPriceMin: null,
+                    currencyId: null
                   },
                   variationDetails: vd
                 })

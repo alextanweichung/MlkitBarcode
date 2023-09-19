@@ -7,29 +7,40 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { AnnouncementFile } from 'src/app/modules/dashboard/models/dashboard';
+import { environment } from 'src/environments/environment';
+import { UntypedFormGroup } from '@angular/forms';
+import { MasterListDetails } from '../models/master-list-details';
+import { MasterList } from '../models/master-list';
+import { format } from 'date-fns';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
-  baseUrl: string;
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
     private loadingService: LoadingService,
-    private opener: FileOpener,
     private file: File,
+    private opener: FileOpener,
     private androidPermissions: AndroidPermissions
-  ) {
-    this.baseUrl = configService.sys_parameter.apiUrl;
-  }
+  ) { }
 
   /* #region common service */
 
   getCompanyProfile() {
     try {
-      return this.http.get(this.baseUrl + "account/companyName");
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "account/companyInfo");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  getCompanyProfileByUrl(apiUrl) {
+    try {
+      return this.http.get(apiUrl + "account/companyInfo").toPromise().then(r => { return r['name'] });
     } catch (e) {
       console.error(e);
     }
@@ -37,8 +48,31 @@ export class CommonService {
 
   syncInbound() {
     try {
-      // return this.http.get(this.baseUrl + "MobileDownload/itemMaster/KLCC/2022-10-31");
-      return this.http.get(this.baseUrl + "MobileDownload/itemMaster").toPromise();      
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster").toPromise();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  syncInboundConsignment(locationCode: string, trxDate: string) {
+    try {
+      return this.http.get(this.configService.selected_sys_param.apiUrl + `MobileDownload/itemMaster/${locationCode}/${trxDate}`).toPromise();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  saveVersion() {
+    try {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/mobileVersion/" + environment.version, null)
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  getAgentsMasterList() {
+    try {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/masterlist");
     } catch (e) {
       console.error(e);
     }
@@ -53,7 +87,7 @@ export class CommonService {
       let today = this.getTodayDate();
       let firstDoy = new Date(new Date().getUTCFullYear(), 0, 1, 0, 0, 0);
       firstDoy.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-      return firstDoy;      
+      return firstDoy;
     } catch (e) {
       console.error(e);
     }
@@ -80,6 +114,12 @@ export class CommonService {
     }
   }
 
+  getDateWithoutTimeZone(inputDate: Date): Date {
+    let newDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(), 0, 0, 0)
+    newDate.setMinutes(newDate.getMinutes() - newDate.getTimezoneOffset())
+    return newDate;
+  }
+
   //To add back timezone differences into UTC Date
   convertUtcDate(inputDate: Date): Date {
     try {
@@ -96,7 +136,7 @@ export class CommonService {
     try {
       let outputDate = new Date(inputDate);
       //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
-      return outputDate;      
+      return outputDate;
     } catch (e) {
       console.error(e);
     }
@@ -275,7 +315,7 @@ export class CommonService {
   computeAmtInclTax(amount: number, taxPct: number) {
     try {
       let amtInclTax = amount * (1 + (taxPct / 100));
-      return amtInclTax;      
+      return amtInclTax;
     } catch (e) {
       console.error(e);
     }
@@ -310,13 +350,13 @@ export class CommonService {
       let discExpression = trxLine.discountExpression;
       let quantity = trxLine.qtyRequest;
       let subTotal;
-  
+
       if (isItemPriceTaxInclusive) {
         subTotal = unitPrice * quantity;
       } else {
         subTotal = unitPriceExTax * quantity;
       }
-  
+
       //To split the expression with multi level discount, for eg. (10%/5%/3%)
       if (discExpression != "" && discExpression != null) {
         let splittedDisc = discExpression.split(/[+/]/g);
@@ -388,7 +428,7 @@ export class CommonService {
         receiptLine.discountGroupCode = receiptLine.oriDiscountGroupCode;
         receiptLine.discountExpression = receiptLine.oriDiscountExpression;
       }
-      return receiptLine;      
+      return receiptLine;
     } catch (e) {
       console.error(e);
     }
@@ -396,41 +436,89 @@ export class CommonService {
 
   /* #endregion */
 
-  /* #region download pdf */
+  /* #region download */
 
-  async commonDownloadPdf(file: Blob, filename: string) {
+  async commonDownload(file: Blob, object: AnnouncementFile) {
+    let mimeType = this.getMimeType(object.filesType);
     try {
       await this.loadingService.showLoading("Downloading");
       if (Capacitor.getPlatform() === 'android') {
-        this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-          async result => {
-            if (!result.hasPermission) {
-              this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE).then(
-                async result => {
-                  this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true }).then(async () => {
-                    this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                    await this.loadingService.dismissLoading();
-                  }).catch(async (error) => {
-                    await this.loadingService.dismissLoading();
-                  });
-                }
-              );
-            } else {
-              this.file.writeFile(this.file.externalRootDirectory + "/Download", filename, file, { replace: true }).then(async () => {
-                this.opener.open(this.file.externalRootDirectory + "/Download/" + filename, "application/pdf");
-                await this.loadingService.dismissLoading();
-              }).catch(async (error) => {
-                await this.loadingService.dismissLoading();
-              });
-            }
-          }
-        )
-      } else if (Capacitor.getPlatform() === 'ios') {
-        this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
-          this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-          await this.loadingService.dismissLoading();
+        await this.file.writeFile(this.file.externalApplicationStorageDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.externalApplicationStorageDirectory + object.filesName + object.filesType, "application/pdf");
+          this.loadingService.dismissLoading();
         }).catch(async (error) => {
-          await this.loadingService.dismissLoading();
+          console.log(`this.file.writeFile ${JSON.stringify(error)}`);
+          this.loadingService.dismissLoading();
+        })
+      } else if (Capacitor.getPlatform() === 'ios') {
+        this.file.writeFile(this.file.tempDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
+          if (mimeType) {
+            await this.opener.open(this.file.tempDirectory + object.filesName + object.filesType, mimeType);
+          }
+          this.loadingService.dismissLoading();
+        }).catch(async (error) => {
+          this.loadingService.dismissLoading();
+        })
+      } else {
+        const url = window.URL.createObjectURL(file);
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", object.filesName + object.filesType);
+        window.document.body.appendChild(link);
+        link.click();
+        link.remove();
+        this.loadingService.dismissLoading();
+      }
+    } catch (e) {
+      this.loadingService.dismissLoading();
+      console.error(e);
+    }
+  }
+
+  getMimeType(filesType: string) {
+    switch (filesType.toUpperCase()) {
+      case ".DOCX":
+        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      case ".XLSX":
+        return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      case ".PPTX":
+        return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+      case ".CSV":
+        return "text/csv";
+      case ".PDF":
+        return "application/pdf";
+      case ".PNG":
+        return "image/png";
+      case ".JPG":
+      case ".JPEG":
+        return "image/jpeg";
+      case ".JSON":
+        return "application/json";
+      case ".TXT":
+        return "text/plain";
+      default:
+        return null;
+    }
+  }
+
+  async commonDownloadPdf(file: Blob, filename: string) { // this filename already with extensions
+    try {
+      await this.loadingService.showLoading("Downloading");
+      filename = filename.replace(" ", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
+      if (Capacitor.getPlatform() === 'android') {
+        await this.file.writeFile(this.file.externalApplicationStorageDirectory, filename, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.externalApplicationStorageDirectory + filename, "application/pdf");
+          this.loadingService.dismissLoading();
+        }).catch(async (error) => {
+          console.log(`this.file.writeFile ${JSON.stringify(error)}`);
+          this.loadingService.dismissLoading();
+        })
+      } else if (Capacitor.getPlatform() === 'ios') {
+        await this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
+          await this.opener.open(this.file.tempDirectory + filename, "application/pdf");
+          this.loadingService.dismissLoading();
+        }).catch(async (error) => {
+          this.loadingService.dismissLoading();
         })
       } else {
         const url = window.URL.createObjectURL(file);
@@ -440,10 +528,10 @@ export class CommonService {
         window.document.body.appendChild(link);
         link.click();
         link.remove();
-        await this.loadingService.dismissLoading();
+        this.loadingService.dismissLoading();
       }
     } catch (e) {
-      await this.loadingService.dismissLoading();
+      this.loadingService.dismissLoading();
       console.error(e);
     }
   }
@@ -463,6 +551,29 @@ export class CommonService {
 
   toFirstCharLowerCase(str: string) {
     return str.charAt(0).toLowerCase() + str.slice(1);
+  }
+
+  /* #endregion */
+
+  /* #region get latest sales agent */
+
+  lookUpSalesAgent(objectForm: UntypedFormGroup, customerMasterList: MasterListDetails[]) {
+    var lookupValue = customerMasterList?.find(e => e.id == objectForm.get('customerId').value);
+    if (lookupValue != undefined) {
+      if (lookupValue.historyInfo && lookupValue.historyInfo.length > 0) {
+        lookupValue.historyInfo.sort(function (a, b) {
+          return new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime();
+        });
+        let salesAgent = lookupValue.historyInfo.find(x => {
+          return new Date(objectForm.get('trxDate').value).getTime() >= new Date(x.effectiveDate).getTime()
+        })
+        if (salesAgent) {
+          objectForm.patchValue({ salesAgentId: parseFloat(salesAgent.salesAgentId.toString()) })
+        } else {
+          objectForm.patchValue({ salesAgentId: parseFloat(lookupValue.attribute1) })
+        }
+      }
+    }
   }
 
   /* #endregion */

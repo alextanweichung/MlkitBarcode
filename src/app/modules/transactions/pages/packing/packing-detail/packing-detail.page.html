@@ -12,31 +12,70 @@
       <ion-label class="label-title">Detail</ion-label>
     </ion-toolbar>
   </ion-header>  
-  <div class="ion-padding" *ngIf="object">
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Information</ion-label>
+  <div class="p-2" *ngIf="object">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Document</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="full">
-      <ion-item>
-        <ion-label position="stacked"><p>Packing Num</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.packingNum}}"></ion-input>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Packing Num.</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.packingNum}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label position="stacked"><p>Trx Date</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.trxDate|date:'dd/MM/yyyy'}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Doc. Date</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label position="stacked"><p>Location</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.locationId|idMapping:locationMasterList}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Location</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+            </ion-col>
+          </ion-row>
+        <!-- </ion-grid>
       </ion-item>
-      <ion-item>
-        <ion-label position="stacked"><p>Customer</p></ion-label>
-        <ion-input readonly class="font-size-small ion-no-padding-end" value="{{object.header.customerId|idMapping:customerMasterList}}"></ion-input>
+      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-grid class="ion-no-padding py-2 pl-2"> -->
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Customer</div>
+            </ion-col>
+          <!-- </ion-row>
+          <ion-row> -->
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
-    </ion-list>    
-    <ion-list-header class="ion-list-header-small">
-      <ion-label>Detail Line</ion-label>
+    </ion-list>
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Details</ion-label>
     </ion-list-header>
-    <app-item-view-list-flat [data]="object.details" [isWithSo]="object.header.isWithSo" [isPacking]="true" [itemVariationXMasterList]="itemVariationXMasterList" [itemVariationYMasterList]="itemVariationYMasterList"></app-item-view-list-flat>
   </div>
 </ion-content>

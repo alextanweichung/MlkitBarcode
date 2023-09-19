@@ -33,10 +33,12 @@
             "styles": [
               "src/assets/idcp/styles.scss",
               "src/assets/theme/variables.scss",
-              "src/assets/global.scss"              
+              "src/assets/global.scss",
+              "node_modules/@fortawesome/fontawesome-free/css/all.css"
             ],
-            "scripts": [],
-            "aot": false,
+            "scripts": [
+              "node_modules/@fortawesome/fontawesome-free/js/all.js"
+            ],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
@@ -143,30 +145,6 @@
             },
             "ci": {
               "devServerTarget": "app:serve:ci"
-            }
-          }
-        },
-        "ionic-cordova-build": {
-          "builder": "@ionic/angular-toolkit:cordova-build",
-          "options": {
-            "browserTarget": "app:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "app:build:production"
-            }
-          }
-        },
-        "ionic-cordova-serve": {
-          "builder": "@ionic/angular-toolkit:cordova-serve",
-          "options": {
-            "cordovaBuildTarget": "app:ionic-cordova-build",
-            "devServerTarget": "app:serve"
-          },
-          "configurations": {
-            "production": {
-              "cordovaBuildTarget": "app:ionic-cordova-build:production",
-              "devServerTarget": "app:serve:production"
             }
           }
         }

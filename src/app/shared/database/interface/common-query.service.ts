@@ -78,39 +78,29 @@ export class CommonQueryService<T> {
 
   private convertDateString(input: Date): string {
     try {
-      return formatDate(input, 'yyyy-MM-dd hh:mm:ss', this.locale);      
+      return formatDate(input, 'yyyy-MM-dd hh:mm:ss', this.locale);
     } catch (e) {
       console.error(e);
     }
   }
 
   load(object, table, database) {
+    console.log(`table: ${JSON.stringify(table)}`);
+    console.log(`database: ${JSON.stringify(database)}`);
     try {
-      let cols = this.getAllColsWithValue(object);
-      let sql = '';
-      let primaryKey = '';
-  
-      for (const key of cols.keys()) {
-        if (key.toLowerCase() === (table.toLowerCase() + "id")) {
-          primaryKey += ` ${key} = ${cols.get(key)}`;
-        } else {
-          sql += ` ${key},`;
-        }
-      }
-  
-      sql = sql.substring(0, sql.length - 1).trimStart();
-      primaryKey = primaryKey.trimStart();
-  
       return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let sqlcmd: string =
           `SELECT * FROM ${table} `;
         let ret: DBSQLiteValues = await db.query(sqlcmd);
-        if (ret.values.length > 0) {
-          return ret.values[0] as Object
+        console.log(`sqlcmd: ${JSON.stringify(sqlcmd)}`);
+        console.log(`ret: ${JSON.stringify(ret)}`);
+        if (ret && ret.values.length > 0) {
+          return ret.values as Object[]
         }
         return null;
       }, database)
     } catch (e) {
+      console.log(`e: ${JSON.stringify(e)}`);
       console.error(e);
     }
   }
@@ -120,7 +110,7 @@ export class CommonQueryService<T> {
       let cols = this.getAllColsWithValue(object);
       let sqlCols = '';
       let sqlParams = '';
-  
+
       for (const key of cols.keys()) {
         switch (this.getColType(cols.get(key))) {
           case "number":
@@ -138,10 +128,10 @@ export class CommonQueryService<T> {
             break;
         }
       }
-  
+
       sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
       sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
-      
+
       return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
         let sqlcmd: string =
           `INSERT INTO ${table} (${sqlCols}) VALUES (${sqlParams})`;
@@ -162,7 +152,7 @@ export class CommonQueryService<T> {
           let sqlCols = '';
           let sqltest = '';
           let sqlParams = '';
-  
+
           for (const key of cols.keys()) {
             switch (this.getColType(cols.get(key))) {
               case "number":
@@ -186,7 +176,7 @@ export class CommonQueryService<T> {
           sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
           sqltest = sqltest.substring(0, sqltest.length - 1).trimStart();
           sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
-  
+
           statements.push({
             statement: `INSERT INTO ${table} ` + `(` + sqlCols + `) VALUES (` + sqltest + `);`,
             values: [
@@ -194,7 +184,7 @@ export class CommonQueryService<T> {
             ]
           })
         });
-  
+
         await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
           let ret: any = await db.executeSet(statements, true);
         }, database)
@@ -227,7 +217,48 @@ export class CommonQueryService<T> {
       let cols = this.getAllColsWithValue(object);
       let sql = '';
       let primaryKey = '';
-  
+
+      for (const key of cols.keys()) {
+        if (key.toLowerCase() === (table.toLowerCase() + "id")) {
+          primaryKey += ` ${key} = '${cols.get(key)}'`;
+        } else {
+          switch (this.getColType(cols.get(key))) {
+            case "number":
+            case "boolean":
+              sql += `${key} = ${cols.get(key)},`;
+              break;
+            case "string":
+            case "Date":
+              sql += `${key} = '${cols.get(key)}',`;
+              break;
+          }
+        }
+      }
+
+
+      sql = sql.substring(0, sql.length - 1).trimStart();
+      primaryKey = primaryKey.trimStart();
+      
+      return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
+        let sqlcmd: string = `UPDATE ${table} SET ${sql} WHERE ${primaryKey}`;
+        let ret: any = await db.run(sqlcmd);
+        return ret;
+      }, database)
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  /* #region delete */
+
+  delete(object, table, database) {
+    try {
+      let cols = this.getAllColsWithValue(object);
+      let sql = '';
+      let primaryKey = '';
+
       for (const key of cols.keys()) {
         if (key.toLowerCase() === (table.toLowerCase() + "id")) {
           primaryKey += ` ${key} = ${cols.get(key)}`;
@@ -244,21 +275,19 @@ export class CommonQueryService<T> {
           }
         }
       }
-  
+
       sql = sql.substring(0, sql.length - 1).trimStart();
       primaryKey = primaryKey.trimStart();
-  
+
       return this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
-        let sqlcmd: string = `UPDATE ${table} SET ${sql} WHERE ${primaryKey}`;
+        let sqlcmd: string = `DELETE FROM ${table} WHERE ${primaryKey}`;
         let ret: any = await db.run(sqlcmd);
         return ret;
-      }, database)      
+      }, database)
     } catch (e) {
       console.error(e);
     }
   }
-
-  /* #endregion */
 
   deleteAll(table, database) {
     try {
@@ -273,18 +302,20 @@ export class CommonQueryService<T> {
     }
   }
 
+  /* #endregion */
+
   /* #region  inbound */
 
   async syncInboundData(table, objects) {
     try {
       const statements = [];
-  
+
       // drop table
       statements.push({
         statement: `DROP TABLE IF EXISTS ${table}`,
         values: []
       })
-  
+
       // insert table
       switch (table) {
         case inboundDb_Tables.item_Master:
@@ -300,12 +331,12 @@ export class CommonQueryService<T> {
           })
           break;
       }
-  
+
       if (objects.length > 0) {
         let cols = this.getAllColumns(objects[0]);
         let sqlCols = '';
         let sqlQMarks = '';
-  
+
         for (const key of cols.keys()) {
           switch (this.getColType(cols.get(key))) {
             case "number":
@@ -327,19 +358,19 @@ export class CommonQueryService<T> {
               break;
           }
         }
-  
+
         sqlCols = sqlCols.substring(0, sqlCols.length - 1).trimStart();
         sqlQMarks = sqlQMarks.substring(0, sqlQMarks.length - 1).trimStart();
-  
+
         statements.push({
           statement: `INSERT INTO ${table} ` + `(` + sqlCols + `) VALUES (` + sqlQMarks + `);`,
           values: []
         })
-        
+
         objects.forEach(i => {
           let cols = this.getAllColsWithValue(i);
           let sqlParams = '';
-  
+
           for (const key of cols.keys()) {
             switch (this.getColType(cols.get(key))) {
               case "number":
@@ -358,19 +389,17 @@ export class CommonQueryService<T> {
             }
           }
           sqlParams = sqlParams.substring(0, sqlParams.length - 1).trimStart();
-  
+
           statements[2].values.push(
             sqlParams.split('~')
           )
         });
-        
-        console.log("🚀 ~ file: common-query.service.ts:328 ~ CommonQueryService<T> ~ syncInboundData ~ statements:", JSON.stringify(statements));
-  
+
         statements.push({
           statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
           values: []
         })
-        
+
         let timestart = new Date();
         await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
           let ret: any = await db.executeSet(statements, true);
@@ -383,6 +412,11 @@ export class CommonQueryService<T> {
       console.error(e);
     }
   }
+
+  /* #endregion */
+
+  /* #region  */
+
 
   /* #endregion */
 

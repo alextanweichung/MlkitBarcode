@@ -12,12 +12,15 @@ export interface MasterListDetails {
    attribute7: string;
    attribute8: string;
    attribute9: string;
+   attribute10: string;
+   attribute11: string;
    attributeArray1: number[];
    shippingInfo?: ShippingInfo[]
    parentId?: number;
    sequence?: number;
    isPrimary: boolean;
    deactivated?: number;
+   historyInfo?: HistoryInfo[]
 }
 
 export interface ShippingInfo {
@@ -32,3 +35,13 @@ export interface ShippingInfo {
    fax: string
    areaId: number
 }
+
+export interface HistoryInfo {
+   effectiveDate: Date
+   keyId: number
+   salesAgentId?: number
+   procurementAgentId?: number
+   currencyId?:number
+   rate?:number
+ }
+ 

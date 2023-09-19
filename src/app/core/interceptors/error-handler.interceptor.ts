@@ -11,7 +11,8 @@ import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
-// import { NgxSpinnerService } from 'ngx-spinner';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);
 
@@ -25,7 +26,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    constructor(
       private router: Router,
       private toastService: ToastService,
-      // private spinner: NgxSpinnerService
+      private loadingService: LoadingService,
+      private spinner: NgxSpinnerService
    ) { }
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {
@@ -34,6 +36,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          });
          return next.handle(authReq);
       }
+      // static ɵcmp: i0.ɵɵComponentDeclaration<NgxSpinnerComponent, "ngx-spinner", never, { "bdColor": "bdColor"; "size": "size"; "color": "color"; "type": "type"; "fullScreen": "fullScreen"; "name": "name"; "zIndex": "zIndex"; "template": "template"; "showSpinner": "showSpinner"; "disableAnimation": "disableAnimation"; }, {}, never, ["*"]>;
       
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
       const authReq = request.clone({
@@ -48,9 +51,10 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          finished = true;
       }
       
-      setTimeout(async () => {
+      setTimeout(() => {
          if (!finished) {
-            // this.spinner.show('sp1');
+            // this.loadingService.showLoading('Loading');
+            this.spinner.show('sp1');
          }
       }, 800);
 
@@ -105,7 +109,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            // this.spinner.hide('sp1');
+            // this.loadingService.dismissLoading();
+            this.spinner.hide('sp1');
          })
       );
    }

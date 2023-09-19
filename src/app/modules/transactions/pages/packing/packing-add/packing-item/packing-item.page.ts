@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, AlertController, IonAccordionGroup } from '@ionic/angular';
 import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingRoot, GoodsPackingSummary } from 'src/app/modules/transactions/models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
@@ -7,8 +6,6 @@ import { PackingService } from 'src/app/modules/transactions/services/packing.se
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
@@ -32,7 +29,7 @@ export class PackingItemPage implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
-    private packingService: PackingService,
+    public objectService: PackingService,
     private navController: NavController,
     private alertController: AlertController,
     private toastService: ToastService,
@@ -40,16 +37,15 @@ export class PackingItemPage implements OnInit {
 
   ngOnInit() {
     try {
-      this.objectHeader = this.packingService.header;
+      this.objectHeader = this.objectService.header;
       if (this.objectHeader === undefined) {
         this.navController.navigateBack('/transactions/packing/packing-sales-order');
       }
-      this.packingSalesOrders = this.packingService.selectedSalesOrders;
+      this.packingSalesOrders = this.objectService.selectedSalesOrders;
       if (this.packingSalesOrders && this.packingSalesOrders.length > 0) {
         this.packingSalesOrders.flatMap(r => r.details).flatMap(r => r.qtyPackedCurrent = 0);
       }
       this.loadModuleControl();
-      this.loadMasterList();
     } catch (e) {
       console.error(e);
     }
@@ -67,21 +63,6 @@ export class PackingItemPage implements OnInit {
         if (ignoreCheckdigit != undefined) {
           this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
         }
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.packingService.getMasterList().subscribe(response => {
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
       }, error => {
         throw error;
       })
@@ -168,7 +149,10 @@ export class PackingItemPage implements OnInit {
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
+                discountPercent: found_item_master.discPct,
+                discountGroupId: null,
+                unitPriceMin: null,
+                currencyId: null
               },
               itemVariationXId: found_barcode.xId,
               itemVariationYId: found_barcode.yId,
@@ -177,7 +161,7 @@ export class PackingItemPage implements OnInit {
             }
             this.addItemToSo(outputData);
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
           }
         }
       }
@@ -228,8 +212,8 @@ export class PackingItemPage implements OnInit {
             itemSku: trxLine.itemSku,
             itemVariationTypeCode: trxLine.variationTypeCode,
             itemCode: trxLine.itemCode,
-            itemVariationXDescription: trxLine.itemVariationXId ? this.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
-            itemVariationYDescription: trxLine.itemVariationYId ? this.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
+            itemVariationXDescription: trxLine.itemVariationXId ? this.objectService.itemVariationXMasterList.find(r => r.id === trxLine.itemVariationXId).description : null,
+            itemVariationYDescription: trxLine.itemVariationYId ? this.objectService.itemVariationYMasterList.find(r => r.id === trxLine.itemVariationYId).description : null,
             itemUomId: null,
             itemUomDescription: null,
             rack: null,
@@ -373,7 +357,7 @@ export class PackingItemPage implements OnInit {
         header: header,
         details: lines
       }
-      this.packingService.insertPacking(object).subscribe(response => {
+      this.objectService.insertPacking(object).subscribe(response => {
         if (response.status === 201) {
           let ps: GoodsPackingSummary = {
             packingNum: response.body["header"]["packingNum"],
@@ -381,7 +365,7 @@ export class PackingItemPage implements OnInit {
             locationId: response.body["header"]["locationId"],
             trxDate: response.body["header"]["trxDate"]
           }
-          this.packingService.setPackingSummary(ps);
+          this.objectService.setPackingSummary(ps);
           this.toastService.presentToast('Packing has been added', '', 'top', 'success', 1000);
           this.navController.navigateForward('/transactions/packing/packing-summary');
         }

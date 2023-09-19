@@ -14,9 +14,9 @@
             <div>Count Type: {{inventoryCountBatchCriteria.randomCountType}}</div>
             <div *ngIf="inventoryCountBatchCriteria.keyId.length > 0">
               {{inventoryCountBatchCriteria.randomCountType}}: 
-              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Brand'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemBrandMasterList}}</div></div>
-              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Group'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemGroupMasterList}}</div></div>
-              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Category'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:itemCategoryMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Brand'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:objectService.itemBrandMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Group'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:objectService.itemGroupMasterList}}</div></div>
+              <div *ngIf="inventoryCountBatchCriteria.randomCountType === 'Category'"><div *ngFor="let k of inventoryCountBatchCriteria.keyId">{{k|idMapping:objectService.itemCategoryMasterList}}</div></div>
             </div>
           </ion-content>
         </ng-template>
@@ -31,44 +31,40 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-barcode-scan-input #barcodeScanInput (onItemAdd)="onItemAdd($event)"></app-barcode-scan-input>
+    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding *ngFor="let line of objectDetail; let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let line of objectDetail; let i = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">
-          <ion-grid class="p-2 ion-no-padding">
+          <ion-grid class="ion-no-padding pt-2 pl-2">
             <ion-row>
-              <ion-col>
+              <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{line.itemBarcode}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
-                <div>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="ion-flex">
                   {{line.itemCode}}
+                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                 </div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
-                <p>{{line.description}}</p>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="ion-text-wrap">{{line.description}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
-              <ion-col>
-                <span class="badge-green px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationXId"> {{line.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple px-1 mr-1" style="font-size: x-small;" *ngIf="line.itemVariationYId"> {{line.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col class="ion-flex">
+              <ion-col class="ion-flex ion-margin-auto">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(line, i)">
                   <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                 </ion-button>
               </ion-col>
-              <ion-col class="ion-flex">
+              <ion-col class="ion-flex ion-margin-auto">
                 <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (ionFocus)="setFocus(inputNumWithoutSo)" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
               </ion-col>
-              <ion-col class="ion-flex">
+              <ion-col class="ion-flex ion-margin-auto">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(line)">
                   <ion-icon slot="icon-only" name="add-circle"></ion-icon>
                 </ion-button>
@@ -77,7 +73,7 @@
           </ion-grid>
         </ion-item>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="deleteLine(i)">Delete</ion-item-option>
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>

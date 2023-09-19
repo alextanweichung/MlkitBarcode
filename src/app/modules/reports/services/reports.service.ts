@@ -3,43 +3,65 @@ import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
-import { DebtorOutstanding } from '../models/debtor-outstanding';
-import { SAPerformaceListing } from '../models/rp-sa-performace-listing';
+import { DebtorOutstanding, DebtorOutstandingRequest } from '../models/debtor-outstanding';
+import { SAPerformanceListing, SalesAgentAllPerformanceObject } from '../models/rp-sa-performance-listing';
 import { ReportSOListing } from '../models/rp-so-listing';
+import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-customer';
+import { CreditInfo } from 'src/app/shared/models/credit-info';
+import { CheckQohRoot } from '../models/rp-check-qoh';
+import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportsService {
-
-  baseUrl: string;
   
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) {
-    console.log("🚀 ~ file: reports.service.ts:22 ~ ReportsService ~ apiUrl:")
-    this.baseUrl = configService.sys_parameter.apiUrl;
+    
   }
 
   getCustomers() {
-    return this.http.get<Customer[]>(this.baseUrl + "mobileReport/customer");
+    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/customer");
   }
 
-  getDebtorOutstanding(customerId: number, trxDate: string) {
-    return this.http.get<DebtorOutstanding[]>(this.baseUrl + "mobileReport/lastOutstanding/debtor/" + customerId.toString() + "/" + trxDate);
+  getDebtorOutstanding(object: DebtorOutstandingRequest) {
+    return this.http.post<DebtorOutstanding[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/lastOutstanding", object);
   }
 
-  getSOListing() {
-    return this.http.get<ReportSOListing[]>(this.baseUrl + "MobileReport/soListing");
+  getSOListing(object: DebtorOutstandingRequest) {
+    return this.http.post<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing", object);
+    // return this.http.get<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing");
   }
 
   getSAPerformance() {
-    return this.http.get<SAPerformaceListing[]>(this.baseUrl + "MobileReport/saPerformance");
+    return this.http.get<SAPerformanceListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/saPerformance");
+  }
+
+  getAllSalesPerformance(dateStart: string, dateEnd: string) {
+    return this.http.get<SalesAgentAllPerformanceObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/allPerformance/" + dateStart + "/" + dateEnd);
+  }
+
+  getSalesByCustomer(object: SalesByCustomerRequest) {
+    return this.http.post<SalesByCustomer[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/salesByCustomer", object);
+  }
+
+  getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
+    return this.http.get<CheckQohRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
+  }
+
+  getCheckCn(object: CheckCnRequest) {
+    return this.http.post<CheckCn[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkCn", object);
   }
 
   getPdf(model: ReportParameterModel) {
-    return this.http.post(this.baseUrl + "mobileReport/exportPdf", model, { responseType: 'blob' });
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "mobileReport/exportPdf", model, { responseType: 'blob' });
+  }
+
+  getCreditInfo(customerId: number) {
+    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + "mobileReport/creditInfo/" + customerId);
   }
   
 }

@@ -8,8 +8,21 @@ export interface Dashboard {
   quotationApprovalCount: TransactionProcessingCount
   salesOrderReviewCount: TransactionProcessingCount
   salesOrderApprovalCount: TransactionProcessingCount
+
+  backToBackOrderReviewCount: TransactionProcessingCount
+  backToBackOrderApprovalCount: TransactionProcessingCount
+
+  purchaseReqReviewCount: TransactionProcessingCount
+  purchaseReqApprovalCount: TransactionProcessingCount
   purchaseOrderReviewCount: TransactionProcessingCount
   purchaseOrderApprovalCount: TransactionProcessingCount
+
+  salesOrderPricingApprovalCount: TransactionProcessingCount
+  b2bOrderPricingApprovalCount: TransactionProcessingCount
+
+  nonTradePurchaseOrderReviewCount: TransactionProcessingCount
+  nonTradePurchaseOrderApprovalCount: TransactionProcessingCount
+
   quotationList: QuotationList[]
   salesOrderList: SalesOrderList[]
 }
@@ -55,7 +68,8 @@ export interface MemoDetail {
 }
 
 export interface AnnouncementFile {
-  filesId: number,
-  filesName: string,
+  filesId: number
+  filesName: string  
   filesType: string
+  filesSize: number
 }

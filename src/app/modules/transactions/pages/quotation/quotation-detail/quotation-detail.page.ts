@@ -1,16 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { QuotationRoot } from '../../../models/quotation';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { TrxChild } from 'src/app/shared/models/trx-child';
 
 @Component({
   selector: 'app-quotation-detail',
@@ -26,13 +27,14 @@ export class QuotationDetailPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private quotationService: QuotationService,
+    public objectService: QuotationService,
     private toastService: ToastService,
     private commonService: CommonService,
     private route: ActivatedRoute,
     private navController: NavController,
     private alertController: AlertController
   ) {
+    this.objectService.loadRequiredMaster();
     try {
       this.route.queryParams.subscribe(params => {
         this.objectId = params['objectId'];
@@ -53,7 +55,6 @@ export class QuotationDetailPage implements OnInit {
         this.navController.navigateBack('/transactions/quotation')
       } else {
         this.loadModuleControl();
-        this.loadMasterList();
         this.loadObject();
       }
     } catch (e) {
@@ -75,28 +76,18 @@ export class QuotationDetailPage implements OnInit {
     }
   }
 
-  locationMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.quotationService.getMasterList().subscribe(response => {
-        this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
-    }
-  }
-
   loadObject() {
     try {
-      this.quotationService.getObjectById(this.objectId).subscribe(response => {
+      this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
+        if (this.object.header.isHomeCurrency) {
+          this.object.header.maxPrecision = this.precisionSales.localMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.localMax
+        } else {
+          this.object.header.maxPrecision = this.precisionSales.foreignMax;
+          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
+        }
+        this.loadWorkflow(this.object.header.quotationId);
       }, error => {
         throw error;
       })
@@ -104,6 +95,43 @@ export class QuotationDetailPage implements OnInit {
       console.error(e);
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
     }
+  }
+
+  workFlowState: WorkFlowState[] = [];
+  trxChild: TrxChild[] = [];
+  loadWorkflow(objectId: number) {
+    this.workFlowState = [];
+    this.objectService.getWorkflow(objectId).subscribe(response => {
+      if (response) {
+        this.workFlowState = response;
+      } else {
+        this.workFlowState = [];
+      }
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  editObject() {
+    this.objectService.setHeader(this.object.header);
+    this.objectService.setChoosenItems(this.object.details);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        objectId: this.object.header.quotationId
+      }
+    }
+    this.navController.navigateRoot('/transactions/quotation/quotation-cart', navigationExtras);
+  }
+
+  toggleObject() {
+    this.objectService.toggleObject(this.object.header.quotationId).subscribe(response => {
+      if (response.status === 204) {
+        this.loadObject();
+        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+      }
+    }, error => {
+      console.error(error);
+    })
   }
 
   matchImage(itemId: number) {
@@ -129,21 +157,11 @@ export class QuotationDetailPage implements OnInit {
 
   /* #region show variaton dialog */
 
-  variationDialog: boolean = false;
-  showVariationDialog() {
-    this.variationDialog = true;
-  }
-
-  hideVariationDialog() {
-    this.selectedItem = null;
-    this.variationDialog = false;
-  }
-
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.selectedItem = item;
-      this.showVariationDialog();
+      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
     }
   }
 
@@ -175,8 +193,7 @@ export class QuotationDetailPage implements OnInit {
   async presentAlertViewPdf() {
     try {
       const alert = await this.alertController.create({
-        header: '',
-        subHeader: 'View Pdf?',
+        header: 'Download PDF?',
         message: '',
         buttons: [
           {
@@ -202,7 +219,7 @@ export class QuotationDetailPage implements OnInit {
 
   async downloadPdf() {
     try {
-      this.quotationService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
+      this.objectService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
         let filename = this.object.header.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
@@ -280,6 +297,8 @@ export class QuotationDetailPage implements OnInit {
     }
   }
 
+  currentWorkflow: WorkFlowState;
+  nextWorkflow: WorkFlowState;
   updateDoc(action: string, listOfDoc: string[], actionReason: string) {
     try {
       if (this.processType && this.selectedSegment) {
@@ -289,13 +308,42 @@ export class QuotationDetailPage implements OnInit {
           docId: listOfDoc.map(i => Number(i))
         }
         try {
-          this.quotationService.bulkUpdateDocumentStatus(this.processType === 'REVIEWS' ? 'mobileQuotationReview' : 'mobileQuotationApprove', bulkConfirmReverse).subscribe(async response => {
+          this.currentWorkflow = this.workFlowState[this.workFlowState.filter(r => r.isCompleted).length - 1];
+          this.nextWorkflow = this.workFlowState.find(r => r.trxId === null);
+          let workflowApiObject: string;
+          if (action.toUpperCase() === "CONFIRM" || action.toUpperCase() === "REJECT") {
+            switch (this.nextWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileQuotationReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileQuotationApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          if (action.toUpperCase() === "REVERSE") {
+            switch (this.currentWorkflow.stateType.toUpperCase()) {
+              case "REVIEW":
+                workflowApiObject = "MobileQuotationReview";
+                break;
+              case "APPROVAL":
+                workflowApiObject = "MobileQuotationApprove";
+                break;
+              default:
+                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                return;
+            }
+          }
+          this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
               this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
               this.navController.back();
             }
           }, error => {
-            throw error;
+            throw Error;
           })
         } catch (error) {
           this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);

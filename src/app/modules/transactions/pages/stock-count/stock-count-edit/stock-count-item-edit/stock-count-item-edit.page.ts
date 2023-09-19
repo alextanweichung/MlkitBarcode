@@ -33,7 +33,7 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
     private alertController: AlertController,
     private configService: ConfigService,
     private toastService: ToastService,
-    private stockCountService: StockCountService
+    public objectService: StockCountService
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -45,35 +45,13 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    this.objectHeader = this.stockCountService.stockCountHeader;
-    this.objectDetail = this.stockCountService.stockCountLines;
+    this.objectHeader = this.objectService.objectHeader;
+    this.objectDetail = this.objectService.objectDetail;
     if (!this.objectHeader || this.objectHeader === undefined) {
       this.navController.navigateBack('/transactions/stock-count');
     }
-    this.loadMasterList();
     this.loadModuleControl();
     this.loadInventoryCountBatchCriteria();
-  }
-
-  itemBrandMasterList: MasterListDetails[] = [];
-  itemGroupMasterList: MasterListDetails[] = [];
-  itemCategoryMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  loadMasterList() {
-    try {
-      this.stockCountService.getMasterList().subscribe(response => {
-        this.itemBrandMasterList = response.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemGroupMasterList = response.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemCategoryMasterList = response.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationXMasterList = response.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-        this.itemVariationYMasterList = response.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   moduleControl: ModuleControl[] = [];
@@ -96,7 +74,7 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
   inventoryCountBatchCriteria: InventoryCountBatchCriteria
   loadInventoryCountBatchCriteria() {
     try {
-      this.stockCountService.getInventoryCountBatchCriteria(this.objectHeader.inventoryCountBatchId).subscribe(response => {
+      this.objectService.getInventoryCountBatchCriteria(this.objectHeader.inventoryCountBatchId).subscribe(response => {
         this.inventoryCountBatchCriteria = response;
       }, error => {
         throw error;
@@ -129,7 +107,10 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
                 discountExpression: found_item_master.discPct + '%',
-                discountPercent: found_item_master.discPct
+                discountPercent: found_item_master.discPct,
+                discountGroupId: null,
+                unitPriceMin: null,
+                currencyId: null
               },
               itemVariationXId: found_barcode.xId,
               itemVariationYId: found_barcode.yId,
@@ -142,7 +123,7 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
             }
             this.addItemToLine(outputData);
           } else {
-            this.toastService.presentToast('Invalid Barcode', '', 'top', 'danger', 1000);
+            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
           }
         } else {
           this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
@@ -153,8 +134,12 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
     }
   }
 
-  onItemAdd(event: TransactionDetail) {
-    this.addItemToLine(event);
+  onItemAdd(event: TransactionDetail[]) {
+    if (event && event.length > 0) {
+      event.forEach(r => {
+        this.addItemToLine(r);
+      })
+    }
   }
 
   async addItemToLine(trxLine: TransactionDetail) {
@@ -337,9 +322,9 @@ export class StockCountItemEditPage implements OnInit, ViewWillEnter {
 
   updateObject() {
     try {
-      this.stockCountService.updateInventoryCount({ header: this.objectHeader, details: this.objectDetail, barcodeTag: [] }).subscribe(response => {
+      this.objectService.updateInventoryCount({ header: this.objectHeader, details: this.objectDetail, barcodeTag: [] }).subscribe(response => {
         if (response.status === 204) {
-          this.stockCountService.resetVariables();
+          this.objectService.resetVariables();
           this.toastService.presentToast('Stock Count updated', '', 'top', 'success', 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { IonSearchbar } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonSearchbar } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
+import { MasterListDetails } from '../../models/master-list-details';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-search-dropdown',
@@ -10,26 +12,30 @@ import { SearchDropdownList } from '../../models/search-dropdown-list';
 export class SearchDropdownPage implements OnInit, OnChanges {
 
   @Input() title: string = "Search";
-  // @Input() showHeaderLabel: boolean = true;
-  // @Input() showBoldHeader: boolean = false;
   @Input() optionLabel: string = 'description';
-  // @Input() showCode: boolean = false;
-  @Input() searchDropdownList: SearchDropdownList[];
+  @Input() searchDropdownList: SearchDropdownList[] = [];
+  @Input() masterDropdownList: MasterListDetails[] = [];
   @Input() emptyMessage: string = 'No results found';
   @Input() disabled: boolean = false;
   @Output() onActionComplete: EventEmitter<SearchDropdownList> = new EventEmitter();
-  tempDropdownList: SearchDropdownList[];
+  tempDropdownList: SearchDropdownList[] = [];
   @Input() selectedId: number;
   selected: SearchDropdownList;
 
   @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
 
-  constructor() { }
+  constructor(
+    private toastService: ToastService
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes.masterDropdownList) {
+      this.bindFromMasterList();
+      this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
+    }
     if (changes.selectedId || changes.searchDropdownList) {
-      if (this.selectedId) {
-        this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
+      if (this.selectedId !== null) {
+        this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
       } else {
         this.selected = null;
       }
@@ -37,25 +43,43 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.selected = this.searchDropdownList.find(r => r.id === this.selectedId);
+
+  }
+  
+  setFocus() {
+    this.searchBar.setFocus();
+  }
+
+  bindFromMasterList() {
+    if (this.masterDropdownList && this.masterDropdownList.length > 0) {
+      this.masterDropdownList.forEach(r => {
+        this.searchDropdownList.push({
+          id: r.id,
+          code: r.code,
+          description: r.description
+        })
+      })
+    }
   }
 
   searchText: string = '';
-  async keypress(event) {
+  async onKeyDown(event) {
     if (event.keyCode === 13) {
-      if (this.searchText.length > 0) {
-        this.tempDropdownList = this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase()));
-      } else {
-        this.tempDropdownList = this.searchDropdownList;
-      }
-    } else {
-      this.tempDropdownList = this.searchDropdownList;
+      this.searchItem();
     }
-    // this.searchBar.setFocus();
+  }
+
+  searchItem() {
+    this.startIndex = 0;
+    this.tempDropdownList = []
+    this.assignToTemp(this.startIndex, this.size);
   }
 
   resetFilter() {
-    this.tempDropdownList = this.searchDropdownList;
+    this.searchText = "";
+    this.startIndex = 0;
+    this.tempDropdownList = [];
+    this.assignToTemp(this.startIndex, this.size);
   }
 
   chooseThis(object: SearchDropdownList) {
@@ -73,11 +97,14 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 
   isModalOpen: boolean = false;
   showModal() {
-    this.tempDropdownList = this.searchDropdownList;
+    this.startIndex = 0;
+    this.assignToTemp(this.startIndex, this.size);
     this.isModalOpen = true;
   }
 
   hideModal(object: SearchDropdownList, triggerOutput: boolean = false) {
+    this.searchText = "";
+    this.tempDropdownList = [];
     if (triggerOutput) {
       this.onActionComplete.emit(object);
     }
@@ -88,6 +115,27 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   cancel() {
     // Dismiss modal
     this.hideModal(null);
+  }
+
+  assignToTemp(startIndex: number, size: number) {
+    this.tempDropdownList = [];
+    if (this.searchText && this.searchText.length > 0) {
+      this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code?.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description?.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+    } else {
+      this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
+    }
+  }
+
+  startIndex: number = 0;
+  readonly size: number = 20;
+  onIonInfinite(event) {
+    this.startIndex += this.size;
+    if (this.searchDropdownList && this.startIndex <= this.searchDropdownList.length) {
+      this.assignToTemp(this.startIndex, this.size);
+    }    
+    setTimeout(() => {
+      (event as InfiniteScrollCustomEvent).target.complete();
+    }, 500);
   }
 
 }

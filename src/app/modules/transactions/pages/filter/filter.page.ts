@@ -24,12 +24,18 @@ export class FilterPage implements OnInit {
   customerFilter: boolean = false;
   customerList: SearchDropdownList[] = [];
 
+  salesAgentFilter: boolean = false;
+  salesAgentList: SearchDropdownList[] = [];
+
+  useDraft: boolean = false;
+  showDraftOnly: boolean = true;
+
   constructor(
     private commonService: CommonService,
     private modalController: ModalController
   ) { }
 
-  ngOnInit() {    
+  ngOnInit() {
     this.date_from = format(parseISO(this.startDate.toISOString()), 'MMM d, yyyy');
     this.date_to = format(parseISO(this.endDate.toISOString()), 'MMM d, yyyy');
   }
@@ -64,9 +70,20 @@ export class FilterPage implements OnInit {
 
   selectedCustomerId: number[] = [];
   onCustomerSelected(event) {
+    this.selectedCustomerId = [];
     if (event) {
       event.forEach(r => {
         this.selectedCustomerId.push(r.id)
+      });
+    }
+  }
+
+  selectedSalesAgentId: number[] = [];
+  onSalesAgentSelected(event) {
+    this.selectedSalesAgentId = [];
+    if (event) {
+      event.forEach(r => {
+        this.selectedSalesAgentId.push(r.id);
       });
     }
   }
@@ -81,11 +98,11 @@ export class FilterPage implements OnInit {
   apply() {
     // Add filter logic here...
     // ...
-    if (this.customerFilter) {
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId };
-    } else {
-      this.filters = { startDate: this.startDate, endDate: this.endDate };
-    }
+    // if (this.customerFilter || this.salesAgentFilter) {
+    this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly };
+    // } else {
+    //   this.filters = { startDate: this.startDate, endDate: this.endDate };
+    // }
 
     // Dismiss modal and apply filters
     this.modalController.dismiss(this.filters);

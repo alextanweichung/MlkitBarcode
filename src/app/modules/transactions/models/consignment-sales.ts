@@ -8,6 +8,7 @@ export interface ConsignmentSalesList {
   locationDesc: string
   toLocationDesc: string
   deactivated: boolean
+  isEntryCompleted: boolean
 }
 
 export interface ConsignmentSalesRoot {
@@ -34,13 +35,7 @@ export interface ConsignmentSalesHeader {
   isDisplayTaxInclusive: boolean
   maxPrecision: number
   maxPrecisionTax: number
-}
-
-export interface ConsignmentSalesSummary {
-  consignmentSalesNum: string
-  customerId: number
-  toLocationId: number
-  trxDate: Date
+  isEntryCompleted: boolean
 }
 
 export interface ConsignmentSalesLocation {
@@ -48,4 +43,5 @@ export interface ConsignmentSalesLocation {
   locationCode: string
   locationDescription: string
   customerId: number
+  isPrimary: boolean
 }
