@@ -29,6 +29,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.selected = null;
     if (changes.masterDropdownList) {
       this.bindFromMasterList();
       this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);

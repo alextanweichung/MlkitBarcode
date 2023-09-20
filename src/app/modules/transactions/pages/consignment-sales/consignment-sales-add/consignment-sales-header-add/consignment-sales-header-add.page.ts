@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -15,6 +17,8 @@ import { CommonService } from 'src/app/shared/services/common.service';
   styleUrls: ['./consignment-sales-header-add.page.scss'],
 })
 export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
+
+  @ViewChild("locationDropdown", {static:false}) locationDropdown: SearchDropdownPage;
 
   objectForm: FormGroup;
   trxDate: Date = null;
@@ -47,8 +51,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
-      toLocationId: [this.objectService.locationList.find(r => r.isPrimary)?.locationId, [Validators.required]],
-      toLocationCode: [this.objectService.locationList.find(r => r.isPrimary)?.locationCode, [Validators.required]],
+      toLocationId: [null, [Validators.required]],
+      toLocationCode: [null, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
       salesAgentId: [null],
@@ -59,8 +63,23 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
       maxPrecisionTax: [null],
       sourceType: ["M"],
       typeCode: ["S"],
-      businessModelType: [null]
+      businessModelType: [null],
+      isBearPromo: [null],
+      marginMode: [null],
     })
+    if (this.objectService.locationList.find(r => r.isPrimary)?.locationId) {
+      let findLocation = this.objectService.locationMasterList.find(r => r.id === this.objectService.locationList.find(r => r.isPrimary)?.locationId);
+      this.objectForm.patchValue({
+        toLocationId: findLocation.id,
+        toLocationCode: findLocation.code,
+        isBearPromo: findLocation.attribute6 == '1' ? true : false,
+        marginMode: findLocation.attribute8
+      })
+      let customerId = this.objectService.locationList.find(r => r.locationId === this.objectService.locationList.find(r => r.isPrimary)?.locationId)?.customerId;
+      if (customerId) {
+        this.onCustomerChanged(customerId)
+      }
+    }
   }
 
   ngOnInit() {
@@ -188,13 +207,24 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
               this.onCustomerChanged(customerId)
             }
             this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
-            await this.objectService.refreshLocalDb(event.code);
+            let findLocation = this.objectService.locationMasterList.find(r => r.id === event.id);
+            this.objectForm.patchValue({
+              isBearPromo: findLocation.attribute6 == '1' ? true : false,
+              marginMode: findLocation.attribute8
+            })
+            if (Capacitor.getPlatform() !== "web") { 
+              await this.objectService.refreshLocalDb(event.code);
+            }
           },
         },
         {
           text: "Cancel",
           role: "cancel",
-          cssClass: "cancel"
+          cssClass: "cancel",
+          handler: () => {
+            this.locationDropdown.selectedId = this.objectForm.controls.toLocationId.value;
+            this.locationDropdown.selected = this.locationDropdown.searchDropdownList.find(r => r.id === this.locationDropdown.selectedId);
+          }
         }]
       });
       await alert.present();

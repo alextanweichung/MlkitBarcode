@@ -398,7 +398,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   /* #region validate new item id */
 
   validateNewItemConversion(found: TransactionDetail) {
-    if (found.newItemId && found.newItemEffectiveDate && this.commonService.convertUtcDate(found.newItemEffectiveDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
+    if (found.newItemId && found.newItemEffectiveDate && found.newItemEffectiveDate <= this.objectHeader.trxDate) {
       let newItemCode = this.configService.item_Masters.find(x => x.id == found.newItemId);
       if (newItemCode) {
         this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1750);

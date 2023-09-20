@@ -6,10 +6,11 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import { environment } from 'src/environments/environment';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { LoginUser } from 'src/app/services/auth/login-user';
 SwiperCore.use([Pagination]);
 
 @Component({
@@ -19,7 +20,7 @@ SwiperCore.use([Pagination]);
 })
 export class CardsPage implements OnInit, AfterContentChecked {
 
-  @ViewChild('swiper') swiper: SwiperComponent;
+  @ViewChild("swiper") swiper: SwiperComponent;
 
   // Swiper config
   config: SwiperOptions = {
@@ -49,14 +50,14 @@ export class CardsPage implements OnInit, AfterContentChecked {
     this.currentVersion = environment.version;
   }
 
-  loginUser: any;
+  loginUser: LoginUser;
   ngOnInit(): void {
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    if (this.loginUser.loginUserType === 'B') {
+    this.loginUser = JSON.parse(localStorage.getItem("loginUser"));
+    if (this.loginUser.loginUserType === "B") {
       this.userType = "Base User";
-    } else if (this.loginUser.loginUserType === 'C') {
+    } else if (this.loginUser.loginUserType === "C") {
       this.userType = "Consignment User";
-    } else if (this.loginUser.loginUserType === 'P') {
+    } else if (this.loginUser.loginUserType === "P") {
       this.userType = "POS User";
     }
     this.authService.currentUserToken$.subscribe(obj => {
@@ -86,9 +87,9 @@ export class CardsPage implements OnInit, AfterContentChecked {
   salesAgentMasterList: MasterListDetails[] = [];
   loadMasterList() {
     this.commonService.getAgentsMasterList().subscribe(response => {
-      this.procurementAgentMasterList = response.filter(x => x.objectName == 'ProcurementAgent' && x.details != null).flatMap(src => src.details);      
-      this.warehouseAgentMasterList = response.filter(x => x.objectName == 'WarehouseAgent' && x.details != null).flatMap(src => src.details);      
-      this.salesAgentMasterList = response.filter(x => x.objectName == 'SalesAgent' && x.details != null).flatMap(src => src.details);
+      this.procurementAgentMasterList = response.filter(x => x.objectName == "ProcurementAgent" && x.details != null).flatMap(src => src.details);      
+      this.warehouseAgentMasterList = response.filter(x => x.objectName == "WarehouseAgent" && x.details != null).flatMap(src => src.details);      
+      this.salesAgentMasterList = response.filter(x => x.objectName == "SalesAgent" && x.details != null).flatMap(src => src.details);
     }, error => {
       console.error(error);
     })
@@ -96,35 +97,41 @@ export class CardsPage implements OnInit, AfterContentChecked {
 
   // Sync
   async sync() {
-    if (Capacitor.getPlatform() !== 'web') {
+    if (Capacitor.getPlatform() !== "web") {
       try {
         let response = await this.commonService.syncInbound();
-        let itemMaster: PDItemMaster[] = response['itemMaster'];
-        let itemBarcode: PDItemBarcode[] = response['itemBarcode'];
+        let itemMaster: PDItemMaster[] = response["itemMaster"];
+        let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+        if (this.loginUser.locationId && this.loginUser.locationId.length > 0) {
+          let response2 = await this.commonService.syncMarginConfig(this.loginUser.locationId);
+          let marginConfig: PDMarginConfig[] = response2;
+          await this.configService.syncMarginConfig(marginConfig);
+        }
       } catch (error) {
-        this.toastService.presentToast(error.message, '', 'top', 'medium', 1000);
+        this.toastService.presentToast(error.message, "", "top", "medium", 1000);
       }
     }
   }
 
   async addNewActivation() {
     const alert = await this.alertController.create({
-      cssClass: 'custom-alert',
-      header: 'New Activation?',
+      cssClass: "custom-alert",
+      header: "New Activation?",
       subHeader: "You'll be signed out to do this!",
       buttons: [
         {
-          text: 'Sign-out',
-          cssClass: 'danger',
+          text: "Sign-out",
+          cssClass: "danger",
           handler: async () => {
             this.authService.signOut(true);
           }
         },
         {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'cancel'
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel"
         }
       ]
     });
@@ -134,20 +141,20 @@ export class CardsPage implements OnInit, AfterContentChecked {
 
   async signOut() {
     const alert = await this.alertController.create({
-      cssClass: 'custom-alert',
-      header: 'Sign-out?',
+      cssClass: "custom-alert",
+      header: "Sign-out?",
       buttons: [
         {
-          text: 'Sign-out',
-          cssClass: 'danger',
+          text: "Sign-out",
+          cssClass: "danger",
           handler: async () => {
             this.authService.signOut();
           }
         },
         {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'cancel'
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel"
         }
       ]
     });

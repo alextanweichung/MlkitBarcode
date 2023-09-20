@@ -72,6 +72,35 @@
                 <div >{{line.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
             </ion-row>
+            <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Margin Pct.</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Margin Amt.</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div class="font-bold">Bearing Amt.</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div class="font-bold">Invoice Amt.</div>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
+              <ion-col class="ion-flex ion-margin-auto">
+                <div *ngIf="(line.marginPct??0 > 0)">{{line.marginPct|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}%</div>
+                <div *ngIf="line.marginPct === null || line.marginPct === 0">{{line.marginPct|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div>{{line.marginAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{line.bearAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{line.invoiceAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              </ion-col>
+            </ion-row>
           </ion-grid>
         </ion-item>
         <ion-item-options>

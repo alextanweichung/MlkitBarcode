@@ -7,6 +7,7 @@ import { ConsignmentSalesRoot } from '../../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../../services/consignment-sales.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
   selector: 'app-consignment-sales-detail',
@@ -42,12 +43,21 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     this.loadModuleControl();
   }
 
+  moduleControl: ModuleControl[] = [];
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   maxPrecision: number = 2;
   maxPrecisionTax: number = 2;
+  consignmentSalesActivateMarginCalculation: boolean = false;
   loadModuleControl() {
     try {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+        this.moduleControl = obj;
+        let activateMargin = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesActivateMarginCalculation");
+        if (activateMargin && activateMargin.ctrlValue.toUpperCase() == 'Y') {
+          this.consignmentSalesActivateMarginCalculation = true;
+        }
+      })
       this.authService.precisionList$.subscribe(precision => {
         this.precisionSales = precision.find(x => x.precisionCode == "SALES");
         this.precisionTax = precision.find(x => x.precisionCode == "TAX");

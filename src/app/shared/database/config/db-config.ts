@@ -5,5 +5,6 @@ export const dbConfig = {
 
 export const inboundDb_Tables = {
    item_Master:  "ITEM_MASTER",
-   item_Barcode: "ITEM_BARCODE"
+   item_Barcode: "ITEM_BARCODE",
+   margin_Config: "MARGIN_CONFIG"
 }

@@ -6,7 +6,7 @@ import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation,
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { format } from 'date-fns';
-import { PDItemMaster, PDItemBarcode } from 'src/app/shared/models/pos-download';
+import { PDItemMaster, PDItemBarcode, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful

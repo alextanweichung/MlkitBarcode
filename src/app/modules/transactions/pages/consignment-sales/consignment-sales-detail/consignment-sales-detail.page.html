@@ -12,7 +12,7 @@
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" items="full">
         <ion-item (click)="popover.dismiss(); completeObjectAlert()" *ngIf="!object?.header?.isEntryCompleted">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
@@ -45,8 +45,8 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2" *ngIf="object">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" items="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" items="full">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -111,8 +111,8 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
-    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object?.details; let i = index">
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" items="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" items="full" *ngFor="let item of object?.details; let i = index">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -178,6 +178,21 @@
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
+            <ion-col class="ion-flex ion-margin-auto">
+              <div *ngIf="(item.marginPct??0 > 0)">{{item.marginPct|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}%</div>
+              <div *ngIf="item.marginPct === null || item.marginPct === 0">{{item.marginPct|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div>{{item.marginAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{item.bearAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{item.invoiceAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

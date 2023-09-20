@@ -74,10 +74,10 @@ export class BarcodeScanInputPage implements OnInit {
     })
   }
 
-  handleBarcodeKeyDown(e: any, key: string) {
+  async handleBarcodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
       let barcode = this.manipulateBarcodeCheckDigit(key);
-      this.validateBarcode(barcode);
+      await this.validateBarcode(barcode);
       e.preventDefault();
       this.setFocus();
     }
@@ -133,11 +133,12 @@ export class BarcodeScanInputPage implements OnInit {
             itemBrandId: found_item_master.brandId,
             itemGroupId: found_item_master.groupId,
             itemCategoryId: found_item_master.catId,
-            itemBarcodeTagId: found_barcode.id
+            itemDepartmentId: found_item_master.deptId,
+            itemBarcodeTagId: found_barcode.id,
+            newItemId: found_item_master.newId,
+            newItemEffectiveDate: found_item_master.newDate
           }
-          if (!this.validateNewItemConversion(found_item_master)) {
-            this.onItemAdd.emit([outputData]);
-          }
+          this.onItemAdd.emit([outputData]);
         } else {
           this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
         }
@@ -147,9 +148,9 @@ export class BarcodeScanInputPage implements OnInit {
     }
   }
 
-  handleItemCodeKeyDown(e: any, key: string) {
+  async handleItemCodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
-      this.validateItem(key);
+      await this.validateItem(key);
       e.preventDefault();
       this.setFocus();
     }
@@ -179,7 +180,6 @@ export class BarcodeScanInputPage implements OnInit {
         }
         if (found_item_master && found_item_master.length > 0) {
           found_item_barcode = this.configService.item_Barcodes.filter(r => found_item_master.flatMap(rr => rr.id).includes(r.itemId));
-
           found_item_master.forEach(r => {
             if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
               let t = found_item_barcode.find(rr => rr.itemId === r.id);
@@ -204,19 +204,17 @@ export class BarcodeScanInputPage implements OnInit {
                   unitPriceMin: null,
                   currencyId: null
                 },
-                // itemVariationXId: r.xId,
-                // itemVariationYId: r.yId,
                 itemSku: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.sku : null,
                 itemBarcode: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.barcode : null,
                 itemBrandId: r.brandId,
                 itemGroupId: r.groupId,
-                itemCategoryId: r.catId
-              }
+                itemCategoryId: r.catId,
+                itemDepartmentId: r.deptId
+              }              
               this.availableItemmmm.push(outputData);
             }
           })
         }
-
         if (found_item_barcode && found_item_barcode.length > 0) {
           found_item_barcode.forEach(async r => {
             if (this.availableVariations.findIndex(rr => rr.itemSku === r.sku) < 0) {
@@ -248,7 +246,10 @@ export class BarcodeScanInputPage implements OnInit {
                 itemBrandId: found_item_master.find(rr => rr.id === r.itemId)?.brandId,
                 itemGroupId: found_item_master.find(rr => rr.id === r.itemId)?.groupId,
                 itemCategoryId: found_item_master.find(rr => rr.id === r.itemId)?.catId,
-                itemBarcodeTagId: r.id
+                itemDepartmentId: found_item_master.find(rr => rr.id === r.itemId)?.deptId,
+                itemBarcodeTagId: r.id,
+                newItemId: found_item_master.find(rr => rr.id === r.itemId)?.newId,
+                newItemEffectiveDate: found_item_master.find(rr => rr.id === r.itemId)?.newDate
               }
               this.availableVariations.push(outputData);
             }
@@ -256,24 +257,12 @@ export class BarcodeScanInputPage implements OnInit {
         } else {
           this.toastService.presentToast('No Item Found', '', 'top', 'danger', 1000);
         }
-        // if (this.availableItems.length > 0) {
-        //   if (this.availableItems.length === 1) {
-        //     if (!this.validateNewItemConversion(found_item_master)) {
-        //       this.onItemAdd.emit(this.availableItems);
-        //     }
-        //   } else {
-        //     if (!this.validateNewItemConversion(found_item_master)) {
         if (found_item_master && found_item_master.length === 1) {
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id);
           this.showVariationModal();
         } else {
           this.showItemModal();
         }
-        //     }
-        //   }
-        // } else {
-        //   this.toastService.presentToast('Item Not Found', '', 'top', 'danger', 1000);
-        // }
       } else {
         this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
       }
@@ -299,14 +288,7 @@ export class BarcodeScanInputPage implements OnInit {
     if (item.variationTypeCode === "0") {
       if (item) {
         let found = this.configService.item_Masters.find(r => r.id === item.itemId);
-        if (found) {
-          if (!this.validateNewItemConversion(found)) {
-            this.onItemAdd.emit([item]);
-          }
-        }
-        else {
-          this.onItemAdd.emit([item]);
-        }
+        this.onItemAdd.emit([item]);
       } else {
         this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
       }
@@ -335,14 +317,7 @@ export class BarcodeScanInputPage implements OnInit {
     let found = this.availableVariationsByItemId.filter(r => r.isSelected)
     if (found.length > 0) {
       let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]);
-      if (found_item_master) {
-        if (!this.validateNewItemConversion(found_item_master[0])) {
-          this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
-        }
-      }
-      else {
-        this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
-      }
+      this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
     }
     else {
       this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
@@ -375,28 +350,6 @@ export class BarcodeScanInputPage implements OnInit {
 
   focusItemSearch() {
     this.itemInput.nativeElement.focus();
-  }
-
-  /* #endregion */
-
-  /* #region validate new item id */
-
-  validateNewItemConversion(found: PDItemMaster) {
-    if (found.newId && found.newDate && this.commonService.convertUtcDate(found.newDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
-      let newItemCode = this.configService.item_Masters.find(x => x.id == found.newId);
-      if (newItemCode) {
-        this.toastService.presentToast("Converted Code Detected", `Item ${found.code} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newDate), 'dd/MM/yyyy')}`, 'top', 'warning', 1750);
-        if (this.systemWideBlockConvertedCode) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
   }
 
   /* #endregion */
