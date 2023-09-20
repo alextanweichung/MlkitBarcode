@@ -25,4 +25,5 @@ export interface InnerVariationDetail {
   openQty?: number
   availableQty?: number
   ratio?: any
+  deactivated?: boolean
 }

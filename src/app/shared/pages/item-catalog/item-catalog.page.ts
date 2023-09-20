@@ -118,7 +118,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           Keyboard.hide();
         }
         this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), "yyyy-MM-dd"), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
-          console.log("🚀 ~ file: item-catalog.page.ts:121 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeywordfortest ~ response:", JSON.stringify(response))
           let rrr = response;
           if (rrr && rrr.length > 0) {
             rrr.forEach(r => {
@@ -129,7 +128,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           } else {
             this.startIndex = this.availableItems.length;
           }
-          this.availableItems = [...this.availableItems, ...rrr.filter(r => r.deactivated === false)];
+          this.availableItems = [...this.availableItems, ...rrr];
           this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
           this.computeQtyInCart();
         })

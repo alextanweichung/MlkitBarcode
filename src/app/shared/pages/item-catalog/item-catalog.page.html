@@ -176,13 +176,13 @@
           </ion-row>
           <div *ngFor="let vd of selectedItem.variationDetails">
             <div *ngFor="let d of vd.details">
-              <ion-row class="py-0">
+              <ion-row class="py-0" *ngIf="d.deactivated === false">
                 <ion-col size="6" class="ion-flex ion-margin-auto">
                   <ion-grid class="ion-no-padding">
                     <ion-row>
                       <ion-col class="ion-flex ion-margin-auto">
                         <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>                        
+                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
                       </ion-col>
                     </ion-row>
                     <ion-row class="pt-1">
