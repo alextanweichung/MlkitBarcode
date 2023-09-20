@@ -118,6 +118,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           Keyboard.hide();
         }
         this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), "yyyy-MM-dd"), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
+          console.log("🚀 ~ file: item-catalog.page.ts:121 ~ ItemCatalogPage ~ this.searchItemService.getItemInfoByKeywordfortest ~ response:", JSON.stringify(response))
           let rrr = response;
           if (rrr && rrr.length > 0) {
             rrr.forEach(r => {
@@ -128,7 +129,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           } else {
             this.startIndex = this.availableItems.length;
           }
-          this.availableItems = [...this.availableItems, ...rrr];
+          this.availableItems = [...this.availableItems, ...rrr.filter(r => r.deactivated === false)];
           this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
           this.computeQtyInCart();
         })
@@ -288,7 +289,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   addToCart(data: TransactionDetail) {
-    if (!this.validateNewItemConversion(data)) {
+    let isBlock = this.validateNewItemConversion(data);
+    if (!isBlock) {
       this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
       this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
       data.qtyRequest = 0;
@@ -359,7 +361,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   addVariationToCart() {
     var totalQty = 0;
-    if (!this.validateNewItemConversion(this.selectedItem)) {
+    let isBlock = this.validateNewItemConversion(this.selectedItem)
+    if (!isBlock) {
       if (this.selectedItem.variationDetails) {
         this.selectedItem.variationDetails.forEach(x => {
           x.details.forEach(y => {
@@ -398,10 +401,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   /* #region validate new item id */
 
   validateNewItemConversion(found: TransactionDetail) {
-    if (found.newItemId && found.newItemEffectiveDate && found.newItemEffectiveDate <= this.objectHeader.trxDate) {
+    if (found.newItemId && found.newItemEffectiveDate && new Date(found.newItemEffectiveDate) <= new Date(this.objectHeader.trxDate)) {
       let newItemCode = this.configService.item_Masters.find(x => x.id == found.newItemId);
       if (newItemCode) {
-        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1750);
+        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(new Date(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1000);
         if (this.systemWideBlockConvertedCode) {
           return true;
         } else {
