@@ -8,9 +8,9 @@
     </ion-segment-button>
   </ion-segment>
   <hr class="hr-small">
-  <ion-list class="list-custom animate__animated animate__fadeIn" [lines]="pendingObjects?.length > 0 ? 'full' : 'none'" *ngIf="selectedSegment === 'pending'">    
-    <ion-item-sliding *ngFor="let object of pendingObjects">      
-      <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="openDetail(object.docId)">
+  <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="selectedSegment === 'pending'">    
+    <ion-item-sliding *ngFor="let object of pendingObjects" >
+      <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="openDetail(object.docId)" line="full">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">

@@ -25,6 +25,8 @@ export class BacktobackOrderDetailPage implements OnInit {
   processType: string;
   selectedSegment: string;
 
+  isShowDisabledLine: boolean = false;
+
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
