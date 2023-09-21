@@ -13,10 +13,6 @@ const routes: Routes = [
     loadChildren: () => import('./transfer-in-detail/transfer-in-detail.module').then( m => m.TransferInDetailPageModule)
   },
   {
-    path: 'transfer-in-add',
-    loadChildren: () => import('./transfer-in-crud/transfer-in-add/transfer-in-add.module').then( m => m.TransferInAddPageModule)
-  },
-  {
     path: 'transfer-in-item',
     loadChildren: () => import('./transfer-in-crud/transfer-in-item/transfer-in-item.module').then( m => m.TransferInItemPageModule)
   }

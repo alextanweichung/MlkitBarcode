@@ -10,7 +10,7 @@
   <hr class="hr-small">
   <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="selectedSegment === 'pending'">    
     <ion-item-sliding *ngFor="let object of pendingObjects" >
-      <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="openDetail(object.docId)" line="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="openDetail(object.docId)">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -27,14 +27,14 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <span class="ion-text-wrap badge-other px-1 mr-1"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
-              <span class="ion-text-wrap badge-green px-1 mr-1"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
+              <span class="ion-text-wrap badge-other px-1 mx-1"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
+              <span class="ion-text-wrap badge-green px-1"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <span class="ion-text-wrap badge-purple px-1 mr-1"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
-              <span class="ion-text-wrap badge-purple px-1 mr-1"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
+              <span class="ion-text-wrap badge-purple px-1 mx-1"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
+              <span class="ion-text-wrap badge-purple px-1"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -66,14 +66,14 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <span class="ion-text-wrap badge-other px-1 mr-1"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
-              <span class="ion-text-wrap badge-green px-1 mr-1"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
+              <span class="ion-text-wrap badge-other px-1 mx-1"><ion-icon name="calendar-number-outline"></ion-icon> {{object.trxDate|date:'dd/MM/yyyy'}}</span>
+              <span class="ion-text-wrap badge-green px-1"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <span class="ion-text-wrap badge-purple px-1 mr-1"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
-              <span class="ion-text-wrap badge-purple px-1 mr-1"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
+              <span class="ion-text-wrap badge-purple px-1 mx-1"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
+              <span class="ion-text-wrap badge-purple px-1"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
             </ion-col>
           </ion-row>
         </ion-grid>

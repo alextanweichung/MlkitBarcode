@@ -69,8 +69,8 @@
           <div *ngFor="let vd of selectedItem.variationDetails">
             <ion-row *ngFor="let d of vd.details">
               <ion-col class="ion-margin-auto">
-                <span class="badge-green px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
+                <span class="badge-green px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                <span class="badge-purple px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
               </ion-col>
               <ion-col class="ion-margin-auto p-0">
                 <ion-grid class="ion-no-padding">

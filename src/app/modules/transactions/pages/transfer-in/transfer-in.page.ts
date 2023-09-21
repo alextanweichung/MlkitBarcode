@@ -5,9 +5,11 @@ import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TransferInList } from '../../models/transfer-in';
+import { TransferInList, TransferInRoot } from '../../models/transfer-in';
 import { TransferInService } from '../../services/transfer-in.service';
 import { FilterPage } from '../filter/filter.page';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { ConsignmentSalesLocation } from '../../models/consignment-sales';
 
 @Component({
   selector: 'app-transfer-in',
@@ -29,7 +31,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
-    private objectService: TransferInService,
+    public objectService: TransferInService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
@@ -61,6 +63,11 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
   }
 
   ionViewDidEnter(): void {
+    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
+      this.selectedLocation = this.objectService.locationList.find(r => r.isPrimary);
+      this.loadPendingList();
+    }
+    this.bindLocationList();
     this.loadObjects();
   }
 
@@ -68,11 +75,61 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   }
 
-  /* #region crud */
+  /* #region pending objects */
+
+  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  bindLocationList() {
+    this.consignmentLocationSearchDropdownList = [];
+    try {
+      this.objectService.locationList.forEach(r => {
+        this.consignmentLocationSearchDropdownList.push({
+          id: r.locationId,
+          code: r.locationCode,
+          description: r.locationDescription
+        })
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  selectedLocation: ConsignmentSalesLocation = null;
+  onLocationChanged(event: any) {
+    if (event) {
+      this.selectedLocation = this.objectService.locationList.find(r => r.locationId === event.id);
+      this.loadPendingList();
+    }
+  }
+
+  pendingObject: TransferInRoot[] = [];
+  loadPendingList() {
+    this.pendingObject = [];
+    if (this.selectedLocation) {
+      this.objectService.getPendingList(this.selectedLocation.locationCode).subscribe(response => {
+        this.pendingObject = response;
+      }, error => {
+        console.error(error);
+      })
+    }
+  }
+
+  selectDoc(object: TransferInRoot) {
+    object.line.forEach(r => {
+      if (r.qtyReceive === null) {
+        r.qtyReceive = r.qty;
+      }
+    })
+    this.objectService.setObject(object);
+    this.navController.navigateForward("/transactions/transfer-in/transfer-in-item");
+  }
+
+  /* #endregion */
+
+  /* #region completed object */
 
   async loadObjects() {
     try {
-      this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {        
+      this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         this.objects = this.objects.filter(r => r.isCompleted);
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
@@ -86,7 +143,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   getObjects(date: Date) {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-  }  
+  }
 
   async bindUniqueGrouping() {
     let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
@@ -96,40 +153,6 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   /* #endregion */
 
-  /* #region add */
-
-  async addObject() {
-    this.navController.navigateForward("/transactions/transfer-in/transfer-in-add");
-  }
-
-  // Select action
-  async selectAction() {
-    try {
-      const actionSheet = await this.actionSheetController.create({
-        header: "Choose an action",
-        cssClass: "custom-action-sheet",
-        buttons: [
-          {
-            text: "Add Transfer In",
-            icon: "document-outline",
-            handler: () => {
-              this.addObject();
-            }
-          },
-          {
-            text: "Cancel",
-            icon: "close",
-            role: "cancel"
-          }]
-      });
-      await actionSheet.present();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  /* #endregion */
-  
   async filter() {
     try {
       const modal = await this.modalController.create({

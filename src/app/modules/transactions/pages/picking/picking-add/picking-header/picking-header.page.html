@@ -29,7 +29,7 @@
         <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
         <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
         
-        <ion-item lines="none">
+        <ion-item>
           <ion-label class="font-bold" position="stacked">Remark</ion-label>
           <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
         </ion-item>
@@ -62,7 +62,7 @@
 
       <div *ngIf="selectedSalesOrders && selectedSalesOrders.length > 0">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple">
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Customer</div></ion-col>
@@ -80,7 +80,7 @@
           </ion-item>
         </ion-list>
         <ion-list class="list-custom animate__animated animate__fadeIn ion-no-padding" lines="none" [formGroup]="objectForm">
-          <ion-item class="ion-no-padding pl-2" lines="none">
+          <ion-item class="ion-no-padding pl-2">
             <ion-label class="font-bold" position="stacked">Remark</ion-label>
             <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
           </ion-item>
@@ -89,7 +89,7 @@
       <div *ngIf="groupType === 'S'">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <!-- <ion-item-sliding #slidingItem *ngFor="let o of uniqueSo"> -->
-            <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let so of uniqueSo" (click)="showDetail()">
+            <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let so of uniqueSo" (click)="showDetail()">
               <circle-progress [percent]="objectService.getProgressBySoNum(so)"></circle-progress>
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
@@ -119,7 +119,7 @@
         
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <!-- <ion-item-sliding #slidingItem *ngFor="let itemCode of uniqueItemSkuAndCode.keys()"> -->
-            <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let itemCode of uniqueItemCode" (click)="showDetail()">
+            <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let itemCode of uniqueItemCode" (click)="showDetail()">
               <circle-progress [percent]="objectService.getProgressByItemCode(itemCode)"></circle-progress>
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
@@ -143,8 +143,8 @@
                       <ion-row>
                         <ion-col class="ion-flex ion-margin-auto">
                           <div>{{l.itemCode}}</div>
-                          <span class="badge-green ion-text-wrap ion-flex my-auto px-1 ml-1" *ngIf="l.itemVariationXDescription"> {{l.itemVariationXDescription}}</span>
-                          <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 ml-1" *ngIf="l.itemVariationYDescription"> {{l.itemVariationYDescription}}</span>
+                          <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="l.itemVariationXDescription"> {{l.itemVariationXDescription}}</span>
+                          <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="l.itemVariationYDescription"> {{l.itemVariationYDescription}}</span>
                         </ion-col>
                       </ion-row>
                     </ion-grid>

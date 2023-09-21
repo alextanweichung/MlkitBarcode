@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { environment } from 'src/environments/environment';
-import { LoginRequest, LoginUser } from 'src/app/services/auth/login-user';
+import { LoginRequest } from 'src/app/services/auth/login-user';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
@@ -63,15 +63,15 @@ export class SigninPage implements OnInit, ViewDidEnter {
   ngOnInit() {
     if (Capacitor.getPlatform() === "web") {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-      // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
+      this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
-      this.signin_form.get("userEmail").setValue("admin@idcp.my");
+      // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
-      // this.signin_form.get("password").setValue("Dev8888");
+      this.signin_form.get("password").setValue("Dev8888");
       // this.signin_form.get("password").setValue("Dev9999");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("password").setValue("i@Dmin7026");
-      this.signin_form.get("password").setValue("c0nnecT#7026");
+      // this.signin_form.get("password").setValue("c0nnecT#7026");
     } else {
       this.setSelectedParam();
     }

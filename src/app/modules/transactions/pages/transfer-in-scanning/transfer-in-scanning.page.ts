@@ -6,8 +6,11 @@ import { ViewWillEnter, ViewDidEnter, ActionSheetController, AlertController, Mo
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TransferInScanningList } from '../../models/transfer-in-scanning';
+import { TransferInScanningList, TransferInScanningRoot } from '../../models/transfer-in-scanning';
 import { TransferInScanningService } from '../../services/transfer-in-scanning.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { ConsignmentSalesLocation } from '../../models/consignment-sales';
+import { TransferInRoot } from '../../models/transfer-in';
 
 @Component({
   selector: 'app-transfer-in-scanning',
@@ -27,7 +30,7 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
-    private objectService: TransferInScanningService,
+    public objectService: TransferInScanningService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
@@ -59,12 +62,62 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
   }
 
   ionViewDidEnter(): void {
+    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
+      this.selectedLocation = this.objectService.locationList.find(r => r.isPrimary);
+      this.loadPendingList();
+    }
+    this.bindLocationList();
     this.loadObjects();
   }
 
   ngOnInit() {
 
   }
+
+  /* #region pending objects */
+
+  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  bindLocationList() {
+    this.consignmentLocationSearchDropdownList = [];
+    try {
+      this.objectService.locationList.forEach(r => {
+        this.consignmentLocationSearchDropdownList.push({
+          id: r.locationId,
+          code: r.locationCode,
+          description: r.locationDescription
+        })
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  selectedLocation: ConsignmentSalesLocation = null;
+  onLocationChanged(event: any) {
+    if (event) {
+      this.selectedLocation = this.objectService.locationList.find(r => r.locationId === event.id);
+      this.loadPendingList();
+    }
+  }
+
+  pendingObject: TransferInScanningRoot[] = [];
+  loadPendingList() {
+    this.pendingObject = [];
+    if (this.selectedLocation) {
+      this.objectService.getPendingList(this.selectedLocation.locationCode).subscribe(response => {
+        this.pendingObject = response;
+      }, error => {
+        console.error(error);
+      })
+    }
+  }
+
+  selectDoc(object: TransferInScanningRoot) {
+    this.objectService.setObject(object);
+    this.navController.navigateForward("/transactions/transfer-in-scanning/transfer-in-scanning-item");
+  }
+
+  /* #endregion */
 
   /* #region crud */
 
@@ -89,40 +142,6 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
     this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
     await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-  }
-
-  /* #endregion */
-
-  /* #region add */
-
-  async addObject() {
-    this.navController.navigateForward("/transactions/transfer-in-scanning/transfer-in-scanning-add");
-  }
-
-  // Select action
-  async selectAction() {
-    try {
-      const actionSheet = await this.actionSheetController.create({
-        header: "Choose an action",
-        cssClass: "custom-action-sheet",
-        buttons: [
-          {
-            text: "Add Transfer In Scanning",
-            icon: "document-outline",
-            handler: () => {
-              this.addObject();
-            }
-          },
-          {
-            text: "Cancel",
-            icon: "close",
-            role: "cancel"
-          }]
-      });
-      await actionSheet.present();
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   /* #endregion */

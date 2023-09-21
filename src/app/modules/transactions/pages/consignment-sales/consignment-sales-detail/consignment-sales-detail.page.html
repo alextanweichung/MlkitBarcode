@@ -12,7 +12,7 @@
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">
-      <ion-list class="list-custom animate__animated animate__fadeIn" items="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item (click)="popover.dismiss(); completeObjectAlert()" *ngIf="!object?.header?.isEntryCompleted">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
@@ -28,7 +28,7 @@
         <ion-item (click)="popover.dismiss(); presentAlertViewPdf()">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
-            <div>Ticketing</div>
+            <div>Download PDF</div>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -45,16 +45,14 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2" *ngIf="object">
-    <ion-list class="list-custom animate__animated animate__fadeIn" items="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" items="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Doc. Num.</div>
-            </ion-col>
+            <ion-col class="ion-flex font-bold">Doc. Num.</ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <ion-icon class="ion-flex mr-2" name="ellipse" [class]="object.header.isEntryCompleted?'color-success':'color-danger'"></ion-icon>
-              <div>{{object.header.consignmentSalesNum}}</div>
+              <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="object.header.isEntryCompleted?'color-success':'color-danger'"></ion-icon>
+              {{object.header.consignmentSalesNum}}
             </ion-col>
           </ion-row>
           <ion-row>
@@ -112,7 +110,7 @@
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of object?.details; let i = index">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of object?.details; let i = index">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -178,6 +176,20 @@
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Margin Pct.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Margin Amt.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">Bearing Amt.</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">Invoice Amt.</div>
             </ion-col>
           </ion-row>
           <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
