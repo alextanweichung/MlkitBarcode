@@ -10,7 +10,7 @@
   <div class="p-2">
     <ion-list class="list-custom" lines="none">
       <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>
-      <ion-item class="ion-flex ion-flex-center" lines="none">
+      <ion-item class="ion-flex ion-flex-center">
         <ion-checkbox slot="end" [(ngModel)]="isOverdueOnly"></ion-checkbox>
         <ion-label>
           <div class="ion-text-small font-bold">Overdue Only</div>

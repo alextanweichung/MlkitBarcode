@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { AlertController, ActionSheetController, NavController } from '@ionic/angular';
 import { TransferInScanningLine, TransferInScanningRoot } from 'src/app/modules/transactions/models/transfer-in-scanning';
@@ -16,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
   templateUrl: './transfer-in-scanning-item.page.html',
   styleUrls: ['./transfer-in-scanning-item.page.scss'],
 })
-export class TransferInScanningItemPage implements OnInit {
+export class TransferInScanningItemPage implements OnInit, OnDestroy {
 
   constructor(
     public objectService: TransferInScanningService,
@@ -28,6 +28,10 @@ export class TransferInScanningItemPage implements OnInit {
     private actionSheetController: ActionSheetController,
     private navController: NavController,
   ) { }
+
+  ngOnDestroy(): void {
+    this.objectService.resetVariables();
+  }
 
   ngOnInit() {
     this.loadModuleControl();
@@ -369,9 +373,30 @@ export class TransferInScanningItemPage implements OnInit {
 
   /* #region steps */
 
-  async previousStep() {
+  async cancelInsert() {
     try {
-      this.navController.navigateBack("/transactions/transfer-in-scanning/transfer-in-scanning-add");
+      const actionSheet = await this.actionSheetController.create({
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
+        buttons: [
+          {
+            text: "Yes",
+            role: "confirm",
+          },
+          {
+            text: "No",
+            role: "cancel",
+          }]
+      });
+      await actionSheet.present();
+
+      const { role } = await actionSheet.onWillDismiss();
+
+      if (role === "confirm") {
+        this.objectService.resetVariables();
+        this.navController.navigateBack("/transactions/transfer-in-scanning");
+      }
     } catch (e) {
       console.error(e);
     }

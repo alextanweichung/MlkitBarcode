@@ -9,10 +9,6 @@ const routes: Routes = [
     component: TransferInScanningPage
   },
   {
-    path: 'transfer-in-scanning-add',
-    loadChildren: () => import('./transfer-in-scanning-crud/transfer-in-scanning-add/transfer-in-scanning-add.module').then( m => m.TransferInScanningAddPageModule)
-  },
-  {
     path: 'transfer-in-scanning-item',
     loadChildren: () => import('./transfer-in-scanning-crud/transfer-in-scanning-item/transfer-in-scanning-item.module').then( m => m.TransferInScanningItemPageModule)
   },

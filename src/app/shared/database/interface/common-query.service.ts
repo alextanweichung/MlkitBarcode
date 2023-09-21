@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { DBSQLiteValues, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { DatabaseService } from 'src/app/services/sqlite/database.service';
-import { create_item_barcode_table, create_item_master_table } from 'src/app/services/sqlite/migration.service';
+import { create_item_barcode_table, create_item_master_table, create_margin_config_table } from 'src/app/services/sqlite/migration.service';
 import { SQLiteService } from 'src/app/services/sqlite/sqlite.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { dbConfig, inboundDb_Tables } from '../config/db-config';
@@ -330,6 +330,11 @@ export class CommonQueryService<T> {
             values: []
           })
           break;
+        case inboundDb_Tables.margin_Config:
+          statements.push({
+            statement: create_margin_config_table,
+            values: []
+          })
       }
 
       if (objects.length > 0) {
@@ -399,6 +404,7 @@ export class CommonQueryService<T> {
           statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
           values: []
         })
+        console.log("🚀 ~ file: common-query.service.ts:401 ~ CommonQueryService<T> ~ syncInboundData ~ statements[2].values:", JSON.stringify(statements))
 
         let timestart = new Date();
         await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {

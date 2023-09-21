@@ -44,7 +44,7 @@
     <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.header.isWithSo && showItemList">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
         <circle-progress slot="start" [percent]="objectService.getProgressByItemCode(i)"></circle-progress>
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
@@ -69,7 +69,7 @@
             <ion-row *ngFor="let v of objectService.getItemVariation(i)">
               <ion-col class="ion-flex ion-margin-auto" *ngIf="v && v.variationTypeCode !== '0'">
                 <div class="ion-flex">
-                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1" *ngIf="v.xDesc"> {{v.xDesc}}</span>
+                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="v.xDesc"> {{v.xDesc}}</span>
                   <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="v.yDesc"> {{v.yDesc}}</span>
                 </div>
               </ion-col>
@@ -90,7 +90,7 @@
     </ion-segment>
 
     <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Barcode</div></ion-col>
@@ -100,7 +100,7 @@
         </ion-grid>
       </ion-item>
       <ion-item-sliding #slidingItem *ngFor="let o of getCartonItems(); let i = index">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="editCartonLine(o);" *ngIf="i >= 0">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="editCartonLine(o);" *ngIf="i >= 0">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">{{o.itemBarcode}}</ion-col>

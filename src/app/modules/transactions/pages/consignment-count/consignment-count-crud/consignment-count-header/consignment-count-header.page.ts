@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 
@@ -54,10 +55,10 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
-
   }
 
   ngOnInit() {
+    this.bindLocationList();
     if (this.objectId) {
       this.loadObject();
     }
@@ -84,6 +85,22 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter {
       }, error => {
         console.error(error);
       })
+    }
+  }
+
+  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  bindLocationList() {
+    this.consignmentLocationSearchDropdownList = [];
+    try {
+      this.objectService.locationList.forEach(r => {
+        this.consignmentLocationSearchDropdownList.push({
+          id: r.locationId,
+          code: r.locationCode,
+          description: r.locationDescription
+        })
+      })
+    } catch (e) {
+      console.error(e);
     }
   }
 

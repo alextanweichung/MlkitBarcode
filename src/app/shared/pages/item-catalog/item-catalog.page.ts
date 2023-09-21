@@ -288,7 +288,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   addToCart(data: TransactionDetail) {
-    if (!this.validateNewItemConversion(data)) {
+    let isBlock = this.validateNewItemConversion(data);
+    if (!isBlock) {
       this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
       this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
       data.qtyRequest = 0;
@@ -359,7 +360,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
   addVariationToCart() {
     var totalQty = 0;
-    if (!this.validateNewItemConversion(this.selectedItem)) {
+    let isBlock = this.validateNewItemConversion(this.selectedItem)
+    if (!isBlock) {
       if (this.selectedItem.variationDetails) {
         this.selectedItem.variationDetails.forEach(x => {
           x.details.forEach(y => {
@@ -398,10 +400,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   /* #region validate new item id */
 
   validateNewItemConversion(found: TransactionDetail) {
-    if (found.newItemId && found.newItemEffectiveDate && this.commonService.convertUtcDate(found.newItemEffectiveDate) <= this.commonService.convertUtcDate(this.commonService.getTodayDate())) {
+    if (found.newItemId && found.newItemEffectiveDate && new Date(found.newItemEffectiveDate) <= new Date(this.objectHeader.trxDate)) {
       let newItemCode = this.configService.item_Masters.find(x => x.id == found.newItemId);
       if (newItemCode) {
-        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(this.commonService.convertUtcDate(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1750);
+        this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(new Date(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1000);
         if (this.systemWideBlockConvertedCode) {
           return true;
         } else {

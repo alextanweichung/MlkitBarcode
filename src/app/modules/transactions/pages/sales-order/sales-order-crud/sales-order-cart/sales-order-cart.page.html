@@ -18,7 +18,7 @@
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
       <ion-item-sliding #slidingItem *ngFor="let item of objectService.itemInCart; let i = index">
-        <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
+        <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
@@ -43,8 +43,8 @@
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">
                   <ion-col class="ion-flex ion-margin-auto">
-                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                   </ion-col>
                   <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
                     <div>{{d.qtyRequest|number:'1.0'}}</div>
@@ -281,10 +281,10 @@
           <ion-grid class="p-0">
             <div *ngFor="let vd of selectedItem.variationDetails">
               <div *ngFor="let d of vd.details">
-                <ion-row>
+                <ion-row class="py-0" *ngIf="d.deactivated === false">
                   <ion-col class="ion-flex ion-margin-auto">
-                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>  
+                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>  
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto p-0">
                     <ion-grid class="ion-no-padding">

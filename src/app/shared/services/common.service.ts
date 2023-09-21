@@ -13,6 +13,8 @@ import { UntypedFormGroup } from '@angular/forms';
 import { MasterListDetails } from '../models/master-list-details';
 import { MasterList } from '../models/master-list';
 import { format } from 'date-fns';
+import { PDMarginConfig } from '../models/pos-download';
+import { ConsignmentSalesHeader } from 'src/app/modules/transactions/models/consignment-sales';
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +62,10 @@ export class CommonService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  syncMarginConfig(locationIds: number[]) {
+    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", locationIds).toPromise();
   }
 
   saveVersion() {
@@ -420,6 +426,50 @@ export class CommonService {
     }
   }
 
+  computeMarginAmtByConsignmentConfig(trxLine: TransactionDetail, objectHeader: ConsignmentSalesHeader, computeInvoiceAmt: boolean): TransactionDetail {
+    //To read bearPct from trxLine
+    let bearPct: number = 0;
+    if (trxLine.bearPct) {
+      bearPct = trxLine.bearPct;
+    }
+    let beforeBearingAmt = trxLine.discountAmt * bearPct / 100;
+    beforeBearingAmt = this.roundToPrecision(beforeBearingAmt, 2);
+    switch (objectHeader.marginMode) {
+      case 'G':
+        trxLine.bearAmt = 0;
+        trxLine.marginAmt = trxLine.unitPrice * trxLine.qtyRequest * trxLine.marginPct / 100;
+        trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
+        break;
+      case 'N':
+        trxLine.bearAmt = 0;
+        trxLine.marginAmt = trxLine.subTotal * trxLine.marginPct / 100;
+        trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
+        break;
+      case 'B':
+        trxLine.bearPct = bearPct;
+        trxLine.bearAmt = beforeBearingAmt;
+        trxLine.marginAmt = (trxLine.subTotal * trxLine.marginPct / 100) - beforeBearingAmt;
+        trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
+        break;
+      case 'A':
+        let afterBearingAmt = trxLine.discountAmt * (100 - bearPct) / 100;
+        afterBearingAmt = this.roundToPrecision(afterBearingAmt, 2);
+        trxLine.bearPct = bearPct;
+        trxLine.bearAmt = beforeBearingAmt;
+        trxLine.marginAmt = (trxLine.subTotal + afterBearingAmt) * (trxLine.marginPct / 100);
+        trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
+        break;
+    }
+    if (computeInvoiceAmt) {
+      trxLine.invoiceAmt = trxLine.subTotal - trxLine.marginAmt;
+      if (trxLine.bearAmt) {
+        trxLine.invoiceAmt = trxLine.invoiceAmt + trxLine.bearAmt;
+      }
+      trxLine.invoiceAmt = this.roundToPrecision(trxLine.invoiceAmt, 2);
+    }
+    return trxLine;
+  }
+
   reversePromoImpact(receiptLine: TransactionDetail) {
     try {
       if (receiptLine.promoEventId != null) {
@@ -431,6 +481,25 @@ export class CommonService {
       return receiptLine;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async getMarginPct(item: TransactionDetail, trxDate: Date, locationId: number): Promise<TransactionDetail> {
+    if (Capacitor.getPlatform() !== "web") {
+      let matchBrand = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === "B" && r.typeId === item.itemBrandId && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
+      let matchGroup = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === "G" && r.typeId === item.itemGroupId && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
+      let matchCategory = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === "C" && r.typeId === item.itemCategoryId && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
+      let matchDepartment = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === "D" && r.typeId === item.itemDepartmentId && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
+      let base = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === null && r.typeId === null && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
+      let allMatch = [...matchBrand, ...matchGroup, ...matchCategory, ...matchDepartment, ...base];
+      console.log("🚀 ~ file: common.service.ts:495 ~ CommonService ~ getMarginPct ~ allMatch:", JSON.stringify(allMatch))
+      if (allMatch && allMatch.length > 0) {
+        allMatch = JSON.parse(JSON.stringify(allMatch.filter(r => r.discCode === item.discountGroupCode)));
+        await allMatch.sort((a, b) => (b.hLevel - a.hLevel) || ((new Date(a.trxDate) < new Date(b.trxDate)) ? 1 : -1))
+        item.marginPct = allMatch[0].mPct;
+        item.bearPct = allMatch[0].bPct;
+      }
+      return item;
     }
   }
 

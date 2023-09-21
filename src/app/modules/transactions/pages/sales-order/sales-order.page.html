@@ -28,7 +28,7 @@
         </ion-list-header>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
           <!-- <ion-item-sliding #slidingItem> -->
-            <ion-item [button]="false" [detail]="false" class="ion-no-padding" (click)="goToDetail(object.salesOrderId, object.isDraft, object.draftTransactionId)" lines="full" *ngFor="let object of getObjects(m)">
+            <ion-item [button]="false" [detail]="false" class="ion-no-padding" (click)="goToDetail(object.salesOrderId, object.isDraft, object.draftTransactionId)" *ngFor="let object of getObjects(m)">
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
                   <ion-col class="ion-flex ion-margin-auto font-bold">

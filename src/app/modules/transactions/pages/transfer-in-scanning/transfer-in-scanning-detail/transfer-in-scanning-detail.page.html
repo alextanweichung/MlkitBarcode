@@ -48,7 +48,7 @@
       <ion-label>Document</ion-label>
     </ion-list-header>
 
-    <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button [detail]="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
@@ -102,7 +102,7 @@
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
         <ion-label>Remark</ion-label>
       </ion-list-header><ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item class="ion-no-padding no-ripple" lines="full">
+        <ion-item class="ion-no-padding no-ripple">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
@@ -120,7 +120,7 @@
     
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col size="10"class="ion-flex ion-margin-auto">
@@ -134,7 +134,7 @@
       </ion-item>
 
       <ion-item-sliding #slidingItem *ngFor="let l of object.line let i = index">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+        <ion-item button detail="false" class="ion-no-padding no-ripple">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col size="10">
@@ -143,7 +143,7 @@
                     <ion-col class="ion-flex ion-margin-auto">
                       <div class="font-bold">{{l.itemCode}}</div>
                       <div class="ion-flex">
-                        <span class="badge-green ion-text-wrap ion-flex my-auto px-1" *ngIf="l.xDesc"> {{l.xDesc}}</span>
+                        <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="l.xDesc"> {{l.xDesc}}</span>
                         <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="l.yDesc"> {{l.yDesc}}</span>
                       </div>
                     </ion-col>
@@ -187,7 +187,7 @@
       <div class="p-2">
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         
-          <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+          <ion-item button detail="false" class="ion-no-padding no-ripple">
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
                 <ion-col size="10" class="ion-flex ion-margin-auto">
@@ -201,7 +201,7 @@
           </ion-item>
         
           <ion-item-sliding #slidingItem *ngFor="let l of object.transferAdjustment.line let i = index">
-            <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+            <ion-item button detail="false" class="ion-no-padding no-ripple">
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
                   <ion-col size="10">
@@ -210,7 +210,7 @@
                         <ion-col class="ion-flex ion-margin-auto">
                           <div class="font-bold">{{l.itemCode}}</div>
                           <div class="ion-flex">
-                            <span class="badge-green ion-text-wrap ion-flex my-auto px-1" *ngIf="l.xDesc"> {{l.xDesc}}</span>
+                            <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="l.xDesc"> {{l.xDesc}}</span>
                             <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="l.yDesc"> {{l.yDesc}}</span>
                           </div>
                         </ion-col>

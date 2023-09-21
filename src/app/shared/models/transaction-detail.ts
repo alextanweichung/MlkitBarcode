@@ -93,15 +93,27 @@ export interface TransactionDetail {
   promoEventId?: number
   isPromoImpactApplied?: boolean
   discountedUnitPrice?: number
+
   /* #region  for stock-count */
   itemBrandId?: number
   itemGroupId?: number
   itemCategoryId?: number
+  itemDepartmentId?: number
   itemBarcodeTagId?: number
   /* #endregion */
+
   /* #region for consignment select */
   isSelected?: boolean
   /* #endregion */
+
+  /* #region for consignment sales */
+  marginPct?: number
+  marginAmt?: number
+  bearPct?: number
+  bearAmt?: number
+  invoiceAmt?: number
+  /* #endregion */
+
   sequence?: number
   createdById?: number
   createdBy?: string

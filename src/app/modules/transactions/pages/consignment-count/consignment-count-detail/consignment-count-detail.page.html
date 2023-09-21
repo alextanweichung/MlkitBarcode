@@ -22,7 +22,7 @@
   </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="object">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -74,8 +74,8 @@
             <ion-col class="ion-flex ion-margin-auto">
               <div class="ion-flex">
                 {{item.itemCode}}
-                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="item.itemVariationLineXDescription"> {{item.itemVariationLineXDescription}}</span>
-                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="item.itemVariationLineYDescription"> {{item.itemVariationLineYDescription}}</span>
+                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationLineXDescription"> {{item.itemVariationLineXDescription}}</span>
+                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationLineYDescription"> {{item.itemVariationLineYDescription}}</span>
               </div>
             </ion-col>
           </ion-row>

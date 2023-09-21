@@ -16,7 +16,7 @@
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn">
       <ion-item-sliding *ngFor="let item of itemInCart; let i = index">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="showEditModal(item, i)">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="showEditModal(item, i)">
           <ion-grid class="ion-no-padding p-2">
             <ion-row class="pb-1">
               <ion-col class="ion-flex ion-margin-auto">
@@ -42,8 +42,8 @@
               <div style="width: 100%;" *ngFor="let d of vd.details">
                 <ion-row *ngIf="d.qtyRequest > 0">
                   <ion-col class="ion-flex ion-margin-auto">
-                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                   </ion-col>
                   <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
                     <div>{{d.qtyRequest|number:'1.0'}}</div>
@@ -105,14 +105,14 @@
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="selectedItem.variationTypeCode === '1' || selectedItem.variationTypeCode === '2'">
           <ion-label>Variations</ion-label>
         </ion-list-header>
-        <ion-item button detail="false" class="no-ripple" lines="none" *ngIf="selectedItem.variationTypeCode === '1' || selectedItem.variationTypeCode === '2'">
+        <ion-item button detail="false" class="no-ripple" *ngIf="selectedItem.variationTypeCode === '1' || selectedItem.variationTypeCode === '2'">
           <ion-grid class="p-0">
             <div *ngFor="let vd of selectedItem.variationDetails">
               <div *ngFor="let d of vd.details">
                 <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
-                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>  
+                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>  
                   </ion-col>
                   <ion-col class="ion-margin-auto p-0">
                     <ion-grid class="ion-no-padding">

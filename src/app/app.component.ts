@@ -25,13 +25,11 @@ export class AppComponent {
     private navController: NavController,
     private pushNotications: NotificationsService
   ) {
-    console.log(`app-root here`);
     this.initializeApp();
   }
 
   // Initialize app
   initializeApp() {
-    console.log(`initializeApp`);
     // Wait until platform is ready
     this.platform.ready().then(async () => {
       await this.configService.load();

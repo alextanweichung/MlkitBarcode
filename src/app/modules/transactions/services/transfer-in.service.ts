@@ -30,8 +30,8 @@ export class TransferInService {
   ) { }
 
   async loadRequiredMaster() {
-    await this.loadMasterList();
     await this.loadConsignmentLocation();
+    await this.loadMasterList();
   }
 
   async loadMasterList() {

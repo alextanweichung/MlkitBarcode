@@ -36,6 +36,8 @@ export interface ConsignmentSalesHeader {
   maxPrecision: number
   maxPrecisionTax: number
   isEntryCompleted: boolean
+  isBearPromo: boolean
+  marginMode: string
 }
 
 export interface ConsignmentSalesLocation {

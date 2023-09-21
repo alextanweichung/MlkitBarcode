@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2"> 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
-      <app-search-dropdown title="Customer" [searchDropdownList]="objectService.customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
+      <app-search-dropdown title="Customer" [searchDropdownList]="objectService.customerSearchDropdownList" [selectedId]="objectForm?.controls?.customerId?.value" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
     </ion-list>
     <div *ngIf="objectForm.controls.customerId.value">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">

@@ -1,9 +1,17 @@
 export interface LoginUser {
-   userEmail: string;
-   token: string;
-   refreshToken: string;
-   playerId: string,
+   userId: number
+   userEmail: string
+   token: string
+   refreshToken: string
+   playerId: string
    userName: string
+   salesAgentId: number
+   warehouseAgentId: number
+   procurementAgentId: number
+   loginUserType: string
+   companyCode: string
+   loginUserGroupType: string
+   locationId: number[]
 }
 
 export interface LoginRequest {

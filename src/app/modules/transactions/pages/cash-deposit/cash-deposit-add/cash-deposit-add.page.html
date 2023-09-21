@@ -47,12 +47,11 @@
           <ion-label position="stacked">Bank In Amount</ion-label>
           <ion-input #amtInput formControlName="depositAmount" inputmode="numeric" type="number" enterkeyhint="next" (ionFocus)="highlight(amtInput)" placeholder="Enter Amount"></ion-input>
         </ion-item>
-        <app-search-dropdown title="Bank Name" [masterDropdownList]="objectService.paymentMethodMasterList" (onActionComplete)="onPaymentMethodSelected($event)"></app-search-dropdown>
+        <app-search-dropdown title="Bank Name" [masterDropdownList]="objectService.paymentMethodMasterList" [selectedId]="objectForm?.controls?.paymentMethodId?.value" (onActionComplete)="onPaymentMethodSelected($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked">Bank In Slip Number</ion-label>
           <ion-input formControlName="depositSlipNum" inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Num"></ion-input>
         </ion-item>
-        <!-- <app-search-dropdown title="Customer" [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown> -->
       </ion-list>
     </form>
     <div class="mt-2">

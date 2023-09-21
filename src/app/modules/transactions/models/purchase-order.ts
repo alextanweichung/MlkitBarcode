@@ -5,9 +5,7 @@ import { VariationDetail } from "src/app/shared/models/variation-detail"
 export interface PurchaseOrderRoot {
    header: PurchaseOrderHeader
    details: TransactionDetail[]
-   // barcodeTag: BarcodeTag[]
-   // otp: any
-  approvalHistory?: ApprovalHistory[]
+   approvalHistory?: ApprovalHistory[]
  }
  
  export interface PurchaseOrderHeader {

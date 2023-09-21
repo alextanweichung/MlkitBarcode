@@ -14,7 +14,7 @@
   </ion-header>
   <div class="p-2"> 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <app-search-dropdown title="Location" optionLabel="description" [selectedId]="objectForm?.controls?.locationId?.value" [masterDropdownList]="objectService.locationMasterList" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
+      <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
     </ion-list>
   </div>
 </ion-content>

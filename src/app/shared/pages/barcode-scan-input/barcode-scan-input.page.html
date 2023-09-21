@@ -33,7 +33,7 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-item detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableItemmmm" (click)="showVariations(item)">
+        <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableItemmmm" (click)="showVariations(item)">
           <!-- <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox> -->
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -65,7 +65,7 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
-        <ion-item detail="false" class="ion-no-padding no-ripple" lines="full" *ngFor="let item of availableVariationsByItemId">
+        <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableVariationsByItemId">
           <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -75,8 +75,8 @@
             </ion-row>
             <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
               <ion-col class="ion-flex ion-margin-auto">
-                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
+                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
               </ion-col>
             </ion-row>
           </ion-grid>

@@ -4,7 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/tables';
-import { PDItemBarcode, PDItemMaster } from 'src/app/shared/models/pos-download';
+import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
 
@@ -17,6 +17,7 @@ export class ConfigService {
   selected_sys_param: Sys_Parameter;
   item_Masters: PDItemMaster[] = [];
   item_Barcodes: PDItemBarcode[] = [];
+  margin_Configs: PDMarginConfig[] = [];
 
   constructor(
     private http: HttpClient,
@@ -142,9 +143,19 @@ export class ConfigService {
     }
   }
 
+  async syncMarginConfig(marginConfigs: PDMarginConfig[]) {
+    try {      
+      await this.commonQueryService.syncInboundData(inboundDb_Tables.margin_Config, marginConfigs);
+      this.margin_Configs = marginConfigs;
+      console.log("done sync margin config")
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   async loadItemMaster(): Promise<PDItemMaster[]> {
     try {
-      let ret = await this.commonQueryService.selectAll("Item_Master", dbConfig.inbounddb) as PDItemMaster[];
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.item_Master, dbConfig.inbounddb) as PDItemMaster[];
       this.item_Masters = ret;
       return this.item_Masters;
     } catch (e) {
@@ -154,9 +165,19 @@ export class ConfigService {
 
   async loadItemBarcode(): Promise<PDItemBarcode[]> {
     try {
-      let ret = await this.commonQueryService.selectAll("Item_Barcode", dbConfig.inbounddb) as PDItemBarcode[];
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.item_Barcode, dbConfig.inbounddb) as PDItemBarcode[];
       this.item_Barcodes = ret;
       return this.item_Barcodes;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async loadMarginConfig(): Promise<PDMarginConfig[]> {
+    try {
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.margin_Config, dbConfig.inbounddb) as PDMarginConfig[];
+      this.margin_Configs = ret;
+      return this.margin_Configs;
     } catch (e) {
       console.error(e);
     }
