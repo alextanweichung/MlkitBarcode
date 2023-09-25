@@ -18,6 +18,7 @@ export class ConfigService {
   item_Masters: PDItemMaster[] = [];
   item_Barcodes: PDItemBarcode[] = [];
   margin_Configs: PDMarginConfig[] = [];
+  selected_consignment_location: number;
 
   constructor(
     private http: HttpClient,
@@ -184,5 +185,9 @@ export class ConfigService {
   }
 
   /* #endregion */
+
+  signout() {
+    this.selected_consignment_location = null;
+  }
 
 }

@@ -57,16 +57,16 @@ export class CommonService {
     }
   }
 
-  syncInboundConsignment(locationCode: string, trxDate: string) {
+  syncInboundConsignment(locationId: number, trxDate: string) {
     try {
-      return this.http.get(this.configService.selected_sys_param.apiUrl + `MobileDownload/itemMaster/${locationCode}/${trxDate}`, { context: background_load() }).toPromise();
+      return this.http.get(this.configService.selected_sys_param.apiUrl + `MobileDownload/itemMaster/${locationId}/${trxDate}`, { context: background_load() }).toPromise();
     } catch (e) {
       console.error(e);
     }
   }
 
-  syncMarginConfig(locationIds: number[]) {
-    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", locationIds, { context: background_load() }).toPromise();
+  syncMarginConfig(locationId: number) {
+    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", locationId, { context: background_load() }).toPromise();
   }
 
   saveVersion() {

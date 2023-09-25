@@ -1,15 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { environment } from 'src/environments/environment';
-import { LoginRequest } from 'src/app/services/auth/login-user';
+import { LoginRequest, LoginUser } from 'src/app/services/auth/login-user';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-signin',
@@ -33,7 +34,8 @@ export class SigninPage implements OnInit, ViewDidEnter {
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
     private alertController: AlertController,
-    private navController: NavController
+    private navController: NavController,
+    private actionSheetController: ActionSheetController
   ) {
     this.currentVersion = environment.version;
     this.newForm();
@@ -56,7 +58,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
   }
 
   ionViewWillEnter(): void {
-    
+
   }
 
   companyNames: Map<string, string> = new Map([]);
@@ -174,27 +176,41 @@ export class SigninPage implements OnInit, ViewDidEnter {
             this.configService.selected_sys_param.password = "";
           }
           await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
-          
+
           // sync item master and item barcode
           try {
-            // download item master
-            let response = await this.commonService.syncInbound();
-            let itemMaster: PDItemMaster[] = response["itemMaster"];
-            let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
-            await this.configService.syncInboundData(itemMaster, itemBarcode);
-
             // update current version to db
             this.commonService.saveVersion().subscribe(response => {
 
             }, error => {
               console.error(error);
             })
-            // save to local db
-            let loginUser = JSON.parse(localStorage.getItem("loginUser"));
-            if (loginUser.locationId && loginUser.locationId.length > 0) {
-              let response2 = await this.commonService.syncMarginConfig(loginUser.locationId);
+
+            // save margin config to local db
+            let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+            if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
+              // for consignment user more than 1 location, go to dashboard and let user select then only sync              
+            }
+            else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {    
+              // sync by location since only 1 location
+              let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+              let itemMaster: PDItemMaster[] = response["itemMaster"];
+              let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+              await this.configService.syncInboundData(itemMaster, itemBarcode);
+                 
+              this.configService.selected_consignment_location = loginUser.locationId[0];
+              let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
               let marginConfig: PDMarginConfig[] = response2;
               await this.configService.syncMarginConfig(marginConfig);
+            } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
+              // show error if consignment user but no location set
+              this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+            } else {
+              // download item master for other user
+              let response = await this.commonService.syncInbound();
+              let itemMaster: PDItemMaster[] = response["itemMaster"];
+              let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+              await this.configService.syncInboundData(itemMaster, itemBarcode);
             }
           } catch (error) {
             this.toastService.presentToast(error.message, "", "top", "medium", 1000);

@@ -54,9 +54,6 @@ export class ConsignmentSalesService {
     await this.loadMasterList();
     await this.loadStaticLov();
     await this.loadConsignmentLocation();
-    if (Capacitor.getPlatform() !== "web" && this.locationList.filter(r => r.isPrimary).length > 0) {
-      this.refreshLocalDb(this.locationList.find(r => r.isPrimary).locationCode);
-    }
   }
 
   async refreshLocalDb(locationCode: string) {
@@ -92,17 +89,15 @@ export class ConsignmentSalesService {
   locationList: ConsignmentSalesLocation[] = [];
   async loadConsignmentLocation() {
     this.locationList = await this.getConsignmentLocation();
-    if (this.locationList && this.locationList.length === 1) {
-      this.refreshLocalDb(this.locationList[0].locationCode);
-    }
+    console.log("🚀 ~ file: consignment-sales.service.ts:95 ~ ConsignmentSalesService ~ loadConsignmentLocation ~ this.locationList:", this.locationList)
   }
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/masterList").toPromise();
   }
 
-  getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
+  async getConsignmentLocation() {
+    return await this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
   }
 
   getStaticLov() {

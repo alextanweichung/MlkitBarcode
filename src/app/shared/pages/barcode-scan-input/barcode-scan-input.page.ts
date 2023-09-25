@@ -1,6 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -97,10 +96,10 @@ export class BarcodeScanInputPage implements OnInit {
   /* #region scan */
 
   barcodeSearchValue: string;
-  @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
+  @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
   async validateBarcode(barcode: string) {
     if (barcode) {
-      this.barcodeSearchValue = '';
+      this.barcodeSearchValue = "";
       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
         let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
         if (found_barcode) {
@@ -111,7 +110,7 @@ export class BarcodeScanInputPage implements OnInit {
             description: found_item_master.itemDesc,
             variationTypeCode: found_item_master.varCd,
             discountGroupCode: found_item_master.discCd,
-            discountExpression: found_item_master.discPct + '%',
+            discountExpression: found_item_master.discPct + "%",
             taxId: found_item_master.taxId,
             taxCode: found_item_master.taxCd,
             taxPct: found_item_master.taxPct,
@@ -120,7 +119,7 @@ export class BarcodeScanInputPage implements OnInit {
               itemId: found_item_master.id,
               unitPrice: found_item_master.price,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: found_item_master.discPct + '%',
+              discountExpression: found_item_master.discPct + "%",
               discountPercent: found_item_master.discPct,
               discountGroupId: null,
               unitPriceMin: null,
@@ -140,10 +139,10 @@ export class BarcodeScanInputPage implements OnInit {
           }
           this.onItemAdd.emit([outputData]);
         } else {
-          this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
+          this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
         }
       } else {
-        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
+        this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
       }
     }
   }
@@ -159,10 +158,10 @@ export class BarcodeScanInputPage implements OnInit {
   itemSearchValue: string;
   availableItemmmm: TransactionDetail[] = [];
   availableVariations: TransactionDetail[] = [];
-  @ViewChild('itemInput', { static: false }) itemInput: ElementRef;
+  @ViewChild("itemInput", { static: false }) itemInput: ElementRef;
   validateItem(searchValue: string) {
     if (searchValue) {
-      this.itemSearchValue = '';
+      this.itemSearchValue = "";
       this.availableItemmmm = [];
       this.availableVariations = [];
       this.availableVariationsByItemId = [];
@@ -189,7 +188,7 @@ export class BarcodeScanInputPage implements OnInit {
                 description: r.itemDesc,
                 variationTypeCode: r.varCd,
                 discountGroupCode: r.discCd,
-                discountExpression: r.discPct + '%',
+                discountExpression: r.discPct + "%",
                 taxId: r.taxId,
                 taxCode: r.taxCd,
                 taxPct: r.taxPct,
@@ -198,7 +197,7 @@ export class BarcodeScanInputPage implements OnInit {
                   itemId: r.id,
                   unitPrice: r.price,
                   discountGroupCode: r.discCd,
-                  discountExpression: r.discPct + '%',
+                  discountExpression: r.discPct + "%",
                   discountPercent: r.discPct,
                   discountGroupId: null,
                   unitPriceMin: null,
@@ -224,7 +223,7 @@ export class BarcodeScanInputPage implements OnInit {
                 description: found_item_master.find(rr => rr.id === r.itemId)?.itemDesc,
                 variationTypeCode: found_item_master.find(rr => rr.id === r.itemId)?.varCd,
                 discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
-                discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + '%',
+                discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + "%",
                 taxId: found_item_master.find(rr => rr.id === r.itemId)?.taxId,
                 taxCode: found_item_master.find(rr => rr.id === r.itemId)?.taxCd,
                 taxPct: found_item_master.find(rr => rr.id === r.itemId)?.taxPct,
@@ -233,7 +232,7 @@ export class BarcodeScanInputPage implements OnInit {
                   itemId: found_item_master.find(rr => rr.id === r.itemId)?.id,
                   unitPrice: found_item_master.find(rr => rr.id === r.itemId)?.price,
                   discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
-                  discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + '%',
+                  discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + "%",
                   discountPercent: found_item_master.find(rr => rr.id === r.itemId)?.discPct,
                   discountGroupId: null,
                   unitPriceMin: null,
@@ -255,7 +254,7 @@ export class BarcodeScanInputPage implements OnInit {
             }
           })
         } else {
-          this.toastService.presentToast('No Item Found', '', 'top', 'danger', 1000);
+          this.toastService.presentToast("No Item Found", "", "top", "danger", 1000);
         }
         if (found_item_master && found_item_master.length === 1) {
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id);
@@ -264,7 +263,7 @@ export class BarcodeScanInputPage implements OnInit {
           this.showItemModal();
         }
       } else {
-        this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
+        this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
       }
     }
   }
@@ -290,7 +289,7 @@ export class BarcodeScanInputPage implements OnInit {
         let found = this.configService.item_Masters.find(r => r.id === item.itemId);
         this.onItemAdd.emit([item]);
       } else {
-        this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
+        this.toastService.presentToast("", "No Item added.", "top", "danger", 1000);
       }
       this.hideItemModel();
     }
@@ -320,7 +319,7 @@ export class BarcodeScanInputPage implements OnInit {
       this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
     }
     else {
-      this.toastService.presentToast('', 'No Item added.', 'top', 'danger', 1000);
+      this.toastService.presentToast("", "No Item added.", "top", "danger", 1000);
     }
     this.hideItemModel();
     this.hideVariationModel();

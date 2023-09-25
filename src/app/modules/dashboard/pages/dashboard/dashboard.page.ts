@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
+import { IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -7,13 +7,19 @@ import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 import { NotificationHistory } from '../../models/notification-history';
 import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/acl-const';
+import { LoginUser } from 'src/app/services/auth/login-user';
+import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
+import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
+import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
+import { Capacitor } from '@capacitor/core';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss']
 })
-export class DashboardPage implements OnInit, ViewDidEnter {
+export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   showQuotationReview: boolean = false;
   showQuotationApproval: boolean = false;
@@ -36,7 +42,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
 
   showNonTradePurchaseOrderReview: boolean = false;
   showNonTradePurchaseOrderApproval: boolean = false;
-  
+
   last_sync_datetime: Date;
 
   showQuotation: boolean = false;
@@ -45,53 +51,57 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   constructor(
     private authService: AuthService,
     private commonService: CommonService,
+    public consignmentSalesService: ConsignmentSalesService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
     private navController: NavController
-  ) { }
-
-  ionViewDidEnter(): void {
-    try {
-      this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
-      this.loadAnnouncements();
-    } catch (e) {
-      console.error(e);
+  ) {
+  }
+  
+  ionViewWillEnter(): void {
+    this.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+    console.log("🚀 ~ file: dashboard.page.ts:57 ~ DashboardPage ~ this.loginUser:", this.loginUser)
+    if (this.loginUser.loginUserType === "C") {
+      this.consignmentSalesService.loadRequiredMaster();
     }
   }
 
-  ngOnInit() {
-    try {
-      this.authService.menuModel$.subscribe(obj => {
-        if (obj) {
-          let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.approval);
-          if (mPageItems) {
-            this.showQuotationReview = mPageItems.findIndex(r => r.title === approvalAppCode.quotationRV) > -1;
-            this.showQuotationApproval = mPageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
-            this.showSalesOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
-            this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
-            this.showBackToBackOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderRV) > -1;
-            this.showBackToBackOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderAP) > -1;
-            this.showPurchaseReqReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;
-            this.showPurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
-            this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
-            this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
-            this.showNonTradePurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePORV) > -1;
-            this.showNonTradePurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePVAP) > -1;
-            this.showSalesOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
-            this.showBackToBackOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
-          }
-
-          let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction);
-          if (tPageItems) {
-            this.showQuotation = tPageItems.findIndex(r => r.title === trxAppCode.mobileQuotation) > -1;
-            this.showSalesOrder = tPageItems.findIndex(r => r.title === trxAppCode.mobileSalesOrder) > -1;
-          }
-        }
-      })
-      this.loadAnnouncements();
-    } catch (e) {
-      console.error(e);
+  ionViewDidEnter(): void {
+    if (this.configService.selected_consignment_location === null || this.configService.selected_consignment_location === undefined) {
+      this.showLocationModal();
     }
+    this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
+  }
+
+  ngOnInit() {
+    this.authService.menuModel$.subscribe(obj => {
+      if (obj) {
+        let mPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.approval);
+        if (mPageItems) {
+          this.showQuotationReview = mPageItems.findIndex(r => r.title === approvalAppCode.quotationRV) > -1;
+          this.showQuotationApproval = mPageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
+          this.showSalesOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
+          this.showSalesOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+          this.showBackToBackOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderRV) > -1;
+          this.showBackToBackOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderAP) > -1;
+          this.showPurchaseReqReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;
+          this.showPurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
+          this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
+          this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
+          this.showNonTradePurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePORV) > -1;
+          this.showNonTradePurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePVAP) > -1;
+          this.showSalesOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
+          this.showBackToBackOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
+        }
+
+        let tPageItems = obj?.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.transaction);
+        if (tPageItems) {
+          this.showQuotation = tPageItems.findIndex(r => r.title === trxAppCode.mobileQuotation) > -1;
+          this.showSalesOrder = tPageItems.findIndex(r => r.title === trxAppCode.mobileSalesOrder) > -1;
+        }
+      }
+    })
+    this.loadAnnouncements();
   }
 
   dashboardData: Dashboard;
@@ -106,6 +116,17 @@ export class DashboardPage implements OnInit, ViewDidEnter {
       console.error(e);
     }
   }
+
+  /* #region choose default location for consignment user */
+
+  async chooseDefaultLocation() {
+    let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+    if (!this.configService.selected_consignment_location) {
+
+    }
+  }
+
+  /* #endregion */
 
   goToManagement(page: string, mode: string) {
     try {
@@ -132,7 +153,7 @@ export class DashboardPage implements OnInit, ViewDidEnter {
   showModal(memo: Memo) {
     try {
       this.selectedAnnouncement = memo;
-      this.isModalOpen = true;      
+      this.isModalOpen = true;
     } catch (e) {
       console.error(e);
     }
@@ -217,5 +238,34 @@ export class DashboardPage implements OnInit, ViewDidEnter {
       console.error(e);
     }
   }
+
+  /* #region select location modal */
+
+  loginUser: LoginUser;
+  selectLocationModal: boolean = false;
+  showLocationModal() {
+    this.selectLocationModal = true;
+  }
+
+  hideLocationModal() {
+    this.selectLocationModal = false;
+  }
+
+  async setDefaultConsignmentLocation(location: ConsignmentSalesLocation) {
+    this.configService.selected_consignment_location = location.locationId;
+    this.hideLocationModal();
+    if (Capacitor.getPlatform() !== "web") {
+      let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+      let itemMaster: PDItemMaster[] = response["itemMaster"];
+      let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+      await this.configService.syncInboundData(itemMaster, itemBarcode);
+      
+      let response2 = await this.commonService.syncMarginConfig(this.configService.selected_consignment_location);
+      let marginConfig: PDMarginConfig[] = response2;
+      await this.configService.syncMarginConfig(marginConfig);
+    }
+  }
+
+  /* #endregion */
 
 }

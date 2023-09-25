@@ -275,3 +275,37 @@
     </ion-content>
   </ng-template>
 </ion-modal>
+
+<ion-modal [isOpen]="selectLocationModal" (didDismiss)="selectLocationModal = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Select Location</ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="hideLocationModal()">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="p-2">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="loginUser.locationId && loginUser.locationId.length === 0">
+          <ion-label>Consignment Location not set</ion-label>
+        </ion-list-header>
+        <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+          <ion-item button="false" *ngFor="let l of consignmentSalesService.locationList" (click)="setDefaultConsignmentLocation(l)">
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                  <ion-badge>
+                    <div>{{l?.locationCode}}</div>
+                  </ion-badge>
+                  <div class="ion-flex ion-text-wrap my-auto mx-2">{{l?.locationDescription}}</div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
