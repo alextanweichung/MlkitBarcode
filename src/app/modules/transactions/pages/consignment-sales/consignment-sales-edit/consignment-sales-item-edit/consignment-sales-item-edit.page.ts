@@ -357,7 +357,7 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.object.header, true);
   }
 
-  onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
+  async onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
     try {
       let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
       if (discPct) {
@@ -366,6 +366,7 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
         } else {
           trxLine.discountExpression = discPct + "%";
         }
+        trxLine = await this.commonService.getMarginPct(trxLine, this.object.header.trxDate, this.object.header.toLocationId);
         this.computeAllAmount(trxLine);
       }
     } catch (e) {

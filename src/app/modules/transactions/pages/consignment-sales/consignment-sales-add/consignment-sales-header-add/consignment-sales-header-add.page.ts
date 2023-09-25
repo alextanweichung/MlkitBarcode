@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -16,7 +16,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './consignment-sales-header-add.page.html',
   styleUrls: ['./consignment-sales-header-add.page.scss'],
 })
-export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
+export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   @ViewChild("locationDropdown", {static:false}) locationDropdown: SearchDropdownPage;
 
@@ -41,6 +41,12 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     if (!this.trxDate) {
       this.trxDate = this.commonService.getTodayDate();
+    }
+  }
+
+  ionViewDidEnter(): void {
+    if (this.locationSearchDropdownList && this.locationSearchDropdownList.length === 1) {
+      this.objectForm.patchValue({ toLocationId: this.locationSearchDropdownList[0].id, toLocationCode: this.locationSearchDropdownList[0].code });      
     }
   }
 

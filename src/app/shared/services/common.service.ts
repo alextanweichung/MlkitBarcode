@@ -15,6 +15,7 @@ import { MasterList } from '../models/master-list';
 import { format } from 'date-fns';
 import { PDMarginConfig } from '../models/pos-download';
 import { ConsignmentSalesHeader } from 'src/app/modules/transactions/models/consignment-sales';
+import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +51,7 @@ export class CommonService {
 
   syncInbound() {
     try {
-      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster").toPromise();
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster", { context: background_load() }).toPromise();
     } catch (e) {
       console.error(e);
     }
@@ -58,14 +59,14 @@ export class CommonService {
 
   syncInboundConsignment(locationCode: string, trxDate: string) {
     try {
-      return this.http.get(this.configService.selected_sys_param.apiUrl + `MobileDownload/itemMaster/${locationCode}/${trxDate}`).toPromise();
+      return this.http.get(this.configService.selected_sys_param.apiUrl + `MobileDownload/itemMaster/${locationCode}/${trxDate}`, { context: background_load() }).toPromise();
     } catch (e) {
       console.error(e);
     }
   }
 
   syncMarginConfig(locationIds: number[]) {
-    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", locationIds).toPromise();
+    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", locationIds, { context: background_load() }).toPromise();
   }
 
   saveVersion() {
@@ -492,10 +493,11 @@ export class CommonService {
       let matchDepartment = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === "D" && r.typeId === item.itemDepartmentId && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
       let base = JSON.parse(JSON.stringify(this.configService.margin_Configs.filter(r => r.type === null && r.typeId === null && (new Date(r.trxDate) <= new Date(trxDate)) && r.locId === locationId)));
       let allMatch = [...matchBrand, ...matchGroup, ...matchCategory, ...matchDepartment, ...base];
-      console.log("🚀 ~ file: common.service.ts:495 ~ CommonService ~ getMarginPct ~ allMatch:", JSON.stringify(allMatch))
       if (allMatch && allMatch.length > 0) {
         allMatch = JSON.parse(JSON.stringify(allMatch.filter(r => r.discCode === item.discountGroupCode)));
         await allMatch.sort((a, b) => (b.hLevel - a.hLevel) || ((new Date(a.trxDate) < new Date(b.trxDate)) ? 1 : -1))
+        console.log("🚀 ~ file: common.service.ts:499 ~ CommonService ~ getMarginPct ~ allMatch:", allMatch)
+        // take newest trxDate only, if same trxDate but id different, sort again by id, take first one
         item.marginPct = allMatch[0].mPct;
         item.bearPct = allMatch[0].bPct;
       }

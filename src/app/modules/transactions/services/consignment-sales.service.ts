@@ -92,6 +92,9 @@ export class ConsignmentSalesService {
   locationList: ConsignmentSalesLocation[] = [];
   async loadConsignmentLocation() {
     this.locationList = await this.getConsignmentLocation();
+    if (this.locationList && this.locationList.length === 1) {
+      this.refreshLocalDb(this.locationList[0].locationCode);
+    }
   }
 
   getMasterList() {

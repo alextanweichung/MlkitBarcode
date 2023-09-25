@@ -34,7 +34,6 @@
     <ion-content>
       <div class="p-2">
         <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableItemmmm" (click)="showVariations(item)">
-          <!-- <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox> -->
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
@@ -45,11 +44,6 @@
         </ion-item>
       </div>
     </ion-content>
-    <!-- <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-      <ion-button class="ion-margin" expand="block" (click)="selectItem()">
-        Select Item(s)
-      </ion-button>
-    </ion-footer> -->
   </ng-template>
 </ion-modal>
 
@@ -65,18 +59,21 @@
     </ion-header>
     <ion-content>
       <div class="p-2">
+        <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="availableVariationsByItemId && availableVariationsByItemId.length > 0">
+          <ion-label>{{availableVariationsByItemId[0].itemCode}} - {{availableVariationsByItemId[0].description}}</ion-label>
+        </ion-list-header>
         <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableVariationsByItemId">
           <ion-checkbox slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
-          <ion-grid class="ion-no-padding py-2 pl-2">
-            <ion-row>
+          <ion-grid class="ion-no-padding">
+            <!-- <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
                 <div>{{item.itemCode}} - {{item.description}}</div>
               </ion-col>
-            </ion-row>
+            </ion-row> -->
             <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
               <ion-col class="ion-flex ion-margin-auto">
-                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
+                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size:larger" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:larger" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>  
               </ion-col>
             </ion-row>
           </ion-grid>

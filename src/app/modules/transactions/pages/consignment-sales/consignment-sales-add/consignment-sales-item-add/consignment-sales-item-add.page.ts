@@ -182,7 +182,6 @@ export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
   }
 
   onItemAdd(event: TransactionDetail[]) {
-    console.log("🚀 ~ file: consignment-sales-item-add.page.ts:185 ~ ConsignmentSalesItemAddPage ~ onItemAdd ~ event:", JSON.stringify(event))
     if (event && event.length > 0) {
       event.forEach(async r => {
         await this.addItemToLine(r);
@@ -368,7 +367,7 @@ export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
     trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectHeader, true);
   }  
 
-  onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
+  async onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
     try {
       let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
       if (discPct) {
@@ -377,6 +376,7 @@ export class ConsignmentSalesItemAddPage implements OnInit, ViewWillEnter {
         } else {
           trxLine.discountExpression = discPct + "%";
         }
+        trxLine = await this.commonService.getMarginPct(trxLine, this.objectHeader.trxDate, this.objectHeader.toLocationId);
         this.computeAllAmount(trxLine);
       }
     } catch (e) {
