@@ -164,8 +164,6 @@ export class SigninPage implements OnInit, ViewDidEnter {
     } else {
       let loginModel: LoginRequest = this.signin_form.value;
       (await this.authService.signIn(loginModel)).subscribe(async response => {
-        this.submit_attempt = false;
-        await this.navController.navigateRoot("/dashboard");
         if (Capacitor.getPlatform() !== "web") {
           this.configService.selected_sys_param.rememberMe = this.rememberMe;
           if (this.rememberMe) {
@@ -189,16 +187,16 @@ export class SigninPage implements OnInit, ViewDidEnter {
             // save margin config to local db
             let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
             if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
-              // for consignment user more than 1 location, go to dashboard and let user select then only sync              
+              // for consignment user more than 1 location, go to dashboard and let user select then only sync
             }
-            else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {    
+            else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {
+              this.configService.selected_consignment_location = loginUser.locationId[0];
               // sync by location since only 1 location
               let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
               let itemMaster: PDItemMaster[] = response["itemMaster"];
               let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
               await this.configService.syncInboundData(itemMaster, itemBarcode);
                  
-              this.configService.selected_consignment_location = loginUser.locationId[0];
               let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
               let marginConfig: PDMarginConfig[] = response2;
               await this.configService.syncMarginConfig(marginConfig);
@@ -212,9 +210,26 @@ export class SigninPage implements OnInit, ViewDidEnter {
               let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
               await this.configService.syncInboundData(itemMaster, itemBarcode);
             }
+            this.submit_attempt = false;
+            await this.navController.navigateRoot("/dashboard");
           } catch (error) {
             this.toastService.presentToast(error.message, "", "top", "medium", 1000);
           }
+        } else {
+          let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+          if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
+            // for consignment user more than 1 location, go to dashboard and let user select then only sync
+          }
+          else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {
+            this.configService.selected_consignment_location = loginUser.locationId[0];
+          } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
+            // show error if consignment user but no location set
+            this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+          } else {
+            
+          }
+          this.submit_attempt = false;
+          await this.navController.navigateRoot("/dashboard");
         }
       }, error => {
         this.submit_attempt = false;

@@ -42,7 +42,7 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter {
       description: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       trxDateTime: [null],
-      locationId: [null, [Validators.required]],
+      locationId: [this.configService.selected_consignment_location ?? 0, [Validators.required]],
       consignmentCountUDField1: [null],
       consignmentCountUDField2: [null],
       consignmentCountUDField3: [null],

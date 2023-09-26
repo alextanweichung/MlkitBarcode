@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Transaction Inquiry</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="p-2">
+    <ion-list class="list-custom" lines="none">
+      <app-search-dropdown #searchType title="Type" optionLabel="description" [searchDropdownList]="type" [selectedId]="selectedType?.id" (onActionComplete)="onTypeChanged($event)"></app-search-dropdown>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col class="ion-margin-auto" *ngIf="!dateto?.date_active">
+            <app-calendar-input #datefrom title="From" [date_value]="trxDateFrom" (onDateSelected)="onDateFromSelected($event)"></app-calendar-input>
+          </ion-col>
+          <ion-col class="ion-margin-auto" *ngIf="!datefrom?.date_active">
+            <app-calendar-input #dateto title="To" [date_value]="trxDate" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <app-search-dropdown #searchCustomer title="Customer" optionLabel="description" [searchDropdownList]="customerSearchDropdown" [selectedId]="selectedCustomer?.id" (onActionComplete)="onCustomerChanged($event)"></app-search-dropdown>
+      <ion-item>
+        <ion-label position="stacked" class="font-bold">Doc Num</ion-label>
+        <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Doc Num" [(ngModel)]="docNum"></ion-textarea>
+      </ion-item>
+    </ion-list>
+    <ion-button class="pt-2" expand="block" size="default" (click)="loadReport()" [disabled]="selectedType === null || trxDateFrom === null || trxDate === null">Search</ion-button>
+    <ngx-datatable *ngIf="object && object.length > 0"
+      class="fullscreen material mt-2"
+      [rows]="object" 
+      [rowHeight]="'auto'" 
+      [columnMode]="'force'">
+      <ngx-datatable-column [width]="40" [sortable]="false" [canAutoResize]="false" [draggable]="false" [resizeable]="false" [headerCheckboxable]="true" [checkboxable]="true"></ngx-datatable-column>
+      <ngx-datatable-column prop="docNum" name="Doc Num">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size div-link-button" (click)="presentAlertViewPdf(row)">{{row.docNum}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="docDate" name="Doc Date">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.docDate|date:'dd/MM/yyyy'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="customerCode" name="Debtor">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.customerCode}} - {{row.customerName}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</ion-content>

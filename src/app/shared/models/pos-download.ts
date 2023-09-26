@@ -44,6 +44,7 @@ export interface PDItemBarcode {
 }
 
 export interface PDMarginConfig {
+  id: number
   trxDate: Date
   locId: number
   type?: string

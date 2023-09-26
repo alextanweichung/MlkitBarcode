@@ -252,6 +252,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   }
 
   async setDefaultConsignmentLocation(location: ConsignmentSalesLocation) {
+    console.log("🚀 ~ file: dashboard.page.ts:255 ~ DashboardPage ~ setDefaultConsignmentLocation ~ setDefaultConsignmentLocation:");
     this.configService.selected_consignment_location = location.locationId;
     this.hideLocationModal();
     if (Capacitor.getPlatform() !== "web") {

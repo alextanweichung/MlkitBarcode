@@ -301,6 +301,10 @@ const routes: Routes = [
     path: 'reports/rp-check-cn',
     loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then( m => m.RpCheckCnPageModule)
   },
+  {
+    path: 'reports/transaction-inquiry',
+    loadChildren: () => import('./modules/reports/pages/transaction-inquiry/transaction-inquiry.module').then( m => m.TransactionInquiryPageModule)
+  },
 
 
 
@@ -371,6 +375,7 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
 
 
 

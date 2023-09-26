@@ -10,6 +10,7 @@ import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-cust
 import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { CheckQohRoot } from '../models/rp-check-qoh';
 import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
+import { TransactionInquiryObject, TransactionInquiryRequestObject } from '../models/transaction-inquiry';
 
 @Injectable({
   providedIn: 'root'
@@ -62,6 +63,10 @@ export class ReportsService {
 
   getCreditInfo(customerId: number) {
     return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + "mobileReport/creditInfo/" + customerId);
+  }
+
+  getTransactionInquiry(requestObject: TransactionInquiryRequestObject) {
+    return this.http.post<TransactionInquiryObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/trxInquiry", requestObject);
   }
   
 }

@@ -400,11 +400,12 @@ export class CommonQueryService<T> {
           )
         });
 
-        statements.push({
-          statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
-          values: []
-        })
-        console.log("🚀 ~ file: common-query.service.ts:401 ~ CommonQueryService<T> ~ syncInboundData ~ statements[2].values:", JSON.stringify(statements))
+        if (table !== inboundDb_Tables.margin_Config) {
+          statements.push({
+            statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
+            values: []
+          })
+        }
 
         let timestart = new Date();
         await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {

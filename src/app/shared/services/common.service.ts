@@ -66,7 +66,7 @@ export class CommonService {
   }
 
   syncMarginConfig(locationId: number) {
-    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", locationId, { context: background_load() }).toPromise();
+    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", [locationId], { context: background_load() }).toPromise();
   }
 
   saveVersion() {
@@ -495,8 +495,8 @@ export class CommonService {
       let allMatch = [...matchBrand, ...matchGroup, ...matchCategory, ...matchDepartment, ...base];
       if (allMatch && allMatch.length > 0) {
         allMatch = JSON.parse(JSON.stringify(allMatch.filter(r => r.discCode === item.discountGroupCode)));
-        await allMatch.sort((a, b) => (b.hLevel - a.hLevel) || ((new Date(a.trxDate) < new Date(b.trxDate)) ? 1 : -1))
-        console.log("🚀 ~ file: common.service.ts:499 ~ CommonService ~ getMarginPct ~ allMatch:", allMatch)
+        await allMatch.sort((a, b) => (b.id - a.id) || ((new Date(a.trxDate) < new Date(b.trxDate)) ? 1 : -1) || (b.hLevel - a.hLevel));
+        console.log("🚀 ~ file: common.service.ts:499 ~ CommonService ~ getMarginPct ~ allMatch:", JSON.stringify(allMatch))
         // take newest trxDate only, if same trxDate but id different, sort again by id, take first one
         item.marginPct = allMatch[0].mPct;
         item.bearPct = allMatch[0].bPct;

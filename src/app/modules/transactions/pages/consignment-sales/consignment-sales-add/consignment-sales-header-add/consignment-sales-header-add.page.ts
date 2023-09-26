@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { Capacitor } from '@capacitor/core';
 import { ActionSheetController, AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
@@ -18,13 +18,14 @@ import { CommonService } from 'src/app/shared/services/common.service';
 })
 export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
-  @ViewChild("locationDropdown", {static:false}) locationDropdown: SearchDropdownPage;
+  @ViewChild("locationDropdown", { static: false }) locationDropdown: SearchDropdownPage;
 
   objectForm: FormGroup;
   trxDate: Date = null;
 
   constructor(
     private authService: AuthService,
+    private configService: ConfigService,
     public objectService: ConsignmentSalesService,
     private commonService: CommonService,
     private navController: NavController,
@@ -46,7 +47,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
 
   ionViewDidEnter(): void {
     if (this.locationSearchDropdownList && this.locationSearchDropdownList.length === 1) {
-      this.objectForm.patchValue({ toLocationId: this.locationSearchDropdownList[0].id, toLocationCode: this.locationSearchDropdownList[0].code });      
+      this.objectForm.patchValue({ toLocationId: this.locationSearchDropdownList[0].id, toLocationCode: this.locationSearchDropdownList[0].code });
     }
   }
 
@@ -57,7 +58,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
-      toLocationId: [null, [Validators.required]],
+      toLocationId: [this.configService.selected_consignment_location ?? 0, [Validators.required]],
       toLocationCode: [null, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
@@ -73,8 +74,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
       isBearPromo: [null],
       marginMode: [null],
     })
-    if (this.objectService.locationList.find(r => r.isPrimary)?.locationId) {
-      let findLocation = this.objectService.locationMasterList.find(r => r.id === this.objectService.locationList.find(r => r.isPrimary)?.locationId);
+    if (this.configService.selected_consignment_location) {
+      let findLocation = this.objectService.locationMasterList.find(r => r.id === this.configService.selected_consignment_location);
       this.objectForm.patchValue({
         toLocationId: findLocation.id,
         toLocationCode: findLocation.code,
@@ -218,9 +219,6 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
               isBearPromo: findLocation.attribute6 == '1' ? true : false,
               marginMode: findLocation.attribute8
             })
-            if (Capacitor.getPlatform() !== "web") { 
-              await this.objectService.refreshLocalDb(event.code);
-            }
           },
         },
         {
@@ -253,8 +251,8 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
             role: "cancel",
           }]
       });
-      await actionSheet.present();  
-      const { role } = await actionSheet.onWillDismiss();  
+      await actionSheet.present();
+      const { role } = await actionSheet.onWillDismiss();
       if (role === "confirm") {
         this.objectService.resetVariables();
         this.navController.navigateBack("/transactions/consignment-sales");

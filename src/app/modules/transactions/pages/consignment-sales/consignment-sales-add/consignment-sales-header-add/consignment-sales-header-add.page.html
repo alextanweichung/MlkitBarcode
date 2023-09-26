@@ -15,7 +15,7 @@
   <div class="p-2"> 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <app-calendar-input title="Trx Date" [date_value]="trxDate" (onDateSelected)="onTrxDateSelected($event)" [maxDateToday]="true"></app-calendar-input>
-      <app-search-dropdown #locationDropdown title="Location" optionLabel="description" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="onLocationChanged($event)" [selectedId]="objectForm.controls.toLocationId.value"></app-search-dropdown>
+      <app-search-dropdown #locationDropdown title="Location" optionLabel="description" [searchDropdownList]="locationSearchDropdownList" (onActionComplete)="onLocationChanged($event)" [selectedId]="objectForm.controls.toLocationId.value" [disabled]="true"></app-search-dropdown>
     </ion-list>
   </div>
 </ion-content>

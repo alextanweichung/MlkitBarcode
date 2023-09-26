@@ -56,13 +56,6 @@ export class ConsignmentSalesService {
     await this.loadConsignmentLocation();
   }
 
-  async refreshLocalDb(locationCode: string) {
-    let rrrrr = await this.commonService.syncInboundConsignment(locationCode, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-    let itemMaster: PDItemMaster[] = rrrrr["itemMaster"];
-    let itemBarcode: PDItemBarcode[] = rrrrr["itemBarcode"];
-    await this.configService.syncInboundData(itemMaster, itemBarcode);
-  }
-
   fullMasterList: MasterList[] = [];
   customerMasterList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
