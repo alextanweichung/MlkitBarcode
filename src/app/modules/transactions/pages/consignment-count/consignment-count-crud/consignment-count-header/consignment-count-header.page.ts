@@ -50,7 +50,9 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter {
       consignmentCountUDOption2: [null],
       consignmentCountUDOption3: [null],
       remark: [null],
-      printCount: [null]
+      printCount: [null],
+      rack: [null],
+      zone: [null]
     });
   }
 

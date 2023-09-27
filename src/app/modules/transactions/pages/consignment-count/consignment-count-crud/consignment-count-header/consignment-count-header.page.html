@@ -13,8 +13,16 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2"> 
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)" [disabled]="true"></app-search-dropdown>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" [formGroup]="objectForm">
+      <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
+      <ion-item>
+        <ion-label position="stacked" class="font-bold">Rack</ion-label>
+        <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Rack" formControlName="rack"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked" class="font-bold">Zone</ion-label>
+        <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Zone" formControlName="zone"></ion-textarea>
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>

@@ -136,8 +136,12 @@
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><div>Unit Price</div></ion-label>
-            <ion-input *ngIf="object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [disabled]="restrictTrxFields['unitPrice'] && !selectedItem.isPricingApproval"></ion-input>
-            <ion-input *ngIf="!object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem)" [disabled]="restrictTrxFields['unitPriceExTax'] && !selectedItem.isPricingApproval"></ion-input>
+            <ion-input *ngIf="object.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem)" [disabled]="restrictTrxFields['unitPrice'] && !selectedItem.isPricingApproval"></ion-input>
+
+
+            <ion-input *ngIf="!object.header.isDisplayTaxInclusive" #unitPriceExTax slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPriceExTax" (ionFocus)="highlight(unitPriceExTax)" (ionInput)="unitPriceExTaxInput($event, unitPriceExTax.value)" (ionChange)="unitPriceExTaxChanged($event)" (ionBlur)="computeUnitPrice(selectedItem)" [disabled]="restrictTrxFields['unitPriceExTax'] && !selectedItem.isPricingApproval"></ion-input>
+
+
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>

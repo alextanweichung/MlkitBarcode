@@ -434,6 +434,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   }
 
   computeAllAmount(data: TransactionDetail) {
+    data.qtyRequest = Number(data.qtyRequest.toFixed(0));
     try {
       if (this.salesOrderQuantityControl == '1') {
         if (data.qtyRequest && data.qtyRequest > data.actualQty) {

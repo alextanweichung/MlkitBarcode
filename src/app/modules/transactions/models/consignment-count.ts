@@ -14,15 +14,17 @@ export interface ConsignmentCountRoot {
    trxDate: string
    trxDateTime: string
    locationId: number
-   consignmentCountUDField1: any
-   consignmentCountUDField2: any
-   consignmentCountUDField3: any
-   consignmentCountUDOption1: any
-   consignmentCountUDOption2: any
-   consignmentCountUDOption3: any
-   remark: any
-   printCount: any
-   sequence: any
+   consignmentCountUDField1: string
+   consignmentCountUDField2: string
+   consignmentCountUDField3: string
+   consignmentCountUDOption1: number
+   consignmentCountUDOption2: number
+   consignmentCountUDOption3: number
+   remark: string
+   printCount: number
+   rack: string
+   zone: string
+   sequence: number
    createdById: number
    createdBy: string
    createdAt: string

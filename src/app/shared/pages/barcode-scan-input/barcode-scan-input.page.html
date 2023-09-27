@@ -11,7 +11,7 @@
   <ion-row>
     <ion-col class="ion-flex ion-margin-auto" size="10">
       <input #barcodeInput hideKeyboard class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'B' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="barcodeSearchValue" placeholder="Enter or Scan Barcode" (keydown)="handleBarcodeKeyDown($event, barcodeSearchValue)">      
-      <input #itemInput hideKeyboard class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'I' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter or Scan Item Code/Sku" (keydown)="handleItemCodeKeyDown($event, itemSearchValue)">
+      <input #itemInput class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'I' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter or Scan Item Code/Sku" (keydown)="handleItemCodeKeyDown($event, itemSearchValue)">
     </ion-col>
     <ion-col class="ion-flex ion-margin-auto justify-content-end">
       <ion-button size="small" fill="clear" (click)="showKeyboard($event)">

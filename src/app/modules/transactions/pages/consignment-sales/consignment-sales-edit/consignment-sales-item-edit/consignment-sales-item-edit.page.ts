@@ -33,10 +33,8 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     private actionSheetController: ActionSheetController,
     private commonService: CommonService,
     private configService: ConfigService,
-    public objectService: ConsignmentSalesService,
-  ) {
-    
-  }
+    public objectService: ConsignmentSalesService
+  ) { }
 
   ionViewWillEnter(): void {
     this.route.queryParams.subscribe(params => {
@@ -114,7 +112,6 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
         });
         this.restrictTrxFields = restrictedTrx;
       })
-      console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:114 ~ ConsignmentSalesItemEditPage ~ loadRestrictColumms ~ restrictedTrx:", restrictedTrx)
     } catch (e) {
       console.error(e);
     }
@@ -124,7 +121,6 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:126 ~ ConsignmentSalesItemEditPage ~ this.objectService.getObjectById ~ this.object:", JSON.stringify(this.object))
         if (this.object.header.isHomeCurrency) {
           this.object.header.maxPrecision = this.precisionSales.localMax;
           this.object.header.maxPrecisionTax = this.precisionTax.localMax
@@ -325,6 +321,7 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
   /* #region  unit price, tax, discount */
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
+    console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:329 ~ ConsignmentSalesItemEditPage ~ computeUnitPriceExTax ~ trxLine:", trxLine)
     try {
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
@@ -334,6 +331,7 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
   }
 
   computeUnitPrice(trxLine: TransactionDetail) {
+    console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:337 ~ ConsignmentSalesItemEditPage ~ computeUnitPrice ~ trxLine:", trxLine)
     try {
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
       this.computeDiscTaxAmount(trxLine);       
@@ -564,6 +562,29 @@ export class ConsignmentSalesItemEditPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  unitPriceExTaxInput(event, nowValue) {
+    if (event) {
+      const parsedValue = parseFloat(event.detail.data);
+      if (!isNaN(parsedValue)) {
+        let full = Number(nowValue.toString().replace(".",""));
+        this.selectedItem.unitPriceExTax = parseFloat((full/100).toFixed(2));
+      }
+    }
+  }
+
+  unitPriceExTaxChanged(event) {
+    const parsedValue = parseFloat(event.detail.value);
+    // Check if the parsed value is a valid number
+    if (!isNaN(parsedValue)) {
+      // Format the parsed value to two decimal places      
+      this.selectedItem.unitPriceExTax = parseFloat(parsedValue.toFixed(2));
+    } else {
+      // If input is not a valid number, reset it to "0.00"
+      this.selectedItem.unitPriceExTax = parseFloat("0.00");
+    }
+    console.log("🚀 ~ file: consignment-sales-item-edit.page.ts:583 ~ ConsignmentSalesItemEditPage ~ unitPriceExTaxChanged ~ this.selectedItem.unitPriceExTax:", this.selectedItem.unitPriceExTax)
   }
 
 }

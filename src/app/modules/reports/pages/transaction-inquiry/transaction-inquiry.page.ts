@@ -51,7 +51,7 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
       { id: 0, code: "SO", description: "Sales Order" },
       { id: 1, code: "SI", description: "Sales Invoice" },
       { id: 2, code: "CN/SR", description: "CN/Sales Return" },
-      { id: 3, code: "S", description: "Statement" }
+      // { id: 3, code: "S", description: "Statement" }
     );
   }
 

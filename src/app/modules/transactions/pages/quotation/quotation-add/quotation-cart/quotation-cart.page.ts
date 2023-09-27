@@ -418,16 +418,17 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   promotionEngineApplicable: boolean = true;
   promotionMaster: PromotionMaster[] = [];
-  computeAllAmount(trxLine: TransactionDetail) {
+  computeAllAmount(data: TransactionDetail) {
+    data.qtyRequest = Number(data.qtyRequest.toFixed(0));
     try {
-      if (trxLine.qtyRequest <= 0) {
+      if (data.qtyRequest <= 0) {
         this.toastService.presentToast('Error', 'Invalid Quantity.', 'top', 'warning', 1000);
       } else {
-        this.computeDiscTaxAmount(trxLine);
         if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
           this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, true)
         }
       }
+      this.computeDiscTaxAmount(data);
     } catch (e) {
       console.error(e);
     }

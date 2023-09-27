@@ -46,9 +46,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
   }
 
   ionViewDidEnter(): void {
-    if (this.locationSearchDropdownList && this.locationSearchDropdownList.length === 1) {
-      this.objectForm.patchValue({ toLocationId: this.locationSearchDropdownList[0].id, toLocationCode: this.locationSearchDropdownList[0].code });
-    }
+
   }
 
   newObjectForm() {
@@ -82,7 +80,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
         isBearPromo: findLocation.attribute6 == '1' ? true : false,
         marginMode: findLocation.attribute8
       })
-      let customerId = this.objectService.locationList.find(r => r.locationId === this.objectService.locationList.find(r => r.isPrimary)?.locationId)?.customerId;
+      let customerId = this.objectService.locationList.find(r => r.locationId === this.configService.selected_consignment_location)?.customerId;
       if (customerId) {
         this.onCustomerChanged(customerId)
       }
