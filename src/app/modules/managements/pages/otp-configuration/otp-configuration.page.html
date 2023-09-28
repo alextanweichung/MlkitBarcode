@@ -13,7 +13,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
       <app-search-dropdown #usersDropdown title="Users" optionLabel="description" [searchDropdownList]="userSearchDropDownList" (onActionComplete)="onUserChanged($event)"></app-search-dropdown>
       <app-search-dropdown #validityDropdown title="Validity" optionLabel="description" [masterDropdownList]="lovStatics" (onActionComplete)="onValidityChanged($event)" [hidden]="selectedUser==null"></app-search-dropdown>
       <app-search-dropdown #appsDropdown [hidden]="selectedValidity !== 'SINGLE'" title="App" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-dropdown>

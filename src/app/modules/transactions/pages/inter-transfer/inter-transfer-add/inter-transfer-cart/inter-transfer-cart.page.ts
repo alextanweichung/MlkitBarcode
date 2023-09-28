@@ -199,6 +199,7 @@ export class InterTransferCartPage implements OnInit, ViewWillEnter {
   /* #endregion */
 
   computeAllAmount(trxLine: TransactionDetail) {
+    trxLine.qtyRequest = parseFloat(trxLine.qtyRequest.toFixed(0));
     try {
       if (trxLine.qtyRequest <= 0) {
         trxLine.qtyRequest = 1;

@@ -16,18 +16,22 @@
   </ion-header>
 
   <div class="p-2">
-    <form [formGroup]="objectForm">
+    <form [formGroup]="objectForm" *ngIf="isKeyboardShown === false">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <app-calendar-input #datefrom title="Doc. Date" [disabled]="true" [date_value]="objectForm.controls.trxDate.value"></app-calendar-input>
         <app-search-dropdown title="From Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
         <app-search-dropdown title="To Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.toLocationId?.value" (onActionComplete)="onToLocationChanged($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked" class="font-bold">Remark</ion-label>
-          <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
+          <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
         </ion-item>
         <ion-item>
           <ion-label position="stacked" class="font-bold">Total Carton</ion-label>
-          <ion-input inputmode="numeric" type="" enterkeyhint="number" placeholder="Enter Total Carton" formControlName="totalCarton"></ion-input>
+          <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Enter Total Carton" formControlName="totalCarton"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked" class="font-bold">GRN Num.</ion-label>
+          <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter GRN Num" formControlName="grnNum"></ion-input>
         </ion-item>
       </ion-list>
     </form>
@@ -82,9 +86,9 @@
   </div>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive" *ngIf="!isKeyboardShown">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
     Insert
   </ion-button>
 </ion-footer>
-<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+<app-camera-scan-input *ngIf="!isKeyboardShown" [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>

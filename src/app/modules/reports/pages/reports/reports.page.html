@@ -14,37 +14,37 @@
   <div class="p-2">
     
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button (click)="goToReport('debtor-latest-outstanding')">
+      <ion-item button (click)="goToReport('debtor-latest-outstanding')" *ngIf="showDebtorLatestOutstanding">
         <ion-label>
           <div>Debtor Latest Outstanding</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('rp-so-listing')">
+      <ion-item button (click)="goToReport('rp-so-listing')" *ngIf="showSOListing">
         <ion-label>
           <div>SO Listing</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('rp-sales-performance')">
+      <ion-item button (click)="goToReport('rp-sales-performance')" *ngIf="showSalesAgentPerformanceAll">
         <ion-label>
           <div>Sales Agent Performance (All)</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('rp-sales-customer')">
+      <ion-item button (click)="goToReport('rp-sales-customer')" *ngIf="showSalesByDebtor">
         <ion-label>
           <div>Sales by Debtor</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('rp-check-qoh')">
+      <ion-item button (click)="goToReport('rp-check-qoh')" *ngIf="showCheckQOH">
         <ion-label>
           <div>Check QOH</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('rp-check-cn')">
+      <ion-item button (click)="goToReport('rp-check-cn')" *ngIf="showCheckCreditNote">
         <ion-label>
           <div>Check Credit Note</div>
         </ion-label>
       </ion-item>
-      <ion-item button (click)="goToReport('transaction-inquiry')">
+      <ion-item button (click)="goToReport('transaction-inquiry')" *ngIf="showTransactionInquiry">
         <ion-label>
           <div>Transaction Inquiry</div>
         </ion-label>

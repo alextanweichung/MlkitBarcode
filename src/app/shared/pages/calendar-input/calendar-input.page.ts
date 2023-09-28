@@ -45,7 +45,6 @@ export class CalendarInputPage implements OnInit, OnChanges {
 
   ngOnInit() {
     this.today = new Date(Date.UTC(this.defaultDate.getFullYear(), this.defaultDate.getMonth(), this.defaultDate.getDate(), 0, 0, 0));
-    console.log("🚀 ~ file: calendar-input.page.ts:48 ~ CalendarInputPage ~ ngOnInit ~ this.today:", this.today.toISOString())
   }
 
   // Toggle date from
@@ -55,8 +54,8 @@ export class CalendarInputPage implements OnInit, OnChanges {
 
   // On date from select
   onDateSelect(event: any) {
-    let date = new Date(event.detail.value);
     this.date_active = false
+    let date = new Date(event.detail.value);
     if (this.presentation === "date-time") {
       this.date_value_here = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), 0));
     } else {

@@ -171,6 +171,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   }
 
   onDateSelected(event: Date) {
+    console.log("🚀 ~ file: otp-configuration.page.ts:174 ~ OtpConfigurationPage ~ onDateSelected ~ event:", event)
     if (event) {
       this.expiryDate = event;
     }
@@ -185,6 +186,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   generateOtp() {
     if (this.selectedApp && this.selectedUser && this.selectedValidity) {
       let t = this.transformObjectToDto();
+      console.log("🚀 ~ file: otp-configuration.page.ts:189 ~ OtpConfigurationPage ~ generateOtp ~ t:", t)
       this.otpConfigService.insertOtp(t).subscribe(async response => {
         if (response.status == 201) {
           this.generatedOtpCode = response.body["header"].otpCode;
@@ -194,7 +196,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
         }
       }, error => {
         console.log(error);
-        this.toastService.presentToast("Error", "Please insert all fields.", "top", "danger", 1000);
+        this.toastService.presentToast("Error", `${error.message}`, "top", "danger", 1000);
       })
     }
     else {
@@ -249,6 +251,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   }
 
   transformObjectToDto(): OtpDTO {
+    console.log("🚀 ~ file: otp-configuration.page.ts:255 ~ OtpConfigurationPage ~ transformObjectToDto ~ this.expiryDate:", this.expiryDate)
     let otpLineArray: OtpLine[] = [];
     let validity = this.selectedValidity
     switch (validity) {
@@ -281,7 +284,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
         otpCode: null,
         userId: this.selectedUser,
         validity: this.selectedValidity,
-        expiredAt: this.checkboxValue ? null : format(this.expiryDate, "dd/MM/yyyy HH:mm:ss"),
+        expiredAt: this.checkboxValue ? null : this.commonService.convertUtcDate(this.expiryDate),
         status: null,
         remark: this.remark
       },

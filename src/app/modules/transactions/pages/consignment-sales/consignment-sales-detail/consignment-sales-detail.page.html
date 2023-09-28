@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Detail</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/transactions/consignment-sales"></ion-back-button>
+      <ion-back-button (click)="goBack()" defaultHref="/transactions/consignment-sales"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
@@ -13,13 +13,13 @@
   <ng-template>
     <ion-content class="p-2">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item (click)="popover.dismiss(); completeObjectAlert()" *ngIf="!object?.header?.isEntryCompleted">
+        <ion-item (click)="popover.dismiss(); completeObjectAlert()" *ngIf="!objectService?.header?.isEntryCompleted">
           <ion-icon name="checkmark-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Complete Full Month</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); edit()" *ngIf="!object?.header?.isEntryCompleted">
+        <ion-item (click)="popover.dismiss(); edit()">
           <ion-icon name="create-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Edit</div>
@@ -44,15 +44,15 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <div class="p-2" *ngIf="object">
+  <div class="p-2" *ngIf="objectService.header">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex font-bold">Doc. Num.</ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="object.header.isEntryCompleted?'color-success':'color-danger'"></ion-icon>
-              {{object.header.consignmentSalesNum}}
+              <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="objectService.header.isEntryCompleted?'color-success':'color-danger'"></ion-icon>
+              {{objectService.header.consignmentSalesNum}}
             </ion-col>
           </ion-row>
           <ion-row>
@@ -60,7 +60,7 @@
               <div class="font-bold">Doc. Date</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+              <div>{{objectService.header.trxDate|date:'dd/MM/yyyy'}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -68,7 +68,7 @@
               <div class="font-bold">Customer</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+              <div>{{objectService.header.customerId|idMapping:objectService.customerMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -76,7 +76,7 @@
               <div class="font-bold">Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.toLocationId|idMapping:objectService.locationMasterList}}</div>
+              <div>{{objectService.header.toLocationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -84,7 +84,7 @@
               <div class="font-bold">Sales Agent</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.salesAgentId|idMapping:objectService.salesAgentMasterList}}</div>
+              <div>{{objectService.header.salesAgentId|idMapping:objectService.salesAgentMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -92,7 +92,7 @@
               <div class="font-bold">Total Quantity</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.details|sum:'qtyRequest'|number}}</div>
+              <div>{{objectService.detail|sum:'qtyRequest'|number}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -100,7 +100,7 @@
               <div class="font-bold">Grand Total</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.details|sum:'subTotal'|number:'1.2-2'}}</div>
+              <div>{{objectService.detail|sum:'subTotal'|number:'1.2-2'}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -109,8 +109,8 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
-    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of object?.details; let i = index">
+    <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.detail">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of objectService.detail; let i = index">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -161,8 +161,8 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
-              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
+              <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
+              <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="ion-flex">
@@ -171,11 +171,11 @@
               </div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.discountAmt|number: (objectService?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (objectService?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div>{{item.subTotal|number: (objectService?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
           <!-- <ion-row *ngIf="consignmentSalesActivateMarginCalculation">

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { NavController, ActionSheetController, AlertController } from '@ionic/angular';
+import { NavController, ActionSheetController, AlertController, ViewWillEnter, ViewWillLeave, Platform } from '@ionic/angular';
 import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
 import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -12,18 +12,21 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-transfer-out-add',
   templateUrl: './transfer-out-add.page.html',
   styleUrls: ['./transfer-out-add.page.scss'],
 })
-export class TransferOutAddPage implements OnInit {
+export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave {
 
   objectForm: UntypedFormGroup;
   objectLine: TransferOutLine[] = [];
   
   systemWideEAN13IgnoreCheckDigit: boolean = false;
+
+  isKeyboardShown: boolean = false;
 
   constructor(
     public objectService: TransferOutService,
@@ -34,9 +37,37 @@ export class TransferOutAddPage implements OnInit {
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private toastService: ToastService,
-    private formBuilder: UntypedFormBuilder
+    private formBuilder: UntypedFormBuilder,
+    private platform: Platform,
   ) {
     this.newObjectForm();
+  }
+  
+  ionViewWillEnter(): void {
+    Keyboard.addListener('keyboardWillShow', info => {
+      setTimeout(_ => {
+        this.isKeyboardShown = true;
+      }, 100);
+      console.log('keyboard will show with height:', info.keyboardHeight);
+    });
+    Keyboard.addListener('keyboardWillHide', () => {
+      setTimeout(_ => {
+        this.isKeyboardShown = false;
+      }, 100);
+      console.log('keyboard will hide');
+    });
+    // this.platform.keyboardDidShow.subscribe(ev => {
+    //   this.isKeyboardShown = true;
+    //   console.log("keyboard shown");
+    // })
+    // this.platform.keyboardDidHide.subscribe(ev => {
+    //   this.isKeyboardShown = false;
+    //   console.log("keyboard hidden");
+    // })
+  }
+
+  ionViewWillLeave(): void {
+    
   }
 
   newObjectForm() {
@@ -54,7 +85,8 @@ export class TransferOutAddPage implements OnInit {
       interTransferNum: [null],
       totalCarton: [null],
       remark: [null],
-      workFlowTransactionId: [null]
+      workFlowTransactionId: [null],
+      grnNum: [null]
     })
   }
   

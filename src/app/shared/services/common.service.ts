@@ -112,13 +112,9 @@ export class CommonService {
   }
 
   getTodayDate(): Date {
-    try {
-      let today = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate(), new Date().getUTCHours(), new Date().getUTCMinutes(), new Date().getUTCSeconds());
-      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-      return today;
-    } catch (e) {
-      console.error(e);
-    }
+    let today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0, 0);
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    return today;
   }
 
   getDateWithoutTimeZone(inputDate: Date): Date {
@@ -127,26 +123,23 @@ export class CommonService {
     return newDate;
   }
 
-  //To add back timezone differences into UTC Date
-  convertUtcDate(inputDate: Date): Date {
-    try {
-      let outputDate = new Date(inputDate);
-      outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
-      return outputDate;
-    } catch (e) {
-      console.error(e);
-    }
+  getDateWithoutTime(inputDate: Date): Date {
+    let newDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(), 0, 0, 0)
+    return newDate;
   }
 
   //To add back timezone differences into UTC Date
-  convertDateFormat(inputDate: Date): Date {
-    try {
-      let outputDate = new Date(inputDate);
-      //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
-      return outputDate;
-    } catch (e) {
-      console.error(e);
-    }
+  convertUtcDate(inputDate: Date): Date{
+    let outputDate = new Date(inputDate);
+    outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
+    return outputDate;
+  }
+
+  //To add back timezone differences into UTC Date
+  convertDateFormat(inputDate: Date): Date{
+    let outputDate = new Date(inputDate);
+    //outputDate.setMinutes(outputDate.getMinutes() - outputDate.getTimezoneOffset());
+    return outputDate;
   }
 
   convertDateFormatIgnoreTimeAndDate(inputDate: Date): Date {

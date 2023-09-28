@@ -17,7 +17,6 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
-  object: ConsignmentSalesRoot;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +33,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
-    if (this.objectId) {
+    if (this.objectId && this.objectId) {
       this.loadObject();
     }
   }
@@ -71,18 +70,21 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   loadObject() {
     try {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
-        this.object = response;
-        if (this.object.header.isHomeCurrency) {
-          this.object.header.maxPrecision = this.precisionSales.localMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.localMax
-        } else {
-          this.object.header.maxPrecision = this.precisionSales.foreignMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
-        }
-      }, error => {
-        throw error;
-      })
+      if (this.objectId && this.objectId) {
+        this.objectService.getObjectById(this.objectId).subscribe(response => {
+          this.objectService.setHeader(response.header);
+          this.objectService.setDetail(response.details);
+          if (this.objectService.header.isHomeCurrency) {
+            this.objectService.header.maxPrecision = this.precisionSales.localMax;
+            this.objectService.header.maxPrecisionTax = this.precisionTax.localMax
+          } else {
+            this.objectService.header.maxPrecision = this.precisionSales.foreignMax;
+            this.objectService.header.maxPrecisionTax = this.precisionTax.foreignMax;
+          }
+        }, error => {
+          throw error;
+        })
+      }
     } catch (e) {
       console.error(e);
     }
@@ -94,7 +96,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
         objectId: this.objectId
       }
     }
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item-edit', navigationExtras);
+    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item', navigationExtras);
   }
 
   async completeObjectAlert() {
@@ -178,8 +180,8 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   async downloadPdf() {
     try {
-      this.objectService.downloadPdf("SMCS001", "pdf", this.object.header.consignmentSalesId, "Mobile Ticketing").subscribe(response => {
-        let filename = this.object.header.consignmentSalesNum + ".pdf";
+      this.objectService.downloadPdf("SMCS001", "pdf", this.objectService.header.consignmentSalesId, "Mobile Ticketing").subscribe(response => {
+        let filename = this.objectService.header.consignmentSalesNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
         console.log(error);
@@ -190,5 +192,10 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
+
+  goBack() {
+    this.objectService.resetVariables();
+    this.navController.navigateBack("/transactions/consignment-sales");
+  }
 
 }

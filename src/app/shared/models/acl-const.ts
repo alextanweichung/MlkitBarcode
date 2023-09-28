@@ -1,7 +1,8 @@
 export const moduleCode = {
    approval: "MAAP",
    transaction: "MATR",
-   other: "MAOT" // tab report
+   other: "MAOT", // mobile download
+   report: "MARP"
 }
 
 export const trxAppCode = {
@@ -48,5 +49,13 @@ export const approvalAppCode = {
 
 export const reportAppCode = {
    mobileReport: "MAOTRP",
-   mobileDownload: "MAOTDL"
+   mobileDownload: "MAOTDL",
+
+   mobileDebtorLatestOutstanding: "MARPDLO",
+   mobileSOListing: "MARPSOL",
+   mobileSAPerformance: "MARPSAPA",
+   mobileSalesByDebtor: "MARPSBD",
+   mobileCheckQOH: "MARPCQOH",
+   mobileCheckCN: "MARPCCN",
+   mobileTrxInq: "MARPTI"
 }

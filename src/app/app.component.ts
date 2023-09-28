@@ -46,6 +46,7 @@ export class AppComponent {
         await OneSignalInit();
 
         this.platform.backButton.unsubscribe();
+        
         // Set StatusBar style (dark / light)
         await StatusBar.setStyle({ style: Style.Dark });
         await BarcodeScanner.checkPermission({ force: true });

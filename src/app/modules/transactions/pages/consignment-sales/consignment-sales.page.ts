@@ -81,7 +81,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter {
   /* #region  add other sales */
 
   async addObject() {
-    this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-header-add");
+    this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-header");
   }
 
   /* #endregion */

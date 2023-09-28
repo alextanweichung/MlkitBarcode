@@ -9,16 +9,12 @@ const routes: Routes = [
     component: ConsignmentSalesPage
   },
   {
-    path: 'consignment-sales-header-add',
-    loadChildren: () => import('./consignment-sales-add/consignment-sales-header-add/consignment-sales-header-add.module').then( m => m.ConsignmentSalesHeaderAddPageModule)
+    path: 'consignment-sales-header',
+    loadChildren: () => import('./consignment-sales-crud/consignment-sales-header/consignment-sales-header.module').then( m => m.ConsignmentSalesHeaderPageModule)
   },
   {
-    path: 'consignment-sales-item-add',
-    loadChildren: () => import('./consignment-sales-add/consignment-sales-item-add/consignment-sales-item-add.module').then( m => m.ConsignmentSalesItemAddPageModule)
-  },
-  {
-    path: 'consignment-sales-item-edit',
-    loadChildren: () => import('./consignment-sales-edit/consignment-sales-item-edit/consignment-sales-item-edit.module').then( m => m.ConsignmentSalesItemEditPageModule)
+    path: 'consignment-sales-item',
+    loadChildren: () => import('./consignment-sales-crud/consignment-sales-item/consignment-sales-item.module').then( m => m.ConsignmentSalesItemPageModule)
   }
 
 ];

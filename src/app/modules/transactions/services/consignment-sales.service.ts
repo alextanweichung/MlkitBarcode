@@ -8,6 +8,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { format } from 'date-fns';
 import { PDItemMaster, PDItemBarcode, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -23,31 +24,29 @@ export class ConsignmentSalesService {
     private http: HttpClient,
     private commonService: CommonService,
     private configService: ConfigService
-  ) { 
-    
-  }
+  ) { }
 
   header: ConsignmentSalesHeader;
+  detail: TransactionDetail[] = [];
   setHeader(header: ConsignmentSalesHeader) {
     this.header = header;
   }
 
-  object: ConsignmentSalesRoot;
-  setObject(object: ConsignmentSalesRoot) {
-    this.object = object;
+  setDetail(detail: TransactionDetail[]) {
+    this.detail = detail;
   }
 
   removeHeader() {
     this.header = null;
   }
 
-  removeObject() {
-    this.object = null;
+  removeDetail() {
+    this.detail = [];
   }
 
   resetVariables() {
     this.removeHeader();
-    this.removeObject();
+    this.removeDetail();
   }
 
   async loadRequiredMaster() {
@@ -82,7 +81,6 @@ export class ConsignmentSalesService {
   locationList: ConsignmentSalesLocation[] = [];
   async loadConsignmentLocation() {
     this.locationList = await this.getConsignmentLocation();
-    console.log("🚀 ~ file: consignment-sales.service.ts:95 ~ ConsignmentSalesService ~ loadConsignmentLocation ~ this.locationList:", this.locationList)
   }
 
   getMasterList() {

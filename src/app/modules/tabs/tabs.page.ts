@@ -27,7 +27,7 @@ export class TabsPage {
 
         this.showMagTab = obj.flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.approval)?.length > 0
 
-        this.showRepTab = obj.flatMap(r => r.items).flatMap(r => r.items).filter(r => r.title === reportAppCode.mobileReport)?.length > 0
+        this.showRepTab = obj.flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.report)?.length > 0
       }
     })
   }

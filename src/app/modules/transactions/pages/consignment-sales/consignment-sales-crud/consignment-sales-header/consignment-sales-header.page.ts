@@ -12,11 +12,11 @@ import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-consignment-sales-header-add',
-  templateUrl: './consignment-sales-header-add.page.html',
-  styleUrls: ['./consignment-sales-header-add.page.scss'],
+  selector: 'app-consignment-sales-header',
+  templateUrl: './consignment-sales-header.page.html',
+  styleUrls: ['./consignment-sales-header.page.scss'],
 })
-export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, ViewDidEnter {
+export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   @ViewChild("locationDropdown", { static: false }) locationDropdown: SearchDropdownPage;
 
@@ -34,14 +34,14 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
     private formBuilder: FormBuilder
   ) {
     if (!this.trxDate) {
-      this.trxDate = this.commonService.getTodayDate();
+      this.trxDate = this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())
     }
     this.newObjectForm();
   }
 
   ionViewWillEnter(): void {
     if (!this.trxDate) {
-      this.trxDate = this.commonService.getTodayDate();
+      this.trxDate = this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())
     }
   }
 
@@ -146,7 +146,7 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
 
   onTrxDateSelected(event: Date) {
     if (event) {
-      this.objectForm.patchValue({ trxDate: event });
+      this.objectForm.patchValue({ trxDate: this.commonService.getDateWithoutTimeZone(event) });
     }
   }
 
@@ -270,10 +270,10 @@ export class ConsignmentSalesHeaderAddPage implements OnInit, ViewWillEnter, Vie
                 objectId: response.header.consignmentSalesId
               }
             }
-            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item-edit", navigationExtras);
+            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item", navigationExtras);
           } else {
             this.objectService.setHeader(this.objectForm.value);
-            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item-add");
+            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item");
           }
         }, error => {
           throw error;

@@ -374,8 +374,9 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   /* #region  unit price, tax, discount */
 
-  computeUnitPriceExTax(trxLine: TransactionDetail) {
+  computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
+      trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(2));
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
@@ -383,8 +384,9 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  computeUnitPrice(trxLine: TransactionDetail) {
+  computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
+      trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(2));
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {

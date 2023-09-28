@@ -409,7 +409,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   /* #region  unit price, tax, discount */
 
-  computeUnitPriceExTax(trxLine: TransactionDetail) {
+  computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) 
+  { // special handle for iPhone, cause no decimal point
     try {
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
@@ -418,7 +419,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  computeUnitPrice(trxLine: TransactionDetail) {
+  computeUnitPrice(trxLine: TransactionDetail, stringValue: string) 
+  { // special handle for iPhone, cause no decimal point
     try {
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);

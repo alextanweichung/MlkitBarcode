@@ -13,6 +13,7 @@ import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/co
 import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import { format } from 'date-fns';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,21 +55,27 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     public consignmentSalesService: ConsignmentSalesService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
-    private navController: NavController
+    private navController: NavController,
+    private toastService: ToastService
   ) {
   }
   
   ionViewWillEnter(): void {
     this.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-    console.log("🚀 ~ file: dashboard.page.ts:57 ~ DashboardPage ~ this.loginUser:", this.loginUser)
     if (this.loginUser.loginUserType === "C") {
       this.consignmentSalesService.loadRequiredMaster();
     }
   }
 
   ionViewDidEnter(): void {
-    if (this.configService.selected_consignment_location === null || this.configService.selected_consignment_location === undefined) {
-      this.showLocationModal();
+    if (this.loginUser.loginUserType === "C" && !this.configService.selected_consignment_location) {
+      if ( this.loginUser.locationId && this.loginUser.locationId.length === 0) {
+        // show error if consignment user but no location set
+        this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+      }
+      if (this.loginUser.locationId && this.loginUser.locationId.length > 1) {
+        this.showLocationModal();
+      }
     }
     this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
   }
@@ -121,7 +128,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   async chooseDefaultLocation() {
     let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-    if (!this.configService.selected_consignment_location) {
+    if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1 && !this.configService.selected_consignment_location) {
 
     }
   }

@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  OnDestroy,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController } from '@ionic/angular';
 
@@ -14,9 +7,7 @@ import { AlertController } from '@ionic/angular';
   templateUrl: './camera-scan-input.page.html',
   styleUrls: ['./camera-scan-input.page.scss'],
 })
-export class CameraScanInputPage implements OnInit, OnDestroy {
-
-  isButtonVisible: boolean = true;
+export class CameraScanInputPage implements OnInit {
 
   @Input() scanActive: boolean;
   @Input() systemWideEAN13IgnoreCheckDigit: boolean;
@@ -25,15 +16,10 @@ export class CameraScanInputPage implements OnInit, OnDestroy {
 
   constructor(
     private alertController: AlertController
-  ) {}
-
-  ngOnDestroy(): void {
-    // this.keyboard.onKeyboardWillShow().unsubscribe();
-    // this.keyboard.onKeyboardWillHide().unsubscribe();
-  }
+  ) { }
 
   ngOnInit() {
-    
+
   }
 
   /* #region  barcode scanner */
@@ -99,14 +85,6 @@ export class CameraScanInputPage implements OnInit, OnDestroy {
     BarcodeScanner.stopScan();
     // this.scanActive = false;
     this.onCameraStatusChanged.emit(false);
-  }
-
-  showButton() {
-    this.isButtonVisible = true;
-  }
-
-  hideButton() { 
-    this.isButtonVisible = false;
   }
 
   /* #endregion */
