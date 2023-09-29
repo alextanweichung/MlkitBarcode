@@ -723,3 +723,25 @@ ion-item {
 .w-full {
    width: 100%
 }
+
+ion-modal.ion-modal-calendar {
+   --background: transparent; //rgba(44, 39, 25, 0.2);
+   --padding-top: 25vh;
+   --padding-start: 20px;
+   --padding-end: 20px;
+
+   // &::part(content) {
+   //    backdrop-filter: blur(6px);
+   // }
+
+   ion-content {
+      --background: transparent;
+      --padding-top: 25vh;
+      --padding-start: 20px;
+      --padding-end: 20px;
+
+      ion-datetime {
+         border-radius: 8px;
+      }
+   }
+}

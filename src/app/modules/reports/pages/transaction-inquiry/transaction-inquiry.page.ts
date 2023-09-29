@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -9,6 +9,7 @@ import { TransactionInquiryObject } from '../../models/transaction-inquiry';
 import { SelectionType } from '@swimlane/ngx-datatable';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-transaction-inquiry',
@@ -26,23 +27,17 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
 
   object: TransactionInquiryObject[] = [];
 
-  @ViewChild("datefrom", { static: false }) datefrom: CalendarInputPage;
-  @ViewChild("dateto", { static: false }) dateto: CalendarInputPage;
-
   constructor(
     private commonService: CommonService,
     private objectService: ReportsService,
     private toastService: ToastService,
     private alertController: AlertController
-  ) { }
+  ) { 
+    this.setFormattedDateString();
+  }
 
   ionViewWillEnter(): void {
-    if (this.trxDate === null || this.trxDate === undefined) {
-      this.trxDate = this.commonService.getTodayDate();
-    }
-    if (this.trxDateFrom === null || this.trxDateFrom === undefined) {
-      this.trxDateFrom = this.commonService.getFirstDayOfTodayMonth();
-    }
+    
   }
 
   ngOnInit() {
@@ -74,7 +69,13 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   objects: any[] = [];
   loadReport() {
     this.object = [];
-    this.objectService.getTransactionInquiry({ type: this.selectedType?.code, dateStart: this.trxDateFrom, dateEnd: this.trxDate, customerId: (this.selectedCustomer ? [this.selectedCustomer?.id] : null), wildDocNum: this.docNum }).subscribe(response => {
+    this.objectService.getTransactionInquiry({
+      type: this.selectedType?.code,
+      dateStart: new Date(format(new Date(this.startDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
+      dateEnd: new Date(format(new Date(this.endDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
+      customerId: (this.selectedCustomer ? [this.selectedCustomer?.id] : null),
+      wildDocNum: this.docNum
+    }).subscribe(response => {
       this.object = response;
     }, error => {
       console.error(error);
@@ -87,20 +88,6 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
 
   onCustomerChanged(event: any) {
     this.selectedCustomer = event;
-  }
-
-  trxDateFrom: Date = null
-  onDateFromSelected(event) {
-    if (event) {
-      this.trxDateFrom = event;
-    }
-  }
-
-  trxDate: Date = null;
-  onDateSelected(event) {
-    if (event) {
-      this.trxDate = event;
-    }
   }
 
   /* #region select all */
@@ -190,6 +177,47 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
     } else {
       this.toastService.presentToast("Invalid App Code", "Please contact adminstrator.", "top", "danger", 1000);
     }
+  }
+
+  /* #endregion */
+
+  /* #region calendar handle here */
+
+  formattedStartDateString: string = "";
+  startDateValue = format(this.commonService.getFirstDayOfTodayMonth(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedStartDateString = format(parseISO(format(new Date(this.startDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    this.formattedEndDateString = format(parseISO(format(new Date(this.endDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+  
+  onStartDateSelected(value: any) {
+    this.startDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  startDateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  startDateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  formattedEndDateString: string = "";
+  endDateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";  
+  onEndDateSelected(value: any) {
+    this.endDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  endDateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  endDateSelect() {
+    this.datetime.confirm(true);
   }
 
   /* #endregion */

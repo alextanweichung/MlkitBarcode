@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SalesAgentAllPerformanceObject } from '../../../models/rp-sa-performance-listing';
 import { ReportsService } from '../../../services/reports.service';
-import { ViewWillEnter } from '@ionic/angular';
+import { IonDatetime, ViewWillEnter } from '@ionic/angular';
 import { CommonService } from '../../../../../shared/services/common.service';
 import { ToastService } from '../../../../../services/toast/toast.service';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-rp-sales-performance',
@@ -15,24 +15,18 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
 
   objects: SalesAgentAllPerformanceObject[] = [];
 
-  startDate: Date = null;
-  endDate: Date = null;
-
   columns: any;
 
   constructor(
     private reportService: ReportsService,
     private commonService: CommonService,
     private toastService: ToastService
-  ) { }
+  ) { 
+    this.setFormattedDateString();
+  }
 
   ionViewWillEnter(): void {
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
-    }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
+
   }
 
   ngOnInit() {
@@ -46,11 +40,11 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
   }
 
   loadReport() {
-    if (!this.startDate || !this.endDate) {
+    if (!(this.startDateValue || this.endDateValue)) {
       this.toastService.presentToast('Error', 'Invalid Date', 'top', 'warning', 1000);
     } else {
       try {
-        this.reportService.getAllSalesPerformance(format(this.startDate, 'yyyy-MM-dd'), format(this.endDate, 'yyyy-MM-dd')).subscribe(response => {
+        this.reportService.getAllSalesPerformance(format(new Date(this.startDateValue), 'yyyy-MM-dd'), format(new Date(this.endDateValue), 'yyyy-MM-dd')).subscribe(response => {
           this.objects = response;
           this.objects.forEach(r => {
             r.netAmount = r.invoiceAmt - r.cnAmount + r.soAmount;
@@ -61,18 +55,6 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
       } catch (e) {
         console.error(e);
       }
-    }
-  }
-
-  onStartDateSelected(event) {
-    if (event) {
-      this.startDate = event;
-    }
-  }
-
-  onEndDateSelected(event) {
-    if (event) {
-      this.endDate = event;
     }
   }
 
@@ -101,5 +83,46 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
     return Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
   }
+
+  /* #region calendar handle here */
+
+  formattedStartDateString: string = "";
+  startDateValue = format(this.commonService.getFirstDayOfTodayMonth(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedStartDateString = format(parseISO(format(new Date(this.startDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    this.formattedEndDateString = format(parseISO(format(new Date(this.endDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+  
+  onStartDateSelected(value: any) {
+    this.startDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  startDateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  startDateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  formattedEndDateString: string = "";
+  endDateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";  
+  onEndDateSelected(value: any) {
+    this.endDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  endDateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  endDateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
 }

@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController } from '@ionic/angular';
+import { ActionSheetController, IonDatetime, NavController } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 import { StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 
@@ -33,6 +33,7 @@ export class StockCountHeaderEditPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
     })
+    this.setFormattedDateString();
     this.newObjectForm();
   }
 
@@ -62,10 +63,6 @@ export class StockCountHeaderEditPage implements OnInit {
     }
   }
 
-  onTrxDateSelected(event: Date) {
-    this.objectForm.patchValue({ trxDate: event });
-  }
-
   onZoneChanged(event: SearchDropdownList) {
     this.objectForm.patchValue({ zoneId: null });
     if (event) {
@@ -90,6 +87,8 @@ export class StockCountHeaderEditPage implements OnInit {
         })
         this.commonService.convertObjectAllDateType(this.inventoryCount.header);
         this.objectForm.patchValue(this.inventoryCount.header);
+        this.dateValue = format(new Date(this.objectForm.controls.trxDate.value), "yyyy-MM-dd") + "T08:00:00.000Z";
+        this.setFormattedDateString();
       }, error => {
         throw error;
       })
@@ -136,5 +135,31 @@ export class StockCountHeaderEditPage implements OnInit {
     this.objectService.setLines(this.inventoryCount.details);
     this.navController.navigateForward('/transactions/stock-count/stock-count-edit/stock-count-item');
   }
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+  
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
 }

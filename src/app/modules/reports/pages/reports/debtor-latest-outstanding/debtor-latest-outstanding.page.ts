@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
@@ -7,7 +7,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstanding, DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
 import { ReportsService } from '../../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AlertController, IonPopover, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonDatetime, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { CreditInfoDetails } from 'src/app/shared/models/credit-info';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { SelectionType } from '@swimlane/ngx-datatable';
@@ -33,12 +33,12 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     private toastService: ToastService,
     private commonService: CommonService,
     private alertController: AlertController,
-  ) { }
+  ) {
+    this.setFormattedDateString();
+  }
 
   ionViewWillEnter(): void {
-    if (!this.trxDate) {
-      this.trxDate = this.commonService.getTodayDate();
-    }
+    
   }
 
   ngOnInit() {
@@ -78,7 +78,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     this.selected = [];
     let obj: DebtorOutstandingRequest = {
       customerId: this.customerIds ?? [],
-      trxDate: format(this.trxDate, "yyyy-MM-dd"),
+      trxDate: format(new Date(this.dateValue), "yyyy-MM-dd"),
       isOverdueOnly: this.isOverdueOnly
     }
     this.objectService.getDebtorOutstanding(obj).subscribe(response => {
@@ -96,12 +96,30 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     }
   }
 
-  trxDate: Date = null;
-  onDateSelected(event) {
-    if (event) {
-      this.trxDate = event;
-    }
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
   }
+
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
   async presentAlertViewPdf(object: DebtorOutstanding) {
     try {
@@ -139,7 +157,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
         reportName: "Debtor Statement",
         customReportParam: {
           parameter1: object.flatMap(r => r.customerId),
-          statementDate: this.trxDate
+          statementDate: new Date(this.dateValue)
         }
       }
       let timestart = new Date();
@@ -186,7 +204,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   hideItemModal() {
     this.displayModal = false;
   }
-  
+
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
@@ -201,7 +219,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
-  
+
   /* #region select all */
 
   SelectionType = SelectionType;
@@ -212,7 +230,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
   }
 
   onActivate(event) {
-    
+
   }
 
   async printAllAlert() {

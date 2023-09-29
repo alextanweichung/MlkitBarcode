@@ -65,15 +65,15 @@ export class SigninPage implements OnInit, ViewDidEnter {
   ngOnInit() {
     if (Capacitor.getPlatform() === "web") {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-      this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
+      // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
-      // this.signin_form.get("userEmail").setValue("admin@idcp.my");
+      this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
-      this.signin_form.get("password").setValue("Dev8888");
+      // this.signin_form.get("password").setValue("Dev8888");
       // this.signin_form.get("password").setValue("Dev9999");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("password").setValue("i@Dmin7026");
-      // this.signin_form.get("password").setValue("c0nnecT#7026");
+      this.signin_form.get("password").setValue("c0nnecT#7026");
     } else {
       this.setSelectedParam();
     }
@@ -202,7 +202,8 @@ export class SigninPage implements OnInit, ViewDidEnter {
               await this.configService.syncMarginConfig(marginConfig);
             } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
               // show error if consignment user but no location set
-              this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+              // error shown in dashboard page
+              // this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
             } else {
               // download item master for other user
               let response = await this.commonService.syncInbound();

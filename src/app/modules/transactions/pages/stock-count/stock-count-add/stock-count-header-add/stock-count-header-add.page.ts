@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, IonDatetime, NavController, ViewWillEnter } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 import { InventoryCountBatchList } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
@@ -22,15 +23,13 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
     private actionSheetController: ActionSheetController,
     private navController: NavController,
     private formBuilder: FormBuilder
-  ) { 
+  ) {
+    this.setFormattedDateString();
     this.newObjectForm();
   }
 
-  trxDate: Date = this.commonService.getTodayDate();
   ionViewWillEnter(): void {
-    if (!this.trxDate) {
-      this.trxDate = this.commonService.getTodayDate();
-    }
+
   }
 
   newObjectForm() {
@@ -38,7 +37,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
       inventoryCountId: [0],
       inventoryCountNum: [null],
       description: [null],
-      trxDate: [this.commonService.getDateWithoutTimeZone(this.trxDate), [Validators.required]],
+      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       locationId: [null, [Validators.required]],
       inventoryCountBatchId: [null, [Validators.required]],
       zoneId: [null],
@@ -54,11 +53,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    
-  }
 
-  onTrxDateSelected(event: Date) {
-    this.objectForm.patchValue({ trxDate: event });
   }
 
   inventoryCountBatchList: InventoryCountBatchList[] = [];
@@ -73,7 +68,7 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
         this.inventoryCountBatchDdl = [];
         this.objectService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
           this.inventoryCountBatchList = response;
-          if (this.inventoryCountBatchList.length> 0) {
+          if (this.inventoryCountBatchList.length > 0) {
             this.inventoryCountBatchList.forEach(r => {
               this.inventoryCountBatchDdl.push({
                 id: r.inventoryCountBatchId,
@@ -129,9 +124,9 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
           }]
       });
       await actionSheet.present();
-  
+
       const { role } = await actionSheet.onWillDismiss();
-  
+
       if (role === 'confirm') {
         this.objectService.resetVariables();
         this.navController.navigateBack('/transactions/stock-count');
@@ -146,5 +141,31 @@ export class StockCountHeaderAddPage implements OnInit, ViewWillEnter {
     this.objectService.removeLines();
     this.navController.navigateForward('/transactions/stock-count/stock-count-add/stock-count-item');
   }
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
 }

@@ -3,11 +3,11 @@ import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportSOListing } from '../../../models/rp-so-listing';
 import { ReportsService } from '../../../services/reports.service';
-import { AlertController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { DatePipe } from '@angular/common';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
@@ -38,9 +38,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
   ) { }
 
   ionViewWillEnter(): void {
-    if (!this.trxDate) {
-      this.trxDate = this.commonService.getTodayDate();
-    }
+    
   }
 
   ngOnInit() {
@@ -91,9 +89,9 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
   loadObjects() {
     let obj: DebtorOutstandingRequest = { // sharing same report request parameter
       customerId: this.customerIds ?? [],
-      trxDate: format(this.trxDate, 'yyyy-MM-dd'),
+      trxDate: format(new Date(this.endDateValue), 'yyyy-MM-dd'),
       isOverdueOnly: this.isOverdueOnly,
-      trxDateFrom: this.trxDateFrom ? format(this.trxDateFrom, 'yyyy-MM-dd') : null
+      trxDateFrom: this.startDateValue ? format(new Date(this.startDateValue), 'yyyy-MM-dd') : null
     }
     this.objectService.getSOListing(obj).subscribe(response => {
       this.objects = response;
@@ -109,53 +107,41 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     }
   }
 
-  trxDateFrom: Date = null
-  onDateFromSelected(event){
-    if (event) {
-      this.trxDateFrom = event;
-    }
-  }
-
-  trxDate: Date = null;
-  onDateSelected(event) {
-    if (event) {
-      this.trxDate = event;
-    }
-  }
-
-  @ViewChild("datefrom", { static: false }) datefrom: CalendarInputPage;
-  @ViewChild("dateto", { static: false }) dateto: CalendarInputPage;
-
   selectedDateRangeId = 2;
   onDateRangeChanged(event) {
     if (event) {
       this.selectedDateRangeId = event.id;
-      this.trxDateFrom = null;
       switch (this.selectedDateRangeId) {
         case 0:
-          this.trxDateFrom = this.commonService.getTodayDate();
+          this.startDateValue = format(this.commonService.getTodayDate(), "yyyy-MM-dd") + "T08:00:00.000Z";
           break;
         case 1:
-          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7));
+          this.startDateValue = format(new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7)), "yyyy-MM-dd") + "T08:00:00.000Z";
+          //new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 7));
           break;
         case 2:
-          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
+          this.startDateValue = format(new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30)), "yyyy-MM-dd") + "T08:00:00.000Z";
+          // new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
           break;
         case 3:
-          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 60));
+          this.startDateValue = format(new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 60)), "yyyy-MM-dd") + "T08:00:00.000Z";
+          //new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 60));
           break;
         case 4:
-          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 90));
+          this.startDateValue = format(new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 90)), "yyyy-MM-dd") + "T08:00:00.000Z";
+          //new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 90));
           break;
         case 5:
-          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 180));
+          this.startDateValue = format(new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 180)), "yyyy-MM-dd") + "T08:00:00.000Z";
+          //new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 180));
           break;
         case 6:
-          this.trxDateFrom = new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30));
-          this.trxDate = this.commonService.getTodayDate();
+          this.startDateValue = format(new Date(this.commonService.getTodayDate().setDate(this.commonService.getTodayDate().getDate() - 30)), "yyyy-MM-dd") + "T08:00:00.000Z";
+          this.endDateValue = format(this.commonService.getTodayDate(), "yyyy-MM-dd") + "T08:00:00.000Z";
           break;
       }
     }
+    this.setFormattedDateString();
   }
 
   error: any;
@@ -272,5 +258,46 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       throw error;
     })
   }
+
+  /* #region calendar handle here */
+
+  formattedStartDateString: string = "";
+  startDateValue = format(this.commonService.getFirstDayOfTodayMonth(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedStartDateString = format(parseISO(format(new Date(this.startDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    this.formattedEndDateString = format(parseISO(format(new Date(this.endDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+  
+  onStartDateSelected(value: any) {
+    this.startDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  startDateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  startDateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  formattedEndDateString: string = "";
+  endDateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";  
+  onEndDateSelected(value: any) {
+    this.endDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  endDateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  endDateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
 }

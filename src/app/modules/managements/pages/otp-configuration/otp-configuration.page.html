@@ -22,7 +22,44 @@
         <ion-checkbox #checkBox slot="end" (ionChange)="onCheckBoxChecked($event)" [(ngModel)]="checkboxValue"></ion-checkbox>
         <ion-label>Default Expiry</ion-label>
       </ion-item>
-      <app-calendar-input #calendar [hidden]="checkBox.checked" [date_value]="expiryDate" [presentation]="'date-time'" title="Expiry Date" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
+      
+      <ion-item id="open-calendar-modal" [hidden]="checkBox.checked">
+        <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
+        <ion-label position="stacked" class="font-bold">Expiry Date</ion-label>
+        <ion-text class="ion-no-padding-end pb-3">{{formattedDateString}}</ion-text>
+      </ion-item>
+      <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
+        <ng-template>
+          <ion-content>
+            <ion-datetime #date [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(date.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
+              <ion-buttons slot="buttons">
+                <ion-button (click)="dateDismiss()" color="danger">Dismiss</ion-button>
+                <ion-button (click)="dateSelect()" color="primary">Select</ion-button>
+              </ion-buttons>
+            </ion-datetime>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+      <!-- <app-calendar-input #calendar [hidden]="checkBox.checked" title="Expiry Date" [date_value]="expiryDate" [presentation]="'date'" (onDateSelected)="onDateSelected($event)"></app-calendar-input> -->
+      
+      <ion-item id="open-time-modal" [hidden]="checkBox.checked">
+        <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
+        <ion-label position="stacked" class="font-bold">Expiry Time</ion-label>
+        <ion-text class="ion-no-padding-end pb-3">{{formattedTimeString}}</ion-text>
+      </ion-item>
+      <ion-modal class="ion-modal-calendar" trigger="open-time-modal">
+        <ng-template>
+          <ion-content>
+            <ion-datetime #time [value]="timeValue" size="cover" (ionChange)="onTrxTimeSelected(time.value)" [preferWheel]="true" showDefaultTitle="true" presentation="time">
+              <ion-buttons slot="buttons">
+                <ion-button (click)="timeDismiss()" color="danger">Dismiss</ion-button>
+                <ion-button (click)="timeSelect()" color="primary">Select</ion-button>
+              </ion-buttons>
+            </ion-datetime>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
       <ion-item button [detail]="false">
         <ion-label position="stacked" class="font-bold">Remark</ion-label>
         <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" [(ngModel)]="remark"></ion-textarea>

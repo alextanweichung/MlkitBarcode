@@ -38,8 +38,24 @@
         <ion-label>
           <div class="ion-text-small font-bold">Overdue Only</div>
         </ion-label>
-      </ion-item>      
-      <app-calendar-input title="Statement Date" [date_value]="trxDate" (onDateSelected)="onDateSelected($event)"></app-calendar-input>
+      </ion-item>
+      <ion-item id="open-calendar-modal">
+        <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
+        <ion-label position="stacked" class="font-bold">Statement Date</ion-label>
+        <ion-text class="ion-no-padding-end pb-3">{{formattedDateString}}</ion-text>
+      </ion-item>
+      <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
+        <ng-template>
+          <ion-content>
+            <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
+              <ion-buttons slot="buttons">
+                <ion-button (click)="dateDismiss()" color="danger">Dismiss</ion-button>
+                <ion-button (click)="dateSelect()" color="primary">Select</ion-button>
+              </ion-buttons>
+            </ion-datetime>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" (click)="loadDebtorReport()">Search</ion-button>
     <ngx-datatable *ngIf="objects && objects.length > 0"

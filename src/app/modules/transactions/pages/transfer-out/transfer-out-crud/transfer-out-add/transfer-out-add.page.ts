@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { NavController, ActionSheetController, AlertController, ViewWillEnter, ViewWillLeave, Platform } from '@ionic/angular';
+import { NavController, ActionSheetController, AlertController, ViewWillEnter, ViewWillLeave, Platform, IonDatetime } from '@ionic/angular';
 import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
 import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -13,6 +13,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Keyboard } from '@capacitor/keyboard';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-transfer-out-add',
@@ -40,30 +41,23 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
     private formBuilder: UntypedFormBuilder,
     private platform: Platform,
   ) {
+    this.setFormattedDateString();
     this.newObjectForm();
   }
   
   ionViewWillEnter(): void {
-    Keyboard.addListener('keyboardWillShow', info => {
-      setTimeout(_ => {
-        this.isKeyboardShown = true;
-      }, 100);
-      console.log('keyboard will show with height:', info.keyboardHeight);
-    });
-    Keyboard.addListener('keyboardWillHide', () => {
-      setTimeout(_ => {
-        this.isKeyboardShown = false;
-      }, 100);
-      console.log('keyboard will hide');
-    });
-    // this.platform.keyboardDidShow.subscribe(ev => {
-    //   this.isKeyboardShown = true;
-    //   console.log("keyboard shown");
-    // })
-    // this.platform.keyboardDidHide.subscribe(ev => {
-    //   this.isKeyboardShown = false;
-    //   console.log("keyboard hidden");
-    // })
+    // Keyboard.addListener('keyboardWillShow', info => {
+    //   setTimeout(_ => {
+    //     this.isKeyboardShown = true;
+    //   }, 100);
+    //   console.log('keyboard will show with height:', info.keyboardHeight);
+    // });
+    // Keyboard.addListener('keyboardWillHide', () => {
+    //   setTimeout(_ => {
+    //     this.isKeyboardShown = false;
+    //   }, 100);
+    //   console.log('keyboard will hide');
+    // });
   }
 
   ionViewWillLeave(): void {
@@ -409,6 +403,32 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       })
       event.preventDefault();
     }
+  }
+
+  /* #endregion */
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
   }
 
   /* #endregion */

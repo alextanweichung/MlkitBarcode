@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { format } from 'date-fns';
+import { ActionSheetController, AlertController, IonDatetime, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -21,7 +21,6 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
   @ViewChild("locationDropdown", { static: false }) locationDropdown: SearchDropdownPage;
 
   objectForm: FormGroup;
-  trxDate: Date = null;
 
   constructor(
     private authService: AuthService,
@@ -33,16 +32,12 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
     private alertController: AlertController,
     private formBuilder: FormBuilder
   ) {
-    if (!this.trxDate) {
-      this.trxDate = this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())
-    }
+    this.setFormattedDateString();
     this.newObjectForm();
   }
 
   ionViewWillEnter(): void {
-    if (!this.trxDate) {
-      this.trxDate = this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())
-    }
+    
   }
 
   ionViewDidEnter(): void {
@@ -144,11 +139,31 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
     }
   }
 
-  onTrxDateSelected(event: Date) {
-    if (event) {
-      this.objectForm.patchValue({ trxDate: this.commonService.getDateWithoutTimeZone(event) });
-    }
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
   }
+  
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
   onCustomerChanged(customerId: number) {
     try {

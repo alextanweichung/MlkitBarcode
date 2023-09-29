@@ -7,11 +7,11 @@ import { OtpService } from '../../services/otp.service';
 import { App } from 'src/app/shared/models/app';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { AlertController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { SearchMultiDropdownPage } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.page';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-otp-configuration',
@@ -33,7 +33,6 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   selectedValidity: any;
   selectedApp: any;
 
-  expiryDate: Date = this.commonService.getTodayDate();
   remark: string = null;
 
   checkboxValue: boolean = true;
@@ -53,12 +52,12 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     private otpConfigService: OtpService,
     private commonService: CommonService,
     private alertController: AlertController,
-  ) { }
+  ) {
+    this.setFormattedDateString();
+   }
 
   ionViewWillEnter(): void {
-    if (!this.expiryDate) {
-      this.expiryDate = this.commonService.getTodayDate();
-    }
+    
   }
 
   ngOnInit() {
@@ -170,23 +169,16 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     }
   }
 
-  onDateSelected(event: Date) {
-    console.log("🚀 ~ file: otp-configuration.page.ts:174 ~ OtpConfigurationPage ~ onDateSelected ~ event:", event)
-    if (event) {
-      this.expiryDate = event;
-    }
-  }
-
   onCheckBoxChecked(event) {
     if (event && event.detail.checked) {
-      this.expiryDate = null;
+      this.dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+      this.setFormattedDateString();
     }
   }
 
   generateOtp() {
     if (this.selectedApp && this.selectedUser && this.selectedValidity) {
       let t = this.transformObjectToDto();
-      console.log("🚀 ~ file: otp-configuration.page.ts:189 ~ OtpConfigurationPage ~ generateOtp ~ t:", t)
       this.otpConfigService.insertOtp(t).subscribe(async response => {
         if (response.status == 201) {
           this.generatedOtpCode = response.body["header"].otpCode;
@@ -231,7 +223,8 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     this.selectedValidity = null;
     this.appsDropdown.clearSelected();
     this.appsMultiDropdown.clearSelected();
-    this.expiryDate = new Date();
+    this.dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+    this.setFormattedDateString();
     this.checkboxValue = true;
     this.remark = null;
   }
@@ -251,7 +244,6 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   }
 
   transformObjectToDto(): OtpDTO {
-    console.log("🚀 ~ file: otp-configuration.page.ts:255 ~ OtpConfigurationPage ~ transformObjectToDto ~ this.expiryDate:", this.expiryDate)
     let otpLineArray: OtpLine[] = [];
     let validity = this.selectedValidity
     switch (validity) {
@@ -284,7 +276,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
         otpCode: null,
         userId: this.selectedUser,
         validity: this.selectedValidity,
-        expiredAt: this.checkboxValue ? null : this.commonService.convertUtcDate(this.expiryDate),
+        expiredAt: this.checkboxValue ? null : new Date(format(new Date(this.dateValue), "yyyy-MM-dd ") + format(new Date(this.timeValue), "hh:mm a")),
         status: null,
         remark: this.remark
       },
@@ -292,5 +284,50 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
     };
     return otpDTO;
   }
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T23:59:59.000Z";
+  @ViewChild("date") date: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    this.formattedTimeString = format(new Date(new Date(this.timeValue).setHours(new Date(this.timeValue).getUTCHours())), "hh:mm a");
+  }
+  
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+  }
+
+  dateDismiss() {
+    this.date.cancel(true);
+  }
+
+  dateSelect() {
+    this.date.confirm(true);
+  }
+
+  formattedTimeString: string = "";
+  timeValue = new Date(new Date().setMinutes(new Date().getMinutes() - new Date().getTimezoneOffset())).toISOString();
+  @ViewChild("time") time: IonDatetime;
+  onTrxTimeSelected(value: any) {
+    if (value.length > 0 && value.includes("+")) {
+      this.timeValue =  new Date(new Date(value).setMinutes(new Date(value).getMinutes() - new Date(value).getTimezoneOffset())).toISOString();
+      console.log("🚀 ~ file: otp-configuration.page.ts:318 ~ OtpConfigurationPage ~ onTrxTimeSelected ~ this.timeValue:", this.timeValue)
+      this.setFormattedDateString();
+    }
+  }
+
+  timeDismiss() {
+    this.time.cancel(true);
+  }
+
+  timeSelect() {
+    this.time.confirm(true);
+  }
+
+  /* #endregion */
 
 }

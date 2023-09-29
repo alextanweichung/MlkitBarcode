@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonDatetime, NavController } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 import { StockReorderLine, StockReorderRoot } from 'src/app/modules/transactions/models/stock-reorder';
 import { StockReorderService } from 'src/app/modules/transactions/services/stock-reorder.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -37,6 +38,7 @@ export class StockReorderAddPage implements OnInit {
     private formBuilder: UntypedFormBuilder
   ) {
     this.newObjectForm();
+    this.setFormattedDateString();
   }
 
   newObjectForm() {
@@ -370,6 +372,32 @@ export class StockReorderAddPage implements OnInit {
       })
       event.preventDefault();
     }
+  }
+
+  /* #endregion */
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
   }
 
   /* #endregion */
