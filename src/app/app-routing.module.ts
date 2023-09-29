@@ -305,6 +305,10 @@ const routes: Routes = [
     path: 'reports/transaction-inquiry',
     loadChildren: () => import('./modules/reports/pages/transaction-inquiry/transaction-inquiry.module').then( m => m.TransactionInquiryPageModule)
   },
+  {
+    path: 'reports/sales-analysis',
+    loadChildren: () => import('./modules/reports/pages/sales-analysis/sales-analysis.module').then( m => m.SalesAnalysisPageModule)
+  },
 
 
 
@@ -375,9 +379,6 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
-
-
-
 
 ];
 @NgModule({

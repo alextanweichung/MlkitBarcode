@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import { AlertController, NavController, IonPopover } from '@ionic/angular';
 import { ViewWillEnter } from '@ionic/angular/types/ionic-lifecycle-hooks';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
@@ -27,6 +28,8 @@ export class StockReplenishCartPage implements OnInit, ViewWillEnter {
 
   submit_attempt: boolean = false;
 
+  inputType: string = "number";
+  
   constructor(
     private authService: AuthService,
     public objectService: StockReplenishService,
@@ -36,6 +39,12 @@ export class StockReplenishCartPage implements OnInit, ViewWillEnter {
     private alertController: AlertController,
     private navController: NavController
   ) {
+    if (Capacitor.getPlatform() === "android") {
+      this.inputType = "number";
+    }
+    if (Capacitor.getPlatform() === "ios") {
+      this.inputType = "tel";
+    }
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
     }

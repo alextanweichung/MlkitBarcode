@@ -170,8 +170,8 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice}}</div>
-              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax}}</div>
+              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice|number:(object?.header?.isHomeCurrency ? precisionPurchase.localFormat : precisionPurchase.foreignFormat)}}</div>
+              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax|number:(object?.header?.isHomeCurrency ? precisionPurchase.localFormat : precisionPurchase.foreignFormat)}}</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="ion-flex">

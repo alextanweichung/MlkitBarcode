@@ -31,11 +31,11 @@
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
                 <ion-icon class="ion-flex mr-2" name="ellipse" [class]="object.isEntryCompleted?'color-success':'color-danger'"></ion-icon>
-                <ion-col class="ion-flex ion-margin-auto font-bold">{{object.consignmentSalesNum}}</ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.customerName}}</ion-col>
+                <ion-col class="ion-flex font-bold">{{object.consignmentSalesNum}}</ion-col>
+                <ion-col class="ion-flex justify-content-end">{{object.customerName}}</ion-col>
               </ion-row>
               <ion-row>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.toLocationDesc}}</ion-col>
+                <ion-col class="ion-flex justify-content-end">{{object.toLocationDesc}}</ion-col>
               </ion-row>
             </ion-grid>
           </ion-item>

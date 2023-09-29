@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
@@ -25,6 +26,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   submit_attempt: boolean = false;
 
+  inputType: string = "number";
+
   constructor(
     private authService: AuthService,
     public objectService: QuotationService,
@@ -34,6 +37,12 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     private alertController: AlertController,
     private navController: NavController
   ) {
+    if (Capacitor.getPlatform() === "android") {
+      this.inputType = "number";
+    }
+    if (Capacitor.getPlatform() === "ios") {
+      this.inputType = "tel";
+    }
     this.objectService.loadRequiredMaster();
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)

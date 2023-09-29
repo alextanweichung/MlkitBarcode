@@ -56,8 +56,8 @@
             </ion-row>
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
-                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{line.unitPrice}}</div>
-                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{line.unitPriceExTax}}</div>
+                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{line.unitPrice|number:(objectService?.header?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
+                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{line.unitPriceExTax|number:(objectService?.header?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="ion-flex">
@@ -66,8 +66,8 @@
                 </div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{line.discountAmt|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{line.discountAmtExTax|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{line.discountAmt|number:(objectService.header?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
+                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{line.discountAmtExTax|number:(objectService.header?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
                 <div>{{line.subTotal|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
@@ -138,9 +138,9 @@
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><div>Unit Price</div></ion-label>
-            <ion-input *ngIf="objectService.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" type="tel" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem, unitPrice.value?.toString())" [disabled]="restrictTrxFields['unitPrice'] && !selectedItem.isPricingApproval"></ion-input>
+            <ion-input *ngIf="objectService.header.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" [type]="inputType" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem, unitPrice.value?.toString())" [disabled]="restrictTrxFields['unitPrice'] && !selectedItem.isPricingApproval"></ion-input>
 
-            <ion-input *ngIf="!objectService.header.isDisplayTaxInclusive" #unitPriceExTax slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" type="tel" (ionFocus)="highlight(unitPriceExTax)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem, unitPriceExTax.value?.toString())" [disabled]="restrictTrxFields['unitPriceExTax'] && !selectedItem.isPricingApproval"></ion-input>
+            <ion-input *ngIf="!objectService.header.isDisplayTaxInclusive" #unitPriceExTax slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" [type]="inputType" (ionFocus)="highlight(unitPriceExTax)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem, unitPriceExTax.value?.toString())" [disabled]="restrictTrxFields['unitPriceExTax'] && !selectedItem.isPricingApproval"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>

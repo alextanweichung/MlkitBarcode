@@ -11,6 +11,8 @@ import { CreditInfo } from 'src/app/shared/models/credit-info';
 import { CheckQohRoot } from '../models/rp-check-qoh';
 import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
 import { TransactionInquiryObject, TransactionInquiryRequestObject } from '../models/transaction-inquiry';
+import { SalesAnalysisObject, SalesAnalysisRequestObject } from '../models/sales-analysis';
+import { ConsignmentSalesLocation } from '../../transactions/models/consignment-sales';
 
 @Injectable({
   providedIn: 'root'
@@ -67,6 +69,14 @@ export class ReportsService {
 
   getTransactionInquiry(requestObject: TransactionInquiryRequestObject) {
     return this.http.post<TransactionInquiryObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/trxInquiry", requestObject);
+  }
+
+  getSalesAnalysis(requestObject: SalesAnalysisRequestObject) {
+    return this.http.post<SalesAnalysisObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/salesAnalysis", requestObject);
+  }
+
+  getConsignmentLocation() {
+    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/consignmentLocation");
   }
   
 }

@@ -49,6 +49,11 @@
           <div>Transaction Inquiry</div>
         </ion-label>
       </ion-item>
+      <ion-item button (click)="goToReport('sales-analysis')" *ngIf="showSalesAnalysis">
+        <ion-label>
+          <div>Sales Analysis</div>
+        </ion-label>
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>

@@ -1,0 +1,133 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sales Analysis</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="Back" defaultHref="/reports"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="p-2">
+    <ion-list class="list-custom" lines="none">
+      <app-search-dropdown #searchLocation title="Location" optionLabel="description" [searchDropdownList]="locationSearchDropDown" [selectedId]="selectedLocation?.id" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col class="ion-margin-auto">
+            <ion-item id="open-start-calendar-modal">
+              <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
+              <ion-label position="stacked" class="font-bold">Start Date</ion-label>
+              <ion-text class="ion-no-padding-end pb-3">{{formattedStartDateString}}</ion-text>
+            </ion-item>
+            <ion-modal class="ion-modal-calendar" trigger="open-start-calendar-modal">
+              <ng-template>
+                <ion-content>
+                  <ion-datetime #datetime [value]="startDateValue" size="cover" (ionChange)="onStartDateSelected(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
+                    <ion-buttons slot="buttons">
+                      <ion-button (click)="startDateDismiss()" color="danger">Dismiss</ion-button>
+                      <ion-button (click)="startDateSelect()" color="primary">Select</ion-button>
+                    </ion-buttons>
+                  </ion-datetime>
+                </ion-content>
+              </ng-template>
+            </ion-modal>
+          </ion-col>
+          <ion-col class="ion-margin-auto">
+            <ion-item id="open-end-calendar-modal">
+              <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
+              <ion-label position="stacked" class="font-bold">End Date</ion-label>
+              <ion-text class="ion-no-padding-end pb-3">{{formattedEndDateString}}</ion-text>
+            </ion-item>
+            <ion-modal class="ion-modal-calendar" trigger="open-end-calendar-modal">
+              <ng-template>
+                <ion-content>
+                  <ion-datetime #datetime [value]="endDateValue" size="cover" (ionChange)="onEndDateSelected(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
+                    <ion-buttons slot="buttons">
+                      <ion-button (click)="endDateDismiss()" color="danger">Dismiss</ion-button>
+                      <ion-button (click)="endDateSelect()" color="primary">Select</ion-button>
+                    </ion-buttons>
+                  </ion-datetime>
+                </ion-content>
+              </ng-template>
+            </ion-modal>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <app-search-dropdown #searchType title="Type" optionLabel="description" [searchDropdownList]="type" [selectedId]="selectedType?.id" (onActionComplete)="onTypeChanged($event)"></app-search-dropdown>
+    </ion-list>
+    <ion-button class="pt-2" expand="block" size="default" (click)="loadReport()" [disabled]="selectedType === null || startDateValue === null || endDateValue === null || selectedLocation === null">Search</ion-button>
+    <ngx-datatable *ngIf="object && object.length > 0"
+      class="fullscreen material mt-2"
+      [rows]="object" 
+      [rowHeight]="'auto'" 
+      [columnMode]="'force'">
+
+      <ngx-datatable-column prop="trxDate" name="Trx. Code" *ngIf="selectedType.id === 1 || selectedType.id === 3">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.trxDate|date:"yyyy-MM-dd"}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="discountGroupCode" name="Disc. Code" *ngIf="selectedType.id === 0 || selectedType.id === 1">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.discountGroupCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="itemCode" name="Item Code" *ngIf="selectedType.id === 0 || selectedType.id === 2">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.itemCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="itemVariationXCode" name="X Code" *ngIf="selectedType.id === 2">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.itemVariationXCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="itemVariationYCode" name="X Code" *ngIf="selectedType.id === 2">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.itemVariationYCode}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="qtyRequest" name="Qty." *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.qtyRequest|number:'1.0'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="subTotal" name="Total" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.subTotal|number:'1.2-2'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="normal" name="Normal" *ngIf="selectedType.id === 3">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.normal|number:'1.0'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="bestBuy" name="Best Buy" *ngIf="selectedType.id === 3">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.bestBuy|number:'1.0'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="promotion" name="Promotion" *ngIf="selectedType.id === 3">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.promotion|number:'1.0'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="total" name="Total" *ngIf="selectedType.id === 3">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.total|number:'1.0'}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+      
+    </ngx-datatable>
+  </div>
+</ion-content>
