@@ -99,7 +99,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item', navigationExtras);
   }
 
-  async completeObjectAlert() {
+  async toggleObjectAlert() {
     const alert = await this.alertController.create({
       header: "Are you sure to proceed?",
       cssClass: "custom-action-sheet",
@@ -123,14 +123,25 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   }
 
   completeObject() {
-    this.objectService.completeObject(this.objectId).subscribe(response => {
-      if (response.status === 204) {
-        this.toastService.presentToast("", "Consignment Sales updated", "top", "success", 1000);
-        this.loadObject();
-      }
-    }, error => {
-      console.error(error);
-    })
+    if (this.objectService.header.isEntryCompleted) {
+      this.objectService.unCompleteObject(this.objectId).subscribe(response => {
+        if (response.status === 204) {
+          this.toastService.presentToast("", "Consignment Sales updated", "top", "success", 1000);
+          this.loadObject();
+        }
+      }, error => {
+        console.error(error);
+      })
+    } else {
+      this.objectService.completeObject(this.objectId).subscribe(response => {
+        if (response.status === 204) {
+          this.toastService.presentToast("", "Consignment Sales updated", "top", "success", 1000);
+          this.loadObject();
+        }
+      }, error => {
+        console.error(error);
+      })
+    }
   }
 
 

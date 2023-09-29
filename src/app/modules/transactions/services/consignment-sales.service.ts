@@ -130,8 +130,13 @@ export class ConsignmentSalesService {
       { responseType: "blob" });
   }
 
-  completeObject(objectId: number) {    
+  completeObject(objectId: number) {
     return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileConsignmentSales/complete/${objectId}`, null, httpObserveHeader)
   }
+
+  unCompleteObject(objectId: number) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileConsignmentSales/uncomplete/${objectId}`, null, httpObserveHeader)
+  }
+
 
 }
