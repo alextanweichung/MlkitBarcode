@@ -19,9 +19,7 @@ export class PurchaseOrderService {
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) {
-    
-  }
+  ) { }
 
   unflattenDtoDetail(purchaseOrder: PurchaseOrderRoot): PurchaseOrderDto {
     let line: PurchaseOrderLine[] = [];

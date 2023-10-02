@@ -20,6 +20,9 @@ export interface Dashboard {
   salesOrderPricingApprovalCount: TransactionProcessingCount
   b2bOrderPricingApprovalCount: TransactionProcessingCount
 
+  nonTradePurchaseReqReviewCount: TransactionProcessingCount
+  nonTradePurchaseReqApprovalCount: TransactionProcessingCount
+
   nonTradePurchaseOrderReviewCount: TransactionProcessingCount
   nonTradePurchaseOrderApprovalCount: TransactionProcessingCount
 

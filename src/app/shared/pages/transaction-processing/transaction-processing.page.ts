@@ -38,7 +38,7 @@ export class TransactionProcessingPage implements OnInit {
       this.transactionProcessingCount = response;
     }, error => {
       console.error(error);
-    })
+    }) 
   }
 
   async presentConfirmAlert(action: string, docId: number, docNum: string) {

@@ -41,6 +41,9 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   showBackToBackOrderPricingApproval: boolean = false;
 
+  showNonTradePurchaseReqReview: boolean = false;
+  showNonTradePurchaseReqApproval: boolean = false;
+
   showNonTradePurchaseOrderReview: boolean = false;
   showNonTradePurchaseOrderApproval: boolean = false;
 
@@ -95,8 +98,12 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
           this.showPurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseReqAP) > -1;
           this.showPurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderRV) > -1;
           this.showPurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.purchaseOrderAP) > -1;
+
+          this.showNonTradePurchaseReqReview = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePRRV) > -1;
+          this.showNonTradePurchaseReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePRAP) > -1;
+
           this.showNonTradePurchaseOrderReview = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePORV) > -1;
-          this.showNonTradePurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePVAP) > -1;
+          this.showNonTradePurchaseOrderApproval = mPageItems.findIndex(r => r.title === approvalAppCode.nonTradePOAP) > -1;
           this.showSalesOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
           this.showBackToBackOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
         }
@@ -116,6 +123,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     try {
       this.dashboardService.getDashboard().subscribe(response => {
         this.dashboardData = response;
+        console.log("🚀 ~ file: dashboard.page.ts:126 ~ DashboardPage ~ this.dashboardService.getDashboard ~ this.dashboardData:", this.dashboardData)
       }, error => {
         throw error;
       })
@@ -259,7 +267,6 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   }
 
   async setDefaultConsignmentLocation(location: ConsignmentSalesLocation) {
-    console.log("🚀 ~ file: dashboard.page.ts:255 ~ DashboardPage ~ setDefaultConsignmentLocation ~ setDefaultConsignmentLocation:");
     this.configService.selected_consignment_location = location.locationId;
     this.hideLocationModal();
     if (Capacitor.getPlatform() !== "web") {

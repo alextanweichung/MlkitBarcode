@@ -93,6 +93,14 @@ const routes: Routes = [
     loadChildren: () => import('./modules/managements/pages/purchase-order-approvals/purchase-order-approvals.module').then(m => m.PurchaseOrderApprovalsPageModule)
   },
   {
+    path: 'managements/non-trade-purchase-req-reviews',
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-req-reviews/non-trade-purchase-req-reviews.module').then( m => m.NonTradePurchaseReqReviewsPageModule)
+  },
+  {
+    path: 'managements/non-trade-purchase-req-approvals',
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-req-approvals/non-trade-purchase-req-approvals.module').then( m => m.NonTradePurchaseReqApprovalsPageModule)
+  },
+  {
     path: 'managements/non-trade-purchase-order-reviews',
     loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-reviews/non-trade-purchase-order-reviews.module').then( m => m.NonTradePurchaseOrderReviewsPageModule)
   },
@@ -263,12 +271,10 @@ const routes: Routes = [
     path: 'transactions/non-trade-purchase-order/non-trade-purchase-order-detail',
     loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-order/non-trade-purchase-order-detail/non-trade-purchase-order-detail.module').then( m => m.NonTradePurchaseOrderDetailPageModule)
   },
-
-
-
-  
-
-
+  {
+    path: 'transactions/non-trade-purchase-req/non-trade-purchase-req-detail',
+    loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-req/non-trade-purchase-req-detail/non-trade-purchase-req-detail.module').then( m => m.NonTradePurchaseReqDetailPageModule)
+  },
 
 
 
@@ -379,6 +385,8 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+
+
 
 ];
 @NgModule({

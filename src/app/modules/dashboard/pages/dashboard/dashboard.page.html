@@ -119,6 +119,21 @@
           <ion-badge slot="end">{{dashboardData?.purchaseOrderApprovalCount?.pending|number:'1.0'}}</ion-badge>
         </ion-item>
         
+        <ion-item *ngIf="showNonTradePurchaseReqReview && dashboardData?.nonTradePurchaseReqReviewCount?.pending > 0" (click)="goToManagement('non-trade-purchase-req', 'reviews')">
+          <ion-icon name="list-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Non-Trade Purchase Req Review</h3>
+          </ion-label>
+          <ion-badge slot="end">{{dashboardData?.nonTradePurchaseReqReviewCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+        <ion-item *ngIf="showNonTradePurchaseReqApproval && dashboardData?.nonTradePurchaseReqApprovalCount?.pending > 0" (click)="goToManagement('non-trade-purchase-req', 'approvals')">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Non-Trade Purchase Req Approval</h3>
+          </ion-label>
+          <ion-badge slot="end">{{dashboardData?.nonTradePurchaseReqApprovalCount?.pending|number:'1.0'}}</ion-badge>
+        </ion-item>
+        
         <ion-item *ngIf="showNonTradePurchaseOrderReview && dashboardData?.nonTradePurchaseOrderReviewCount?.pending > 0" (click)="goToManagement('non-trade-purchase-order', 'reviews')">
           <ion-icon name="list-outline" slot="start"></ion-icon>
           <ion-label>
