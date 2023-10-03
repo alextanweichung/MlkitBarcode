@@ -30,8 +30,7 @@
       <ion-label class="label-title">Item</ion-label>
     </ion-toolbar>
   </ion-header>
-  <!-- <div class="p-2"> -->
-  
+  <div class="p-2">  
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding #slidingItem *ngFor="let line of detail; let i = index">
@@ -78,7 +77,7 @@
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
-  <!-- </div> -->
+  </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
