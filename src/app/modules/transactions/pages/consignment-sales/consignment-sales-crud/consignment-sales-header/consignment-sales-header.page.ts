@@ -72,7 +72,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       this.objectForm.patchValue({
         toLocationId: findLocation.id,
         toLocationCode: findLocation.code,
-        isBearPromo: findLocation.attribute6 == '1' ? true : false,
+        isBearPromo: findLocation.attribute6 === "1" ? true : false,
         marginMode: findLocation.attribute8
       })
       let customerId = this.objectService.locationList.find(r => r.locationId === this.configService.selected_consignment_location)?.customerId;
@@ -175,11 +175,11 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
           this.objectForm.patchValue({
             salesAgentId: parseFloat(lookupValue.attribute1),
             currencyId: parseFloat(lookupValue.attribute4),
-            isItemPriceTaxInclusive: lookupValue.attribute8 == "1" ? true : false,
-            isDisplayTaxInclusive: lookupValue.attribute9 == "1" ? true : false
+            isItemPriceTaxInclusive: lookupValue.attribute8 === "1" ? true : false,
+            isDisplayTaxInclusive: lookupValue.attribute9 === "1" ? true : false
           });
           this.onCurrencySelected(lookupValue.attribute4);
-          if (lookupValue.attribute5 == "T") {
+          if (lookupValue.attribute5 === "T") {
             this.objectForm.controls.toLocationId.clearValidators();
             this.objectForm.controls.toLocationId.updateValueAndValidity();
           }

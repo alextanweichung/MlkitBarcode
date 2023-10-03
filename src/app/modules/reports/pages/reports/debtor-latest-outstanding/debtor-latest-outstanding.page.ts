@@ -235,26 +235,30 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
 
   async printAllAlert() {
     try {
-      const alert = await this.alertController.create({
-        header: `Download ${this.selected.length} PDF?`,
-        message: "",
-        buttons: [
-          {
-            text: "OK",
-            cssClass: "success",
-            role: "confirm",
-            handler: async () => {
-              await this.downloadPdf(this.selected);
+      if (this.selected && this.selected.length > 0) {
+        const alert = await this.alertController.create({
+          header: `Download ${this.selected.length} PDF?`,
+          message: "",
+          buttons: [
+            {
+              text: "OK",
+              cssClass: "success",
+              role: "confirm",
+              handler: async () => {
+                await this.downloadPdf(this.selected);
+              },
             },
-          },
-          {
-            cssClass: "cancel",
-            text: "Cancel",
-            role: "cancel"
-          },
-        ]
-      });
-      await alert.present();
+            {
+              cssClass: "cancel",
+              text: "Cancel",
+              role: "cancel"
+            },
+          ]
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast("", "Please choose at least 1 document to print", "top", "danger", 1000);
+      }
     } catch (e) {
       console.error(e);
     }

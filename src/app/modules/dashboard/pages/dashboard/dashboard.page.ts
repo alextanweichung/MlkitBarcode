@@ -123,7 +123,6 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     try {
       this.dashboardService.getDashboard().subscribe(response => {
         this.dashboardData = response;
-        console.log("🚀 ~ file: dashboard.page.ts:126 ~ DashboardPage ~ this.dashboardService.getDashboard ~ this.dashboardData:", this.dashboardData)
       }, error => {
         throw error;
       })

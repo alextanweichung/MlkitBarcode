@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { PDItemMaster, PDItemBarcode, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -19,7 +20,6 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class ConsignmentSalesService {
-  
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
@@ -138,5 +138,8 @@ export class ConsignmentSalesService {
     return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileConsignmentSales/uncomplete/${objectId}`, null, httpObserveHeader)
   }
 
+  sendDebug(debugObject: JsonDebug) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/jsonDebug", debugObject, httpObserveHeader);
+  }
 
 }

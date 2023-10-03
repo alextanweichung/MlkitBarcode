@@ -1,7 +1,7 @@
 export interface SearchDropdownList {
    id: number
-   code: string
+   code?: string
    oldCode?: string
-   description: string
+   description?: string
    checked?: boolean
 }

@@ -4,8 +4,25 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>{{objectId && objectId > 0 ? "Cancel" : "Back"}}</ion-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item (click)="popover.dismiss(); sendForDebug()">
+          <ion-icon name="push-outline" slot="end" color="danger"></ion-icon>
+          <ion-label>
+            <div>Debug</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 <ion-content fullscreen [hidden]="scanActive">
   <ion-header collapse="condense">
     <ion-toolbar>

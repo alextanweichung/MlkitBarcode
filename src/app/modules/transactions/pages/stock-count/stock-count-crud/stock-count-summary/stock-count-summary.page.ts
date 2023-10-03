@@ -4,11 +4,11 @@ import { StockCountRoot, StockCountHeader, StockCountDetail } from 'src/app/modu
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 
 @Component({
-  selector: 'app-stock-count-summary-add',
-  templateUrl: './stock-count-summary-add.page.html',
-  styleUrls: ['./stock-count-summary-add.page.scss'],
+  selector: 'app-stock-count-summary',
+  templateUrl: './stock-count-summary.page.html',
+  styleUrls: ['./stock-count-summary.page.scss'],
 })
-export class StockCountSummaryAddPage implements OnInit {
+export class StockCountSummaryPage implements OnInit {
 
   objectRoot: StockCountRoot;
   objectHeader: StockCountHeader;

@@ -315,7 +315,6 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
   onTrxTimeSelected(value: any) {
     if (value.length > 0 && value.includes("+")) {
       this.timeValue =  new Date(new Date(value).setMinutes(new Date(value).getMinutes() - new Date(value).getTimezoneOffset())).toISOString();
-      console.log("🚀 ~ file: otp-configuration.page.ts:318 ~ OtpConfigurationPage ~ onTrxTimeSelected ~ this.timeValue:", this.timeValue)
       this.setFormattedDateString();
     }
   }

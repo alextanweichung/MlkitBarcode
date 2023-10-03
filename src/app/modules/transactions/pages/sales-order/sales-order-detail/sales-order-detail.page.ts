@@ -91,7 +91,6 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   loadObject() {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
-        console.log("🚀 ~ file: sales-order-detail.page.ts:92 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ response:", response)
         this.object = response;
         if (this.object.header.isHomeCurrency) {
           this.object.header.maxPrecision = this.precisionSales.localMax;

@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { StockCountItemAddPageRoutingModule } from './stock-count-item-add-routing.module';
+import { StockCountItemPageRoutingModule } from './stock-count-item-routing.module';
 
-import { StockCountItemAddPage } from './stock-count-item-add.page';
+import { StockCountItemPage } from './stock-count-item.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
@@ -16,11 +16,11 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
     CommonModule,
     FormsModule,
     IonicModule,
-    StockCountItemAddPageRoutingModule,
+    StockCountItemPageRoutingModule,
     IdMappingModule,
     BarcodeScanInputPageModule,
     CameraScanInputPageModule
   ],
-  declarations: [StockCountItemAddPage]
+  declarations: [StockCountItemPage]
 })
-export class StockCountItemAddPageModule {}
+export class StockCountItemPageModule {}

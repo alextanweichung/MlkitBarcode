@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
+import { BarcodeTag, ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCount, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -50,27 +50,37 @@ export class StockCountService {
     this.zoneMasterList = this.fullMasterList.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
   }
 
-  objectHeader: StockCountHeader;
+  objectHeader: StockCountHeader = null;
   setHeader(objectHeader: StockCountHeader) {
     this.objectHeader = objectHeader;
   }
   
   objectDetail: StockCountDetail[] = []
-  setLines(objectDetail: StockCountDetail[]) {
+  setDetail(objectDetail: StockCountDetail[]) {
     this.objectDetail = objectDetail;
+  }
+
+  objectBarcodeTag: BarcodeTag[] = [];
+  setBarcodeTag(objectBarcodeTag: BarcodeTag[]) {
+    this.objectBarcodeTag = objectBarcodeTag;
   }
 
   removeHeader() {
     this.objectHeader = null
   }
 
-  removeLines() {
+  removeDetail() {
     this.objectDetail = [];
+  }
+
+  removeBarcodeTag() {
+    this.objectBarcodeTag = [];
   }
 
   resetVariables() {
     this.removeHeader();
-    this.removeLines();
+    this.removeDetail();
+    this.removeBarcodeTag();
   }
 
   getMasterList() {

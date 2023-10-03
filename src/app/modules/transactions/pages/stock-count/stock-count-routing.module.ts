@@ -9,29 +9,17 @@ const routes: Routes = [
     component: StockCountPage
   },
   {
-    path: 'stock-count-add/stock-count-header',
-    loadChildren: () => import('./stock-count-add/stock-count-header-add/stock-count-header-add.module').then( m => m.StockCountHeaderAddPageModule)
+    path: 'stock-count-crud/stock-count-header',
+    loadChildren: () => import('./stock-count-crud/stock-count-header/stock-count-header.module').then( m => m.StockCountHeaderPageModule)
   },
   {
-    path: 'stock-count-add/stock-count-item',
-    loadChildren: () => import('./stock-count-add/stock-count-item-add/stock-count-item-add.module').then( m => m.StockCountItemAddPageModule)
+    path: 'stock-count-crud/stock-count-item',
+    loadChildren: () => import('./stock-count-crud/stock-count-item/stock-count-item.module').then( m => m.StockCountItemPageModule)
   },
   {
-    path: 'stock-count-add/stock-count-summary',
-    loadChildren: () => import('./stock-count-add/stock-count-summary-add/stock-count-summary-add.module').then( m => m.StockCountSummaryAddPageModule)
+    path: 'stock-count-crud/stock-count-summary',
+    loadChildren: () => import('./stock-count-crud/stock-count-summary/stock-count-summary.module').then( m => m.StockCountSummaryPageModule)
   },
-  {
-    path: 'stock-count-edit/stock-count-header',
-    loadChildren: () => import('./stock-count-edit/stock-count-header-edit/stock-count-header-edit.module').then( m => m.StockCountHeaderEditPageModule)
-  },
-  {
-    path: 'stock-count-edit/stock-count-item',
-    loadChildren: () => import('./stock-count-edit/stock-count-item-edit/stock-count-item-edit.module').then( m => m.StockCountItemEditPageModule)
-  },
-  {
-    path: 'stock-count-edit/stock-count-summary',
-    loadChildren: () => import('./stock-count-edit/stock-count-summary-edit/stock-count-summary-edit.module').then( m => m.StockCountSummaryEditPageModule)
-  }
 ];
 
 @NgModule({

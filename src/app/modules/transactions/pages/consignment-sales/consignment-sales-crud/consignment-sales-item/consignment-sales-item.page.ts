@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ConsignmentSalesRoot } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -63,7 +64,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
     if (this.objectId && this.objectId > 0) {
       this.loadObject();
     }
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:59 ~ ConsignmentSalesItemPage ~ ionViewWillEnter ~ this.objectService.header:", JSON.stringify(this.objectService.header))
   }
 
   ngOnInit() {
@@ -165,7 +165,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
               description: found_item_master.itemDesc,
               variationTypeCode: found_item_master.varCd,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: found_item_master.discPct + "%",
+              discountExpression: (found_item_master.discPct??"0") + '%',
               taxId: found_item_master.taxId,
               taxCode: found_item_master.taxCd,
               taxPct: found_item_master.taxPct,
@@ -174,8 +174,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                 itemId: found_item_master.id,
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
-                discountExpression: found_item_master.discPct + "%",
-                discountPercent: found_item_master.discPct,
+                discountExpression: (found_item_master.discPct??"0") + '%',
+                discountPercent: found_item_master.discPct??0,
                 discountGroupId: null,
                 unitPriceMin: null,
                 currencyId: null
@@ -358,7 +358,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
   /* #region  unit price, tax, discount */
 
   computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:331 ~ ConsignmentSalesItemPage ~ computeUnitPriceExTax ~ trxLine:", JSON.stringify(trxLine))
     try {
       trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(2));
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.maxPrecision);
@@ -369,7 +368,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
   }
 
   computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:342 ~ ConsignmentSalesItemPage ~ computeUnitPrice ~ trxLine:", JSON.stringify(trxLine))
     try {
       trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(2));
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
@@ -382,7 +380,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
   computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
       trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.maxPrecision);
-      console.log("🚀 ~ file: consignment-sales-item.page.ts:351 ~ ConsignmentSalesItemPage ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
       if (this.consignmentSalesActivateMarginCalculation) {
         this.computeMarginAmount(trxLine);
       }
@@ -393,7 +390,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
   computeMarginAmount(trxLine: TransactionDetail) {
     trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.header, true);
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:362 ~ ConsignmentSalesItemPage ~ computeMarginAmount ~ trxLine:", JSON.stringify(trxLine))
   }
 
   async onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
@@ -545,13 +541,17 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
         header: this.objectService.header,
         details: this.objectService.detail
       }
+      
       this.objectService.insertObject(trxDto).subscribe(response => {
-        let object = response.body as ConsignmentSalesRoot;
-        this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            objectId: object.header.consignmentSalesId
+        if (response.status === 201) {
+          let object = response.body as ConsignmentSalesRoot;
+          this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: object.header.consignmentSalesId
+            }
           }
+          this.navController.navigateRoot("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
         }
       }, error => {
         throw error;
@@ -567,16 +567,16 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
         header: this.objectService.header,
         details: this.objectService.detail
       }
-      console.log("🚀 ~ file: consignment-sales-item.page.ts:508 ~ ConsignmentSalesItemPage ~ insertObject ~ trxDto:", JSON.stringify(trxDto))
       this.objectService.updateObject(trxDto).subscribe(response => {
-        let object = response.body as ConsignmentSalesRoot;
-        this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            objectId: this.objectId
+        if (response.status === 204) {
+          this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: this.objectId
+            }
           }
+          this.navController.navigateRoot("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
         }
-        this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
       }, error => {
         throw error;
       });
@@ -623,6 +623,44 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
+  sendForDebug() {
+    let trxDto: ConsignmentSalesRoot = {
+      header: this.objectService.header,
+      details: this.objectService.detail
+    }
+    let jsonObjectString = JSON.stringify(trxDto);
+    let debugObject: JsonDebug = {
+      jsonDebugId: 0,
+      jsonData: jsonObjectString
+    };
+
+    this.objectService.sendDebug(debugObject).subscribe(response => {
+      if (response.status == 200) {
+        this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+        // this.messageService.add({ severity: 'success', summary: 'Debugging successful', detail: "Data has been sent for debugging" });
+      }
+    }, error => {
+      this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+      // this.messageService.add({ severity: 'error', summary: 'Debugging failure', detail: "Data failed to send for debugging" });
+      console.log(error);
+    });
   }
 
 }

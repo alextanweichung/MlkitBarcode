@@ -75,7 +75,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
         objectId: this.objectId
       }
     }
-    this.navController.navigateForward('/transactions/stock-count/stock-count-edit/stock-count-header', navigationExtras);
+    this.navController.navigateForward('/transactions/stock-count/stock-count-crud/stock-count-header', navigationExtras);
   }
 
 }

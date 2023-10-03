@@ -110,7 +110,7 @@ export class BarcodeScanInputPage implements OnInit {
             description: found_item_master.itemDesc,
             variationTypeCode: found_item_master.varCd,
             discountGroupCode: found_item_master.discCd,
-            discountExpression: found_item_master.discPct + "%",
+            discountExpression: (found_item_master.discPct ?? "0") + "%",
             taxId: found_item_master.taxId,
             taxCode: found_item_master.taxCd,
             taxPct: found_item_master.taxPct,
@@ -119,8 +119,8 @@ export class BarcodeScanInputPage implements OnInit {
               itemId: found_item_master.id,
               unitPrice: found_item_master.price,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: found_item_master.discPct + "%",
-              discountPercent: found_item_master.discPct,
+              discountExpression: (found_item_master.discPct ?? "0") + "%",
+              discountPercent: found_item_master.discPct ?? 0,
               discountGroupId: null,
               unitPriceMin: null,
               currencyId: null
@@ -182,35 +182,38 @@ export class BarcodeScanInputPage implements OnInit {
           found_item_master.forEach(r => {
             if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
               let t = found_item_barcode.find(rr => rr.itemId === r.id);
-              let outputData: TransactionDetail = {
-                itemId: r.id,
-                itemCode: r.code,
-                description: r.itemDesc,
-                variationTypeCode: r.varCd,
-                discountGroupCode: r.discCd,
-                discountExpression: r.discPct + "%",
-                taxId: r.taxId,
-                taxCode: r.taxCd,
-                taxPct: r.taxPct,
-                qtyRequest: null,
-                itemPricing: {
+              if (t) {
+                let outputData: TransactionDetail = {
                   itemId: r.id,
-                  unitPrice: r.price,
+                  itemCode: r.code,
+                  description: r.itemDesc,
+                  variationTypeCode: r.varCd,
                   discountGroupCode: r.discCd,
-                  discountExpression: r.discPct + "%",
-                  discountPercent: r.discPct,
-                  discountGroupId: null,
-                  unitPriceMin: null,
-                  currencyId: null
-                },
-                itemSku: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.sku : null,
-                itemBarcode: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.barcode : null,
-                itemBrandId: r.brandId,
-                itemGroupId: r.groupId,
-                itemCategoryId: r.catId,
-                itemDepartmentId: r.deptId
-              }              
-              this.availableItemmmm.push(outputData);
+                  discountExpression: (r.discPct ?? "0") + "%",
+                  taxId: r.taxId,
+                  taxCode: r.taxCd,
+                  taxPct: r.taxPct,
+                  qtyRequest: null,
+                  itemPricing: {
+                    itemId: r.id,
+                    unitPrice: r.price,
+                    discountGroupCode: r.discCd,
+                    discountExpression: (r.discPct ?? "0") + "%",
+                    discountPercent: r.discPct ?? 0,
+                    discountGroupId: null,
+                    unitPriceMin: null,
+                    currencyId: null
+                  },
+                  itemSku: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.sku : null,
+                  itemBarcode: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.barcode : null,
+                  itemBrandId: r.brandId,
+                  itemGroupId: r.groupId,
+                  itemCategoryId: r.catId,
+                  itemDepartmentId: r.deptId,
+                  itemBarcodeTagId: r.varCd === "0" ? t.id : null
+                }
+                this.availableItemmmm.push(outputData);
+              }
             }
           })
         }
@@ -223,7 +226,7 @@ export class BarcodeScanInputPage implements OnInit {
                 description: found_item_master.find(rr => rr.id === r.itemId)?.itemDesc,
                 variationTypeCode: found_item_master.find(rr => rr.id === r.itemId)?.varCd,
                 discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
-                discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + "%",
+                discountExpression: (found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? "0") + "%",
                 taxId: found_item_master.find(rr => rr.id === r.itemId)?.taxId,
                 taxCode: found_item_master.find(rr => rr.id === r.itemId)?.taxCd,
                 taxPct: found_item_master.find(rr => rr.id === r.itemId)?.taxPct,
@@ -232,8 +235,8 @@ export class BarcodeScanInputPage implements OnInit {
                   itemId: found_item_master.find(rr => rr.id === r.itemId)?.id,
                   unitPrice: found_item_master.find(rr => rr.id === r.itemId)?.price,
                   discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
-                  discountExpression: found_item_master.find(rr => rr.id === r.itemId)?.discPct + "%",
-                  discountPercent: found_item_master.find(rr => rr.id === r.itemId)?.discPct,
+                  discountExpression: (found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? "0") + "%",
+                  discountPercent: found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? 0,
                   discountGroupId: null,
                   unitPriceMin: null,
                   currencyId: null
@@ -258,8 +261,12 @@ export class BarcodeScanInputPage implements OnInit {
         }
         if (found_item_master && found_item_master.length === 1) {
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id);
-          this.showVariationModal();
-        } else {
+          if (this.availableVariationsByItemId && this, this.availableVariationsByItemId.length > 1) {
+            this.showVariationModal();
+          } else {
+            this.showItemModal();
+          }
+        } else if (found_item_master && found_item_master.length > 0) {
           this.showItemModal();
         }
       } else {
@@ -321,8 +328,8 @@ export class BarcodeScanInputPage implements OnInit {
     else {
       this.toastService.presentToast("", "No Item added.", "top", "danger", 1000);
     }
-    this.hideItemModel();
     this.hideVariationModel();
+    this.hideItemModel();
   }
 
   /* #endregion */

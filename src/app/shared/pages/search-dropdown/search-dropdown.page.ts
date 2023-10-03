@@ -28,13 +28,20 @@ export class SearchDropdownPage implements OnInit, OnChanges {
     private toastService: ToastService
   ) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.selected = null;
     if (changes.masterDropdownList) {
-      this.bindFromMasterList();
+      await this.bindFromMasterList();
       this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
     }
-    if (changes.selectedId || changes.searchDropdownList) {
+    if (changes.selectedId) {
+      if (this.selectedId !== null) {
+        this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
+      } else {
+        this.selected = null;
+      }
+    }
+    if (changes.searchDropdownList) {
       if (this.selectedId !== null) {
         this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
       } else {
