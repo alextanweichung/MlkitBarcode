@@ -430,19 +430,11 @@ export class CommonService {
     beforeBearingAmt = this.roundToPrecision(beforeBearingAmt, 2);
     switch (objectHeader.marginMode) {
       case 'G':
-        trxLine.bearAmt = 0;
         trxLine.marginAmt = trxLine.unitPrice * trxLine.qtyRequest * trxLine.marginPct / 100;
         trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
         break;
       case 'N':
-        trxLine.bearAmt = 0;
         trxLine.marginAmt = trxLine.subTotal * trxLine.marginPct / 100;
-        trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
-        break;
-      case 'B':
-        trxLine.bearPct = bearPct;
-        trxLine.bearAmt = beforeBearingAmt;
-        trxLine.marginAmt = (trxLine.subTotal * trxLine.marginPct / 100) - beforeBearingAmt;
         trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
         break;
       case 'A':
@@ -452,6 +444,16 @@ export class CommonService {
         trxLine.bearAmt = beforeBearingAmt;
         trxLine.marginAmt = (trxLine.subTotal + afterBearingAmt) * (trxLine.marginPct / 100);
         trxLine.marginAmt = this.roundToPrecision(trxLine.marginAmt, 2);
+        break;
+    }
+    switch (objectHeader.isBearPromo) {
+      case true:
+        trxLine.bearPct = bearPct;
+        trxLine.bearAmt = beforeBearingAmt;
+        break;
+      case false:
+        trxLine.bearPct = 0;
+        trxLine.bearAmt = 0;
         break;
     }
     if (computeInvoiceAmt) {
