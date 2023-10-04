@@ -91,8 +91,10 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
     this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
     this.objectForm.patchValue(this.object.header);
     this.object.details.forEach(r => {
-      r.itemCode = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku)?.itemCode,
-      r.description = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku)?.description
+      if (r.itemCode === null || r.itemCode === undefined) {
+        r.itemCode = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku)?.itemCode,
+        r.description = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku)?.description
+      }
     })
     this.dateValue = format(this.object.header.trxDate, "yyyy-MM-dd") + "T08:00:00.000Z";
     this.setFormattedDateString();

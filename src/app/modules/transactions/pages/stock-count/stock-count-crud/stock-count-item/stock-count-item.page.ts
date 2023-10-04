@@ -19,7 +19,7 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
   styleUrls: ['./stock-count-item.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
-export class StockCountItemPage implements OnInit, ViewDidEnter {
+export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -34,6 +34,10 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
     private configService: ConfigService,
     private toastService: ToastService
   ) { }
+  
+  ionViewWillEnter(): void {
+    throw new Error('Method not implemented.');
+  }
 
   ionViewDidEnter(): void {
     try {
