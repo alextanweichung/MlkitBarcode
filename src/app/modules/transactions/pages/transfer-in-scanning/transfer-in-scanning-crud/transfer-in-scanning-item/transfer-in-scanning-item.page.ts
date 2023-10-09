@@ -209,6 +209,10 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
           this.objectService.object.line[index].lineQty = event.lineQty;
         // }
       } else {
+        if (this.objectService.object.line && this.objectService.object.line.length > 0) {
+          this.objectService.object.line.forEach(r => r.sequence += 1);
+        }
+        event.sequence = 0;
         this.objectService.object.line.unshift(event);
       }
     }
@@ -246,7 +250,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
   }
 
   getInsertedLine() {
-    return this.objectService.object.line.filter(r => r.uuid !== null);
+    return this.objectService.object.line.filter(r => r.uuid !== null).sort((a, b) => { return a.sequence - b.sequence });
   }
 
   /* #region camera scanner */

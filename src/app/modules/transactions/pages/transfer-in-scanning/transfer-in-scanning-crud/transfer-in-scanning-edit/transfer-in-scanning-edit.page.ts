@@ -225,6 +225,10 @@ export class TransferInScanningEditPage implements OnInit {
         }
         this.object.line[index].lineQty = (this.object.line[index].lineQty??0) + 1;
       } else {
+        if (this.object.line && this.object.line.length > 0) {
+          this.object.line.forEach(r => r.sequence += 1);
+        }
+        event.sequence = 0;
         this.object.line.unshift(event);
       }
     }
