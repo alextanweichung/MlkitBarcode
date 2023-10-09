@@ -137,7 +137,6 @@ export class BarcodeScanInputPage implements OnInit {
             newItemId: found_item_master.newId,
             newItemEffectiveDate: found_item_master.newDate
           }
-          console.log("🚀 ~ file: barcode-scan-input.page.ts:141 ~ BarcodeScanInputPage ~ validateBarcode ~ [outputData]:", JSON.stringify([outputData]))
           this.onItemAdd.emit([outputData]);
         } else {
           this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
@@ -260,10 +259,8 @@ export class BarcodeScanInputPage implements OnInit {
         } else {
           this.toastService.presentToast("", "No Item Found", "top", "danger", 1000);
         }
-        console.log("🚀 ~ file: barcode-scan-input.page.ts:263 ~ BarcodeScanInputPage ~ validateItem ~ found_item_master:", JSON.stringify(found_item_master))
         if (found_item_master && found_item_master.length === 1) { // only 1 item found
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
-          console.log("🚀 ~ file: barcode-scan-input.page.ts:266 ~ BarcodeScanInputPage ~ validateItem ~ this.availableVariationsByItemId:", JSON.stringify(this.availableVariationsByItemId))
           if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
             this.showVariationModal();
           } else { // else simple item model
@@ -297,7 +294,6 @@ export class BarcodeScanInputPage implements OnInit {
     if (item.variationTypeCode === "0") {
       if (item) {
         let found = this.configService.item_Masters.find(r => r.id === item.itemId);
-        console.log("🚀 ~ file: barcode-scan-input.page.ts:302 ~ BarcodeScanInputPage ~ showVariations ~ [item]:", JSON.stringify([item]))
         this.onItemAdd.emit([item]);
       } else {
         this.toastService.presentToast("", "No Item added.", "top", "danger", 1000);
@@ -327,7 +323,6 @@ export class BarcodeScanInputPage implements OnInit {
     let found = this.availableVariationsByItemId.filter(r => r.isSelected)
     if (found.length > 0) {
       let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]);
-      console.log("🚀 ~ file: barcode-scan-input.page.ts:333 ~ BarcodeScanInputPage ~ addVariations ~ this.availableVariationsByItemId.filter(r => r.isSelected):", JSON.stringify(this.availableVariationsByItemId.filter(r => r.isSelected)))
       this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
     }
     else {
