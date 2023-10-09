@@ -226,14 +226,12 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
     } else {
       let isBlock: boolean = false;
       isBlock = this.validateNewItemConversion(trxLine);
-      console.log("🚀 ~ file: consignment-sales-item.page.ts:229 ~ ConsignmentSalesItemPage ~ addItemToLine ~ isBlock:", isBlock)
       if (!isBlock) {
         this.objectService.detail.forEach(r => r.sequence += 1);
         trxLine.qtyRequest = 1;
         trxLine.locationId = this.objectService.header.toLocationId;
         trxLine.sequence = 0;
         trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.header.trxDate, this.objectService.header.toLocationId);
-        console.log("🚀 ~ file: consignment-sales-item.page.ts:217 ~ ConsignmentSalesItemPage ~ addItemToLine ~ trxLine:", JSON.stringify(trxLine))
         await this.assignTrxItemToDataLine(trxLine);
       }
     }
@@ -274,10 +272,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
     item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
     item.oriUnitPrice = item.unitPrice;
     item.oriUnitPriceExTax = item.unitPriceExTax;
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:277 ~ ConsignmentSalesItemPage ~ assignTrxItemToDataLine ~ item:", JSON.stringify(item))
 
     if (this.consignmentSalesActivateMarginCalculation) {
-      console.log("🚀 ~ file: consignment-sales-item.page.ts:279 ~ ConsignmentSalesItemPage ~ assignTrxItemToDataLine ~ this.objectService.detail:", JSON.stringify(this.objectService.detail))
       if (item.marginPct) {
         this.objectService.detail.unshift(item);
         await this.computeAllAmount(this.objectService.detail[0]);
@@ -298,7 +294,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       this.objectService.detail.unshift(item);
       await this.computeAllAmount(this.objectService.detail[0]);
     }
-    console.log("🚀 ~ file: consignment-sales-item.page.ts:292 ~ ConsignmentSalesItemPage ~ assignTrxItemToDataLine ~ this.objectService.detail:", JSON.stringify(this.objectService.detail))
   }
 
   async deleteLine(index) {

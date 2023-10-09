@@ -26,7 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'forget-password',
-    loadChildren: () => import('./modules/public/forget-password/forget-password.module').then( m => m.ForgetPasswordPageModule)
+    loadChildren: () => import('./modules/public/forget-password/forget-password.module').then(m => m.ForgetPasswordPageModule)
   },
 
 
@@ -68,20 +68,20 @@ const routes: Routes = [
   // management-b2bo
   {
     path: 'managements/b2bo-reviews',
-    loadChildren: () => import('./modules/managements/pages/b2bo-reviews/b2bo-reviews.module').then( m => m.B2boReviewsPageModule)
+    loadChildren: () => import('./modules/managements/pages/b2bo-reviews/b2bo-reviews.module').then(m => m.B2boReviewsPageModule)
   },
   {
     path: 'managements/b2bo-approvals',
-    loadChildren: () => import('./modules/managements/pages/b2bo-approvals/b2bo-approvals.module').then( m => m.B2boApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/b2bo-approvals/b2bo-approvals.module').then(m => m.B2boApprovalsPageModule)
   },
   // management-purchase-req
   {
     path: 'managements/purchase-req-reviews',
-    loadChildren: () => import('./modules/managements/pages/purchase-req-reviews/purchase-req-reviews.module').then( m => m.PurchaseReqReviewsPageModule)
+    loadChildren: () => import('./modules/managements/pages/purchase-req-reviews/purchase-req-reviews.module').then(m => m.PurchaseReqReviewsPageModule)
   },
   {
     path: 'managements/purchase-req-approvals',
-    loadChildren: () => import('./modules/managements/pages/purchase-req-approvals/purchase-req-approvals.module').then( m => m.PurchaseReqApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/purchase-req-approvals/purchase-req-approvals.module').then(m => m.PurchaseReqApprovalsPageModule)
   },
   // management-purchase-order  
   {
@@ -94,29 +94,29 @@ const routes: Routes = [
   },
   {
     path: 'managements/non-trade-purchase-req-reviews',
-    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-req-reviews/non-trade-purchase-req-reviews.module').then( m => m.NonTradePurchaseReqReviewsPageModule)
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-req-reviews/non-trade-purchase-req-reviews.module').then(m => m.NonTradePurchaseReqReviewsPageModule)
   },
   {
     path: 'managements/non-trade-purchase-req-approvals',
-    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-req-approvals/non-trade-purchase-req-approvals.module').then( m => m.NonTradePurchaseReqApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-req-approvals/non-trade-purchase-req-approvals.module').then(m => m.NonTradePurchaseReqApprovalsPageModule)
   },
   {
     path: 'managements/non-trade-purchase-order-reviews',
-    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-reviews/non-trade-purchase-order-reviews.module').then( m => m.NonTradePurchaseOrderReviewsPageModule)
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-reviews/non-trade-purchase-order-reviews.module').then(m => m.NonTradePurchaseOrderReviewsPageModule)
   },
   {
     path: 'managements/non-trade-purchase-order-approvals',
-    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-approvals/non-trade-purchase-order-approvals.module').then( m => m.NonTradePurchaseOrderApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-approvals/non-trade-purchase-order-approvals.module').then(m => m.NonTradePurchaseOrderApprovalsPageModule)
   },
   // management-pricing
   {
     path: 'managements/pricing-approvals',
-    loadChildren: () => import('./modules/managements/pages/pricing-approvals/pricing-approvals.module').then( m => m.PricingApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/pricing-approvals/pricing-approvals.module').then(m => m.PricingApprovalsPageModule)
   },
   // management-b2bopricing
   {
     path: 'managements/b2bopricing-approvals',
-    loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then( m => m.B2bopricingApprovalsPageModule)
+    loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then(m => m.B2bopricingApprovalsPageModule)
   },
   // management-otp-configuration
   {
@@ -159,12 +159,12 @@ const routes: Routes = [
   // transaction-backtoback-order
   {
     path: 'transactions/backtoback-order',
-    loadChildren: () => import('./modules/transactions/pages/backtoback-order/backtoback-order.module').then( m => m.BackToBackOrderPageModule)
+    loadChildren: () => import('./modules/transactions/pages/backtoback-order/backtoback-order.module').then(m => m.BackToBackOrderPageModule)
   },
   // transaction-purchase-req
   {
     path: 'transactions/purchase-req/purchase-req-detail',
-    loadChildren: () => import('./modules/transactions/pages/purchase-req/purchase-req-detail/purchase-req-detail.module').then( m => m.PurchaseReqDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/purchase-req/purchase-req-detail/purchase-req-detail.module').then(m => m.PurchaseReqDetailPageModule)
   },
   // transactions-purchase-order
   {
@@ -215,7 +215,7 @@ const routes: Routes = [
   // transaction-inventory-level-retail
   {
     path: 'transactions/inventory-level-retail',
-    loadChildren: () => import('./modules/transactions/pages/inventory-level-retail/inventory-level-retail.module').then( m => m.InventoryLevelRetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/inventory-level-retail/inventory-level-retail.module').then(m => m.InventoryLevelRetailPageModule)
   },
 
   // transaction-cash-deposit
@@ -229,51 +229,51 @@ const routes: Routes = [
   },
   {
     path: 'transactions/inter-transfer',
-    loadChildren: () => import('./modules/transactions/pages/inter-transfer/inter-transfer.module').then( m => m.InterTransferPageModule)
+    loadChildren: () => import('./modules/transactions/pages/inter-transfer/inter-transfer.module').then(m => m.InterTransferPageModule)
   },
   {
     path: 'transactions/transfer-confirmation',
-    loadChildren: () => import('./modules/transactions/pages/transfer-confirmation/transfer-confirmation.module').then( m => m.TransferConfirmationPageModule)
+    loadChildren: () => import('./modules/transactions/pages/transfer-confirmation/transfer-confirmation.module').then(m => m.TransferConfirmationPageModule)
   },
   {
     path: 'transactions/debtor-application',
-    loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then( m => m.DebtorApplicationPageModule)
+    loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then(m => m.DebtorApplicationPageModule)
   },
   {
     path: 'transactions/stock-replenish',
-    loadChildren: () => import('./modules/transactions/pages/stock-replenish/stock-replenish.module').then( m => m.StockReplenishPageModule)
+    loadChildren: () => import('./modules/transactions/pages/stock-replenish/stock-replenish.module').then(m => m.StockReplenishPageModule)
   },
   {
     path: 'transactions/consignment-count',
-    loadChildren: () => import('./modules/transactions/pages/consignment-count/consignment-count.module').then( m => m.ConsignmentCountPageModule)
+    loadChildren: () => import('./modules/transactions/pages/consignment-count/consignment-count.module').then(m => m.ConsignmentCountPageModule)
   },
   {
     path: 'transactions/inbound-scan',
-    loadChildren: () => import('./modules/transactions/pages/inbound-scan/inbound-scan.module').then( m => m.InboundScanPageModule)
+    loadChildren: () => import('./modules/transactions/pages/inbound-scan/inbound-scan.module').then(m => m.InboundScanPageModule)
   },
   {
     path: 'transactions/stock-reorder',
-    loadChildren: () => import('./modules/transactions/pages/stock-reorder/stock-reorder.module').then( m => m.StockReorderPageModule)
+    loadChildren: () => import('./modules/transactions/pages/stock-reorder/stock-reorder.module').then(m => m.StockReorderPageModule)
   },
   {
     path: 'transactions/transfer-out',
-    loadChildren: () => import('./modules/transactions/pages/transfer-out/transfer-out.module').then( m => m.TransferOutPageModule)
+    loadChildren: () => import('./modules/transactions/pages/transfer-out/transfer-out.module').then(m => m.TransferOutPageModule)
   },
   {
     path: 'transactions/transfer-in',
-    loadChildren: () => import('./modules/transactions/pages/transfer-in/transfer-in.module').then( m => m.TransferInPageModule)
+    loadChildren: () => import('./modules/transactions/pages/transfer-in/transfer-in.module').then(m => m.TransferInPageModule)
   },
   {
     path: 'transactions/transfer-in-scanning',
-    loadChildren: () => import('./modules/transactions/pages/transfer-in-scanning/transfer-in-scanning.module').then( m => m.TransferInScanningPageModule)
+    loadChildren: () => import('./modules/transactions/pages/transfer-in-scanning/transfer-in-scanning.module').then(m => m.TransferInScanningPageModule)
   },
   {
     path: 'transactions/non-trade-purchase-order/non-trade-purchase-order-detail',
-    loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-order/non-trade-purchase-order-detail/non-trade-purchase-order-detail.module').then( m => m.NonTradePurchaseOrderDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-order/non-trade-purchase-order-detail/non-trade-purchase-order-detail.module').then(m => m.NonTradePurchaseOrderDetailPageModule)
   },
   {
     path: 'transactions/non-trade-purchase-req/non-trade-purchase-req-detail',
-    loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-req/non-trade-purchase-req-detail/non-trade-purchase-req-detail.module').then( m => m.NonTradePurchaseReqDetailPageModule)
+    loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-req/non-trade-purchase-req-detail/non-trade-purchase-req-detail.module').then(m => m.NonTradePurchaseReqDetailPageModule)
   },
 
 
@@ -293,27 +293,27 @@ const routes: Routes = [
   },
   {
     path: 'reports/rp-sales-customer',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then( m => m.RpSalesCustomerPageModule)
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then(m => m.RpSalesCustomerPageModule)
   },
   {
     path: 'reports/rp-sales-performance',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-performance/rp-sales-performance.module').then( m => m.RpSalesPerformancePageModule)
+    loadChildren: () => import('./modules/reports/pages/reports/rp-sales-performance/rp-sales-performance.module').then(m => m.RpSalesPerformancePageModule)
   },
   {
     path: 'reports/rp-check-qoh',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then( m => m.RpCheckQohPageModule)
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then(m => m.RpCheckQohPageModule)
   },
   {
     path: 'reports/rp-check-cn',
-    loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then( m => m.RpCheckCnPageModule)
+    loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then(m => m.RpCheckCnPageModule)
   },
   {
     path: 'reports/transaction-inquiry',
-    loadChildren: () => import('./modules/reports/pages/transaction-inquiry/transaction-inquiry.module').then( m => m.TransactionInquiryPageModule)
+    loadChildren: () => import('./modules/reports/pages/transaction-inquiry/transaction-inquiry.module').then(m => m.TransactionInquiryPageModule)
   },
   {
     path: 'reports/sales-analysis',
-    loadChildren: () => import('./modules/reports/pages/sales-analysis/sales-analysis.module').then( m => m.SalesAnalysisPageModule)
+    loadChildren: () => import('./modules/reports/pages/sales-analysis/sales-analysis.module').then(m => m.SalesAnalysisPageModule)
   },
 
 
@@ -375,7 +375,7 @@ const routes: Routes = [
   },
   {
     path: 'item-catalog-without-price',
-    loadChildren: () => import('./shared/pages/item-catalog-without-price/item-catalog-without-price.module').then( m => m.ItemCatalogWithoutPricePageModule)
+    loadChildren: () => import('./shared/pages/item-catalog-without-price/item-catalog-without-price.module').then(m => m.ItemCatalogWithoutPricePageModule)
   },
   {
     path: 'camera-scan-input',
@@ -394,8 +394,8 @@ const routes: Routes = [
     RouterModule.forRoot(
       routes,
       {
-    preloadingStrategy: PreloadAllModules
-})
+        preloadingStrategy: PreloadAllModules
+      })
   ],
   exports: [RouterModule]
 })

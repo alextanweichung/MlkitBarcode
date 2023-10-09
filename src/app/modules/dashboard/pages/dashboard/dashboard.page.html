@@ -31,7 +31,7 @@
     <ion-list-header>
       <ion-label class="pl-2" color="dark">Announcement</ion-label>
     </ion-list-header>
-    <ion-list class="list-custom" lines="none">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button *ngFor="let memo of dashboardData?.memo" (click)="showModal(memo)">
         <ion-icon name="desktop-outline" slot="start"></ion-icon>
         <h6>{{memo?.header?.subject}}</h6>

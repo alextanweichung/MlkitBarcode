@@ -18,6 +18,7 @@
       <app-search-dropdown #validityDropdown title="Validity" optionLabel="description" [masterDropdownList]="lovStatics" (onActionComplete)="onValidityChanged($event)" [hidden]="selectedUser==null"></app-search-dropdown>
       <app-search-dropdown #appsDropdown [hidden]="selectedValidity !== 'SINGLE'" title="App" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-dropdown>
       <app-search-multi-dropdown #appsMultiDropdown [hidden]="selectedValidity !== 'MULTIPLE'" title="App" [showHeaderLabel]="true" [showBoldHeader]="false" [showCode]="true" optionLabel="description" [searchDropdownList]="appsSearchDropdownList" (onActionComplete)="onAppChanged($event)"></app-search-multi-dropdown>
+      
       <ion-item color="none">
         <ion-checkbox #checkBox slot="end" (ionChange)="onCheckBoxChecked($event)" [(ngModel)]="checkboxValue"></ion-checkbox>
         <ion-label>Default Expiry</ion-label>

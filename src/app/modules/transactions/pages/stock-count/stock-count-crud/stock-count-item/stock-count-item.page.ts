@@ -36,7 +36,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
   ) { }
   
   ionViewWillEnter(): void {
-    throw new Error('Method not implemented.');
+    
   }
 
   ionViewDidEnter(): void {
@@ -145,6 +145,11 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       event.forEach(r => {
         this.addItemToLine(r);
       })
+      try {
+        this.barcodescaninput.setFocus();
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
