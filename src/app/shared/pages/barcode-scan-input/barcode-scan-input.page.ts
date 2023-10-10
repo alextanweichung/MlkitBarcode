@@ -259,12 +259,12 @@ export class BarcodeScanInputPage implements OnInit {
         } else {
           this.toastService.presentToast("", "No Item Found", "top", "danger", 1000);
         }
+        console.log("🚀 ~ file: barcode-scan-input.page.ts:263 ~ BarcodeScanInputPage ~ validateItem ~ found_item_master:", JSON.stringify(found_item_master))
+        console.log("🚀 ~ file: barcode-scan-input.page.ts:271 ~ BarcodeScanInputPage ~ validateItem ~ this.availableVariations:", JSON.stringify(this.availableVariations))
         if (found_item_master && found_item_master.length === 1) { // only 1 item found
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
           if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
             this.showVariationModal();
-          } else { // else simple item model
-            this.showItemModal();
           }
         } else if (found_item_master && found_item_master.length > 0 && this.availableVariations && this.availableVariations.length > 0) { // if item found, and has barcode tag
           this.showItemModal();

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, DoCheck, IterableDiffers, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, IonDatetime, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
@@ -248,6 +248,10 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
     }
   }
 
+  test(ttttt) {
+    console.log("🚀 ~ file: consignment-sales-header.page.ts:252 ~ ConsignmentSalesHeaderPage ~ test ~ ttttt:", ttttt)
+  }
+
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
@@ -278,21 +282,21 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
   async nextStep() {
     try {
       if (this.objectForm.valid) {
-        this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), "yyyy-MM-dd"), this.objectForm.controls.toLocationId.value).subscribe(response => {
-          if (response) {
-            let navigationExtras: NavigationExtras = {
-              queryParams: {
-                objectId: response.header.consignmentSalesId
-              }
-            }
-            this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item", navigationExtras);
-          } else {
+        // this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), "yyyy-MM-dd"), this.objectForm.controls.toLocationId.value).subscribe(response => {
+        //   if (response) {
+        //     let navigationExtras: NavigationExtras = {
+        //       queryParams: {
+        //         objectId: response.header.consignmentSalesId
+        //       }
+        //     }
+        //     this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item", navigationExtras);
+        //   } else {
             this.objectService.setHeader(this.objectForm.value);
             this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item");
-          }
-        }, error => {
-          throw error;
-        })
+        //   }
+        // }, error => {
+        //   throw error;
+        // })
       }
     } catch (e) {
       console.error(e);
