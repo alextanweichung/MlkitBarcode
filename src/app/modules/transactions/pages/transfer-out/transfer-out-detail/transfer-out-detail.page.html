@@ -98,6 +98,14 @@
               <div>{{object.totalCarton|number:'1.0'}}</div>
             </ion-col>
           </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> Total Quantity</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{object.line|sum:"lineQty"|number:"1.0"}}
+            </ion-col>
+          </ion-row>
         </ion-grid>
       </ion-item>
     </ion-list>
@@ -120,10 +128,31 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
+
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item class="ion-no-padding no-ripple" *ngFor="let l of object.line">
+      
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
+            <ion-col size="1"class="ion-flex ion-margin-auto">
+              <div class="ion-flex my-auto font-bold">No.</div>
+            </ion-col>
+            <ion-col size="9"class="ion-flex ion-margin-auto">
+              <div class="ion-flex my-auto font-bold">Item</div>
+            </ion-col>
+            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+              <div class="ion-flex my-auto font-bold">Quantity</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let l of object.line; let i = index">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col size="1" class="ion-flex ion-margin-auto">
+              <ion-badge><div class="ion-text-right">{{i|number:'1.0'}}</div></ion-badge>
+            </ion-col>
             <ion-col size="9">
               <ion-grid class="ion-no-padding">
                 <ion-row>
@@ -147,7 +176,7 @@
                 </ion-row>
               </ion-grid>
             </ion-col>
-            <ion-col size="3" class="ion-flex ion-margin-auto justify-content-center">
+            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
               <div>{{l.lineQty|number:'1.0'}}</div>
             </ion-col>
           </ion-row>

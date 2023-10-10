@@ -8,6 +8,7 @@ import { TransferInDetailPageRoutingModule } from './transfer-in-detail-routing.
 
 import { TransferInDetailPage } from './transfer-in-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     TransferInDetailPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    SumModule
   ],
   declarations: [TransferInDetailPage]
 })
