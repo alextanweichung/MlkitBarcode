@@ -8,6 +8,8 @@ import { ModuleControl } from '../../models/module-control';
 import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -32,7 +34,8 @@ export class BarcodeScanInputPage implements OnInit {
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -336,6 +339,10 @@ export class BarcodeScanInputPage implements OnInit {
 
   /* #region focus */
 
+  @Input() scanActive: boolean;
+  @Output() onCameraStatusChanged = new EventEmitter<boolean>();
+  @Output() onDoneScanning = new EventEmitter<string>();
+
   scanningMethodChanged() {
     setTimeout(() => {
       this.setFocus();
@@ -356,6 +363,62 @@ export class BarcodeScanInputPage implements OnInit {
 
   focusItemSearch() {
     this.itemInput.nativeElement.focus();
+  }
+
+  /* #endregion */
+
+  /* #region camera scanner */
+
+  async startScanning() {
+    const allowed = await this.checkPermission();
+    if (allowed) {
+      // this.scanActive = true;
+      this.onCameraStatusChanged.emit(true);
+      const result = await BarcodeScanner.startScan();
+      if (result.hasContent) {
+        let barcode = result.content;
+        // this.scanActive = false;
+        this.onCameraStatusChanged.emit(false);
+        barcode = this.manipulateBarcodeCheckDigit(barcode);
+        await this.onDoneScanning.emit(barcode);
+      }
+    }
+  }
+
+  async checkPermission() {
+    return new Promise(async (resolve) => {
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      if (status.granted) {
+        resolve(true);
+      } else if (status.denied) {
+        const alert = await this.alertController.create({
+          header: 'No permission',
+          message: 'Please allow camera access in your setting',
+          buttons: [
+            {
+              text: 'Open Settings',
+              handler: () => {
+                BarcodeScanner.openAppSettings();
+                resolve(false);
+              },
+            },
+            {
+              text: 'No',
+              role: 'cancel',
+            },
+          ],
+        });
+        await alert.present();
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged.emit(false);
   }
 
   /* #endregion */

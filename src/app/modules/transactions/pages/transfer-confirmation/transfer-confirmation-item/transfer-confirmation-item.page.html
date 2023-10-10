@@ -13,7 +13,7 @@
       <ion-label class="label-title">Details</ion-label>
     </ion-toolbar>
   </ion-header>
-  <app-barcode-scan-input (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+  <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
   <div class="pl-2 pr-2 pb-2">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="selectedObject">
       <ion-item-sliding *ngFor="let l of selectedObject?.line; let i = index">
@@ -66,4 +66,9 @@
   </ion-button>
 </ion-footer>
 
-<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+<ion-row class="scanner-buttons" [hidden]="!scanActive">
+  <ion-col class="ion-no-padding">
+    <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
+  </ion-col>
+</ion-row>
+<div class="scan-box" [hidden]="!scanActive"></div>

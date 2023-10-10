@@ -11,7 +11,6 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { NgCircleProgressModule } from 'ng-circle-progress';
-import { HideKeyboardDirective } from 'src/app/shared/utilities/hide-keyboard.directive';
 import HideKeyboardModule from 'src/app/shared/utilities/hide-keyboard.module';
 
 @NgModule({

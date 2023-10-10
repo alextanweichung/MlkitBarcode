@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
 import { TransferInLine, TransferInRoot } from 'src/app/modules/transactions/models/transfer-in';
 import { TransferInService } from 'src/app/modules/transactions/services/transfer-in.service';
@@ -191,6 +192,12 @@ export class TransferInItemPage implements OnInit, OnDestroy {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

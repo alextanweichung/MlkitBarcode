@@ -9,7 +9,6 @@ import { TransferOutEditPageRoutingModule } from './transfer-out-edit-routing.mo
 import { TransferOutEditPage } from './transfer-out-edit.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
-import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
@@ -21,8 +20,7 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     SearchDropdownPageModule,
     CalendarInputPageModule,
     ReactiveFormsModule,
-    BarcodeScanInputPageModule,
-    CameraScanInputPageModule
+    BarcodeScanInputPageModule
   ],
   declarations: [TransferOutEditPage]
 })

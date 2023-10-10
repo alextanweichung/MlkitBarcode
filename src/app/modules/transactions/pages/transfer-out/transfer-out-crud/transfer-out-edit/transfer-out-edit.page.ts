@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, ActionSheetController, AlertController, IonDatetime } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
@@ -239,6 +240,12 @@ export class TransferOutEditPage implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

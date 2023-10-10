@@ -14,6 +14,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Keyboard } from '@capacitor/keyboard';
 import { format, parseISO } from 'date-fns';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 @Component({
   selector: 'app-transfer-out-add',
@@ -234,6 +235,12 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

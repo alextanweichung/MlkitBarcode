@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { ActionSheetController, AlertController, IonDatetime, NavController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { StockReorderLine, StockReorderRoot } from 'src/app/modules/transactions/models/stock-reorder';
@@ -203,6 +204,12 @@ export class StockReorderAddPage implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

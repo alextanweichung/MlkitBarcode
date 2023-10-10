@@ -88,4 +88,5 @@ export class CameraScanInputPage implements OnInit {
   }
 
   /* #endregion */
+  
 }

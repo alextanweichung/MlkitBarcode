@@ -18,8 +18,7 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
     IonicModule,
     StockCountItemPageRoutingModule,
     IdMappingModule,
-    BarcodeScanInputPageModule,
-    CameraScanInputPageModule
+    BarcodeScanInputPageModule
   ],
   declarations: [StockCountItemPage]
 })

@@ -11,6 +11,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CurrentPickList, MultiPickingCarton, MultiPickingObject, MultiPickingOutstandingPickList, MultiPickingRoot, PickingLineVariation } from 'src/app/modules/transactions/models/picking';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 @Component({
   selector: 'app-picking-item',
@@ -623,6 +624,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

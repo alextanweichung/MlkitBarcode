@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, ActionSheetController, AlertController, IonPopover } from '@ionic/angular';
 import { TransferInScanningLine, TransferInScanningRoot } from 'src/app/modules/transactions/models/transfer-in-scanning';
 import { TransferInScanningService } from 'src/app/modules/transactions/services/transfer-in-scanning.service';
@@ -286,6 +287,12 @@ export class TransferInScanningEditPage implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

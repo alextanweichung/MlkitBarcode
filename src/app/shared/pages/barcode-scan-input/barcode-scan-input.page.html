@@ -1,25 +1,29 @@
-  <ion-segment [scrollable]="true" [(ngModel)]="selectedScanningMethod" (ionChange)="scanningMethodChanged()">
-    <ion-segment-button value="I">
-      <ion-label>By Item</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="B">
-      <ion-label>By Barcode</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+<ion-segment [scrollable]="true" [(ngModel)]="selectedScanningMethod" (ionChange)="scanningMethodChanged()">
+  <ion-segment-button value="I">
+    <ion-label>By Item</ion-label>
+  </ion-segment-button>
+  <ion-segment-button value="B">
+    <ion-label>By Barcode</ion-label>
+  </ion-segment-button>
+</ion-segment>
 
-  <ion-grid class="ion-no-padding">
-    <ion-row>
-      <ion-col class="ion-flex ion-margin-auto" size="10">
-        <input #barcodeInput hideKeyboard class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'B' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="barcodeSearchValue" placeholder="Enter or Scan Barcode" (keydown)="handleBarcodeKeyDown($event, barcodeSearchValue)">
-        <input #itemInput class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'I' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter or Scan Item Code/Sku" (keydown)="handleItemCodeKeyDown($event, itemSearchValue)">
-      </ion-col>
-      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-        <ion-button size="small" fill="clear" (click)="showKeyboard($event)">
-          <i slot="icon-only" class="fas fa-keyboard"></i>
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+<ion-grid class="ion-no-padding">
+  <ion-row>
+    <ion-col class="ion-flex ion-margin-auto" [size]="selectedScanningMethod === 'B' ? '8': '10'">
+      <input #barcodeInput hideKeyboard class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'B' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="barcodeSearchValue" placeholder="Enter or Scan Barcode" (keydown)="handleBarcodeKeyDown($event, barcodeSearchValue)">
+      <input #itemInput class="p-2 ion-flex ion-text-center" [type]="selectedScanningMethod === 'I' ? 'text' : 'hidden'" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Enter or Scan Item Code/Sku" (keydown)="handleItemCodeKeyDown($event, itemSearchValue)">
+    </ion-col>
+    <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedScanningMethod === 'B'">
+      <ion-button fill="clear" (click)="startScanning()">
+        <!-- <ion-icon slot="icon-only" name="camera-outline"></ion-icon> -->
+        <i slot="icon-only" class="fas fa-camera"></i>
+      </ion-button>
+      <ion-button fill="clear" (click)="showKeyboard($event)">
+        <i slot="icon-only" class="fas fa-keyboard"></i>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
 
 <ion-modal #itemModal [isOpen]="itemModalOpen" (didDismiss)="itemModalOpen = false">
   <ng-template>

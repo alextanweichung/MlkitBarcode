@@ -22,7 +22,6 @@ import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-i
     BarcodeScanInputPageModule,
     ItemAddListFlatPageModule,
     IdMappingModule,
-    CameraScanInputPageModule,
     ItemCodeInputOfflinePageModule
   ],
   declarations: [ConsignmentSalesItemPage]

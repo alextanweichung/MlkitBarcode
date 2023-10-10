@@ -4,7 +4,7 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>{{objectId && objectId > 0 ? "Cancel" : "Back"}}</ion-button>
     </ion-buttons>
-    <ion-buttons slot="end">
+    <ion-buttons slot="end">      
       <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -30,9 +30,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    
-    <app-barcode-scan-input (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
-
+    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding #slidingItem *ngFor="let line of objectService.detail; let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="highlight(qtyRequestInput)">
@@ -135,7 +133,12 @@
   </ion-button>
 </ion-footer>
 
-<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+<ion-row class="scanner-buttons" [hidden]="!scanActive">
+  <ion-col class="ion-no-padding">
+    <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
+  </ion-col>
+</ion-row>
+<div class="scan-box" [hidden]="!scanActive"></div>
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
   <ng-template>

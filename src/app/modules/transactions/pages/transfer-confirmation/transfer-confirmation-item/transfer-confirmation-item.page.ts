@@ -7,6 +7,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 @Component({
   selector: 'app-transfer-confirmation-item',
@@ -144,6 +145,12 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   async validateBarcode(barcode: string) {

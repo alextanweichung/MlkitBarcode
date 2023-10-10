@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, AlertController, IonAccordionGroup } from '@ionic/angular';
 import { GoodsPackingHeader, GoodsPackingLine, GoodsPackingRoot, GoodsPackingSummary } from 'src/app/modules/transactions/models/packing';
 import { PackingSalesOrderDetail, PackingSalesOrderRoot } from 'src/app/modules/transactions/models/packing-sales-order';
@@ -281,6 +282,12 @@ export class PackingItemPage implements OnInit {
     if (event) {
       await this.validateBarcode(event);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */

@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { AlertController, NavController, ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -19,7 +20,7 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
   styleUrls: ['./stock-count-item.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
-export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
+export class StockCountItemPage implements OnInit, ViewDidEnter {
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -34,10 +35,6 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
     private configService: ConfigService,
     private toastService: ToastService
   ) { }
-  
-  ionViewWillEnter(): void {
-    
-  }
 
   ionViewDidEnter(): void {
     try {
@@ -59,7 +56,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
     this.loadModuleControl();
   }
 
-  moduleControl: ModuleControl[] = [];  
+  moduleControl: ModuleControl[] = [];
   systemWideEAN13IgnoreCheckDigit: boolean = false;
   loadModuleControl() {
     try {
@@ -103,7 +100,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
               description: found_item_master.itemDesc,
               variationTypeCode: found_item_master.varCd,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: (found_item_master.discPct??"0") + '%',
+              discountExpression: (found_item_master.discPct ?? "0") + '%',
               taxId: found_item_master.taxId,
               taxCode: found_item_master.taxCd,
               taxPct: found_item_master.taxPct,
@@ -112,8 +109,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                 itemId: found_item_master.id,
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
-                discountExpression: (found_item_master.discPct??"0") + '%',
-                discountPercent: found_item_master.discPct??0,
+                discountExpression: (found_item_master.discPct ?? "0") + '%',
+                discountPercent: found_item_master.discPct ?? 0,
                 discountGroupId: null,
                 unitPriceMin: null,
                 currencyId: null
@@ -177,7 +174,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
           }
           break;
       }
-  
+
       if (this.detail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
         this.detail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
       } else {
@@ -275,7 +272,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   /* #endregion */
 
-  /* #region  barcode scanner */
+  /* #region  camera scanner */
 
   scanActive: boolean = false;
   onCameraStatusChanged(event) {
@@ -289,6 +286,12 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
     if (event) {
       await this.validateBarcode(event);
     }
+  }
+
+  stopScanner() {
+    BarcodeScanner.stopScan();
+    // this.scanActive = false;
+    this.onCameraStatusChanged(false);
   }
 
   /* #endregion */
@@ -320,7 +323,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             role: "cancel",
             cssClass: "cancel",
             handler: async () => {
-  
+
             }
           }
         ]

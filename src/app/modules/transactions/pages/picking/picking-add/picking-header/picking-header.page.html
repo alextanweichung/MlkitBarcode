@@ -5,7 +5,10 @@
       <ion-button (click)="cancelInsert()">
         <ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel
       </ion-button>
-    </ion-buttons>
+    </ion-buttons>    
+    <ion-buttons slot="primary">
+      <app-camera-scan-input #cameraScanInput *ngIf="isButtonVisible && isWithSo ==='true'" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+    </ion-buttons>    
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen [hidden]="scanActive">
@@ -168,9 +171,10 @@
     </ion-button>
   </div>
 </ion-content>
-<!-- <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
-  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-    Next
-  </ion-button>
-</ion-footer> -->
-<app-camera-scan-input #cameraScanInput *ngIf="isButtonVisible && isWithSo ==='true'" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+
+<ion-row class="scanner-buttons" [hidden]="!scanActive">
+  <ion-col class="ion-no-padding">
+    <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
+  </ion-col>
+</ion-row>
+<div class="scan-box" [hidden]="!scanActive"></div>

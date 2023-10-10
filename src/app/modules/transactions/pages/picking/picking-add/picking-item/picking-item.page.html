@@ -39,10 +39,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-
-    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
-    <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
-
+    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.header.isWithSo && showItemList">
       <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
         <circle-progress slot="start" [percent]="objectService.getProgressByItemCode(i)"></circle-progress>
@@ -123,7 +120,13 @@
     {{(objectService.header.multiPickingId??0 )=== 0 ? 'Insert' : 'Update'}}
   </ion-button>
 </ion-footer>
-<app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+
+<ion-row class="scanner-buttons" [hidden]="!scanActive">
+  <ion-col class="ion-no-padding">
+    <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
+  </ion-col>
+</ion-row>
+<div class="scan-box" [hidden]="!scanActive"></div>
 
 <ion-modal [isOpen]="isImageModalOpen" [initialBreakpoint]="1" [breakpoints]="[0, 1]" (ionModalDidDismiss)="isImageModalOpen = false">
   <ng-template>
