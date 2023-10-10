@@ -4,9 +4,6 @@
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
-    <ion-buttons slot="primary">
-      <app-camera-scan-input [scanActive]="scanActive" [systemWideEAN13IgnoreCheckDigit]="systemWideEAN13IgnoreCheckDigit" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen [hidden]="scanActive">
@@ -16,7 +13,7 @@
     </ion-toolbar>
   </ion-header>
   <div class="p-2">
-    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding #slidingItem *ngFor="let line of objectDetail; let i = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">

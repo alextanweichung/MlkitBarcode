@@ -66,7 +66,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
     if (Capacitor.getPlatform() === "web") {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
-      this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+      this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
       this.signin_form.get("password").setValue("Dev8888");
