@@ -126,7 +126,6 @@ export class SearchDropdownPage implements OnInit, OnChanges {
   }
 
   assignToTemp(startIndex: number, size: number) {
-    this.tempDropdownList = [];
     if (this.searchText && this.searchText.length > 0) {
       this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code?.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description?.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
     } else {
