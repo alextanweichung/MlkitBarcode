@@ -85,10 +85,44 @@ export class TransferInScanningDetailPage implements OnInit, ViewWillEnter {
     await alert.present();
   }
 
+  async undoObjectAlert() {
+    const alert = await this.alertController.create({
+      header: "Are you sure to proceed?",
+      cssClass: "custom-action-sheet",
+      buttons: [
+        {
+          text: "Yes",
+          role: "confirm",
+          cssClass: "success",
+          handler: async () => {
+            this.undoObject();
+          },
+        },
+        {
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "cancel",
+        },
+      ],
+    });
+    await alert.present();
+  }
+
   completeObject() {
     this.objectService.completeObject(this.objectId).subscribe(response => {
       if (response.status === 204) {
         this.toastService.presentToast("", "Transfer Adjustment generated", "top", "success", 1000);
+        this.loadObject();
+      }
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  undoObject() {
+    this.objectService.undoObject(this.objectId).subscribe(response => {
+      if (response.status === 204) {
+        this.toastService.presentToast("", "Transfer Adjustment undo", "top", "success", 1000);
         this.loadObject();
       }
     }, error => {

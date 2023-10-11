@@ -119,6 +119,10 @@ export class TransferInScanningService {
     return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileTransferInScanning/generateDocument/${objectId}`, null, httpObserveHeader)
   }
 
+  undoObject(objectId: number) {
+    return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileTransferInScanning/undoDocument/${objectId}`, null, httpObserveHeader)
+  }
+
   // for web testing 
   validateBarcode(barcode: string) {
     return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileTransferInScanning/itemByBarcode/" + barcode);
