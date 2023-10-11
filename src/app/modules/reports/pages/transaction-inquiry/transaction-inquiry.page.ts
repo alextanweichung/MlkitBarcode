@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonDatetime, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -90,6 +90,21 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
     this.selectedCustomer = event;
   }
 
+  /* #region more action popover */
+
+  isPopoverOpen: boolean = false;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+  showPopover(event) {
+    try {
+      this.popoverMenu.event = event;
+      this.isPopoverOpen = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
+
   /* #region select all */
 
   SelectionType = SelectionType;
@@ -101,6 +116,38 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
 
   onActivate(event) {
 
+  }
+
+  async printAllAlert() {
+    try {
+      if (this.selected && this.selected.length > 0) {
+        console.log("🚀 ~ file: transaction-inquiry.page.ts:109 ~ TransactionInquiryPage ~ printAllAlert ~ this.selected:", this.selected)
+        const alert = await this.alertController.create({
+          header: `Download ${this.selected.length} PDF?`,
+          message: "",
+          buttons: [
+            {
+              text: "OK",
+              cssClass: "success",
+              role: "confirm",
+              handler: async () => {
+                await this.downloadPdf(this.selected);
+              },
+            },
+            {
+              cssClass: "cancel",
+              text: "Cancel",
+              role: "cancel"
+            },
+          ]
+        });
+        await alert.present();
+      } else {
+        this.toastService.presentToast("", "Please choose at least 1 document to print", "top", "danger", 1000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /* #endregion */
@@ -118,7 +165,7 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
             cssClass: "success",
             role: "confirm",
             handler: async () => {
-              await this.downloadPdf(object);
+              await this.downloadPdf([object]);
             },
           },
           {
@@ -134,11 +181,11 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
     }
   }
 
-  async downloadPdf(object: TransactionInquiryObject) {
-    if (object) {
+  async downloadPdf(object: TransactionInquiryObject[]) {
+    if (object && object.length > 0) {
       let appCode = "";
       let reportName = "";
-      switch (object.type) {
+      switch (object[0].type) {
         case "SalesOrder":
           appCode = "SMSC002";
           reportName = "Sales Order";
@@ -160,13 +207,13 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
         let paramModel: ReportParameterModel = {
           appCode: appCode,
           format: "pdf",
-          documentIds: [object.docId],
+          documentIds: object.flatMap(r => r.docId),
           reportName: reportName
         }
         let timestart = new Date();
         await this.objectService.getPdf(paramModel).subscribe(async response => {
           let timeend = new Date();
-          await this.commonService.commonDownloadPdf(response, object.docNum + "." + paramModel.format);
+          await this.commonService.commonDownloadPdf(response, (object.length > 1 ? object[0].type.replace(" ", "") : object[0].docNum) + "." + paramModel.format);
           this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), "top", "success", 1000);
         }, error => {
           console.log(error);
