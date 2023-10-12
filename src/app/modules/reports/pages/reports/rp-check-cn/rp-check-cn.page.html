@@ -31,6 +31,9 @@
       <app-search-multi-dropdown title="Debtor" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"  [searchDropdownList]="customerSearchDropdownList" (onActionComplete)="onCustomerSelected($event)"></app-search-multi-dropdown>
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" (click)="loadReport()">Search</ion-button>
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
+      <ion-label>Nothing found!</ion-label>
+    </ion-list-header>
     <ngx-datatable *ngIf="objects && objects.length > 0"
       class="fullscreen material mt-2"
       [rows]="objects" 

@@ -95,6 +95,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     }
     this.objectService.getSOListing(obj).subscribe(response => {
       this.objects = response;
+      this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
     }, error => {
       throw error;
     })

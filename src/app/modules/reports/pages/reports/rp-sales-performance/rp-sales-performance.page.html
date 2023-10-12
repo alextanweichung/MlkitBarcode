@@ -47,6 +47,9 @@
       <app-calendar-input title="End Date" [date_value]="endDate" (onDateSelected)="onEndDateSelected($event)"></app-calendar-input> -->
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" [disabled]="!(startDateValue || endDateValue)" (click)="loadReport()">Search</ion-button>
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
+      <ion-label>Nothing found!</ion-label>
+    </ion-list-header>
     <ngx-datatable *ngIf="objects && objects.length > 0"
       class="fullscreen material mt-2"
       [rows]="objects" 

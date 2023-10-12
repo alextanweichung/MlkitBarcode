@@ -11,6 +11,9 @@
   <div class="p-2">
     <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (search)="search(searchbar.value, true)" (ionChange)="itemSearchText=''; objects=[]; realObject=[];"></ion-searchbar>
     <div class="prefix-css" *ngIf="realObject && realObject.length > 0">
+      <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!realObject || realObject?.length === 0">
+        <ion-label>Nothing found!</ion-label>
+      </ion-list-header>
       <ngx-datatable
       class="fullscreen material mt-2"
       [rows]="realObject" 

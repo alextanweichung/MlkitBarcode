@@ -77,6 +77,7 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
       wildDocNum: this.docNum
     }).subscribe(response => {
       this.object = response;
+      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 300, true);
     }, error => {
       console.error(error);
     })
@@ -121,7 +122,6 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   async printAllAlert() {
     try {
       if (this.selected && this.selected.length > 0) {
-        console.log("🚀 ~ file: transaction-inquiry.page.ts:109 ~ TransactionInquiryPage ~ printAllAlert ~ this.selected:", this.selected)
         const alert = await this.alertController.create({
           header: `Download ${this.selected.length} PDF?`,
           message: "",

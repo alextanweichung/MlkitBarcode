@@ -58,6 +58,9 @@
       </ion-modal>
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" (click)="loadDebtorReport()">Search</ion-button>
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
+      <ion-label>Nothing found!</ion-label>
+    </ion-list-header>
     <ngx-datatable *ngIf="objects && objects.length > 0"
       class="material mt-2"
       [rows]="objects" 

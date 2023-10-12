@@ -9,6 +9,7 @@ import { SalesAnalysisPageRoutingModule } from './sales-analysis-routing.module'
 import { SalesAnalysisPage } from './sales-analysis.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
     IonicModule,
     SalesAnalysisPageRoutingModule,
     SearchDropdownPageModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    SumModule
   ],
   declarations: [SalesAnalysisPage]
 })

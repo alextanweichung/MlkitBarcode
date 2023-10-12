@@ -1,13 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
-import { SelectionType } from '@swimlane/ngx-datatable';
 import { format, parseISO } from 'date-fns';
-import { Customer } from 'src/app/modules/transactions/models/customer';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TransactionInquiryObject } from '../../models/transaction-inquiry';
 import { ReportsService } from '../../services/reports.service';
 import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
 import { SalesAnalysisObject } from '../../models/sales-analysis';
@@ -76,6 +72,7 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
       locationId: this.selectedLocation.id
     }).subscribe(response => {
       this.object = response;
+      this.toastService.presentToast("Search Complete", `${this.object.length} record(s) found.`, "top", "success", 300, true);
     }, error => {
       console.error(error);
     })

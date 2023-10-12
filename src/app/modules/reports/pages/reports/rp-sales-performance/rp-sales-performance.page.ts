@@ -49,6 +49,7 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
           this.objects.forEach(r => {
             r.netAmount = r.invoiceAmt - r.cnAmount + r.soAmount;
           })
+          this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
         }, error => {
           throw error;
         })

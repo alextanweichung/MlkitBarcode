@@ -83,7 +83,7 @@ export class DebtorLatestOutstandingPage implements OnInit, ViewWillEnter {
     }
     this.objectService.getDebtorOutstanding(obj).subscribe(response => {
       this.objects = response;
-      this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+      this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
     }, error => {
       console.log(error);
     })

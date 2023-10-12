@@ -49,7 +49,7 @@ export class RpCheckQohPage implements OnInit {
         this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(response => {
           this.objects = response;
           this.massageData();
-          this.toastService.presentToast("Search Complete", `${this.objects.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+          this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
         })
       } else {
         this.toastService.presentToast("Enter at least 3 characters to start searching", "", "top", "warning", 1000);
