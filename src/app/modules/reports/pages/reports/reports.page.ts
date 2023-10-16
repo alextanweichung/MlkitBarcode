@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoginUser } from 'src/app/services/auth/login-user';
 import { moduleCode, reportAppCode } from 'src/app/shared/models/acl-const';
+import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
+import { ReportsService } from '../../services/reports.service';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
   selector: 'app-reports',
@@ -10,7 +14,8 @@ import { moduleCode, reportAppCode } from 'src/app/shared/models/acl-const';
 })
 export class ReportsPage implements OnInit {
 
-  loginUser: any;
+  loginUser: LoginUser;
+  isConsignmentUser: boolean = false;
 
   showDebtorLatestOutstanding: boolean = false;
   showSOListing: boolean = false;
@@ -23,6 +28,8 @@ export class ReportsPage implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private objectService: ReportsService,
+    private commonService: CommonService,
     private navController: NavController,
   ) { }
 
@@ -46,10 +53,29 @@ export class ReportsPage implements OnInit {
     }
     
     this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    this.isConsignmentUser = this.loginUser.loginUserType === "C";
   }
 
   goToReport(link: string) {
     this.navController.navigateRoot(`/reports/${link}`);
+  }
+
+  async downloadCustomerDetails() {
+    if (this.isConsignmentUser && this.loginUser.salesAgentId) {
+      let paramModel: ReportParameterModel = {
+        appCode: "SMMD001",
+        format: "pdf",
+        documentIds: [this.loginUser.salesAgentId],
+        reportName: "Customer Listing By Latest Sales Agent",
+      }
+      let timestart = new Date();
+      await this.objectService.getPdf(paramModel).subscribe(async response => {
+        let timeend = new Date();
+        await this.commonService.commonDownloadPdf(response, "MyCustomerDetail." + paramModel.format);
+      }, error => {
+        console.log(error);
+      })
+    }
   }
 
 }

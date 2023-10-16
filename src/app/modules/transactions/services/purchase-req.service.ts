@@ -85,7 +85,8 @@ export class PurchaseReqService {
         workFlowTransactionId: object.header.workFlowTransactionId,
         countryId: object.header.countryId,
         currencyId: object.header.currencyId,
-        currencyRate: object.header.currencyRate
+        currencyRate: object.header.currencyRate,
+        remark: object.header.remark
       },
       details: line
     }

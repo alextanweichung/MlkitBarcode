@@ -331,9 +331,10 @@ export class CommonService {
   }
 
   roundToPrecision(inputNumber: number, precision: number): number {
+    let factor = Math.pow(10, precision);
     try {
       if (inputNumber) {
-        return Number(inputNumber.toFixed(precision));
+        return Math.round(Number((inputNumber * factor).toFixed(precision))) / factor;
       } else {
         return null;
       }
@@ -381,7 +382,7 @@ export class CommonService {
           trxLine.discountAmtExTax = this.computeAmtExclTax(totalDiscAmt, trxLine.taxPct);
           trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
           trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-          trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+          trxLine.subTotal = (quantity * unitPrice) - trxLine.discountAmt;
           trxLine.subTotalExTax = (quantity * this.computeAmtExclTax(unitPrice, trxLine.taxPct)) - trxLine.discountAmtExTax;
           trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
           trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);
@@ -406,7 +407,7 @@ export class CommonService {
         trxLine.discountAmtExTax = totalDiscAmt;
         trxLine.discountAmt = this.roundToPrecision(trxLine.discountAmt, roundingPrecision);
         trxLine.discountAmtExTax = this.roundToPrecision(trxLine.discountAmtExTax, roundingPrecision);
-        trxLine.subTotal = (quantity * unitPrice) - totalDiscAmt;
+        trxLine.subTotal = (quantity * unitPrice) - trxLine.discountAmt;
         trxLine.subTotalExTax = trxLine.subTotal
         trxLine.subTotal = this.roundToPrecision(trxLine.subTotal, roundingPrecision);
         trxLine.subTotalExTax = this.roundToPrecision(trxLine.subTotalExTax, roundingPrecision);

@@ -100,6 +100,24 @@
         </ion-grid>
       </ion-item>
     </ion-list>
+    
+    <div *ngIf="object && object.header.remark && object.header.remark.length > 0">
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label>Remark</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item class="ion-no-padding no-ripple">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div>{{object.header.remark}}</div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+    </div>
+    
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
