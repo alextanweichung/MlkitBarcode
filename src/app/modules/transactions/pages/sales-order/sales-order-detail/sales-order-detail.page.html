@@ -61,10 +61,16 @@
             <div>Status</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); isShowDisabledLine = !isShowDisabledLine">
-          <ion-icon name="{{isShowDisabledLine ? 'eye-off-outline' : 'eye-outline'}}" slot="end"></ion-icon>
+        <ion-item (click)="popover.dismiss(); showDisabledLine = !showDisabledLine">
+          <ion-icon name="{{showDisabledLine ? 'eye-off-outline' : 'eye-outline'}}" slot="end"></ion-icon>
           <ion-label>
-            <div>{{isShowDisabledLine ? "Hide Disabled Line" : "Show Disabled Line"}}</div>
+            <div>{{showDisabledLine ? "Hide Disabled Line" : "Show Disabled Line"}}</div>
+          </ion-label>
+        </ion-item>
+        <ion-item (click)="popover.dismiss(); showAdditionalInfo = !showAdditionalInfo">
+          <ion-icon name="{{showAdditionalInfo ? 'eye-off-outline' : 'eye-outline'}}" slot="end"></ion-icon>
+          <ion-label>
+            <div>{{showAdditionalInfo ? "Hide Add. Info" : "Show Add. Info"}}</div>
           </ion-label>
         </ion-item>
         <ion-item *ngIf="processType && selectedSegment === 'pending' && !isDraft" (click)="popover.dismiss(); presentApprovalAlert('CONFIRM')">
@@ -201,28 +207,122 @@
         </ion-grid>
       </ion-item>
     </ion-list>
-    <div *ngIf="object && object.header.remark && object.header.remark.length > 0">
+
+    <ng-container *ngIf="showAdditionalInfo">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-        <ion-label>Remark</ion-label>
+        <ion-label>Additional Info</ion-label>
       </ion-list-header>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item class="ion-no-padding no-ripple">
+        <ion-item button detail="false" class="ion-no-padding no-ripple">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Remark</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
                 <div>{{object.header.remark}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Ship Method</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipMethodId|idMapping:objectService.shipMethodMasterList}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Delivery Date</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{formattedDateString}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Customer PO</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.customerPo}}</div>
               </ion-col>
             </ion-row>
           </ion-grid>
         </ion-item>
       </ion-list>
-    </div>
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+        <ion-label>Delivery Address</ion-label>
+      </ion-list-header>        
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button detail="false" class="ion-no-padding no-ripple">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Address</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipAddress}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Postcode</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipPostCode}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Phone</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipPhone}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Email</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipEmail}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Fax</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipFax}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Area</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.shipAreaId|idMapping:objectService.areaMasterList}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Attention</div>
+              </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.attention}}</div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" items="full">
       <ng-container *ngFor="let item of object.details">
-        <ion-item [ngClass]="{'color-blue': (item.isPricingApproval && !item.deactivated), 'color-danger' : item.deactivated }" class="ion-no-padding no-ripple" (click)="showDetails(item)" *ngIf="!item.deactivated || isShowDisabledLine">
+        <ion-item [ngClass]="{'color-blue': (item.isPricingApproval && !item.deactivated), 'color-danger' : item.deactivated }" class="ion-no-padding no-ripple" (click)="showDetails(item)" *ngIf="!item.deactivated || showDisabledLine">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">

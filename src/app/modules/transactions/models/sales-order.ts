@@ -92,6 +92,7 @@ export interface SalesOrderHeader {
   isPriorityDate: Date
   deliveryDate: Date
   orderLifeCycle: string
+  customerPo: string
 
   /* #region  special to pass in precision */
   maxPrecision: number

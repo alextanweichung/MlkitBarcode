@@ -22,7 +22,7 @@
       <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
         <ng-template>
           <ion-content>
-            <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [ngModel]="dateValue" (ngModelChange)="test(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
+            <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [ngModel]="dateValue" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
               <ion-buttons slot="buttons">
                 <ion-button (click)="dateDismiss()" color="danger">Dismiss</ion-button>
                 <ion-button (click)="dateSelect()" color="primary">Select</ion-button>

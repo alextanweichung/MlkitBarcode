@@ -248,10 +248,6 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
     }
   }
 
-  test(ttttt) {
-    console.log("🚀 ~ file: consignment-sales-header.page.ts:252 ~ ConsignmentSalesHeaderPage ~ test ~ ttttt:", ttttt)
-  }
-
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({

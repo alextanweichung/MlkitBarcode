@@ -174,6 +174,30 @@
               <ion-select-option *ngFor="let s of objectService.shipMethodMasterList" [value]="s.id">{{s.description}}</ion-select-option>
             </ion-select>
           </ion-item>
+
+          <ion-item id="open-calendar-modal">
+            <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
+            <ion-label position="stacked">Delivery Date</ion-label>
+            <ion-text class="ion-no-padding-end pb-3" *ngIf="objectService.header.deliveryDate">{{formattedDateString}}</ion-text>
+          </ion-item>
+          <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
+            <ng-template>
+              <ion-content>
+                <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [ngModel]="dateValue" [preferWheel]="true" showDefaultTitle="true" presentation="date">
+                  <ion-buttons slot="buttons">
+                    <ion-button (click)="dateDismiss()" color="danger">Clear</ion-button>
+                    <ion-button (click)="dateSelect()" color="primary">Select</ion-button>
+                  </ion-buttons>
+                </ion-datetime>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+
+          <ion-item>
+            <ion-label position="stacked">Customer PO</ion-label>
+            <ion-input [(ngModel)]="objectService.header.customerPo" placeholder="Enter Customer PO"></ion-input>
+          </ion-item>
+
         </ion-list>
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>Delivery Address</ion-label>

@@ -1,7 +1,8 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonDatetime, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -54,6 +55,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
+    }
+    if (this.objectService.header.deliveryDate) {
+      this.dateValue = format(new Date(this.objectService.header.deliveryDate), "yyyy-MM-dd") + "T08:00:00.000Z";
+      this.setFormattedDateString();
     }
   }
 
@@ -774,5 +779,31 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       this.objectService.header.isPriorityDate = null
     }
   }
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+  
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectService.header.deliveryDate = new Date(format(new Date(value), 'yyyy-MM-dd') + "T00:00:00.000Z");
+  }
+
+  dateDismiss() {
+    this.objectService.header.deliveryDate = null;
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
+  }
+
+  /* #endregion */
 
 }

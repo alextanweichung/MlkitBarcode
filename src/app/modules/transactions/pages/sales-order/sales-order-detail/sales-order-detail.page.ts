@@ -13,6 +13,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { TrxChild } from 'src/app/shared/models/trx-child';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -30,7 +31,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   draftTransactionId: number;
   draftObject: DraftTransaction;
 
-  isShowDisabledLine: boolean = false;
+  showDisabledLine: boolean = false;
+  showAdditionalInfo: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -101,6 +103,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         }
         this.loadWorkflow(this.object.header.salesOrderId);
         this.objectService.setHeader(this.object.header);
+        console.log("🚀 ~ file: sales-order-detail.page.ts:104 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ this.object.header:", this.object.header)
         this.objectService.setChoosenItems(this.object.details);
       }, error => {
         throw error;
@@ -547,5 +550,14 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
+  
+  formattedDateString: string = "";
+  setFormattedDateString() {
+    if (this.object.header.deliveryDate) {
+      this.formattedDateString = format(parseISO(format(new Date(this.object.header.deliveryDate), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    } else {
+      this.formattedDateString = "";
+    }
+  }
 
 }
