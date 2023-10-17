@@ -15,6 +15,7 @@ export interface InterTransferList {
  export interface InterTransferRoot {
    header: InterTransferHeader
    details: TransactionDetail[]
+   cBMMapping: CBMMapping[]
  }
  
  export interface InterTransferHeader {
@@ -101,5 +102,14 @@ export interface TransferConfirmationLine {
   qty: number
   qtyReceive: number
   isDeleted: boolean
-  
+
+}
+
+export interface CBMMapping {
+  cbmValue: number
+  cbmMappingId: number
+  cartonQty: number
+  totalCBMValue: number
+  interTransferId: number
+  interTransferCbmId: number
 }

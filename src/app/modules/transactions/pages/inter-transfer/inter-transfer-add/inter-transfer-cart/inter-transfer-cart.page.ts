@@ -254,7 +254,8 @@ export class InterTransferCartPage implements OnInit, ViewWillEnter {
     try {
       let trxDto: InterTransferRoot = {
         header: this.objectHeader,
-        details: this.itemInCart
+        details: this.itemInCart,
+        cBMMapping: []
       }
       this.objectService.insertObject(trxDto).subscribe(response => {
         this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
