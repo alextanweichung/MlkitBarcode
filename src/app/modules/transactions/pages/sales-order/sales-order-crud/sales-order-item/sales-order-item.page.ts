@@ -42,6 +42,8 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
+    this.objectService.itemInCart = JSON.parse(JSON.stringify(this.objectService.itemInCart));
+    console.log("🚀 ~ file: sales-order-item.page.ts:46 ~ SalesOrderItemPage ~ ionViewWillEnter ~ this.objectService.itemInCart:", this.objectService.itemInCart)
     try {
       if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
         this.navController.navigateBack('/transactions/sales-order/sales-order-header');

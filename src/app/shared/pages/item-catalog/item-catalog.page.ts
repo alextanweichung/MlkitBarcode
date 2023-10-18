@@ -14,14 +14,14 @@ import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
-import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ViewWillEnter } from '@ionic/angular';
 
 @Component({
   selector: 'app-item-catalog',
   templateUrl: './item-catalog.page.html',
   styleUrls: ['./item-catalog.page.scss'],
 })
-export class ItemCatalogPage implements OnInit, OnChanges {
+export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
 
   @Input() itemInCart: TransactionDetail[] = [];
   @Input() keyId: number;
@@ -35,12 +35,13 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   @Input() showImage: boolean = false;
   @Input() showAvailQty: boolean = false;
   @Input() isSalesOrder: boolean = false;
+  @Input() isBackToBackOrder: boolean = false;
   @Input() disableIfPricingNotSet: boolean = true;
 
   brandMasterList: MasterListDetails[] = [];
   groupMasterList: MasterListDetails[] = [];
   categoryMasterList: MasterListDetails[] = [];
-  salesOrderQuantityControl: string = "0";  
+  salesOrderQuantityControl: string = "0";
   systemWideBlockConvertedCode: boolean = false;
   itemListLoadSize: number;
 
@@ -54,9 +55,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     private toastService: ToastService
   ) { }
 
+  ionViewWillEnter(): void {
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.itemInCart) {
-      this.computeQtyInCart();
+      this.computeQtyInCart();      
     }
   }
 
@@ -68,6 +72,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   moduleControl: ModuleControl[] = [];
+  configOrderingActivateMOQControl: boolean;
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
@@ -93,6 +98,17 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         this.systemWideBlockConvertedCode = false;
       }
       
+      let moqCtrl = this.moduleControl.find(x => x.ctrlName === "OrderingActivateMOQControl");
+      if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() == 'Y') {
+        if (this.isSalesOrder || this.isBackToBackOrder) {
+          this.configOrderingActivateMOQControl = true;
+        } else {
+          this.configOrderingActivateMOQControl = false;
+        }
+      } else {
+        this.configOrderingActivateMOQControl = false;
+      }
+
     })
   }
 
@@ -132,7 +148,9 @@ export class ItemCatalogPage implements OnInit, OnChanges {
           this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
           this.computeQtyInCart();
         })
-        this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
+        if (Capacitor.getPlatform() !== "web") {
+          this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
+        }
       } else {
         this.toastService.presentToast("Enter at least 3 characters to search", "", "top", "warning", 1000);
       }
@@ -223,6 +241,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
     item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
     item.oriUnitPrice = item.unitPrice;
     item.oriUnitPriceExTax = item.unitPriceExTax;
+
+    if (this.configOrderingActivateMOQControl) {
+      if (item.minOrderQty) {
+        item.minOrderQty = item.minOrderQty;
+      } else {
+        item.minOrderQty = 0;
+      }
+    }
   }
 
   calculatNetPrice(price, discountExpression) {
@@ -290,9 +316,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   addToCart(data: TransactionDetail) {
     let isBlock = this.validateNewItemConversion(data);
     if (!isBlock) {
-      this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
-      this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
-      data.qtyRequest = 0;
+      let validMinOrderQty = this.validateMinOrderQty(data);
+      if (validMinOrderQty) {
+        this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
+        this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
+        data.qtyRequest = null;
+      }
     }
   }
 
@@ -311,6 +340,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   itemVariationYMasterList: MasterListDetails[] = [];
   showModal(data: TransactionDetail) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
+    console.log("🚀 ~ file: item-catalog.page.ts:343 ~ ItemCatalogPage ~ showModal ~ this.selectedItem:", this.selectedItem)
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.isModalOpen = true;
@@ -359,29 +389,34 @@ export class ItemCatalogPage implements OnInit, OnChanges {
   }
 
   addVariationToCart() {
-    var totalQty = 0;
     let isBlock = this.validateNewItemConversion(this.selectedItem)
     if (!isBlock) {
       if (this.selectedItem.variationDetails) {
         this.selectedItem.variationDetails.forEach(x => {
           x.details.forEach(y => {
-            totalQty = totalQty + y.qtyRequest;
+            this.selectedItem.qtyRequest = (this.selectedItem.qtyRequest??0) + y.qtyRequest;
           });
         })
       }
-      this.selectedItem.qtyRequest = totalQty;
-      if (totalQty > 0) {
-        // count total in cart
-        this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + totalQty;
-        // count variation in cart
-        this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
-          x.details.forEach(y => {
-            y.qtyInCart = (y.qtyInCart ?? 0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
-          })
-        })
-        this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
-      }
-      this.hideModal();
+      // this.selectedItem.qtyRequest = totalQty;
+      setTimeout(() => {
+        let validMinOrderQty = this.validateMinOrderQty(this.selectedItem);
+        if (validMinOrderQty) {
+          if (this.selectedItem.qtyRequest > 0) {
+            // count total in cart
+            this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + this.selectedItem.qtyRequest;
+            // count variation in cart
+            this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
+              x.details.forEach(y => {
+                y.qtyInCart = (y.qtyInCart ?? 0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
+              })
+            })
+            console.log("🚀 ~ file: item-catalog.page.ts:414 ~ ItemCatalogPage ~ this.availableItems.find ~ this.availableItems:", this.availableItems)
+            this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+          }
+          this.hideModal();
+        }
+      }, 100);
     }
   }
 
@@ -414,6 +449,46 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       }
     } else {
       return false;
+    }
+  }
+
+  /* #endregion */
+
+  /* #region check min order qty */
+
+  validateMinOrderQty(data: TransactionDetail) {
+    console.log("🚀 ~ file: item-catalog.page.ts:460 ~ ItemCatalogPage ~ validateMinOrderQty ~ data:", data)
+    if (this.configOrderingActivateMOQControl) {
+      if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B") {
+        if (data.qtyRequest && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
+          let sameItemInCart = this.availableItems.find(r => r.itemId === data.itemId);
+          console.log("🚀 ~ file: item-catalog.page.ts:464 ~ ItemCatalogPage ~ validateMinOrderQty ~ sameItemInCart:", sameItemInCart)
+          if (sameItemInCart && (sameItemInCart.qtyInCart ?? 0) > 0) {
+            // check if qtyincart has same item if yes then check minorderqty again
+            if (data.qtyRequest && data.minOrderQty && (data.qtyRequest + (sameItemInCart.qtyInCart ?? 0)) < data.minOrderQty) {
+              this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + data.qtyRequest + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+              setTimeout(() => {
+                data.qtyRequest = null;
+                return false;
+              }, 10);
+            } else {
+              return true;
+            }
+          } else {
+            this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + data.qtyRequest + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+            setTimeout(() => {
+              data.qtyRequest = null;
+              return false;
+            }, 10);
+          }
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      return true;
     }
   }
 

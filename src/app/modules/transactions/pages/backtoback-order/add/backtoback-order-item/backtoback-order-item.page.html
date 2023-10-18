@@ -44,7 +44,7 @@
 </ion-popover>
 <ion-content fullscreen>
   <div class="p-2">
-    <app-item-catalog [keyId]="this.objectService.header.customerId" [locationId]="this.objectService.header.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectService.header" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="this.objectService.header.isItemPriceTaxInclusive" [maxPrecision]="this.objectService.header.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="false" [showAvailQty]="showAvailQty" [itemInCart]="objectService.itemInCart"></app-item-catalog>
+    <app-item-catalog [keyId]="this.objectService.header.customerId" [locationId]="this.objectService.header.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectService.header" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="this.objectService.header.isItemPriceTaxInclusive" [maxPrecision]="this.objectService.header.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isBackToBackOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="objectService.itemInCart"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

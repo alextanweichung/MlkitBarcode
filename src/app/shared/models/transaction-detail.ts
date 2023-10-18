@@ -133,6 +133,8 @@ export interface TransactionDetail {
 
   newItemId?: number;
   newItemEffectiveDate?: Date
+  minOrderQty?: number;
+
 }
 
 export interface ItemPricing {

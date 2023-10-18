@@ -74,8 +74,8 @@
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
                 <ion-col class="ion-flex ion-margin-auto">
-                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size:larger" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:larger" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size:x-small" *ngIf="item.itemVariationXId"> {{item.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:x-small" *ngIf="item.itemVariationYId"> {{item.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
                 </ion-col>
               </ion-row>
             </ion-grid>

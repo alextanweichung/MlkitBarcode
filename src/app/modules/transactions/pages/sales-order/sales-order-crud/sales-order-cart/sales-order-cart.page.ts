@@ -92,6 +92,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   orderingPriceApprovalEnabledFields: string = "0"
   salesOrderQuantityControl: string = "0";
   configSalesActivatePromotionEngine: boolean;
+  configOrderingActivateMOQControl: boolean;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
@@ -116,6 +117,12 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
         if (priceApprovalEnabledFields) {
           this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
         }
+        let moqCtrl = this.moduleControl.find(x => x.ctrlName === "OrderingActivateMOQControl");
+        if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() == 'Y') {
+          this.configOrderingActivateMOQControl = true;
+        } else {
+          this.configOrderingActivateMOQControl = false;
+        }
       }, error => {
         throw error;
       })
@@ -137,18 +144,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
         let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrder").map(y => y.fieldName);
-        // apiData.forEach(element => {
-        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
-        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
-        //       restrictedObject[ctrl] = true;
-        //     }
-        //   });
-        // });
-        // if (!this.authService.isAdmin && this.systemWideDisableDocumentNumber) {
-        //   restrictedObject['salesOrderNum'] = true;
-        // }
-        // this.restrictFields = restrictedObject;  
-
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
@@ -168,7 +163,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   selectedIndex: number;
   showEditModal(data: TransactionDetail, rowIndex: number) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
-    // this.selectedItem = data;
     this.selectedIndex = rowIndex;
     this.isModalOpen = true;
   }
@@ -388,11 +382,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   removeItem(data: TransactionDetail, index: number) {
     try {
-      this.objectService.itemInCart.splice(index,1);
-      // let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
-      // if (index > -1) {
-      //   this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
-      // }
+      this.objectService.itemInCart.splice(index, 1);
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
       }
@@ -414,7 +404,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       console.error(e);
     }
   }
-  
+
   computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
       trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(2));
@@ -788,7 +778,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   setFormattedDateString() {
     this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
   }
-  
+
   onTrxDateSelected(value: any) {
     this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
     this.setFormattedDateString();
