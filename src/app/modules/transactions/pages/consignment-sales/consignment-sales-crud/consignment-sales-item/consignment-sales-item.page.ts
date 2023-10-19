@@ -14,6 +14,7 @@ import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
@@ -206,11 +207,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
     }
   }
 
+  @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
   onItemAdd(event: TransactionDetail[]) {
     if (event && event.length > 0) {
       event.forEach(async r => {
         await this.addItemToLine(r);
       })
+      this.barcodescaninput.setFocus();
     }
   }
 
@@ -310,7 +313,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
               cssClass: "danger",
               handler: async () => {
                 this.objectService.detail.splice(index, 1);
-                this.toastService.presentToast("Line removed.", "", "top", "success", 1000);
+                this.toastService.presentToast("", "Line removed", "top", "success", 1000);
               }
             },
             {

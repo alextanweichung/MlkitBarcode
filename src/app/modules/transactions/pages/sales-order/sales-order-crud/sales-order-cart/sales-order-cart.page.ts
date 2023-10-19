@@ -195,16 +195,20 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
           })
         })
         hasQtyError = totalQty <= 0;
+        this.selectedItem.qtyRequest = totalQty;
+        this.computeAllAmount(this.selectedItem);
       }
       if (hasQtyError) {
-        this.toastService.presentToast("Error", "Invalid Quantity.", "top", "warning", 1000);
+        this.toastService.presentToast("", "Invalid Quantity.", "top", "warning", 1000);
       } else {
-        this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-        this.hideEditModal();
-
-        if (this.selectedItem.isPricingApproval) {
-          this.objectService.header.isPricingApproval = true;
-        }
+        // let validMinOrderQty = this.validateMinOrderQty(this.selectedItem);
+        // if (validMinOrderQty) {
+          this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+          this.hideEditModal();
+          if (this.selectedItem.isPricingApproval) {
+            this.objectService.header.isPricingApproval = true;
+          }
+        // }
       }
     }
   }
@@ -352,43 +356,48 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   /* #region  delete item */
 
   async presentDeleteItemAlert(data: TransactionDetail, index: number) {
-    try {
-      const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to delete?',
-        buttons: [
-          {
-            text: 'OK',
-            role: 'confirm',
-            cssClass: 'danger',
-            handler: () => {
-              this.removeItem(data, index);
-            },
+    // try {
+    const alert = await this.alertController.create({
+      cssClass: 'custom-alert',
+      header: 'Are you sure to delete?',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'confirm',
+          cssClass: 'danger',
+          handler: async () => {
+            await this.removeItem(data, index);
           },
-          {
-            text: 'Cancel',
-            role: 'cancel',
-            handler: () => {
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
 
-            }
-          },
-        ],
-      });
-      await alert.present();
-    } catch (e) {
-      console.error(e);
-    }
+          }
+        },
+      ],
+    });
+    await alert.present();
+    // } catch (e) {
+    //   console.error(e);
+    // }
   }
 
   removeItem(data: TransactionDetail, index: number) {
-    try {
-      this.objectService.itemInCart.splice(index, 1);
+    // remove item = set qtyRequest = 0 for validateMinOrderQty
+    // let tempData = JSON.parse(JSON.stringify(data));
+    // tempData.qtyRequest = 0;
+    // let validMinOrderQty = this.validateMinOrderQty(tempData);
+    // if (validMinOrderQty) {
+      setTimeout(() => {
+        this.objectService.itemInCart.splice(index, 1);
+        this.toastService.presentToast("", "Line removed.", "top", "success", 1000);
+      }, 1);
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
       }
-    } catch (e) {
-      console.error(e);
-    }
+    // }
   }
 
   /* #endregion */
@@ -488,33 +497,36 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     try {
       this.submit_attempt = true;
       if (this.objectService.itemInCart.length > 0) {
-        const alert = await this.alertController.create({
-          header: "Are you sure to proceed?",
-          subHeader: (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) ? "This will delete Draft & Generate SO" : "",
-          buttons: [
-            {
-              text: 'OK',
-              cssClass: 'success',
-              role: 'confirm',
-              handler: async () => {
-                if (this.objectService.header.salesOrderId > 0) {
-                  await this.updateObject();
-                } else {
-                  await this.insertObject();
+        // let validMinOrderQty = this.validateMinOrderQty();
+        // if (validMinOrderQty) {
+          const alert = await this.alertController.create({
+            header: "Are you sure to proceed?",
+            subHeader: (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) ? "This will delete Draft & Generate SO" : "",
+            buttons: [
+              {
+                text: 'OK',
+                cssClass: 'success',
+                role: 'confirm',
+                handler: async () => {
+                  if (this.objectService.header.salesOrderId > 0) {
+                    await this.updateObject();
+                  } else {
+                    await this.insertObject();
+                  }
+                },
+              },
+              {
+                text: 'Cancel',
+                cssClass: 'cancel',
+                role: 'cancel',
+                handler: async () => {
+                  this.submit_attempt = false;
                 }
               },
-            },
-            {
-              text: 'Cancel',
-              cssClass: 'cancel',
-              role: 'cancel',
-              handler: async () => {
-                this.submit_attempt = false;
-              }
-            },
-          ],
-        });
-        await alert.present();
+            ],
+          });
+          await alert.present();
+        // }
       } else {
         this.submit_attempt = false;
         this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
@@ -792,6 +804,49 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
   dateSelect() {
     this.datetime.confirm(true);
+  }
+
+  /* #endregion */
+
+  /* #region check min order qty */
+
+  validateMinOrderQty() {
+    if (this.configOrderingActivateMOQControl) {
+      if (this.objectService.header.businessModelType === "T" || this.objectService.header.businessModelType === "B") {
+
+
+        // if (data.qtyRequest !== null && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
+        //   let sameItemInCart = this.objectService.itemInCart.filter(r => r.itemId === data.itemId && r.uuid !== data.uuid);
+        //   console.log("🚀 ~ file: sales-order-cart.page.ts:814 ~ SalesOrderCartPage ~ validateMinOrderQty ~ sameItemInCart:", sameItemInCart)
+        //   let totalQtyRequestOfSameItemInCart = sameItemInCart.flatMap(r => (r.qtyRequest ?? 0)).reduce((a, c) => (a + c), 0);
+        //   console.log("🚀 ~ file: sales-order-cart.page.ts:815 ~ SalesOrderCartPage ~ validateMinOrderQty ~ totalQtyRequestOfSameItemInCart:", totalQtyRequestOfSameItemInCart)
+        //   if (sameItemInCart && totalQtyRequestOfSameItemInCart > 0) {
+        //     // check if qtyincart has same item if yes then check minorderqty again
+        //     if (data.qtyRequest !== null && data.minOrderQty && (data.qtyRequest + totalQtyRequestOfSameItemInCart) < data.minOrderQty) {
+        //       this.toastService.presentToast("Invalid Quantity", "Total requested quantity [" + Number(data.qtyRequest + totalQtyRequestOfSameItemInCart) + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+        //       setTimeout(() => {
+        //         data.qtyRequest = saveQtyReq;
+        //         return false;
+        //       }, 10);
+        //     } else {
+        //       return true;
+        //     }
+        //   } else {
+        //     this.toastService.presentToast("Invalid Quantity", "Total requested quantity [" + Number(data.qtyRequest + totalQtyRequestOfSameItemInCart) + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+        //     setTimeout(() => {
+        //       data.qtyRequest = saveQtyReq;
+        //       return false;
+        //     }, 10);
+        //   }
+        // } else {
+        //   return true;
+        // }
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
   }
 
   /* #endregion */

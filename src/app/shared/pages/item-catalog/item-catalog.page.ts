@@ -60,7 +60,7 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.itemInCart) {
-      this.computeQtyInCart();      
+      this.computeQtyInCart();
     }
   }
 
@@ -199,9 +199,17 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
             })
           }
         } else {
-          r.qtyInCart = 0;
+          r.qtyInCart = null;
+          if (r.variationTypeCode === "1" || r.variationTypeCode === "2") {
+            r.variationDetails.forEach(x => {
+              x.details.forEach(y => {
+                y.qtyInCart = null;
+              })
+            })
+          }
         }
       })
+      console.log("🚀 ~ file: item-catalog.page.ts:205 ~ ItemCatalogPage ~ computeQtyInCart ~ this.availableItems:", this.availableItems)
     }
   }
 
@@ -316,12 +324,12 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
   addToCart(data: TransactionDetail) {
     let isBlock = this.validateNewItemConversion(data);
     if (!isBlock) {
-      let validMinOrderQty = this.validateMinOrderQty(data);
-      if (validMinOrderQty) {
+      // let validMinOrderQty = this.validateMinOrderQty(data);
+      // if (validMinOrderQty) {
         this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
         this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
         data.qtyRequest = null;
-      }
+      // }
     }
   }
 
@@ -340,7 +348,6 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
   itemVariationYMasterList: MasterListDetails[] = [];
   showModal(data: TransactionDetail) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
-    console.log("🚀 ~ file: item-catalog.page.ts:343 ~ ItemCatalogPage ~ showModal ~ this.selectedItem:", this.selectedItem)
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.isModalOpen = true;
@@ -400,8 +407,8 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
       }
       // this.selectedItem.qtyRequest = totalQty;
       setTimeout(() => {
-        let validMinOrderQty = this.validateMinOrderQty(this.selectedItem);
-        if (validMinOrderQty) {
+        // let validMinOrderQty = this.validateMinOrderQty(this.selectedItem);
+        // if (validMinOrderQty) {
           if (this.selectedItem.qtyRequest > 0) {
             // count total in cart
             this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + this.selectedItem.qtyRequest;
@@ -411,11 +418,10 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
                 y.qtyInCart = (y.qtyInCart ?? 0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
               })
             })
-            console.log("🚀 ~ file: item-catalog.page.ts:414 ~ ItemCatalogPage ~ this.availableItems.find ~ this.availableItems:", this.availableItems)
             this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
           }
           this.hideModal();
-        }
+        // }
       }, 100);
     }
   }
@@ -456,41 +462,41 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
 
   /* #region check min order qty */
 
-  validateMinOrderQty(data: TransactionDetail) {
-    console.log("🚀 ~ file: item-catalog.page.ts:460 ~ ItemCatalogPage ~ validateMinOrderQty ~ data:", data)
-    if (this.configOrderingActivateMOQControl) {
-      if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B") {
-        if (data.qtyRequest && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
-          let sameItemInCart = this.availableItems.find(r => r.itemId === data.itemId);
-          console.log("🚀 ~ file: item-catalog.page.ts:464 ~ ItemCatalogPage ~ validateMinOrderQty ~ sameItemInCart:", sameItemInCart)
-          if (sameItemInCart && (sameItemInCart.qtyInCart ?? 0) > 0) {
-            // check if qtyincart has same item if yes then check minorderqty again
-            if (data.qtyRequest && data.minOrderQty && (data.qtyRequest + (sameItemInCart.qtyInCart ?? 0)) < data.minOrderQty) {
-              this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + data.qtyRequest + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
-              setTimeout(() => {
-                data.qtyRequest = null;
-                return false;
-              }, 10);
-            } else {
-              return true;
-            }
-          } else {
-            this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + data.qtyRequest + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
-            setTimeout(() => {
-              data.qtyRequest = null;
-              return false;
-            }, 10);
-          }
-        } else {
-          return true;
-        }
-      } else {
-        return true;
-      }
-    } else {
-      return true;
-    }
-  }
+  // validateMinOrderQty(data: TransactionDetail) {
+  //   console.log("🚀 ~ file: item-catalog.page.ts:460 ~ ItemCatalogPage ~ validateMinOrderQty ~ data:", data)
+  //   if (this.configOrderingActivateMOQControl) {
+  //     if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B") {
+  //       if (data.qtyRequest && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
+  //         let sameItemInCart = this.availableItems.find(r => r.itemId === data.itemId);
+  //         console.log("🚀 ~ file: item-catalog.page.ts:464 ~ ItemCatalogPage ~ validateMinOrderQty ~ sameItemInCart:", sameItemInCart)
+  //         if (sameItemInCart && (sameItemInCart.qtyInCart ?? 0) > 0) {
+  //           // check if qtyincart has same item if yes then check minorderqty again
+  //           if (data.qtyRequest && data.minOrderQty && (data.qtyRequest + (sameItemInCart.qtyInCart ?? 0)) < data.minOrderQty) {
+  //             this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + data.qtyRequest + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+  //             setTimeout(() => {
+  //               data.qtyRequest = null;
+  //               return false;
+  //             }, 10);
+  //           } else {
+  //             return true;
+  //           }
+  //         } else {
+  //           this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + data.qtyRequest + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+  //           setTimeout(() => {
+  //             data.qtyRequest = null;
+  //             return false;
+  //           }, 10);
+  //         }
+  //       } else {
+  //         return true;
+  //       }
+  //     } else {
+  //       return true;
+  //     }
+  //   } else {
+  //     return true;
+  //   }
+  // }
 
   /* #endregion */
 

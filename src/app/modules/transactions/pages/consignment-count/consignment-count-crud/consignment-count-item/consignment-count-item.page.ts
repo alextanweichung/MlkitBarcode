@@ -22,7 +22,7 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
 })
 export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
 
-  @ViewChild('barcodescaninput', { static: false }) barcodescaninput: BarcodeScanInputPage;
+  @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
   objectHeader: ConsignmentCountHeader;
   objectDetail: TransactionDetail[] = [];
@@ -54,7 +54,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
 
     if (this.objectHeader === null || this.objectHeader === undefined) {
       this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
-      this.navController.navigateBack('/transactions/consignment-count/consignment-count-header');
+      this.navController.navigateBack("/transactions/consignment-count/consignment-count-header");
     }
     this.loadModuleControl();
   }
@@ -92,7 +92,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
               description: found_item_master.itemDesc,
               variationTypeCode: found_item_master.varCd,
               discountGroupCode: found_item_master.discCd,
-              discountExpression: (found_item_master.discPct??"0") + '%',
+              discountExpression: (found_item_master.discPct??"0") + "%",
               taxId: found_item_master.taxId,
               taxCode: found_item_master.taxCd,
               taxPct: found_item_master.taxPct,
@@ -101,7 +101,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
                 itemId: found_item_master.id,
                 unitPrice: found_item_master.price,
                 discountGroupCode: found_item_master.discCd,
-                discountExpression: (found_item_master.discPct??"0") + '%',
+                discountExpression: (found_item_master.discPct??"0") + "%",
                 discountPercent: found_item_master.discPct??0,
                 discountGroupId: null,
                 unitPriceMin: null,
@@ -118,10 +118,10 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
             }
             this.addItemToLine(outputData);
           } else {
-            this.toastService.presentToast('', 'Barcode not found.', 'top', 'danger', 1000);
+            this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
           }
         } else {
-          this.toastService.presentToast('Something went wrong!', 'Local db not found.', 'top', 'danger', 1000);
+          this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
         }
       }
     } catch (e) {
@@ -191,7 +191,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
 
   eventHandler(keyCode, line) {
     if (keyCode === 13) {
-      if (Capacitor.getPlatform() !== 'web') {
+      if (Capacitor.getPlatform() !== "web") {
         Keyboard.hide();
       }
     }
@@ -205,22 +205,22 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
     try {
       if (this.objectDetail[index]) {
         const alert = await this.alertController.create({
-          cssClass: 'custom-alert',
-          header: 'Delete this item?',
-          message: 'This action cannot be undone.',
+          cssClass: "custom-alert",
+          header: "Delete this item?",
+          message: "This action cannot be undone.",
           buttons: [
             {
-              text: 'Delete item',
-              cssClass: 'danger',
+              text: "Delete item",
+              cssClass: "danger",
               handler: async () => {
                 this.objectDetail.splice(index, 1);
-                this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
+                this.toastService.presentToast("", "Line removed", "top", "success", 1000);
               }
             },
             {
-              text: 'Cancel',
-              role: 'cancel',
-              cssClass: 'cancel',
+              text: "Cancel",
+              role: "cancel",
+              cssClass: "cancel",
               handler: async () => {
                 this.objectDetail[index].qtyRequest === 0 ? this.objectDetail[index].qtyRequest++ : 1;
               }
@@ -229,7 +229,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('Something went wrong!', '', 'top', 'danger', 1000);
+        this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -265,18 +265,18 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
   /* #region steps */
 
   previousStep() {
-    this.navController.navigateBack('/transactions/consignment-count/consignment-count-header');
+    this.navController.navigateBack("/transactions/consignment-count/consignment-count-header");
   }
 
   async nextStep() {
     try {
       const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to proceed?',
+        cssClass: "custom-alert",
+        header: "Are you sure to proceed?",
         buttons: [
           {
-            text: 'Confirm',
-            cssClass: 'success',
+            text: "Confirm",
+            cssClass: "success",
             handler: async () => {
               if (this.objectHeader.consignmentCountId > 0) {
                 this.updateObject();
@@ -286,9 +286,9 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
             }
           },
           {
-            text: 'Cancel',
-            role: 'cancel',
-            cssClass: 'cancel',
+            text: "Cancel",
+            role: "cancel",
+            cssClass: "cancel",
             handler: async () => {
 
             }
@@ -307,13 +307,13 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
         if (response.status === 201) {
           let object = response.body as ConsignmentCountRoot;
           this.objectService.resetVariables();
-          this.toastService.presentToast('', 'Consignment Count added', 'top', 'success', 1000);
+          this.toastService.presentToast("", "Consignment Count added", "top", "success", 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: object.header.consignmentCountId
             }
           }
-          this.navController.navigateForward('/transactions/consignment-count/consignment-count-detail', navigationExtras);
+          this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
         throw error;
@@ -329,13 +329,13 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
         if (response.status === 201) {
           let object = response.body as ConsignmentCountRoot;
           this.objectService.resetVariables();
-          this.toastService.presentToast('', 'Consignment Count updated', 'top', 'success', 1000);
+          this.toastService.presentToast("", "Consignment Count updated", "top", "success", 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: object.header.consignmentCountId
             }
           }
-          this.navController.navigateForward('/transactions/consignment-count/consignment-count-detail', navigationExtras);
+          this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
         throw error;

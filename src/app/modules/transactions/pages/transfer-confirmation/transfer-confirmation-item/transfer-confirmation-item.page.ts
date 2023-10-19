@@ -106,7 +106,7 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
             cssClass: 'danger',
             handler: async () => {
               this.selectedObject.line.splice(rowIndex, 1);
-              this.toastService.presentToast('Line removed.', '', 'top', 'success', 1000);
+              this.toastService.presentToast('', 'Line removed', 'top', 'success', 1000);
             }
           },
           {

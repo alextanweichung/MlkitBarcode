@@ -1,6 +1,6 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>View Cart</ion-title>
+    <ion-title>Cart</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
@@ -9,102 +9,106 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Cart</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
-    <ion-list class="list-custom animate__animated animate__fadeIn">
-      <ion-item-sliding #slidingItem *ngFor="let item of objectService.itemInCart; let i = index">
-        <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" (click)="showEditModal(item, i)">
-          <ion-grid class="ion-no-padding p-2">
-            <ion-row>
-              <ion-col class="ion-flex ion-margin-auto">
-                <div class="font-bold">{{item.itemCode}}</div>
-                <div class="font-bold ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <div class="ion-text-wrap">{{item.description}}</div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <div class="font-bold">Total Quantity</div>
-              </ion-col>
-              <ion-col>
-                <div class="ion-text-right">{{item.qtyRequest}}</div>
-              </ion-col>
-            </ion-row>
-            <div style="width: 100%;" *ngFor="let vd of item.variationDetails">
-              <div style="width: 100%;" *ngFor="let d of vd.details">
-                <ion-row *ngIf="d.qtyRequest > 0">
-                  <ion-col class="ion-flex ion-margin-auto">
-                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
-                  </ion-col>
-                  <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
-                    <div>{{d.qtyRequest|number:'1.0'}}</div>
-                  </ion-col>
-                </ion-row>
+    <ion-list class="list-custom" *ngIf="objectService.itemInCart && objectService.itemInCart.length > 0" >
+      <ng-container *ngFor="let item of objectService.itemInCart; let i = index">
+        <ion-item-sliding #slidingItem>
+          <ion-item [ngClass]="{'color-blue': item.isPricingApproval}" class="ion-no-padding no-ripple" (click)="showEditModal(item, i)">
+            <ion-grid class="ion-no-padding p-2">
+              <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                  <div class="font-bold">{{item.itemCode}}</div>
+                  <div class="font-bold ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <div class="ion-text-wrap">{{item.description}}</div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <div class="font-bold">Total Quantity</div>
+                </ion-col>
+                <ion-col>
+                  <div class="ion-text-right">{{item.qtyRequest}}</div>
+                </ion-col>
+              </ion-row>
+              <div style="width: 100%;" *ngFor="let vd of item.variationDetails">
+                <div style="width: 100%;" *ngFor="let d of vd.details">
+                  <ion-row *ngIf="d.qtyRequest > 0">
+                    <ion-col class="ion-flex ion-margin-auto">
+                      <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                      <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                    </ion-col>
+                    <ion-col size="3" class="ion-flex ion-margin-auto justify-content-end">
+                      <div>{{d.qtyRequest|number:'1.0'}}</div>
+                    </ion-col>
+                  </ion-row>
+                </div>
               </div>
-            </div>
-            <ion-row>
-              <ion-col>
-                <div class="font-bold">
-                  Unit Price
-                </div>
-              </ion-col>
-              <ion-col>
-                <div class="font-bold">
-                  Disc. Code
-                </div>
-              </ion-col>
-              <ion-col>
-                <div class="font-bold ion-text-right">
-                  Disc. Amt
-                </div>
-              </ion-col>
-              <ion-col>
-                <div class="font-bold ion-text-right">
-                  Subtotal
-                </div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.unitPrice|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-              <ion-col>
-                <div class="ion-flex">
-                  <div>{{item.discountGroupCode}}</div>
-                  <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
-                </div>
-              </ion-col>
-              <ion-col class="ion-text-right">
-                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.discountAmt|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-              <ion-col class="ion-text-right">
-                <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.subTotal??0|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-                <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.subTotalExTax??0|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-item>
-        <ion-item-options>
-          <ion-item-option color="danger" (click)="slidingItem.close(); presentDeleteItemAlert(item, i)">
-            <ion-icon name="trash-outline"></ion-icon>
-          </ion-item-option>
-        </ion-item-options>
-      </ion-item-sliding>
+              <ion-row>
+                <ion-col>
+                  <div class="font-bold">
+                    Unit Price
+                  </div>
+                </ion-col>
+                <ion-col>
+                  <div class="font-bold">
+                    Disc. Code
+                  </div>
+                </ion-col>
+                <ion-col>
+                  <div class="font-bold ion-text-right">
+                    Disc. Amt
+                  </div>
+                </ion-col>
+                <ion-col>
+                  <div class="font-bold ion-text-right">
+                    Subtotal
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.unitPrice|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.unitPriceExTax|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                </ion-col>
+                <ion-col>
+                  <div class="ion-flex">
+                    <div>{{item.discountGroupCode}}</div>
+                    <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
+                  </div>
+                </ion-col>
+                <ion-col class="ion-text-right">
+                  <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.discountAmt|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                </ion-col>
+                <ion-col class="ion-text-right">
+                  <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.subTotal??0|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.subTotalExTax??0|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+          <ion-item-options>
+            <ion-item-option color="danger" (click)="slidingItem.close(); presentDeleteItemAlert(item, i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ng-container>
     </ion-list>
+    <ng-container *ngIf="objectService.itemInCart === null || objectService.itemInCart.length === 0">        
+      <ion-list-header class="ion-list-header ion-flex ion-text-center">
+        <ion-label>Your cart is empty</ion-label>
+      </ion-list-header>
+    </ng-container>
   </div>
 </ion-content>
+
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
   <ion-grid class="ion-no-padding">
     <ion-row class="pt-2 pl-3 pr-3">
