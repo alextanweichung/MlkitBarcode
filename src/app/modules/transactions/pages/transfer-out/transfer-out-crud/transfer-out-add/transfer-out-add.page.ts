@@ -171,7 +171,7 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       const { role } = await actionSheet.onWillDismiss();
 
       if (role === "confirm") {
-        if (this.objectService.header.transferOutId > 0) {
+        if (this.objectService?.header?.transferOutId > 0) {
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: this.objectService.header.transferOutId

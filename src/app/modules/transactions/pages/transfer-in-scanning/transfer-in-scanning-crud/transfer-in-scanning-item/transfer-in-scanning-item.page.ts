@@ -203,11 +203,13 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
         let index = this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku);
         if (this.objectService.object.line[index].uuid === null) {
           this.objectService.object.line[index].uuid = event.uuid;
+          this.objectService.object.line[index].lineQty = event.lineQty;
+        } else {
+          this.objectService.object.line[index].lineQty += event.lineQty;
         }
         // if (this.objectService.object.line[index].lineQty !== null && (this.objectService.object.line[index].qtyReceive + 1) > this.objectService.object.line[index].lineQty) {
         //   this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
         // } else {
-          this.objectService.object.line[index].lineQty = event.lineQty;
         // }
       } else {
         if (this.objectService.object.line && this.objectService.object.line.length > 0) {
