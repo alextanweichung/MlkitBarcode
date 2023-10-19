@@ -360,7 +360,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
   highlight(event) {
     event.getInputElement().then(r => {
-      r.select();
+      r.setFocus();
     })
   }
 

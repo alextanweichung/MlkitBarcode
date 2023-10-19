@@ -49,14 +49,14 @@ export class TransferOutService {
   /* #region  for insert */
 
   header: TransferOutRoot;
-  itemInCart: TransferOutLine[] = [];
+  detail: TransferOutLine[] = [];
   object: TransferOutRoot;
   async setHeader(header: TransferOutRoot) {
     this.header = header;
   }
 
-  setChoosenItems(items: TransferOutLine[]) {
-    this.itemInCart = JSON.parse(JSON.stringify(items));
+  setLine(detail: TransferOutLine[]) {
+    this.detail = JSON.parse(JSON.stringify(detail));
   }
 
   setObject(object: TransferOutRoot) {
@@ -67,8 +67,8 @@ export class TransferOutService {
     this.header = null;
   }
 
-  removeItems() {
-    this.itemInCart = [];
+  removeLine() {
+    this.detail = [];
   }
 
   removeObject() {
@@ -77,7 +77,7 @@ export class TransferOutService {
 
   resetVariables() {
     this.removeHeader();
-    this.removeItems();
+    this.removeLine();
     this.removeObject();
   }
 

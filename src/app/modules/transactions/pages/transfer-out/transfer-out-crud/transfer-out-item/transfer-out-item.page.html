@@ -1,52 +1,20 @@
 <ion-header [hidden]="scanActive">
   <ion-toolbar>
-    <ion-title>Stock Reorder</ion-title>
+    <ion-title>Line</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" [hidden]="scanActive">
   <div class="p-2">
-    <form [formGroup]="objectForm">
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-        <ion-item id="open-calendar-modal" [disabled]="true">
-          <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
-          <ion-label position="stacked" class="font-bold">Doc. Date</ion-label>
-          <ion-text class="ion-no-padding-end pb-3">{{formattedDateString}}</ion-text>
-        </ion-item>
-        <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
-          <ng-template>
-            <ion-content>
-              <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
-                <ion-buttons slot="buttons">
-                  <ion-button (click)="dateDismiss()" color="danger">Dismiss</ion-button>
-                  <ion-button (click)="dateSelect()" color="primary">Select</ion-button>
-                </ion-buttons>
-              </ion-datetime>
-            </ion-content>
-          </ng-template>
-        </ion-modal>
-        <!-- <app-calendar-input #datefrom title="Doc. Date" [disabled]="true" [date_value]="objectForm.controls.trxDate.value"></app-calendar-input> -->
-        <app-search-dropdown title="From Location" [searchDropdownList]="locationSearchDropdownList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
-        <ion-item>
-          <ion-label position="stacked" class="font-bold">Remark</ion-label>
-          <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
-        </ion-item>
-      </ion-list>
-    </form>
-      
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-      <ion-label>Line</ion-label>
-    </ion-list-header>
-    
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
 
     <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
-      <ion-item-sliding #slidingItem *ngFor="let l of objectLine let i = index">
-        <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="highlight(qtyInput)">
+      <ion-item-sliding #slidingItem *ngFor="let l of objectService.detail let i = index">
+        <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="highlight(qtyInput)">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
               <ion-col size="9">
@@ -87,9 +55,9 @@
   </div>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive" >
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-    Insert
+    {{objectService.header.transferOutId > 0 ? "Update" : "Insert"}}
   </ion-button>
 </ion-footer>
 

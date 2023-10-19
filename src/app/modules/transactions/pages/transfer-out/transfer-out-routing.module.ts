@@ -17,8 +17,8 @@ const routes: Routes = [
     loadChildren: () => import('./transfer-out-crud/transfer-out-add/transfer-out-add.module').then( m => m.TransferOutAddPageModule)
   },
   {
-    path: 'transfer-out-edit',
-    loadChildren: () => import('./transfer-out-crud/transfer-out-edit/transfer-out-edit.module').then( m => m.TransferOutEditPageModule)
+    path: 'transfer-out-item',
+    loadChildren: () => import('./transfer-out-crud/transfer-out-item/transfer-out-item.module').then( m => m.TransferOutItemPageModule)
   }
 ];
 

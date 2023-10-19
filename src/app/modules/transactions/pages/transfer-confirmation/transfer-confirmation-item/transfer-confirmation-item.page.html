@@ -1,4 +1,4 @@
-<ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
+<ion-header [hidden]="scanActive">
   <ion-toolbar>
     <ion-title>Details</ion-title>
     <ion-buttons slot="start">
@@ -8,11 +8,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" [hidden]="scanActive">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Details</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     

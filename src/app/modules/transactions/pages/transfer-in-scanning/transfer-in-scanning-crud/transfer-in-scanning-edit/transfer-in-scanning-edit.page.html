@@ -1,4 +1,4 @@
-<ion-header [translucent]="true" [hidden]="scanActive">
+<ion-header [hidden]="scanActive">
   <ion-toolbar>
     <ion-title>Transfer In Scanning</ion-title>
     <ion-buttons slot="start">
@@ -26,11 +26,7 @@
 </ion-popover>
 
 <ion-content [fullscreen]="true" [hidden]="scanActive">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Transfer In Scanning</ion-label>
-    </ion-toolbar>
-  </ion-header>
+  
   <div class="p-2" *ngIf="object">
 
     <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">

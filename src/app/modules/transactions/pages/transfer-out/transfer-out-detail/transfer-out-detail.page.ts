@@ -117,9 +117,9 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
     let navigationExtras: NavigationExtras = {
       queryParams: {
         objectId: this.object.transferOutId
-      }
+      } 
     }
-    this.navController.navigateRoot("/transactions/transfer-out/transfer-out-edit", navigationExtras);
+    this.navController.navigateRoot("/transactions/transfer-out/transfer-out-add", navigationExtras);
   }
 
   /* #region more action popover */

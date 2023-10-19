@@ -1,4 +1,4 @@
-<ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
+<ion-header [hidden]="scanActive">
   <ion-toolbar>
     <ion-title>Details</ion-title>
     <ion-buttons slot="start">
@@ -8,11 +8,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" [hidden]="scanActive">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Details</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
     <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
       <ion-item button [detail]="false" class="ion-no-padding no-ripple">

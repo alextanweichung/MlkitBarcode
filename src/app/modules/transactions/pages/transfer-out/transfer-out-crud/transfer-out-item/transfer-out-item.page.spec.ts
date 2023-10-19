@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TransferOutEditPage } from './transfer-out-edit.page';
+import { TransferOutItemPage } from './transfer-out-item.page';
 
-describe('TransferOutEditPage', () => {
-  let component: TransferOutEditPage;
-  let fixture: ComponentFixture<TransferOutEditPage>;
+describe('TransferOutItemPage', () => {
+  let component: TransferOutItemPage;
+  let fixture: ComponentFixture<TransferOutItemPage>;
 
   beforeEach(waitForAsync () => {
-    fixture = TestBed.createComponent(TransferOutEditPage);
+    fixture = TestBed.createComponent(TransferOutItemPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

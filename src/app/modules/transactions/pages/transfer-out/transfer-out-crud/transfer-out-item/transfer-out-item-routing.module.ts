@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { TransferOutEditPage } from './transfer-out-edit.page';
+import { TransferOutItemPage } from './transfer-out-item.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: TransferOutEditPage
+    component: TransferOutItemPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class TransferOutEditPageRoutingModule {}
+export class TransferOutItemPageRoutingModule {}
