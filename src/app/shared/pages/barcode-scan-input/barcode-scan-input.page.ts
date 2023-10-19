@@ -172,6 +172,7 @@ export class BarcodeScanInputPage implements OnInit {
       let found_item_barcode: PDItemBarcode[] = [];
       if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
         let found = this.configService.item_Masters.filter(r => r.code.length > 0).filter(r => r.code.toUpperCase().includes(searchValue.toUpperCase())); // if found by itemCode
+        console.log("🚀 ~ file: barcode-scan-input.page.ts:175 ~ BarcodeScanInputPage ~ validateItem ~ found:", JSON.stringify(found))
         if (found && found.length > 0) {
           found_item_master = this.configService.item_Masters.filter(r => found.flatMap(rr => rr.id).includes(r.id));
         } else {
@@ -180,8 +181,10 @@ export class BarcodeScanInputPage implements OnInit {
             found_item_master = this.configService.item_Masters.filter(r => found2.flatMap(rr => rr.id).includes(r.id));
           }
         }
+        console.log("🚀 ~ file: barcode-scan-input.page.ts:185 ~ BarcodeScanInputPage ~ validateItem ~ found_item_master:", JSON.stringify(found_item_master))
         if (found_item_master && found_item_master.length > 0) {
           found_item_barcode = this.configService.item_Barcodes.filter(r => found_item_master.flatMap(rr => rr.id).includes(r.itemId));
+          console.log("🚀 ~ file: barcode-scan-input.page.ts:187 ~ BarcodeScanInputPage ~ validateItem ~ found_item_barcode:", JSON.stringify(found_item_barcode))
           found_item_master.forEach(r => {
             if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
               let t = found_item_barcode.find(rr => rr.itemId === r.id);
@@ -262,12 +265,12 @@ export class BarcodeScanInputPage implements OnInit {
         } else {
           this.toastService.presentToast("", "No Item Found", "top", "danger", 1000);
         }
-        console.log("🚀 ~ file: barcode-scan-input.page.ts:263 ~ BarcodeScanInputPage ~ validateItem ~ found_item_master:", JSON.stringify(found_item_master))
-        console.log("🚀 ~ file: barcode-scan-input.page.ts:271 ~ BarcodeScanInputPage ~ validateItem ~ this.availableVariations:", JSON.stringify(this.availableVariations))
         if (found_item_master && found_item_master.length === 1) { // only 1 item found
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
           if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
             this.showVariationModal();
+          } else {
+            this.showItemModal();
           }
         } else if (found_item_master && found_item_master.length > 0 && this.availableVariations && this.availableVariations.length > 0) { // if item found, and has barcode tag
           this.showItemModal();

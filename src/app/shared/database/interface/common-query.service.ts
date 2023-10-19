@@ -413,7 +413,7 @@ export class CommonQueryService<T> {
         }, dbConfig.inbounddb)
         console.log(new Date());
         let timeend = new Date();
-        this.toastService.presentToast(`table ${table}`, (timeend.getTime() - timestart.getTime()).toString(), 'top', 'success', 1000);
+        // this.toastService.presentToast(`table ${table}`, (timeend.getTime() - timestart.getTime()).toString(), 'top', 'success', 1000);
       }
     } catch (e) {
       console.error(e);

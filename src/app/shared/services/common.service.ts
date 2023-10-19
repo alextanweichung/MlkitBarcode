@@ -336,7 +336,7 @@ export class CommonService {
       if (inputNumber) {
         return Math.round(Number((inputNumber * factor).toFixed(precision))) / factor;
       } else {
-        return null;
+        return 0;
       }
     } catch (e) {
       console.error(e);

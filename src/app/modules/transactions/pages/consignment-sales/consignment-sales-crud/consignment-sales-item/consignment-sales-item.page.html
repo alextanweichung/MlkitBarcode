@@ -23,11 +23,9 @@
     </ion-content>
   </ng-template>
 </ion-popover>
-<ion-content fullscreen [hidden]="scanActive">
+<ion-content [hidden]="scanActive">
   <div class="p-2">
-    <ng-container slot="fixed" style="position: absolute; top: 0; left: 0; right: 0; z-index: 2;">
-      <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
-    </ng-container>
+    <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item-sliding #slidingItem *ngFor="let line of objectService.detail; let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="qtyRequestInput.setFocus()">
@@ -36,8 +34,8 @@
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="font-bold">{{line.itemBarcode}}</div>
               </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end">                
-                <ion-input #qtyRequestInput inputmode="numeric" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode)" (ionBlur)="computeAllAmount(line)"></ion-input>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <ion-input #qtyRequestInput inputmode="numeric" type="number" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode)" (ionBlur)="computeAllAmount(line)"></ion-input>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -85,40 +83,11 @@
                 <div>{{line.subTotal|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
               </ion-col>
             </ion-row>
-            <!-- <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
-              <ion-col class="ion-flex ion-margin-auto">
-                <div class="font-bold">Margin Pct.</div>
-              </ion-col>
-              <ion-col class="ion-flex ion-margin-auto">
-                <div class="font-bold">Margin Amt.</div>
-              </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div class="font-bold">Bearing Amt.</div>
-              </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div class="font-bold">Invoice Amt.</div>
-              </ion-col>
-            </ion-row>
-            <ion-row *ngIf="consignmentSalesActivateMarginCalculation">
-              <ion-col class="ion-flex ion-margin-auto">
-                <div *ngIf="(line.marginPct??0 > 0)">{{line.marginPct|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}%</div>
-                <div *ngIf="line.marginPct === null || line.marginPct === 0">{{line.marginPct|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-              <ion-col class="ion-flex ion-margin-auto">
-                <div>{{line.marginAmt|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div>{{line.bearAmt|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div>{{line.invoiceAmt|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              </ion-col>
-            </ion-row> -->
           </ion-grid>
         </ion-item>
         <ion-item-options>
-          <ion-item-option color="primary" (click)="slidingItem.close(); showEditModal(line, i)"><ion-icon name="create-outline"></ion-icon></ion-item-option>
-          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
+          <ion-item-option color="primary" (click)="slidingItem.close(); showEditModal(line, i)"><ion-icon slot="top" name="create-outline"></ion-icon>Edit</ion-item-option>
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)"><ion-icon slot="top" name="trash"></ion-icon>Delete</ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>

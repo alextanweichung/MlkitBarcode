@@ -224,10 +224,10 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
         return;
       }
     }
-    if (this.objectService.detail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) {
-      this.objectService.detail[0].qtyRequest += 1;
-      this.computeAllAmount(this.objectService.detail[0]);
-    } else {
+    // if (this.objectService.detail.filter(r => r.itemSku === trxLine.itemSku && r.unitPrice === trxLine?.itemPricing?.unitPrice && r.discountGroupCode === trxLine.discountGroupCode).length > 1) {
+    //   this.objectService.detail[1].qtyRequest += 1;
+    //   this.computeAllAmount(this.objectService.detail[1]);
+    // } else {
       let isBlock: boolean = false;
       isBlock = this.validateNewItemConversion(trxLine);
       if (!isBlock) {
@@ -238,7 +238,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
         trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.header.trxDate, this.objectService.header.toLocationId);
         await this.assignTrxItemToDataLine(trxLine);
       }
-    }
+    // }
   }
 
   validateNewItemConversion(trxLine: TransactionDetail): boolean {
@@ -477,8 +477,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
       return;
     } else {
-      if ((this.selectedItem.qtyRequest ?? 0) <= 0) {
-        this.toastService.presentToast("Invalid Qty", "", "top", "warning", 1000);
+      if (this.selectedItem.unitPrice === null || this.selectedItem.unitPrice === undefined || isNaN(Number(this.selectedItem.unitPrice))) {
+        this.toastService.presentToast("", "Invalid Unit Price", "top", "warning", 1000);
       } else {
         this.objectService.detail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
         this.hideEditModal();

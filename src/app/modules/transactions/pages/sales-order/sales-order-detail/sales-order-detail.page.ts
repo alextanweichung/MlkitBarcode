@@ -103,7 +103,6 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         }
         this.loadWorkflow(this.object.header.salesOrderId);
         this.objectService.setHeader(this.object.header);
-        console.log("🚀 ~ file: sales-order-detail.page.ts:104 ~ SalesOrderDetailPage ~ this.objectService.getObjectById ~ this.object.header:", this.object.header)
         this.objectService.setChoosenItems(this.object.details);
       }, error => {
         throw error;

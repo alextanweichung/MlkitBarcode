@@ -133,7 +133,7 @@ export class ConfigService {
       console.log("done sync item master")
       await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Barcode, itemBarcodes);
       this.item_Barcodes = itemBarcodes;
-      console.log("done sync item barcode")
+      // console.log("done sync item barcode")
     } catch (e) {
       console.error(e);
     }
