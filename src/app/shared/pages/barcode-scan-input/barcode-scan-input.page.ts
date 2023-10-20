@@ -9,14 +9,14 @@ import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 
 @Component({
   selector: 'app-barcode-scan-input',
   templateUrl: './barcode-scan-input.page.html',
   styleUrls: ['./barcode-scan-input.page.scss'],
 })
-export class BarcodeScanInputPage implements OnInit {
+export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter {
 
   @Input() itemVariationXMasterList: MasterListDetails[] = [];
   @Input() itemVariationYMasterList: MasterListDetails[] = [];
@@ -37,6 +37,14 @@ export class BarcodeScanInputPage implements OnInit {
     private toastService: ToastService,
     private alertController: AlertController
   ) { }
+
+  ionViewWillEnter(): void {
+    this.setFocus();
+  }
+
+  ionViewDidEnter(): void {
+    this.setFocus();
+  }
 
   ngOnInit() {
     this.loadModuleControl();
@@ -292,6 +300,7 @@ export class BarcodeScanInputPage implements OnInit {
 
   hideItemModel() {
     this.itemModalOpen = false;
+    this.setFocus();
   }
 
   availableVariationsByItemId: TransactionDetail[] = [];
@@ -323,6 +332,7 @@ export class BarcodeScanInputPage implements OnInit {
 
   hideVariationModel() {
     this.variationModalOpen = false;
+    this.setFocus();
   }
 
   addVariations() {
@@ -347,17 +357,17 @@ export class BarcodeScanInputPage implements OnInit {
   @Output() onDoneScanning = new EventEmitter<string>();
 
   scanningMethodChanged() {
-    setTimeout(() => {
-      this.setFocus();
-    }, 100);
+    this.setFocus();
   }
 
   setFocus() {
-    if (this.selectedScanningMethod === "B") {
-      this.focusBarcodeSearch();
-    } else {
-      this.focusItemSearch();
-    }
+    setTimeout(() => {
+      if (this.selectedScanningMethod === "B") {
+        this.focusBarcodeSearch();
+      } else {
+        this.focusItemSearch();
+      }
+    }, 200);
   }
 
   focusBarcodeSearch() {
