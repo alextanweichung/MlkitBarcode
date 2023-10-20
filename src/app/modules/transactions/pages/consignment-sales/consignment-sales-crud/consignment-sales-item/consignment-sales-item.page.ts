@@ -427,14 +427,19 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
   }
 
   computeAllAmount(data: TransactionDetail) {
-    data.qtyRequest = parseFloat(data.qtyRequest.toFixed(0));
-    try {
-      this.computeDiscTaxAmount(data);
-      if (this.consignmentSalesActivateMarginCalculation) {
-        this.computeMarginAmount(data);
+    if (data.qtyRequest === null || data.qtyRequest === undefined || isNaN(Number(data.qtyRequest))) {
+      this.toastService.presentToast("", "Invalid Qty", "top", "danger", 1000);
+      return;
+    } else {
+      data.qtyRequest = parseFloat(data.qtyRequest.toFixed(0));
+      try {
+        this.computeDiscTaxAmount(data);
+        if (this.consignmentSalesActivateMarginCalculation) {
+          this.computeMarginAmount(data);
+        }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
     }
   }
 
@@ -518,37 +523,47 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
   /* #endregion */
 
   async nextStep() {
-    try {
-      if (this.objectService.detail.length > 0) {
-        const alert = await this.alertController.create({
-          header: "Are you sure to proceed?",
-          cssClass: "custom-alert",
-          buttons: [
-            {
-              text: "OK",
-              cssClass: "success",
-              role: "confirm",
-              handler: async () => {
-                if (this.objectId && this.objectId > 0) {
-                  await this.updateObject();
-                } else {
-                  await this.insertObject();
-                }
-              },
-            },
-            {
-              text: "Cancel",
-              cssClass: "cancel",
-              role: "cancel"
-            },
-          ],
-        });
-        await alert.present();
-      } else {
-        this.toastService.presentToast("Error!", "Please add at least 1 item to continue", "top", "danger", 1000);
+    let lineError = false;
+    this.objectService.detail.forEach(r => {
+      if (r.qtyRequest === null || r.qtyRequest === undefined || isNaN(Number(r.qtyRequest))) {
+        lineError = true;
       }
-    } catch (e) {
-      console.error(e);
+    })
+    if (lineError) {
+      this.toastService.presentToast("Unable to proceed", "Invalid Qty", "top", "danger", 1000);
+    } else {
+      try {
+        if (this.objectService.detail.length > 0) {
+          const alert = await this.alertController.create({
+            header: "Are you sure to proceed?",
+            cssClass: "custom-alert",
+            buttons: [
+              {
+                text: "OK",
+                cssClass: "success",
+                role: "confirm",
+                handler: async () => {
+                  if (this.objectId && this.objectId > 0) {
+                    await this.updateObject();
+                  } else {
+                    await this.insertObject();
+                  }
+                },
+              },
+              {
+                text: "Cancel",
+                cssClass: "cancel",
+                role: "cancel"
+              },
+            ],
+          });
+          await alert.present();
+        } else {
+          this.toastService.presentToast("Error!", "Please add at least 1 item to continue", "top", "danger", 1000);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
