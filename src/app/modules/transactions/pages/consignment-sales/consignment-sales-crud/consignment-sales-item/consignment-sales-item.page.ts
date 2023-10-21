@@ -57,9 +57,9 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
     if (Capacitor.getPlatform() === "ios") {
       this.inputType = "tel";
     }
-    this.route.queryParams.subscribe(params => {
-      this.objectId = params['objectId'];
-    })
+    // this.route.queryParams.subscribe(params => {
+    //   this.objectId = params['objectId'];
+    // })
   }
 
   ionViewWillEnter(): void {

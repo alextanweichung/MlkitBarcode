@@ -61,10 +61,7 @@
           </ion-label>
         </ion-item>
         <ion-item *ngIf="configService.sys_parameter.length > 1" button detail="false" (click)="popover.dismiss(); deleteAlert();">
-          <ion-icon name="trash-outline" slot="end"></ion-icon>
-          <ion-label>
-            <div>Delete this</div>
-          </ion-label>
+          <ion-icon slot="end" name="trash-outline"></ion-icon>Delete
         </ion-item>
       </ion-list>
     </ion-content>

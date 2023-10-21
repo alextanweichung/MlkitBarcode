@@ -134,7 +134,7 @@ export interface TransactionDetail {
   newItemId?: number;
   newItemEffectiveDate?: Date
   minOrderQty?: number;
-
+  minOrderQtyError?: boolean
 }
 
 export interface ItemPricing {

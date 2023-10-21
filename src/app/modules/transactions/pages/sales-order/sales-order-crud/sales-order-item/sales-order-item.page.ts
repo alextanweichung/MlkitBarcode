@@ -97,7 +97,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
         return;
       }
     } else {
-      if (event.variationDetails.flatMap(r => r.details).filter(r => (r.qtyRequest ?? 0 !== 0)).length === 0) {
+      if (event.variationDetails.flatMap(r => r.details).filter(r => ((r.qtyRequest ?? 0) !== 0)).length === 0) {
         return;
       }
     }

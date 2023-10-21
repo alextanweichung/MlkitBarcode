@@ -22,6 +22,9 @@
                   <div class="font-bold">{{item.itemCode}}</div>
                   <div class="font-bold ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
                 </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <ion-icon color="danger" style="position: relative; top: 0.1rem" *ngIf="configOrderingActivateMOQControl && item.minOrderQtyError" name="alert-circle-outline"></ion-icon>
+                </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col>
@@ -61,12 +64,12 @@
                   </div>
                 </ion-col>
                 <ion-col>
-                  <div class="font-bold ion-text-right">
+                  <div class="font-bold justify-content-end">
                     Disc. Amt
                   </div>
                 </ion-col>
                 <ion-col>
-                  <div class="font-bold ion-text-right">
+                  <div class="font-bold justify-content-end">
                     Subtotal
                   </div>
                 </ion-col>
@@ -82,11 +85,11 @@
                     <div *ngIf="item.discountExpression"> [{{item.discountExpression}}]</div>
                   </div>
                 </ion-col>
-                <ion-col class="ion-text-right">
+                <ion-col class="justify-content-end">
                   <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.discountAmt|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                   <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 </ion-col>
-                <ion-col class="ion-text-right">
+                <ion-col class="justify-content-end">
                   <div *ngIf="objectService.header.isDisplayTaxInclusive">{{item.subTotal??0|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                   <div *ngIf="!objectService.header.isDisplayTaxInclusive">{{item.subTotalExTax??0|number: (objectService.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
                 </ion-col>
@@ -95,7 +98,7 @@
           </ion-item>
           <ion-item-options>
             <ion-item-option color="danger" (click)="slidingItem.close(); presentDeleteItemAlert(item, i)">
-              <ion-icon name="trash-outline"></ion-icon>
+              <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>

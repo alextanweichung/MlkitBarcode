@@ -55,7 +55,9 @@
           </ion-grid>
         </ion-item>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)"><ion-icon name="trash-outline"></ion-icon></ion-item-option>
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)">
+            <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
+          </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>

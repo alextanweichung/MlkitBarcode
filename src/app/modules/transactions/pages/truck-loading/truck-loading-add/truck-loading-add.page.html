@@ -128,7 +128,9 @@
           </ion-grid>
         </ion-item>
         <ion-item-options side="end">
-          <ion-item-option color="danger" (click)="presentDeleteAlert(i)"><ion-icon name="trash-outline" slot="bottom"></ion-icon>Reverse</ion-item-option>
+          <ion-item-option color="danger" (click)="presentDeleteAlert(i)">
+            <ion-icon slot="top" name="arrow-undo-outline"></ion-icon>Reverse
+          </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>

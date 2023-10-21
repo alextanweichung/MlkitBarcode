@@ -30,7 +30,9 @@
       <ion-item-sliding *ngFor="let soLine of packingSalesOrders[0]?.details; let i = index">
         <app-item-add-list-flat [line]="soLine" [isPacking]="true" qtyField="qtyPackedCurrent" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" (onQtyChanged)="onQtyChanged($event, soLine, i)"></app-item-add-list-flat>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="deleteSoLine(i)">Delete</ion-item-option>
+          <ion-item-option color="danger" (click)="deleteSoLine(i)">
+            <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
+          </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
