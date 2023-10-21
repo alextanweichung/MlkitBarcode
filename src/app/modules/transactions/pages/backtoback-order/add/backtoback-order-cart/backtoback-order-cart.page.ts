@@ -25,7 +25,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   useTax: boolean = false;
 
   submit_attempt: boolean = false;
-  
+
   inputType: string = "number";
 
   constructor(
@@ -53,6 +53,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
       this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
     }
+    this.validateMinOrderQty();
   }
 
   ngOnInit() {
@@ -83,6 +84,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   orderingPriceApprovalEnabledFields: string = "0"
   salesOrderQuantityControl: string = "0";
   configSalesActivatePromotionEngine: boolean;
+  configOrderingActivateMOQControl: boolean;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
@@ -106,6 +108,12 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         let priceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
         if (priceApprovalEnabledFields) {
           this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
+        }
+        let moqCtrl = this.moduleControl.find(x => x.ctrlName === "OrderingActivateMOQControl");
+        if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() == 'Y') {
+          this.configOrderingActivateMOQControl = true;
+        } else {
+          this.configOrderingActivateMOQControl = false;
         }
       }, error => {
         throw error;
@@ -186,11 +194,11 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       let hasQtyError: boolean = false;
       let totalQty: number = 0;
       if (this.selectedItem.variationTypeCode === "0") {
-        hasQtyError = (this.selectedItem.qtyRequest??0) <= 0;
+        hasQtyError = (this.selectedItem.qtyRequest ?? 0) <= 0;
       } else {
         this.selectedItem.variationDetails.forEach(r => {
           r.details.forEach(rr => {
-            totalQty += (rr.qtyRequest??0)
+            totalQty += (rr.qtyRequest ?? 0)
           })
         })
         hasQtyError = totalQty <= 0;
@@ -199,11 +207,13 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast("Error", "Invalid Quantity.", "top", "warning", 1000);
       } else {
         this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-        this.hideEditModal();
-
-        if (this.selectedItem.isPricingApproval) {
-          this.objectService.header.isPricingApproval = true;
-        }
+        setTimeout(async () => {
+          await this.validateMinOrderQty();
+          this.hideEditModal();
+          if (this.selectedItem.isPricingApproval) {
+            this.objectService.header.isPricingApproval = true;
+          }
+        }, 10);
       }
     }
   }
@@ -400,17 +410,13 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   }
 
   removeItem(data: TransactionDetail, index: number) {
-    try {
-      this.objectService.itemInCart.splice(index,1);
-      // let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
-      // if (index > -1) {
-      //   this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
-      // }
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
-      }
-    } catch (e) {
-      console.error(e);
+    setTimeout(() => {
+      this.objectService.itemInCart.splice(index, 1);
+      this.toastService.presentToast("", "Line removed.", "top", "success", 1000);
+      this.validateMinOrderQty();
+    }, 1);
+    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
     }
   }
 
@@ -418,8 +424,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   /* #region  unit price, tax, discount */
 
-  computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) 
-  { // special handle for iPhone, cause no decimal point
+  computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
@@ -428,8 +433,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  computeUnitPrice(trxLine: TransactionDetail, stringValue: string) 
-  { // special handle for iPhone, cause no decimal point
+  computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
       this.computeDiscTaxAmount(trxLine);
@@ -511,32 +515,38 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     try {
       this.submit_attempt = true;
       if (this.objectService.itemInCart.length > 0) {
-        const alert = await this.alertController.create({
-          header: 'Are you sure to proceed?',
-          buttons: [
-            {
-              text: 'OK',
-              cssClass: 'success',
-              role: 'confirm',
-              handler: async () => {
-                if (this.objectService.header.backToBackOrderId) {
-                  await this.updateObject();
-                } else {
-                  await this.insertObject();
+        let validMinOrderQty = this.validateMinOrderQty();
+        if (validMinOrderQty) {
+          const alert = await this.alertController.create({
+            header: 'Are you sure to proceed?',
+            buttons: [
+              {
+                text: 'OK',
+                cssClass: 'success',
+                role: 'confirm',
+                handler: async () => {
+                  if (this.objectService.header.backToBackOrderId) {
+                    await this.updateObject();
+                  } else {
+                    await this.insertObject();
+                  }
+                },
+              },
+              {
+                text: 'Cancel',
+                cssClass: 'cancel',
+                role: 'cancel',
+                handler: async () => {
+                  this.submit_attempt = false;
                 }
               },
-            },
-            {
-              text: 'Cancel',
-              cssClass: 'cancel',
-              role: 'cancel',
-              handler: async () => {
-                this.submit_attempt = false;
-              }
-            },
-          ],
-        });
-        await alert.present();
+            ],
+          });
+          await alert.present();
+        } else {
+          // this.toastService.presentToast("Invalid Quantity", "Total requested quantity [" + Number(data.qtyRequest + totalQtyRequestOfSameItemInCart) + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+          this.toastService.presentToast("Invalid Quantity", "Some item does not meet minimum order quantity.", "top", "warning", 1000);
+        }
       } else {
         this.submit_attempt = false;
         this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
@@ -544,7 +554,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     } catch (e) {
       this.submit_attempt = false;
       console.error(e);
-    } finally {      
+    } finally {
       this.submit_attempt = false;
     }
   }
@@ -568,7 +578,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     } catch (e) {
       this.submit_attempt = false;
       console.error(e);
-    } finally {      
+    } finally {
       this.submit_attempt = false;
     }
   }
@@ -666,6 +676,45 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       if (this.restrictTrxFields.discountGroupCode == false) {
         this.restrictTrxFields.discountGroupCode = true;
       }
+    }
+  }
+
+  /* #endregion */
+
+  /* #region check min order qty */
+
+  validateMinOrderQty() {
+    if (this.configOrderingActivateMOQControl) {
+      if (this.objectService.header.businessModelType === "T" || this.objectService.header.businessModelType === "B") {
+        this.objectService.itemInCart.forEach(data => {
+          if (data.qtyRequest !== null && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
+            let sameItemInCart = this.objectService.itemInCart.filter(r => r.itemId === data.itemId && r.uuid !== data.uuid);
+            let totalQtyRequestOfSameItemInCart = sameItemInCart.flatMap(r => (r.qtyRequest ?? 0)).reduce((a, c) => (a + c), 0);
+            if (sameItemInCart && totalQtyRequestOfSameItemInCart > 0) {
+              // check if qtyincart has same item if yes then check minorderqty again
+              if (data.qtyRequest !== null && data.minOrderQty && (data.qtyRequest + totalQtyRequestOfSameItemInCart) < data.minOrderQty) {
+                data.minOrderQtyError = true;
+                // this.toastService.presentToast("Invalid Quantity", "Total requested quantity [" + Number(data.qtyRequest + totalQtyRequestOfSameItemInCart) + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+                return false;
+              } else {
+                data.minOrderQtyError = false;
+                return true;
+              }
+            } else {
+              // this.toastService.presentToast("Invalid Quantity", "Total requested quantity [" + Number(data.qtyRequest + totalQtyRequestOfSameItemInCart) + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
+              data.minOrderQtyError = true;
+              return false;
+            }
+          } else {
+            data.minOrderQtyError = false;
+            return true;
+          }
+        })
+      } else {
+        return true;
+      }
+    } else {
+      return true;
     }
   }
 

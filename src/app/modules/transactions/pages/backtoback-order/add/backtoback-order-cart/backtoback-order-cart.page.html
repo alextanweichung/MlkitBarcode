@@ -25,6 +25,9 @@
                 <div class="font-bold">{{item.itemCode}}</div>
                 <div class="ml-1" *ngIf="item?.vendorItemCode"> | {{item?.vendorItemCode}}</div>
               </ion-col>
+              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <ion-icon color="danger" style="position: relative; top: 0.1rem" *ngIf="configOrderingActivateMOQControl && item.minOrderQtyError" name="alert-circle-outline"></ion-icon>
+              </ion-col>
             </ion-row>
             <ion-row>
               <ion-col>
