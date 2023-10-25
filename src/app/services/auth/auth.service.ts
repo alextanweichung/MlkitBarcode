@@ -251,6 +251,7 @@ export class AuthService {
   // Sign out
   async signOut(isAddNew: boolean = false) {
     localStorage.removeItem('loginUser');
+    localStorage.removeItem('temptt');
     this.currentUserSource.next(null);
     this.currentUserTokenSource.next(null);
     this.menuItemSubject.next(null);

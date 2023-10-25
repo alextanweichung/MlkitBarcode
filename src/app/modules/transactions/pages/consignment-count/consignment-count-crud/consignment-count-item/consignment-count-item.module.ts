@@ -10,6 +10,7 @@ import { ConsignmentCountItemPage } from './consignment-count-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     ConsignmentCountItemPageRoutingModule,
     IdMappingModule,
     BarcodeScanInputPageModule,
-    CameraScanInputPageModule
+    CameraScanInputPageModule,
+    SumModule
   ],
   declarations: [ConsignmentCountItemPage]
 })

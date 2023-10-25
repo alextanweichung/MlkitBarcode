@@ -79,8 +79,12 @@ export interface TransactionDetail {
   priceListLine?: any
   itemVariationXId?: number
   itemVariationLineXId?: number
+  itemVariationXCd?: string
+  itemVariationXDesc?: string
   itemVariationYId?: number
   itemVariationLineYId?: number
+  itemVariationYCd?: string
+  itemVariationYDesc?: string
   itemSku?: string
   itemBarcode?: string
   cartonNum?: number

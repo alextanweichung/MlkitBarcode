@@ -1,29 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ViewWillEnter, ModalController, NavController, ActionSheetController } from '@ionic/angular';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { ViewWillEnter, NavController, ActionSheetController, ViewDidEnter, AlertController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentCountService } from '../../services/consignment-count.service';
 import { ConsignmentCountHeader } from '../../models/consignment-count';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { NavigationOptions } from 'swiper/types';
 
 @Component({
   selector: 'app-consignment-count',
   templateUrl: './consignment-count.page.html',
   styleUrls: ['./consignment-count.page.scss'],
 })
-export class ConsignmentCountPage implements OnInit, ViewWillEnter {
+export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   objects: ConsignmentCountHeader[] = [];
   uniqueGrouping: Date[] = [];
 
   constructor(
-    private authService: AuthService,
     public objectService: ConsignmentCountService,
+    private authService: AuthService,
+    private configService: ConfigService,
     private commonService: CommonService,
     private toastService: ToastService,
-    private modalController: ModalController,
     private navController: NavController,
+    private alertController: AlertController,
     private actionSheetController: ActionSheetController
   ) {
     this.objectService.loadRequiredMaster();
@@ -33,8 +36,50 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter {
     this.loadObjects();
   }
 
+  async ionViewDidEnter(): Promise<void> {
+    // check incomplete trx here
+    let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
+    if (data !== null) {
+      this.promptIncompleteTrxAlert();
+    }
+  }
+
   ngOnInit() {
 
+  }
+
+  async promptIncompleteTrxAlert() {
+    const alert = await this.alertController.create({
+      cssClass: "custom-alert",
+      header: "You have uncompleted transaction.",
+      subHeader: "Do you want to retrieve or discard",
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: "Retrieve",
+          cssClass: "success",
+          handler: async () => {
+            let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
+            await this.objectService.setHeader(data.header);
+            await this.objectService.setLines(data.details);
+            if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+              this.navController.navigateRoot("/transactions/consignment-count/consignment-count-item");
+            } else {
+              this.navController.navigateRoot("/transactions/consignment-count/consignment-count-header");
+            }
+          }
+        },
+        {
+          text: "Discard",
+          role: "cancel",
+          cssClass: "cancel",
+          handler: async () => {
+            await this.configService.removeFromLocalStorage(this.objectService.trxKey);
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   loadObjects() {
@@ -61,7 +106,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter {
     let navigationExtras: NavigationExtras = {
       queryParams: {
         objectId: objectId
-      }
+      }      
     }
     this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
   }
@@ -93,7 +138,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter {
   }
 
   addObject() {
-    this.navController.navigateForward("/transactions/consignment-count/consignment-count-header");
+    this.navController.navigateRoot("/transactions/consignment-count/consignment-count-header");
   }
 
 }

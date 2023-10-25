@@ -137,7 +137,11 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
               currencyId: null
             },
             itemVariationXId: found_barcode.xId,
+            itemVariationXCd: found_barcode.xCd,
+            itemVariationXDesc: found_barcode.xDesc,
             itemVariationYId: found_barcode.yId,
+            itemVariationYCd: found_barcode.yCd,
+            itemVariationYDesc: found_barcode.yDesc,
             itemSku: found_barcode.sku,
             itemBarcode: found_barcode.barcode,
             itemBrandId: found_item_master.brandId,
@@ -150,10 +154,10 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
           }
           this.onItemAdd.emit([outputData]);
         } else {
-          this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
+          this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
         }
       } else {
-        this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
+        this.toastService.presentToast("System Error", "Local db not found", "top", "danger", 1000);
       }
     }
   }
@@ -180,7 +184,6 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       let found_item_barcode: PDItemBarcode[] = [];
       if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
         let found = this.configService.item_Masters.filter(r => r.code.length > 0).filter(r => r.code.toUpperCase().includes(searchValue.toUpperCase())); // if found by itemCode
-        console.log("🚀 ~ file: barcode-scan-input.page.ts:175 ~ BarcodeScanInputPage ~ validateItem ~ found:", JSON.stringify(found))
         if (found && found.length > 0) {
           found_item_master = this.configService.item_Masters.filter(r => found.flatMap(rr => rr.id).includes(r.id));
         } else {
@@ -189,10 +192,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             found_item_master = this.configService.item_Masters.filter(r => found2.flatMap(rr => rr.id).includes(r.id));
           }
         }
-        console.log("🚀 ~ file: barcode-scan-input.page.ts:185 ~ BarcodeScanInputPage ~ validateItem ~ found_item_master:", JSON.stringify(found_item_master))
         if (found_item_master && found_item_master.length > 0) {
           found_item_barcode = this.configService.item_Barcodes.filter(r => found_item_master.flatMap(rr => rr.id).includes(r.itemId));
-          console.log("🚀 ~ file: barcode-scan-input.page.ts:187 ~ BarcodeScanInputPage ~ validateItem ~ found_item_barcode:", JSON.stringify(found_item_barcode))
           found_item_master.forEach(r => {
             if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
               let t = found_item_barcode.find(rr => rr.itemId === r.id);
@@ -256,7 +257,11 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   currencyId: null
                 },
                 itemVariationXId: r.xId,
+                itemVariationXCd: r.xCd,
+                itemVariationXDesc: r.xDesc,
                 itemVariationYId: r.yId,
+                itemVariationYCd: r.yCd,
+                itemVariationYDesc: r.yDesc,
                 itemSku: r.sku,
                 itemBarcode: r.barcode,
                 itemBrandId: found_item_master.find(rr => rr.id === r.itemId)?.brandId,
@@ -271,7 +276,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             }
           })
         } else {
-          this.toastService.presentToast("", "No Item Found", "top", "danger", 1000);
+          this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
         }
         if (found_item_master && found_item_master.length === 1) { // only 1 item found
           this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
@@ -284,7 +289,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
           this.showItemModal();
         }
       } else {
-        this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
+        this.toastService.presentToast("System Error", "Local db not found.", "top", "danger", 1000);
       }
     }
   }
@@ -311,7 +316,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
         let found = this.configService.item_Masters.find(r => r.id === item.itemId);
         this.onItemAdd.emit([item]);
       } else {
-        this.toastService.presentToast("", "No Item added.", "top", "danger", 1000);
+        this.toastService.presentToast("", "No item added", "top", "warning", 1000);
       }
       this.hideItemModel();
     }
@@ -342,7 +347,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
     }
     else {
-      this.toastService.presentToast("", "No Item added.", "top", "danger", 1000);
+      this.toastService.presentToast("", "No item added", "top", "warning", 1000);
     }
     this.hideVariationModel();
     this.hideItemModel();
@@ -367,7 +372,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       } else {
         this.focusItemSearch();
       }
-    }, 200);
+    }, 100);
   }
 
   focusBarcodeSearch() {
@@ -405,19 +410,19 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
         resolve(true);
       } else if (status.denied) {
         const alert = await this.alertController.create({
-          header: 'No permission',
-          message: 'Please allow camera access in your setting',
+          header: "No permission",
+          message: "Please allow camera access in your setting",
           buttons: [
             {
-              text: 'Open Settings',
+              text: "Open Settings",
               handler: () => {
                 BarcodeScanner.openAppSettings();
                 resolve(false);
               },
             },
             {
-              text: 'No',
-              role: 'cancel',
+              text: "No",
+              role: "cancel",
             },
           ],
         });

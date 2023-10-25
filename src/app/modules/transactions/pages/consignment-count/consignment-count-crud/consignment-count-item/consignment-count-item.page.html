@@ -1,21 +1,34 @@
-<ion-header collapse="fade" [translucent]="true" [hidden]="scanActive">
+<ion-header [hidden]="scanActive">
   <ion-toolbar>
-    <ion-title>Item</ion-title>
+    <ion-title>Line</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content fullscreen [hidden]="scanActive">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Item</ion-label>
-    </ion-toolbar>
-  </ion-header>
+
+<ion-content [hidden]="scanActive">
   <div class="p-2">
+
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+      
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding #slidingItem *ngFor="let line of objectDetail; let i = index">
+      <ion-item button detail="false" class="no-ripple ion-no-padding">
+        <ion-grid class="ion-no-padding pl-2">
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Total Quantity</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">{{objectService.objectDetail|sum:"qtyRequest"|number:"1.0"}}</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item-sliding #slidingItem *ngFor="let line of objectService.objectDetail; let i = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">
           <ion-grid class="ion-no-padding pt-2 pl-2">
             <ion-row>
@@ -34,7 +47,7 @@
             </ion-row>
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
-                <div class="ion-text-wrap">{{line.description}}</div>
+                <div class="ion-text-wrap">{{line.itemDescription}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -44,7 +57,7 @@
                 </ion-button>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto">
-                <ion-input #inputNumWithoutSo class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (ionFocus)="setFocus(inputNumWithoutSo)" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
+                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto">
                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(line)">
@@ -61,10 +74,11 @@
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
+    
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
-  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
+  <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="submit_attempt">
     Save
   </ion-button>
 </ion-footer>

@@ -176,7 +176,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
           cssClass: "danger",
           handler: async () => {
             await this.authService.signOut();
-            await this.configService.signout();
+            await this.configService.signOut();
           }
         },
         {

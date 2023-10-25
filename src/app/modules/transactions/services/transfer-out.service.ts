@@ -115,6 +115,17 @@ export class TransferOutService {
     return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileTransferOut/generateDocument/${objectId}`, null, httpObserveHeader)
   }
 
+  downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/exportPdf",
+      {
+        "appCode": appCode,
+        "format": format,
+        "documentIds": [documentId],
+        "reportName": reportName ?? null
+      },
+      { responseType: "blob" });
+  }
+
   // for web testing 
   validateBarcode(barcode: string) {
     return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/itemByBarcode/" + barcode);

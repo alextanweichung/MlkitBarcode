@@ -144,5 +144,49 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
       console.error(e);
     }
   }
+
+  /* #region download pdf */
+
+  async presentAlertViewPdf() {
+    try {
+      const alert = await this.alertController.create({
+        header: "Download PDF?",
+        message: "",
+        buttons: [
+          {
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
+            handler: async () => {
+              await this.downloadPdf();
+            },
+          },
+          {
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
+          },
+        ]
+      });
+      await alert.present();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async downloadPdf() {
+    try {
+      this.objectService.downloadPdf("WDWO003", "pdf", this.object.interTransferId, "Inter Transfer").subscribe(response => {
+        let filename = this.object.interTransferNum + ".pdf";
+        this.commonService.commonDownloadPdf(response, filename);
+      }, error => {
+        console.log(error);
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* #endregion */
   
 }

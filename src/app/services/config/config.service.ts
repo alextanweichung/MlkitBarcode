@@ -188,8 +188,24 @@ export class ConfigService {
 
   /* #endregion */
 
-  signout() {
+  signOut() {
     this.selected_consignment_location = null;
+  }
+
+  async saveToLocaLStorage(key: string, data: any) {
+    await localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  async retrieveFromLocalStorage(key: string) {
+    let data = await localStorage.getItem(key);
+    if (data !== null) {
+      return JSON.parse(data);
+    }
+    return null;
+  }
+
+  async removeFromLocalStorage(key: string) {
+    await localStorage.removeItem(key);
   }
 
 }

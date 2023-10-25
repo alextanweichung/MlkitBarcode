@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
-import { ConsignmentCountHeader, ConsignmentCountRoot } from "../models/consignment-count";
+import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountRoot } from "../models/consignment-count";
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
@@ -16,6 +16,8 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class ConsignmentCountService {
+
+  trxKey: string = "consignmentCount";
 
   constructor(
     private http: HttpClient,
@@ -46,8 +48,8 @@ export class ConsignmentCountService {
     this.objectHeader = objectHeader;
   }
 
-  objectDetail: TransactionDetail[] = []
-  setLines(objectDetail: TransactionDetail[]) {
+  objectDetail: ConsignmentCountDetail[] = []
+  setLines(objectDetail: ConsignmentCountDetail[]) {
     this.objectDetail = objectDetail;
   }
 
@@ -62,6 +64,7 @@ export class ConsignmentCountService {
   resetVariables() {
     this.removeHeader();
     this.removeLines();
+    this.configService.removeFromLocalStorage(this.trxKey);
   }
 
   locationList: ConsignmentSalesLocation[] = [];

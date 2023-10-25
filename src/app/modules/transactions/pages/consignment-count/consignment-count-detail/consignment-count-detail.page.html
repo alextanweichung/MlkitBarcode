@@ -1,28 +1,20 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Detail</ion-title>
+    <ion-title>{{object?.header?.consignmentCountNum}}</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="Back" defaultHref="/transactions/consignment-count" routerDirection="back"></ion-back-button>
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
     <ion-buttons slot="primary">
       <ion-button (click)="edit()">
-        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        <ion-icon slot="icon-only" size="small" name="create-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Detail</ion-label>
-      <ion-buttons slot="start">
-        <ion-back-button text="Back"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="object">
-      <ion-item button detail="false" class="ion-no-padding no-ripple">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngIf="objectService.objectHeader">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -53,7 +45,7 @@
               <div class="font-bold">Total Quantity</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.details|sum:'qtyRequest'|number}}</div>
+              <div>{{object.details|sum:"qtyRequest"|number}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -63,29 +55,59 @@
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of objectDetail">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">{{item.itemBarcode}}</div>
+            <ion-col size="1" class="ion-flex ion-margin-auto">
+              <div class="font-bold">#</div>
             </ion-col>
-          </ion-row>
-          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <div class="ion-flex">
-                {{item.itemCode}}
-                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationLineXDescription"> {{item.itemVariationLineXDescription}}</span>
-                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationLineYDescription"> {{item.itemVariationLineYDescription}}</span>
-              </div>
+              <div class="font-bold">Item Info</div>
             </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div>{{item.description}}</div>
+            <ion-col size="1" class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">Qty</div>
             </ion-col>
           </ion-row>
         </ion-grid>
-        <ion-badge mode="ios" slot="end">{{item.qtyRequest|number:'1.0'}}</ion-badge>
+      </ion-item>
+    </ion-list>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of objectService.objectDetail; let i = index">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col size="1" class="ion-flex ion-margin-auto">
+              <div>{{i+1}}</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto">
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div class="font-bold">{{item.itemBarcode}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div class="ion-flex">
+                      {{item.itemCode}}
+                      <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationXId"> {{item.itemVariationXDescription}}</span>
+                      <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationYId"> {{item.itemVariationYDescription}}</span>
+                    </div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div>{{item.itemDescription}}</div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-col>
+            <ion-col size="1" class="ion-flex ion-margin-auto justify-content-end">
+              <div>
+                <ion-badge mode="ios">{{item.qtyRequest|number:"1.0"}}</ion-badge>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
     </ion-list>
   </div>

@@ -1,6 +1,7 @@
 export interface TransferOutRoot {
    transferOutId: number
    transferOutNum: string
+   interTransferId: number
    interTransferNum: string
    trxDate: string
    trxDateTime: string

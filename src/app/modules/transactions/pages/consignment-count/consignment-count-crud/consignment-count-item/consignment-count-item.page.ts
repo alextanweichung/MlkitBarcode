@@ -3,8 +3,8 @@ import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, NavController, ViewDidEnter } from '@ionic/angular';
-import { ConsignmentCountHeader, ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
+import { AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ConsignmentCountDetail, ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -20,12 +20,11 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
   styleUrls: ['./consignment-count-item.page.scss'],
   providers: [BarcodeScanInputService, { provide: "apiObject", useValue: "MobileConsignmentCount" }]
 })
-export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
+export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
+
+  submit_attempt: boolean = false;
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
-
-  objectHeader: ConsignmentCountHeader;
-  objectDetail: TransactionDetail[] = [];
 
   constructor(
     public objectService: ConsignmentCountService,
@@ -36,27 +35,25 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
     private navController: NavController
   ) { }
 
-  ionViewDidEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
+    
+  }
+
+  async ionViewDidEnter(): Promise<void> {
     try {
-      this.barcodescaninput.setFocus();
+      await this.barcodescaninput.setFocus();
+      if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
+        this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+        this.navController.navigateRoot("/transactions/consignment-count/consignment-count-header");
+      }
+      this.loadModuleControl();
     } catch (e) {
       console.error(e);
     }
   }
 
   ngOnInit() {
-    this.objectHeader = this.objectService.objectHeader;
-    if (this.objectHeader.consignmentCountId === 0) {
-      this.objectDetail = [];
-    } else {
-      this.objectDetail = this.objectService.objectDetail;
-    }
 
-    if (this.objectHeader === null || this.objectHeader === undefined) {
-      this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
-      this.navController.navigateBack("/transactions/consignment-count/consignment-count-header");
-    }
-    this.loadModuleControl();
   }
 
   moduleControl: ModuleControl[] = [];
@@ -77,57 +74,57 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
     }
   }
 
-  /* #region item line */  
+  /* #region item line */
 
-  async validateBarcode(barcode: string) {
-    try {
-      if (barcode) {
-        if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-          let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-          if (found_barcode) {
-            let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-            let outputData: TransactionDetail = {
-              itemId: found_item_master.id,
-              itemCode: found_item_master.code,
-              description: found_item_master.itemDesc,
-              variationTypeCode: found_item_master.varCd,
-              discountGroupCode: found_item_master.discCd,
-              discountExpression: (found_item_master.discPct??"0") + "%",
-              taxId: found_item_master.taxId,
-              taxCode: found_item_master.taxCd,
-              taxPct: found_item_master.taxPct,
-              qtyRequest: null,
-              itemPricing: {
-                itemId: found_item_master.id,
-                unitPrice: found_item_master.price,
-                discountGroupCode: found_item_master.discCd,
-                discountExpression: (found_item_master.discPct??"0") + "%",
-                discountPercent: found_item_master.discPct??0,
-                discountGroupId: null,
-                unitPriceMin: null,
-                currencyId: null
-              },
-              itemVariationXId: found_barcode.xId,
-              itemVariationYId: found_barcode.yId,
-              itemSku: found_barcode.sku,
-              itemBarcode: found_barcode.barcode,
-              itemBrandId: found_item_master.brandId,
-              itemGroupId: found_item_master.groupId,
-              itemCategoryId: found_item_master.catId,
-              itemBarcodeTagId: found_barcode.id
-            }
-            this.addItemToLine(outputData);
-          } else {
-            this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
-          }
-        } else {
-          this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // async validateBarcode(barcode: string) {
+  //   try {
+  //     if (barcode) {
+  //       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
+  //         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
+  //         if (found_barcode) {
+  //           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+  //           let outputData: TransactionDetail = {
+  //             itemId: found_item_master.id,
+  //             itemCode: found_item_master.code,
+  //             description: found_item_master.itemDesc,
+  //             variationTypeCode: found_item_master.varCd,
+  //             discountGroupCode: found_item_master.discCd,
+  //             discountExpression: (found_item_master.discPct ?? "0") + "%",
+  //             taxId: found_item_master.taxId,
+  //             taxCode: found_item_master.taxCd,
+  //             taxPct: found_item_master.taxPct,
+  //             qtyRequest: null,
+  //             itemPricing: {
+  //               itemId: found_item_master.id,
+  //               unitPrice: found_item_master.price,
+  //               discountGroupCode: found_item_master.discCd,
+  //               discountExpression: (found_item_master.discPct ?? "0") + "%",
+  //               discountPercent: found_item_master.discPct ?? 0,
+  //               discountGroupId: null,
+  //               unitPriceMin: null,
+  //               currencyId: null
+  //             },
+  //             itemVariationXId: found_barcode.xId,
+  //             itemVariationYId: found_barcode.yId,
+  //             itemSku: found_barcode.sku,
+  //             itemBarcode: found_barcode.barcode,
+  //             itemBrandId: found_item_master.brandId,
+  //             itemGroupId: found_item_master.groupId,
+  //             itemCategoryId: found_item_master.catId,
+  //             itemBarcodeTagId: found_barcode.id
+  //           }
+  //           this.addItemToLine(outputData);
+  //         } else {
+  //           this.toastService.presentToast("", "Barcode not found", "top", "danger", 1000);
+  //         }
+  //       } else {
+  //         this.toastService.presentToast("System Error", "Local db not found", "top", "danger", 1000);
+  //       }
+  //     }
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   onItemAdd(event: TransactionDetail[]) {
     if (event && event.length > 0) {
@@ -139,25 +136,27 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
 
   async addItemToLine(trxLine: TransactionDetail) {
     try {
-      if (this.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
-        this.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+      if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+        this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += 1;
       } else {
-        let d: TransactionDetail = {
-          lineId: 0,
-          headerId: this.objectHeader.consignmentCountId,
-          locationId: this.objectHeader.locationId,
+        let newLine: ConsignmentCountDetail = {
+          consignmentCountLineId: 0,
+          consignmentCountId: this.objectService.objectHeader.consignmentCountId,
+          locationId: this.objectService.objectHeader.locationId,
           itemId: trxLine.itemId,
-          itemCode: trxLine.itemCode,
-          description: trxLine.description,
           itemVariationXId: trxLine.itemVariationXId,
           itemVariationYId: trxLine.itemVariationYId,
           itemSku: trxLine.itemSku,
-          itemBarcode: trxLine.itemBarcode,
           itemBarcodeTagId: trxLine.itemBarcodeTagId,
+          itemBarcode: trxLine.itemBarcode,
           qtyRequest: 1,
-          sequence: this.objectDetail.length
+          sequence: this.objectService.objectDetail.length,
+          // for local use
+          itemDescription: trxLine.description
         }
-        await this.objectDetail.length > 0 ? this.objectDetail.unshift(d) : this.objectDetail.push(d);
+        await this.objectService.objectDetail.unshift(newLine);
+        let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
     } catch (e) {
       console.error(e);
@@ -168,18 +167,16 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
 
   /* #region  manual amend qty */
 
-  setFocus(event) {
-    event.getInputElement().then(r => {
-      r.select();
-    })
-  }
-
-  async decreaseQty(line: TransactionDetail, index: number) {
+  async decreaseQty(line: ConsignmentCountDetail, index: number) {
     try {
       if (line.qtyRequest - 1 < 0) {
         line.qtyRequest = 0;
+        let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       } else {
         line.qtyRequest--;
+        let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
       if (line.qtyRequest === 0) {
         await this.deleteLine(index);
@@ -197,13 +194,15 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
     }
   }
 
-  increaseQty(line: TransactionDetail) {
-    line.qtyRequest++;
+  increaseQty(line: ConsignmentCountDetail) {
+    line.qtyRequest += 1;
+    let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+    this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
   }
 
   async deleteLine(index) {
     try {
-      if (this.objectDetail[index]) {
+      if (this.objectService.objectDetail[index]) {
         const alert = await this.alertController.create({
           cssClass: "custom-alert",
           header: "Delete this item?",
@@ -213,8 +212,10 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
               text: "Delete item",
               cssClass: "danger",
               handler: async () => {
-                this.objectDetail.splice(index, 1);
-                this.toastService.presentToast("", "Line removed", "top", "success", 1000);
+                this.objectService.objectDetail.splice(index, 1);
+                this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
+                let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
             },
             {
@@ -222,14 +223,16 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
               role: "cancel",
               cssClass: "cancel",
               handler: async () => {
-                this.objectDetail[index].qtyRequest === 0 ? this.objectDetail[index].qtyRequest++ : 1;
+                this.objectService.objectDetail[index].qtyRequest === 0 ? (this.objectService.objectDetail[index].qtyRequest += 1) : 1;
+                let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
             }
           ]
         });
         await alert.present();
       } else {
-        this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
+        this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -248,9 +251,9 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
     }
   }
 
-  async onDoneScanning(event) {
-    if (event) {
-      await this.validateBarcode(event);
+  async onDoneScanning(barcode: string) {
+    if (barcode) {
+      await this.barcodescaninput.validateBarcode(barcode);
     }
   }
 
@@ -270,6 +273,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
 
   async nextStep() {
     try {
+      this.submit_attempt = true;
       const alert = await this.alertController.create({
         cssClass: "custom-alert",
         header: "Are you sure to proceed?",
@@ -278,7 +282,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
             text: "Confirm",
             cssClass: "success",
             handler: async () => {
-              if (this.objectHeader.consignmentCountId > 0) {
+              if (this.objectService.objectHeader.consignmentCountId > 0) {
                 this.updateObject();
               } else {
                 this.insertObject();
@@ -290,58 +294,69 @@ export class ConsignmentCountItemPage implements OnInit, ViewDidEnter {
             role: "cancel",
             cssClass: "cancel",
             handler: async () => {
-
+              this.submit_attempt = false;
             }
           }
         ]
       });
       await alert.present();
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
   insertObject() {
     try {
-      this.objectService.insertObject({ header: this.objectHeader, details: this.objectDetail }).subscribe(response => {
+      this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(response => {
         if (response.status === 201) {
+          this.submit_attempt = false;
           let object = response.body as ConsignmentCountRoot;
-          this.objectService.resetVariables();
           this.toastService.presentToast("", "Consignment Count added", "top", "success", 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: object.header.consignmentCountId
             }
           }
-          this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+          this.objectService.resetVariables();
+          this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
         throw error;
       })
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
   updateObject() {
     try {
-      this.objectService.updateObject({ header: this.objectHeader, details: this.objectDetail }).subscribe(response => {
+      this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(response => {
         if (response.status === 201) {
+          this.submit_attempt = false;
           let object = response.body as ConsignmentCountRoot;
-          this.objectService.resetVariables();
           this.toastService.presentToast("", "Consignment Count updated", "top", "success", 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {
               objectId: object.header.consignmentCountId
             }
           }
-          this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+          this.objectService.resetVariables();
+          this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
         throw error;
       })
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
