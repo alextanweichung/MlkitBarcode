@@ -61,4 +61,7 @@ export interface ConsignmentCountDetail {
   itemDescription?: string
   itemVariationXDescription?: string
   itemVariationYDescription?: string
+  
+  // testing performance
+  guid?: string
 }

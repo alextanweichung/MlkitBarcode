@@ -5,6 +5,7 @@ import { ActionSheetController, AlertController, NavController, ViewDidEnter, Vi
 import { ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -23,6 +24,7 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
     public objectService: ConsignmentCountService,
     private configService: ConfigService,
     private commonService: CommonService,
+    private toastService: ToastService,
     private navController: NavController,
     private alertController: AlertController,
     private actionSheetController: ActionSheetController,
@@ -58,12 +60,6 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
   }
 
   ionViewDidEnter(): void {
-    // this.route.queryParams.subscribe(params => {
-    //   this.objectId = params["objectId"];
-    //   if (this.objectId) {
-    //     this.loadObject();
-    //   }
-    // })
     if (this.objectService.objectHeader !== null || this.objectService.objectHeader !== undefined) {
       this.objectForm.patchValue(this.objectService.objectHeader);
     }
@@ -72,31 +68,6 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
   ngOnInit() {
 
   }
-
-  // loadObject() {
-  //   if (this.objectId) {
-  //     this.objectService.getObjectById(this.objectId).subscribe(response => {
-  //       this.objectRoot = response;
-  //       this.objectRoot.header = this.commonService.convertObjectAllDateType(this.objectRoot.header);
-  //       this.objectForm.patchValue(this.objectRoot.header);
-  //       this.objectService.setHeader(this.objectRoot.header);        
-  //       let td: TransactionDetail[] = [];
-  //       this.objectRoot.details.forEach(async r => {
-  //         let found = this.objectRoot.barcodeTag.find(rr => rr.itemId === r.itemId);
-  //         if (found) {
-  //           r.itemCode = found.itemCode;
-  //           r.description = found.description;
-  //         }
-  //         td.push(r);
-  //       })
-  //       this.objectService.setLines(td);
-  //       let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-  //       this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-  //     }, error => {
-  //       console.error(error);
-  //     })
-  //   }
-  // }
 
   consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
   bindLocationList() {
@@ -181,10 +152,10 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
     }
   }
 
-  nextStep() {
+  async nextStep() {
     this.objectService.setHeader(this.objectForm.getRawValue());
     let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-    this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
     this.navController.navigateForward("/transactions/consignment-count/consignment-count-item");
   }
 

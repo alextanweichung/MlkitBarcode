@@ -5,6 +5,7 @@ import { NavController, ViewWillEnter } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-consignment-count-detail',
@@ -49,29 +50,27 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
             r.itemCode = found.itemCode,
             r.itemDescription = found.description,
             r.itemVariationXDescription = found.itemVariationLineXDescription,
-            r.itemVariationYDescription = found.itemVariationLineYDescription
+            r.itemVariationYDescription = found.itemVariationLineYDescription,
+            r.guid = uuidv4()
           }
         })
         await this.objectService.setHeader(JSON.parse(JSON.stringify(this.object.header)));
         await this.objectService.setLines(JSON.parse(JSON.stringify(this.object.details)));
+        this.loadingService.dismissLoading();
       }, error => {
-        throw error;
+        this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
       this.loadingService.dismissLoading();
       console.error(e);
-    } finally {      
+    } finally {
       this.loadingService.dismissLoading();
     }
   }
 
   edit() {
-    // let navigationExtras: NavigationExtras = {
-    //   queryParams: {
-    //     objectId: this.objectId
-    //   }
-    // }
-    this.navController.navigateRoot("/transactions/consignment-count/consignment-count-header");//, navigationExtras);
+    this.navController.navigateRoot("/transactions/consignment-count/consignment-count-header");
   }
 
   previousStep() {

@@ -13,6 +13,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-consignment-count-item',
@@ -23,6 +24,7 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
 export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   submit_attempt: boolean = false;
+  max: number = 10;
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -46,14 +48,13 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
         this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
         this.navController.navigateRoot("/transactions/consignment-count/consignment-count-header");
       }
-      this.loadModuleControl();
     } catch (e) {
       console.error(e);
     }
   }
 
   ngOnInit() {
-
+    this.loadModuleControl();
   }
 
   moduleControl: ModuleControl[] = [];
@@ -75,56 +76,6 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
   }
 
   /* #region item line */
-
-  // async validateBarcode(barcode: string) {
-  //   try {
-  //     if (barcode) {
-  //       if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-  //         let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-  //         if (found_barcode) {
-  //           let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-  //           let outputData: TransactionDetail = {
-  //             itemId: found_item_master.id,
-  //             itemCode: found_item_master.code,
-  //             description: found_item_master.itemDesc,
-  //             variationTypeCode: found_item_master.varCd,
-  //             discountGroupCode: found_item_master.discCd,
-  //             discountExpression: (found_item_master.discPct ?? "0") + "%",
-  //             taxId: found_item_master.taxId,
-  //             taxCode: found_item_master.taxCd,
-  //             taxPct: found_item_master.taxPct,
-  //             qtyRequest: null,
-  //             itemPricing: {
-  //               itemId: found_item_master.id,
-  //               unitPrice: found_item_master.price,
-  //               discountGroupCode: found_item_master.discCd,
-  //               discountExpression: (found_item_master.discPct ?? "0") + "%",
-  //               discountPercent: found_item_master.discPct ?? 0,
-  //               discountGroupId: null,
-  //               unitPriceMin: null,
-  //               currencyId: null
-  //             },
-  //             itemVariationXId: found_barcode.xId,
-  //             itemVariationYId: found_barcode.yId,
-  //             itemSku: found_barcode.sku,
-  //             itemBarcode: found_barcode.barcode,
-  //             itemBrandId: found_item_master.brandId,
-  //             itemGroupId: found_item_master.groupId,
-  //             itemCategoryId: found_item_master.catId,
-  //             itemBarcodeTagId: found_barcode.id
-  //           }
-  //           this.addItemToLine(outputData);
-  //         } else {
-  //           this.toastService.presentToast("", "Barcode not found", "top", "danger", 1000);
-  //         }
-  //       } else {
-  //         this.toastService.presentToast("System Error", "Local db not found", "top", "danger", 1000);
-  //       }
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
 
   onItemAdd(event: TransactionDetail[]) {
     if (event && event.length > 0) {
@@ -150,10 +101,14 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           itemBarcodeTagId: trxLine.itemBarcodeTagId,
           itemBarcode: trxLine.itemBarcode,
           qtyRequest: 1,
-          sequence: this.objectService.objectDetail.length,
+          sequence: 0,
           // for local use
-          itemDescription: trxLine.description
+          itemCode: trxLine.itemCode,
+          itemDescription: trxLine.description,          
+          // testing performance
+          guid: uuidv4()
         }
+        this.objectService.objectDetail.forEach(r => { r.sequence += 1 });
         await this.objectService.objectDetail.unshift(newLine);
         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
         this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
@@ -361,5 +316,13 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
   }
 
   /* #endregion */
+
+  identify(index, line) {
+    return line.guid;
+  }
+
+  async loadALl() {
+    this.max += (this.objectService.objectDetail.length??0)
+  }
 
 }
