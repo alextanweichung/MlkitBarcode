@@ -26,7 +26,7 @@ export class BacktobackOrderSummaryPage implements OnInit {
 
   ngOnInit() {
     this.loadModuleControl
-    this.object = this.objectService.object;
+    this.object = this.objectService.objectSummary;
   }
 
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };

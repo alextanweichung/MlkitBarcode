@@ -1,99 +1,80 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { AlertController, IonPopover, NavController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
-import { QuotationRoot } from '../../../models/quotation';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { TrxChild } from 'src/app/shared/models/trx-child';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ApprovalHistory } from 'src/app/shared/models/approval-history';
 
 @Component({
   selector: 'app-quotation-detail',
   templateUrl: './quotation-detail.page.html',
   styleUrls: ['./quotation-detail.page.scss']
 })
-export class QuotationDetailPage implements OnInit {
+export class QuotationDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number
-  object: QuotationRoot;
   processType: string;
   selectedSegment: string;
+  objectApprovalHistory: ApprovalHistory[];
 
   constructor(
-    private authService: AuthService,
     public objectService: QuotationService,
-    private toastService: ToastService,
+    private authService: AuthService,
     private commonService: CommonService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private route: ActivatedRoute,
     private navController: NavController,
     private alertController: AlertController
-  ) {
+  ) { }
+
+  ionViewWillEnter(): void {
     this.objectService.loadRequiredMaster();
-    try {
-      this.route.queryParams.subscribe(params => {
-        this.objectId = params['objectId'];
-        this.processType = params['processType'];
-        this.selectedSegment = params['selectedSegment'];
-        if (!this.objectId) {
-          this.navController.navigateBack('/transactions/quotation');
-        }
-      })
-    } catch (e) {
-      console.error(e);
-    }
+    this.route.queryParams.subscribe(params => {
+      this.objectId = params["objectId"];
+      this.processType = params["processType"];
+      this.selectedSegment = params["selectedSegment"];
+      if (!this.objectId) {
+        this.navController.navigateBack("/transactions/quotation");
+      } else {        
+        this.loadObject();
+      }
+    })
   }
 
   ngOnInit() {
-    try {
-      if (!this.objectId) {
-        this.navController.navigateBack('/transactions/quotation')
-      } else {
-        this.loadModuleControl();
-        this.loadObject();
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    
   }
 
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
+  async loadObject() {
     try {
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+      await this.loadingService.showLoading();
+      this.objectService.getObjectById(this.objectId).subscribe(async response => {
+        let object = response;
+        object.header = this.commonService.convertObjectAllDateType(object.header);
+        this.objectApprovalHistory = object.approvalHistory;
+        this.loadWorkflow(object.header.quotationId);
+        await this.objectService.setHeader(object.header);
+        await this.objectService.setLine(object.details);
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
+      this.toastService.presentToast("System Error", "Something went wrong", "top", "danger", 1000);
       console.error(e);
-      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
-    }
-  }
-
-  loadObject() {
-    try {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
-        this.object = response;
-        if (this.object.header.isHomeCurrency) {
-          this.object.header.maxPrecision = this.precisionSales.localMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.localMax
-        } else {
-          this.object.header.maxPrecision = this.precisionSales.foreignMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
-        }
-        this.loadWorkflow(this.object.header.quotationId);
-      }, error => {
-        throw error;
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+    } finally {      
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -113,21 +94,14 @@ export class QuotationDetailPage implements OnInit {
   }
 
   editObject() {
-    this.objectService.setHeader(this.object.header);
-    this.objectService.setChoosenItems(this.object.details);
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: this.object.header.quotationId
-      }
-    }
-    this.navController.navigateRoot('/transactions/quotation/quotation-cart', navigationExtras);
+    this.navController.navigateRoot("/transactions/quotation/quotation-cart");
   }
 
   toggleObject() {
-    this.objectService.toggleObject(this.object.header.quotationId).subscribe(response => {
+    this.objectService.toggleObject(this.objectService.objectHeader.quotationId).subscribe(response => {
       if (response.status === 204) {
         this.loadObject();
-        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+        this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
       }
     }, error => {
       console.error(error);
@@ -160,7 +134,7 @@ export class QuotationDetailPage implements OnInit {
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;
     }
   }
@@ -193,21 +167,21 @@ export class QuotationDetailPage implements OnInit {
   async presentAlertViewPdf() {
     try {
       const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
+        header: "Download PDF?",
+        message: "",
         buttons: [
           {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
             handler: async () => {
               await this.downloadPdf();
             },
           },
           {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
           },
         ]
       });
@@ -219,11 +193,11 @@ export class QuotationDetailPage implements OnInit {
 
   async downloadPdf() {
     try {
-      this.objectService.downloadPdf("SMSC001", "pdf", this.object.header.quotationId).subscribe(response => {
-        let filename = this.object.header.quotationNum + ".pdf";
+      this.objectService.downloadPdf("SMSC001", "pdf", this.objectService.objectHeader.quotationId).subscribe(response => {
+        let filename = this.objectService.objectHeader.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -235,7 +209,7 @@ export class QuotationDetailPage implements OnInit {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -253,44 +227,44 @@ export class QuotationDetailPage implements OnInit {
     try {
       if (this.processType && this.selectedSegment) {
         const alert = await this.alertController.create({
-          cssClass: 'custom-alert',
+          cssClass: "custom-alert",
           backdropDismiss: false,
-          header: 'Are you sure to ' + action + ' ' + this.object.header.quotationNum + '?',
+          header: "Are you sure to " + action + " " + this.objectService.objectHeader.quotationNum + "?",
           inputs: [
             {
-              name: 'actionreason',
-              type: 'textarea',
-              placeholder: 'Please enter Reason',
-              value: ''
+              name: "actionreason",
+              type: "textarea",
+              placeholder: "Please enter Reason",
+              value: ""
             }
           ],
           buttons: [
             {
-              text: 'OK',
-              role: 'confirm',
-              cssClass: 'success',
+              text: "OK",
+              role: "confirm",
+              cssClass: "success",
               handler: (data) => {
-                if (action === 'REJECT' && this.processType) {
+                if (action === "REJECT" && this.processType) {
                   if (!data.actionreason && data.actionreason.length === 0) {
-                    this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                    this.toastService.presentToast("", "Please enter reason", "top", "warning", 1000);
                     return false;
                   } else {
-                    this.updateDoc(action, [this.object.header.quotationId.toString()], data.actionreason);
+                    this.updateDoc(action, [this.objectService.objectHeader.quotationId.toString()], data.actionreason);
                   }
                 } else {
-                  this.updateDoc(action, [this.object.header.quotationId.toString()], data.actionreason);
+                  this.updateDoc(action, [this.objectService.objectHeader.quotationId.toString()], data.actionreason);
                 }
               },
             },
             {
-              text: 'Cancel',
-              role: 'cancel'
+              text: "Cancel",
+              role: "cancel"
             },
           ],
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -339,17 +313,18 @@ export class QuotationDetailPage implements OnInit {
           }
           this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
-              this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
+              this.toastService.presentToast("", "Doc review is completed", "top", "success", 1000);
               this.navController.back();
             }
           }, error => {
-            throw Error;
+            console.error(error);;
           })
         } catch (error) {
-          this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+          this.toastService.presentToast("System Error", "Update error", "top", "danger", 1000);
+          console.error(error);
         }
       } else {
-        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);

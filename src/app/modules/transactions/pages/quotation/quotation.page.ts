@@ -11,6 +11,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { Customer } from '../../models/customer';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-quotation',
@@ -31,17 +32,16 @@ export class QuotationPage implements OnInit, ViewWillEnter {
     private authService: AuthService,
     private commonService: CommonService,
     private objectService: QuotationService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private modalController: ModalController,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private navController: NavController,
-    private toastService: ToastService,
-  ) { 
-    // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
-  }
+  ) { }
 
   ionViewWillEnter(): void {
+    this.objectService.loadRequiredMaster();
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
@@ -58,8 +58,9 @@ export class QuotationPage implements OnInit, ViewWillEnter {
 
   /* #region  crud */
 
-  loadObjects() {
+  async loadObjects() {
     try {
+      await this.loadingService.showLoading();
       let obj: SalesSearchModal = {
         dateStart: format(this.startDate, "yyyy-MM-dd"),
         dateEnd: format(this.endDate, "yyyy-MM-dd"),
@@ -71,13 +72,17 @@ export class QuotationPage implements OnInit, ViewWillEnter {
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-      }, error => {
-        throw Error;
+      }, async error => {
+         await this.loadingService.dismissLoading();
+         console.error(error);
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
-      this.toastService.presentToast("Error loading object", "", "top", "danger", 1000);
+    } finally {      
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -107,7 +112,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
       if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward("/transactions/quotation/quotation-header");
       } else {
-        this.toastService.presentToast("System Error", "Sales Agent not set.", "top", "danger", 1000);
+        this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "danger", 1000);
       }      
     } catch (e) {
       console.error(e);
@@ -176,7 +181,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
         let filename = doc.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

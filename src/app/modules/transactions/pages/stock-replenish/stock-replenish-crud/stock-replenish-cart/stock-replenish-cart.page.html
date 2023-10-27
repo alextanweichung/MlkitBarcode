@@ -1,4 +1,4 @@
-<ion-header collapse="fade" [translucent]="true">
+<!-- <ion-header collapse="fade" [translucent]="true">
   <ion-toolbar>
     <ion-title>View Cart</ion-title>
     <ion-buttons slot="start">
@@ -139,7 +139,6 @@
   </ion-grid>
 </ion-footer>
 
-<!-- extra info e.g. remark, addr -->
 <ion-modal [isOpen]="isExtraInfoModal" (didDismiss)="isExtraInfoModal = false">
   <ng-template>
     <ion-header>
@@ -175,7 +174,6 @@
   </ng-template>
 </ion-modal>
 
-<!-- change line price, disc, disc code, qty -->
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
   <ng-template>
     <ion-header>
@@ -281,7 +279,6 @@
   </ng-template>
 </ion-modal>
 
-<!-- for isPricingApproval -->
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
     <ion-content class="p-2">
@@ -293,4 +290,4 @@
       </ion-list>
     </ion-content>
   </ng-template>
-</ion-popover>
+</ion-popover> -->

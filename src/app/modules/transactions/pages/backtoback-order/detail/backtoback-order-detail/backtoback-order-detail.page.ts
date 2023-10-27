@@ -55,22 +55,7 @@ export class BacktobackOrderDetailPage implements OnInit {
     if (!this.objectId) {
       this.navController.navigateBack('/transactions/backtoback-order')
     } else {
-      this.loadModuleControl();
       this.loadObject();
-    }
-  }
-
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
-    try {
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast('Error loading module control', '', 'top', 'danger', 1000);
     }
   }
 
@@ -78,16 +63,9 @@ export class BacktobackOrderDetailPage implements OnInit {
     try {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
-        if (this.object.header.isHomeCurrency) {
-          this.object.header.maxPrecision = this.precisionSales.localMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.localMax
-        } else {
-          this.object.header.maxPrecision = this.precisionSales.foreignMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
-        }
         this.loadWorkflow(this.object.header.backToBackOrderId);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -147,7 +125,7 @@ export class BacktobackOrderDetailPage implements OnInit {
 
   editObject() {
     this.objectService.setHeader(this.object.header);
-    this.objectService.setChoosenItems(this.object.details);
+    this.objectService.setLine(this.object.details);
     let navigationExtras: NavigationExtras = {
       queryParams: {
         objectId: this.object.header.backToBackOrderId
@@ -313,7 +291,7 @@ export class BacktobackOrderDetailPage implements OnInit {
               this.navController.back();
             }
           }, error => {
-            throw Error;
+            console.error(error);;
           })
         } catch (error) {
           this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);

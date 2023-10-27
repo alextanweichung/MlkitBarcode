@@ -1,17 +1,16 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Header</ion-title>
+    <ion-title>
+      <div class="ion-text-wrap">
+        Quotation
+      </div>
+    </ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
+      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Header</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2"> 
     <ion-list class="list-custom" lines="none">
       <app-search-dropdown title="Customer" [searchDropdownList]="objectService.customerSearchDropdownList" [selectedId]="objectForm?.controls?.customerId?.value" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>

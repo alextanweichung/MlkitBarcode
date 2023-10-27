@@ -67,7 +67,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

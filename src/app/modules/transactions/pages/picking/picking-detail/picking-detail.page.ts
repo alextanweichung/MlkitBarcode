@@ -55,7 +55,7 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
           this.uniqueSalesOrder = [...new Set(this.object.outstandingPickList.flatMap(r => r.salesOrderNum))];
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

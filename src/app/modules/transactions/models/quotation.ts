@@ -33,27 +33,28 @@ export interface QuotationHeader {
   customerId: number
   businessModelType: string
   salesAgentId: number
-  shipAddress: any
-  shipPostCode: any
-  shipPhone: any
-  shipEmail: any
-  shipFax: any
-  shipAreaId: any
-  shipMethodId: any
-  attention: any
+  shipAddress: string
+  shipPostCode: string
+  shipPhone: string
+  shipEmail: string
+  shipFax: string
+  shipStateId: number
+  shipAreaId: number
+  shipMethodId: number
+  attention: string
   locationId: number
-  toLocationId: any
+  toLocationId?: number
   termPeriodId: number
-  workFlowTransactionId: any
+  workFlowTransactionId?: number
   countryId: number
   currencyId: number
   currencyRate: number
-  quotationUDField1: any
-  quotationUDField2: any
-  quotationUDField3: any
-  quotationUDOption1: any
-  quotationUDOption2: any
-  quotationUDOption3: any
+  quotationUDField1?: string
+  quotationUDField2?: string
+  quotationUDField3?: string
+  quotationUDOption1?: number
+  quotationUDOption2?: number
+  quotationUDOption3?: number
   totalGrossAmt: number
   totalDiscAmt: number
   totalTaxAmt: number
@@ -65,29 +66,23 @@ export interface QuotationHeader {
   localGrandTotal: number
   localGrandTotalExTax: number
   printCount: number
-  childType: any
-  childId: any
-  externalDocNum: any
-  masterUDGroup1: any
-  masterUDGroup2: any
-  masterUDGroup3: any
-  remark: any
+  childType?: string
+  childId?: number
+  externalDocNum?: string
+  masterUDGroup1?: number
+  masterUDGroup2?: number
+  masterUDGroup3?: number
+  remark?: string
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean
-  /* #region  special to pass in precision */
-  maxPrecision: number
-  maxPrecisionTax: number
-  /* #endregion */
-
-  isPricingApproval?: boolean
-  
+  isPricingApproval: boolean
   sequence: number
   createdById: number
   createdBy: string
   createdAt: string
-  modifiedById: any
-  modifiedBy: any
-  modifiedAt: any
+  modifiedById?: number
+  modifiedBy?: string
+  modifiedAt?: Date
   deactivated: boolean
 }

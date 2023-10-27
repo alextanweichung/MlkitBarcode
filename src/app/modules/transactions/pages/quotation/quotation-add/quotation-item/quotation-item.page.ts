@@ -1,14 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { ItemCartPage } from 'src/app/shared/pages/item-cart/item-cart.page';
+import { ItemCatalogPage } from 'src/app/shared/pages/item-catalog/item-catalog.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
 import {v4 as uuidv4} from 'uuid';
@@ -19,12 +19,9 @@ import {v4 as uuidv4} from 'uuid';
   styleUrls: ['./quotation-item.page.scss'],
   providers: [DatePipe, SearchItemService, { provide: 'apiObject', useValue: 'mobileQuotation' }]
 })
-export class QuotationItemPage implements OnInit, ViewWillEnter {
+export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
-  moduleControl: ModuleControl[] = [];
-  useTax: boolean = false;
-
-  @ViewChild('itemCatalog', { static: false }) itemCatalog: ItemCartPage;
+  @ViewChild("itemCatalog", { static: false }) itemCatalog: ItemCatalogPage;
 
   constructor(
     private authService: AuthService,
@@ -33,77 +30,41 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
     private commonService: CommonService,
     private toastService: ToastService,
     private actionSheetController: ActionSheetController
-  ) {
-    this.objectService.loadRequiredMaster();
-    try {
-      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
-        this.navController.navigateBack('/transactions/quotation/quotation-header');
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  ) { }
 
   ionViewWillEnter(): void {
     try {
-      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
-        this.navController.navigateBack('/transactions/quotation/quotation-header');
-      } else {
-        this.componentsLoad();
+      this.objectService.loadRequiredMaster();
+      if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
+        this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+        this.navController.navigateBack("/transactions/quotation/quotation-header");
       }
     } catch (e) {
       console.error(e);
     }
   }
 
+  async ionViewDidEnter(): Promise<void> {
+    await this.itemCatalog.setFocus();
+  }
+
   ngOnInit() {
-  }
 
-  componentsLoad() {
-    this.loadModuleControl();
-  }
-
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
-    try {
-      this.authService.moduleControlConfig$.subscribe(obj => {
-        this.moduleControl = obj;
-        let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-        if (SystemWideActivateTaxControl != undefined) {
-          this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
-        }
-        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-          this.configSalesActivatePromotionEngine = true;
-        } else {
-          this.configSalesActivatePromotionEngine = false;
-        }
-      }, error => {
-        throw error;
-      })
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })      
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   async onItemAdded(event: TransactionDetail) {
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignTrxItemToDataLine(trxLine);
-      if (this.objectService.header.isItemPriceTaxInclusive) {
+      if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
         await this.computeUnitPriceExTax(trxLine);
       } else {
         await this.computeUnitPrice(trxLine);
       }
-      this.objectService.itemInCart.unshift(trxLine);
-      await this.computeAllAmount(this.objectService.itemInCart[0]);
+      await this.objectService.objectDetail.unshift(trxLine);
+      await this.computeAllAmount(this.objectService.objectDetail[0]);
       await this.assignSequence();
-      this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
+      this.toastService.presentToast("", "Item added", "top", "success", 1000);
     } catch (e) {
       console.error(e);
     }
@@ -111,7 +72,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   assignSequence() {
     let index = 0;
-    this.objectService.itemInCart.forEach(r => {
+    this.objectService.objectDetail.forEach(r => {
       r.sequence = index;
       index++;
     })
@@ -128,8 +89,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   /* #region  tax handle here */
 
-  promotionEngineApplicable: boolean = true;
-  configSalesActivatePromotionEngine: boolean;
   disablePromotionCheckBox: boolean = false;
   async computeAllAmount(trxLine: TransactionDetail) {
     try {
@@ -141,7 +100,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   getVariationSum(trxLine: TransactionDetail) {
     try {
-      if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
+      if (trxLine.variationTypeCode === "1" || trxLine.variationTypeCode === "2") {
         trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
       }
     } catch (e) {
@@ -151,7 +110,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -160,7 +119,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);      
     } catch (e) {
       console.error(e);
@@ -170,7 +129,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
       await this.getVariationSum(trxLine);
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax);
     } catch (e) {
       console.error(e);
     }
@@ -179,9 +138,9 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       trxLine.lineId = 0;
-      trxLine.headerId = this.objectService.header.quotationId;
-      if (this.useTax) {
-        if (this.objectService.header.isItemPriceTaxInclusive) {
+      trxLine.headerId = this.objectService.objectHeader.quotationId;
+      if (this.objectService.systemWideActivateTaxControl) {
+        if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
           trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
         } else {
@@ -194,16 +153,16 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
       }
       trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.header.maxPrecision);
-      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.header.maxPrecision);
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
       
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      if (this.objectService.salesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-        if (this.objectService.header.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPrice;
+        if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax) : trxLine.unitPrice;
         } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPriceExTax;
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax) : trxLine.unitPriceExTax;
         }
         if (trxLine.itemGroupInfo) {
           trxLine.brandId = trxLine.itemGroupInfo.brandId;
@@ -233,7 +192,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.navController.navigateForward('/transactions/quotation/quotation-cart');
+      this.navController.navigateForward("/transactions/quotation/quotation-cart");
     } catch (e) {
       console.error(e);
     }
@@ -241,7 +200,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/quotation/quotation-header');
+      this.navController.navigateBack("/transactions/quotation/quotation-header");
     } catch (e) {
       console.error(e);
     }
@@ -250,28 +209,29 @@ export class QuotationItemPage implements OnInit, ViewWillEnter {
   async backToDetail() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        subHeader: 'Changes made will be discard.',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
-      if (role === 'confirm') {
+      if (role === "confirm") {
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: this.objectService.header.quotationId
+            objectId: this.objectService.objectHeader.quotationId
           }
         }
-        this.navController.navigateRoot('/transactions/quotation/quotation-detail', navigationExtras);
+        this.objectService.resetVariables();
+        this.navController.navigateRoot("/transactions/quotation/quotation-detail", navigationExtras);
       }
     } catch (e) {
       console.error(e);

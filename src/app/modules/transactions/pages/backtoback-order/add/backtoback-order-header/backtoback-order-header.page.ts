@@ -78,8 +78,6 @@ export class BacktobackOrderHeaderPage implements OnInit {
       businessModelType: [null],
       remark: [null],
       isHomeCurrency: [null],
-      maxPrecision: [null],
-      maxPrecisionTax: [null],
       status: [null],
       isCompleted: [null],
       posLocationId: [null],
@@ -102,9 +100,6 @@ export class BacktobackOrderHeaderPage implements OnInit {
   workflowEnablePrintAfterApproved: boolean;
   disableTradeTransactionGenerateGL: boolean;
   BoDoSiDisplayPosLocationCode: boolean = false;
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionCurrency: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   loadModuleControl() {
     this.authService.moduleControlConfig$.subscribe(obj => {
       this.moduleControl = obj;
@@ -139,11 +134,6 @@ export class BacktobackOrderHeaderPage implements OnInit {
         this.BoDoSiDisplayPosLocationCode = true;
       }
       this.loadRestrictColumms();
-    })
-    this.authService.precisionList$.subscribe(precision => {
-      this.precisionCurrency = precision.find(x => x.precisionCode == "CURRENCY");
-      this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-      this.precisionTax = precision.find(x => x.precisionCode == "TAX");
     })
   }
   
@@ -211,7 +201,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
   onCustomerSelected(event: any, ignoreCurrencyRate?: boolean) {
     var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
     if (lookupValue != undefined) {
-      this.objectService.removeItems();
+      this.objectService.removeLine();
       this.objectForm.patchValue({ customerId: lookupValue.id });
       this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
       if (lookupValue.attributeArray1.length > 0) {
@@ -264,12 +254,8 @@ export class BacktobackOrderHeaderPage implements OnInit {
           this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
           if (lookupValue.attribute2 == "Y") {
             this.objectForm.patchValue({ isHomeCurrency: true });
-            this.objectForm.patchValue({ maxPrecision: this.precisionSales.localMax });
-            this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.localMax });
           } else {
             this.objectForm.patchValue({ isHomeCurrency: false });
-            this.objectForm.patchValue({ maxPrecision: this.precisionSales.foreignMax });
-            this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.foreignMax });
           }
         }
       }      

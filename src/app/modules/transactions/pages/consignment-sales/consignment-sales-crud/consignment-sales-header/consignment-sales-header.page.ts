@@ -291,7 +291,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
             this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item");
         //   }
         // }, error => {
-        //   throw error;
+        //   console.error(error);;
         // })
       }
     } catch (e) {

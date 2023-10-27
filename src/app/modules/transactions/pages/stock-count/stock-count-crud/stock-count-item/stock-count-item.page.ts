@@ -67,7 +67,7 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
           this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -80,7 +80,7 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
       this.objectService.getInventoryCountBatchCriteria(this.header.inventoryCountBatchId).subscribe(response => {
         this.inventoryCountBatchCriteria = response;
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -349,7 +349,7 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
           this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -370,7 +370,7 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
           this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

@@ -40,16 +40,16 @@ export interface SalesOrderHeader {
   status: string
   customerId: number
   businessModelType: string
-  salesAgentId: number
-  shipAddress: string
-  shipPostCode: string
-  shipPhone: string
-  shipFax: string
-  shipEmail: string
-  shipStateId: number
-  shipAreaId: number
-  shipMethodId: number
-  attention: string
+  salesAgentId?: number
+  shipAddress?: string
+  shipPostCode?: string
+  shipPhone?: string
+  shipFax?: string
+  shipEmail?: string
+  shipStateId?: number
+  shipAreaId?: number
+  shipMethodId?: number
+  attention?: string
   locationId: number
   toLocationId: number
   termPeriodId: number
@@ -57,12 +57,12 @@ export interface SalesOrderHeader {
   countryId: number
   currencyId: number
   currencyRate: number
-  salesOrderUDField1: any
-  salesOrderUDField2: string
-  salesOrderUDField3: string
-  salesOrderUDOption1: number
-  salesOrderUDOption2: number
-  salesOrderUDOption3: number
+  salesOrderUDField1?: string
+  salesOrderUDField2?: string
+  salesOrderUDField3?: string
+  salesOrderUDOption1?: number
+  salesOrderUDOption2?: number
+  salesOrderUDOption3?: number
   totalGrossAmt: number
   totalDiscAmt: number
   totalTaxAmt: number
@@ -74,11 +74,11 @@ export interface SalesOrderHeader {
   localGrandTotal: number
   localGrandTotalExTax: number
   printCount: number
-  externalDocNum: string
-  masterUDGroup1: string
-  masterUDGroup2: string
-  masterUDGroup3: string
-  remark: string
+  externalDocNum?: string
+  masterUDGroup1?: number
+  masterUDGroup2?: number
+  masterUDGroup3?: number
+  remark?: string
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean
@@ -86,26 +86,20 @@ export interface SalesOrderHeader {
   isOpeningBalance: boolean
   isPricingApproval: boolean
   isTrackerComplete: boolean
-  trackerCompleteDate: Date
-  closeRemark: string
+  trackerCompleteDate?: Date
+  closeRemark?: string
   isPriority: boolean
-  isPriorityDate: Date
-  deliveryDate: Date
+  isPriorityDate?: Date
+  deliveryDate?: Date
   orderLifeCycle: string
-  customerPo: string
-
-  /* #region  special to pass in precision */
-  maxPrecision: number
-  maxPrecisionTax: number
-  /* #endregion */
-
+  customerPo?: string
   sequence: number
   createdById: number
   createdBy: string
   createdAt: string
-  modifiedById: number
-  modifiedBy: string
-  modifiedAt: Date
+  modifiedById?: number
+  modifiedBy?: string
+  modifiedAt?: Date
   deactivated: boolean
 }
 

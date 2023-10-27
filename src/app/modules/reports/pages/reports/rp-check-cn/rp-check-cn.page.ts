@@ -69,7 +69,7 @@ export class RpCheckCnPage implements OnInit {
         this.objects = response;
         this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 300, true);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -114,7 +114,7 @@ export class RpCheckCnPage implements OnInit {
       this.objectService.getPdf(paramModel).subscribe(async response => {
         await this.commonService.commonDownloadPdf(response, docNum + "." + paramModel.format);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -191,7 +191,7 @@ export class RpCheckCnPage implements OnInit {
         this.objectService.getPdf(paramModel).subscribe(async response => {
           await this.commonService.commonDownloadPdf(response, "ARCreditNote." + paramModel.format);
         }, error => {
-          throw error;
+          console.error(error);;
         })
       }
 
@@ -205,7 +205,7 @@ export class RpCheckCnPage implements OnInit {
         this.objectService.getPdf(paramModel).subscribe(async response => {
           await this.commonService.commonDownloadPdf(response, "SalesReturn." + paramModel.format);
         }, error => {
-          throw error;
+          console.error(error);;
         })
       }
 

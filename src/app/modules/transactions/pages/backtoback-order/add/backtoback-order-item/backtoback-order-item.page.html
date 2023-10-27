@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Item</ion-title>
-    <ion-buttons slot="start" *ngIf="objectService.header.backToBackOrderId === 0">
+    <ion-buttons slot="start" *ngIf="objectService.objectHeader.backToBackOrderId === 0">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
-    <ion-buttons slot="start" *ngIf="objectService.header.backToBackOrderId > 0">
+    <ion-buttons slot="start" *ngIf="objectService.objectHeader.backToBackOrderId > 0">
       <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
@@ -44,7 +44,7 @@
 </ion-popover>
 <ion-content fullscreen>
   <div class="p-2">
-    <app-item-catalog [keyId]="this.objectService.header.customerId" [locationId]="this.objectService.header.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectService.header" [precisionSales]="precisionSales" [isItemPriceTaxInclusive]="this.objectService.header.isItemPriceTaxInclusive" [maxPrecision]="this.objectService.header.maxPrecision" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isBackToBackOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="objectService.itemInCart"></app-item-catalog>
+    <app-item-catalog [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isBackToBackOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="objectService.objectDetail"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
@@ -52,7 +52,7 @@
     <ion-row>
       <ion-col>
         <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-          View Cart ({{objectService.itemInCart.length|number:'1.0'}})
+          View Cart ({{objectService.objectDetail.length|number:'1.0'}})
         </ion-button>
       </ion-col>
     </ion-row>

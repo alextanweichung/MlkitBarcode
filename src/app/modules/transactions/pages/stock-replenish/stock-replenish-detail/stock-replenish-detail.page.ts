@@ -71,17 +71,17 @@ export class StockReplenishDetailPage implements OnInit, ViewWillEnter {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
         if (this.object.header.isHomeCurrency) {
-          this.object.header.maxPrecision = this.precisionSales.localMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.localMax
+          // this.object.header.maxPrecision = this.precisionSales.localMax;
+          // this.object.header.maxPrecisionTax = this.precisionTax.localMax
         } else {
-          this.object.header.maxPrecision = this.precisionSales.foreignMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
+          // this.object.header.maxPrecision = this.precisionSales.foreignMax;
+          // this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
         }
         // this.loadWorkflow(this.object.header.salesOrderId);
         this.objectService.setHeader(this.object.header);
         this.objectService.setChoosenItems(this.object.details);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

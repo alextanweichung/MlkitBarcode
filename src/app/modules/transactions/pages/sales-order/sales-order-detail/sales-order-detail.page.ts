@@ -4,7 +4,6 @@ import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ioni
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
@@ -14,6 +13,7 @@ import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { TrxChild } from 'src/app/shared/models/trx-child';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { format, parseISO } from 'date-fns';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-sales-order-detail',
@@ -35,81 +35,65 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   showAdditionalInfo: boolean = false;
 
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private navController: NavController,
     public objectService: SalesOrderService,
-    private alertController: AlertController,
+    private authService: AuthService,
+    private commonService: CommonService,
     private toastService: ToastService,
-    private commonService: CommonService
+    private loadingService: LoadingService,
+    private navController: NavController,
+    private alertController: AlertController,
+    private route: ActivatedRoute,
   ) {
-    this.objectService.loadRequiredMaster();
-    try {
-      this.route.queryParams.subscribe(params => {
-        this.objectId = params['objectId'];
-        this.processType = params['processType'];
-        this.selectedSegment = params['selectedSegment'];
+  }
 
-        this.isDraft = params['isDraft'];
+  async ionViewWillEnter(): Promise<void> {
+    try {
+      await this.objectService.loadRequiredMaster();
+      this.route.queryParams.subscribe(params => {
+        this.isDraft = params["isDraft"];
         if (this.isDraft) {
-          this.draftTransactionId = params['draftTransactionId'];
+          this.draftTransactionId = params["draftTransactionId"];
+          this.loadDraftObject();
+        } else {
+          this.objectId = params["objectId"];
+          this.processType = params["processType"];
+          this.selectedSegment = params["selectedSegment"];
+          if (this.objectId && this.objectId > 0) {
+            this.loadObject();
+          } else {
+            this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "warning", 1000);
+            this.navController.navigateBack("/transactions/sales-order");
+          }
         }
       })
     } catch (e) {
       console.error(e);
     }
-  }
-
-  ionViewWillEnter(): void {
-
   }
 
   ngOnInit() {
-    if (this.objectId && this.objectId > 0) {
-      this.loadObject();
-    } else if (this.isDraft && this.draftTransactionId && this.draftTransactionId > 0) {
-      this.loadDraftObject();
-    } else {
-      this.toastService.presentToast("", "Invalid Sales Order.", "top", "warning", 1000);
-      this.navController.navigateBack("/transactions/sales-order");
-    }
-    this.loadModuleControl();
+
   }
 
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
+  async loadObject() {
     try {
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
-    }
-  }
-
-  loadObject() {
-    try {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
+      await this.loadingService.showLoading();
+      this.objectService.getObjectById(this.objectId).subscribe(async response => {
         this.object = response;
-        if (this.object.header.isHomeCurrency) {
-          this.object.header.maxPrecision = this.precisionSales.localMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.localMax
-        } else {
-          this.object.header.maxPrecision = this.precisionSales.foreignMax;
-          this.object.header.maxPrecisionTax = this.precisionTax.foreignMax;
-        }
+        this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
         this.loadWorkflow(this.object.header.salesOrderId);
         this.objectService.setHeader(this.object.header);
-        this.objectService.setChoosenItems(this.object.details);
-      }, error => {
-        throw error;
+        this.objectService.setLine(this.object.details);
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
-      this.toastService.presentToast("Error", "Sales Order", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -119,7 +103,6 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     this.workFlowState = [];
     this.objectService.getWorkflow(objectId).subscribe(response => {
       this.workFlowState = response;
-
       this.objectService.getTrxChild(objectId).subscribe(response2 => {
         this.trxChild = response2;
         if (this.trxChild.length > 0) {
@@ -164,38 +147,41 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   }
 
   loadDraftObject() {
-    this.objectService.getDraftObject(this.draftTransactionId).subscribe(response => {
-      this.draftObject = response;
-      this.object = JSON.parse(this.draftObject.jsonData) as SalesOrderRoot;
-      this.object.header.salesOrderNum = this.draftObject.draftTransactionNum;
-      this.isDraft = true;
-      this.objectService.setHeader(this.object.header);
-      this.objectService.setChoosenItems(this.object.details);
-      this.objectService.setDraftObject(this.draftObject);
-    }, error => {
+    try {
+      this.objectService.getDraftObject(this.draftTransactionId).subscribe(response => {
+        this.draftObject = response;
+        let object = JSON.parse(this.draftObject.jsonData) as SalesOrderRoot;
+        object.header.salesOrderNum = this.draftObject.draftTransactionNum;
+        this.isDraft = true;
+        this.object = object;
+        this.objectService.setHeader(object.header);
+        this.objectService.setLine(object.details);
+        this.objectService.setDraftObject(this.draftObject);
+      }, error => {
+        console.error(error);
+      })
+    } catch (error) {
       console.error(error);
-    })
+    }
   }
 
   editObject() {
-    this.objectService.setHeader(this.object.header);
-    this.objectService.setChoosenItems(this.object.details);
     if (this.isDraft) {
       this.objectService.setDraftObject(this.draftObject);
     }
     let navigationExtras: NavigationExtras = {
       queryParams: {
-        objectId: this.object.header.salesOrderId
+        objectId: this.objectService.objectHeader.salesOrderId
       }
     }
     this.navController.navigateRoot("/transactions/sales-order/sales-order-cart", navigationExtras);
   }
 
   toggleObject() {
-    this.objectService.toggleObject(this.object.header.salesOrderId).subscribe(response => {
+    this.objectService.toggleObject(this.objectService.objectHeader.salesOrderId).subscribe(response => {
       if (response.status === 204) {
         this.loadObject();
-        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+        this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
       }
     }, error => {
       console.error(error);
@@ -228,7 +214,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;
     }
   }
@@ -279,8 +265,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
   async downloadPdf(reportName: string) {
     try {
-      this.objectService.downloadPdf("SMSC002", "pdf", this.object.header.salesOrderId, reportName).subscribe(response => {
-        let filename = this.object.header.salesOrderNum + ".pdf";
+      this.objectService.downloadPdf("SMSC002", "pdf", this.objectService.objectHeader.salesOrderId, reportName).subscribe(response => {
+        let filename = this.objectService.objectHeader.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
         console.log(error);
@@ -315,7 +301,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         const alert = await this.alertController.create({
           cssClass: "custom-alert",
           backdropDismiss: false,
-          header: "Are you sure to " + action + " " + this.object.header.salesOrderNum + "?",
+          header: "Are you sure to " + action + " " + this.objectService.objectHeader.salesOrderNum + "?",
           inputs: [
             {
               name: "actionreason",
@@ -335,10 +321,10 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
                     this.toastService.presentToast("Please enter reason", "", "top", "danger", 1000);
                     return false;
                   } else {
-                    this.updateDoc(action, [this.object.header.salesOrderId.toString()], data.actionreason);
+                    this.updateDoc(action, [this.objectService.objectHeader.salesOrderId.toString()], data.actionreason);
                   }
                 } else {
-                  this.updateDoc(action, [this.object.header.salesOrderId.toString()], data.actionreason);
+                  this.updateDoc(action, [this.objectService.objectHeader.salesOrderId.toString()], data.actionreason);
                 }
               },
             },
@@ -409,7 +395,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
               this.navController.back();
             }
           }, error => {
-            throw Error;
+            console.error(error);;
           })
         } catch (error) {
           this.toastService.presentToast("Update error", "", "top", "danger", 1000);
@@ -428,10 +414,10 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
   showStatus() {
     try {
-      this.objectService.getStatus(this.object.header.salesOrderId).subscribe(response => {
+      this.objectService.getStatus(this.objectService.objectHeader.salesOrderId).subscribe(response => {
         this.toastService.presentToast("Doc Status", response.currentStatus, "top", "success", 2000);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -444,7 +430,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
   async presentConfirmAlert() {
     try {
-      if (this.objectService.itemInCart.length > 0) {
+      if (this.objectService.objectDetail.length > 0) {
         const alert = await this.alertController.create({
           header: "Are you sure to proceed?",
           subHeader: "This will delete Draft & Generate SO",
@@ -466,7 +452,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         });
         await alert.present();
       } else {
-        this.toastService.presentToast("Error!", "Please add at least 1 item to continue", "top", "danger", 1000);
+        this.toastService.presentToast("Control Error", "Please add at least 1 item to continue", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -475,23 +461,31 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
   async insertObject() {
     try {
+      await this.loadingService.showLoading();
       let trxDto: SalesOrderRoot = {
-        header: this.objectService.header,
-        details: this.objectService.itemInCart
+        header: this.objectService.objectHeader,
+        details: this.objectService.objectDetail
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+      console.log("🚀 ~ file: sales-order-detail.page.ts:471 ~ SalesOrderDetailPage ~ insertObject ~ trxDto:", trxDto)
       trxDto.header.salesOrderNum = null; // always default to null when insert
       if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
-        this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(response => {
-          this.objectService.setObject((response.body as SalesOrderRoot));
-          this.toastService.presentToast("Insert Complete", "", "top", "success", 1000);
+        this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(async response => {
+          console.log("🚀 ~ file: sales-order-detail.page.ts:476 ~ SalesOrderDetailPage ~ this.objectService.confirmDraftObject ~ response.body:", response.body)
+          this.objectService.setSummary(response.body);
+          await this.loadingService.dismissLoading();
+          this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
           this.navController.navigateRoot("/transactions/sales-order/sales-order-summary");
-        }, error => {
+        }, async error => {
+          await this.loadingService.dismissLoading();
           console.error(error);
         })
       }
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -549,11 +543,11 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
   }
 
   /* #endregion */
-  
+
   formattedDateString: string = "";
   setFormattedDateString() {
-    if (this.object.header.deliveryDate) {
-      this.formattedDateString = format(parseISO(format(new Date(this.object.header.deliveryDate), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    if (this.objectService.objectHeader.deliveryDate) {
+      this.formattedDateString = format(parseISO(format(new Date(this.objectService.objectHeader.deliveryDate), "yyyy-MM-dd") + `T00:00:00.000Z`), "MMM d, yyyy");
     } else {
       this.formattedDateString = "";
     }

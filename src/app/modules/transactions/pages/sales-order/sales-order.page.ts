@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-sales-order',
@@ -33,15 +34,15 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     private authService: AuthService,
     private commonService: CommonService,
     private objectService: SalesOrderService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService,
     private differs: IterableDiffers
   ) {
     // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
     this.objectDiffer = this.differs.find(this.objects).create();
   }
 
@@ -54,6 +55,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   ionViewWillEnter(): void {
     this.objectService.resetVariables();
+    this.objectService.loadRequiredMaster();
     this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
@@ -63,12 +65,12 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     }
   }
 
-  ionViewDidEnter(): void {
+  async ionViewDidEnter(): Promise<void> {
     if (this.showDraftOnly) {
-      this.loadDraftObjects();
+      await this.loadDraftObjects();
     } else {
-      this.loadObjects();
-      this.loadDraftObjects();
+      await this.loadObjects();
+      await this.loadDraftObjects();
     }
   }
 
@@ -80,6 +82,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   async loadObjects() {
     try {
+      await this.loadingService.showLoading();
       let obj: SalesSearchModal = {
         dateStart: format(this.startDate, "yyyy-MM-dd"),
         dateEnd: format(this.endDate, "yyyy-MM-dd"),
@@ -88,17 +91,23 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       }
       this.objectService.getObjectListByDate(obj).subscribe(async response => {
         this.objects = [...this.objects, ...response];
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        throw error;
+        await this.loadingService.dismissLoading();
+        console.log(error);
       })
     } catch (error) {
-      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
+      await this.loadingService.dismissLoading();
+      this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
-  loadDraftObjects() {
+  async loadDraftObjects() {
     try {
+      await this.loadingService.showLoading();
       this.objectService.getDraftObjects().subscribe(async response => {
         this.draftObjects = response;
         for (let index = 0; index < this.draftObjects.length; index++) {
@@ -124,12 +133,17 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
           }
           this.objects = [...this.objects, obj];
         }
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        throw error;
+        await this.loadingService.dismissLoading();
+        console.log(error);
       })
     } catch (error) {
-      this.toastService.presentToast("", "Error loading draft object.", "top", "danger", 1000);
+      await this.loadingService.dismissLoading();
+      this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -152,7 +166,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       if (this.objectService.hasSalesAgent()) {
         this.navController.navigateForward("/transactions/sales-order/sales-order-header");
       } else {
-        this.toastService.presentToast("System Error", "Sales Agent not set.", "top", "danger", 1000);
+        this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -222,7 +236,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
         let filename = doc.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

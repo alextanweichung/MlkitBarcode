@@ -71,7 +71,7 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
         this.object = response;
         // this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

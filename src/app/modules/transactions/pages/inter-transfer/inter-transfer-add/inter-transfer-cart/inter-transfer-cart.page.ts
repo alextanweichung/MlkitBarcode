@@ -271,7 +271,7 @@ export class InterTransferCartPage implements OnInit, ViewWillEnter {
           console.error(e);
         }
       }, error => {
-        throw error;
+        console.error(error);;
       });
     } catch (e) {
       console.error(e);

@@ -76,7 +76,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
         this.objects = response;
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        throw error;
+        console.error(error);;
       })
     } catch (error) {
       this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);

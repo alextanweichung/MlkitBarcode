@@ -4,11 +4,10 @@ import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ioni
 import { QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { PromotionMaster } from 'src/app/shared/models/promotion-engine';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -22,18 +21,16 @@ import { PromotionEngineService } from 'src/app/shared/services/promotion-engine
 export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   moduleControl: ModuleControl[] = [];
-  useTax: boolean = false;
-
   submit_attempt: boolean = false;
-
   inputType: string = "number";
 
   constructor(
-    private authService: AuthService,
     public objectService: QuotationService,
+    private authService: AuthService,
     private commonService: CommonService,
     private promotionEngineService: PromotionEngineService,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private alertController: AlertController,
     private navController: NavController
   ) {
@@ -43,22 +40,19 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     if (Capacitor.getPlatform() === "ios") {
       this.inputType = "tel";
     }
-    this.objectService.loadRequiredMaster();
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
-    }
   }
 
-  ionViewWillEnter(): void {
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
+    if (this.objectService.salesActivatePromotionEngine) {
+      await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false)
     }
+    this.loadRestrictColumms();
+    this.loadAvailableAddresses();
   }
 
   ngOnInit() {
-    this.loadModuleControl();
-    this.loadRestrictColumms();
-    this.loadAvailableAddresses();
+
   }
 
   availableAddress: ShippingInfo[] = [];
@@ -66,49 +60,15 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   loadAvailableAddresses() {
     try {
       this.availableAddress = [];
-      if (this.objectService.header) {
-        if (this.objectService.header.businessModelType === 'T') {
-          this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectService.header.customerId).flatMap(r => r.shippingInfo);
+      if (this.objectService.objectHeader) {
+        if (this.objectService.objectHeader.businessModelType === "T") {
+          this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectService.objectHeader.customerId).flatMap(r => r.shippingInfo);
         } else {
-          this.availableAddress = this.objectService.locationMasterList.filter(r => r.id === this.objectService.header.toLocationId).flatMap(r => r.shippingInfo);
+          this.availableAddress = this.objectService.locationMasterList.filter(r => r.id === this.objectService.objectHeader.toLocationId).flatMap(r => r.shippingInfo);
         }
       }
       this.selectedAddress = this.availableAddress.find(r => r.isPrimary);
       this.onAddressSelected();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  orderingPriceApprovalEnabledFields: string = "0"
-  configSalesActivatePromotionEngine: boolean;
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
-    try {
-      this.authService.moduleControlConfig$.subscribe(obj => {
-        this.moduleControl = obj;
-        let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-        if (SystemWideActivateTaxControl != undefined) {
-          this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
-        }
-        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-          this.configSalesActivatePromotionEngine = true;
-        } else {
-          this.configSalesActivatePromotionEngine = false;
-        }
-        let priceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
-        if (priceApprovalEnabledFields) {
-          this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
-        }
-      }, error => {
-        throw error;
-      })
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })
     } catch (e) {
       console.error(e);
     }
@@ -123,17 +83,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
         let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "Quotation").map(y => y.fieldName);
-        // apiData.forEach(element => {
-        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
-        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
-        //       restrictedObject[ctrl] = true;
-        //     }
-        //   });
-        // });
-        // if (!this.authService.isAdmin && this.systemWideDisableDocumentNumber) {
-        //   restrictedObject['quotationNum'] = true;
-        // }
-        // this.restrictFields = restrictedObject;  
 
         let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "QuotationLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
@@ -161,29 +110,28 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   saveChanges() {
     if (this.selectedIndex === null || this.selectedIndex === undefined) {
-      this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
+      this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       return;
     } else {
       let hasQtyError: boolean = false;
       let totalQty: number = 0;
       if (this.selectedItem.variationTypeCode === "0") {
-        hasQtyError = (this.selectedItem.qtyRequest??0) <= 0;
+        hasQtyError = (this.selectedItem.qtyRequest ?? 0) <= 0;
       } else {
         this.selectedItem.variationDetails.forEach(r => {
           r.details.forEach(rr => {
-            totalQty += (rr.qtyRequest??0)
+            totalQty += (rr.qtyRequest ?? 0)
           })
         })
         hasQtyError = totalQty <= 0;
       }
       if (hasQtyError) {
-        this.toastService.presentToast("Error", "Invalid Quantity.", "top", "warning", 1000);
+        this.toastService.presentToast("Controll Error", "Invalid quantity", "top", "warning", 1000);
       } else {
-        this.objectService.itemInCart[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
+        this.objectService.objectDetail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
         this.hideEditModal();
-
         if (this.selectedItem.isPricingApproval) {
-          this.objectService.header.isPricingApproval = true;
+          this.objectService.objectHeader.isPricingApproval = true;
         }
       }
     }
@@ -192,20 +140,20 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   async cancelChanges() {
     try {
       const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to discard changes?',
+        cssClass: "custom-alert",
+        header: "Are you sure to discard changes?",
         buttons: [
           {
-            text: 'OK',
-            role: 'confirm',
-            cssClass: 'success',
+            text: "OK",
+            role: "confirm",
+            cssClass: "success",
             handler: () => {
               this.isModalOpen = false;
             },
           },
           {
-            text: 'Cancel',
-            role: 'cancel',
+            text: "Cancel",
+            role: "cancel",
             handler: () => {
 
             }
@@ -222,11 +170,11 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     this.isModalOpen = false;
   }
 
-  onModalHide() {
+  async onModalHide() {
     this.selectedIndex = null;
     this.selectedItem = null;
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-      this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
+    if (this.objectService.salesActivatePromotionEngine) {
+      await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false)
     }
   }
 
@@ -242,7 +190,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
           this.selectedItem.variationDetails.forEach(x => {
             x.details.forEach(y => {
               if (y.qtyRequest && y.qtyRequest < 0) {
-                this.toastService.presentToast('Error', 'Invalid Quantity.', 'top', 'warning', 1000);
+                this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
               }
               totalQty = totalQty + y.qtyRequest;
             });
@@ -295,21 +243,21 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   onAddressSelected() {
     try {
       if (this.selectedAddress) {
-        this.objectService.header.shipAddress = this.selectedAddress.address;
-        this.objectService.header.shipPostCode = this.selectedAddress.postCode;
-        this.objectService.header.shipPhone = this.selectedAddress.phone;
-        this.objectService.header.shipEmail = this.selectedAddress.email;
-        this.objectService.header.shipFax = this.selectedAddress.fax;
-        this.objectService.header.shipAreaId = this.selectedAddress.areaId;
-        this.objectService.header.attention = this.selectedAddress.attention;
+        this.objectService.objectHeader.shipAddress = this.selectedAddress.address;
+        this.objectService.objectHeader.shipPostCode = this.selectedAddress.postCode;
+        this.objectService.objectHeader.shipPhone = this.selectedAddress.phone;
+        this.objectService.objectHeader.shipEmail = this.selectedAddress.email;
+        this.objectService.objectHeader.shipFax = this.selectedAddress.fax;
+        this.objectService.objectHeader.shipAreaId = this.selectedAddress.areaId;
+        this.objectService.objectHeader.attention = this.selectedAddress.attention;
       } else {
-        this.objectService.header.shipAddress = null;
-        this.objectService.header.shipPostCode = null;
-        this.objectService.header.shipPhone = null;
-        this.objectService.header.shipEmail = null;
-        this.objectService.header.shipFax = null;
-        this.objectService.header.shipAreaId = null;
-        this.objectService.header.attention = null;
+        this.objectService.objectHeader.shipAddress = null;
+        this.objectService.objectHeader.shipPostCode = null;
+        this.objectService.objectHeader.shipPhone = null;
+        this.objectService.objectHeader.shipEmail = null;
+        this.objectService.objectHeader.shipFax = null;
+        this.objectService.objectHeader.shipAreaId = null;
+        this.objectService.objectHeader.attention = null;
       }
     } catch (e) {
       console.error(e);
@@ -321,7 +269,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -338,20 +286,20 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   async presentDeleteItemAlert(data: TransactionDetail, index: number) {
     try {
       const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to delete?',
+        cssClass: "custom-alert",
+        header: "Are you sure to delete?",
         buttons: [
           {
-            text: 'OK',
-            role: 'confirm',
-            cssClass: 'danger',
+            text: "OK",
+            role: "confirm",
+            cssClass: "danger",
             handler: () => {
               this.removeItem(data, index);
             },
           },
           {
-            text: 'Cancel',
-            role: 'cancel',
+            text: "Cancel",
+            role: "cancel",
             handler: () => {
 
             }
@@ -364,15 +312,11 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  removeItem(data: TransactionDetail, index: number) {
+  async removeItem(data: TransactionDetail, index: number) {
     try {
-      this.objectService.itemInCart.splice(index,1);
-      // let index = this.objectService.itemInCart.findIndex(r => r.itemId === data.itemId);
-      // if (index > -1) {
-      //   this.objectService.itemInCart = [...this.objectService.itemInCart.filter(r => r.itemId !== data.itemId)];
-      // }
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-        this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, false)
+      await this.objectService.objectDetail.splice(index, 1);
+      if (this.objectService.salesActivatePromotionEngine) {
+        await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false)
       }
     } catch (e) {
       console.error(e);
@@ -385,8 +329,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
-      trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(2));
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
+      trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax));
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -395,8 +339,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
     try {
-      trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(2));
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
+      trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax));
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -405,7 +349,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
     } catch (e) {
       console.error(e);
     }
@@ -427,16 +371,14 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  promotionEngineApplicable: boolean = true;
-  promotionMaster: PromotionMaster[] = [];
-  computeAllAmount(data: TransactionDetail) {
+  async computeAllAmount(data: TransactionDetail) {
     data.qtyRequest = Number(data.qtyRequest.toFixed(0));
     try {
       if (data.qtyRequest <= 0) {
-        this.toastService.presentToast('Error', 'Invalid Quantity.', 'top', 'warning', 1000);
+        this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
       } else {
-        if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
-          this.promotionEngineService.runPromotionEngine(this.objectService.itemInCart.filter(x => x.qtyRequest > 0), this.promotionMaster, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision, this.objectService.discountGroupMasterList, true)
+        if (this.objectService.salesActivatePromotionEngine) {
+          await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, true)
         }
       }
       this.computeDiscTaxAmount(data);
@@ -446,8 +388,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   }
 
   getPromoDesc(promoEventId: number) {
-    if (this.promotionMaster.length > 0) {
-      let find = this.promotionMaster.find(x => x.promoEventId == promoEventId);
+    if (this.objectService.promotionMaster.length > 0) {
+      let find = this.objectService.promotionMaster.find(x => x.promoEventId == promoEventId);
       if (find) {
         return find.description;
       } else {
@@ -464,7 +406,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/quotation/quotation-item');
+      this.navController.navigateBack("/transactions/quotation/quotation-item");
     } catch (e) {
       console.error(e);
     }
@@ -473,16 +415,16 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
   async nextStep() {
     try {
       this.submit_attempt = true;
-      if (this.objectService.itemInCart.length > 0) {
+      if (this.objectService.objectDetail.length > 0) {
         const alert = await this.alertController.create({
-          header: 'Are you sure to proceed?',
+          header: "Are you sure to proceed?",
           buttons: [
             {
-              text: 'OK',
-              role: 'confirm',
-              cssClass: 'success',
+              text: "OK",
+              role: "confirm",
+              cssClass: "success",
               handler: async () => {
-                if (this.objectService.header.quotationId) {
+                if (this.objectService.objectHeader.quotationId) {
                   await this.updateObject();
                 } else {
                   await this.insertObject();
@@ -490,9 +432,9 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
               },
             },
             {
-              text: 'Cancel',
-              cssClass: 'cancel',
-              role: 'cancel',
+              text: "Cancel",
+              cssClass: "cancel",
+              role: "cancel",
               handler: async () => {
                 this.submit_attempt = false;
               }
@@ -502,7 +444,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
         await alert.present();
       } else {
         this.submit_attempt = false;
-        this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
+        this.toastService.presentToast("Error!", "Please add at least 1 item to continue", "top", "danger", 1000);
       }
     } catch (e) {
       this.submit_attempt = false;
@@ -512,48 +454,60 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  insertObject() {
+  async insertObject() {
     try {
+      await this.loadingService.showLoading();
       let trxDto: QuotationRoot = {
-        header: this.objectService.header,
-        details: this.objectService.itemInCart
+        header: this.objectService.objectHeader,
+        details: this.objectService.objectDetail
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      this.objectService.insertObject(trxDto).subscribe(response => {
-        this.objectService.setObject((response.body as QuotationRoot))
-        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/quotation/quotation-summary');
-      }, error => {
+      this.objectService.insertObject(trxDto).subscribe(async response => {
+        let object = response.body;
+        await this.objectService.setSummary(object);
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
+        this.navController.navigateRoot("/transactions/quotation/quotation-summary");
+      }, async error => {
         this.submit_attempt = false;
-        throw error;
+        await this.loadingService.dismissLoading();
+        console.error(error);
       });
     } catch (e) {
       this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
       console.error(e);
-    } finally {      
+    } finally {
       this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
     }
   }
 
-  updateObject() {
+  async updateObject() {
     try {
+      await this.loadingService.showLoading();
       let trxDto: QuotationRoot = {
-        header: this.objectService.header,
-        details: this.objectService.itemInCart
+        header: this.objectService.objectHeader,
+        details: this.objectService.objectDetail
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      this.objectService.updateObject(trxDto).subscribe(response => {
-        this.objectService.setObject((response.body as QuotationRoot));
-        this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/quotation/quotation-summary');
-      }, error => {
+      this.objectService.updateObject(trxDto).subscribe(async response => {
+        let object = response.body;
+        await this.objectService.setSummary(object);
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
+        this.navController.navigateRoot("/transactions/quotation/quotation-summary");
+      }, async error => {
+        await this.loadingService.dismissLoading();
         this.submit_attempt = false;
-        throw error;
+        console.error(error);;
       });
     } catch (e) {
+      await this.loadingService.dismissLoading();
       this.submit_attempt = false;
       console.error(e);
     } finally {
+      await this.loadingService.dismissLoading();
       this.submit_attempt = false;
     }
   }
@@ -582,7 +536,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
   onPricingApprovalSwitch(event: any) {
     if (event.detail.checked) {
-      switch (this.orderingPriceApprovalEnabledFields) {
+      switch (this.objectService.orderingPriceApprovalEnabledFields) {
         case "0":
           if (this.restrictTrxFields.unitPrice) {
             this.restrictTrxFields.unitPrice = false;

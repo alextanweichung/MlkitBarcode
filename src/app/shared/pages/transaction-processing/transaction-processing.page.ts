@@ -99,7 +99,7 @@ export class TransactionProcessingPage implements OnInit {
             this.onObjectUpdated.emit(listOfDoc.map(i => Number(i))[0]);
           }
         }, error => {
-          throw error;
+          console.error(error);;
         })
       } catch (error) {
         this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);

@@ -70,7 +70,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -285,7 +285,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       this.submit_attempt = false;
@@ -315,7 +315,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       this.submit_attempt = false;

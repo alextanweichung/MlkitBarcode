@@ -78,10 +78,6 @@ export interface BackToBackOrderHeader {
   isItemPriceTaxInclusive: boolean
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean
-  /* #region  special to pass in precision */
-  maxPrecision: number
-  maxPrecisionTax: number
-  /* #endregion */
   isCompleted: boolean
   isPricingApproval: boolean
   posLocationId: any

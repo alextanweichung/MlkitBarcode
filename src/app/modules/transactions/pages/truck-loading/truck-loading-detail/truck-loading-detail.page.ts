@@ -44,7 +44,7 @@ export class TruckLoadingDetailPage implements OnInit {
       this.objectService.getObject(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

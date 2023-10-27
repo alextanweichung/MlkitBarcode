@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { format } from 'date-fns';
@@ -14,14 +14,15 @@ import { TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
-import { InfiniteScrollCustomEvent, ViewWillEnter } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonSearchbar, ViewWillEnter } from '@ionic/angular';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-item-catalog',
   templateUrl: './item-catalog.page.html',
   styleUrls: ['./item-catalog.page.scss'],
 })
-export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
+export class ItemCatalogPage implements OnInit, OnChanges {
 
   @Input() itemInCart: TransactionDetail[] = [];
   @Input() keyId: number;
@@ -30,8 +31,8 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
   @Input() useTax: boolean;
   @Input() objectHeader: any;
   @Input() precisionSales: PrecisionList;
+  @Input() precisionSalesUnitPrice: PrecisionList;
   @Input() isItemPriceTaxInclusive: boolean;
-  @Input() maxPrecision: number;
   @Input() showImage: boolean = false;
   @Input() showAvailQty: boolean = false;
   @Input() isSalesOrder: boolean = false;
@@ -43,8 +44,9 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
   categoryMasterList: MasterListDetails[] = [];
   salesOrderQuantityControl: string = "0";
   systemWideBlockConvertedCode: boolean = false;
-  itemListLoadSize: number;
-
+  itemListLoadSize: number = 10;
+  
+  @ViewChild("searchbar", { static: false }) searchbar: IonSearchbar;
   @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
 
   constructor(
@@ -52,11 +54,9 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
     private searchItemService: SearchItemService,
     private commonService: CommonService,
     private configService: ConfigService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private loadingService: LoadingService
   ) { }
-
-  ionViewWillEnter(): void {
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.itemInCart) {
@@ -123,17 +123,18 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
   }
 
   startIndex: number = 0;
-  searchItem(searchText: string, newSearch: boolean) {
+  async searchItem(searchText: string, newSearch: boolean) {
     if (newSearch) {
       this.availableItems = [];
     }
     this.itemSearchText = searchText;
     try {
+      await this.loadingService.showLoading();
       if (this.itemSearchText && this.itemSearchText.trim().length > 2) {
         if (Capacitor.getPlatform() !== "web") {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), "yyyy-MM-dd"), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(response => {
+        this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), "yyyy-MM-dd"), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(async response => {
           let rrr = response;
           if (rrr && rrr.length > 0) {
             rrr.forEach(r => {
@@ -145,18 +146,23 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
             this.startIndex = this.availableItems.length;
           }
           this.availableItems = [...this.availableItems, ...rrr];
-          this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
           this.computeQtyInCart();
+          await this.loadingService.dismissLoading()
+          this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
         })
         if (Capacitor.getPlatform() !== "web") {
           this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
         }
       } else {
-        this.toastService.presentToast("Enter at least 3 characters to search", "", "top", "warning", 1000);
+        await this.loadingService.dismissLoading()
+        this.toastService.presentToast("", "Enter at least 3 characters to search", "top", "warning", 1000);
       }
       this.onBrowseModeChanged();
     } catch (e) {
+      await this.loadingService.dismissLoading()
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading()
     }
   }
 
@@ -244,8 +250,8 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
       item.unitPrice = item.itemPricing.unitPrice;
       item.unitPriceExTax = item.itemPricing.unitPrice;
     }
-    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
-    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
+    item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.objectHeader?.isHomeCurrency?this.precisionSalesUnitPrice.localMax:this.precisionSalesUnitPrice.foreignMax);
+    item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.objectHeader?.isHomeCurrency?this.precisionSalesUnitPrice.localMax:this.precisionSalesUnitPrice.foreignMax);
     item.oriUnitPrice = item.unitPrice;
     item.oriUnitPriceExTax = item.unitPriceExTax;
 
@@ -495,5 +501,9 @@ export class ItemCatalogPage implements OnInit, OnChanges, ViewWillEnter {
   }
 
   /* #endregion */
+
+  async setFocus() {
+    await this.searchbar.setFocus();
+  }
 
 }

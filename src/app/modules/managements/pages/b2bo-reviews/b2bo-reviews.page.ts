@@ -52,7 +52,7 @@ export class B2boReviewsPage implements OnInit, ViewWillEnter {
         this.completedObjects = response.filter(r => r.isComplete);
         this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
-        throw Error;
+        console.error(error);;
       })      
     } catch (error) {
       this.toastService.presentToast("", "Error Loading", "top", "danger", 1000);

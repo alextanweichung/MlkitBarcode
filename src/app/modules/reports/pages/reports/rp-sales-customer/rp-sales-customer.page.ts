@@ -75,7 +75,7 @@ export class RpSalesCustomerPage implements OnInit, ViewWillEnter {
           this.objects = response;
           this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
         }, error => {
-          throw error;
+          console.error(error);;
         })
       } catch (e) {
         console.error(e);

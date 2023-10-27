@@ -62,7 +62,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
           })
         })
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

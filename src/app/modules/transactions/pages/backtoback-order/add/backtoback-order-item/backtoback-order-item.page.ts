@@ -35,7 +35,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   ) {
     this.objectService.loadRequiredMaster();
     try {
-      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
+      if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
         this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-header');
       }
     } catch (e) {
@@ -45,7 +45,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     try {
-      if (!this.objectService.header || this.objectService.header === undefined || this.objectService.header === null) {
+      if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
         this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-header');
       } else {
         this.componentsLoad();
@@ -63,8 +63,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
     this.loadModuleControl();
   }
 
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  
   loadModuleControl() {
     try {
       this.authService.moduleControlConfig$.subscribe(obj => {
@@ -80,11 +79,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
           this.configSalesActivatePromotionEngine = false;
         }
       }, error => {
-        throw error;
-      })
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);
@@ -104,13 +99,13 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
     try {
       let trxLine = JSON.parse(JSON.stringify(event));
       trxLine = this.assignTrxItemToDataLine(trxLine);
-      if (this.objectService.header.isItemPriceTaxInclusive) {
+      if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
         await this.computeUnitPriceExTax(trxLine);
       } else {
         await this.computeUnitPrice(trxLine);
       }
-      this.objectService.itemInCart.unshift(trxLine);
-      await this.computeAllAmount(this.objectService.itemInCart[0]);
+      this.objectService.objectDetail.unshift(trxLine);
+      await this.computeAllAmount(this.objectService.objectDetail[0]);
       await this.assignSequence();
       this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
     } catch (e) {
@@ -120,7 +115,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   assignSequence() {
     let index = 0;
-    this.objectService.itemInCart.forEach(r => {
+    this.objectService.objectDetail.forEach(r => {
       r.sequence = index;
       index++;
     })
@@ -184,7 +179,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectService.header.maxPrecision);
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -193,7 +188,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectService.header.maxPrecision);
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -203,7 +198,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
       await this.getVariationSum(trxLine);
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.header.isItemPriceTaxInclusive, this.objectService.header.isDisplayTaxInclusive, this.objectService.header.maxPrecision);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax);
     } catch (e) {
       console.error(e);
     }
@@ -212,9 +207,9 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   assignTrxItemToDataLine(trxLine: TransactionDetail) {
     try {
       trxLine.lineId = 0;
-      trxLine.headerId = this.objectService.header.backToBackOrderId;
+      trxLine.headerId = this.objectService.objectHeader.backToBackOrderId;
       if (this.useTax) {
-        if (this.objectService.header.isItemPriceTaxInclusive) {
+        if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
           trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
         } else {
@@ -227,16 +222,16 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
       }
       trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.header.maxPrecision);
-      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.header.maxPrecision);
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
 
       if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
-        if (this.objectService.header.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPrice;
+        if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax) : trxLine.unitPrice;
         } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.header.maxPrecision) : trxLine.unitPriceExTax;
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax) : trxLine.unitPriceExTax;
         }
         if (trxLine.itemGroupInfo) {
           trxLine.brandId = trxLine.itemGroupInfo.brandId;
@@ -301,7 +296,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
       if (role === 'confirm') {
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: this.objectService.header.backToBackOrderId
+            objectId: this.objectService.objectHeader.backToBackOrderId
           }
         }
         this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-detail', navigationExtras);

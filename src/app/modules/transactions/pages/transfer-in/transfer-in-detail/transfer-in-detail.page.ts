@@ -64,7 +64,7 @@ export class TransferInDetailPage implements OnInit, ViewWillEnter {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (e) {
       console.error(e);

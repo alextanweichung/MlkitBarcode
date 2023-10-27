@@ -72,7 +72,7 @@ export class TransferInScanningEditPage implements OnInit {
       this.objectService.getObjectById(this.objectId).subscribe(response => {
         this.object = response;
       }, error => {
-        throw error;
+        console.error(error);;
       })
     }
   }

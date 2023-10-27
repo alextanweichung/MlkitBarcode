@@ -35,7 +35,7 @@ export class DatabaseService {
         return cb;
       }
     } catch (error) {
-      throw Error(error.message);
+      console.error(error);(error.message);
     }
   }
 

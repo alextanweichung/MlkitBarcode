@@ -9,6 +9,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { BackToBackOrderService } from '../../services/backtoback-order.service';
 import { BackToBackOrderList } from '../../models/backtoback-order';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-backtoback-order',
@@ -29,20 +30,20 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   salesAgentDropdownList: SearchDropdownList[] = [];
 
   constructor(
+    private objectService: BackToBackOrderService,
     private authService: AuthService,
     private commonService: CommonService,
-    private objectService: BackToBackOrderService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService
-  ) {
-    // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
-  }
+  ) { }
 
   ionViewWillEnter(): void {
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
@@ -50,8 +51,6 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
       this.endDate = this.commonService.getTodayDate();
     }
     this.loadObjects();
-    // this.bindCustomerList();
-    // this.bindSalesAgentList();
   }
 
   ngOnInit() {
@@ -62,6 +61,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
 
   loadObjects() {
     try {
+
       this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
@@ -69,10 +69,10 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
-        throw error;
+        console.error(error);;
       })
     } catch (error) {
-      this.toastService.presentToast("Error loading object", "", "top", "danger", 1000);
+      this.toastService.presentToast("System Error", "", "top", "danger", 1000);
     }
   }
 
@@ -182,7 +182,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   //       let filename = doc.salesOrderNum + ".pdf";
   //       this.commonService.commonDownloadPdf(response, filename);
   //     }, error => {
-  //       throw error;
+  //       console.error(error);;
   //     })
   //   } catch (e) {
   //     console.error(e);

@@ -25,7 +25,7 @@ export class InitializeAppService {
           await this.configService.load();
         }
       } catch (error) {
-        throw Error(`initializeAppError: ${error}`);
+        console.error(error);(`initializeAppError: ${error}`);
       }
     });
   }
