@@ -5,9 +5,6 @@ import { MasterList } from 'src/app/shared/models/master-list';
 import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot } from '../models/consignment-sales';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { format } from 'date-fns';
-import { PDItemMaster, PDItemBarcode, PDMarginConfig } from 'src/app/shared/models/pos-download';
-import { Capacitor } from '@capacitor/core';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 
@@ -20,33 +17,37 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class ConsignmentSalesService {
+
+  trxKey: string = "ConsignmentSales";
+
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
     private configService: ConfigService
   ) { }
 
-  header: ConsignmentSalesHeader;
-  detail: TransactionDetail[] = [];
-  setHeader(header: ConsignmentSalesHeader) {
-    this.header = header;
+  objectHeader: ConsignmentSalesHeader;
+  objectDetail: TransactionDetail[] = [];
+  setHeader(objectHeader: ConsignmentSalesHeader) {
+    this.objectHeader = objectHeader;
   }
 
-  setDetail(detail: TransactionDetail[]) {
-    this.detail = detail;
+  setLines(objectDetail: TransactionDetail[]) {
+    this.objectDetail = objectDetail;
   }
 
   removeHeader() {
-    this.header = null;
+    this.objectHeader = null;
   }
 
   removeDetail() {
-    this.detail = [];
+    this.objectDetail = [];
   }
 
   resetVariables() {
     this.removeHeader();
     this.removeDetail();
+    this.configService.removeFromLocalStorage(this.trxKey);
   }
 
   async loadRequiredMaster() {

@@ -1,17 +1,14 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Transaction</ion-title>
+    <ion-title>
+      <div class="ion-text-wrap">Transaction</div>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Transaction</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
     <ng-container>
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button routerLink="quotation" *ngIf="showQuotation">
           <ion-icon name="newspaper-outline" slot="start"></ion-icon>
           <ion-label>

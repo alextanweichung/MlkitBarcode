@@ -11,6 +11,7 @@ import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/mode
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
 import { format } from 'date-fns';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-signin',
@@ -33,6 +34,7 @@ export class SigninPage implements OnInit, ViewDidEnter {
     public configService: ConfigService,
     private formBuilder: UntypedFormBuilder,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private alertController: AlertController,
     private navController: NavController,
     private actionSheetController: ActionSheetController

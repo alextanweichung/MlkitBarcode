@@ -1,50 +1,46 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{object?.header?.consignmentCountNum}}</ion-title>
+    <ion-title>
+      <div class="ion-text-wrap">
+        {{object?.header?.consignmentCountNum}}
+      </div>
+    </ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
     <ion-buttons slot="primary">
       <ion-button (click)="edit()">
-        <ion-icon slot="icon-only" size="small" name="create-outline"></ion-icon>
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <div class="p-2">
+  <div class="p-2" *ngIf="objectService.objectHeader">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngIf="objectService.objectHeader">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Doc. Num.</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{object.header.consignmentCountNum}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Doc. Date</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Location</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Total Quantity</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{object.details|sum:"qtyRequest"|number}}</div>
             </ion-col>
           </ion-row>

@@ -16,12 +16,12 @@
       <ion-item button detail="false" class="no-ripple ion-no-padding">
         <ion-grid class="ion-no-padding pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Total Quantity</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div class="font-bold">{{objectService.objectDetail|sum:"qtyRequest"|number:"1.0"}}</div>
             </ion-col>
+            <!-- <ion-col class="ion-flex ion-margin-auto text-align-center">
+            </ion-col> -->
           </ion-row>
         </ion-grid>
       </ion-item>
@@ -88,7 +88,7 @@
       <ion-grid class="ion-no-padding pt-2 pl-2">
         <ion-row>
           <ion-col class="ion-flex ion-margin-auto justify-content-center">
-            <ion-label>Tap to load all</ion-label>
+            <ion-label>Tap to load all...</ion-label>
           </ion-col>
         </ion-row>
         <ion-row>

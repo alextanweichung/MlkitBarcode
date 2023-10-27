@@ -1,6 +1,10 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Consignment Count</ion-title>
+    <ion-title>
+      <div class="ion-text-wrap">
+        Consignment Count
+      </div>
+    </ion-title>
     <ion-buttons slot="start">
       <ion-back-button text="" defaultHref="/transactions"></ion-back-button>
     </ion-buttons>
@@ -20,12 +24,16 @@
           <ion-item button detail="false" class="ion-no-padding" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.consignmentCountId)">
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
-                <ion-col class="ion-flex ion-margin-auto font-bold">{{object.consignmentCountNum}}</ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="ion-text-right">{{object.trxDate|date:'dd/MM/yyyy'}}</div></ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                  <div class="font-bold">{{object.consignmentCountNum}}</div>
+                  <div>{{object.trxDate|date:'dd/MM/yyyy'}}</div>
+                </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col class="ion-flex ion-margin-auto">{{object.description}}</ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.locationId|idMapping:objectService.locationMasterList}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                  <div>{{object.description}}</div>
+                  <div>{{object.locationId|idMapping:objectService.locationMasterList}}</div>
+                </ion-col>
               </ion-row>
             </ion-grid>
           </ion-item>

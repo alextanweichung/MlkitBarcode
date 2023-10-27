@@ -139,6 +139,9 @@ export interface TransactionDetail {
   newItemEffectiveDate?: Date
   minOrderQty?: number;
   minOrderQtyError?: boolean
+  
+  // testing performance
+  guid?: string
 }
 
 export interface ItemPricing {

@@ -1,28 +1,26 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Header</ion-title>
+    <ion-title>
+      <div class="ion-text-wrap">
+        Consignment Sales
+      </div>
+    </ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Header</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2"> 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item id="open-calendar-modal">
-        <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
         <ion-label position="stacked" class="font-bold">Transaction Date</ion-label>
         <ion-text class="ion-no-padding-end pb-3">{{formattedDateString}}</ion-text>
       </ion-item>
       <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
         <ng-template>
           <ion-content>
-            <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [ngModel]="dateValue" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate">
+            <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [ngModel]="dateValue" showDefaultTitle="true" presentation="date" [max]="maxDate">
               <ion-buttons slot="buttons">
                 <ion-button (click)="dateDismiss()" color="danger">Dismiss</ion-button>
                 <ion-button (click)="dateSelect()" color="primary">Select</ion-button>

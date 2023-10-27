@@ -8,6 +8,7 @@ import { ConsignmentCountDetail, ConsignmentCountRoot } from 'src/app/modules/tr
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -33,12 +34,13 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
     private configService: ConfigService,
     private authService: AuthService,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private alertController: AlertController,
     private navController: NavController
   ) { }
 
   async ionViewWillEnter(): Promise<void> {
-    
+
   }
 
   async ionViewDidEnter(): Promise<void> {
@@ -89,6 +91,8 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
     try {
       if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
         this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += 1;
+        let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       } else {
         let newLine: ConsignmentCountDetail = {
           consignmentCountLineId: 0,
@@ -104,14 +108,14 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           sequence: 0,
           // for local use
           itemCode: trxLine.itemCode,
-          itemDescription: trxLine.description,          
+          itemDescription: trxLine.description,
           // testing performance
           guid: uuidv4()
         }
         this.objectService.objectDetail.forEach(r => { r.sequence += 1 });
         await this.objectService.objectDetail.unshift(newLine);
         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-        this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
     } catch (e) {
       console.error(e);
@@ -127,11 +131,11 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       if (line.qtyRequest - 1 < 0) {
         line.qtyRequest = 0;
         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-        this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       } else {
         line.qtyRequest--;
         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-        this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
       if (line.qtyRequest === 0) {
         await this.deleteLine(index);
@@ -149,10 +153,10 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
     }
   }
 
-  increaseQty(line: ConsignmentCountDetail) {
+  async increaseQty(line: ConsignmentCountDetail) {
     line.qtyRequest += 1;
     let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-    this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
   }
 
   async deleteLine(index) {
@@ -170,7 +174,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
                 this.objectService.objectDetail.splice(index, 1);
                 this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
                 let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-                this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
             },
             {
@@ -180,7 +184,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
               handler: async () => {
                 this.objectService.objectDetail[index].qtyRequest === 0 ? (this.objectService.objectDetail[index].qtyRequest += 1) : 1;
                 let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-                this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
             }
           ]
@@ -263,9 +267,10 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
     }
   }
 
-  insertObject() {
+  async insertObject() {
     try {
-      this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(response => {
+      await this.loadingService.showLoading();
+      this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
         if (response.status === 201) {
           this.submit_attempt = false;
           let object = response.body as ConsignmentCountRoot;
@@ -276,6 +281,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
             }
           }
           this.objectService.resetVariables();
+          await this.loadingService.dismissLoading();
           this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
@@ -283,15 +289,18 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       })
     } catch (e) {
       this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
       console.error(e);
     } finally {
       this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
     }
   }
 
-  updateObject() {
+  async updateObject() {
     try {
-      this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(response => {
+      await this.loadingService.showLoading();
+      this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
         if (response.status === 201) {
           this.submit_attempt = false;
           let object = response.body as ConsignmentCountRoot;
@@ -302,6 +311,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
             }
           }
           this.objectService.resetVariables();
+          await this.loadingService.dismissLoading();
           this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
       }, error => {
@@ -309,9 +319,11 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       })
     } catch (e) {
       this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
       console.error(e);
     } finally {
       this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
     }
   }
 

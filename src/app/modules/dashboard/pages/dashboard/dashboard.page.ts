@@ -14,6 +14,7 @@ import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/mode
 import { Capacitor } from '@capacitor/core';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -56,12 +57,12 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     private authService: AuthService,
     private commonService: CommonService,
     public consignmentSalesService: ConsignmentSalesService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private configService: ConfigService,
     private dashboardService: DashboardService,
-    private navController: NavController,
-    private toastService: ToastService
-  ) {
-  }
+    private navController: NavController
+  ) { }
   
   ionViewWillEnter(): void {
     this.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
@@ -269,14 +270,24 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     this.configService.selected_consignment_location = location.locationId;
     this.hideLocationModal();
     if (Capacitor.getPlatform() !== "web") {
-      let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-      let itemMaster: PDItemMaster[] = response["itemMaster"];
-      let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
-      await this.configService.syncInboundData(itemMaster, itemBarcode);
-      
-      let response2 = await this.commonService.syncMarginConfig(this.configService.selected_consignment_location);
-      let marginConfig: PDMarginConfig[] = response2;
-      await this.configService.syncMarginConfig(marginConfig);
+      try {
+        await this.loadingService.showLoading("Downloading resources");
+        let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+        let itemMaster: PDItemMaster[] = response["itemMaster"];
+        let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+        await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+        let response2 = await this.commonService.syncMarginConfig(this.configService.selected_consignment_location);
+        let marginConfig: PDMarginConfig[] = response2;
+        await this.configService.syncMarginConfig(marginConfig);
+
+        await this.loadingService.dismissLoading();
+      } catch (e) {
+        await this.loadingService.dismissLoading();
+        console.error(e);
+      } finally {
+        await this.loadingService.dismissLoading();
+      }
     }
   }
 

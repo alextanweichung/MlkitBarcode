@@ -38,9 +38,9 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 
   }
 
-  loadObject() {
+  async loadObject() {
     try {
-      this.loadingService.showLoading();
+      await this.loadingService.showLoading();
       this.objectService.getObjectById(this.objectId).subscribe(async response => {
         this.object = response;
         this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
@@ -56,16 +56,16 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
         })
         await this.objectService.setHeader(JSON.parse(JSON.stringify(this.object.header)));
         await this.objectService.setLines(JSON.parse(JSON.stringify(this.object.details)));
-        this.loadingService.dismissLoading();
-      }, error => {
-        this.loadingService.dismissLoading();
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
         console.error(error);
       })
     } catch (e) {
-      this.loadingService.dismissLoading();
+      await this.loadingService.dismissLoading();
       console.error(e);
     } finally {
-      this.loadingService.dismissLoading();
+      await this.loadingService.dismissLoading();
     }
   }
 

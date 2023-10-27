@@ -194,6 +194,7 @@ export class ConfigService {
 
   async saveToLocaLStorage(key: string, data: any) {
     await localStorage.setItem(key, JSON.stringify(data));
+    localStorage.getItem(key);
   }
 
   async retrieveFromLocalStorage(key: string) {

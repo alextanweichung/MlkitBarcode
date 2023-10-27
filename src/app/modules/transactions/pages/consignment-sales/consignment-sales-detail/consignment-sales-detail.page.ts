@@ -3,11 +3,12 @@ import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
-import { ConsignmentSalesRoot } from '../../../models/consignment-sales';
 import { ConsignmentSalesService } from '../../../services/consignment-sales.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-consignment-sales-detail',
@@ -19,23 +20,24 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   objectId: number;
 
   constructor(
-    private route: ActivatedRoute,
-    private authService: AuthService,
     public objectService: ConsignmentSalesService,
-    private navController: NavController,
+    private authService: AuthService,
     private commonService: CommonService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
+    private navController: NavController,
     private alertController: AlertController,
-    private toastService: ToastService
+    private route: ActivatedRoute,
   ) {
-    this.route.queryParams.subscribe(params => {
-      this.objectId = params['objectId'];
-    })
   }
 
   ionViewWillEnter(): void {
-    if (this.objectId && this.objectId) {
-      this.loadObject();
-    }
+    this.route.queryParams.subscribe(params => {
+      this.objectId = params["objectId"];
+      if (this.objectId) {
+        this.loadObject();
+      }
+    })
   }
 
   ngOnInit() {
@@ -53,7 +55,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
       this.authService.moduleControlConfig$.subscribe(obj => {
         this.moduleControl = obj;
         let activateMargin = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesActivateMarginCalculation");
-        if (activateMargin && activateMargin.ctrlValue.toUpperCase() == 'Y') {
+        if (activateMargin && activateMargin.ctrlValue.toUpperCase() == "Y") {
           this.consignmentSalesActivateMarginCalculation = true;
         }
       })
@@ -68,35 +70,41 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
   }
 
-  loadObject() {
+  async loadObject() {
     try {
-      if (this.objectId && this.objectId) {
-        this.objectService.getObjectById(this.objectId).subscribe(response => {
-          this.objectService.setHeader(response.header);
-          this.objectService.setDetail(response.details);
-          if (this.objectService.header.isHomeCurrency) {
-            this.objectService.header.maxPrecision = this.precisionSales.localMax;
-            this.objectService.header.maxPrecisionTax = this.precisionTax.localMax
+      await this.loadingService.showLoading();
+      if (this.objectId) {
+        this.objectService.getObjectById(this.objectId).subscribe(async response => {
+          let objectRoot = response;
+          objectRoot.header = this.commonService.convertObjectAllDateType(objectRoot.header);
+          if (objectRoot.header.isHomeCurrency) {
+            objectRoot.header.maxPrecision = this.precisionSales.localMax;
+            objectRoot.header.maxPrecisionTax = this.precisionTax.localMax
           } else {
-            this.objectService.header.maxPrecision = this.precisionSales.foreignMax;
-            this.objectService.header.maxPrecisionTax = this.precisionTax.foreignMax;
+            objectRoot.header.maxPrecision = this.precisionSales.foreignMax;
+            objectRoot.header.maxPrecisionTax = this.precisionTax.foreignMax;
           }
-        }, error => {
-          throw error;
+          objectRoot.details.forEach(r => {
+            r.guid = uuidv4();
+          })
+          await this.objectService.setHeader(objectRoot.header);
+          await this.objectService.setLines(objectRoot.details);
+          await this.loadingService.dismissLoading();
+        }, async error => {
+          await this.loadingService.dismissLoading();
+          console.error(error);
         })
       }
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
   edit() {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: this.objectId
-      }
-    }
-    this.navController.navigateForward('/transactions/consignment-sales/consignment-sales-item', navigationExtras);
+    this.navController.navigateRoot("/transactions/consignment-sales/consignment-sales-item");
   }
 
   async toggleObjectAlert() {
@@ -123,7 +131,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   }
 
   completeObject() {
-    if (this.objectService.header.isEntryCompleted) {
+    if (this.objectService.objectHeader.isEntryCompleted) {
       this.objectService.unCompleteObject(this.objectId).subscribe(response => {
         if (response.status === 204) {
           this.toastService.presentToast("", "Consignment Sales updated", "top", "success", 1000);
@@ -148,7 +156,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -165,21 +173,21 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
   async presentAlertViewPdf() {
     try {
       const alert = await this.alertController.create({
-        header: 'Download PDF?',
-        message: '',
+        header: "Download PDF?",
+        message: "",
         buttons: [
           {
-            text: 'OK',
-            cssClass: 'success',
-            role: 'confirm',
+            text: "OK",
+            cssClass: "success",
+            role: "confirm",
             handler: async () => {
               await this.downloadPdf();
             },
           },
           {
-            cssClass: 'cancel',
-            text: 'Cancel',
-            role: 'cancel'
+            cssClass: "cancel",
+            text: "Cancel",
+            role: "cancel"
           },
         ]
       });
@@ -191,8 +199,8 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   async downloadPdf() {
     try {
-      this.objectService.downloadPdf("SMCS001", "pdf", this.objectService.header.consignmentSalesId, "Mobile Ticketing").subscribe(response => {
-        let filename = this.objectService.header.consignmentSalesNum + ".pdf";
+      this.objectService.downloadPdf("SMCS001", "pdf", this.objectService.objectHeader.consignmentSalesId, "Mobile Ticketing").subscribe(response => {
+        let filename = this.objectService.objectHeader.consignmentSalesNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
         console.log(error);
@@ -204,7 +212,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
-  goBack() {
+  previousStep() {
     this.objectService.resetVariables();
     this.navController.navigateBack("/transactions/consignment-sales");
   }

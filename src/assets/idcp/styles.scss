@@ -615,12 +615,18 @@ input {
    text-align: center;
 }
 
+.text-align-end {
+   text-align: end;
+   text-align: right;
+}
+
 .justify-content-center {
    justify-content: center;
 }
 
 .justify-content-end {
    text-align: end;
+   text-align: right;
    justify-content: end;
 }
 
