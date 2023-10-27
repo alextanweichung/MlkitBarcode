@@ -157,6 +157,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
         await this.assignTrxItemToDataLine(trxLine);
         let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+        this.max = 10;
       }
   }
 

@@ -459,13 +459,13 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
       createdBy: null,
       createdAt: null,
       remark: this.objectService.object.remark,
-      workFlowTransactionId: null,
+      workFlowTransactionId: this.objectService.object.workFlowTransactionId,
       interTransferQty: null,
       line: this.objectService.object.line.filter(r => r.uuid !== null),
       transferAdjustment: null    
     }    
     
-    this.objectService.insertObject(insertObject).subscribe(response => {
+  this.objectService.insertObject(insertObject).subscribe(response => {
       if (response.status === 201) {
         let obj = (response.body as TransferInScanningRoot)
         this.toastService.presentToast("", "Transfer In Scanning created", "top", "success", 1000);

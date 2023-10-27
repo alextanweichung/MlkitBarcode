@@ -116,6 +116,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
         await this.objectService.objectDetail.unshift(newLine);
         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+        this.max = 10;
       }
     } catch (e) {
       console.error(e);
