@@ -53,7 +53,7 @@
               </ion-button>
             </ion-col>
             <ion-col>
-              <ion-input #input class="ion-text-center" type="number" [(ngModel)]="item.qtyRequest" placeholder="0" (ionFocus)="highlight(input)" [disabled]="disableIfPricingNotSet&&(item.itemPricing===null)"></ion-input>
+              <ion-input #input class="ion-text-center" type="number" [(ngModel)]="item.qtyRequest" placeholder="0" [disabled]="disableIfPricingNotSet&&(item.itemPricing===null)"></ion-input>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-center">
               <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(item)" [disabled]="disableIfPricingNotSet&&(item.itemPricing===null)">
@@ -90,7 +90,7 @@
               </ion-button>
             </ion-col>
             <ion-col size="2">
-              <ion-input #input class="ion-text-center" type="number" [(ngModel)]="item.qtyRequest" placeholder="0" (ionFocus)="highlight(input)" (ionBlur)="isValidQty(item)" [disabled]="disableIfPricingNotSet&&(item.itemPricing===null)"></ion-input>
+              <ion-input #input class="ion-text-center" type="number" [(ngModel)]="item.qtyRequest" placeholder="0" (ionBlur)="isValidQty(item)" [disabled]="disableIfPricingNotSet&&(item.itemPricing===null)"></ion-input>
             </ion-col>
             <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
               <ion-button class="ion-button-custom" fill="clear" color="primary" size="small"(click)="increaseQty(item)" [disabled]="disableIfPricingNotSet&&(item.itemPricing===null)">
@@ -208,7 +208,7 @@
                         </ion-button>
                       </ion-col>
                       <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                        <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="d.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="isValidVariationQty(d)" placeholder="0"></ion-input>
+                        <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="d.qtyRequest" (ionBlur)="isValidVariationQty(d)" placeholder="0"></ion-input>
                       </ion-col>
                       <ion-col class="ion-flex ion-margin-auto justify-content-center">
                         <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(d)">

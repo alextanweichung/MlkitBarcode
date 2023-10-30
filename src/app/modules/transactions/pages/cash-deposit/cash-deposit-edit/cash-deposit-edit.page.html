@@ -42,7 +42,7 @@
         </ion-datetime>
         <ion-item>
           <ion-label position="stacked">Bank in Amount</ion-label>
-          <ion-input #amtInput formControlName="depositAmount" inputmode="numeric" type="number" enterkeyhint="next" (ionFocus)="highlight(amtInput)" placeholder="Enter Amount"></ion-input>
+          <ion-input #amtInput formControlName="depositAmount" inputmode="numeric" type="number" enterkeyhint="next" placeholder="Enter Amount"></ion-input>
         </ion-item>
         <app-search-dropdown title="Bank Name" [masterDropdownList]="objectService.paymentMethodMasterList" [selectedId]="objectForm.controls.paymentMethodId.value" (onActionComplete)="onPaymentMethodSelected($event)"></app-search-dropdown>
         <ion-item>

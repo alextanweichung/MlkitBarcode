@@ -36,7 +36,7 @@
                   </ion-button>
                 </ion-col>
                 <ion-col>
-                  <ion-input #qtyRequest0 class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0" (ionBlur)="onItemEditComplete(item)" (ionFocus)="highlight(qtyRequest0)"></ion-input>
+                  <ion-input #qtyRequest0 class="ion-text-center" type="number" [min]="0" [(ngModel)]="item.qtyRequest" placeholder="0" (ionBlur)="onItemEditComplete(item)"></ion-input>
                 </ion-col>
                 <ion-col class="ion-margin-auto">
                   <ion-button fill="clear" color="primary" size="small" (click)="increaseQty(item)">
@@ -76,7 +76,7 @@
                       </ion-button>
                     </ion-col>  
                     <ion-col class="ion-margin-auto">
-                      <ion-input #qtyRequest12 class="ion-text-center" type="number" [min]="0" [(ngModel)]="d.qtyRequest" placeholder="0" (ionBlur)="onItemEditComplete(item)" (ionFocus)="highlight(qtyRequest12)"></ion-input>
+                      <ion-input #qtyRequest12 class="ion-text-center" type="number" [min]="0" [(ngModel)]="d.qtyRequest" placeholder="0" (ionBlur)="onItemEditComplete(item)"></ion-input>
                     </ion-col>
                     <ion-col class="ion-margin-auto">
                       <ion-button fill="clear" color="primary" size="small" (click)="increaseVariationQty(item, d)">
@@ -126,8 +126,8 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Unit Price</p></ion-label>
-            <ion-input *ngIf="isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="onModalItemEditComplete()"></ion-input>
-            <ion-input *ngIf="!isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="onModalItemEditComplete()"></ion-input>
+            <ion-input *ngIf="isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="onModalItemEditComplete()"></ion-input>
+            <ion-input *ngIf="!isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="onModalItemEditComplete()"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
@@ -137,7 +137,7 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Expression</p></ion-label>
-            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" [(ngModel)]="selectedItem.discountExpression"></ion-input>
+            <ion-input #discExp readonly slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" [(ngModel)]="selectedItem.discountExpression"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Amount</p></ion-label>

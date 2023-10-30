@@ -167,13 +167,13 @@
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
           <ion-item>
             <ion-label><div>Quantity</div></ion-label>
-            <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
+            <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionBlur)="computeAllAmount(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Unit Price</div></ion-label>
-            <ion-input *ngIf="objectService.objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" [type]="inputType" (ionFocus)="highlight(unitPrice)" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem, unitPrice.value?.toString())" [disabled]="restrictTrxFields['unitPrice']"></ion-input>
+            <ion-input *ngIf="objectService.objectHeader.isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" [type]="inputType" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="computeUnitPriceExTax(selectedItem, unitPrice.value?.toString())" [disabled]="restrictTrxFields['unitPrice']"></ion-input>
             
-            <ion-input *ngIf="!objectService.objectHeader.isDisplayTaxInclusive" #unitPriceExTax slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" [type]="inputType" (ionFocus)="highlight(unitPriceExTax)" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem, unitPriceExTax.value?.toString())" [disabled]="restrictTrxFields['unitPriceExTax']"></ion-input>
+            <ion-input *ngIf="!objectService.objectHeader.isDisplayTaxInclusive" #unitPriceExTax slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" [type]="inputType" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="computeUnitPrice(selectedItem, unitPriceExTax.value?.toString())" [disabled]="restrictTrxFields['unitPriceExTax']"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Code</div></ion-label>
@@ -183,7 +183,7 @@
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Expr.</div></ion-label>
-            <ion-input #discExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionFocus)="highlight(discExp)" (ionBlur)="computeAllAmount(selectedItem)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression']"></ion-input>
+            <ion-input #discExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionBlur)="computeAllAmount(selectedItem)" [(ngModel)]="selectedItem.discountExpression" [disabled]="restrictTrxFields['discountExpression']"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><div>Disc. Amt.</div></ion-label>
@@ -220,7 +220,7 @@
                           </ion-button>
                         </ion-col>
                         <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                          <ion-input #input class="ion-text-center" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="d.qtyRequest" (ionFocus)="highlight(input)" (ionBlur)="computeQty()" placeholder="0"></ion-input>
+                          <ion-input #input class="ion-text-center" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="d.qtyRequest" (ionBlur)="computeQty()" placeholder="0"></ion-input>
                         </ion-col>
                         <ion-col class="ion-flex ion-margin-auto justify-content-center">
                           <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(d)">
