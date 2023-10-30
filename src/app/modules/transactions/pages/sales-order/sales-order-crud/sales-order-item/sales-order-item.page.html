@@ -7,13 +7,10 @@
     <ion-buttons slot="start" *ngIf="objectService.objectHeader.salesOrderId > 0">
       <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="!showImage">
-      <ion-button (click)="toggleShowImage()">Grid</ion-button>
+    <ion-buttons slot="end">
+      <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
     </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="showImage">
-      <ion-button (click)="toggleShowImage()">List</ion-button>
-    </ion-buttons>
-  </ion-toolbar>  
+  </ion-toolbar>
 </ion-header>
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
