@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonDatetime, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { CalendarInputPage } from 'src/app/shared/pages/calendar-input/calendar-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportsService } from '../../services/reports.service';
 import { Customer } from 'src/app/modules/transactions/models/customer';
@@ -10,6 +9,7 @@ import { SelectionType } from '@swimlane/ngx-datatable';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { format, parseISO } from 'date-fns';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-transaction-inquiry',
@@ -28,9 +28,10 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   object: TransactionInquiryObject[] = [];
 
   constructor(
-    private commonService: CommonService,
     private objectService: ReportsService,
+    private commonService: CommonService,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private alertController: AlertController
   ) { 
     this.setFormattedDateString();
@@ -46,7 +47,7 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
       { id: 0, code: "SO", description: "Sales Order" },
       { id: 1, code: "SI", description: "Sales Invoice" },
       { id: 2, code: "CN/SR", description: "CN/Sales Return" },
-      // { id: 3, code: "S", description: "Statement" }
+      { id: 3, code: "DN", description: "Debit Note" }
     );
   }
 
@@ -67,20 +68,30 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   }
 
   objects: any[] = [];
-  loadReport() {
-    this.object = [];
-    this.objectService.getTransactionInquiry({
-      type: this.selectedType?.code,
-      dateStart: new Date(format(new Date(this.startDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
-      dateEnd: new Date(format(new Date(this.endDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
-      customerId: (this.selectedCustomer ? [this.selectedCustomer?.id] : null),
-      wildDocNum: this.docNum
-    }).subscribe(response => {
-      this.object = response;
-      this.toastService.presentToast('Search Complete', `${this.objects.length} record(s) found.`, 'top', 'success', 300, true);
-    }, error => {
+  async loadReport() {
+    try {
+      await this.loadingService.showLoading();
+      this.object = [];
+      this.objectService.getTransactionInquiry({
+        type: this.selectedType?.code,
+        dateStart: new Date(format(new Date(this.startDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
+        dateEnd: new Date(format(new Date(this.endDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
+        customerId: (this.selectedCustomer ? [this.selectedCustomer?.id] : null),
+        wildDocNum: this.docNum
+      }).subscribe(async response => {
+        this.object = response;
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
+      })
+    } catch (error) {
+      await this.loadingService.dismissLoading();
       console.error(error);
-    })
+    } finally {
+      await this.loadingService.dismissLoading();
+    }
   }
 
   onTypeChanged(event: any) {
@@ -202,6 +213,10 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
           appCode = "FAAR004";
           reportName = "AR Credit Note";
           break;
+        case "DebitNote":
+          appCode = "FAAR003";
+          reportName = "AR Debit Note";
+          break;
       }
       if (appCode !== null && appCode.length > 0) {
         let paramModel: ReportParameterModel = {
@@ -235,12 +250,12 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
   @ViewChild("datetime") datetime: IonDatetime
   setFormattedDateString() {
-    this.formattedStartDateString = format(parseISO(format(new Date(this.startDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
-    this.formattedEndDateString = format(parseISO(format(new Date(this.endDateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+    this.formattedStartDateString = format(parseISO(format(new Date(this.startDateValue), "yyyy-MM-dd") + `T00:00:00.000Z`), "MMM d, yyyy");
+    this.formattedEndDateString = format(parseISO(format(new Date(this.endDateValue), "yyyy-MM-dd") + `T00:00:00.000Z`), "MMM d, yyyy");
   }
   
   onStartDateSelected(value: any) {
-    this.startDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.startDateValue = format(new Date(value), "yyyy-MM-dd") + "T08:00:00.000Z";
     this.setFormattedDateString();
   }
 
@@ -255,7 +270,7 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   formattedEndDateString: string = "";
   endDateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";  
   onEndDateSelected(value: any) {
-    this.endDateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.endDateValue = format(new Date(value), "yyyy-MM-dd") + "T08:00:00.000Z";
     this.setFormattedDateString();
   }
 
