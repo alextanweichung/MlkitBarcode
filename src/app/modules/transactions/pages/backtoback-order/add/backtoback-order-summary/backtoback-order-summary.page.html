@@ -1,18 +1,13 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>Summary</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="" defaultHref="/transactions/backtoback-order"></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Summary</ion-label>
-      <ion-buttons slot="start">
-        <ion-back-button text="Back"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-  <div class="p-2" *ngIf="object">
+  <div class="p-2" *ngIf="objectService.objectSummary">
     <!-- <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Document</ion-label>
     </ion-list-header> -->
@@ -24,7 +19,7 @@
               <div class="font-bold">Doc. Num.</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.backToBackOrderNum}}</div>
+              <div>{{objectService.objectSummary.header.backToBackOrderNum}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -32,7 +27,7 @@
               <div class="font-bold">Doc. Date</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+              <div>{{objectService.objectSummary.header.trxDate|date:'dd/MM/yyyy'}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -40,7 +35,7 @@
               <div class="font-bold">Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+              <div>{{objectService.objectSummary.header.locationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -48,7 +43,7 @@
               <div class="font-bold">Customer</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+              <div>{{objectService.objectSummary.header.customerId|idMapping:objectService.customerMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -56,7 +51,7 @@
               <div class="font-bold">Total Quantity</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.details|sum:'qtyRequest'|number}}</div>
+              <div>{{objectService.objectSummary.details|sum:"qtyRequest"|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -64,7 +59,7 @@
               <div class="font-bold">Grand Total</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.details|sum:'subTotal'|number:'1.2-2'}}</div>
+              <div>{{objectService.objectSummary.details|sum:"subTotal"|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -74,7 +69,7 @@
       <ion-label>Details</ion-label>
     </ion-list-header>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" *ngFor="let item of object.details" (click)="showDetails(item)">
+      <ion-item [ngClass]="{'color-blue': item.isPricingApproval }" class="ion-no-padding no-ripple" *ngFor="let item of objectService.objectSummary?.details" (click)="showDetails(item)">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
@@ -132,8 +127,8 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <div *ngIf="object.header.isDisplayTaxInclusive">{{item.unitPrice|number:(object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              <div *ngIf="!object.header.isDisplayTaxInclusive">{{item.unitPriceExTax|number:(object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div *ngIf="objectService.objectSummary.header.isDisplayTaxInclusive">{{item.unitPrice|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}</div>
+              <div *ngIf="!objectService.objectSummary.header.isDisplayTaxInclusive">{{item.unitPriceExTax|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto">
               <div class="ion-flex">
@@ -142,11 +137,11 @@
               </div>
             </ion-col>
             <ion-col>
-              <div class="ion-text-right" *ngIf="object.header.isDisplayTaxInclusive">{{item.discountAmt|number:(object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
-              <div class="ion-text-right" *ngIf="!object.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number:(object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div class="ion-text-right" *ngIf="objectService.objectSummary.header.isDisplayTaxInclusive">{{item.discountAmt|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
+              <div class="ion-text-right" *ngIf="!objectService.objectSummary.header.isDisplayTaxInclusive">{{item.discountAmtExTax|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
             </ion-col>
             <ion-col>
-              <div class="ion-text-right">{{item.subTotal|number: (object?.header?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+              <div class="ion-text-right">{{item.subTotal|number:(objectService.objectSummary?.header?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

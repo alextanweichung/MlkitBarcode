@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { NavController, ActionSheetController, ModalController } from '@ionic/angular';
+import { NavController, ActionSheetController, ModalController, ViewWillEnter } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -16,27 +16,32 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './backtoback-order-header.page.html',
   styleUrls: ['./backtoback-order-header.page.scss'],
 })
-export class BacktobackOrderHeaderPage implements OnInit {
+export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
 
   objectForm: FormGroup;
 
   customPopoverOptions: any = {
-    message: 'Select one',
-    cssClass: 'popover-in-modal'
+    message: "Select one",
+    cssClass: "popover-in-modal"
   };
 
   constructor(
-    private authService: AuthService,
     public objectService: BackToBackOrderService,
+    private authService: AuthService,
     private commonService: CommonService,
+    private toastService: ToastService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
-    private toastService: ToastService,
     private formBuilder: UntypedFormBuilder,
     private modalController: ModalController
   ) {
-    this.objectService.loadRequiredMaster();
     this.newForm();
+  }
+  
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
+    await this.loadRestrictColumms();
+    await this.setDefaultValue();
   }
 
   newForm() {
@@ -82,68 +87,21 @@ export class BacktobackOrderHeaderPage implements OnInit {
       isCompleted: [null],
       posLocationId: [null],
       posLocationCode: [null],
-      sourceType: ['M']
+      sourceType: ["M"]
     });
   }
 
   ngOnInit() {
-    this.loadModuleControl();
-    this.setDefaultValue();
+
   }
 
-  selectedCustomer: Customer;
-  
-  moduleControl: ModuleControl[];
-  allowDocumentWithEmptyLine: string = "N";
-  systemWideDisableDocumentNumber: boolean = false;
-  configSalesActivatePromotionEngine: boolean;
-  workflowEnablePrintAfterApproved: boolean;
-  disableTradeTransactionGenerateGL: boolean;
-  BoDoSiDisplayPosLocationCode: boolean = false;
-  loadModuleControl() {
-    this.authService.moduleControlConfig$.subscribe(obj => {
-      this.moduleControl = obj;
-      let config = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
-      if (config != undefined) {
-        this.allowDocumentWithEmptyLine = config.ctrlValue.toUpperCase();
-      }
-      let config2 = this.moduleControl.find(x => x.ctrlName === "WorkflowEnablePrintAfterApproved")?.ctrlValue;
-      if (config2 && config2.toUpperCase() == "Y") {
-        this.workflowEnablePrintAfterApproved = true;
-      } else {
-        this.workflowEnablePrintAfterApproved = false;
-      }
-      let config3 = this.moduleControl.find(x => x.ctrlName === "DisableTradeTransactionGenerateGL")?.ctrlValue;
-      if (config3 && config3.toUpperCase() == "Y") {
-        this.disableTradeTransactionGenerateGL = true;
-      } else {
-        this.disableTradeTransactionGenerateGL = false;
-      }
-      let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-      if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-        this.configSalesActivatePromotionEngine = true;
-      } else {
-        this.configSalesActivatePromotionEngine = false;
-      }
-      let restrictDocnum = this.moduleControl.find(x => x.ctrlName === "SystemWideDisableDocumentNumber");
-      if (restrictDocnum && restrictDocnum.ctrlValue.toUpperCase() == 'Y') {
-        this.systemWideDisableDocumentNumber = true;
-      }
-      let displayPosLocation = this.moduleControl.find(x => x.ctrlName === "BoDoSiDisplayPosLocationCode");
-      if (displayPosLocation && displayPosLocation.ctrlValue.toUpperCase() == 'Y') {
-        this.BoDoSiDisplayPosLocationCode = true;
-      }
-      this.loadRestrictColumms();
-    })
-  }
-  
   restrictFields: any = {};
   restrictTrxFields: any = {};
   loadRestrictColumms() {
     let restrictedObject = {};
     let restrictedTrx = {};
     this.authService.restrictedColumn$.subscribe(obj => {
-      let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "BackToBackOrder").map(y => y.fieldName);
+      let apiData = obj.filter(x => x.moduleName === "SM" && x.objectName === "BackToBackOrder").map(y => y.fieldName);
       apiData.forEach(element => {
         Object.keys(this.objectForm.controls).forEach(ctrl => {
           if (element.toUpperCase() === ctrl.toUpperCase()) {
@@ -151,11 +109,11 @@ export class BacktobackOrderHeaderPage implements OnInit {
           }
         });
       });
-      if (!this.authService.isAdmin && this.systemWideDisableDocumentNumber) {
-        restrictedObject['backToBackOrderNum'] = true;
+      if (!this.authService.isAdmin && this.objectService.systemWideDisableDocumentNumber) {
+        restrictedObject["backToBackOrderNum"] = true;
       }
       this.restrictFields = restrictedObject;
-      let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "BackToBackOrderLine").map(y => y.fieldName);
+      let trxDataColumns = obj.filter(x => x.moduleName === "SM" && x.objectName === "BackToBackOrderLine").map(y => y.fieldName);
       trxDataColumns.forEach(element => {
         restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
       });
@@ -195,6 +153,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
     }
   }
 
+  selectedCustomer: Customer;
   selectedCustomerLocationList: MasterListDetails[] = [];
   availableAddress: ShippingInfo[] = [];
   creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
@@ -209,7 +168,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
       } else {
         this.selectedCustomerLocationList = [];
       }
-      this.objectForm.patchValue({ salesAgentId: parseFloat(lookupValue.attribute1), termPeriodId: parseFloat(lookupValue.attribute2), countryId: parseFloat(lookupValue.attribute3), locationId: parseFloat(lookupValue.attribute6), toLocationId: null, isItemPriceTaxInclusive: lookupValue.attribute8 == '1' ? true : false, isDisplayTaxInclusive: lookupValue.attribute9 == '1' ? true : false });
+      this.objectForm.patchValue({ salesAgentId: parseFloat(lookupValue.attribute1), termPeriodId: parseFloat(lookupValue.attribute2), countryId: parseFloat(lookupValue.attribute3), locationId: parseFloat(lookupValue.attribute6), toLocationId: null, isItemPriceTaxInclusive: lookupValue.attribute8 === "1" ? true : false, isDisplayTaxInclusive: lookupValue.attribute9 === "1" ? true : false });
       // this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList);
       if (!ignoreCurrencyRate) {
         this.objectForm.patchValue({ currencyId: parseFloat(lookupValue.attribute4) });
@@ -217,31 +176,31 @@ export class BacktobackOrderHeaderPage implements OnInit {
        
       this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
       this.onCurrencySelected(this.objectForm.controls.currencyId.value);
-      if (lookupValue.attribute5 == "T") {
+      if (lookupValue.attribute5 === "T") {
         this.objectForm.controls.toLocationId.clearValidators();
         this.objectForm.controls.toLocationId.updateValueAndValidity();
       }
-      if (lookupValue.attributeArray1.length == 1) {
+      if (lookupValue.attributeArray1.length === 1) {
         this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
       }
       //Auto map object type code
-      if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
-        this.objectForm.patchValue({ typeCode: 'S' });
-        this.objectForm.controls['typeCode'].disable();
+      if (lookupValue.attribute5 === "T" || lookupValue.attribute5 === "F") {
+        this.objectForm.patchValue({ typeCode: "S" });
+        this.objectForm.controls["typeCode"].disable();
       } else {
-        this.objectForm.patchValue({ typeCode: 'T' });
-        this.objectForm.controls['typeCode'].disable();
+        this.objectForm.patchValue({ typeCode: "T" });
+        this.objectForm.controls["typeCode"].disable();
       }
-      this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls['customerId'].value).flatMap(r => r.shippingInfo);// handle location
+      this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls["customerId"].value).flatMap(r => r.shippingInfo);// handle location
     }
-    if (!this.disableTradeTransactionGenerateGL) {
+    if (!this.objectService.disableTradeTransactionGenerateGL) {
       this.objectService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
         if (response) {
           this.creditInfo = response;
         }
       })
     }
-    if (this.configSalesActivatePromotionEngine) {
+    if (this.objectService.salesActivatePromotionEngine) {
       // this.loadPromotion(this.objectForm.controls.customerId.value);
     }
   }
@@ -249,10 +208,10 @@ export class BacktobackOrderHeaderPage implements OnInit {
   onCurrencySelected(event: any) {
     try {
       if (event) {
-        var lookupValue = this.objectService.currencyMasterList?.find(e => e.id == event);
+        var lookupValue = this.objectService.currencyMasterList?.find(e => e.id === event);
         if (lookupValue != undefined) {
           this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
-          if (lookupValue.attribute2 == "Y") {
+          if (lookupValue.attribute2 === "Y") {
             this.objectForm.patchValue({ isHomeCurrency: true });
           } else {
             this.objectForm.patchValue({ isHomeCurrency: false });
@@ -265,7 +224,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
   }
 
   displayModal: boolean = false;
-  creditInfoType: string = '';
+  creditInfoType: string = "";
   tableValue: CreditInfoDetails[] = [];
   displayDetails(tableValue: CreditInfoDetails[], infoType: string) {
     try {
@@ -285,24 +244,24 @@ export class BacktobackOrderHeaderPage implements OnInit {
   async cancelInsert() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        subHeader: 'Changes made will be discard.',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
-      if (role === 'confirm') {
+      if (role === "confirm") {
         this.objectService.resetVariables();
-        this.navController.navigateBack('/transactions/backtoback-order');
+        this.navController.navigateBack("/transactions/backtoback-order");
       }      
     } catch (e) {
       console.error(e);
@@ -312,7 +271,7 @@ export class BacktobackOrderHeaderPage implements OnInit {
   async nextStep() {
     try {
       await this.objectService.setHeader(this.objectForm.getRawValue());
-      this.navController.navigateForward('/transactions/backtoback-order/backtoback-order-item');
+      this.navController.navigateForward("/transactions/backtoback-order/backtoback-order-item");
     } catch (e) {
       console.error(e);
     }

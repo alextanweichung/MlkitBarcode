@@ -112,6 +112,8 @@ export class BackToBackOrderService {
   orderingPriceApprovalEnabledFields: string = "0"
   salesOrderQuantityControl: string = "0";
   orderingActivateMOQControl: boolean = false;
+  boDoSiDisplayPosLocationCode: boolean = false;
+  systemWideDisableDocumentNumber: boolean = false;
   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -166,6 +168,16 @@ export class BackToBackOrderService {
           this.orderingActivateMOQControl = true;
         } else {
           this.orderingActivateMOQControl = false;
+        }
+
+        let displayPosLocation = this.moduleControl.find(x => x.ctrlName === "BoDoSiDisplayPosLocationCode");
+        if (displayPosLocation && displayPosLocation.ctrlValue.toUpperCase() == "Y") {
+          this.boDoSiDisplayPosLocationCode = true;
+        }
+
+        let restrictDocnum = this.moduleControl.find(x => x.ctrlName === "SystemWideDisableDocumentNumber");
+        if (restrictDocnum && restrictDocnum.ctrlValue.toUpperCase() == "Y") {
+          this.systemWideDisableDocumentNumber = true;
         }
       })
       this.authService.precisionList$.subscribe(precision => {

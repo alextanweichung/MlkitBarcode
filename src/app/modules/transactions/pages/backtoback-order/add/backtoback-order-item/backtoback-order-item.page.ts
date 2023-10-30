@@ -5,8 +5,6 @@ import { ActionSheetController, IonPopover, NavController, ViewWillEnter } from 
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ModuleControl } from 'src/app/shared/models/module-control';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
@@ -20,11 +18,6 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
-  // objectHeader: BackToBackOrderHeader;
-
-  moduleControl: ModuleControl[] = [];
-  useTax: boolean = false;
-
   constructor(
     private authService: AuthService,
     public objectService: BackToBackOrderService,
@@ -32,23 +25,13 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
     private commonService: CommonService,
     private toastService: ToastService,
     private actionSheetController: ActionSheetController
-  ) {
-    this.objectService.loadRequiredMaster();
-    try {
-      if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
-        this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-header');
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  ) { }
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
     try {
+      await this.objectService.loadRequiredMaster();
       if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
-        this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-header');
-      } else {
-        this.componentsLoad();
+        this.navController.navigateBack("/transactions/backtoback-order/backtoback-order-header");
       }
     } catch (e) {
       console.error(e);
@@ -59,35 +42,8 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   }
 
-  componentsLoad() {
-    this.loadModuleControl();
-  }
-
-  
-  loadModuleControl() {
-    try {
-      this.authService.moduleControlConfig$.subscribe(obj => {
-        this.moduleControl = obj;
-        let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-        if (SystemWideActivateTaxControl != undefined) {
-          this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
-        }
-        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-          this.configSalesActivatePromotionEngine = true;
-        } else {
-          this.configSalesActivatePromotionEngine = false;
-        }
-      }, error => {
-        console.error(error);;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   async onItemAdded(event: TransactionDetail) {
-    if (event.variationTypeCode === '0') {
+    if (event.variationTypeCode === "0") {
       if (event.qtyRequest === null || event.qtyRequest === undefined || event.qtyRequest === 0) {
         return;
       }
@@ -107,7 +63,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
       this.objectService.objectDetail.unshift(trxLine);
       await this.computeAllAmount(this.objectService.objectDetail[0]);
       await this.assignSequence();
-      this.toastService.presentToast('Item Added to Cart', '', 'top', 'success', 1000);
+      this.toastService.presentToast("", "Item added", "top", "success", 1000);
     } catch (e) {
       console.error(e);
     }
@@ -142,7 +98,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -169,7 +125,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   getVariationSum(trxLine: TransactionDetail) {
     try {
-      if (trxLine.variationTypeCode === '1' || trxLine.variationTypeCode === '2') {
+      if (trxLine.variationTypeCode === "1" || trxLine.variationTypeCode === "2") {
         trxLine.qtyRequest = trxLine.variationDetails.flatMap(r => r.details).filter(r => r.qtyRequest && r.qtyRequest > 0).flatMap(r => r.qtyRequest).filter(r => r > 0).reduce((a, c) => Number(a) + Number(c));
       }
     } catch (e) {
@@ -208,7 +164,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
     try {
       trxLine.lineId = 0;
       trxLine.headerId = this.objectService.objectHeader.backToBackOrderId;
-      if (this.useTax) {
+      if (this.objectService.systemWideActivateTaxControl) {
         if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
           trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
@@ -261,7 +217,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   async nextStep() {
     try {
-      this.navController.navigateForward('/transactions/backtoback-order/backtoback-order-cart');
+      this.navController.navigateForward("/transactions/backtoback-order/backtoback-order-cart");
     } catch (e) {
       console.error(e);
     }
@@ -269,7 +225,7 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-header');
+      this.navController.navigateBack("/transactions/backtoback-order/backtoback-order-header");
     } catch (e) {
       console.error(e);
     }
@@ -278,28 +234,29 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
   async backToDetail() {
     try {
       const actionSheet = await this.actionSheetController.create({
-        header: 'Are you sure to cancel?',
-        subHeader: 'Changes made will be discard.',
-        cssClass: 'custom-action-sheet',
+        header: "Are you sure to cancel?",
+        subHeader: "Changes made will be discard.",
+        cssClass: "custom-action-sheet",
         buttons: [
           {
-            text: 'Yes',
-            role: 'confirm',
+            text: "Yes",
+            role: "confirm",
           },
           {
-            text: 'No',
-            role: 'cancel',
+            text: "No",
+            role: "cancel",
           }]
       });
       await actionSheet.present();
       const { role } = await actionSheet.onWillDismiss();
-      if (role === 'confirm') {
+      if (role === "confirm") {
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectService.objectHeader.backToBackOrderId
           }
         }
-        this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-detail', navigationExtras);
+        this.objectService.resetVariables();
+        this.navController.navigateRoot("/transactions/backtoback-order/backtoback-order-detail", navigationExtras);
       }
     } catch (e) {
       console.error(e);

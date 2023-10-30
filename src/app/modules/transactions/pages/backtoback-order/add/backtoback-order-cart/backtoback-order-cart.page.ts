@@ -6,8 +6,6 @@ import { BackToBackOrderService } from 'src/app/modules/transactions/services/ba
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
-import { ModuleControl } from 'src/app/shared/models/module-control';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -20,17 +18,12 @@ import { PromotionEngineService } from 'src/app/shared/services/promotion-engine
 })
 export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
-  moduleControl: ModuleControl[] = [];
-  promotionEngineApplicable: boolean = true;
-  useTax: boolean = false;
-
   submit_attempt: boolean = false;
-
   inputType: string = "number";
 
   constructor(
-    private authService: AuthService,
     public objectService: BackToBackOrderService,
+    private authService: AuthService,
     private commonService: CommonService,
     private promotionEngineService: PromotionEngineService,
     private toastService: ToastService,
@@ -46,15 +39,14 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   }
 
   async ionViewWillEnter(): Promise<void> {
-    this.objectService.loadRequiredMaster();
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+    if (this.objectService.salesActivatePromotionEngine) {
       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false)
     }
-    this.validateMinOrderQty();
+    await this.validateMinOrderQty();
   }
 
   ngOnInit() {
-    this.loadModuleControl();
+    this.objectService.loadRequiredMaster();
     this.loadRestrictColumms();
     this.loadAvailableAddresses();
   }
@@ -65,7 +57,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     try {
       this.availableAddress = [];
       if (this.objectService.objectHeader) {
-        if (this.objectService.objectHeader.businessModelType === 'T') {
+        if (this.objectService.objectHeader.businessModelType === "T") {
           this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectService.objectHeader.customerId).flatMap(r => r.shippingInfo);
         } else {
           this.availableAddress = this.objectService.locationMasterList.filter(r => r.id === this.objectService.objectHeader.toLocationId).flatMap(r => r.shippingInfo);
@@ -78,88 +70,14 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     }
   }
 
-  orderingPriceApprovalEnabledFields: string = "0"
-  salesOrderQuantityControl: string = "0";
-  configSalesActivatePromotionEngine: boolean;
-  configOrderingActivateMOQControl: boolean;
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
-    try {
-      this.authService.moduleControlConfig$.subscribe(obj => {
-        this.moduleControl = obj;
-        let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-        if (SystemWideActivateTaxControl != undefined) {
-          this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
-        }
-        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() == "Y") {
-          this.configSalesActivatePromotionEngine = true;
-        } else {
-          this.configSalesActivatePromotionEngine = false;
-        }
-        let salesOrderQuantityControl = this.moduleControl.find(x => x.ctrlName === "SalesOrderQuantityControl");
-        if (salesOrderQuantityControl) {
-          this.salesOrderQuantityControl = salesOrderQuantityControl.ctrlValue;
-        }
-        let priceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
-        if (priceApprovalEnabledFields) {
-          this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
-        }
-        let moqCtrl = this.moduleControl.find(x => x.ctrlName === "OrderingActivateMOQControl");
-        if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() == 'Y') {
-          this.configOrderingActivateMOQControl = true;
-        } else {
-          this.configOrderingActivateMOQControl = false;
-        }
-      }, error => {
-        console.error(error);;
-      })
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  // restrictFields: any = {};
   restrictTrxFields: any = {};
   originalRestrictTrxFields: any = {};
   loadRestrictColumms() {
-    // try {
-    //   let restrictedObject = {};
-    //   let restrictedTrx = {};
-    //   this.authService.restrictedColumn$.subscribe(obj => {  
-    //     let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "SalesOrderLine").map(y => y.fieldName);
-    //     trxDataColumns.forEach(element => {
-    //       restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
-    //     });
-    //     this.restrictTrxFields = restrictedTrx;
-    //   })
-    // } catch (e) {
-    //   console.error(e);
-    // }
     try {
       let restrictedObject = {};
       let restrictedTrx = {};
       this.authService.restrictedColumn$.subscribe(obj => {
-        // let apiData = obj.filter(x => x.moduleName == "SM" && x.objectName == "BackToBackOrder").map(y => y.fieldName);
-        // apiData.forEach(element => {
-        //   Object.keys(this.objectForm.controls).forEach(ctrl => {
-        //     if (element.toUpperCase() === ctrl.toUpperCase()) {
-        //       restrictedObject[ctrl] = true;
-        //     }
-        //   });
-        // });
-        // if (!this.accountService.isAdmin && this.systemWideDisableDocumentNumber) {
-        //   restrictedObject['backToBackOrderNum'] = true;
-        // }
-        // this.restrictFields = restrictedObject;
-
-
-        let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "BackToBackOrderLine").map(y => y.fieldName);
+        let trxDataColumns = obj.filter(x => x.moduleName === "SM" && x.objectName === "BackToBackOrderLine").map(y => y.fieldName);
         trxDataColumns.forEach(element => {
           restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
         });
@@ -178,14 +96,13 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   selectedIndex: number;
   showEditModal(data: TransactionDetail, rowIndex: number) {
     this.selectedItem = JSON.parse(JSON.stringify(data));
-    // this.selectedItem = data;
     this.selectedIndex = rowIndex;
     this.isModalOpen = true;
   }
 
   saveChanges() {
     if (this.selectedIndex === null || this.selectedIndex === undefined) {
-      this.toastService.presentToast("System Error", "Please contact Administrator.", "top", "danger", 1000);
+      this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       return;
     } else {
       let hasQtyError: boolean = false;
@@ -201,7 +118,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         hasQtyError = totalQty <= 0;
       }
       if (hasQtyError) {
-        this.toastService.presentToast("Error", "Invalid Quantity.", "top", "warning", 1000);
+        this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
       } else {
         this.objectService.objectDetail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
         setTimeout(async () => {
@@ -218,20 +135,20 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   async cancelChanges() {
     try {
       const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to discard changes?',
+        cssClass: "custom-alert",
+        header: "Are you sure to discard changes?",
         buttons: [
           {
-            text: 'OK',
-            role: 'confirm',
-            cssClass: 'success',
+            text: "OK",
+            role: "confirm",
+            cssClass: "success",
             handler: () => {
               this.isModalOpen = false;
             },
           },
           {
-            text: 'Cancel',
-            role: 'cancel',
+            text: "Cancel",
+            role: "cancel",
             handler: () => {
 
             }
@@ -251,7 +168,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   async onModalHide() {
     this.selectedIndex = null;
     this.selectedItem = null;
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+    if (this.objectService.salesActivatePromotionEngine) {
       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false)
     }
   }
@@ -262,13 +179,13 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   computeQty() {
     try {
-      if (this.selectedItem.variationTypeCode == "1" || this.selectedItem.variationTypeCode == "2") {
+      if (this.selectedItem.variationTypeCode === "1" || this.selectedItem.variationTypeCode === "2") {
         var totalQty = 0;
         if (this.selectedItem.variationDetails) {
           this.selectedItem.variationDetails.forEach(x => {
             x.details.forEach(y => {
               if (y.qtyRequest && y.qtyRequest < 0) {
-                this.toastService.presentToast('Error', 'Invalid qty.', 'top', 'danger', 1000);
+                this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
               }
               totalQty = totalQty + y.qtyRequest;
             });
@@ -297,17 +214,17 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   increaseVariationQty(data: InnerVariationDetail) {
     try {
-      if (this.salesOrderQuantityControl == '1') {
+      if (this.objectService.salesOrderQuantityControl === "1") {
         if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
           data.qtyRequest = null;
-          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+          this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
         } else {
           data.qtyRequest = (data.qtyRequest ?? 0) + 1;
         }
-      } else if (this.salesOrderQuantityControl == '2') {
+      } else if (this.objectService.salesOrderQuantityControl === "2") {
         if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
           data.qtyRequest = null;
-          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+          this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
         } else {
           data.qtyRequest = (data.qtyRequest ?? 0) + 1;
         }
@@ -363,7 +280,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -380,20 +297,20 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   async presentDeleteItemAlert(data: TransactionDetail, index: number) {
     try {
       const alert = await this.alertController.create({
-        cssClass: 'custom-alert',
-        header: 'Are you sure to delete?',
+        cssClass: "custom-alert",
+        header: "Are you sure to delete?",
         buttons: [
           {
-            text: 'OK',
-            role: 'confirm',
-            cssClass: 'danger',
+            text: "OK",
+            role: "confirm",
+            cssClass: "danger",
             handler: () => {
               this.removeItem(data, index);
             },
           },
           {
-            text: 'Cancel',
-            role: 'cancel',
+            text: "Cancel",
+            role: "cancel",
             handler: () => {
 
             }
@@ -409,10 +326,10 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   async removeItem(data: TransactionDetail, index: number) {
     setTimeout(() => {
       this.objectService.objectDetail.splice(index, 1);
-      this.toastService.presentToast("", "Line removed.", "top", "success", 1000);
+      this.toastService.presentToast("", "Line removed", "top", "success", 1000);
       this.validateMinOrderQty();
     }, 1);
-    if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+    if (this.objectService.salesActivatePromotionEngine) {
       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false)
     }
   }
@@ -453,7 +370,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
     try {
       let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
       if (discPct) {
-        if (discPct == "0") {
+        if (discPct === "0") {
           trxLine.discountExpression = null;
         } else {
           trxLine.discountExpression = discPct + "%";
@@ -468,15 +385,15 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   computeAllAmount(data: TransactionDetail) {
     data.qtyRequest = Number(data.qtyRequest.toFixed(0));
     try {
-      if (this.salesOrderQuantityControl == '1') {
+      if (this.objectService.salesOrderQuantityControl === "1") {
         if (data.qtyRequest && data.qtyRequest > data.actualQty) {
           data.qtyRequest = null;
-          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded actual quantity [${data.actualQty}]`, 'top', 'warning', 1000);
+          this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
         }
-      } else if (this.salesOrderQuantityControl == '2') {
+      } else if (this.objectService.salesOrderQuantityControl === "2") {
         if (data.qtyRequest && data.qtyRequest > data.availableQty) {
           data.qtyRequest = null;
-          this.toastService.presentToast('Invalid Quantity', `Requested quantity exceeded available quantity [${data.availableQty}]`, 'top', 'warning', 1000);
+          this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
         }
       }
       this.computeDiscTaxAmount(data);
@@ -487,7 +404,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   getPromoDesc(promoEventId: number) {
     if (this.objectService.promotionMaster.length > 0) {
-      let find = this.objectService.promotionMaster.find(x => x.promoEventId == promoEventId);
+      let find = this.objectService.promotionMaster.find(x => x.promoEventId === promoEventId);
       if (find) {
         return find.description;
       } else {
@@ -504,7 +421,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   previousStep() {
     try {
-      this.navController.navigateBack('/transactions/backtoback-order/backtoback-order-item');
+      this.navController.navigateBack("/transactions/backtoback-order/backtoback-order-item");
     } catch (e) {
       console.error(e);
     }
@@ -517,12 +434,12 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         await this.validateMinOrderQty();
         if (this.objectService.objectDetail.filter(r => r.minOrderQtyError).length === 0) {
           const alert = await this.alertController.create({
-            header: 'Are you sure to proceed?',
+            header: "Are you sure to proceed?",
             buttons: [
               {
-                text: 'OK',
-                cssClass: 'success',
-                role: 'confirm',
+                text: "OK",
+                cssClass: "success",
+                role: "confirm",
                 handler: async () => {
                   if (this.objectService.objectHeader.backToBackOrderId) {
                     await this.updateObject();
@@ -532,9 +449,9 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
                 },
               },
               {
-                text: 'Cancel',
-                cssClass: 'cancel',
-                role: 'cancel',
+                text: "Cancel",
+                cssClass: "cancel",
+                role: "cancel",
                 handler: async () => {
                   this.submit_attempt = false;
                 }
@@ -548,7 +465,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         }
       } else {
         this.submit_attempt = false;
-        this.toastService.presentToast('Error!', 'Please add at least 1 item to continue', 'top', 'danger', 1000);
+        this.toastService.presentToast("Control Error", "Please add at least 1 item to continue", "top", "warning", 1000);
       }
     } catch (e) {
       this.submit_attempt = false;
@@ -568,8 +485,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       this.objectService.insertObject(trxDto).subscribe(response => {
         let object = response.body as BackToBackOrderRoot;
         this.objectService.setSummary(object);
-        this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-summary');
+        this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
+        this.navController.navigateRoot("/transactions/backtoback-order/backtoback-order-summary");
       }, error => {
         this.submit_attempt = false;
         console.error(error);;
@@ -592,8 +509,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       this.objectService.updateObject(trxDto).subscribe(response => {
         let object = response.body as BackToBackOrderRoot;
         this.objectService.setSummary(object);
-        this.toastService.presentToast('Update Complete', '', 'top', 'success', 1000);
-        this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-summary');
+        this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
+        this.navController.navigateRoot("/transactions/backtoback-order/backtoback-order-summary");
       }, error => {
         this.submit_attempt = false;
         console.error(error);;
@@ -630,7 +547,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 
   onPricingApprovalSwitch(event: any) {
     if (event.detail.checked) {
-      switch (this.orderingPriceApprovalEnabledFields) {
+      switch (this.objectService.orderingPriceApprovalEnabledFields) {
         case "0":
           if (this.restrictTrxFields.unitPrice) {
             this.restrictTrxFields.unitPrice = false;
@@ -663,16 +580,16 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
           break;
       }
     } else {
-      if (this.restrictTrxFields.unitPrice == false) {
+      if (this.restrictTrxFields.unitPrice === false) {
         this.restrictTrxFields.unitPrice = true;
       }
-      if (this.restrictTrxFields.unitPriceExTax == false) {
+      if (this.restrictTrxFields.unitPriceExTax === false) {
         this.restrictTrxFields.unitPriceExTax = true;
       }
-      if (this.restrictTrxFields.discountExpression == false) {
+      if (this.restrictTrxFields.discountExpression === false) {
         this.restrictTrxFields.discountExpression = true;
       }
-      if (this.restrictTrxFields.discountGroupCode == false) {
+      if (this.restrictTrxFields.discountGroupCode === false) {
         this.restrictTrxFields.discountGroupCode = true;
       }
     }
@@ -685,13 +602,10 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
   validateMinOrderQty() {
     if (this.objectService.orderingActivateMOQControl) {
       if (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B") {
-        this.objectService.objectDetail.forEach(data => {          
-          console.log("🚀 ~ file: sales-order-cart.page.ts:779 ~ SalesOrderCartPage ~ validateMinOrderQty ~ data.itemCode:", data.itemCode)
+        this.objectService.objectDetail.forEach(data => {
           if (data.qtyRequest !== null && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
             let sameItemInCart = this.objectService.objectDetail.filter(r => r.itemId === data.itemId && r.uuid !== data.uuid);
-            console.log("🚀 ~ file: sales-order-cart.page.ts:780 ~ SalesOrderCartPage ~ validateMinOrderQty ~ sameItemInCart:", sameItemInCart)
             let totalQtyRequestOfSameItemInCart = sameItemInCart.flatMap(r => (r.qtyRequest ?? 0)).reduce((a, c) => (a + c), 0);
-            console.log("🚀 ~ file: sales-order-cart.page.ts:782 ~ SalesOrderCartPage ~ validateMinOrderQty ~ totalQtyRequestOfSameItemInCart:", totalQtyRequestOfSameItemInCart)
             if (sameItemInCart && totalQtyRequestOfSameItemInCart > 0) {
               // check if qtyincart has same item if yes then check minorderqty again
               if (data.qtyRequest !== null && data.minOrderQty && (data.qtyRequest + totalQtyRequestOfSameItemInCart) < data.minOrderQty) {
@@ -706,7 +620,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
             data.minOrderQtyError = false;
           }
         })
-      } 
+      }
     }
   }
 

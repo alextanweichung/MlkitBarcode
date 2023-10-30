@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { AlertController, IonPopover, NavController } from '@ionic/angular';
-import { BackToBackOrderRoot } from 'src/app/modules/transactions/models/backtoback-order';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { TrxChild } from 'src/app/shared/models/trx-child';
@@ -18,58 +17,63 @@ import { CommonService } from 'src/app/shared/services/common.service';
   templateUrl: './backtoback-order-detail.page.html',
   styleUrls: ['./backtoback-order-detail.page.scss'],
 })
-export class BacktobackOrderDetailPage implements OnInit {
+export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number
-  object: BackToBackOrderRoot;
   processType: string;
   selectedSegment: string;
 
   isShowDisabledLine: boolean = false;
 
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private navController: NavController,
     public objectService: BackToBackOrderService,
-    private alertController: AlertController,
+    private authService: AuthService,
+    private commonService: CommonService,
     private toastService: ToastService,
-    private commonService: CommonService
-  ) {
-    this.objectService.loadRequiredMaster();
-    try {
-      this.route.queryParams.subscribe(params => {
-        this.objectId = params['objectId'];
-        this.processType = params['processType'];
-        this.selectedSegment = params['selectedSegment'];
-        if (!this.objectId) {
-          this.navController.navigateBack('/transactions/backtoback-order');
-        }
-      })
-    } catch (e) {
-      console.error(e);
-    }
+    private loadingService: LoadingService,
+    private navController: NavController,
+    private alertController: AlertController,
+    private route: ActivatedRoute,
+  ) { }
+
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
+    this.route.queryParams.subscribe(params => {
+      this.objectId = params["objectId"];
+      this.processType = params["processType"];
+      this.selectedSegment = params["selectedSegment"];
+      if (!this.objectId) {
+        this.navController.navigateBack("/transactions/backtoback-order");
+      } else {        
+        this.loadObject();
+      }
+    })
   }
 
   ngOnInit() {
-    if (!this.objectId) {
-      this.navController.navigateBack('/transactions/backtoback-order')
-    } else {
-      this.loadObject();
-    }
+    
   }
 
-  loadObject() {
+  async loadObject() {
     try {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
-        this.object = response;
-        this.loadWorkflow(this.object.header.backToBackOrderId);
-      }, error => {
+      await this.loadingService.showLoading();
+      this.objectService.getObjectById(this.objectId).subscribe(async response => {
+        let object = response;
+        object.header = this.commonService.convertObjectAllDateType(object.header);
+        this.loadWorkflow(object.header.backToBackOrderId);
+        await this.objectService.setHeader(object.header);
+        await this.objectService.setLine(object.details);
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
         console.error(error);;
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
-      this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
+      this.toastService.presentToast("System Error", "Doc not found", "top", "danger", 1000);
+    } finally {      
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -79,7 +83,6 @@ export class BacktobackOrderDetailPage implements OnInit {
     this.workFlowState = [];
     this.objectService.getWorkflow(objectId).subscribe(response => {
       this.workFlowState = response;
-
       this.objectService.getTrxChild(objectId).subscribe(response2 => {
         this.trxChild = response2;
         if (this.trxChild.length > 0) {
@@ -91,8 +94,8 @@ export class BacktobackOrderDetailPage implements OnInit {
             let trxNums = relatedArray.map(x => x.trxNum);
             let trxDates = relatedArray.map(x => x.trxDate);
             let routerLinks = relatedArray.map(x => x.routerLink);
-            if (type == 'SalesInvoice') {
-              type = 'Sales Invoice';
+            if (type == "SalesInvoice") {
+              type = "Sales Invoice";
             }
             let newState: WorkFlowState = {
               stateId: null,
@@ -106,8 +109,8 @@ export class BacktobackOrderDetailPage implements OnInit {
               trxBy: null,
               routerLink: null,
               routerLinks: routerLinks,
-              icon: 'pi pi-star-fill',
-              stateType: 'TRANSACTION',
+              icon: "pi pi-star-fill",
+              stateType: "TRANSACTION",
               isCompleted: true,
               sequence: null,
               interval: null
@@ -124,18 +127,11 @@ export class BacktobackOrderDetailPage implements OnInit {
   }
 
   editObject() {
-    this.objectService.setHeader(this.object.header);
-    this.objectService.setLine(this.object.details);
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: this.object.header.backToBackOrderId
-      }
-    }
-    this.navController.navigateRoot('/transactions/backtoback-order/backtoback-order-cart', navigationExtras);
+    this.navController.navigateRoot("/transactions/backtoback-order/backtoback-order-cart");
   }
 
   toggleObject() {
-    this.objectService.toggleObject(this.object.header.backToBackOrderId).subscribe(response => {
+    this.objectService.toggleObject(this.objectService.objectHeader.backToBackOrderId).subscribe(response => {
       if (response.status === 204) {
         this.loadObject();
         this.toastService.presentToast("Update Complete", "", "top", "success", 1000);
@@ -167,7 +163,7 @@ export class BacktobackOrderDetailPage implements OnInit {
   selectedItem: TransactionDetail;
   showDetails(item: TransactionDetail) {
     if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;
     }
   }
@@ -177,7 +173,7 @@ export class BacktobackOrderDetailPage implements OnInit {
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
-  @ViewChild('popover', { static: false }) popoverMenu: IonPopover;
+  @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
   showPopover(event) {
     try {
       this.popoverMenu.event = event;
@@ -195,44 +191,44 @@ export class BacktobackOrderDetailPage implements OnInit {
     try {
       if (this.processType && this.selectedSegment) {
         const alert = await this.alertController.create({
-          cssClass: 'custom-alert',
+          cssClass: "custom-alert",
           backdropDismiss: false,
-          header: 'Are you sure to ' + action + ' ' + this.object.header.backToBackOrderNum + '?',
+          header: "Are you sure to " + action + " " + this.objectService.objectHeader.backToBackOrderNum + "?",
           inputs: [
             {
-              name: 'actionreason',
-              type: 'textarea',
-              placeholder: 'Please enter Reason',
-              value: ''
+              name: "actionreason",
+              type: "textarea",
+              placeholder: "Please enter Reason",
+              value: ""
             }
           ],
           buttons: [
             {
-              text: 'OK',
-              role: 'confirm',
-              cssClass: 'success',
+              text: "OK",
+              role: "confirm",
+              cssClass: "success",
               handler: (data) => {
-                if (action === 'REJECT' && this.processType) {
+                if (action === "REJECT" && this.processType) {
                   if (!data.actionreason && data.actionreason.length === 0) {
-                    this.toastService.presentToast('Please enter reason', '', 'top', 'danger', 1000);
+                    this.toastService.presentToast("Please enter reason", "", "top", "danger", 1000);
                     return false;
                   } else {
-                    this.updateDoc(action, [this.object.header.backToBackOrderId.toString()], data.actionreason);
+                    this.updateDoc(action, [this.objectService.objectHeader.backToBackOrderId.toString()], data.actionreason);
                   }
                 } else {
-                  this.updateDoc(action, [this.object.header.backToBackOrderId.toString()], data.actionreason);
+                  this.updateDoc(action, [this.objectService.objectHeader.backToBackOrderId.toString()], data.actionreason);
                 }
               },
             },
             {
-              text: 'Cancel',
-              role: 'cancel'
+              text: "Cancel",
+              role: "cancel"
             },
           ],
         });
         await alert.present();
       } else {
-        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -265,7 +261,7 @@ export class BacktobackOrderDetailPage implements OnInit {
                 workflowApiObject = "MobileBackToBackOrderPricingApprove";
                 break;
               default:
-                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                this.toastService.presentToast("System Error", "Workflow not found", "top", "danger", 1000);
                 return;
             }
           }
@@ -281,23 +277,23 @@ export class BacktobackOrderDetailPage implements OnInit {
                 workflowApiObject = "MobileBackToBackOrderPricingApprove";
                 break;
               default:
-                this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                this.toastService.presentToast("System Error", "Workflow not found", "top", "danger", 1000);
                 return;
             }
           }
           this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
             if (response.status == 204) {
-              this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
+              this.toastService.presentToast("", "Doc review is completed", "top", "success", 1000);
               this.navController.back();
             }
           }, error => {
             console.error(error);;
           })
         } catch (error) {
-          this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);
+          this.toastService.presentToast("Update error", "", "top", "danger", 1000);
         }
       } else {
-        this.toastService.presentToast('System Error', 'Something went wrong, please contact Adminstrator', 'top', 'danger', 1000);
+        this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);

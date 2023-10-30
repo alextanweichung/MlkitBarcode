@@ -43,8 +43,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
     private navController: NavController,
     private alertController: AlertController,
     private route: ActivatedRoute,
-  ) {
-  }
+  ) { }
 
   async ionViewWillEnter(): Promise<void> {
     try {

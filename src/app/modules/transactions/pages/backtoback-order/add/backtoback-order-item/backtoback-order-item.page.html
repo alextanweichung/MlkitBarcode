@@ -1,11 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Item</ion-title>
-    <ion-buttons slot="start" *ngIf="objectService.objectHeader.backToBackOrderId === 0">
-      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    <ion-buttons slot="start" *ngIf="objectService.objectHeader?.backToBackOrderId === 0">
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
-    <ion-buttons slot="start" *ngIf="objectService.objectHeader.backToBackOrderId > 0">
-      <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+    <ion-buttons slot="start" *ngIf="objectService.objectHeader?.backToBackOrderId > 0">
+      <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
@@ -44,7 +44,7 @@
 </ion-popover>
 <ion-content fullscreen>
   <div class="p-2">
-    <app-item-catalog [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="useTax" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isBackToBackOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="objectService.objectDetail"></app-item-catalog>
+    <app-item-catalog [keyId]="objectService.objectHeader?.customerId" [locationId]="objectService.objectHeader?.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader?.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isBackToBackOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="objectService.objectDetail"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
