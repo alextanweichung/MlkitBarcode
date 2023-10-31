@@ -6,6 +6,7 @@ import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountRoot } 
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
+import { JsonDebug } from "src/app/shared/models/jsonDebug";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -94,6 +95,10 @@ export class ConsignmentCountService {
 
   updateObject(objectRoot: ConsignmentCountRoot) {
     return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
+  }
+
+  sendDebug(debugObject: JsonDebug) {
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/jsonDebug", debugObject, httpObserveHeader);
   }
 
 }
