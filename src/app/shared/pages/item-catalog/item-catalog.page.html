@@ -3,7 +3,7 @@
 <ion-grid class="ion-no-padding" *ngIf="availableItems.length > 0">
   <ion-row *ngIf="showImage">
     <ion-col size="6" *ngFor="let item of availableItems">
-      <ion-card class="m-1">
+      <ion-card class="m-0">
         <ion-badge class="overlapBadgeTopRight" *ngIf="item?.itemPricing?.discountExpression">
           <div class="font-bold font-smaller">
             [{{item?.itemPricing?.discountGroupCode}}] {{item?.itemPricing?.discountExpression}}
@@ -76,8 +76,8 @@
     </ion-col>
   </ion-row>
   <ion-row *ngIf="!showImage">
-    <ion-col size="12" class="py-0" *ngFor="let item of availableItems">
-      <ion-card class="m-1">
+    <ion-col size="12" *ngFor="let item of availableItems">
+      <ion-card class="m-0">
         <ion-grid class="ion-no-padding p-2">
           <ion-row *ngIf="item.variationTypeCode==='0'">
             <ion-col size="8" class="ion-flex ion-margin-auto">

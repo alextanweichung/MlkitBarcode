@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Line</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Back</ion-button>
+      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -13,7 +13,7 @@
     <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
 
     <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
-      <ion-item-sliding #slidingItem *ngFor="let l of objectService.detail let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let l of objectService.objectDetail; let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="qtyInput.setFocus()">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -59,7 +59,7 @@
 
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive" >
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-    {{objectService.header.transferOutId > 0 ? "Update" : "Insert"}}
+    {{objectService.objectHeader.transferOutId > 0 ? "Update" : "Insert"}}
   </ion-button>
 </ion-footer>
 

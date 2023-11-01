@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { MasterListDetails } from '../models/master-list-details';
-import { PromotionLine, PromotionLineItemList, PromotionMaster } from '../models/promotion-engine';
-import { TransactionDetail } from '../models/transaction-detail';
-import { CommonService } from './common.service';
+import { Injectable } from "@angular/core";
+import { MasterListDetails } from "../models/master-list-details";
+import { PromotionMaster, PromotionLineItemList, PromotionLine } from "../models/promotion-engine";
+import { CommonService } from "./common.service";
+import { TransactionDetail } from "../models/transaction-detail";
 
 @Injectable({
   providedIn: 'root'

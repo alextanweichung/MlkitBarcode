@@ -2,19 +2,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { NavController, ActionSheetController, AlertController, ViewWillEnter, ViewWillLeave, Platform, IonDatetime } from '@ionic/angular';
-import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
 import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { v4 as uuidv4 } from 'uuid';
-import { Keyboard } from '@capacitor/keyboard';
 import { format, parseISO } from 'date-fns';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 @Component({
   selector: 'app-transfer-out-add',
@@ -33,28 +28,24 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
     private authService: AuthService,
     private configService: ConfigService,
     private commonService: CommonService,
+    private toastService: ToastService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    private toastService: ToastService,
     private formBuilder: UntypedFormBuilder,
     private route: ActivatedRoute,
     private platform: Platform,
   ) {
-    this.setFormattedDateString();
     this.newObjectForm();
-
-    this.route.queryParams.subscribe(params => {
-      this.objectId = params["objectId"];
-      if (this.objectId) {
-        this.loadObject();
-      }
-    })
-
   }
   
-  ionViewWillEnter(): void {
-    
+  async ionViewWillEnter(): Promise<void> {
+    await this.bindLocationList();
+    if (this.objectService.objectHeader?.transferOutId > 0) {
+      this.dateValue = format(new Date(this.objectService.objectHeader?.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
+      this.objectForm.patchValue(this.objectService.objectHeader);
+    }
+    this.setFormattedDateString();
   }
 
   ionViewWillLeave(): void {
@@ -83,7 +74,6 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
   
   ngOnInit() {
     this.loadModuleControl();
-    this.bindLocationList();
   }
 
   moduleControl: ModuleControl[] = [];
@@ -95,7 +85,7 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       this.moduleControl = obj;
       let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
       if (ignoreCheckdigit != undefined) {
-        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
       }
       let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
       if (scanningMethod != undefined) {
@@ -131,22 +121,6 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       this.objectForm.patchValue({ toLocationId: event.id });
     }
   }
-
-  loadObject() {
-    if (this.objectId) {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
-        let object = response;
-        this.commonService.convertObjectAllDateType(object);
-        this.objectForm.patchValue(object);
-        this.objectService.setHeader(object);
-        this.objectService.setLine(object.line);
-        this.dateValue = format(new Date(object.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
-        this.setFormattedDateString();
-      }, error => {
-        console.error(error);
-      })
-    }
-  }
   
   /* #region steps */
 
@@ -171,16 +145,17 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       const { role } = await actionSheet.onWillDismiss();
 
       if (role === "confirm") {
-        if (this.objectService?.header?.transferOutId > 0) {
+        if (this.objectService?.objectHeader?.transferOutId > 0) {
           let navigationExtras: NavigationExtras = {
             queryParams: {
-              objectId: this.objectService.header.transferOutId
+              objectId: this.objectService.objectHeader.transferOutId
             } 
           }
+          this.objectService.resetVariables();
           this.navController.navigateRoot("/transactions/transfer-out/transfer-out-detail", navigationExtras);
         } else {
           this.objectService.resetVariables();
-          this.navController.navigateBack("/transactions/transfer-out");
+          this.navController.navigateRoot("/transactions/transfer-out");
         }
       }
     } catch (e) {

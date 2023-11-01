@@ -7,6 +7,7 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransferOutRoot, TransferOutLine } from '../../../models/transfer-out';
 import { TransferOutService } from '../../../services/transfer-out.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-transfer-out-detail',
@@ -16,66 +17,71 @@ import { TransferOutService } from '../../../services/transfer-out.service';
 export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
-  object: TransferOutRoot;
   
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private navController: NavController,
     public objectService: TransferOutService,
+    private authService: AuthService,
+    private commonService: CommonService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
+    private navController: NavController,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    private toastService: ToastService,
-    private commonService: CommonService
-  ) {
+    private route: ActivatedRoute,
+  ) { }
+
+  ionViewWillEnter(): void {
     try {
       this.route.queryParams.subscribe(params => {
         this.objectId = params["objectId"];
+        if (this.objectId && this.objectId > 0) {
+          this.loadObject();
+        } else {
+          this.toastService.presentToast("", "Invalid Transfer Out", "top", "warning", 1000);
+          this.navController.navigateBack("/transactions/transfer-out");
+        }
       })
     } catch (e) {
       console.error(e);
     }
-  }
-
-  ionViewWillEnter(): void {
-
   }
 
   ngOnInit() {
-    if (this.objectId && this.objectId > 0) {
-      this.loadObject();
-    } else {
-      this.toastService.presentToast("", "Invalid Transfer Out.", "top", "warning", 1000);
-      this.navController.navigateBack("/transactions/transfer-out");
-    }
-    this.loadModuleControl();
+    
   }
 
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
-    try {
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-        this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-      })
-    } catch (e) {
-      console.error(e);
-      this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
-    }
-  }
+  // precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  // precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+  // loadModuleControl() {
+  //   try {
+  //     this.authService.precisionList$.subscribe(precision => {
+  //       this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+  //       this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //     this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
+  //   }
+  // }
 
-  loadObject() {
+  async loadObject() {
     try {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
-        this.object = response;
-        // this.loadWorkflow(this.object.header.salesOrderId);
-      }, error => {
-        console.error(error);;
+      await this.loadingService.showLoading();
+      this.objectService.getObjectById(this.objectId).subscribe(async response => {
+        let object = response;
+        object = this.commonService.convertObjectAllDateType(object);
+        await this.objectService.setHeader(object);
+        await this.objectService.setLine(object.line);
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
-      this.toastService.presentToast("Error", "Transfer Out", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -114,12 +120,7 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
   }
 
   editObject() {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: this.object.transferOutId
-      } 
-    }
-    this.navController.navigateRoot("/transactions/transfer-out/transfer-out-add", navigationExtras);
+    this.navController.navigateRoot("/transactions/transfer-out/transfer-out-add");
   }
 
   /* #region more action popover */
@@ -176,8 +177,8 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
   async downloadPdf() {
     try {
-      this.objectService.downloadPdf("WDWO003", "pdf", this.object.interTransferId, "Inter Transfer").subscribe(response => {
-        let filename = this.object.interTransferNum + ".pdf";
+      this.objectService.downloadPdf("WDWO003", "pdf", this.objectService.objectHeader.interTransferId, "Inter Transfer").subscribe(response => {
+        let filename = this.objectService.objectHeader.interTransferNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
         console.log(error);

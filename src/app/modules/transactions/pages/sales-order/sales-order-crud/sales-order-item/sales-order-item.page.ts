@@ -5,8 +5,6 @@ import { ActionSheetController, IonPopover, NavController, ViewWillEnter } from 
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ModuleControl } from 'src/app/shared/models/module-control';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
@@ -115,9 +113,6 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   /* #region  tax handle here */
 
-  promotionEngineApplicable: boolean = true;
-  configSalesActivatePromotionEngine: boolean;
-  disablePromotionCheckBox: boolean = false;
   async computeAllAmount(trxLine: TransactionDetail) {
     try {
       await this.computeDiscTaxAmount(trxLine);
@@ -138,7 +133,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPriceExTax(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
+      trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -147,7 +142,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
   computeUnitPrice(trxLine: TransactionDetail) {
     try {
-      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
+      trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
       this.computeDiscTaxAmount(trxLine);
     } catch (e) {
       console.error(e);
@@ -157,7 +152,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
   async computeDiscTaxAmount(trxLine: TransactionDetail) {
     try {
       await this.getVariationSum(trxLine);
-      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax);
+      trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
     } catch (e) {
       console.error(e);
     }
@@ -181,16 +176,16 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       }
       trxLine.discountGroupCode = trxLine.itemPricing.discountGroupCode;
       trxLine.discountExpression = trxLine.itemPricing.discountExpression;
-      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
-      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSalesUnitPrice.localMax:this.objectService.precisionSalesUnitPrice.foreignMax);
+      trxLine.unitPrice = this.commonService.roundToPrecision(trxLine.unitPrice, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
+      trxLine.unitPriceExTax = this.commonService.roundToPrecision(trxLine.unitPriceExTax, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
 
-      if (this.promotionEngineApplicable && this.configSalesActivatePromotionEngine) {
+      if (this.objectService.salesActivatePromotionEngine) {
         trxLine.uuid = uuidv4();
         let discPct = Number(trxLine.discountExpression?.replace("%", ""));
         if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax) : trxLine.unitPrice;
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPrice * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax) : trxLine.unitPrice;
         } else {
-          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency?this.objectService.precisionSales.localMax:this.objectService.precisionSales.foreignMax) : trxLine.unitPriceExTax;
+          trxLine.discountedUnitPrice = discPct ? this.commonService.roundToPrecision(trxLine.unitPriceExTax * ((100 - discPct) / 100), this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax) : trxLine.unitPriceExTax;
         }
         if (trxLine.itemGroupInfo) {
           trxLine.brandId = trxLine.itemGroupInfo.brandId;

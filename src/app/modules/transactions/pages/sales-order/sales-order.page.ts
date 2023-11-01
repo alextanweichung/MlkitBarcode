@@ -149,7 +149,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   getObjects(date: Date) {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-  }  
+  }
 
   async bindUniqueGrouping() {
     let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
@@ -163,11 +163,11 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   async addObject() {
     try {
-      if (this.objectService.hasSalesAgent()) {
-        this.navController.navigateForward("/transactions/sales-order/sales-order-header");
-      } else {
-        this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);
-      }
+      // if (this.objectService.hasSalesAgent()) {
+      this.navController.navigateForward("/transactions/sales-order/sales-order-header");
+      // } else {
+      //   this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);
+      // }
     } catch (e) {
       console.error(e);
     }
@@ -277,8 +277,8 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
         if (data.showDraftOnly) {
           this.loadDraftObjects();
         } else {
-          this.loadObjects();
-          this.loadDraftObjects();
+          await this.loadObjects();
+          await this.loadDraftObjects();
         }
       }
     } catch (e) {

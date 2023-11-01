@@ -10,7 +10,6 @@ import { TransferInScanningList, TransferInScanningRoot } from '../../models/tra
 import { TransferInScanningService } from '../../services/transfer-in-scanning.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { ConsignmentSalesLocation } from '../../models/consignment-sales';
-import { TransferInRoot } from '../../models/transfer-in';
 
 @Component({
   selector: 'app-transfer-in-scanning',

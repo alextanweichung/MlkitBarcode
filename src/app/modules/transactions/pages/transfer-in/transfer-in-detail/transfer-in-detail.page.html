@@ -1,25 +1,14 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>Detail</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="Back" defaultHref="/transactions/transfer-in"></ion-back-button>
+      <ion-back-button text="" defaultHref="/transactions/transfer-in"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Detail</ion-label>
-      <ion-buttons slot="start">
-        <ion-back-button text="Back"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2" *ngIf="object">
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-      <ion-label>Document</ion-label>
-    </ion-list-header>
-
+    
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button [detail]="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
@@ -84,14 +73,14 @@
       <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col size="1"class="ion-flex ion-margin-auto">
-              <div class="ion-flex my-auto font-bold">No.</div>
+            <ion-col size="1" class="ion-flex ion-margin-auto">
+              <div class="ion-flex my-auto font-bold">#</div>
             </ion-col>
-            <ion-col size="7"class="ion-flex ion-margin-auto">
+            <ion-col size="7" class="ion-flex ion-margin-auto">
               <div class="ion-flex my-auto font-bold">Item</div>
             </ion-col>
             <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-              <div class="ion-flex my-auto font-bold">Quantity</div>
+              <div class="ion-flex my-auto font-bold text-align-center">Quantity</div>
             </ion-col>
             <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
               <div class="ion-flex my-auto font-bold text-align-center">Received Qty</div>
@@ -104,7 +93,7 @@
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col size="1" class="ion-flex ion-margin-auto">
-              <ion-badge><div class="ion-text-right">{{i+1|number:'1.0'}}</div></ion-badge>
+              <div>{{i+1|number:"1.0"}}</div>
             </ion-col>
             <ion-col size="7">
               <ion-grid class="ion-no-padding">
@@ -129,11 +118,11 @@
                 </ion-row>
               </ion-grid>
             </ion-col>
-            <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
-              <div class="ion-flex my-auto">{{l.qty}}</div>
+            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+              <div class="ion-flex my-auto text-align-center">{{l.qty}}</div>
             </ion-col>
-            <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
-              <div class="ion-flex my-auto">{{l.qtyReceive}}</div>
+            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+              <div class="ion-flex my-auto text-align-center">{{l.qtyReceive}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

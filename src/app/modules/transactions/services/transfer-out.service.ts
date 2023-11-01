@@ -18,6 +18,9 @@ const httpObserveHeader = {
 
 export class TransferOutService {
 
+  filterStartDate: Date;
+  filterEndDate: Date;
+
   fullMasterList: MasterList[] = [];
   interTransferTypeList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
@@ -48,37 +51,27 @@ export class TransferOutService {
 
   /* #region  for insert */
 
-  header: TransferOutRoot;
-  detail: TransferOutLine[] = [];
-  object: TransferOutRoot;
-  async setHeader(header: TransferOutRoot) {
-    this.header = header;
+  objectHeader: TransferOutRoot;
+  objectDetail: TransferOutLine[] = [];
+  async setHeader(objectHeader: TransferOutRoot) {
+    this.objectHeader = objectHeader;
   }
 
-  setLine(detail: TransferOutLine[]) {
-    this.detail = JSON.parse(JSON.stringify(detail));
-  }
-
-  setObject(object: TransferOutRoot) {
-    this.object = object;
+  setLine(objectDetail: TransferOutLine[]) {
+    this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
   }
 
   removeHeader() {
-    this.header = null;
+    this.objectHeader = null;
   }
 
   removeLine() {
-    this.detail = [];
-  }
-
-  removeObject() {
-    this.object = null;
+    this.objectDetail = [];
   }
 
   resetVariables() {
     this.removeHeader();
     this.removeLine();
-    this.removeObject();
   }
 
   /* #endregion */

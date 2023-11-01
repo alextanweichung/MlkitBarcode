@@ -8,6 +8,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransferOutList } from '../../models/transfer-out';
 import { TransferOutService } from '../../services/transfer-out.service';
 import { FilterPage } from '../filter/filter.page';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-transfer-out',
@@ -19,8 +20,6 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
   private objectDiffer: any;
   objects: TransferOutList[] = [];
 
-  startDate: Date;
-  endDate: Date;
   customerIds: number[] = [];
   salesAgentIds: number[] = [];
 
@@ -30,15 +29,15 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
     private authService: AuthService,
     private commonService: CommonService,
     private objectService: TransferOutService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService,
     private differs: IterableDiffers
   ) {
     // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
     this.objectDiffer = this.differs.find(this.objects).create();
   }
 
@@ -49,19 +48,21 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
     }
   }
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
     this.objectService.resetVariables();
     this.objects = []; // clear list when enter
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+    if (!this.objectService.filterStartDate) {
+      this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
     }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
+    if (!this.objectService.filterEndDate) {
+      this.objectService.filterEndDate = this.commonService.getTodayDate();
     }
+    this.loadObjects();
   }
 
   ionViewDidEnter(): void {
-    this.loadObjects();
+    
   }
 
   ngOnInit() {
@@ -72,14 +73,20 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
 
   async loadObjects() {
     try {
-      this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
+      await this.loadingService.showLoading();
+      this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"),format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        console.error(error);;
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (error) {
-      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
+      await this.loadingService.dismissLoading();
+      this.toastService.presentToast("", "Error loading object", "top", "danger", 1000);
+    } finally {      
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -134,8 +141,8 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
       const modal = await this.modalController.create({
         component: FilterPage,
         componentProps: {
-          startDate: this.startDate,
-          endDate: this.endDate,
+          startDate: this.objectService.filterStartDate,
+          endDate: this.objectService.filterEndDate,
         },
         canDismiss: true
       })
@@ -144,8 +151,8 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
       if (data && data !== undefined) {
         this.objects = [];
         this.uniqueGrouping = [];
-        this.startDate = new Date(data.startDate);
-        this.endDate = new Date(data.endDate);
+        this.objectService.filterStartDate = new Date(data.startDate);
+        this.objectService.filterEndDate = new Date(data.endDate);
         this.loadObjects();
       }
     } catch (e) {

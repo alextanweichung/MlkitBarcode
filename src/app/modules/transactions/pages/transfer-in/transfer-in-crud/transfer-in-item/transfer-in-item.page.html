@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Details</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
+      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -17,7 +17,7 @@
               <div class="font-bold"> Doc. Num.</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.object.interTransferNum}}
+              {{objectService.objectHeader.interTransferNum}}
             </ion-col>
           </ion-row>
           <ion-row>
@@ -25,7 +25,7 @@
               <div class="font-bold"> Doc. Date</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.object.trxDate|date:"dd/MM/yyyy"}}
+              {{objectService.objectHeader.trxDate|date:"dd/MM/yyyy"}}
             </ion-col>
           </ion-row>
           <ion-row>
@@ -33,7 +33,7 @@
               <div class="font-bold"> From Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.object.locationId|idMapping:objectService.locationMasterList}}
+              {{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -64,7 +64,7 @@
         </ion-grid>        
       </ion-item>
 
-      <ion-item-sliding #slidingItem *ngFor="let l of objectService.object.line let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let l of objectService.objectHeader.line let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="highlight(qtyInput)">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
-import { TransferInLine, TransferInRoot } from 'src/app/modules/transactions/models/transfer-in';
+import { TransferInLine } from 'src/app/modules/transactions/models/transfer-in';
 import { TransferInService } from 'src/app/modules/transactions/services/transfer-in.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -46,7 +46,7 @@ export class TransferInItemPage implements OnInit, OnDestroy {
       this.moduleControl = obj;
       let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
       if (ignoreCheckdigit != undefined) {
-        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+        this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
       }
       let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
       if (scanningMethod != undefined) {
@@ -67,8 +67,8 @@ export class TransferInItemPage implements OnInit, OnDestroy {
             let outputData: TransferInLine = {
               interTransferLineId: 0,
               interTransferVariationId: 0,
-              interTransferId: this.objectService.object.interTransferId,
-              sequence: this.objectService.object.line.length,
+              interTransferId: this.objectService.objectHeader.interTransferId,
+              sequence: this.objectService.objectHeader.line.length,
               itemId: found_item_master.id,
               itemCode: found_item_master.code,
               itemSku: found_barcode.sku,
@@ -102,8 +102,8 @@ export class TransferInItemPage implements OnInit, OnDestroy {
           let outputData: TransferInLine = {
             interTransferLineId: 0,
             interTransferVariationId: 0,
-            interTransferId: this.objectService.object.interTransferId,
-            sequence: this.objectService.object.line.length,
+            interTransferId: this.objectService.objectHeader.interTransferId,
+            sequence: this.objectService.objectHeader.line.length,
             itemId: r.itemId,
             itemCode: r.itemCode,
             itemSku: r.itemSku,
@@ -131,11 +131,11 @@ export class TransferInItemPage implements OnInit, OnDestroy {
 
   insertIntoLine(event: TransferInLine) {
     if (event) {
-      if (this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
-        let index = this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku);
-        this.objectService.object.line[index].qtyReceive = (this.objectService.object.line[index].qtyReceive??0) + 1; 
+      if (this.objectService.objectHeader.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
+        let index = this.objectService.objectHeader.line.findIndex(r => r.itemSku === event.itemSku);
+        this.objectService.objectHeader.line[index].qtyReceive = (this.objectService.objectHeader.line[index].qtyReceive??0) + 1; 
       } else {
-        this.objectService.object.line.push(event);
+        this.objectService.objectHeader.line.push(event);
       }
     }
   }
@@ -150,7 +150,7 @@ export class TransferInItemPage implements OnInit, OnDestroy {
           role: "confirm",
           cssClass: "danger",
           handler: async () => {
-            this.objectService.object.line.splice(rowIndex, 1);
+            this.objectService.objectHeader.line.splice(rowIndex, 1);
           },
         },
         {
@@ -223,8 +223,8 @@ export class TransferInItemPage implements OnInit, OnDestroy {
           let outputData: TransferInLine = {
             interTransferLineId: 0,
             interTransferVariationId: 0,
-            interTransferId: this.objectService.object.interTransferId,
-            sequence: this.objectService.object.line.length,
+            interTransferId: this.objectService.objectHeader.interTransferId,
+            sequence: this.objectService.objectHeader.line.length,
             itemId: response.itemId,
             itemCode: response.itemCode,
             itemSku: response.itemSku,
@@ -308,12 +308,12 @@ export class TransferInItemPage implements OnInit, OnDestroy {
   }
 
   updateObject() {
-    this.objectService.updateObject(this.objectService.object).subscribe(response => {
+    this.objectService.updateObject(this.objectService.objectHeader).subscribe(response => {
       if (response.status === 204) {
         this.toastService.presentToast("", "Inter Transfer updated", "top", "success", 1000);
         let navigationExtras: NavigationExtras = {
           queryParams: {
-            objectId: this.objectService.object.interTransferId
+            objectId: this.objectService.objectHeader.interTransferId
           }
         }
         this.objectService.resetVariables();

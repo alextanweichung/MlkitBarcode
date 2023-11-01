@@ -5,11 +5,12 @@ import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TransferInList, TransferInRoot } from '../../models/transfer-in';
+import { TransferInHeader, TransferInList } from '../../models/transfer-in';
 import { TransferInService } from '../../services/transfer-in.service';
 import { FilterPage } from '../filter/filter.page';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { ConsignmentSalesLocation } from '../../models/consignment-sales';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-transfer-in',
@@ -19,6 +20,7 @@ import { ConsignmentSalesLocation } from '../../models/consignment-sales';
 export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
   private objectDiffer: any;
+
   objects: TransferInList[] = [];
 
   startDate: Date;
@@ -29,18 +31,17 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
   uniqueGrouping: Date[] = [];
 
   constructor(
+    public objectService: TransferInService,
     private authService: AuthService,
     private commonService: CommonService,
-    public objectService: TransferInService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService,
     private differs: IterableDiffers
   ) {
-    // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
     this.objectDiffer = this.differs.find(this.objects).create();
   }
 
@@ -53,6 +54,9 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   ionViewWillEnter(): void {
     this.objectService.resetVariables();
+    // reload all masterlist whenever user enter listing
+    this.objectService.loadRequiredMaster();
+    this.bindLocationList();
     this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
@@ -67,7 +71,6 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       this.selectedLocation = this.objectService.locationList.find(r => r.isPrimary);
       this.loadPendingList();
     }
-    this.bindLocationList();
     this.loadObjects();
   }
 
@@ -101,7 +104,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     }
   }
 
-  pendingObject: TransferInRoot[] = [];
+  pendingObject: TransferInHeader[] = [];
   loadPendingList() {
     this.pendingObject = [];
     if (this.selectedLocation) {
@@ -113,14 +116,14 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     }
   }
 
-  selectDoc(object: TransferInRoot) {
+  selectDoc(object: TransferInHeader) {
     object.line.forEach(r => {
       if (r.qtyReceive === null) {
         r.qtyReceive = r.qty;
       }
     })
-    this.objectService.setObject(object);
-    this.navController.navigateForward("/transactions/transfer-in/transfer-in-item");
+    this.objectService.setHeader(object);
+    this.navController.navigateRoot("/transactions/transfer-in/transfer-in-item");
   }
 
   /* #endregion */
@@ -129,15 +132,21 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   async loadObjects() {
     try {
+      await this.loadingService.showLoading();
       this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         this.objects = this.objects.filter(r => r.isCompleted);
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        console.error(error);;
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (error) {
-      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
+      await this.loadingService.dismissLoading();
+      this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 

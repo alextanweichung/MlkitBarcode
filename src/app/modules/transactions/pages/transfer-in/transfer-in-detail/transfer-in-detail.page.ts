@@ -4,8 +4,8 @@ import { ViewWillEnter, NavController, ActionSheetController, AlertController } 
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { TransferInRoot } from '../../../models/transfer-in';
 import { TransferInService } from '../../../services/transfer-in.service';
+import { TransferInHeader } from '../../../models/transfer-in';
 
 @Component({
   selector: 'app-transfer-in-detail',
@@ -15,7 +15,7 @@ import { TransferInService } from '../../../services/transfer-in.service';
 export class TransferInDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
-  object: TransferInRoot;
+  object: TransferInHeader;
   
   constructor(
     private authService: AuthService,

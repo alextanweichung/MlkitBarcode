@@ -23,9 +23,9 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
   objectForm: FormGroup;
 
   constructor(
+    public objectService: ConsignmentSalesService,
     private authService: AuthService,
     private configService: ConfigService,
-    public objectService: ConsignmentSalesService,
     private commonService: CommonService,
     private navController: NavController,
     private actionSheetController: ActionSheetController,
@@ -36,8 +36,8 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
     this.newObjectForm();
   }
 
-  ionViewWillEnter(): void {
-    
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();    
   }
 
   ionViewDidEnter(): void {
@@ -287,7 +287,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
         //     }
         //     this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item", navigationExtras);
         //   } else {
-            this.objectService.setHeader(this.objectForm.value);
+            this.objectService.setHeader(this.objectForm.getRawValue());
             this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item");
         //   }
         // }, error => {

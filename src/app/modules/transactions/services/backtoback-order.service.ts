@@ -62,6 +62,7 @@ export class BackToBackOrderService {
     await this.loadStaticLovList();
     await this.loadCustomer();
     await this.loadModuleControl();
+    await this.loadPromotion();
   }
 
   async loadMasterList() {
@@ -88,6 +89,14 @@ export class BackToBackOrderService {
     this.customers = await this.getCustomerList();
     await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
     this.bindCustomerList();
+  }
+
+  async loadPromotion() {
+    if (this.objectHeader?.trxDate && this.objectHeader?.customerId) {
+      this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
+    } else {
+      this.promotionMaster = [];
+    }
   }
 
   customerSearchDropdownList: SearchDropdownList[] = [];
@@ -218,7 +227,7 @@ export class BackToBackOrderService {
   async setHeader(objectHeader: BackToBackOrderHeader) {
     this.objectHeader = objectHeader;
     // load promotion first after customer confirmed or whenever header changed.
-    this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
+    await this.loadPromotion();
   }
 
   setLine(objectDetail: TransactionDetail[]) {

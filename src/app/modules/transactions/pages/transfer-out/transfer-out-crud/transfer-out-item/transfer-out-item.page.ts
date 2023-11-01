@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
 import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,15 +15,20 @@ import { v4 as uuidv4 } from 'uuid';
   templateUrl: './transfer-out-item.page.html',
   styleUrls: ['./transfer-out-item.page.scss'],
 })
-export class TransferOutItemPage implements OnInit {
+export class TransferOutItemPage implements OnInit, ViewWillEnter {
 
   constructor(
     public objectService: TransferOutService,
     private configService: ConfigService,
     private navController: NavController,
     private alertController: AlertController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private loadingService: LoadingService
   ) { }
+
+  ionViewWillEnter(): void {
+    throw new Error('Method not implemented.');
+  }
 
   ngOnInit() {
 
@@ -77,7 +83,7 @@ export class TransferOutItemPage implements OnInit {
             let outputData: TransferOutLine = {
               id: 0,
               uuid: uuidv4(),
-              transferOutId: this.objectService.header.transferOutId,
+              transferOutId: this.objectService.objectHeader.transferOutId,
               sequence: 0,
               itemId: found_item_master.id,
               itemCode: found_item_master.code,
@@ -95,7 +101,7 @@ export class TransferOutItemPage implements OnInit {
             }
             return outputData;
           } else {
-            this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
+            this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
           }
         }
       }
@@ -111,7 +117,7 @@ export class TransferOutItemPage implements OnInit {
           let outputData: TransferOutLine = {
             id: 0,
             uuid: uuidv4(),
-            transferOutId: this.objectService.header.transferOutId,
+            transferOutId: this.objectService.objectHeader.transferOutId,
             sequence: 0,
             itemId: r.itemId,
             itemCode: r.itemCode,
@@ -139,14 +145,14 @@ export class TransferOutItemPage implements OnInit {
 
   insertIntoLine(event: TransferOutLine) {
     if (event) {
-      if (this.objectService.detail !== null && this.objectService.detail.length > 0) {
-        if (this.objectService.detail[0].itemSku === event.itemSku) {
-          this.objectService.detail[0].lineQty += event.lineQty;
+      if (this.objectService.objectDetail !== null && this.objectService.objectDetail.length > 0) {
+        if (this.objectService.objectDetail[0].itemSku === event.itemSku) {
+          this.objectService.objectDetail[0].lineQty += event.lineQty;
         } else {
-          this.objectService.detail.unshift(event);
+          this.objectService.objectDetail.unshift(event);
         }
       } else {
-        this.objectService.detail.unshift(event);
+        this.objectService.objectDetail.unshift(event);
       }
     }
   }
@@ -161,7 +167,7 @@ export class TransferOutItemPage implements OnInit {
           role: "confirm",
           cssClass: "danger",
           handler: async () => {
-            this.objectService.detail.splice(rowIndex, 1);
+            this.objectService.objectDetail.splice(rowIndex, 1);
           },
         },
         {
@@ -223,18 +229,19 @@ export class TransferOutItemPage implements OnInit {
 
   saveObject() {
     let object: TransferOutRoot;
-    object = this.objectService.header;
-    object.line = this.objectService.detail;
+    object = this.objectService.objectHeader;
+    object.line = this.objectService.objectDetail;
     if (object.line !== null && object.line.length > 0) {
-      if (this.objectService.header.transferOutId > 0) {
+      if (this.objectService.objectHeader.transferOutId > 0) {
         this.objectService.updateObject(object).subscribe(response => {
           if (response.status === 204) {
             this.toastService.presentToast("", "Transfer Out updated", "top", "success", 1000);
             let navigationExtras: NavigationExtras = {
               queryParams: {
-                objectId: this.objectService.header.transferOutId
+                objectId: this.objectService.objectHeader.transferOutId
               }
             }
+            this.objectService.resetVariables();
             this.navController.navigateRoot("/transactions/transfer-out/transfer-out-detail", navigationExtras);
           }
         }, error => {
@@ -250,6 +257,7 @@ export class TransferOutItemPage implements OnInit {
                 objectId: objectId
               }
             }
+            this.objectService.resetVariables();
             this.navController.navigateRoot("/transactions/transfer-out/transfer-out-detail", navigationExtras);
           }
         }, error => {

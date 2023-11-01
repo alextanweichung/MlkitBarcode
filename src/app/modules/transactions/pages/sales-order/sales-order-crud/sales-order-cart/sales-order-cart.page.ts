@@ -9,8 +9,6 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
-import { ModuleControl } from 'src/app/shared/models/module-control';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -774,7 +772,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
   validateMinOrderQty() {
     if (this.objectService.orderingActivateMOQControl) {
       if (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B") {
-        this.objectService.objectDetail.forEach(data => {          
+        this.objectService.objectDetail.forEach(data => {
           console.log("🚀 ~ file: sales-order-cart.page.ts:779 ~ SalesOrderCartPage ~ validateMinOrderQty ~ data.itemCode:", data.itemCode)
           if (data.qtyRequest !== null && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
             let sameItemInCart = this.objectService.objectDetail.filter(r => r.itemId === data.itemId && r.uuid !== data.uuid);
@@ -795,7 +793,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             data.minOrderQtyError = false;
           }
         })
-      } 
+      }
     }
   }
 

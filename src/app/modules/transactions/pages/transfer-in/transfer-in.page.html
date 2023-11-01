@@ -1,8 +1,8 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>Transfer In</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="Back" defaultHref="/transactions"></ion-back-button>
+      <ion-back-button text="" defaultHref="/transactions"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="primary">
       <ion-button (click)="filter()">
@@ -12,18 +12,13 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Transfer In</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <app-search-dropdown title="Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="selectedLocation?.locationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
     </ion-list>
       
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="pendingObject && pendingObject.length > 0">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="selectedLocation?.locationId && pendingObject && pendingObject.length > 0">
       <ion-label>Pending Doc.</ion-label>
     </ion-list-header>
 
