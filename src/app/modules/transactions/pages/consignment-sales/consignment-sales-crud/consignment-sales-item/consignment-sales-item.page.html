@@ -31,6 +31,22 @@
       <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Total Quantity</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{objectService.objectDetail|sum:"qtyRequest"|number:"1.0"}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Total Amount</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{objectService.objectDetail|sum:"subTotal"|number:(objectService.objectHeader?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
             <ion-col size="1" class="ion-flex ion-margin-auto">
               <div class="font-bold">#</div>
             </ion-col>
@@ -56,8 +72,8 @@
                     <ion-col class="ion-flex ion-margin-auto">
                       <div class="font-bold">{{line.itemBarcode}}</div>
                     </ion-col>
-                    <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                      <ion-input #qtyRequestInput type="number" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode)" (ionBlur)="computeAllAmount(line)"></ion-input>
+                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                      <ion-input #qtyRequestInput class="ion-text-center" type="number" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode)" (ionBlur)="computeAllAmount(line)"></ion-input>
                     </ion-col>
                   </ion-row>
                   <ion-row>
@@ -102,7 +118,7 @@
                       <div *ngIf="!objectService.objectHeader.isDisplayTaxInclusive">{{line.discountAmtExTax|number:(objectService.objectHeader?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
                     </ion-col>
                     <ion-col class="ion-margin-auto justify-content-end">
-                      <div>{{line.subTotal|number: (objectService.objectHeader?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
+                      <div>{{line.subTotal|number:(objectService.objectHeader?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}</div>
                     </ion-col>
                   </ion-row>
                 </ion-grid>
@@ -142,7 +158,7 @@
     
   </div>
 </ion-content>
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color:white;" [hidden]="scanActive">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
     Save
   </ion-button>
@@ -194,7 +210,7 @@
         </ion-list>
       </div>
     </ion-content>
-    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color:white;">
       <ion-grid class="ion-no-padding">
         <ion-row>
           <ion-col>

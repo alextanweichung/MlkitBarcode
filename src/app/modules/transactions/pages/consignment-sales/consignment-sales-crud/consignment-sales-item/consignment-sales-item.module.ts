@@ -12,6 +12,7 @@ import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-fl
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-input-offline/item-code-input-offline.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-i
     BarcodeScanInputPageModule,
     ItemAddListFlatPageModule,
     IdMappingModule,
-    ItemCodeInputOfflinePageModule
+    ItemCodeInputOfflinePageModule,
+    SumModule
   ],
   declarations: [ConsignmentSalesItemPage]
 })

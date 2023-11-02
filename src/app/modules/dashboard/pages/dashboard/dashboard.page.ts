@@ -69,6 +69,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     if (this.loginUser.loginUserType === "C") {
       this.consignmentSalesService.loadRequiredMaster();
     }
+    this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
   }
 
   ionViewDidEnter(): void {

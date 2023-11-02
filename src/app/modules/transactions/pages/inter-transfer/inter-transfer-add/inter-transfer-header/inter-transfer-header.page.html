@@ -1,17 +1,12 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>New Inter Transfer</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
+      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">New Inter Transfer</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
     <form [formGroup]="objectForm">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">

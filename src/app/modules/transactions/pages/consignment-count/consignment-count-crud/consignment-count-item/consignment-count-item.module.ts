@@ -11,6 +11,7 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IdMappingModule,
     BarcodeScanInputPageModule,
     CameraScanInputPageModule,
-    SumModule
+    SumModule,
+    NgxPaginationModule
   ],
   declarations: [ConsignmentCountItemPage]
 })

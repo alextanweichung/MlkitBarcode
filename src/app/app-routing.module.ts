@@ -118,6 +118,10 @@ const routes: Routes = [
     path: 'managements/b2bopricing-approvals',
     loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then(m => m.B2bopricingApprovalsPageModule)
   },
+  {
+    path: 'managements/refund-approvals',
+    loadChildren: () => import('./modules/managements/pages/refund-approvals/refund-approvals.module').then( m => m.RefundApprovalsPageModule)
+  },
   // management-otp-configuration
   {
     path: 'managements/otp-configuration',
@@ -385,8 +389,6 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
-
-
 
 ];
 @NgModule({

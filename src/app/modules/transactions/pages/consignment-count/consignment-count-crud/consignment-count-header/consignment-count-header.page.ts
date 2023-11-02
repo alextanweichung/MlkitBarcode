@@ -7,7 +7,6 @@ import { ConsignmentCountService } from 'src/app/modules/transactions/services/c
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({

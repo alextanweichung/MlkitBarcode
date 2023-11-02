@@ -34,6 +34,7 @@ export class ManagementPage implements OnInit {
   showNonTradePurchaseOrderApproval: boolean = false;
   showSalesOrderPricingApproval: boolean = false;
   showBackToBackOrderPricingApproval: boolean = false;
+  showRefundApproval: boolean = false;
   showOtpConfig: boolean = false;
 
   constructor(
@@ -63,6 +64,9 @@ export class ManagementPage implements OnInit {
           this.showNonTradePurchaseOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.nonTradePOAP) > -1;
           this.showSalesOrderPricingApproval = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
           this.showBackToBackOrderPricingApproval = pageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;
+
+          this.showRefundApproval = pageItems.findIndex(r => r.title === approvalAppCode.refundAP) > -1;
+          
           this.showOtpConfig = pageItems.findIndex(r => r.title === approvalAppCode.otpConfig) > -1;
         }
       })

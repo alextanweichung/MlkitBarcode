@@ -5,7 +5,6 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentCountDetail, ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
-import { ConsignmentSalesRoot } from 'src/app/modules/transactions/models/consignment-sales';
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -27,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   submit_attempt: boolean = false;
-  max: number = 10;
+  currentPage: number = 1;
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -118,7 +117,6 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
         await this.objectService.objectDetail.unshift(newLine);
         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-        this.max = 10;
       }
     } catch (e) {
       console.error(e);
@@ -174,7 +172,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
               text: "Delete item",
               cssClass: "danger",
               handler: async () => {
-                this.objectService.objectDetail.splice(index, 1);
+                await this.objectService.objectDetail.splice(index, 1);
                 this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
                 let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                 await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
@@ -185,7 +183,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
               role: "cancel",
               cssClass: "cancel",
               handler: async () => {
-                this.objectService.objectDetail[index].qtyRequest === 0 ? (this.objectService.objectDetail[index].qtyRequest += 1) : 1;
+                this.objectService.objectDetail[index].qtyRequest = 1;
                 let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                 await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
@@ -336,10 +334,6 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
     return line.guid;
   }
 
-  async loadALl() {
-    this.max += (this.objectService.objectDetail.length??0)
-  }
-
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;
@@ -361,15 +355,11 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       details: this.objectService.objectDetail
     }
     let jsonObjectString = JSON.stringify(trxDto);
-    console.log("🚀 ~ file: consignment-count-item.page.ts:364 ~ ConsignmentCountItemPage ~ sendForDebug ~ trxDto:", JSON.stringify(trxDto))
     let debugObject: JsonDebug = {
       jsonDebugId: 0,
       jsonData: jsonObjectString
     };
-    console.log("🚀 ~ file: consignment-count-item.page.ts:369 ~ ConsignmentCountItemPage ~ sendForDebug ~ debugObject:", JSON.stringify(debugObject))
-
     this.objectService.sendDebug(debugObject).subscribe(response => {
-      console.log("🚀 ~ file: consignment-count-item.page.ts:372 ~ ConsignmentCountItemPage ~ this.objectService.sendDebug ~ response:", JSON.stringify(response))
       if (response.status == 200) {
         this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
       }

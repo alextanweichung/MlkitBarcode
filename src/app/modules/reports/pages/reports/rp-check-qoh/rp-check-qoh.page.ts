@@ -52,7 +52,7 @@ export class RpCheckQohPage implements OnInit {
           this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
         })
       } else {
-        this.toastService.presentToast("Enter at least 3 characters to start searching", "", "top", "warning", 1000);
+        this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
       }
     } catch (e) {
       console.error(e);

@@ -8,20 +8,27 @@
     <ion-buttons slot="start">
       <ion-back-button text="" defaultHref="/transactions"></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="filter()">
+        <ion-icon slot="icon-only" name="filter"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <div class="p-2">
-    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
+  <div class="px-2 pb-2">
+    <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (search)="search(searchbar.value, true)" (ionChange)="resetFilteredObj()"></ion-searchbar>
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!filteredObj||filteredObj?.length === 0">
       <ion-label>Nothing found!</ion-label>
     </ion-list-header>
-    <ng-container *ngIf="objects.length > 0">      
-      <div *ngFor="let m of uniqueGrouping">
-        <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+    <ng-container *ngIf="filteredObj.length > 0">
+      <!-- <div *ngFor="let m of uniqueGrouping|paginate:{itemsPerPage:12,currentPage=currentPage}"> -->
+        <!-- <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
           <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
-        </ion-list-header>        
+        </ion-list-header> -->
+        <pagination-controls class="ion-flex justify-content-center my-pagination" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-          <ion-item button detail="false" class="ion-no-padding" *ngFor="let object of getObjects(m)" (click)="goToDetail(object.consignmentCountId)">
+          <ion-item button detail="false" class="ion-no-padding" *ngFor="let object of filteredObj|paginate:{itemsPerPage:12,currentPage:currentPage}" (click)="goToDetail(object.consignmentCountId)">
             <ion-grid class="ion-no-padding py-2 pl-2">
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto justify-content-between">
@@ -38,7 +45,7 @@
             </ion-grid>
           </ion-item>
         </ion-list>
-      </div>
+      <!-- </div> -->
     </ng-container>
   </div>
   <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">

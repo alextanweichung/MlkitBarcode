@@ -154,7 +154,7 @@ export class GeneralSalesListPage implements OnInit {
         }
       }
     } else {
-      this.toastService.presentToast('Enter at least 3 characters to start searching', '', 'top', 'medium', 1000);
+      this.toastService.presentToast('', 'Search with 3 characters and above', 'top', 'medium', 1000);
     }
   }
 

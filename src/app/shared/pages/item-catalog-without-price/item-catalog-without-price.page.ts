@@ -57,7 +57,7 @@ export class ItemCatalogWithoutPricePage implements OnInit {
         })
         this.loadImages(searchText);
       } else {
-        this.toastService.presentToast("Enter at least 3 characters to start searching", "", "top", "warning", 1000);
+        this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
       }
     } catch (e) {
       console.error(e);

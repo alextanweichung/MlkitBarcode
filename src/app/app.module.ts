@@ -23,6 +23,7 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import {NgxPaginationModule} from 'ngx-pagination';
 
 export function initializeFactory(init: InitializeAppService) {
     return () => init.initializeApp();
@@ -53,7 +54,8 @@ export function initializeFactory(init: InitializeAppService) {
             animation: false,
             animationDuration: 0,
             showSubtitle: false
-        })
+        }),
+        NgxPaginationModule
     ],
     providers: [
         File,

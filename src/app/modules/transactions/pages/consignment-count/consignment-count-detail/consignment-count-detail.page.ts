@@ -16,6 +16,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
   object: ConsignmentCountRoot;
+  currentPage: number = 1;
 
   constructor(
     public objectService: ConsignmentCountService,
@@ -76,6 +77,10 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
   previousStep() {
     this.objectService.resetVariables();
     this.navController.navigateBack("/transactions/consignment-count");
+  }
+
+  identify(index, line) {
+    return line.guid;
   }
 
 }

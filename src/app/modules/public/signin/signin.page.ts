@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActionSheetController, AlertController, IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -18,7 +18,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
   templateUrl: './signin.page.html',
   styleUrls: ['./signin.page.scss'],
 })
-export class SigninPage implements OnInit, ViewDidEnter {
+export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   current_year: number = new Date().getFullYear();
   currentVersion: string;
@@ -52,15 +52,15 @@ export class SigninPage implements OnInit, ViewDidEnter {
     });
   }
 
-  ionViewDidEnter(): void {
+  ionViewWillEnter(): void {
     this.companyNames = new Map([]);
     if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
       this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
     }
   }
 
-  ionViewWillEnter(): void {
-
+  ionViewDidEnter(): void {
+    
   }
 
   companyNames: Map<string, string> = new Map([]);
@@ -149,97 +149,149 @@ export class SigninPage implements OnInit, ViewDidEnter {
 
   // Sign in
   async signIn() {
-    // todo : check if delay
-    this.configService.selected_sys_param = this.configService.sys_parameter.find(r => r.apiUrl === this.signin_form.controls.apiUrl.value);
+    try {
+      // todo : check if delay
+      this.configService.selected_sys_param = this.configService.sys_parameter.find(r => r.apiUrl === this.signin_form.controls.apiUrl.value);
+      this.submit_attempt = true;
+      await this.loadingService.showLoading();
+      if (Capacitor.getPlatform() !== "web") {
+        OneSignal.getDeviceState(function (stateChanges) {
+          localStorage.setItem("player_Id", stateChanges.userId);
+        });
+      } else {
+        localStorage.setItem("player_Id", "6ce7134e-5a4b-426f-b89b-54de14e05eba");
+      }
+      // If email or password empty
+      if (this.signin_form.value.email == "" || this.signin_form.value.password == "") {
+        this.submit_attempt = false;
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("Error", "Please input email and password", "top", "danger", 2000);
+      } else {
+        let loginModel: LoginRequest = this.signin_form.value;
+        (await this.authService.signIn(loginModel)).subscribe(async response => {
+          if (Capacitor.getPlatform() !== "web") {
+            this.configService.selected_sys_param.rememberMe = this.rememberMe;
+            if (this.rememberMe) {
+              this.configService.selected_sys_param.username = this.signin_form.controls.userEmail.value;
+              this.configService.selected_sys_param.password = this.signin_form.controls.password.value;
+            } else {
+              this.configService.selected_sys_param.username = "";
+              this.configService.selected_sys_param.password = "";
+            }
+            await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
+  
+            // sync item master and item barcode
+            try {
+              // update current version to db
+              this.commonService.saveVersion().subscribe(response => {
+  
+              }, async error => {
+                await this.loadingService.dismissLoading();
+                console.error(error);
+              })
+  
+              let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+              if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
+                // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                await this.loadingService.dismissLoading();
+                await this.navController.navigateRoot("/dashboard");
+              }
+              else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {
+                this.configService.selected_consignment_location = loginUser.locationId[0];
+                // sync by location since only 1 location
+                await this.loadingService.showLoading("Downloading resources");
 
-    this.submit_attempt = true;
-    if (Capacitor.getPlatform() !== "web") {
-      OneSignal.getDeviceState(function (stateChanges) {
-        localStorage.setItem("player_Id", stateChanges.userId);
-      });
-    } else {
-      localStorage.setItem("player_Id", "6ce7134e-5a4b-426f-b89b-54de14e05eba");
-    }
-    // If email or password empty
-    if (this.signin_form.value.email == "" || this.signin_form.value.password == "") {
-      this.submit_attempt = false;
-      this.toastService.presentToast("Error", "Please input email and password", "top", "danger", 2000);
-    } else {
-      let loginModel: LoginRequest = this.signin_form.value;
-      (await this.authService.signIn(loginModel)).subscribe(async response => {
-        if (Capacitor.getPlatform() !== "web") {
-          this.configService.selected_sys_param.rememberMe = this.rememberMe;
-          if (this.rememberMe) {
-            this.configService.selected_sys_param.username = this.signin_form.controls.userEmail.value;
-            this.configService.selected_sys_param.password = this.signin_form.controls.password.value;
+                let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+                let itemMaster: PDItemMaster[] = response["itemMaster"];
+                let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+                await this.configService.syncInboundData(itemMaster, itemBarcode);
+                   
+                let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
+                let marginConfig: PDMarginConfig[] = response2;
+                await this.configService.syncMarginConfig(marginConfig);
+  
+                await this.loadingService.dismissLoading();
+                await this.navController.navigateRoot("/dashboard");
+              } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
+                // show error if consignment user but no location set
+                // error shown in dashboard page
+                await this.loadingService.dismissLoading();
+                await this.navController.navigateRoot("/dashboard");
+              } else {
+                // download item master for normal use
+                // let lastSync = this.configService.selected_sys_param.lastDownloadAt;
+                // if (lastSync) {
+                //   let diffMs = (new Date(lastSync).getTime() - new Date().getTime()); // milliseconds between now & last_sync
+                //   var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+                //   const alert = await this.alertController.create({
+                //     cssClass: "custom-alert",
+                //     header: `Last sync at ${format(new Date(lastSync),'dd/MM/yyyy hh:mm:ss')}`,
+                //     subHeader: "Do you want to sync resources?",
+                //     buttons: [
+                //       {
+                //         text: "Ok",
+                //         cssClass: "success",
+                //         handler: async () => {
+                          await this.loadingService.showLoading("Downloading resources");
+                          let response = await this.commonService.syncInbound();
+                          let itemMaster: PDItemMaster[] = response["itemMaster"];
+                          let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+                          await this.configService.syncInboundData(itemMaster, itemBarcode);
+                          await this.loadingService.dismissLoading();
+                          await this.navController.navigateRoot("/dashboard");
+                //         }
+                //       },
+                //       {
+                //         text: "Cancel",
+                //         role: "cancel",
+                //         cssClass: "cancel",
+                //         handler: async () => {
+                //           this.submit_attempt = false;
+                //           await this.loadingService.dismissLoading();
+                //           await this.navController.navigateRoot("/dashboard");
+                //         }
+                //       }
+                //     ]
+                //   });
+                //   await alert.present();
+                // }
+              }
+            } catch (error) {
+              await this.loadingService.dismissLoading();
+              this.toastService.presentToast("", error.message, "top", "medium", 1000);
+            } finally {
+              await this.loadingService.dismissLoading();
+            }
           } else {
-            this.configService.selected_sys_param.username = "";
-            this.configService.selected_sys_param.password = "";
-          }
-          await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
-
-          // sync item master and item barcode
-          try {
-            // update current version to db
-            this.commonService.saveVersion().subscribe(response => {
-
-            }, error => {
-              console.error(error);
-            })
-
-            // save margin config to local db
+            // for web development
             let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
             if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
               // for consignment user more than 1 location, go to dashboard and let user select then only sync
             }
             else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {
               this.configService.selected_consignment_location = loginUser.locationId[0];
-              // sync by location since only 1 location
-              let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-              let itemMaster: PDItemMaster[] = response["itemMaster"];
-              let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
-              await this.configService.syncInboundData(itemMaster, itemBarcode);
-                 
-              let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
-              let marginConfig: PDMarginConfig[] = response2;
-              await this.configService.syncMarginConfig(marginConfig);
             } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
               // show error if consignment user but no location set
-              // error shown in dashboard page
-              // this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+              this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
             } else {
-              // download item master for other user
-              let response = await this.commonService.syncInbound();
-              let itemMaster: PDItemMaster[] = response["itemMaster"];
-              let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
-              await this.configService.syncInboundData(itemMaster, itemBarcode);
+              
             }
             this.submit_attempt = false;
+            await this.loadingService.dismissLoading();
             await this.navController.navigateRoot("/dashboard");
-          } catch (error) {
-            this.toastService.presentToast(error.message, "", "top", "medium", 1000);
           }
-        } else {
-          let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-          if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
-            // for consignment user more than 1 location, go to dashboard and let user select then only sync
-          }
-          else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {
-            this.configService.selected_consignment_location = loginUser.locationId[0];
-          } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
-            // show error if consignment user but no location set
-            this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
-          } else {
-            
-          }
+        }, async error => {
           this.submit_attempt = false;
-          await this.navController.navigateRoot("/dashboard");
-        }
-      }, error => {
-        this.submit_attempt = false;
-        console.error(error);
-      });
-    }
+          await this.loadingService.dismissLoading();
+          console.error(error);
+        });
+      }
+    } catch (error) {
+      await this.loadingService.dismissLoading();
+      console.error(error);
+    } finally {      
+      await this.loadingService.dismissLoading();
+    } 
   }
 
   /* #region more action */

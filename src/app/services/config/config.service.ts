@@ -53,11 +53,11 @@ export class ConfigService {
           // apiUrl: "https://idcp-testing.motorparts.asia/api/",
           // apiUrl: "https://idcp-testing.umaracing.com/api/",
           // apiUrl: "https://idcp.motorparts.asia/api/",
-          apiUrl: "https://idcp.umaracing.com/api/",
+          // apiUrl: "https://idcp.umaracing.com/api/",
           // apiUrl: "https://idcp-ararat.com:8081/api/",
           // apiUrl: "https://idcp.rcb.com/api/",
           // apiUrl: "https://tfsb-sys.com:1000/api/",
-          // apiUrl: "https://adt-sys.com/api/",
+          apiUrl: "https://adt-sys.com/api/",
           imgUrl: null,
           lastDownloadAt: null
         })

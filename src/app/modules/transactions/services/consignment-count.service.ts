@@ -18,6 +18,9 @@ const httpObserveHeader = {
 })
 export class ConsignmentCountService {
 
+  filterStartDate: Date;
+  filterEndDate: Date;
+
   trxKey: string = "consignmentCount";
 
   constructor(
@@ -82,7 +85,9 @@ export class ConsignmentCountService {
   }
 
   getObjects() {
-    return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount");
+  // getObjects(dateStart: string, dateEnd: string) {
+    // return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
+    return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount`);
   }
 
   getObjectById(objectId: number) {

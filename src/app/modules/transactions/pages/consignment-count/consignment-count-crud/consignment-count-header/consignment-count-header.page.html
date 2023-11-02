@@ -13,7 +13,7 @@
 <ion-content fullscreen>
   <div class="p-2"> 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" [formGroup]="objectForm">
-      <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
+      <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)" [disabled]="objectForm?.controls?.consignmentCountId?.value > 0"></app-search-dropdown>
       <ion-item>
         <ion-label position="stacked" class="font-bold">Rack</ion-label>
         <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Rack" formControlName="rack"></ion-textarea>

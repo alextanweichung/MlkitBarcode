@@ -1,14 +1,9 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>Management</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Management</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
 
     <ng-container *ngIf="showQuotationReview || showQuotationApproval">
@@ -171,6 +166,20 @@
       </ion-list-header>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button routerLink="b2bopricing-approvals">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Approvals</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
+    <ng-container *ngIf="showRefundApproval">
+      <ion-list-header>
+        <ion-label class="pl-2">Refund Approval</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button routerLink="refund-approvals">
           <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
           <ion-label>
             <h3>Approvals</h3>

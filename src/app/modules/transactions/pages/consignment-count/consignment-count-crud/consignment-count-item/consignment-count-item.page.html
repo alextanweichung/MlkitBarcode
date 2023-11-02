@@ -26,10 +26,13 @@
 </ion-popover>
 
 <ion-content [hidden]="scanActive">
+
   <div class="p-2">
 
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
-      
+
+    <pagination-controls class="ion-flex justify-content-center my-pagination" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
+
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" class="no-ripple ion-no-padding">
         <ion-grid class="ion-no-padding pl-2">
@@ -38,15 +41,13 @@
               <div class="font-bold">Total Quantity</div>
               <div class="font-bold">{{objectService.objectDetail|sum:"qtyRequest"|number:"1.0"}}</div>
             </ion-col>
-            <!-- <ion-col class="ion-flex ion-margin-auto text-align-center">
-            </ion-col> -->
           </ion-row>
         </ion-grid>
       </ion-item>
     </ion-list>
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding #slidingItem *ngFor="let line of objectService.objectDetail.slice(0,max); trackBy:identify; let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let line of objectService.objectDetail|paginate:{itemsPerPage:12,currentPage:currentPage}; trackBy:identify; let i = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">
           <ion-grid class="ion-no-padding pt-2 pl-2">
             <ion-row>
@@ -101,25 +102,6 @@
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
-
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="max < objectService.objectDetail?.length" (click)="loadALl()">
-      <ion-grid class="ion-no-padding pt-2 pl-2">
-        <ion-row>
-          <ion-col class="ion-flex ion-margin-auto justify-content-center">
-            <ion-label>Tap to load all...</ion-label>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col class="ion-flex ion-margin-auto justify-content-center">
-            <ion-label>Showing {{max}} of {{(objectService.objectDetail?.length??0)}} result(s) </ion-label>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-list-header>
-
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="max >= objectService.objectDetail?.length">
-      <ion-label>You're at the end of the list!</ion-label>
-    </ion-list-header>
     
   </div>
 </ion-content>

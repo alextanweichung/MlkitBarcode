@@ -155,7 +155,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         }
       } else {
         await this.loadingService.dismissLoading()
-        this.toastService.presentToast("", "Enter at least 3 characters to search", "top", "warning", 1000);
+        this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
       }
       this.onBrowseModeChanged();
     } catch (e) {

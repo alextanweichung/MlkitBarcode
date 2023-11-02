@@ -9,6 +9,7 @@ import { ConsignmentCountDetailPageRoutingModule } from './consignment-count-det
 import { ConsignmentCountDetailPage } from './consignment-count-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IonicModule,
     ConsignmentCountDetailPageRoutingModule,
     IdMappingModule,
-    SumModule
+    SumModule,
+    NgxPaginationModule
   ],
   declarations: [ConsignmentCountDetailPage]
 })

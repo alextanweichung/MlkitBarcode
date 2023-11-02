@@ -50,6 +50,7 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
+    <pagination-controls class="ion-flex justify-content-center my-pagination" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
@@ -68,7 +69,7 @@
       </ion-item>
     </ion-list>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of objectService.objectDetail; let i = index">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of objectService.objectDetail|paginate:{itemsPerPage:12,currentPage:currentPage}; trackBy:identify; let i = index">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col size="1" class="ion-flex ion-margin-auto">
@@ -97,9 +98,9 @@
                 </ion-row>
               </ion-grid>
             </ion-col>
-            <ion-col size="1" class="ion-flex ion-margin-auto justify-content-end">
-              <div>
-                <ion-badge mode="ios">{{item.qtyRequest|number:"1.0"}}</ion-badge>
+            <ion-col size="1" class="ion-margin-auto justify-content-end">
+              <div >
+                <ion-badge mode="ios" class="justify-content-center">{{item.qtyRequest|number:"1.0"}}</ion-badge>
               </div>
             </ion-col>
           </ion-row>

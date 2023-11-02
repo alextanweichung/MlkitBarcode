@@ -8,6 +8,7 @@ import { ConsignmentCountPageRoutingModule } from './consignment-count-routing.m
 
 import { ConsignmentCountPage } from './consignment-count.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     ConsignmentCountPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    NgxPaginationModule
   ],
   declarations: [ConsignmentCountPage]
 })
