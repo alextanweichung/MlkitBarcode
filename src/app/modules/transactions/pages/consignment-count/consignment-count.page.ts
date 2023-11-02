@@ -100,8 +100,8 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
   async loadObjects() {
     try {
       await this.loadingService.showLoading();
-      this.objectService.getObjects().subscribe(async response => {
-      // this.objectService.getObjects(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
+      // this.objectService.getObjects().subscribe(async response => {
+      this.objectService.getObjects(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         this.resetFilteredObj();
         // let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
