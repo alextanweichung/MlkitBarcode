@@ -50,7 +50,8 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
       remark: [null],
       printCount: [null],
       rack: [null],
-      zone: [null]
+      zone: [null],
+      sourceType: ["M"]
     });
   }
 
