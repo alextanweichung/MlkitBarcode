@@ -30,27 +30,21 @@
       <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let o of pendingObject" (click)="selectDoc(o)">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> Doc. Num.</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{o.interTransferNum}}
+              <div>{{o.interTransferNum}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> Doc. Date</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{o.trxDate|date:"dd/MM/yyyy"}}
+              <div>{{o.trxDate|date:"dd/MM/yyyy"}}</div>              
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> From Location</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{o.locationId|idMapping:objectService.locationMasterList}}
+              <div>{{o.locationId|idMapping:objectService.locationMasterList}}</div>              
             </ion-col>
           </ion-row>
         </ion-grid>

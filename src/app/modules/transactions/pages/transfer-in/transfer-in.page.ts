@@ -52,11 +52,11 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     }
   }
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
     this.objectService.resetVariables();
     // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
-    this.bindLocationList();
+    await this.objectService.loadRequiredMaster();
+    await this.bindLocationList();
     this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();

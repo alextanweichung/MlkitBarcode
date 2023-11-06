@@ -13,27 +13,21 @@
       <ion-item button [detail]="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> Doc. Num.</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.objectHeader.interTransferNum}}
+              <div>{{objectService.objectHeader.interTransferNum}}</div>              
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> Doc. Date</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.objectHeader.trxDate|date:"dd/MM/yyyy"}}
+              <div>{{objectService.objectHeader.trxDate|date:"dd/MM/yyyy"}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> From Location</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}
+              <div>{{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -55,10 +49,10 @@
               <div class="ion-flex my-auto font-bold">Item</div>
             </ion-col>
             <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-              <div class="ion-flex my-auto font-bold">Quantity</div>
+              <div class="ion-flex my-auto font-bold">Qty</div>
             </ion-col>
             <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-              <div class="ion-flex my-auto font-bold text-align-center">Received Qty</div>
+              <div class="ion-flex my-auto font-bold text-align-center">Rec'd Qty</div>
             </ion-col>
           </ion-row>
         </ion-grid>        
