@@ -17,6 +17,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
   objectId: number;
   object: ConsignmentCountRoot;
   currentPage: number = 1;
+  itemsPerPage: number = 12;
 
   constructor(
     public objectService: ConsignmentCountService,

@@ -9,7 +9,8 @@ import { StockCountItemPageRoutingModule } from './stock-count-item-routing.modu
 import { StockCountItemPage } from './stock-count-item.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
-import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -18,7 +19,9 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
     IonicModule,
     StockCountItemPageRoutingModule,
     IdMappingModule,
-    BarcodeScanInputPageModule
+    BarcodeScanInputPageModule,
+    SumModule,
+    NgxPaginationModule
   ],
   declarations: [StockCountItemPage]
 })

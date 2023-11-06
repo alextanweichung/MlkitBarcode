@@ -4,15 +4,17 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, NavController, ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
-import { StockCountHeader, StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
+import { StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-stock-count-item',
@@ -20,24 +22,36 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
   styleUrls: ['./stock-count-item.page.scss'],
   providers: [BarcodeScanInputService, { provide: 'apiObject', useValue: 'MobileInventoryCount' }]
 })
-export class StockCountItemPage implements OnInit, ViewDidEnter {
+export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
+
+  submit_attempt: boolean = false;
+  currentPage: number = 1;
+  itemsPerPage: number = 12;
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
-  header: StockCountHeader;
-  detail: StockCountDetail[] = [];
-
   constructor(
-    private authService: AuthService,
     public objectService: StockCountService,
+    private authService: AuthService,
+    private configService: ConfigService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private navController: NavController,
     private alertController: AlertController,
-    private configService: ConfigService,
-    private toastService: ToastService
   ) { }
+
+  ionViewWillEnter(): void {
+    
+  }
 
   ionViewDidEnter(): void {
     try {
+      if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
+        this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+        this.navController.navigateBack("/transactions/stock-count/stock-count-crud/stock-count-header");
+      } else {
+        this.loadInventoryCountBatchCriteria();
+      }
       this.barcodescaninput.setFocus();
     } catch (e) {
       console.error(e);
@@ -45,14 +59,6 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
   }
 
   ngOnInit() {
-    if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
-      this.toastService.presentToast("Something went wrong!", "", "top", "danger", 1000);
-      this.navController.navigateBack("/transactions/stock-count/stock-count-crud/stock-count-header");
-    } else {
-      this.header = JSON.parse(JSON.stringify(this.objectService.objectHeader));
-      this.detail = JSON.parse(JSON.stringify(this.objectService.objectDetail));
-      this.loadInventoryCountBatchCriteria();
-    }
     this.loadModuleControl();
   }
 
@@ -64,7 +70,7 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
         this.moduleControl = obj;
         let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
         if (ignoreCheckdigit != undefined) {
-          this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+          this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
         }
       }, error => {
         console.error(error);;
@@ -77,61 +83,11 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
   inventoryCountBatchCriteria: InventoryCountBatchCriteria;
   loadInventoryCountBatchCriteria() {
     try {
-      this.objectService.getInventoryCountBatchCriteria(this.header.inventoryCountBatchId).subscribe(response => {
+      this.objectService.getInventoryCountBatchCriteria(this.objectService.objectHeader.inventoryCountBatchId).subscribe(response => {
         this.inventoryCountBatchCriteria = response;
       }, error => {
         console.error(error);;
       })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async validateBarcode(barcode: string) {
-    try {
-      if (barcode) {
-        if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-          let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-          if (found_barcode) {
-            let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-            let outputData: TransactionDetail = {
-              itemId: found_item_master.id,
-              itemCode: found_item_master.code,
-              description: found_item_master.itemDesc,
-              variationTypeCode: found_item_master.varCd,
-              discountGroupCode: found_item_master.discCd,
-              discountExpression: (found_item_master.discPct ?? "0") + '%',
-              taxId: found_item_master.taxId,
-              taxCode: found_item_master.taxCd,
-              taxPct: found_item_master.taxPct,
-              qtyRequest: null,
-              itemPricing: {
-                itemId: found_item_master.id,
-                unitPrice: found_item_master.price,
-                discountGroupCode: found_item_master.discCd,
-                discountExpression: (found_item_master.discPct ?? "0") + '%',
-                discountPercent: found_item_master.discPct ?? 0,
-                discountGroupId: null,
-                unitPriceMin: null,
-                currencyId: null
-              },
-              itemVariationXId: found_barcode.xId,
-              itemVariationYId: found_barcode.yId,
-              itemSku: found_barcode.sku,
-              itemBarcode: found_barcode.barcode,
-              itemBrandId: found_item_master.brandId,
-              itemGroupId: found_item_master.groupId,
-              itemCategoryId: found_item_master.catId,
-              itemBarcodeTagId: found_barcode.id
-            }
-            this.addItemToLine(outputData);
-          } else {
-            this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
-          }
-        } else {
-          this.toastService.presentToast("Something went wrong!", "Local db not found.", "top", "danger", 1000);
-        }
-      }
     } catch (e) {
       console.error(e);
     }
@@ -157,43 +113,51 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
           break;
         case "Brand":
           if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemBrandId)) {
-            this.toastService.presentToast("", "Item Brand not match", "top", "danger", 1000);
+            this.toastService.presentToast("", "Item Brand not match", "top", "warning", 1000);
             return;
           }
           break;
         case "Group":
           if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemGroupId)) {
-            this.toastService.presentToast("", "Item Group not match", "top", "danger", 1000);
+            this.toastService.presentToast("", "Item Group not match", "top", "warning", 1000);
             return;
           }
           break;
         case "Category":
           if (!this.inventoryCountBatchCriteria.keyId.includes(trxLine.itemCategoryId)) {
-            this.toastService.presentToast("", "Item Category not match", "top", "danger", 1000);
+            this.toastService.presentToast("", "Item Category not match", "top", "warning", 1000);
             return;
           }
           break;
       }
 
-      if (this.detail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
-        this.detail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+      if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+        this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+        let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       } else {
-        let d: StockCountDetail = {
+        let newLine: StockCountDetail = {
           inventoryCountLineId: 0,
-          inventoryCountId: 0,
-          locationId: this.header.locationId,
+          inventoryCountId: this.objectService.objectHeader.inventoryCountId,
+          locationId: this.objectService.objectHeader.locationId,
           itemId: trxLine.itemId,
-          itemCode: trxLine.itemCode,
-          description: trxLine.description,
           itemVariationXId: trxLine.itemVariationXId,
           itemVariationYId: trxLine.itemVariationYId,
           itemSku: trxLine.itemSku,
-          itemBarcode: trxLine.itemBarcode,
           itemBarcodeTagId: trxLine.itemBarcodeTagId,
+          itemBarcode: trxLine.itemBarcode,
           qtyRequest: 1,
-          sequence: this.detail.length
+          sequence: 0,
+          // for local use
+          itemCode: trxLine.itemCode,
+          itemDescription: trxLine.description,
+          // testing performance
+          guid: uuidv4()
         }
-        await this.detail.length > 0 ? this.detail.unshift(d) : this.detail.push(d);
+        this.objectService.objectDetail.forEach(r => { r.sequence += 1 });
+        await this.objectService.objectDetail.unshift(newLine);
+        let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
     } catch (e) {
       console.error(e);
@@ -212,8 +176,12 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
     try {
       if (line.qtyRequest - 1 < 0) {
         line.qtyRequest = 0;
+        let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       } else {
         line.qtyRequest--;
+        let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
       if (line.qtyRequest === 0) {
         await this.deleteLine(index);
@@ -231,13 +199,15 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
     }
   }
 
-  increaseQty(line: StockCountDetail) {
-    line.qtyRequest++;
+  async increaseQty(line: StockCountDetail) {
+    line.qtyRequest+=1;
+    let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
   }
 
   async deleteLine(index) {
     try {
-      if (this.detail[index]) {
+      if (this.objectService.objectDetail[index]) {
         const alert = await this.alertController.create({
           cssClass: "custom-alert",
           header: "Delete this item?",
@@ -247,8 +217,10 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
               text: "Delete item",
               cssClass: "danger",
               handler: async () => {
-                this.detail.splice(index, 1);
-                this.toastService.presentToast("", "Line removed", "top", "success", 1000);
+                this.objectService.objectDetail.splice(index, 1);
+                this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
+                let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
             },
             {
@@ -256,14 +228,16 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
               role: "cancel",
               cssClass: "cancel",
               handler: async () => {
-                this.detail[index].qtyRequest === 0 ? this.detail[index].qtyRequest++ : 1;
+                this.objectService.objectDetail[index].qtyRequest = 1;
+                let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
               }
             }
           ]
         });
         await alert.present();
       } else {
-        this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
+        this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
       }
     } catch (e) {
       console.error(e);
@@ -284,7 +258,7 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
 
   async onDoneScanning(event) {
     if (event) {
-      await this.validateBarcode(event);
+      await this.barcodescaninput.validateBarcode(event);
     }
   }
 
@@ -297,12 +271,12 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
   /* #endregion */
 
   previousStep() {
-    this.objectService.setDetail(JSON.parse(JSON.stringify(this.detail)));
     this.navController.navigateBack("/transactions/stock-count/stock-count-crud/stock-count-header");
   }
 
   async nextStep() {
     try {
+      this.submit_attempt = true;
       const alert = await this.alertController.create({
         cssClass: "custom-alert",
         header: "Are you sure to proceed?",
@@ -311,10 +285,10 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
             text: "Confirm",
             cssClass: "success",
             handler: async () => {
-              if (this.header.inventoryCountId === 0) {
-                this.insertObject();
-              } else {
+              if (this.objectService.objectHeader.inventoryCountId > 0) {
                 this.updateObject();
+              } else {
+                this.insertObject();
               }
             }
           },
@@ -323,21 +297,26 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
             role: "cancel",
             cssClass: "cancel",
             handler: async () => {
-
+              this.submit_attempt = false;
             }
           }
         ]
       });
       await alert.present();
     } catch (e) {
+      this.submit_attempt = false;
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
     }
   }
 
-  insertObject() {
+  async insertObject() {
     try {
-      this.objectService.insertInventoryCount({ header: this.header, details: this.detail, barcodeTag: [] }).subscribe(response => {
+      await this.loadingService.showLoading();
+      this.objectService.insertInventoryCount({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
         if (response.status === 201) {
+          this.submit_attempt = false;
           let object = response.body as StockCountRoot;
           this.objectService.resetVariables();
           this.toastService.presentToast("", "Stock Count added", "top", "success", 1000);
@@ -346,35 +325,58 @@ export class StockCountItemPage implements OnInit, ViewDidEnter {
               objectId: object.header.inventoryCountId
             }
           }
+          this.objectService.resetVariables();
+          await this.loadingService.dismissLoading();
           this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
         }
-      }, error => {
+      }, async error => {
+        this.submit_attempt = false;
+        await this.loadingService.dismissLoading();
         console.error(error);;
       })
     } catch (e) {
+      this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
     }
   }
 
-  updateObject() {
+  async updateObject() {
     try {
-      this.objectService.updateInventoryCount({ header: this.header, details: this.detail, barcodeTag: [] }).subscribe(response => {
+      await this.loadingService.showLoading();
+      this.objectService.updateInventoryCount({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
         if (response.status === 204) {
-          this.objectService.resetVariables();
+          this.submit_attempt = false;
           this.toastService.presentToast("", "Stock Count updated", "top", "success", 1000);
           let navigationExtras: NavigationExtras = {
             queryParams: {
-              objectId: this.header.inventoryCountId
+              objectId: this.objectService.objectHeader.inventoryCountId
             }
           }
+          this.objectService.resetVariables();
+          await this.loadingService.dismissLoading();
           this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
         }
-      }, error => {
-        console.error(error);;
+      }, async error => {
+        this.submit_attempt = false;
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
+      this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      this.submit_attempt = false;
+      await this.loadingService.dismissLoading();
     }
+  }
+
+  identify(index, line) {
+    return line.guid;
   }
 
 }

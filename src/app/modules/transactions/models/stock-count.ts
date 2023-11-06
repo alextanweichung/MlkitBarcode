@@ -6,7 +6,7 @@ export interface StockCount {
   trxDate: string
   locationCode: string
   locationDescription: string
-  description: any
+  description?: string
   inventoryCountBatchNum: string
   inventoryCountBatchDescription: string
   zoneCode?: string
@@ -20,7 +20,7 @@ export interface StockCount {
 export interface StockCountList {
   inventoryCountId: number
   inventoryCountNum: string
-  description: any
+  description?: string
   locationCode: string
   locationDescription: string
   batchNum: string
@@ -30,13 +30,13 @@ export interface StockCountList {
 export interface StockCountRoot {
   header: StockCountHeader
   details: StockCountDetail[]
-  barcodeTag: BarcodeTag[]
+  barcodeTag?: BarcodeTag[]
 }
 
 export interface StockCountHeader {
   inventoryCountId: number
   inventoryCountNum: string
-  description: any
+  description?: string
   trxDate: Date
   trxDateTime: string
   locationId: number
@@ -45,22 +45,22 @@ export interface StockCountHeader {
   inventoryCountBatchDescription: string
   zoneId: number
   rackId: number
-  inventoryCountUDField1: any
-  inventoryCountUDField2: any
-  inventoryCountUDField3: any
-  inventoryCountUDOption1: any
-  inventoryCountUDOption2: any
-  inventoryCountUDOption3: any
-  remark: any
+  inventoryCountUDField1?: string
+  inventoryCountUDField2?: string
+  inventoryCountUDField3?: string
+  inventoryCountUDOption1?: number
+  inventoryCountUDOption2?: number
+  inventoryCountUDOption3?: number
+  remark?: string
   printCount: number
   sequence: number
-  createdById: number
-  createdBy: string
-  createdAt: string
-  modifiedById: any
-  modifiedBy: any
-  modifiedAt: any
-  deactivated: boolean
+  createdById?: number
+  createdBy?: string
+  createdAt?: Date
+  modifiedById?: number
+  modifiedBy?: string
+  modifiedAt?: Date
+  deactivated?: boolean
 }
 
 export interface StockCountDetail {
@@ -68,42 +68,31 @@ export interface StockCountDetail {
   inventoryCountId: number
   locationId: number
   itemId: number
-  itemCode: string
-  description: string
   itemVariationXId?: number
   itemVariationYId?: number
   itemSku: string
   itemBarcode: string
   itemBarcodeTagId: number
   qtyRequest: number
-  qtyApproved?: any
-  qtyCommit?: any
-  sequence?: number
+  qtyApproved?: number
+  qtyCommit?: number
+  sequence: number
   createdById?: number
   createdBy?: string
-  createdAt?: string
-  modifiedById?: any
-  modifiedBy?: any
-  modifiedAt?: any
+  createdAt?: Date
+  modifiedById?: number
+  modifiedBy?: string
+  modifiedAt?: Date
   deactivated?: boolean
-}
 
-export interface StockCountItem {
-  itemId: number
+  // for local use
   itemCode: string
-  description: string
-  variationTypeCode?: string
-  itemVariationLineXId: number
-  itemVariationLineYId: number
-  itemVariationLineXDescription?: string
-  itemVariationLineYDescription?: string
-  itemSku: string
-  itemBarcodeTagId: number
-  itemBarcode?: string
-  itemUomId?: number
-  itemUomDescription?: string
-  deactivated?: boolean
-  qtyRequest: number
+  itemDescription: string
+  itemVariationXDescription?: string
+  itemVariationYDescription?: string
+  
+  // testing performance
+  guid?: string
 }
 
 export interface InventoryCountBatchList {

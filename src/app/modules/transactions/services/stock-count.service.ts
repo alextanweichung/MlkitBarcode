@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { format, parseISO } from 'date-fns';
-import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { BarcodeTag, ItemBarcodeModel } from 'src/app/shared/models/item-barcode';
 import { MasterList } from 'src/app/shared/models/master-list';
@@ -17,6 +15,11 @@ const httpObserveHeader = {
   providedIn: 'root'
 })
 export class StockCountService {
+
+  filterStartDate: Date;
+  filterEndDate: Date;
+
+  trxKey: string = "inventoryCount";
 
   constructor(
     private http: HttpClient,
@@ -56,7 +59,7 @@ export class StockCountService {
   }
   
   objectDetail: StockCountDetail[] = []
-  setDetail(objectDetail: StockCountDetail[]) {
+  setLines(objectDetail: StockCountDetail[]) {
     this.objectDetail = objectDetail;
   }
 
@@ -81,6 +84,7 @@ export class StockCountService {
     this.removeHeader();
     this.removeDetail();
     this.removeBarcodeTag();
+    this.configService.removeFromLocalStorage(this.trxKey);
   }
 
   getMasterList() {

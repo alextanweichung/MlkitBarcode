@@ -16,9 +16,6 @@ import { CommonService } from 'src/app/shared/services/common.service';
 })
 export class StockCountHeaderPage implements OnInit, ViewWillEnter {
 
-  objectId: number;
-  object: StockCountRoot;
-
   objectForm: FormGroup;
 
   constructor(
@@ -29,26 +26,14 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute
   ) {
-    this.setFormattedDateString();
     this.newObjectForm();
-    this.route.queryParams.subscribe(params => {
-      this.objectId = params["objectId"];
-    })
   }
 
   ionViewWillEnter(): void {
     if (this.objectService.objectHeader !== null && this.objectService.objectHeader?.inventoryCountId > 0) {
-      this.objectId = this.objectService.objectHeader.inventoryCountId;
-      this.object = {
-        header: JSON.parse(JSON.stringify(this.objectService.objectHeader)),
-        details: JSON.parse(JSON.stringify(this.objectService.objectDetail)),
-        barcodeTag: JSON.parse(JSON.stringify(this.objectService.objectBarcodeTag))
-      };
       this.bindExistingValue();
     }
-    if (this.objectId && this.objectId > 0 && this.objectService.objectHeader === null) {
-      this.loadObject();
-    }
+    this.setFormattedDateString();
   }
 
   newObjectForm() {
@@ -75,30 +60,14 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
 
   }
 
-  loadObject() {
-    if (this.objectId && this.objectId > 0) {
-      this.objectService.getInventoryCount(this.objectId).subscribe(response => {
-        this.object = response;
-        this.bindExistingValue();
-      }, error => {
-        console.error(error);
-      })
-    }
-  }
-
   bindExistingValue() {
     // bind display
-    this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
-    this.objectForm.patchValue(this.object.header);
-    this.object.details.forEach(r => {
-      if (r.itemCode === null || r.itemCode === undefined) {
-        r.itemCode = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku)?.itemCode,
-        r.description = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku)?.description
-      }
-    })
-    this.dateValue = format(this.object.header.trxDate, "yyyy-MM-dd") + "T08:00:00.000Z";
+    this.objectForm.patchValue(this.objectService.objectHeader);
+    this.dateValue = format(this.objectService.objectHeader.trxDate, "yyyy-MM-dd") + "T08:00:00.000Z";
     this.setFormattedDateString();
-    this.onLocationSelected({ id: this.object.header.locationId });
+    if (this.objectService.objectHeader?.inventoryCountId === 0) {
+      this.onLocationSelected({ id: this.objectService.objectHeader.locationId });
+    }
   }
 
   inventoryCountBatchList: InventoryCountBatchList[] = [];
@@ -107,18 +76,17 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
   onLocationSelected(event: SearchDropdownList) {
     try {
       this.objectForm.patchValue({ locationId: null });
-      if (this.objectId === null || this.objectId === undefined) {
+      if (this.objectService.objectHeader?.inventoryCountId === null || this.objectService.objectHeader?.inventoryCountId === undefined) {
         this.inventoryCountBatchSdd.clearSelected();
       }
       if (event) {
         this.objectForm.patchValue({ locationId: event.id });
-        this.objectService.removeDetail();
         this.inventoryCountBatchDdl = [];
         this.objectService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
           this.inventoryCountBatchList = response;
-          if (this.objectId && this.objectId > 0 && this.object) {
-            this.object.header.inventoryCountBatchNum = this.inventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.object.header.inventoryCountBatchId)?.inventoryCountBatchNum;
-            this.object.header.inventoryCountBatchDescription = this.inventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.object.header.inventoryCountBatchId)?.description;
+          if (this.objectService.objectHeader?.inventoryCountId && this.objectService.objectHeader?.inventoryCountId > 0) {
+            this.objectService.objectHeader.inventoryCountBatchNum = this.inventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.objectService.objectHeader.inventoryCountBatchId)?.inventoryCountBatchNum;
+            this.objectService.objectHeader.inventoryCountBatchDescription = this.inventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.objectService.objectHeader.inventoryCountBatchId)?.description;
           }
           if (this.inventoryCountBatchList.length > 0) {
             let temp: SearchDropdownList[] = [];
@@ -182,16 +150,16 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
       const { role } = await actionSheet.onWillDismiss();
 
       if (role === "confirm") {
-        this.objectService.resetVariables();
-        if (this.objectId && this.objectId > 0) {
+        if (this.objectService.objectHeader?.inventoryCountId && this.objectService.objectHeader?.inventoryCountId > 0) {
           let navigationExtras: NavigationExtras = {
             queryParams: {
-              objectId: this.objectId
+              objectId: this.objectService.objectHeader?.inventoryCountId
             }
           }
+          this.objectService.resetVariables();
           this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
         } else {
-          this.navController.navigateBack("/transactions/stock-count");
+          this.navController.navigateRoot("/transactions/stock-count");
         }
       }
     } catch (e) {
@@ -201,10 +169,6 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
 
   nextStep() {
     this.objectService.setHeader(this.objectForm.getRawValue());
-    if (this.objectId && this.objectId > 0) {
-      this.objectService.setDetail(this.object.details);
-      this.objectService.setBarcodeTag(this.object.barcodeTag);
-    }
     this.navController.navigateForward("/transactions/stock-count/stock-count-crud/stock-count-item");
   }
 

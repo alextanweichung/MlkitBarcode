@@ -27,6 +27,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 
   submit_attempt: boolean = false;
   currentPage: number = 1;
+  itemsPerPage: number = 12;
 
   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -285,8 +286,10 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           await this.loadingService.dismissLoading();
           this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
-      }, error => {
-        console.error(error);;
+      }, async error => {
+        this.submit_attempt = false;
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
       this.submit_attempt = false;
@@ -315,7 +318,9 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
           await this.loadingService.dismissLoading();
           this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
         }
-      }, error => {
+      }, async error => {
+        this.submit_attempt = false;
+        await this.loadingService.dismissLoading();
         console.error(error);;
       })
     } catch (e) {

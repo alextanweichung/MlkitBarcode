@@ -1,20 +1,15 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>Header</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon>Cancel</ion-button>
+      <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Header</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2"> 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ng-container *ngIf="objectId && objectId > 0 && object">
+      <ng-container *ngIf="objectService.objectHeader?.inventoryCountId && objectService.objectHeader?.inventoryCountId > 0">
         <ion-item button detail="false" class="ion-no-padding no-ripple">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -22,7 +17,7 @@
                 <div class="font-bold">Doc. Num.</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div>{{object.header.inventoryCountNum}}</div>
+                <div>{{objectService.objectHeader?.inventoryCountNum}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -30,7 +25,7 @@
                 <div class="font-bold">Doc. Date</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+                <div>{{objectService.objectHeader?.trxDate|date:'dd/MM/yyyy'}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -38,7 +33,7 @@
                 <div class="font-bold">Location</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+                <div>{{objectService.objectHeader?.locationId|idMapping:objectService.locationMasterList}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -46,13 +41,13 @@
                 <div class="font-bold">Inventory Count Batch</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div>{{object.header.inventoryCountBatchNum}}</div>
+                <div>{{objectService.objectHeader?.inventoryCountBatchNum}}</div>
               </ion-col>
             </ion-row>
           </ion-grid>
         </ion-item>
       </ng-container>
-      <ng-container *ngIf="objectId === null || objectId === undefined">
+      <ng-container *ngIf="objectService.objectHeader?.inventoryCountId === null || objectService.objectHeader?.inventoryCountId === undefined">
         <ion-item id="open-calendar-modal">
           <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
           <ion-label position="stacked" class="font-bold">Transaction Date</ion-label>
@@ -61,7 +56,7 @@
         <ion-modal class="ion-modal-calendar" trigger="open-calendar-modal">
           <ng-template>
             <ion-content>
-              <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate" [disabled]="objectId && objectId > 0">
+              <ion-datetime #datetime [value]="dateValue" size="cover" (ionChange)="onTrxDateSelected(datetime.value)" [preferWheel]="true" showDefaultTitle="true" presentation="date" [max]="maxDate" [disabled]="objectService.objectHeader?.inventoryCountId && objectService.objectHeader?.inventoryCountId > 0">
                 <ion-buttons slot="buttons">
                   <ion-button (click)="dateDismiss()" color="danger">Dismiss</ion-button>
                   <ion-button (click)="dateSelect()" color="primary">Select</ion-button>
@@ -70,8 +65,8 @@
             </ion-content>
           </ng-template>
         </ion-modal>
-        <app-search-dropdown title="Location" optionLabel="description" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)" [disabled]="objectId && objectId > 0"></app-search-dropdown>  
-        <app-search-dropdown #inventoryCountBatchSdd title="Inventory Count Batch" optionLabel="description" [searchDropdownList]="inventoryCountBatchDdl" [selectedId]="objectForm?.controls?.inventoryCountBatchId?.value" (onActionComplete)="onInventoryCountBatchChanged($event)" emptyMessage="This Location does not have Inventory Count Batch" [disabled]="objectId && objectId > 0"></app-search-dropdown>
+        <app-search-dropdown title="Location" optionLabel="description" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)" [disabled]="objectService.objectHeader?.inventoryCountId && objectService.objectHeader?.inventoryCountId > 0"></app-search-dropdown>  
+        <app-search-dropdown #inventoryCountBatchSdd title="Inventory Count Batch" optionLabel="description" [searchDropdownList]="inventoryCountBatchDdl" [selectedId]="objectForm?.controls?.inventoryCountBatchId?.value" (onActionComplete)="onInventoryCountBatchChanged($event)" emptyMessage="This Location does not have Inventory Count Batch" [disabled]="objectService.objectHeader?.inventoryCountId && objectService.objectHeader?.inventoryCountId > 0"></app-search-dropdown>
       </ng-container>
     </ion-list>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">

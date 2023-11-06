@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -8,40 +8,40 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { StockCount } from '../../models/stock-count';
 import { StockCountService } from '../../services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-stock-count',
   templateUrl: './stock-count.page.html',
   styleUrls: ['./stock-count.page.scss'],
 })
-export class StockCountPage implements OnInit, ViewWillEnter {
-
-  startDate: Date;
-  endDate: Date;
+export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   objects: StockCount[] = [];
-
   uniqueGrouping: Date[] = [];
 
   constructor(
-    private authService: AuthService,
     private objectService: StockCountService,
+    private authService: AuthService,
+    private configService: ConfigService,
     private commonService: CommonService,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private modalController: ModalController,
     private navController: NavController,
+    private alertController: AlertController,
     private actionSheetController: ActionSheetController
-  ) { 
-    this.objectService.loadRequiredMaster();
-  }
+  ) { }
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
     try {
-      if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      if (!this.objectService.filterStartDate) {
+        this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
       }
-      if (!this.endDate) {
-        this.endDate = this.commonService.getTodayDate();
+      if (!this.objectService.filterEndDate) {
+        this.objectService.filterEndDate = this.commonService.getTodayDate();
       }
       this.loadObjects();
     } catch (e) {
@@ -49,23 +49,71 @@ export class StockCountPage implements OnInit, ViewWillEnter {
     }
   }
 
+  async ionViewDidEnter(): Promise<void> {
+    // check incomplete trx here
+    let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
+    if (data !== null) {
+      this.promptIncompleteTrxAlert();
+    }
+  }
+
   ngOnInit() {
     
   }
 
-  loadObjects() {
+  async promptIncompleteTrxAlert() {
+    const alert = await this.alertController.create({
+      cssClass: "custom-alert",
+      header: "You have uncompleted transaction.",
+      subHeader: "Do you want to retrieve or discard",
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: "Retrieve",
+          cssClass: "success",
+          handler: async () => {
+            let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
+            await this.objectService.setHeader(data.header);
+            await this.objectService.setLines(data.details);
+            if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+              this.navController.navigateRoot("/transactions/stock-count/stock-count-crud/stock-count-item");
+            } else {
+              this.navController.navigateRoot("/transactions/stock-count/stock-count-crud/stock-count-header");
+            }
+          }
+        },
+        {
+          text: "Discard",
+          role: "cancel",
+          cssClass: "cancel",
+          handler: async () => {
+            await this.configService.removeFromLocalStorage(this.objectService.trxKey);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async loadObjects() {
     try {
-      this.objectService.getInventoryCountByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
+      await this.loadingService.showLoading();
+      this.objectService.getInventoryCountByDate(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
         await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-      }, error => {
+      }, async error => {
+        await this.loadingService.dismissLoading();
         console.error(error);;
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -117,16 +165,16 @@ export class StockCountPage implements OnInit, ViewWillEnter {
       const modal = await this.modalController.create({
         component: FilterPage,
         componentProps: {
-          startDate: this.startDate,
-          endDate: this.endDate
+          startDate: this.objectService.filterStartDate,
+          endDate: this.objectService.filterEndDate
         },
         canDismiss: true
       })
       await modal.present();
       let { data } = await modal.onWillDismiss();
       if (data && data !== undefined) {
-        this.startDate = new Date(data.startDate);
-        this.endDate = new Date(data.endDate);
+        this.objectService.filterStartDate = new Date(data.startDate);
+        this.objectService.filterEndDate = new Date(data.endDate);
         this.loadObjects();
       }
     } catch (e) {

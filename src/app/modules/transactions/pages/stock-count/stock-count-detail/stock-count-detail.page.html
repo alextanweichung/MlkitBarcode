@@ -1,8 +1,12 @@
-<ion-header collapse="fade" [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Detail</ion-title>
+    <ion-title>
+      <div class="ion-text-wrap">
+        {{objectService.objectHeader?.inventoryCountNum}}
+      </div>
+    </ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="Back" defaultHref="/transactions/stock-count" routerDirection="back"></ion-back-button>
+      <ion-back-button text="" defaultHref="/transactions/stock-count" routerDirection="back"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="primary">
       <ion-button (click)="edit()">
@@ -12,16 +16,8 @@
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Detail</ion-label>
-      <ion-buttons slot="start">
-        <ion-back-button text="Back"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="object">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.objectHeader">
       <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
@@ -29,7 +25,7 @@
               <div class="font-bold">Doc. Num.</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.inventoryCountNum}}</div>
+              <div>{{objectService.objectHeader.inventoryCountNum}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -37,7 +33,7 @@
               <div class="font-bold">Doc. Date</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+              <div>{{objectService.objectHeader.trxDate|date:'dd/MM/yyyy'}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -45,23 +41,23 @@
               <div class="font-bold">Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+              <div>{{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
-          <ion-row *ngIf="object.header.zoneId">
+          <ion-row *ngIf="objectService.objectHeader.zoneId">
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">Zone</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.zoneId|idMapping:objectService.zoneMasterList}}</div>
+              <div>{{objectService.objectHeader.zoneId|idMapping:objectService.zoneMasterList}}</div>
             </ion-col>
           </ion-row>
-          <ion-row *ngIf="object.header.rackId">
+          <ion-row *ngIf="objectService.objectHeader.rackId">
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">Rack</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.rackId|idMapping:objectService.rackMasterList}}</div>
+              <div>{{objectService.objectHeader.rackId|idMapping:objectService.rackMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -69,7 +65,7 @@
               <div class="font-bold">Total Quantity</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.details|sum:'qtyRequest'|number}}</div>
+              <div>{{objectService.objectDetail|sum:'qtyRequest'|number}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -78,30 +74,61 @@
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
       <ion-label>Details</ion-label>
     </ion-list-header>
+    <pagination-controls class="ion-flex justify-content-center my-pagination" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of scannedItems">
+      <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">{{item.itemBarcode}}</div>
+            <ion-col size="1" class="ion-flex ion-margin-auto">
+              <div class="font-bold">#</div>
             </ion-col>
-          </ion-row>
-          <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
-              <div class="ion-flex">
-                {{item.itemCode}}
-                <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationLineXDescription"> {{item.itemVariationLineXDescription}}</span>
-                <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationLineYDescription"> {{item.itemVariationLineYDescription}}</span>
-              </div>
+              <div class="font-bold">Item Info</div>
             </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div>{{item.description}}</div>
+            <ion-col size="1" class="ion-flex ion-margin-auto justify-content-end">
+              <div class="font-bold">Qty</div>
             </ion-col>
           </ion-row>
         </ion-grid>
-        <ion-badge mode="ios" slot="end">{{item.qtyRequest|number:'1.0'}}</ion-badge>
+      </ion-item>
+    </ion-list>
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let i = index">
+        <ion-grid class="ion-no-padding py-2 pl-2">
+          <ion-row>
+            <ion-col size="1" class="ion-flex ion-margin-auto">
+              <div>{{i+1+((currentPage-1)*itemsPerPage)}}</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto">
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div class="font-bold">{{item.itemBarcode}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div class="ion-flex">
+                      {{item.itemCode}}
+                      <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemVariationXDescription"> {{item.itemVariationXDescription}}</span>
+                      <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="item.itemVariationYDescription"> {{item.itemVariationYDescription}}</span>
+                    </div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div>{{item.itemDescription}}</div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-col>
+            <ion-col size="1" class="ion-margin-auto justify-content-end">
+              <div >
+                <ion-badge mode="ios" class="justify-content-center">{{item.qtyRequest|number:"1.0"}}</ion-badge>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
     </ion-list>
   </div>

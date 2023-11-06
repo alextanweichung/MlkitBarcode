@@ -15,11 +15,7 @@ const routes: Routes = [
   {
     path: 'stock-count-crud/stock-count-item',
     loadChildren: () => import('./stock-count-crud/stock-count-item/stock-count-item.module').then( m => m.StockCountItemPageModule)
-  },
-  {
-    path: 'stock-count-crud/stock-count-summary',
-    loadChildren: () => import('./stock-count-crud/stock-count-summary/stock-count-summary.module').then( m => m.StockCountSummaryPageModule)
-  },
+  }
 ];
 
 @NgModule({

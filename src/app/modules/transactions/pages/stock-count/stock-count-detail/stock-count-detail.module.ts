@@ -9,6 +9,7 @@ import { StockCountDetailPageRoutingModule } from './stock-count-detail-routing.
 import { StockCountDetailPage } from './stock-count-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IonicModule,
     StockCountDetailPageRoutingModule,
     IdMappingModule,
-    SumModule
+    SumModule,
+    NgxPaginationModule
   ],
   declarations: [StockCountDetailPage]
 })

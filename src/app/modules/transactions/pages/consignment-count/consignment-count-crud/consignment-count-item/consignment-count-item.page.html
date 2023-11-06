@@ -47,12 +47,12 @@
     </ion-list>
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding #slidingItem *ngFor="let line of objectService.objectDetail|paginate:{itemsPerPage:12,currentPage:currentPage}; trackBy:identify; let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let line of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let i = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">
           <ion-grid class="ion-no-padding pt-2 pl-2">
             <ion-row>
               <ion-col size="1" class="ion-flex ion-margin-auto">
-                <div>{{i+1}}</div>
+                <div>{{i+1+((currentPage-1)*itemsPerPage)}}</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto">
                 <ion-grid class="ion-no-padding">

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationExtras } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { NavController, ViewWillEnter } from '@ionic/angular';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { StockCountItem, StockCountRoot } from '../../../models/stock-count';
 import { StockCountService } from '../../../services/stock-count.service';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-stock-count-detail',
@@ -13,69 +14,67 @@ import { StockCountService } from '../../../services/stock-count.service';
 export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
   objectId: number;
-
-  object: StockCountRoot;
-  scannedItems: StockCountItem[] = [];
+  currentPage: number = 1;
+  itemsPerPage: number = 12;
 
   constructor(
-    private route: ActivatedRoute,
+    public objectService: StockCountService,
+    private commonService: CommonService,
+    private loadingService: LoadingService,
     private navController: NavController,
-    public objectService: StockCountService
-  ) {
+    private route: ActivatedRoute,
+  ) { }
+
+  ionViewWillEnter(): void {
     this.route.queryParams.subscribe(params => {
-      this.objectId = params['objectId'];
+      this.objectId = params["objectId"];
+      if (this.objectId) {
+        this.loadObject();
+      }
     })
   }
 
-  ionViewWillEnter(): void {
-    if (this.objectId) {
-      this.loadObject();
-    }
-  }
-  
   ngOnInit() {
-    
+
   }
 
-  loadObject() {
+  async loadObject() {
     try {
-      this.scannedItems = [];
-      this.objectService.getInventoryCount(this.objectId).subscribe(response => {
-        this.object = response;
-        this.object.details.forEach(r => {
-          let barcodeTag = this.object.barcodeTag.find(rr => rr.itemSku === r.itemSku);
-          this.scannedItems.push({
-            itemId: r.itemId,
-            itemCode: barcodeTag.itemCode,
-            description: barcodeTag.description,
-            variationTypeCode: barcodeTag.variationTypeCode,
-            itemVariationLineXId: barcodeTag.itemVariationLineXId,
-            itemVariationLineYId: barcodeTag.itemVariationLineYId,
-            itemVariationLineXDescription: barcodeTag.itemVariationLineXDescription,
-            itemVariationLineYDescription: barcodeTag.itemVariationLineYDescription,
-            itemSku: barcodeTag.itemSku,
-            itemBarcodeTagId: barcodeTag.itemBarcodeTagId,
-            itemBarcode: barcodeTag.itemBarcode,
-            itemUomId: barcodeTag.itemUomId,
-            itemUomDescription: barcodeTag.itemUomDescription,
-            qtyRequest: r.qtyRequest
-          })
+      await this.loadingService.showLoading();
+      this.objectService.getInventoryCount(this.objectId).subscribe(async response => {
+        let object = response;
+        object.header = this.commonService.convertObjectAllDateType(object.header);
+        object.details.forEach(r => {
+          let found = object.barcodeTag.find(rr => rr.itemSku === r.itemSku);
+          if (found) {
+            r.itemCode = found.itemCode;
+            r.itemDescription = found.description;
+            r.itemVariationXDescription = found.itemVariationLineXDescription;
+            r.itemVariationYDescription = found.itemVariationLineYDescription;
+            r.guid = uuidv4();
+          }
         })
-      }, error => {
-        console.error(error);;
+        await this.objectService.setHeader(object.header);
+        await this.objectService.setLines(object.details);
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
   edit() {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: this.objectId
-      }
-    }
-    this.navController.navigateForward('/transactions/stock-count/stock-count-crud/stock-count-header', navigationExtras);
+    this.navController.navigateRoot("/transactions/stock-count/stock-count-crud/stock-count-header");
+  }
+
+  identify(index, line) {
+    return line.guid;
   }
 
 }
