@@ -6,6 +6,7 @@ import { moduleCode, reportAppCode } from 'src/app/shared/models/acl-const';
 import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { ReportsService } from '../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-reports',
@@ -29,6 +30,7 @@ export class ReportsPage implements OnInit {
     private authService: AuthService,
     private objectService: ReportsService,
     private commonService: CommonService,
+    private toastService: ToastService,
     private navController: NavController,
   ) { }
 
@@ -72,6 +74,8 @@ export class ReportsPage implements OnInit {
       }, error => {
         console.log(error);
       })
+    } else {
+      this.toastService.presentToast("", "Sales Agent not set", "top", "warning", 1000);
     }
   }
 
