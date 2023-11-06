@@ -8,6 +8,7 @@ import { TransferOutItemPageRoutingModule } from './transfer-out-item-routing.mo
 
 import { TransferOutItemPage } from './transfer-out-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
     FormsModule,
     IonicModule,
     TransferOutItemPageRoutingModule,
-    BarcodeScanInputPageModule
+    BarcodeScanInputPageModule,
+    SumModule
   ],
   declarations: [TransferOutItemPage]
 })

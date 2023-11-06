@@ -27,7 +27,7 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
   ) { }
 
   ionViewWillEnter(): void {
-    throw new Error('Method not implemented.');
+    
   }
 
   ngOnInit() {
