@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { ActionSheetController, AlertController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { TransferInLine } from 'src/app/modules/transactions/models/transfer-in';
 import { TransferInService } from 'src/app/modules/transactions/services/transfer-in.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -15,7 +15,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
   templateUrl: './transfer-in-item.page.html',
   styleUrls: ['./transfer-in-item.page.scss'],
 })
-export class TransferInItemPage implements OnInit, OnDestroy {
+export class TransferInItemPage implements OnInit, ViewWillEnter {
   
   systemWideEAN13IgnoreCheckDigit: boolean = false;
 
@@ -28,9 +28,13 @@ export class TransferInItemPage implements OnInit, OnDestroy {
     private actionSheetController: ActionSheetController,
     private navController: NavController,
   ) { }
+
+  ionViewWillEnter(): void {
+    
+  }
   
   ngOnDestroy(): void {
-    this.objectService.resetVariables();
+
   }
 
   ngOnInit() {
@@ -86,7 +90,7 @@ export class TransferInItemPage implements OnInit, OnDestroy {
             }
             return outputData;
           } else {
-            this.toastService.presentToast("", "Barcode not found.", "top", "danger", 1000);
+            this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
           }
         }
       }

@@ -53,10 +53,6 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
   }
 
   async ionViewWillEnter(): Promise<void> {
-    this.objectService.resetVariables();
-    // reload all masterlist whenever user enter listing
-    await this.objectService.loadRequiredMaster();
-    await this.bindLocationList();
     this.objects = []; // clear list when enter
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
@@ -64,14 +60,18 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
+    await this.objectService.resetVariables();
+    // reload all masterlist whenever user enter listing
+    await this.objectService.loadRequiredMaster();
+    await this.bindLocationList();
+    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {      
+      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.isPrimary);
+    }
+    await this.loadPendingList();
   }
 
-  ionViewDidEnter(): void {
-    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
-      this.selectedLocation = this.objectService.locationList.find(r => r.isPrimary);
-      this.loadPendingList();
-    }
-    this.loadObjects();
+  async ionViewDidEnter(): Promise<void> {
+    await this.loadObjects();
   }
 
   ngOnInit() {
@@ -96,23 +96,34 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     }
   }
 
-  selectedLocation: ConsignmentSalesLocation = null;
   onLocationChanged(event: any) {
     if (event) {
-      this.selectedLocation = this.objectService.locationList.find(r => r.locationId === event.id);
+      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.locationId === event.id);
       this.loadPendingList();
     }
   }
 
   pendingObject: TransferInHeader[] = [];
-  loadPendingList() {
-    this.pendingObject = [];
-    if (this.selectedLocation) {
-      this.objectService.getPendingList(this.selectedLocation.locationCode).subscribe(response => {
-        this.pendingObject = response;
-      }, error => {
-        console.error(error);
-      })
+  async loadPendingList() {
+    try {
+      await this.loadingService.showLoading();
+      this.pendingObject = [];
+      if (this.objectService.selectedConsignmentLocation) {
+        this.objectService.getPendingList(this.objectService.selectedConsignmentLocation.locationCode).subscribe(async response => {
+          this.pendingObject = response;
+          await this.loadingService.dismissLoading();
+        }, async error => {
+          await this.loadingService.dismissLoading();
+          console.error(error);
+        })
+      } else {
+        await this.loadingService.dismissLoading();
+      }
+    } catch (error) {
+      await this.loadingService.dismissLoading();
+      console.error(error);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 

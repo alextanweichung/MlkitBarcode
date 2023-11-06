@@ -15,10 +15,10 @@
   <div class="p-2">
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <app-search-dropdown title="Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="selectedLocation?.locationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
+      <app-search-dropdown title="Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectService.selectedConsignmentLocation?.locationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
     </ion-list>
       
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="selectedLocation?.locationId && pendingObject && pendingObject.length > 0">
+    <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="objectService.selectedConsignmentLocation?.locationId && pendingObject && pendingObject.length > 0">
       <ion-label>Pending Doc.</ion-label>
     </ion-list-header>
 
@@ -27,24 +27,24 @@
     </ion-list-header>
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let o of pendingObject" (click)="selectDoc(o)">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let po of pendingObject" (click)="selectDoc(po)">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> Doc. Num.</div>
-              <div>{{o.interTransferNum}}</div>
+              <div>{{po.interTransferNum}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> Doc. Date</div>
-              <div>{{o.trxDate|date:"dd/MM/yyyy"}}</div>              
+              <div>{{po.trxDate|date:"dd/MM/yyyy"}}</div>              
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold"> From Location</div>
-              <div>{{o.locationId|idMapping:objectService.locationMasterList}}</div>              
+              <div>{{po.locationId|idMapping:objectService.locationMasterList}}</div>              
             </ion-col>
           </ion-row>
         </ion-grid>

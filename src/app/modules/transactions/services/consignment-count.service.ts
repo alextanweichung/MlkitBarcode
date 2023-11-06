@@ -83,10 +83,10 @@ export class ConsignmentCountService {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/masterList").toPromise();
   }
 
-  getObjects() {
-  // getObjects(dateStart: string, dateEnd: string) {
-    // return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
-    return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount`);
+  // getObjects() {
+  getObjects(dateStart: string, dateEnd: string) {
+    return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
+    // return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount`);
   }
 
   getObjectById(objectId: number) {

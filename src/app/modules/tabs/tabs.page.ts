@@ -13,7 +13,7 @@ export class TabsPage {
 
   showTrxTab: boolean = false;
   showMagTab: boolean = false;
-  showRepTab: boolean = false;
+  // showRepTab: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -27,7 +27,7 @@ export class TabsPage {
 
         this.showMagTab = obj.flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.approval)?.length > 0
 
-        this.showRepTab = obj.flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.report)?.length > 0
+        // this.showRepTab = obj.flatMap(r => r.items).filter(r => r.subModuleCode === moduleCode.report)?.length > 0
       }
     })
   }

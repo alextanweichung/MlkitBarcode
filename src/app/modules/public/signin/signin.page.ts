@@ -67,8 +67,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
   ngOnInit() {
     if (Capacitor.getPlatform() === "web") {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-      // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
-      this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
+      this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+      // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
       // this.signin_form.get("userEmail").setValue("waynecon@idcp.my");
@@ -257,9 +257,10 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                 // }
               }
             } catch (error) {
+              this.submit_attempt = false;
               await this.loadingService.dismissLoading();
               this.toastService.presentToast("", error.message, "top", "medium", 1000);
-            } finally {
+            } finally {this.submit_attempt = false;
               await this.loadingService.dismissLoading();
             }
           } else {

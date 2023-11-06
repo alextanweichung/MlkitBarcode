@@ -36,6 +36,11 @@ export interface TransferInLine {
   qty: number
   qtyReceive?: number
   isDeleted?: boolean
+  unitPrice?: number
+  discountGroupCode?: string
+  discountExpression?: string
+  discountAmt?: number
+  subTotal?: number
 }
 
 export interface TransferInList {

@@ -15,7 +15,6 @@ import { CommonService } from 'src/app/shared/services/common.service';
 export class ReportsPage implements OnInit {
 
   loginUser: LoginUser;
-  isConsignmentUser: boolean = false;
 
   showDebtorLatestOutstanding: boolean = false;
   showSOListing: boolean = false;
@@ -48,12 +47,10 @@ export class ReportsPage implements OnInit {
           this.showSalesAnalysis = pageItems.findIndex(r => r.title === reportAppCode.mobileSalesAnalysis) > -1;
         }
       })
+      this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
     } catch (e) {
       console.error(e);
     }
-    
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    this.isConsignmentUser = this.loginUser.loginUserType === "C";
   }
 
   goToReport(link: string) {
@@ -61,7 +58,7 @@ export class ReportsPage implements OnInit {
   }
 
   async downloadCustomerDetails() {
-    if (this.isConsignmentUser && this.loginUser.salesAgentId) {
+    if (this.loginUser.salesAgentId) {
       let paramModel: ReportParameterModel = {
         appCode: "SMMD001",
         format: "pdf",

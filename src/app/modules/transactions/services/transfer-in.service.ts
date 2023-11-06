@@ -18,6 +18,8 @@ const httpObserveHeader = {
 
 export class TransferInService {
 
+  selectedConsignmentLocation: ConsignmentSalesLocation = null;
+
   fullMasterList: MasterList[] = [];
   interTransferTypeList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
@@ -43,6 +45,7 @@ export class TransferInService {
 
   locationList: ConsignmentSalesLocation[] = [];
   async loadConsignmentLocation() {
+    this.locationList = [];
     this.locationList = await this.getConsignmentLocation();
   }
 
