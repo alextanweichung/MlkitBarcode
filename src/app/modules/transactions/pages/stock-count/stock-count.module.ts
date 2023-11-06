@@ -8,6 +8,7 @@ import { StockCountPageRoutingModule } from './stock-count-routing.module';
 
 import { StockCountPage } from './stock-count.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     StockCountPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    NgxPaginationModule
   ],
   declarations: [StockCountPage]
 })

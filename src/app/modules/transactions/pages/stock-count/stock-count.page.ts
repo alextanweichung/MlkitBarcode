@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonSearchbar, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -10,6 +10,8 @@ import { StockCountService } from '../../services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-stock-count',
@@ -18,8 +20,12 @@ import { ConfigService } from 'src/app/services/config/config.service';
 })
 export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
+  @ViewChild("searchbar", { static: false }) searchbar: IonSearchbar;
+  
   objects: StockCount[] = [];
   uniqueGrouping: Date[] = [];
+  currentPage: number = 1;
+  itemsPerPage: number = 12;
 
   constructor(
     private objectService: StockCountService,
@@ -100,9 +106,10 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
       await this.loadingService.showLoading();
       this.objectService.getInventoryCountByDate(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
-        let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-        this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-        await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+        this.resetFilteredObj();
+        // let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
+        // this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
+        // await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
         await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
@@ -181,4 +188,38 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
       console.error(e);
     }
   }
+
+  itemSearchText: string;
+  filteredObj: StockCount[] = [];
+  search(searchText, newSearch: boolean = false) {
+    if (newSearch) {
+      this.filteredObj = [];
+    }
+    this.itemSearchText = searchText;
+    try {
+      if (searchText && searchText.trim().length > 2) {
+        if (Capacitor.getPlatform() !== "web") {
+          Keyboard.hide();
+        }
+        this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.inventoryCountNum.toUpperCase().includes(searchText.toUpperCase()))));
+        this.currentPage = 1;
+      } else {
+        this.resetFilteredObj();
+        this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  resetFilteredObj() {
+    this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+  }
+
+  highlight(event) {
+    event.getInputElement().then(r => {
+      r.select();
+    })
+  }
+
 }
