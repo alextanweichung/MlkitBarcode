@@ -10,12 +10,12 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PosApprovalProcessingService } from 'src/app/shared/services/pos-approval-processing.service';
 
 @Component({
-  selector: 'app-refund-approvals',
-  templateUrl: './refund-approvals.page.html',
-  styleUrls: ['./refund-approvals.page.scss'],
-  providers: [PosApprovalProcessingService, { provide: "apiObject", useValue: "MobileRefundApprove" }]
+  selector: 'app-exchange-approvals',
+  templateUrl: './exchange-approvals.page.html',
+  styleUrls: ['./exchange-approvals.page.scss'],
+  providers: [PosApprovalProcessingService, { provide: "apiObject", useValue: "MobileExchangeApprove" }]
 })
-export class RefundApprovalsPage implements OnInit, ViewWillEnter {
+export class ExchangeApprovalsPage implements OnInit, ViewWillEnter {
 
   fullDocList: PosApproval[] = [];
   pendingDocList: PosApproval[] = [];
@@ -52,7 +52,7 @@ export class RefundApprovalsPage implements OnInit, ViewWillEnter {
     try {
       await this.loadingService.showLoading();
       this.transactionProcessingService.getObjects(format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd"), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(async response => {
-        console.log("🚀 ~ file: refund-approvals.page.ts:62 ~ RefundApprovalsPage ~ this.transactionProcessingService.getProcessingDocumentByDateRange ~ response:", response)
+        console.log("🚀 ~ file: exchange-approvals.page.ts:62 ~ ExchangeApprovalsPage ~ this.transactionProcessingService.getProcessingDocumentByDateRange ~ response:", response)
         this.fullDocList = response;
         this.pendingDocList = this.fullDocList.filter(r => r.isApproved === null);
         this.completedDocList = this.fullDocList.filter(r => (r.isApproved === true || r.isApproved === false));

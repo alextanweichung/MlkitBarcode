@@ -122,6 +122,10 @@ const routes: Routes = [
     path: 'managements/refund-approvals',
     loadChildren: () => import('./modules/managements/pages/refund-approvals/refund-approvals.module').then( m => m.RefundApprovalsPageModule)
   },
+  {
+    path: 'managements/exchange-approvals',
+    loadChildren: () => import('./modules/managements/pages/exchange-approvals/exchange-approvals.module').then( m => m.ExchangeApprovalsPageModule)
+  },
   // management-otp-configuration
   {
     path: 'managements/otp-configuration',
@@ -397,6 +401,7 @@ const routes: Routes = [
     path: 'pos-approval-processing',
     loadChildren: () => import('./shared/pages/pos-approval-processing/pos-approval-processing.module').then( m => m.PosApprovalProcessingPageModule)
   },
+
 
 
 ];

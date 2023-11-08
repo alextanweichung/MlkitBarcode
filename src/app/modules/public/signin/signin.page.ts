@@ -69,15 +69,15 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
-      this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
-      // this.signin_form.get("userEmail").setValue("admin@idcp.my");
+      // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
+      this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
       // this.signin_form.get("userEmail").setValue("waynecon@idcp.my");
-      this.signin_form.get("password").setValue("Dev8888");
+      // this.signin_form.get("password").setValue("Dev8888");
       // this.signin_form.get("password").setValue("Dev9999");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("password").setValue("i@Dmin7026");
-      // this.signin_form.get("password").setValue("c0nnecT#7026");
+      this.signin_form.get("password").setValue("c0nnecT#7026");
     } else {
       this.setSelectedParam();
     }

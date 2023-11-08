@@ -11,7 +11,9 @@ export interface PosApproval {
    posBillNum: string
    posRefundMethodId: number
    posRefundAmount: number
+   posSpecialExchangeDetails: string
    posSpecialExchangeId: number
+   posSpecialExchangeNum: string
    isApproved: boolean
    isCompleted: boolean
    approvedAt: Date

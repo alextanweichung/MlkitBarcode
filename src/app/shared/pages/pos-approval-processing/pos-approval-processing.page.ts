@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { TransactionProcessingCount } from '../../models/transaction-processing';
 import { NavController, AlertController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PosApproval } from '../../models/pos-approval-processing';
+import { PosApproval, PosApprovalLine } from '../../models/pos-approval-processing';
 import { PosApprovalProcessingService } from '../../services/pos-approval-processing.service';
 import { MasterListDetails } from '../../models/master-list-details';
 
@@ -12,7 +12,7 @@ import { MasterListDetails } from '../../models/master-list-details';
   templateUrl: './pos-approval-processing.page.html',
   styleUrls: ['./pos-approval-processing.page.scss'],
 })
-export class PosApprovalProcessingPage implements OnInit {  
+export class PosApprovalProcessingPage implements OnInit {
 
   posRefundMethodMasterList: MasterListDetails[] = [];
 
@@ -51,7 +51,7 @@ export class PosApprovalProcessingPage implements OnInit {
       this.transactionProcessingCount = response;
     }, error => {
       console.error(error);
-    }) 
+    })
   }
 
   async presentConfirmAlert(action: string, docId: number, object: PosApproval) {
@@ -84,7 +84,7 @@ export class PosApprovalProcessingPage implements OnInit {
           },
         ],
       });
-      await alert.present();      
+      await alert.present();
     } catch (e) {
       console.error(e);
     }
@@ -117,19 +117,46 @@ export class PosApprovalProcessingPage implements OnInit {
 
   async goToDetail(object: PosApproval) {
     try {
-      let docId = object.posApprovalType === "RF" ? object.posBillId : "";
-      let navigationExtras: NavigationExtras;
-      navigationExtras = {
-        queryParams: {
-          objectId: docId,
-          processType: this.processType,
-          selectedSegment: this.selectedSegment
+      if (object.posApprovalType === "RF" || object.posApprovalType === "RD") {
+        let docId = object.posApprovalType === "RF" ? object.posBillId : "";
+        let navigationExtras: NavigationExtras;
+        navigationExtras = {
+          queryParams: {
+            objectId: docId,
+            processType: this.processType,
+            selectedSegment: this.selectedSegment
+          }
         }
+        this.navController.navigateForward(`/transactions/${this.parentType.toLowerCase()}/${this.parentType.toLowerCase()}-detail`, navigationExtras);
+      } else {
+        this.loadObjectLine(object.posApprovalId);
       }
-      this.navController.navigateForward(`/transactions/${this.parentType.toLowerCase()}/${this.parentType.toLowerCase()}-detail`, navigationExtras);
     } catch (e) {
       console.error(e);
     }
   }
+
+  exchangeLines: PosApprovalLine[] = [];
+  loadObjectLine(objectId: number) {
+    this.objectService.getObjectLine(objectId).subscribe(response => {
+      this.exchangeLines = response;
+      this.showExchangeLineModal();
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  /* #region exchange line modal */
+
+  exchangeLineModal: boolean = false;
+  showExchangeLineModal() {
+    this.exchangeLineModal = true;
+  }
+
+  hideExchangeLineModal() {
+    this.exchangeLineModal = false;
+  }
+
+  /* #endregion */
 
 }
