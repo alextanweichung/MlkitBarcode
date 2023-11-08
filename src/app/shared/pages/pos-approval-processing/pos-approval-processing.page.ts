@@ -118,7 +118,7 @@ export class PosApprovalProcessingPage implements OnInit {
   async goToDetail(object: PosApproval) {
     try {
       if (object.posApprovalType === "RF" || object.posApprovalType === "RD") {
-        let docId = object.posApprovalType === "RF" ? object.posBillId : "";
+        let docId = object.posApprovalType === "RF" ? object.posBillId : object.salesDepositId;
         let navigationExtras: NavigationExtras;
         navigationExtras = {
           queryParams: {

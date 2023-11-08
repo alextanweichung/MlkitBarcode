@@ -14,6 +14,9 @@ export interface PosApproval {
    posSpecialExchangeDetails: string
    posSpecialExchangeId: number
    posSpecialExchangeNum: string
+   salesDepositId: number
+   salesDepositNum: string
+   salesDepositAmount: number
    isApproved: boolean
    isCompleted: boolean
    approvedAt: Date

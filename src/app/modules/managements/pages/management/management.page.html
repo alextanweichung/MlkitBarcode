@@ -202,6 +202,20 @@
       </ion-list>
     </ng-container>
 
+    <ng-container *ngIf="showRecallDepositApproval">
+      <ion-list-header>
+        <ion-label class="pl-2">Recall Deposit Approval</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item button routerLink="recall-deposit-approvals">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Approvals</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
     <ng-container *ngIf="showOtpConfig">
       <ion-list-header>
         <ion-label class="pl-2">OTP Configuration</ion-label>

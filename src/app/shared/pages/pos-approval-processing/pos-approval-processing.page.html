@@ -21,6 +21,10 @@
 							<ng-container *ngIf="rowData.posApprovalType === 'SE'">
 								<span class="font-bold">Exchange: {{rowData.posSpecialExchangeNum}}</span>
 							</ng-container>
+							<ng-container *ngIf="rowData.posApprovalType === 'RF'">
+								<span class="font-bold">Recall: {{rowData.salesDepositNum}}</span>
+								<!-- <a routerLink="/rm/pos-bill" [queryParams]="{id: item.posBillId}" target="_blank">{{item.posBillNum}} <i class="pi pi-external-link" pTooltip="Browse document"></i></a> -->
+							</ng-container>
 						</ion-col>
 					</ion-row>
 					<ng-container *ngIf="rowData.posApprovalType === 'RF'">
@@ -63,6 +67,23 @@
 							</ion-col>
 						</ion-row>
 					</ng-container>
+					<ng-container *ngIf="rowData.posApprovalType === 'RD'">
+						<ion-row>
+							<ion-col class="ion-flex ion-margin-auto">
+								<span class="block">Recall Amount: {{rowData.salesDepositAmount|number: '1.2-2'}}</span>
+							</ion-col>
+						</ion-row>
+						<ion-row>
+							<ion-col class="ion-flex ion-margin-auto">
+								<span class="block">Reason: {{rowData.reason}}</span>
+							</ion-col>
+						</ion-row>
+						<ion-row>
+							<ion-col class="ion-flex ion-margin-auto">
+								<span class="block font-semibold" *ngIf="rowData.remark">HQ Remark: {{rowData.remark}}</span>
+							</ion-col>
+						</ion-row>
+					</ng-container>
 					<ion-row>
 						<ion-col class="ion-flex ion-margin-auto">
 							<span class="ion-text-wrap badge-other px-1"><ion-icon name="calendar-number-outline"></ion-icon> {{rowData.trxDate|date:'dd/MM/yyyy'}}</span>
@@ -91,6 +112,10 @@
 						</ng-container>
 						<ng-container *ngIf="rowData.posApprovalType === 'SE'">
 							<span class="font-bold">Exchange: {{rowData.posSpecialExchangeNum}}</span>
+						</ng-container>
+						<ng-container *ngIf="rowData.posApprovalType === 'RF'">
+							<span class="font-bold">Recall: {{rowData.salesDepositNum}}</span>
+							<!-- <a routerLink="/rm/pos-bill" [queryParams]="{id: item.posBillId}" target="_blank">{{item.posBillNum}} <i class="pi pi-external-link" pTooltip="Browse document"></i></a> -->
 						</ng-container>
 					</ion-col>
 				</ion-row>
@@ -121,6 +146,23 @@
 					<ion-row>
 						<ion-col class="ion-flex ion-margin-auto">
 							<span class="block">Channel Details: {{rowData.posSpecialExchangeDetails}}</span>
+						</ion-col>
+					</ion-row>
+					<ion-row>
+						<ion-col class="ion-flex ion-margin-auto">
+							<span class="block">Reason: {{rowData.reason}}</span>
+						</ion-col>
+					</ion-row>
+					<ion-row>
+						<ion-col class="ion-flex ion-margin-auto">
+							<span class="block font-semibold" *ngIf="rowData.remark">HQ Remark: {{rowData.remark}}</span>
+						</ion-col>
+					</ion-row>
+				</ng-container>
+				<ng-container *ngIf="rowData.posApprovalType === 'RD'">
+					<ion-row>
+						<ion-col class="ion-flex ion-margin-auto">
+							<span class="block">Recall Amount: {{rowData.salesDepositAmount|number: '1.2-2'}}</span>
 						</ion-col>
 					</ion-row>
 					<ion-row>

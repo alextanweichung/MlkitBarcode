@@ -126,6 +126,10 @@ const routes: Routes = [
     path: 'managements/exchange-approvals',
     loadChildren: () => import('./modules/managements/pages/exchange-approvals/exchange-approvals.module').then( m => m.ExchangeApprovalsPageModule)
   },
+  {
+    path: 'managements/recall-deposit-approvals',
+    loadChildren: () => import('./modules/managements/pages/recall-deposit-approvals/recall-deposit-approvals.module').then( m => m.RecallDepositApprovalsPageModule)
+  },
   // management-otp-configuration
   {
     path: 'managements/otp-configuration',
@@ -287,6 +291,10 @@ const routes: Routes = [
     path: 'transactions/pos-bill/pos-bill-detail',
     loadChildren: () => import('./modules/transactions/pages/pos-bill/pos-bill-detail/pos-bill-detail.module').then( m => m.PosBillDetailPageModule)
   },
+  {
+    path: 'transactions/pos-sales-deposit/pos-sales-deposit-detail',
+    loadChildren: () => import('./modules/transactions/pages/pos-sales-deposit/pos-sales-deposit-detail/pos-sales-deposit-detail.module').then( m => m.PosSalesDepositDetailPageModule)
+  },
 
 
 
@@ -401,6 +409,8 @@ const routes: Routes = [
     path: 'pos-approval-processing',
     loadChildren: () => import('./shared/pages/pos-approval-processing/pos-approval-processing.module').then( m => m.PosApprovalProcessingPageModule)
   },
+
+
 
 
 

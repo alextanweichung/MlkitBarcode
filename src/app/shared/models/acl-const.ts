@@ -48,6 +48,7 @@ export const approvalAppCode = {
    nonTradePOAP: "MANTPOAP",
    refundAP: "MAMRAP",
    exchangeAP: "MAMERP",
+   recallDepositAP: "MAMRDAP",
    otpConfig: "MAMAOTP",
 }
 
