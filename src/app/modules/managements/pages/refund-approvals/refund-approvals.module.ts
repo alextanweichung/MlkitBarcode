@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { RefundApprovalsPageRoutingModule } from './refund-approvals-routing.module';
 
 import { RefundApprovalsPage } from './refund-approvals.page';
-import { TransactionProcessingPageModule } from 'src/app/shared/pages/transaction-processing/transaction-processing.module';
+import { PosApprovalProcessingPageModule } from 'src/app/shared/pages/pos-approval-processing/pos-approval-processing.module';
 
 @NgModule({
   imports: [
@@ -15,7 +15,7 @@ import { TransactionProcessingPageModule } from 'src/app/shared/pages/transactio
     FormsModule,
     IonicModule,
     RefundApprovalsPageRoutingModule,
-    TransactionProcessingPageModule
+    PosApprovalProcessingPageModule
   ],
   declarations: [RefundApprovalsPage]
 })

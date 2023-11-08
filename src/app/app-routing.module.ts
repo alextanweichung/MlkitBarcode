@@ -279,6 +279,10 @@ const routes: Routes = [
     path: 'transactions/non-trade-purchase-req/non-trade-purchase-req-detail',
     loadChildren: () => import('./modules/transactions/pages/non-trade-purchase-req/non-trade-purchase-req-detail/non-trade-purchase-req-detail.module').then(m => m.NonTradePurchaseReqDetailPageModule)
   },
+  {
+    path: 'transactions/pos-bill/pos-bill-detail',
+    loadChildren: () => import('./modules/transactions/pages/pos-bill/pos-bill-detail/pos-bill-detail.module').then( m => m.PosBillDetailPageModule)
+  },
 
 
 
@@ -389,6 +393,11 @@ const routes: Routes = [
     path: 'item-code-input-offline',
     loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
   },
+  {
+    path: 'pos-approval-processing',
+    loadChildren: () => import('./shared/pages/pos-approval-processing/pos-approval-processing.module').then( m => m.PosApprovalProcessingPageModule)
+  },
+
 
 ];
 @NgModule({
