@@ -18,6 +18,11 @@ const httpObserveHeader = {
 
 export class TransferInScanningService {
 
+  filterStartDate: Date;
+  filterEndDate: Date;
+  
+  selectedConsignmentLocation: ConsignmentSalesLocation = null;
+
   fullMasterList: MasterList[] = [];
   interTransferTypeList: MasterListDetails[] = [];
   locationMasterList: MasterListDetails[] = [];
@@ -48,27 +53,9 @@ export class TransferInScanningService {
 
   /* #region  for insert */
 
-  header: TransferInScanningRoot;
-  itemInCart: TransferInScanningLine[] = [];
   object: TransferInScanningRoot;
-  async setHeader(header: TransferInScanningRoot) {
-    this.header = header;
-  }
-
-  setChoosenItems(items: TransferInScanningLine[]) {
-    this.itemInCart = JSON.parse(JSON.stringify(items));
-  }
-
   setObject(object: TransferInScanningRoot) {
     this.object = object;
-  }
-
-  removeHeader() {
-    this.header = null;
-  }
-
-  removeItems() {
-    this.itemInCart = [];
   }
 
   removeObject() {
@@ -76,8 +63,6 @@ export class TransferInScanningService {
   }
 
   resetVariables() {
-    this.removeHeader();
-    this.removeItems();
     this.removeObject();
   }
 

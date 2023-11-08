@@ -16,10 +16,6 @@ const routes: Routes = [
     path: 'transfer-in-scanning-detail',
     loadChildren: () => import('./transfer-in-scanning-detail/transfer-in-scanning-detail.module').then( m => m.TransferInScanningDetailPageModule)
   },
-  {
-    path: 'transfer-in-scanning-edit',
-    loadChildren: () => import('./transfer-in-scanning-crud/transfer-in-scanning-edit/transfer-in-scanning-edit.module').then( m => m.TransferInScanningEditPageModule)
-  }
 ];
 
 @NgModule({

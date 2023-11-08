@@ -35,6 +35,15 @@ export interface TransferOutRoot {
    barcode: string
    lineQty: number
    isDeleted: boolean
+   unitPrice?: number
+   discountGroupCode?: string
+   discountExpression?: string
+   discountAmt?: number
+   subTotal?: number
+
+   // for local use
+   qtyRequest?: number
+   unitPriceExTax?: number   
  }
  
  export interface TransferOutList {

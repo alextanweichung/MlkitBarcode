@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
@@ -8,6 +8,8 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
+import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -17,17 +19,20 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class TransferOutItemPage implements OnInit, ViewWillEnter {
 
+  @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage
+
   constructor(
     public objectService: TransferOutService,
     private configService: ConfigService,
+    private commonService: CommonService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private navController: NavController,
     private alertController: AlertController,
-    private toastService: ToastService,
-    private loadingService: LoadingService
   ) { }
 
   ionViewWillEnter(): void {
-    
+
   }
 
   ngOnInit() {
@@ -51,12 +56,7 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
   async onDoneScanning(event) {
     try {
       if (event) {
-        let itemFound = await this.validateBarcode(event);
-        if (itemFound) {
-          this.insertIntoLine(itemFound);
-        } else {
-          this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
-        }
+        await this.barcodescaninput.validateBarcode(event);
       }
     } catch (e) {
       console.error(e);
@@ -72,43 +72,6 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
   /* #endregion */
 
   /* #region barcode & check so */
-
-  async validateBarcode(barcode: string) {
-    try {
-      if (barcode) {
-        if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-          let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-          if (found_barcode) {
-            let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-            let outputData: TransferOutLine = {
-              id: 0,
-              uuid: uuidv4(),
-              transferOutId: this.objectService.objectHeader.transferOutId,
-              sequence: 0,
-              itemId: found_item_master.id,
-              itemCode: found_item_master.code,
-              itemSku: found_barcode.sku,
-              itemDesc: found_item_master.itemDesc,
-              xId: found_barcode.xId,
-              xCd: found_barcode.xCd,
-              xDesc: found_barcode.xDesc,
-              yId: found_barcode.yId,
-              yCd: found_barcode.yCd,
-              yDesc: found_barcode.yDesc,
-              barcode: found_barcode.barcode,
-              lineQty: 1,
-              isDeleted: false
-            }
-            return outputData;
-          } else {
-            this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
-          }
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
 
   async onItemAdd(event: TransactionDetail[]) {
     try {
@@ -131,8 +94,14 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
             yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
             barcode: r.itemBarcode,
             lineQty: 1,
-            isDeleted: false
+            qtyRequest: 1,
+            isDeleted: false,
+            unitPrice: r.itemPricing?.unitPrice,
+            unitPriceExTax: r.itemPricing?.unitPrice,
+            discountGroupCode: r.itemPricing?.discountGroupCode,
+            discountExpression: r.itemPricing?.discountExpression
           }
+          await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
           this.insertIntoLine(outputData);
         })
       }
@@ -143,11 +112,22 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
-  insertIntoLine(event: TransferOutLine) {
+  async qtyInputBlur(event, rowIndex) {
+    if (rowIndex === null || rowIndex === undefined) {
+      this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+    } else {
+      this.objectService.objectDetail[rowIndex].qtyRequest = this.objectService.objectDetail[rowIndex].lineQty;
+      await this.commonService.computeDiscTaxAmount(this.objectService.objectDetail[rowIndex], false, false, false, 2);
+    }
+  }
+
+  async insertIntoLine(event: TransferOutLine) {
     if (event) {
       if (this.objectService.objectDetail !== null && this.objectService.objectDetail.length > 0) {
         if (this.objectService.objectDetail[0].itemSku === event.itemSku) {
           this.objectService.objectDetail[0].lineQty += event.lineQty;
+          this.objectService.objectDetail[0].qtyRequest = this.objectService.objectDetail[0].lineQty;
+          await this.commonService.computeDiscTaxAmount(this.objectService.objectDetail[0], false, false, false, 2);
         } else {
           this.objectService.objectDetail.unshift(event);
         }

@@ -466,11 +466,9 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
         details: this.objectService.objectDetail
       }
       trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
-      console.log("🚀 ~ file: sales-order-detail.page.ts:471 ~ SalesOrderDetailPage ~ insertObject ~ trxDto:", trxDto)
       trxDto.header.salesOrderNum = null; // always default to null when insert
       if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
         this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(async response => {
-          console.log("🚀 ~ file: sales-order-detail.page.ts:476 ~ SalesOrderDetailPage ~ this.objectService.confirmDraftObject ~ response.body:", response.body)
           this.objectService.setSummary(response.body);
           await this.loadingService.dismissLoading();
           this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);

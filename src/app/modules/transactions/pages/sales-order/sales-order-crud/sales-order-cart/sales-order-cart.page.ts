@@ -773,12 +773,9 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
     if (this.objectService.orderingActivateMOQControl) {
       if (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B") {
         this.objectService.objectDetail.forEach(data => {
-          console.log("🚀 ~ file: sales-order-cart.page.ts:779 ~ SalesOrderCartPage ~ validateMinOrderQty ~ data.itemCode:", data.itemCode)
           if (data.qtyRequest !== null && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
             let sameItemInCart = this.objectService.objectDetail.filter(r => r.itemId === data.itemId && r.uuid !== data.uuid);
-            console.log("🚀 ~ file: sales-order-cart.page.ts:780 ~ SalesOrderCartPage ~ validateMinOrderQty ~ sameItemInCart:", sameItemInCart)
             let totalQtyRequestOfSameItemInCart = sameItemInCart.flatMap(r => (r.qtyRequest ?? 0)).reduce((a, c) => (a + c), 0);
-            console.log("🚀 ~ file: sales-order-cart.page.ts:782 ~ SalesOrderCartPage ~ validateMinOrderQty ~ totalQtyRequestOfSameItemInCart:", totalQtyRequestOfSameItemInCart)
             if (sameItemInCart && totalQtyRequestOfSameItemInCart > 0) {
               // check if qtyincart has same item if yes then check minorderqty again
               if (data.qtyRequest !== null && data.minOrderQty && (data.qtyRequest + totalQtyRequestOfSameItemInCart) < data.minOrderQty) {

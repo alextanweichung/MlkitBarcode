@@ -13,7 +13,7 @@
     <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
     <!-- <input #barcodeInput class="p-2 mt-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" placeholder="Scan or Enter Item Barcode" (keydown)="handleKeyDown($event)"> -->
 
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.objectDetail">
       <ion-item button detail="false" class="ion-no-padding no-ripple">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
@@ -42,10 +42,8 @@
           </ion-row>
         </ion-grid>
       </ion-item>
-    </ion-list>
-
-    <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full" *ngIf="objectService.objectDetail">
-      <ion-item-sliding #slidingItem *ngFor="let l of objectService.objectDetail; let i = index">
+      
+      <ion-item-sliding #slidingItem *ngFor="let line of objectService.objectDetail; let i = index">
         <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="qtyInput.setFocus()">
           <ion-grid class="ion-no-padding py-2 pl-2">
             <ion-row>
@@ -56,33 +54,72 @@
                 <ion-grid class="ion-no-padding">
                   <ion-row>
                     <ion-col class="ion-flex ion-margin-auto">
-                      <div class="font-bold">{{l.itemCode}}</div>
+                      <div class="font-bold">{{line.itemCode}}</div>
                       <div class="ion-flex">
-                        <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="l.xDesc"> {{l.xDesc}}</span>
-                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="l.yDesc"> {{l.yDesc}}</span>
+                        <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="line.xDesc"> {{line.xDesc}}</span>
+                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="line.yDesc"> {{line.yDesc}}</span>
                       </div>
                     </ion-col>
                   </ion-row>
                   <ion-row>
                     <ion-col class="ion-flex ion-margin-auto">
-                      <div class="ion-text-wrap">{{l.itemDesc}}</div>
+                      <div class="ion-text-wrap">{{line.itemDesc}}</div>
                     </ion-col>
                   </ion-row>
                   <ion-row>
                     <ion-col class="ion-flex ion-margin-auto">
-                      <div class="ion-text-wrap">{{l.barcode}}</div>
+                      <div class="ion-text-wrap">{{line.barcode}}</div>
                     </ion-col>
                   </ion-row>
                 </ion-grid>
               </ion-col>
               <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="l.lineQty" placeholder="0"></ion-input>
+                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="line.lineQty" placeholder="0" (ionBlur)="qtyInputBlur($event, i)"></ion-input>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div class="font-bold">
+                  Unit Price
+                </div>
+              </ion-col>
+              <ion-col>
+                <div class="font-bold">
+                  Disc. Code
+                </div>
+              </ion-col>
+              <ion-col>
+                <div class="font-bold justify-content-end">
+                  Disc. Amt
+                </div>
+              </ion-col>
+              <ion-col>
+                <div class="font-bold justify-content-end">
+                  SubTotal
+                </div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div>{{line.unitPrice|number:"1.0-2"}}</div>
+              </ion-col>
+              <ion-col>
+                <div class="ion-flex">
+                  <div>{{line.discountGroupCode}}</div>
+                  <div *ngIf="line.discountExpression"> [{{line.discountExpression}}]</div>
+                </div>
+              </ion-col>
+              <ion-col class="justify-content-end">
+                <div >{{(line.discountAmt??0)|number:"1.0-2"}}</div>
+              </ion-col>
+              <ion-col class="justify-content-end">
+                <div >{{(line.subTotal??0)|number:"1.0-2"}}</div>
               </ion-col>
             </ion-row>
           </ion-grid>
         </ion-item>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i, l);">
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i, line);">
             <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
           </ion-item-option>
         </ion-item-options>

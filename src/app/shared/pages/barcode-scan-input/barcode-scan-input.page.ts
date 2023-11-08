@@ -146,6 +146,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             itemBarcode: found_barcode.barcode,
             itemBrandId: found_item_master.brandId,
             itemGroupId: found_item_master.groupId,
+            itemUomId: found_item_master.uomId,
             itemCategoryId: found_item_master.catId,
             itemDepartmentId: found_item_master.deptId,
             itemBarcodeTagId: found_barcode.id,
@@ -223,6 +224,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   itemBarcode: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.barcode : null,
                   itemBrandId: r.brandId,
                   itemGroupId: r.groupId,
+                  itemUomId: r.uomId,
                   itemCategoryId: r.catId,
                   itemDepartmentId: r.deptId,
                   itemBarcodeTagId: r.varCd === "0" ? t.id : null
@@ -266,6 +268,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                 itemBarcode: r.barcode,
                 itemBrandId: found_item_master.find(rr => rr.id === r.itemId)?.brandId,
                 itemGroupId: found_item_master.find(rr => rr.id === r.itemId)?.groupId,
+                itemUomId: found_item_master.find(rr => rr.id === r.itemId)?.uomId,
                 itemCategoryId: found_item_master.find(rr => rr.id === r.itemId)?.catId,
                 itemDepartmentId: found_item_master.find(rr => rr.id === r.itemId)?.deptId,
                 itemBarcodeTagId: r.id,

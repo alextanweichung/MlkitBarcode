@@ -10,6 +10,8 @@ import { TransferInScanningList, TransferInScanningRoot } from '../../models/tra
 import { TransferInScanningService } from '../../services/transfer-in-scanning.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { ConsignmentSalesLocation } from '../../models/consignment-sales';
+import { LocationChangeListener } from '@angular/common';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-transfer-in-scanning',
@@ -20,25 +22,21 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
 
   private objectDiffer: any;
   objects: TransferInScanningList[] = [];
-
-  startDate: Date;
-  endDate: Date;
-
   uniqueGrouping: Date[] = [];
 
   constructor(
+    public objectService: TransferInScanningService,
     private authService: AuthService,
     private commonService: CommonService,
-    public objectService: TransferInScanningService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private modalController: ModalController,
     private navController: NavController,
-    private toastService: ToastService,
     private differs: IterableDiffers
   ) {
     // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
     this.objectDiffer = this.differs.find(this.objects).create();
   }
 
@@ -49,24 +47,24 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     }
   }
 
-  ionViewWillEnter(): void {
-    this.objectService.resetVariables();
-    this.objects = []; // clear list when enter
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
+    await this.objectService.resetVariables();
+    if (!this.objectService.filterStartDate) {
+      this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
     }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
+    if (!this.objectService.filterEndDate) {
+      this.objectService.filterEndDate = this.commonService.getTodayDate();
     }
+    await this.bindLocationList();
+    await this.loadObjects();
   }
 
-  ionViewDidEnter(): void {
+  async ionViewDidEnter(): Promise<void> {
     if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
-      this.selectedLocation = this.objectService.locationList.find(r => r.isPrimary);
-      this.loadPendingList();
+      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.isPrimary);
     }
-    this.bindLocationList();
-    this.loadObjects();
+    await this.loadPendingList();
   }
 
   ngOnInit() {
@@ -91,23 +89,32 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     }
   }
 
-  selectedLocation: ConsignmentSalesLocation = null;
   onLocationChanged(event: any) {
     if (event) {
-      this.selectedLocation = this.objectService.locationList.find(r => r.locationId === event.id);
+      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.locationId === event.id);
       this.loadPendingList();
     }
   }
 
   pendingObject: TransferInScanningRoot[] = [];
-  loadPendingList() {
-    this.pendingObject = [];
-    if (this.selectedLocation) {
-      this.objectService.getPendingList(this.selectedLocation.locationCode).subscribe(response => {
-        this.pendingObject = response;
-      }, error => {
-        console.error(error);
-      })
+  async loadPendingList() {
+    try {
+      await this.loadingService.showLoading();
+      this.pendingObject = [];
+      if (this.objectService.selectedConsignmentLocation) {
+        this.objectService.getPendingList(this.objectService.selectedConsignmentLocation.locationCode).subscribe(async response => {
+          this.pendingObject = response;
+          await this.loadingService.dismissLoading();
+        }, async error => {
+          await this.loadingService.dismissLoading();
+          console.error(error);
+        })
+      }
+    } catch (error) {
+      await this.loadingService.dismissLoading();
+      console.error(error);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -122,14 +129,21 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
 
   async loadObjects() {
     try {
-      this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"),format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {        
+      await this.loadingService.showLoading();
+      this.objects = []; // clear list when enter
+      this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"),format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {        
         this.objects = response;
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        console.error(error);;
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (error) {
-      this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
+      await this.loadingService.dismissLoading();
+      this.toastService.presentToast("", "Error loading object", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -150,8 +164,8 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
       const modal = await this.modalController.create({
         component: FilterPage,
         componentProps: {
-          startDate: this.startDate,
-          endDate: this.endDate,
+          startDate: this.objectService.filterStartDate,
+          endDate: this.objectService.filterEndDate,
         },
         canDismiss: true
       })
@@ -160,8 +174,8 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
       if (data && data !== undefined) {
         this.objects = [];
         this.uniqueGrouping = [];
-        this.startDate = new Date(data.startDate);
-        this.endDate = new Date(data.endDate);
+        this.objectService.filterStartDate = new Date(data.startDate);
+        this.objectService.filterEndDate = new Date(data.endDate);
         this.loadObjects();
       }
     } catch (e) {

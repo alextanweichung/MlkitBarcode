@@ -13,8 +13,11 @@ export interface PDItemMaster {
   catId: number
   catCd: string
   catDesc: string
-  deptId: number,
-  seasonId: number,
+  uomId: number
+  uomCd: string
+  uomDesc: string
+  deptId: number
+  seasonId: number
   varCd: string
   price: number
   minPrice: number

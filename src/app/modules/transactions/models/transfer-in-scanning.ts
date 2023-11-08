@@ -44,6 +44,15 @@ export interface TransferInScanningRoot {
    lineQty: number
    qtyReceive: number
    isDeleted: boolean
+   unitPrice?: number
+   discountGroupCode?: string
+   discountExpression?: string
+   discountAmt?: number
+   subTotal?: number
+
+   // for local use
+   qtyRequest?: number
+   unitPriceExTax?: number
  }
 
  export interface TransferAdjustmentRoot {

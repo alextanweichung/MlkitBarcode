@@ -15,7 +15,6 @@ import { MasterList } from '../models/master-list';
 import { format } from 'date-fns';
 import { PDMarginConfig } from '../models/pos-download';
 import { ConsignmentSalesHeader } from 'src/app/modules/transactions/models/consignment-sales';
-import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 
 @Injectable({
   providedIn: 'root'
@@ -364,7 +363,7 @@ export class CommonService {
         splittedDisc.forEach(x => {
           if (x.includes('%')) {
             let currentdiscPct = parseFloat(x) / 100;
-            //let currentDiscAmt = unitPrice * currentdiscPct;    
+            //let currentDiscAmt = unitPrice * currentdiscPct;
             let currentDiscAmt = subTotal * currentdiscPct;
             totalDiscAmt = totalDiscAmt + currentDiscAmt;
             // unitPrice = unitPrice - currentDiscAmt;

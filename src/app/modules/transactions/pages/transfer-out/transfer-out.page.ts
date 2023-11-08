@@ -51,18 +51,17 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
   async ionViewWillEnter(): Promise<void> {
     await this.objectService.loadRequiredMaster();
     this.objectService.resetVariables();
-    this.objects = []; // clear list when enter
     if (!this.objectService.filterStartDate) {
       this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
     }
     if (!this.objectService.filterEndDate) {
       this.objectService.filterEndDate = this.commonService.getTodayDate();
     }
-    this.loadObjects();
+    await this.loadObjects();
   }
 
   ionViewDidEnter(): void {
-    
+
   }
 
   ngOnInit() {
@@ -73,8 +72,9 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
 
   async loadObjects() {
     try {
+      this.objects = []; // clear list
       await this.loadingService.showLoading();
-      this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"),format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
+      this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         await this.loadingService.dismissLoading();
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
@@ -85,14 +85,14 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
     } catch (error) {
       await this.loadingService.dismissLoading();
       this.toastService.presentToast("", "Error loading object", "top", "danger", 1000);
-    } finally {      
+    } finally {
       await this.loadingService.dismissLoading();
     }
   }
 
   getObjects(date: Date) {
     return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-  }  
+  }
 
   async bindUniqueGrouping() {
     let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
@@ -135,7 +135,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
   }
 
   /* #endregion */
-  
+
   async filter() {
     try {
       const modal = await this.modalController.create({

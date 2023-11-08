@@ -6,6 +6,7 @@ import { ViewWillEnter, NavController, ActionSheetController, AlertController, I
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-transfer-in-scanning-detail',
@@ -18,47 +19,50 @@ export class TransferInScanningDetailPage implements OnInit, ViewWillEnter {
   object: TransferInScanningRoot;
 
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private navController: NavController,
     public objectService: TransferInScanningService,
+    private authService: AuthService,
+    private commonService: CommonService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
+    private navController: NavController,
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
-    private toastService: ToastService,
-    private commonService: CommonService
-  ) {
-    try {
-      this.route.queryParams.subscribe(params => {
-        this.objectId = params["objectId"];
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+    private route: ActivatedRoute,
+  ) { }
 
   ionViewWillEnter(): void {
-
+    this.route.queryParams.subscribe(params => {
+      this.objectId = params["objectId"];
+      if (this.objectId && this.objectId > 0) {
+        this.loadObject();
+      } else {
+        this.toastService.presentToast("", "Invalid Transfer In Scanning", "top", "warning", 1000);
+        this.navController.navigateBack("/transactions/transfer-in-scanning");
+      }
+    })
   }
 
   ngOnInit() {
-    if (this.objectId && this.objectId > 0) {
-      this.loadObject();
-    } else {
-      this.toastService.presentToast("", "Invalid Transfer In Scanning", "top", "warning", 1000);
-      this.navController.navigateBack("/transactions/transfer-in-scanning");
-    }
+
   }
 
-  loadObject() {
+  async loadObject() {
     try {
-      this.objectService.getObjectById(this.objectId).subscribe(response => {
+      await this.loadingService.showLoading();
+      this.objectService.getObjectById(this.objectId).subscribe(async response => {
         this.object = response;
-      }, error => {
-        console.error(error);;
+        await this.objectService.setObject(this.object);
+        await this.loadingService.dismissLoading();
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
       })
     } catch (e) {
+      await this.loadingService.dismissLoading();
       console.error(e);
       this.toastService.presentToast("", "Invalid Transfer In Scanning", "top", "danger", 1000);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -131,12 +135,7 @@ export class TransferInScanningDetailPage implements OnInit, ViewWillEnter {
   }
 
   editObject() {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        objectId: this.object.transferInScanningId
-      }
-    }
-    this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-edit", navigationExtras);
+    this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-item");
   }
 
   /* #region variance modal */

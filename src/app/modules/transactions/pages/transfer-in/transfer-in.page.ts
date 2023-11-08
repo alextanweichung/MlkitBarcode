@@ -64,7 +64,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     // reload all masterlist whenever user enter listing
     await this.objectService.loadRequiredMaster();
     await this.bindLocationList();
-    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {      
+    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
       this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.isPrimary);
     }
     await this.loadPendingList();

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController, ActionSheetController, NavController } from '@ionic/angular';
@@ -9,6 +9,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,6 +19,8 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrls: ['./transfer-in-scanning-item.page.scss'],
 })
 export class TransferInScanningItemPage implements OnInit, OnDestroy {
+  
+  @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage
 
   constructor(
     public objectService: TransferInScanningService,
@@ -57,81 +60,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
     })
   }
 
-  /* #region barcode scanner */
-
-  async validateBarcode(barcode: string) {
-    try {
-      if (barcode) {
-        if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-          let found_barcode = await this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode === barcode);
-          if (found_barcode) {
-            let found_item_master = await this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-            if (found_item_master) {
-              let itemExistInLine = this.objectService.object.line.find(r => r.itemSku === found_barcode.sku);
-              if (itemExistInLine) {
-                let outputData: TransferInScanningLine = {
-                  id: 0,
-                  uuid: uuidv4(),
-                  transferInScanningId: 0,
-                  interTransferLineId: itemExistInLine.interTransferLineId,
-                  interTransferVariationId: itemExistInLine.interTransferVariationId,
-                  interTransferId: itemExistInLine.interTransferId,
-                  sequence: 0,
-                  itemId: itemExistInLine.itemId,
-                  itemCode: itemExistInLine.itemCode,
-                  itemSku: itemExistInLine.itemSku,
-                  itemDesc: itemExistInLine.itemDesc,
-                  xId: itemExistInLine.xId,
-                  xCd: itemExistInLine.xCd,
-                  xDesc: itemExistInLine.xDesc,
-                  yId: itemExistInLine.yId,
-                  yCd: itemExistInLine.yCd,
-                  yDesc: itemExistInLine.yDesc,
-                  barcode: itemExistInLine.barcode,
-                  lineQty: 1,
-                  qtyReceive: null,
-                  isDeleted: itemExistInLine.isDeleted
-                }
-                return outputData;
-              } else {
-                let outputData: TransferInScanningLine = {
-                  id: 0,
-                  uuid: uuidv4(),
-                  transferInScanningId: 0,
-                  interTransferLineId: null,
-                  interTransferVariationId: null,
-                  interTransferId: null,
-                  sequence: 0,
-                  itemId: found_item_master.id,
-                  itemCode: found_item_master.code,
-                  itemSku: found_barcode.sku,
-                  itemDesc: found_item_master.itemDesc,
-                  xId: found_barcode.xId,
-                  xCd: found_barcode.xCd,
-                  xDesc: found_barcode.xDesc,
-                  yId: found_barcode.yId,
-                  yCd: found_barcode.yCd,
-                  yDesc: found_barcode.yDesc,
-                  barcode: found_barcode.barcode,
-                  lineQty: 1,
-                  qtyReceive: null,
-                  isDeleted: false
-                }
-                return outputData;                
-              }
-            } else {
-              this.toastService.presentToast("", "Item not found.", "top", "warning", 1000);
-            }
-          } else {
-            this.toastService.presentToast("", "Barcode not found.", "top", "warning", 1000);
-          }
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   async onItemAdd(event: TransactionDetail[]) {
     try {
       if (event) {
@@ -158,10 +86,16 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
               yDesc: itemExistInLine.yDesc,
               barcode: itemExistInLine.barcode,
               lineQty: 1,
+              qtyRequest: 1,
               qtyReceive: null,
-              isDeleted: itemExistInLine.isDeleted
+              isDeleted: itemExistInLine.isDeleted,
+              unitPrice: itemExistInLine?.unitPrice,
+              unitPriceExTax: itemExistInLine?.unitPrice,
+              discountGroupCode: itemExistInLine?.discountGroupCode,
+              discountExpression: itemExistInLine?.discountExpression
             }
-            this.insertIntoLine(outputData);
+            await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
+            await this.insertIntoLine(outputData);
           } else {
             let outputData: TransferInScanningLine = {
               id: 0,
@@ -183,10 +117,16 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
               yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
               barcode: r.itemBarcode,
               lineQty: 1,
+              qtyRequest: 1,
               qtyReceive: null,
-              isDeleted: false
+              isDeleted: false,
+              unitPrice: r.itemPricing?.unitPrice,
+              unitPriceExTax: r.itemPricing?.unitPrice,
+              discountGroupCode: r.itemPricing?.discountGroupCode,
+              discountExpression: r.itemPricing?.discountExpression
             }
-            this.insertIntoLine(outputData);
+            await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
+            await this.insertIntoLine(outputData);
           }
         })
       }
@@ -197,20 +137,29 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
 
   /* #endregion */
 
-  insertIntoLine(event: TransferInScanningLine) {
+  async qtyInputBlur(event, rowIndex) {
+    if (rowIndex === null || rowIndex === undefined) {
+      this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+    } else {
+      this.objectService.object.line[rowIndex].qtyRequest = this.objectService.object.line[rowIndex].lineQty;
+      await this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
+    }
+  }
+
+  async insertIntoLine(event: TransferInScanningLine) {
     if (event) {
       if (this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
         let index = this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku);
         if (this.objectService.object.line[index].uuid === null) {
           this.objectService.object.line[index].uuid = event.uuid;
-          this.objectService.object.line[index].lineQty = event.lineQty;
-        } else {
-          this.objectService.object.line[index].lineQty += event.lineQty;
-        }
-        // if (this.objectService.object.line[index].lineQty !== null && (this.objectService.object.line[index].qtyReceive + 1) > this.objectService.object.line[index].lineQty) {
-        //   this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
-        // } else {
-        // }
+        } 
+        this.objectService.object.line[index].lineQty += event.lineQty;
+        this.objectService.object.line[index].qtyRequest = this.objectService.object.line[index].lineQty;
+        this.objectService.object.line[index].unitPrice = event?.unitPrice;
+        this.objectService.object.line[index].unitPriceExTax = event?.unitPrice;
+        this.objectService.object.line[index].discountGroupCode = event?.discountGroupCode;
+        this.objectService.object.line[index].discountExpression = event?.discountExpression;
+        await this.commonService.computeDiscTaxAmount(this.objectService.object.line[index], false, false, false, 2);
       } else {
         if (this.objectService.object.line && this.objectService.object.line.length > 0) {
           this.objectService.object.line.forEach(r => r.sequence += 1);
@@ -235,8 +184,11 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
             if (lineToDelete !== null && (lineToDelete.interTransferId !== null || lineToDelete.interTransferId > 0)) {
               this.objectService.object.line[rowIndex].uuid = null;
               this.objectService.object.line[rowIndex].lineQty = null;
+              this.objectService.object.line[rowIndex].qtyRequest = null;
+              await this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
             } else {
-              this.objectService.object.line.splice(rowIndex, 1);
+              await this.objectService.object.line.splice(rowIndex, 1);
+              this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
             }
           },
         },
@@ -273,12 +225,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
   async onDoneScanning(event) {
     try {
       if (event) {
-        let itemFound = await this.validateBarcode(event);
-        if (itemFound) {
-          this.insertIntoLine(itemFound);
-        } else {
-          this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
-        }
+        await this.barcodescaninput.validateBarcode(event);
       }
     } catch (e) {
       console.error(e);
@@ -301,14 +248,11 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
     })
   }
 
-  qtyOnBlur(rowIndex: number, qty: any) {
+  async qtyOnBlur(rowIndex: number, qty: any) {
     if (qty && Number(qty) > 0) {
-      // if (qty > this.objectService.object.line[rowIndex].lineQty) {
-      //   this.objectService.object.line[rowIndex].qtyReceive = this.objectService.object.line[rowIndex].lineQty;
-      //   this.toastService.presentToast("", "Received Qty cannot exceed Line Qty", "top", "warning", 1000);
-      // } else {
-        this.objectService.object.line[rowIndex].lineQty = Number(qty);
-      // }
+      this.objectService.object.line[rowIndex].lineQty = Number(qty);
+      this.objectService.object.line[rowIndex].qtyRequest = this.objectService.object.line[rowIndex].lineQty;
+      await this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
     }
   }
 
@@ -407,8 +351,18 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
       const { role } = await actionSheet.onWillDismiss();
 
       if (role === "confirm") {
-        this.objectService.resetVariables();
-        this.navController.navigateBack("/transactions/transfer-in-scanning");
+        if (this.objectService.object?.transferInScanningId > 0) {
+          let navigationExtras: NavigationExtras = {
+            queryParams: {
+              objectId: this.objectService.object.transferInScanningId
+            }
+          }
+          this.objectService.resetVariables();
+          this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-detail", navigationExtras);
+        } else {
+          this.objectService.resetVariables();
+          this.navController.navigateBack("/transactions/transfer-in-scanning");
+        }
       }
     } catch (e) {
       console.error(e);

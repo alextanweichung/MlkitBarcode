@@ -9,6 +9,7 @@ import { TransferInScanningItemPageRoutingModule } from './transfer-in-scanning-
 import { TransferInScanningItemPage } from './transfer-in-scanning-item.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
     IonicModule,
     TransferInScanningItemPageRoutingModule,
     IdMappingModule,
-    BarcodeScanInputPageModule
+    BarcodeScanInputPageModule,
+    SumModule
   ],
   declarations: [TransferInScanningItemPage]
 })
