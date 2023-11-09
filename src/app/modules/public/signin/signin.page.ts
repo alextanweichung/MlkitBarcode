@@ -60,24 +60,26 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
   }
 
   ionViewDidEnter(): void {
-    
+
   }
 
   companyNames: Map<string, string> = new Map([]);
   ngOnInit() {
     if (Capacitor.getPlatform() === "web") {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-      // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+      this.signin_form.get("userEmail").setValue("aychia@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
-      this.signin_form.get("userEmail").setValue("admin@idcp.my");
+      // this.signin_form.get("userEmail").setValue("admin@idcp.my");
+      // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
       // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
       // this.signin_form.get("userEmail").setValue("waynecon@idcp.my");
-      // this.signin_form.get("password").setValue("Dev8888");
+      this.signin_form.get("password").setValue("Dev8888");
       // this.signin_form.get("password").setValue("Dev9999");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("password").setValue("i@Dmin7026");
-      this.signin_form.get("password").setValue("c0nnecT#7026");
+      // this.signin_form.get("password").setValue("c0nnecT#7026");
+      // this.signin_form.get("password").setValue("String1234");
     } else {
       this.setSelectedParam();
     }
@@ -180,17 +182,17 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
               this.configService.selected_sys_param.password = "";
             }
             await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
-  
+
             // sync item master and item barcode
             try {
               // update current version to db
               this.commonService.saveVersion().subscribe(response => {
-  
+
               }, async error => {
                 await this.loadingService.dismissLoading();
                 console.error(error);
               })
-  
+
               let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
               if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
                 // for consignment user more than 1 location, go to dashboard and let user select then only sync
@@ -206,11 +208,11 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                 let itemMaster: PDItemMaster[] = response["itemMaster"];
                 let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
                 await this.configService.syncInboundData(itemMaster, itemBarcode);
-                   
+
                 let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
                 let marginConfig: PDMarginConfig[] = response2;
                 await this.configService.syncMarginConfig(marginConfig);
-  
+
                 await this.loadingService.dismissLoading();
                 await this.navController.navigateRoot("/dashboard");
               } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
@@ -233,13 +235,13 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                 //         text: "Ok",
                 //         cssClass: "success",
                 //         handler: async () => {
-                          await this.loadingService.showLoading("Downloading resources");
-                          let response = await this.commonService.syncInbound();
-                          let itemMaster: PDItemMaster[] = response["itemMaster"];
-                          let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
-                          await this.configService.syncInboundData(itemMaster, itemBarcode);
-                          await this.loadingService.dismissLoading();
-                          await this.navController.navigateRoot("/dashboard");
+                await this.loadingService.showLoading("Downloading resources");
+                let response = await this.commonService.syncInbound();
+                let itemMaster: PDItemMaster[] = response["itemMaster"];
+                let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+                await this.configService.syncInboundData(itemMaster, itemBarcode);
+                await this.loadingService.dismissLoading();
+                await this.navController.navigateRoot("/dashboard");
                 //         }
                 //       },
                 //       {
@@ -261,7 +263,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
               this.submit_attempt = false;
               await this.loadingService.dismissLoading();
               this.toastService.presentToast("", error.message, "top", "medium", 1000);
-            } finally {this.submit_attempt = false;
+            } finally {
+              this.submit_attempt = false;
               await this.loadingService.dismissLoading();
             }
           } else {
@@ -276,7 +279,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
               // show error if consignment user but no location set
               this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
             } else {
-              
+
             }
             this.submit_attempt = false;
             await this.loadingService.dismissLoading();
@@ -291,9 +294,9 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
     } catch (error) {
       await this.loadingService.dismissLoading();
       console.error(error);
-    } finally {      
+    } finally {
       await this.loadingService.dismissLoading();
-    } 
+    }
   }
 
   /* #region more action */
