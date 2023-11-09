@@ -7,6 +7,7 @@ import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
 import { ReportsService } from '../../services/reports.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-reports',
@@ -25,12 +26,14 @@ export class ReportsPage implements OnInit {
   showCheckCreditNote: boolean = false;
   showTransactionInquiry: boolean = false;
   showSalesAnalysis: boolean = false;
+  showCustomerDetail: boolean = false;
 
   constructor(
     private authService: AuthService,
     private objectService: ReportsService,
     private commonService: CommonService,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private navController: NavController,
   ) { }
 
@@ -47,6 +50,7 @@ export class ReportsPage implements OnInit {
           this.showCheckCreditNote = pageItems.findIndex(r => r.title === reportAppCode.mobileCheckCN) > -1;
           this.showTransactionInquiry = pageItems.findIndex(r => r.title === reportAppCode.mobileTrxInq) > -1;
           this.showSalesAnalysis = pageItems.findIndex(r => r.title === reportAppCode.mobileSalesAnalysis) > -1;
+          this.showCustomerDetail = pageItems.findIndex(r => r.title === reportAppCode.mobileCustomerDetail) > -1;
         }
       })
       this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
@@ -60,22 +64,33 @@ export class ReportsPage implements OnInit {
   }
 
   async downloadCustomerDetails() {
-    if (this.loginUser.salesAgentId) {
-      let paramModel: ReportParameterModel = {
-        appCode: "SMMD001",
-        format: "pdf",
-        documentIds: [this.loginUser.salesAgentId],
-        reportName: "Customer Listing By Latest Sales Agent",
+    try {
+      await this.loadingService.showLoading();
+      if (this.loginUser.salesAgentId) {
+        let paramModel: ReportParameterModel = {
+          appCode: "SMMD001",
+          format: "pdf",
+          documentIds: [this.loginUser.salesAgentId],
+          reportName: "Customer Listing By Latest Sales Agent",
+        }
+        let timestart = new Date();
+        await this.objectService.getPdf(paramModel).subscribe(async response => {
+          let timeend = new Date();
+          await this.loadingService.dismissLoading();
+          await this.commonService.commonDownloadPdf(response, "MyCustomerDetail." + paramModel.format);
+        }, async error => {
+          await this.loadingService.dismissLoading();
+          console.log(error);
+        })
+      } else {
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("", "Sales Agent not set", "top", "warning", 1000);
       }
-      let timestart = new Date();
-      await this.objectService.getPdf(paramModel).subscribe(async response => {
-        let timeend = new Date();
-        await this.commonService.commonDownloadPdf(response, "MyCustomerDetail." + paramModel.format);
-      }, error => {
-        console.log(error);
-      })
-    } else {
-      this.toastService.presentToast("", "Sales Agent not set", "top", "warning", 1000);
+    } catch (error) {
+      await this.loadingService.dismissLoading();
+      console.error(error);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
