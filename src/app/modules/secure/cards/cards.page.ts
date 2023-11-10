@@ -6,7 +6,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
+import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import { environment } from 'src/environments/environment';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -105,26 +105,26 @@ export class CardsPage implements OnInit, AfterContentChecked {
         if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
           if (this.configService.selected_consignment_location) {
             let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-            let itemMaster: PDItemMaster[] = response["itemMaster"];
-            let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+            let itemMaster: LocalItemMaster[] = response["itemMaster"];
+            let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
             await this.configService.syncInboundData(itemMaster, itemBarcode);
               
             this.configService.selected_consignment_location = loginUser.locationId[0];
             let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
-            let marginConfig: PDMarginConfig[] = response2;
+            let marginConfig: LocalMarginConfig[] = response2;
             await this.configService.syncMarginConfig(marginConfig);
           }
         }
         else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {    
           // sync by location since only 1 location
           let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-          let itemMaster: PDItemMaster[] = response["itemMaster"];
-          let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+          let itemMaster: LocalItemMaster[] = response["itemMaster"];
+          let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
           await this.configService.syncInboundData(itemMaster, itemBarcode);
             
           this.configService.selected_consignment_location = loginUser.locationId[0];
           let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
-          let marginConfig: PDMarginConfig[] = response2;
+          let marginConfig: LocalMarginConfig[] = response2;
           await this.configService.syncMarginConfig(marginConfig);
         } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
           // show error if consignment user but no location set
@@ -132,8 +132,8 @@ export class CardsPage implements OnInit, AfterContentChecked {
         } else {
           // download item master for other user
           let response = await this.commonService.syncInbound();
-          let itemMaster: PDItemMaster[] = response["itemMaster"];
-          let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+          let itemMaster: LocalItemMaster[] = response["itemMaster"];
+          let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
           await this.configService.syncInboundData(itemMaster, itemBarcode);
         }
       } catch (error) {

@@ -10,11 +10,11 @@ import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/a
 import { LoginUser } from 'src/app/services/auth/login-user';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
-import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
 
 @Component({
   selector: 'app-dashboard',
@@ -274,12 +274,12 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
       try {
         await this.loadingService.showLoading("Downloading resources");
         let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-        let itemMaster: PDItemMaster[] = response["itemMaster"];
-        let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+        let itemMaster: LocalItemMaster[] = response["itemMaster"];
+        let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
 
         let response2 = await this.commonService.syncMarginConfig(this.configService.selected_consignment_location);
-        let marginConfig: PDMarginConfig[] = response2;
+        let marginConfig: LocalMarginConfig[] = response2;
         await this.configService.syncMarginConfig(marginConfig);
 
         await this.loadingService.dismissLoading();

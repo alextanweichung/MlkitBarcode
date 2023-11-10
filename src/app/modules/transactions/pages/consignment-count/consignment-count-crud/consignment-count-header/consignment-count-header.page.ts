@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonDatetime, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 import { ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -51,18 +52,27 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
       printCount: [null],
       rack: [null],
       zone: [null],
-      sourceType: ["M"]
+      sourceType: ["M"],
+      isLocal: [null],
+      guid: [null],
+      lastUpdated: [null]
     });
   }
 
-  ionViewWillEnter(): void {
-    this.bindLocationList();
+  async ionViewWillEnter(): Promise<void> {
+    await this.setFormattedDateString();
+    await this.bindLocationList();
+    if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
+
+    } else {
+      await this.objectForm.patchValue(this.objectService.objectHeader);
+      this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
+      await this.setFormattedDateString();
+    }
   }
 
   ionViewDidEnter(): void {
-    if (this.objectService.objectHeader !== null || this.objectService.objectHeader !== undefined) {
-      this.objectForm.patchValue(this.objectService.objectHeader);
-    }
+    
   }
 
   ngOnInit() {
@@ -136,7 +146,17 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
     const { role } = await actionSheet.onWillDismiss();
 
     if (role === "confirm") {
-      if (this.objectService.objectHeader && this.objectService.objectHeader.consignmentCountId > 0) {
+      if (this.objectService.objectHeader.isLocal) {
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            objectId: 0,
+            isLocal: true,
+            guid: this.objectService.objectHeader.guid
+          }
+        }
+        this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+      }      
+      else if (this.objectService.objectHeader && this.objectService.objectHeader.consignmentCountId > 0) {
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectService.objectHeader.consignmentCountId
@@ -157,6 +177,32 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
     let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
     await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
     this.navController.navigateForward("/transactions/consignment-count/consignment-count-item");
+  }
+
+  /* #endregion */
+
+  /* #region calendar handle here */
+
+  formattedDateString: string = "";
+  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  maxDate = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+  @ViewChild("datetime") datetime: IonDatetime
+  setFormattedDateString() {
+    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+  }
+  
+  onTrxDateSelected(value: any) {
+    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+    this.setFormattedDateString();
+    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+  }
+
+  dateDismiss() {
+    this.datetime.cancel(true);
+  }
+
+  dateSelect() {
+    this.datetime.confirm(true);
   }
 
   /* #endregion */

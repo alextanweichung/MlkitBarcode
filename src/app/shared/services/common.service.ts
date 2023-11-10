@@ -13,7 +13,7 @@ import { UntypedFormGroup } from '@angular/forms';
 import { MasterListDetails } from '../models/master-list-details';
 import { MasterList } from '../models/master-list';
 import { format } from 'date-fns';
-import { PDMarginConfig } from '../models/pos-download';
+import { LocalMarginConfig } from '../models/pos-download';
 import { ConsignmentSalesHeader } from 'src/app/modules/transactions/models/consignment-sales';
 
 @Injectable({
@@ -65,7 +65,7 @@ export class CommonService {
   }
 
   syncMarginConfig(locationId: number) {
-    return this.http.post<PDMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", [locationId]).toPromise();
+    return this.http.post<LocalMarginConfig[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/marginConfig", [locationId]).toPromise();
   }
 
   saveVersion() {
@@ -333,9 +333,11 @@ export class CommonService {
     let factor = Math.pow(10, precision);
     try {
       if (inputNumber) {
-        return Math.round(Number((inputNumber * factor).toFixed(precision))) / factor;
-      } else {
+        return Math.round(Number(inputNumber * factor)) / factor;
+      } else if (inputNumber === 0) {
         return 0;
+      } else {
+        return null;
       }
     } catch (e) {
       console.error(e);
@@ -510,19 +512,19 @@ export class CommonService {
       if (Capacitor.getPlatform() === 'android') {
         await this.file.writeFile(this.file.externalApplicationStorageDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
           await this.opener.open(this.file.externalApplicationStorageDirectory + object.filesName + object.filesType, "application/pdf");
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         }).catch(async (error) => {
           console.log(`this.file.writeFile ${JSON.stringify(error)}`);
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         })
       } else if (Capacitor.getPlatform() === 'ios') {
         this.file.writeFile(this.file.tempDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
           if (mimeType) {
             await this.opener.open(this.file.tempDirectory + object.filesName + object.filesType, mimeType);
           }
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         }).catch(async (error) => {
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         })
       } else {
         const url = window.URL.createObjectURL(file);
@@ -532,11 +534,13 @@ export class CommonService {
         window.document.body.appendChild(link);
         link.click();
         link.remove();
-        this.loadingService.dismissLoading();
+        await this.loadingService.dismissLoading();
       }
     } catch (e) {
-      this.loadingService.dismissLoading();
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 
@@ -573,17 +577,17 @@ export class CommonService {
       if (Capacitor.getPlatform() === 'android') {
         await this.file.writeFile(this.file.externalApplicationStorageDirectory, filename, file, { replace: true }).then(async () => {
           await this.opener.open(this.file.externalApplicationStorageDirectory + filename, "application/pdf");
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         }).catch(async (error) => {
+          await this.loadingService.dismissLoading();
           console.log(`this.file.writeFile ${JSON.stringify(error)}`);
-          this.loadingService.dismissLoading();
         })
       } else if (Capacitor.getPlatform() === 'ios') {
         await this.file.writeFile(this.file.tempDirectory, filename, file, { replace: true }).then(async () => {
           await this.opener.open(this.file.tempDirectory + filename, "application/pdf");
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         }).catch(async (error) => {
-          this.loadingService.dismissLoading();
+          await this.loadingService.dismissLoading();
         })
       } else {
         const url = window.URL.createObjectURL(file);
@@ -593,11 +597,13 @@ export class CommonService {
         window.document.body.appendChild(link);
         link.click();
         link.remove();
-        this.loadingService.dismissLoading();
+        await this.loadingService.dismissLoading();
       }
     } catch (e) {
-      this.loadingService.dismissLoading();
+      await this.loadingService.dismissLoading();
       console.error(e);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 

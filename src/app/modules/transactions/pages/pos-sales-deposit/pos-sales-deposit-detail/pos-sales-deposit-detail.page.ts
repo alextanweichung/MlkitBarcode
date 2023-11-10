@@ -65,11 +65,9 @@ export class PosSalesDepositDetailPage implements OnInit, ViewWillEnter {
       this.object = null;
       this.objectService.getSalesDepositById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: pos-sales-deposit-detail.page.ts:77 ~ PosSalesDepositDetailPage ~ this.objectService.getSalesDepositById ~ this.object:", this.object)
       }, error => {
         console.log(error);
-      })
-      
+      })      
     }
   }
 

@@ -10,7 +10,7 @@ export interface ConsignmentCountHeader {
   consignmentCountId: number
   consignmentCountNum: string
   description: string
-  trxDate: string
+  trxDate: Date
   trxDateTime: string
   locationId: number
   consignmentCountUDField1: string
@@ -32,6 +32,11 @@ export interface ConsignmentCountHeader {
   modifiedBy: string
   modifiedAt: string
   deactivated: boolean
+
+  // local use
+  isLocal: boolean
+  guid: string
+  lastUpdated: Date
 }
 
 export interface ConsignmentCountDetail {

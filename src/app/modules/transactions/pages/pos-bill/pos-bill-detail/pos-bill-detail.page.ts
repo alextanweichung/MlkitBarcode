@@ -77,7 +77,6 @@ export class PosBillDetailPage implements OnInit, ViewWillEnter {
       this.object = null;
       this.objectService.getSalesBillById(this.objectId).subscribe(response => {
         this.object = response;
-        console.log("🚀 ~ file: pos-bill-detail.page.ts:77 ~ PosBillDetailPage ~ this.objectService.getSalesBillById ~ this.object:", this.object)
       }, error => {
         console.log(error);
       })

@@ -37,9 +37,9 @@ export class CommonQueryService<T> {
     try {
       let ret: Map<string, Object> = new Map<string, Object>();
       for (var prop in object) {
-        if (this.getColType(object[prop]) === "Date") {
+        if (this.getColType(object[prop]) === 'Date') {
           ret.set(prop, this.convertDateString(object[prop]));
-        } else if (this.getColType(object[prop]) === "boolean") {
+        } else if (this.getColType(object[prop]) === 'boolean') {
           ret.set(prop, object[prop] ? 1 : 0);
         } else {
           ret.set(prop, object[prop]);
@@ -54,10 +54,10 @@ export class CommonQueryService<T> {
   private getColType(col: Object) {
     try {
       if (typeof col === 'object') {
-        if (Object.prototype.toString.call(col) === "[object Date]") {
-          return "Date";
+        if (Object.prototype.toString.call(col) === '[object Date]') {
+          return 'Date';
         } else {
-          return "Unknown";
+          return 'Unknown';
         }
       } else {
         return typeof col;
@@ -113,16 +113,16 @@ export class CommonQueryService<T> {
 
       for (const key of cols.keys()) {
         switch (this.getColType(cols.get(key))) {
-          case "number":
+          case 'number':
             sqlCols += ` ${key},`;
             sqlParams += `${cols.get(key)},`;
             break;
-          case "boolean":
+          case 'boolean':
             sqlCols += ` ${key},`;
             sqlParams += `${cols.get(key)},`;
             break;
-          case "string":
-          case "Date":
+          case 'string':
+          case 'Date':
             sqlCols += ` ${key},`;
             sqlParams += `'${cols.get(key)}',`;
             break;
@@ -155,18 +155,18 @@ export class CommonQueryService<T> {
 
           for (const key of cols.keys()) {
             switch (this.getColType(cols.get(key))) {
-              case "number":
+              case 'number':
                 sqlCols += ` ${key},`;
                 sqltest += '?,';
                 sqlParams += `${cols.get(key)},`;
                 break;
-              case "boolean":
+              case 'boolean':
                 sqlCols += ` ${key},`;
                 sqltest += '?,';
                 sqlParams += `${cols.get(key)},`;
                 break;
-              case "string":
-              case "Date":
+              case 'string':
+              case 'Date':
                 sqlCols += ` ${key},`;
                 sqltest += '?,';
                 sqlParams += `${cols.get(key)},`;
@@ -219,22 +219,21 @@ export class CommonQueryService<T> {
       let primaryKey = '';
 
       for (const key of cols.keys()) {
-        if (key.toLowerCase() === (table.toLowerCase() + "id")) {
+        if (key.toLowerCase() === (table.toLowerCase() + 'id') || key.toLowerCase() === 'id') {
           primaryKey += ` ${key} = '${cols.get(key)}'`;
         } else {
           switch (this.getColType(cols.get(key))) {
-            case "number":
-            case "boolean":
+            case 'number':
+            case 'boolean':
               sql += `${key} = ${cols.get(key)},`;
               break;
-            case "string":
-            case "Date":
+            case 'string':
+            case 'Date':
               sql += `${key} = '${cols.get(key)}',`;
               break;
           }
         }
       }
-
 
       sql = sql.substring(0, sql.length - 1).trimStart();
       primaryKey = primaryKey.trimStart();
@@ -260,16 +259,16 @@ export class CommonQueryService<T> {
       let primaryKey = '';
 
       for (const key of cols.keys()) {
-        if (key.toLowerCase() === (table.toLowerCase() + "id")) {
-          primaryKey += ` ${key} = ${cols.get(key)}`;
+        if (key.toLowerCase() === (table.toLowerCase() + 'id') || key.toLowerCase() === 'id') {
+          primaryKey += ` ${key} = '${cols.get(key)}'`;
         } else {
           switch (this.getColType(cols.get(key))) {
-            case "number":
-            case "boolean":
+            case 'number':
+            case 'boolean':
               sql += `${key} = ${cols.get(key)},`;
               break;
-            case "string":
-            case "Date":
+            case 'string':
+            case 'Date':
               sql += `${key} = '${cols.get(key)}',`;
               break;
           }
@@ -344,16 +343,16 @@ export class CommonQueryService<T> {
 
         for (const key of cols.keys()) {
           switch (this.getColType(cols.get(key))) {
-            case "number":
+            case 'number':
               sqlCols += ` ${key},`;
               sqlQMarks += '?,';
               break;
-            case "boolean":
+            case 'boolean':
               sqlCols += ` ${key},`;
               sqlQMarks += '?,';
               break;
-            case "string":
-            case "Date":
+            case 'string':
+            case 'Date':
               sqlCols += ` ${key},`;
               sqlQMarks += '?,';
               break;
@@ -378,14 +377,14 @@ export class CommonQueryService<T> {
 
           for (const key of cols.keys()) {
             switch (this.getColType(cols.get(key))) {
-              case "number":
+              case 'number':
                 sqlParams += `${cols.get(key)}~`;
                 break;
-              case "boolean":
+              case 'boolean':
                 sqlParams += `${cols.get(key)}~`;
                 break;
-              case "string":
-              case "Date":
+              case 'string':
+              case 'Date':
                 sqlParams += `${cols.get(key)}~`;
                 break;
               default:
@@ -419,11 +418,6 @@ export class CommonQueryService<T> {
       console.error(e);
     }
   }
-
-  /* #endregion */
-
-  /* #region  */
-
 
   /* #endregion */
 

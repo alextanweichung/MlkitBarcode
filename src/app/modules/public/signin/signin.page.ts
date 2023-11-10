@@ -7,11 +7,11 @@ import { environment } from 'src/environments/environment';
 import { LoginRequest, LoginUser } from 'src/app/services/auth/login-user';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
 import { format } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
 
 @Component({
   selector: 'app-signin',
@@ -67,8 +67,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
   ngOnInit() {
     if (Capacitor.getPlatform() === "web") {
       // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-      this.signin_form.get("userEmail").setValue("aychia@idcp.my");
-      // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
+      // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+      this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
       // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
       // this.signin_form.get("userEmail").setValue("admin@idcp.my");
       // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
@@ -205,12 +205,12 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                 await this.loadingService.showLoading("Downloading resources");
 
                 let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-                let itemMaster: PDItemMaster[] = response["itemMaster"];
-                let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+                let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
                 await this.configService.syncInboundData(itemMaster, itemBarcode);
 
                 let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
-                let marginConfig: PDMarginConfig[] = response2;
+                let marginConfig: LocalMarginConfig[] = response2;
                 await this.configService.syncMarginConfig(marginConfig);
 
                 await this.loadingService.dismissLoading();
@@ -237,8 +237,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                 //         handler: async () => {
                 await this.loadingService.showLoading("Downloading resources");
                 let response = await this.commonService.syncInbound();
-                let itemMaster: PDItemMaster[] = response["itemMaster"];
-                let itemBarcode: PDItemBarcode[] = response["itemBarcode"];
+                let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
                 await this.configService.syncInboundData(itemMaster, itemBarcode);
                 await this.loadingService.dismissLoading();
                 await this.navController.navigateRoot("/dashboard");

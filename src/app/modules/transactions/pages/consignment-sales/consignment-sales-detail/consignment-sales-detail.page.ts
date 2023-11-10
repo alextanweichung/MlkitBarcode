@@ -152,7 +152,6 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
     }
   }
 
-
   /* #region more action popover */
 
   isPopoverOpen: boolean = false;

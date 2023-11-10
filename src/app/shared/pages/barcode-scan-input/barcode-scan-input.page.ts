@@ -5,7 +5,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from '../../models/master-list-details';
 import { ModuleControl } from '../../models/module-control';
-import { PDItemBarcode, PDItemMaster } from '../../models/pos-download';
+import { LocalItemBarcode, LocalItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
@@ -181,8 +181,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       this.availableItemmmm = [];
       this.availableVariations = [];
       this.availableVariationsByItemId = [];
-      let found_item_master: PDItemMaster[] = [];
-      let found_item_barcode: PDItemBarcode[] = [];
+      let found_item_master: LocalItemMaster[] = [];
+      let found_item_barcode: LocalItemBarcode[] = [];
       if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
         let found = this.configService.item_Masters.filter(r => r.code.length > 0).filter(r => r.code.toUpperCase().includes(searchValue.toUpperCase())); // if found by itemCode
         if (found && found.length > 0) {

@@ -52,7 +52,6 @@ export class RefundApprovalsPage implements OnInit, ViewWillEnter {
     try {
       await this.loadingService.showLoading();
       this.transactionProcessingService.getObjects(format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd"), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(async response => {
-        console.log("🚀 ~ file: refund-approvals.page.ts:62 ~ RefundApprovalsPage ~ this.transactionProcessingService.getProcessingDocumentByDateRange ~ response:", response)
         this.fullDocList = response;
         this.pendingDocList = this.fullDocList.filter(r => r.isApproved === null);
         this.completedDocList = this.fullDocList.filter(r => (r.isApproved === true || r.isApproved === false));

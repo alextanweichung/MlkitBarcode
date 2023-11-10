@@ -6,6 +6,7 @@ import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountRoot } 
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
+import { LocalTransaction } from "src/app/shared/models/pos-download";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -56,6 +57,11 @@ export class ConsignmentCountService {
     this.objectDetail = objectDetail;
   }
 
+  localObject: LocalTransaction;
+  setLocalObject(localObject: LocalTransaction) {
+    this.localObject = localObject;
+  }
+
   removeHeader() {
     this.objectHeader = null
   }
@@ -64,9 +70,14 @@ export class ConsignmentCountService {
     this.objectDetail = [];
   }
 
+  removeLocalObject() {
+    this.localObject = null;
+  }
+
   resetVariables() {
     this.removeHeader();
     this.removeLines();
+    this.removeLocalObject();
     this.configService.removeFromLocalStorage(this.trxKey);
   }
 

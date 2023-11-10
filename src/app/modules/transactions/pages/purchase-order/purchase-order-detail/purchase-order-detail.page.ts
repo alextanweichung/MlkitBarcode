@@ -11,6 +11,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-purchase-order-detail',
@@ -31,13 +32,14 @@ export class PurchaseOrderDetailPage implements OnInit {
   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
 
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private navController: NavController,
-    private toastService: ToastService,
     private objectService: PurchaseOrderService,
-    private alertController: AlertController,
+    private authService: AuthService,
     private commonService: CommonService,
+    private toastService: ToastService,
+    private loadingService: LoadingService,
+    private navController: NavController,
+    private alertController: AlertController,
+    private route: ActivatedRoute,
   ) {
     this.route.queryParams.subscribe(params => {
       this.objectId = params['objectId'];
@@ -133,21 +135,21 @@ export class PurchaseOrderDetailPage implements OnInit {
 
   async presentAlertViewPdf() {
     const alert = await this.alertController.create({
-      header: 'Download PDF?',
-      message: '',
+      header: "Download PDF?",
+      message: "",
       buttons: [
         {
-          text: 'OK',
-          cssClass: 'success',
-          role: 'confirm',
+          text: "OK",
+          cssClass: "success",
+          role: "confirm",
           handler: async () => {
             await this.downloadPdf();
           },
         },
         {
-          cssClass: 'cancel',
-          text: 'Cancel',
-          role: 'cancel'
+          cssClass: "cancel",
+          text: "Cancel",
+          role: "cancel"
         },
       ]
     });
@@ -155,12 +157,22 @@ export class PurchaseOrderDetailPage implements OnInit {
   }
 
   async downloadPdf() {
-    this.objectService.downloadPdf("IMPC002", "pdf", this.object.header.purchaseOrderId).subscribe(response => {
-      let filename = this.object.header.purchaseOrderNum + ".pdf";
-      this.commonService.commonDownloadPdf(response, filename);
-    }, error => {
-      console.log(error);
-    })
+    try {
+      await this.loadingService.showLoading();
+      this.objectService.downloadPdf("IMPC002", "pdf", this.object.header.purchaseOrderId).subscribe(async response => {
+        let filename = this.object.header.purchaseOrderNum + ".pdf";
+        await this.loadingService.dismissLoading();
+        this.commonService.commonDownloadPdf(response, filename);
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.log(error);
+      })
+    } catch (error) {
+      await this.loadingService.dismissLoading();
+      console.error(error);
+    } finally {
+      await this.loadingService.dismissLoading();
+    }
   }
 
   /* #endregion */

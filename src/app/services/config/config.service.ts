@@ -4,7 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { dbConfig, inboundDb_Tables } from 'src/app/shared/database/config/db-config';
 import { CommonQueryService } from 'src/app/shared/database/interface/common-query.service';
 import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/tables';
-import { PDItemBarcode, PDItemMaster, PDMarginConfig } from 'src/app/shared/models/pos-download';
+import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig, LocalTransaction } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
 
@@ -15,9 +15,9 @@ export class ConfigService {
 
   sys_parameter: Sys_Parameter[] = [];
   selected_sys_param: Sys_Parameter;
-  item_Masters: PDItemMaster[] = [];
-  item_Barcodes: PDItemBarcode[] = [];
-  margin_Configs: PDMarginConfig[] = [];
+  item_Masters: LocalItemMaster[] = [];
+  item_Barcodes: LocalItemBarcode[] = [];
+  margin_Configs: LocalMarginConfig[] = [];
   selected_consignment_location: number;
 
   constructor(
@@ -126,7 +126,7 @@ export class ConfigService {
 
   /* #region inbound */
 
-  async syncInboundData(itemMasters: PDItemMaster[], itemBarcodes: PDItemBarcode[]) {
+  async syncInboundData(itemMasters: LocalItemMaster[], itemBarcodes: LocalItemBarcode[]) {
     try {
       await this.commonQueryService.syncInboundData(inboundDb_Tables.item_Master, itemMasters);
       this.item_Masters = itemMasters;
@@ -146,7 +146,7 @@ export class ConfigService {
     }
   }
 
-  async syncMarginConfig(marginConfigs: PDMarginConfig[]) {
+  async syncMarginConfig(marginConfigs: LocalMarginConfig[]) {
     try {      
       await this.commonQueryService.syncInboundData(inboundDb_Tables.margin_Config, marginConfigs);
       this.margin_Configs = marginConfigs;
@@ -156,9 +156,9 @@ export class ConfigService {
     }
   }
 
-  async loadItemMaster(): Promise<PDItemMaster[]> {
+  async loadItemMaster(): Promise<LocalItemMaster[]> {
     try {
-      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.item_Master, dbConfig.inbounddb) as PDItemMaster[];
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.item_Master, dbConfig.inbounddb) as LocalItemMaster[];
       this.item_Masters = ret;
       return this.item_Masters;
     } catch (e) {
@@ -166,9 +166,9 @@ export class ConfigService {
     }
   }
 
-  async loadItemBarcode(): Promise<PDItemBarcode[]> {
+  async loadItemBarcode(): Promise<LocalItemBarcode[]> {
     try {
-      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.item_Barcode, dbConfig.inbounddb) as PDItemBarcode[];
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.item_Barcode, dbConfig.inbounddb) as LocalItemBarcode[];
       this.item_Barcodes = ret;
       return this.item_Barcodes;
     } catch (e) {
@@ -176,13 +176,58 @@ export class ConfigService {
     }
   }
 
-  async loadMarginConfig(): Promise<PDMarginConfig[]> {
+  async loadMarginConfig(): Promise<LocalMarginConfig[]> {
     try {
-      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.margin_Config, dbConfig.inbounddb) as PDMarginConfig[];
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.margin_Config, dbConfig.inbounddb) as LocalMarginConfig[];
       this.margin_Configs = ret;
       return this.margin_Configs;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async insertLocalTransaction(localTrx: LocalTransaction): Promise<LocalTransaction> {
+    try {
+      let ret = await this.commonQueryService.insert(localTrx, inboundDb_Tables.local_Transaction, dbConfig.inbounddb) as LocalTransaction;
+      return ret;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updateLocalTransaction(localTrx: LocalTransaction): Promise<LocalTransaction> {
+    try {
+      let ret = await this.commonQueryService.update(localTrx, inboundDb_Tables.local_Transaction, dbConfig.inbounddb) as LocalTransaction;
+      return ret;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getLocalTransaction(trxType: string): Promise<LocalTransaction[]> {
+    try {
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.local_Transaction, dbConfig.inbounddb) as LocalTransaction[];
+      return ret.filter(r => r.apiUrl === this.selected_sys_param.apiUrl && r.trxType === trxType);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getLocalTransactionById(trxType: string, guid: string): Promise<LocalTransaction> {
+    try {
+      let ret = await this.commonQueryService.selectAll(inboundDb_Tables.local_Transaction, dbConfig.inbounddb) as LocalTransaction[];
+      return ret.find(r => r.apiUrl === this.selected_sys_param.apiUrl && r.trxType === trxType && r.id === guid && r.apiUrl === this.selected_sys_param.apiUrl);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async deleteLocalTransaction(trxType: string, localTrx: LocalTransaction): Promise<number> {    
+    try {
+      let ret = await this.commonQueryService.delete(localTrx, inboundDb_Tables.local_Transaction, dbConfig.inbounddb);
+      return ret;
+    } catch (error) {
+      console.error(error);
     }
   }
 

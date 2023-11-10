@@ -1,4 +1,4 @@
-export interface PDItemMaster {
+export interface LocalItemMaster {
   id: number
   code: string
   itemDesc: string
@@ -30,7 +30,7 @@ export interface PDItemMaster {
   imgUrl: string
 }
 
-export interface PDItemBarcode {
+export interface LocalItemBarcode {
   id: number
   itemId: number
   xId: any
@@ -46,7 +46,7 @@ export interface PDItemBarcode {
   qty: number
 }
 
-export interface PDMarginConfig {
+export interface LocalMarginConfig {
   id: number
   trxDate: Date
   locId: number
@@ -56,4 +56,12 @@ export interface PDMarginConfig {
   hLevel: number
   mPct: number
   bPct: number
+}
+
+export interface LocalTransaction {
+  id: string
+  apiUrl: string
+  trxType: string
+  lastUpdated: Date
+  jsonData: string
 }

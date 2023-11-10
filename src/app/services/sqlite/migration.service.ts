@@ -11,81 +11,83 @@ export const create_item_barcode_table: string = `CREATE TABLE IF NOT EXISTS ITE
 
 export const create_margin_config_table: string = `CREATE TABLE IF NOT EXISTS MARGIN_CONFIG (id INTEGER, trxDate DATE, locId INTEGER, type VARCHAR(20), typeId INTEGER, discCode VARCHAR(20), hLevel INTEGER, mPct DECIMAL(6,0), bPct DECIMAL(6,0));`;
 
-// export const create_local_transaction_table: string = `CREATE TABLE IF NOT EXISTS LOCAL_TRANSACTION (id GUID PRIMARY KEY, trxType VARCHAR(100), lastUpdated DATE, jsonData TEXT)`
+export const create_local_transaction_table: string = `CREATE TABLE IF NOT EXISTS LOCAL_TRANSACTION (id GUID PRIMARY KEY, apiUrl VARCHAR(255), trxType VARCHAR(100), lastUpdated DATE, jsonData TEXT)`
 
 export const delete_inbound_tables: string = `DROP TABLE IF EXISTS ITEM_MASTER; DROP TABLE IF EXISTS ITEM_BARCODE; DROP TABLE IF EXISTS MARGIN_CONFIG;`;
 
 @Injectable()
 export class MigrationService {
 
-  constructor(private sqliteService: SQLiteService, private databaseService: DatabaseService) {
-  }
+	constructor(
+		private sqliteService: SQLiteService,
+		private databaseService: DatabaseService
+	) { }
 
-  async migrate(): Promise<any> {
-    await this.createSystemParamTable();
-    // await this.addSystemParamCol();
-    await this.deleteInboundTables();
-    await this.createInboundTables();
-  }
+	async migrate(): Promise<any> {
+		await this.createSystemParamTable();
+		// await this.addSystemParamCol();
+		await this.deleteInboundTables();
+		await this.createInboundTables();
+	}
 
-  async createSystemParamTable(): Promise<void> {
-    console.log(`going to create a connection`)
-    const db = await this.sqliteService.createConnection(dbConfig.idcpcore, false, "no-encryption", 1);
-    console.log(`db ${JSON.stringify(db)}`);
+	async createSystemParamTable(): Promise<void> {
+		console.log(`going to create a connection`)
+		const db = await this.sqliteService.createConnection(dbConfig.idcpcore, false, "no-encryption", 1);
+		console.log(`db ${JSON.stringify(db)}`);
 
-    await db.open();
-    console.log(`after db.open`);
+		await db.open();
+		console.log(`after db.open`);
 
-    console.log(`query ${sys_Parameter_Table}`);
-    const ret: any = await db.execute(sys_Parameter_Table);
-    console.log(`ret: ${JSON.stringify(ret)}`);
+		console.log(`query ${sys_Parameter_Table}`);
+		const ret: any = await db.execute(sys_Parameter_Table);
+		console.log(`ret: ${JSON.stringify(ret)}`);
 
-    await this.sqliteService.closeConnection(dbConfig.idcpcore);
-    console.log(`after closeConnection`);
-  }
+		await this.sqliteService.closeConnection(dbConfig.idcpcore);
+		console.log(`after closeConnection`);
+	}
 
-  async deleteInboundTables(): Promise<void> {
-    console.log(`going to create a connection`)
-    const db = await this.sqliteService.createConnection(dbConfig.inbounddb, false, "no-encryption", 1);
-    console.log(`db ${JSON.stringify(db)}`);
+	async deleteInboundTables(): Promise<void> {
+		console.log(`going to create a connection`)
+		const db = await this.sqliteService.createConnection(dbConfig.inbounddb, false, "no-encryption", 1);
+		console.log(`db ${JSON.stringify(db)}`);
 
-    await db.open();
-    console.log(`after db.open`);
-    
-    console.log(`query ${delete_inbound_tables}`);
-    const ret: any = await db.execute(delete_inbound_tables);
-    console.log(`ret: ${JSON.stringify(ret)}`);
+		await db.open();
+		console.log(`after db.open`);
 
-    await this.sqliteService.closeConnection(dbConfig.inbounddb);
-    console.log(`after closeConnection`);
-  }
+		console.log(`query ${delete_inbound_tables}`);
+		const ret: any = await db.execute(delete_inbound_tables);
+		console.log(`ret: ${JSON.stringify(ret)}`);
 
-  async createInboundTables(): Promise<void> {
-    console.log(`going to create a connection`)
-    const db = await this.sqliteService.createConnection(dbConfig.inbounddb, false, "no-encryption", 1);
-    console.log(`db ${JSON.stringify(db)}`);
+		await this.sqliteService.closeConnection(dbConfig.inbounddb);
+		console.log(`after closeConnection`);
+	}
 
-    await db.open();
-    console.log(`after db.open`);
-    
-    console.log(`query ${create_item_master_table}`);
-    const ret: any = await db.execute(create_item_master_table);
-    console.log(`ret: ${JSON.stringify(ret)}`);
-    
-    console.log(`query ${create_item_barcode_table}`);
-    const ret2: any = await db.execute(create_item_barcode_table);
-    console.log(`ret: ${JSON.stringify(ret2)}`);
-    
-    console.log(`query ${create_margin_config_table}`);
-    const ret3: any = await db.execute(create_margin_config_table);
-    console.log(`ret: ${JSON.stringify(ret3)}`);
+	async createInboundTables(): Promise<void> {
+		console.log(`going to create a connection`)
+		const db = await this.sqliteService.createConnection(dbConfig.inbounddb, false, "no-encryption", 1);
+		console.log(`db ${JSON.stringify(db)}`);
 
-    // console.log(`query ${create_local_transaction_table}`);
-    // const ret4: any = await db.execute(create_local_transaction_table);
-    // console.log(`ret: ${JSON.stringify(ret4)}`);
+		await db.open();
+		console.log(`after db.open`);
 
-    await this.sqliteService.closeConnection(dbConfig.inbounddb);
-    console.log(`after closeConnection`);
-  }
+		console.log(`query ${create_item_master_table}`);
+		const ret: any = await db.execute(create_item_master_table);
+		console.log(`ret: ${JSON.stringify(ret)}`);
+
+		console.log(`query ${create_item_barcode_table}`);
+		const ret2: any = await db.execute(create_item_barcode_table);
+		console.log(`ret: ${JSON.stringify(ret2)}`);
+
+		console.log(`query ${create_margin_config_table}`);
+		const ret3: any = await db.execute(create_margin_config_table);
+		console.log(`ret: ${JSON.stringify(ret3)}`);
+
+		console.log(`query ${create_local_transaction_table}`);
+		const ret4: any = await db.execute(create_local_transaction_table);
+		console.log(`ret: ${JSON.stringify(ret4)}`);
+
+		await this.sqliteService.closeConnection(dbConfig.inbounddb);
+		console.log(`after closeConnection`);
+	}
 
 }

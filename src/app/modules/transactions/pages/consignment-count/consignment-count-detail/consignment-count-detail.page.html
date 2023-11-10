@@ -1,20 +1,50 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
+    <ion-title *ngIf="!objectService.objectHeader?.isLocal">
       <div class="ion-text-wrap">
-        {{object?.header?.consignmentCountNum}}
+        {{objectService.objectHeader?.consignmentCountNum}}
+      </div>
+    </ion-title>
+    <ion-title *ngIf="objectService.objectHeader?.isLocal">
+      <div class="ion-text-wrap">
+        DATA-{{objectService.objectHeader?.lastUpdated|date:"yyMMddhhmmss"}}     
       </div>
     </ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
     <ion-buttons slot="primary">
+      <ion-button (click)="showPopover($event)">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="primary">
       <ion-button (click)="edit()">
         <ion-icon slot="icon-only" name="create-outline"></ion-icon>
       </ion-button>
-    </ion-buttons>
+    </ion-buttons> -->
   </ion-toolbar>
 </ion-header>
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item (click)="popover.dismiss(); edit()">
+          <ion-icon name="create-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Edit</div>
+          </ion-label>
+        </ion-item>
+        <ion-item (click)="popover.dismiss(); deleteLocal()" *ngIf="objectService.objectHeader.isLocal">
+          <ion-icon name="trash-outline" slot="end"></ion-icon>
+          <ion-label>
+            <div>Delete</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 <ion-content fullscreen>
   <div class="p-2" *ngIf="objectService.objectHeader">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -22,26 +52,35 @@
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
-              <div class="font-bold">Doc. Num.</div>
-              <div>{{object.header.consignmentCountNum}}</div>
+              <div class="font-bold">Doc. Date</div>
+              <ng-container *ngIf="objectService.objectHeader.isLocal">
+                <div class="ion-flex">
+                  <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="objectService.objectHeader.isLocal&&objectService.objectHeader.consignmentCountId===0?'color-danger':'color-warning'"></ion-icon>
+                  <div class="font-bold">DATA-{{objectService.objectHeader.lastUpdated|date:"yyMMddhhmmss"}}</div>
+                  <span class="badge-green ion-text-wrap ion-flex px-1 mx-1 my-auto"> LOCAL</span>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="!objectService.objectHeader.isLocal">
+                <div class="font-bold">{{objectService.objectHeader.consignmentCountNum}}</div>
+              </ng-container>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Doc. Date</div>
-              <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+              <div>{{objectService.objectHeader.trxDate|date:"dd/MM/yyyy"}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Location</div>
-              <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+              <div>{{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Total Quantity</div>
-              <div>{{object.details|sum:"qtyRequest"|number}}</div>
+              <div>{{objectService.objectDetail|sum:"qtyRequest"|number}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
