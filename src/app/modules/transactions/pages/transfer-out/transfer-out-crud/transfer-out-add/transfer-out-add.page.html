@@ -30,7 +30,7 @@
             </ion-content>
           </ng-template>
         </ion-modal>
-        <app-search-dropdown title="From Location" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)" [disabled]="objectService.objectHeader?.transferOutId > 0"></app-search-dropdown>
+        <app-search-dropdown title="From Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)" [disabled]="objectService.objectHeader?.transferOutId > 0"></app-search-dropdown>
         <app-search-dropdown title="To Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.toLocationId?.value" (onActionComplete)="onToLocationChanged($event)" [disabled]="objectService.objectHeader?.transferOutId > 0"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked" class="font-bold">Remark</ion-label>

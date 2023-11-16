@@ -22,7 +22,7 @@ const httpObserveHeader = {
 })
 export class AuthService {
 
-  isDebug: string = 'False';
+  isDebug: string = "False";
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
   showSearchResult: boolean = false;
@@ -72,7 +72,7 @@ export class AuthService {
       map((response: LoginUser) => {
         const loginUser = response;
         if (loginUser.token !== null) {
-          localStorage.setItem('loginUser', JSON.stringify(loginUser));
+          localStorage.setItem("loginUser", JSON.stringify(loginUser));
           this.currentUserSource.next(loginUser);
           this.setCurrentUserToken(loginUser.token);
           this.buildAllObjects();
@@ -96,11 +96,11 @@ export class AuthService {
   }
 
   refreshToken(tokenRequest: TokenRequest) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + 'account/refreshToken', tokenRequest).pipe(
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "account/refreshToken", tokenRequest).pipe(
       map((response: LoginUser) => {
         const loginUser = response;
         if (loginUser.token != null) {
-          localStorage.setItem('loginUser', JSON.stringify(loginUser));
+          localStorage.setItem("loginUser", JSON.stringify(loginUser));
           this.currentUserSource.next(loginUser);
           this.setCurrentUserToken(loginUser.token);
           this.isLoggedIn = true;
@@ -146,7 +146,7 @@ export class AuthService {
     this.getMenuHierachy().subscribe(response => {
       this.model = response;
       // Manually add dashboard item and move it to the beginning of array
-      // this.dashboardItem = { label: 'Dashboard', icon: 'pi pi-home', routerLink: ['/'], tabindex: "1" };
+      // this.dashboardItem = { label: "Dashboard", icon: "pi pi-home", routerLink: ["/"], tabindex: "1" };
       // this.model.push(this.dashboardItem);
       // Only display menu which is not under Mobile Apps Module
       this.model = this.model.filter(x => x.fragment === "M");
@@ -179,7 +179,7 @@ export class AuthService {
   }
 
   getMenuHierachy() {
-    return this.http.get<MenuHierarchy[]>(this.configService.selected_sys_param.apiUrl + 'account/menu').pipe(
+    return this.http.get<MenuHierarchy[]>(this.configService.selected_sys_param.apiUrl + "account/menu").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -191,7 +191,7 @@ export class AuthService {
   }
 
   getRestrictedColumn() {
-    return this.http.get<RestrictedColumn[]>(this.configService.selected_sys_param.apiUrl + 'account/restrictedColumns').pipe(
+    return this.http.get<RestrictedColumn[]>(this.configService.selected_sys_param.apiUrl + "account/restrictedColumns").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -203,7 +203,7 @@ export class AuthService {
   }
 
   getModuleControl() {
-    return this.http.get<ModuleControl[]>(this.configService.selected_sys_param.apiUrl + 'account/frontEndModuleControl').pipe(
+    return this.http.get<ModuleControl[]>(this.configService.selected_sys_param.apiUrl + "account/frontEndModuleControl").pipe(
       map((response: any) =>
         response.map((item: any) => item)
       )
@@ -211,14 +211,14 @@ export class AuthService {
   }
 
   getPrecisionList() {
-    return this.http.get<PrecisionList[]>(this.configService.selected_sys_param.apiUrl + 'account/precision');
+    return this.http.get<PrecisionList[]>(this.configService.selected_sys_param.apiUrl + "account/precision");
   }
 
   setModuleControl(item: any) {
     this.moduleControlSubject.next(item);
     let showSearchResult = item.find(x => x.ctrlName === "ShowSearchResult");
     if (showSearchResult) {
-      this.showSearchResult = (showSearchResult.ctrlValue === '0') ? false : true;
+      this.showSearchResult = (showSearchResult.ctrlValue === "0") ? false : true;
     } 
   }
 
@@ -236,7 +236,7 @@ export class AuthService {
   }
 
   getToken(): string {
-    return JSON.parse(localStorage.getItem('loginUser'))?.token;
+    return JSON.parse(localStorage.getItem("loginUser"))?.token;
   }
 
   getTokenExpirationDate(token: string): Date {
@@ -250,19 +250,19 @@ export class AuthService {
 
   // Sign out
   async signOut(isAddNew: boolean = false) {
-    localStorage.removeItem('loginUser');
-    localStorage.removeItem('temptt');
+    localStorage.removeItem("loginUser");
     this.currentUserSource.next(null);
     this.currentUserTokenSource.next(null);
     this.menuItemSubject.next(null);
     this.precisionListSubject.next(null);
     this.isLoggedIn = false;
     this.isAdmin = false;
+    this.configService.loginUser = null;
     if (isAddNew) {
-      this.navController.navigateRoot('/welcome');
+      this.navController.navigateRoot("/welcome");
     } else {
       // Navigate to sign-in
-      this.navController.navigateRoot('/signin');
+      this.navController.navigateRoot("/signin");
     }
   }
 
@@ -271,11 +271,11 @@ export class AuthService {
   }
 
   forgotPassword(passwordResetRequest: ForgotPasswordRequest) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + 'account/forgotPassword', passwordResetRequest, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "account/forgotPassword", passwordResetRequest, httpObserveHeader);
   }
 
   resetPassword(passwordResetDto: ResetPassword) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + 'account/resetPassword', passwordResetDto, httpObserveHeader);
+    return this.http.post(this.configService.selected_sys_param.apiUrl + "account/resetPassword", passwordResetDto, httpObserveHeader);
   }
 
 }

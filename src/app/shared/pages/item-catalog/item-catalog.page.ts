@@ -16,6 +16,7 @@ import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
 import { InfiniteScrollCustomEvent, IonSearchbar, ViewWillEnter } from '@ionic/angular';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { SalesItemRequest } from '../../models/sales-item-request';
 
 @Component({
   selector: 'app-item-catalog',
@@ -134,7 +135,15 @@ export class ItemCatalogPage implements OnInit, OnChanges {
         if (Capacitor.getPlatform() !== "web") {
           Keyboard.hide();
         }
-        this.searchItemService.getItemInfoByKeywordfortest(this.itemSearchText, format(new Date(), "yyyy-MM-dd"), this.keyId, this.objectHeader.locationId ?? 0, this.startIndex, this.itemListLoadSize).subscribe(async response => {
+        let requestObject: SalesItemRequest = {
+          search: this.itemSearchText,
+          trxDate: this.commonService.getTodayDate(),
+          customerId: this.keyId,
+          locationId: this.objectHeader?.locationId??0,
+          startIndex: this.startIndex,
+          size: this.itemListLoadSize
+        }
+        this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
           let rrr = response;
           if (rrr && rrr.length > 0) {
             rrr.forEach(r => {
@@ -146,12 +155,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.startIndex = this.availableItems.length;
           }
           this.availableItems = [...this.availableItems, ...rrr];
-          this.computeQtyInCart();
+          await this.computeQtyInCart();
           await this.loadingService.dismissLoading()
           this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
         })
         if (Capacitor.getPlatform() !== "web") {
-          this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
+          await this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
         }
       } else {
         await this.loadingService.dismissLoading()

@@ -8,6 +8,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { Network } from '@capacitor/network';
 
 @Component({
 	selector: 'app-consignment-count-detail',
@@ -34,7 +35,9 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 	) { }
 
 	async ionViewWillEnter(): Promise<void> {
-		await this.objectService.loadRequiredMaster();
+		if ((await Network.getStatus()).connected) {
+			await this.objectService.loadRequiredMaster();
+		}
 		this.route.queryParams.subscribe(params => {
 			this.isLocal = params["isLocal"];
 			this.guid = params["guid"];

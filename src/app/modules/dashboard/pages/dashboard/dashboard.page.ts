@@ -7,14 +7,12 @@ import { Dashboard, Memo, MemoDetail } from '../../models/dashboard';
 import { DashboardService } from '../../services/dashboard.service';
 import { NotificationHistory } from '../../models/notification-history';
 import { approvalAppCode, moduleCode, trxAppCode } from 'src/app/shared/models/acl-const';
-import { LoginUser } from 'src/app/services/auth/login-user';
-import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
-import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
 import { Capacitor } from '@capacitor/core';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,31 +52,36 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   showSalesOrder: boolean = false;
 
   constructor(
+    public objectService: DashboardService,
     private authService: AuthService,
+    public configService: ConfigService,
     private commonService: CommonService,
-    public consignmentSalesService: ConsignmentSalesService,
     private toastService: ToastService,
     private loadingService: LoadingService,
-    private configService: ConfigService,
-    private dashboardService: DashboardService,
     private navController: NavController
   ) { }
   
-  ionViewWillEnter(): void {
-    this.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-    if (this.loginUser.loginUserType === "C") {
-      this.consignmentSalesService.loadRequiredMaster();
-    }
+  async ionViewWillEnter(): Promise<void> {
+    await this.objectService.loadRequiredMaster();
     this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
   }
 
   ionViewDidEnter(): void {
-    if (this.loginUser.loginUserType === "C" && !this.configService.selected_consignment_location) {
-      if ( this.loginUser.locationId && this.loginUser.locationId.length === 0) {
+    if (this.configService.loginUser.loginUserType === "C" && !this.configService.selected_location) {
+      if ( this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 0) {
         // show error if consignment user but no location set
         this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
       }
-      if (this.loginUser.locationId && this.loginUser.locationId.length > 1) {
+      if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+        this.showLocationModal();
+      }
+    }
+    if (this.configService.loginUser.loginUserType === "P" && !this.configService.selected_location) {      
+      if ( this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 0) {
+        // show error if consignment user but no location set
+        this.toastService.presentToast("", "POS Location not set", "top", "warning", 1000);
+      }
+      if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
         this.showLocationModal();
       }
     }
@@ -123,7 +126,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   dashboardData: Dashboard;
   loadAnnouncements() {
     try {
-      this.dashboardService.getDashboard().subscribe(response => {
+      this.objectService.getDashboard().subscribe(response => {
         this.dashboardData = response;
       }, error => {
         console.error(error);;
@@ -134,13 +137,6 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   }
 
   /* #region choose default location for consignment user */
-
-  async chooseDefaultLocation() {
-    let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-    if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1 && !this.configService.selected_consignment_location) {
-
-    }
-  }
 
   /* #endregion */
 
@@ -188,7 +184,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     try {
       if (memoDetail) {
         let filename = memoDetail.filesName + memoDetail.filesType;
-        this.dashboardService.downloadFiles(memoDetail.filesId).subscribe(async response => {
+        this.objectService.downloadFiles(memoDetail.filesId).subscribe(async response => {
           await this.commonService.commonDownloadPdf(response, filename);
         }, error => {
           console.error(error);;
@@ -220,7 +216,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   notificationHistories: NotificationHistory[] = [];
   async showNotificationHistoryModal() {
     try {
-      await this.dashboardService.loadNotificationHistory().subscribe(response => {
+      await this.objectService.loadNotificationHistory().subscribe(response => {
         this.notificationHistories = response;
         this.notificationHistoryModal = true;
       }, error => {
@@ -257,7 +253,6 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   /* #region select location modal */
 
-  loginUser: LoginUser;
   selectLocationModal: boolean = false;
   showLocationModal() {
     this.selectLocationModal = true;
@@ -267,21 +262,22 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
     this.selectLocationModal = false;
   }
 
-  async setDefaultConsignmentLocation(location: ConsignmentSalesLocation) {
-    this.configService.selected_consignment_location = location.locationId;
+  async setDefaultLocation(location: MasterListDetails) {
+    this.configService.selected_location = location.id;
     this.hideLocationModal();
     if (Capacitor.getPlatform() !== "web") {
       try {
         await this.loadingService.showLoading("Downloading resources");
-        let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+        let response = await this.commonService.syncInboundConsignment(this.configService.selected_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
         let itemMaster: LocalItemMaster[] = response["itemMaster"];
         let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
         await this.configService.syncInboundData(itemMaster, itemBarcode);
 
-        let response2 = await this.commonService.syncMarginConfig(this.configService.selected_consignment_location);
-        let marginConfig: LocalMarginConfig[] = response2;
-        await this.configService.syncMarginConfig(marginConfig);
-
+        if (this.configService.loginUser.loginUserType === "C") {
+          let response2 = await this.commonService.syncMarginConfig(this.configService.selected_location);
+          let marginConfig: LocalMarginConfig[] = response2;
+          await this.configService.syncMarginConfig(marginConfig);
+        }
         await this.loadingService.dismissLoading();
       } catch (e) {
         await this.loadingService.dismissLoading();

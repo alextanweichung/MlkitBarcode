@@ -7,6 +7,7 @@ import { FireStoreReturn, Sys_Parameter } from 'src/app/shared/database/tables/t
 import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig, LocalTransaction } from 'src/app/shared/models/pos-download';
 import { DatabaseService } from '../sqlite/database.service';
 import { ToastService } from '../toast/toast.service';
+import { LoginUser } from '../auth/login-user';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,8 @@ export class ConfigService {
   item_Masters: LocalItemMaster[] = [];
   item_Barcodes: LocalItemBarcode[] = [];
   margin_Configs: LocalMarginConfig[] = [];
-  selected_consignment_location: number;
+  selected_location: number;
+  loginUser: LoginUser;
 
   constructor(
     private http: HttpClient,
@@ -234,7 +236,7 @@ export class ConfigService {
   /* #endregion */
 
   signOut() {
-    this.selected_consignment_location = null;
+    this.selected_location = null;
   }
 
   async saveToLocaLStorage(key: string, data: any) {

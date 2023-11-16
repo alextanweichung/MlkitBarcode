@@ -7,6 +7,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportsService } from '../../services/reports.service';
 import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
 import { SalesAnalysisObject } from '../../models/sales-analysis';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
   selector: 'app-sales-analysis',
@@ -24,9 +25,10 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
   object: SalesAnalysisObject[] = [];
 
   constructor(
-    private commonService: CommonService,
     private objectService: ReportsService,
+    private commonService: CommonService,
     private toastService: ToastService,
+    private loadingService: LoadingService,
     private alertController: AlertController
   ) { 
     this.setFormattedDateString();
@@ -63,19 +65,29 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
   }
 
   objects: any[] = [];
-  loadReport() {
-    this.object = [];
-    this.objectService.getSalesAnalysis({
-      reportType : this.selectedType?.id,
-      dateStart: new Date(format(new Date(this.startDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
-      dateEnd: new Date(format(new Date(this.endDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
-      locationId: this.selectedLocation.id
-    }).subscribe(response => {
-      this.object = response;
-      this.toastService.presentToast("Search Complete", `${this.object.length} record(s) found.`, "top", "success", 300, true);
-    }, error => {
+  async loadReport() {
+    try {
+      await this.loadingService.showLoading();
+      this.object = [];
+      this.objectService.getSalesAnalysis({
+        reportType : this.selectedType?.id,
+        dateStart: new Date(format(new Date(this.startDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
+        dateEnd: new Date(format(new Date(this.endDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
+        locationId: this.selectedLocation.id
+      }).subscribe(async response => {
+        this.object = response;
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("Search Complete", `${this.object.length} record(s) found.`, "top", "success", 300, true);
+      }, async error => {
+        await this.loadingService.dismissLoading();
+        console.error(error);
+      })
+    } catch (error) {
+      await this.loadingService.dismissLoading();
       console.error(error);
-    })
+    } finally {
+      await this.loadingService.dismissLoading();
+    }
   }
 
   onTypeChanged(event: any) {

@@ -43,13 +43,13 @@ export class StockReorderAddPage implements OnInit {
   }
 
   newObjectForm() {
-    let primaryLocationIndex = this.objectService.locationList.findIndex(r => r.isPrimary);
+    let defaultLocation = this.configService.selected_location??0;
     this.objectForm = this.formBuilder.group({
       stockReorderId: [0],
       stockReorderNum: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       typeCode: ["C"],
-      locationId: [(primaryLocationIndex > -1 ? this.objectService.locationList[primaryLocationIndex].locationId : null), [Validators.required]],
+      locationId: [(defaultLocation ? defaultLocation : null), [Validators.required]],
       deactivated: [false],
       isCompleted: [false],
       sourceType: ["M"],
@@ -62,7 +62,7 @@ export class StockReorderAddPage implements OnInit {
   
   ngOnInit() {
     this.loadModuleControl();
-    this.bindLocationList();
+    // this.bindLocationList();
   }
 
   moduleControl: ModuleControl[] = [];
@@ -83,21 +83,21 @@ export class StockReorderAddPage implements OnInit {
     })
   }
 
-  locationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    this.locationSearchDropdownList = [];
-    try {
-      this.objectService.locationList.forEach(r => {
-        this.locationSearchDropdownList.push({
-          id: r.locationId,
-          code: r.locationCode,
-          description: r.locationDescription
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // locationSearchDropdownList: SearchDropdownList[] = [];
+  // bindLocationList() {
+  //   this.locationSearchDropdownList = [];
+  //   try {
+  //     this.objectService.locatm.forEach(r => {
+  //       this.locationSearchDropdownList.push({
+  //         id: r.locationId,
+  //         code: r.locationCode,
+  //         description: r.locationDescription
+  //       })
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   onLocationChanged(event: any) {
     if (event) {

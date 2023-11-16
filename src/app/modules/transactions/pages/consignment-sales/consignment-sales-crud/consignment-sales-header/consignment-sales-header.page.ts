@@ -51,7 +51,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       customerId: [null],
       locationId: [null],
-      toLocationId: [this.configService.selected_consignment_location ?? 0, [Validators.required]],
+      toLocationId: [this.configService.selected_location ?? 0, [Validators.required]],
       toLocationCode: [null, [Validators.required]],
       currencyId: [null],
       currencyRate: [null],
@@ -67,15 +67,15 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       isBearPromo: [null],
       marginMode: [null],
     })
-    if (this.configService.selected_consignment_location) {
-      let findLocation = this.objectService.locationMasterList.find(r => r.id === this.configService.selected_consignment_location);
+    if (this.configService.selected_location) {
+      let findLocation = this.objectService.locationMasterList.find(r => r.id === this.configService.selected_location);
       this.objectForm.patchValue({
         toLocationId: findLocation.id,
         toLocationCode: findLocation.code,
         isBearPromo: findLocation.attribute6 === "1" ? true : false,
         marginMode: findLocation.attribute8
       })
-      let customerId = this.objectService.locationList.find(r => r.locationId === this.configService.selected_consignment_location)?.customerId;
+      let customerId = Number(this.objectService.locationMasterList.find(r => r.id === this.configService.selected_location)?.attribute13);
       if (customerId) {
         this.onCustomerChanged(customerId)
       }
@@ -84,7 +84,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
 
   ngOnInit() {
     this.loadModuleControl();
-    this.bindLocationList();
+    // this.bindLocationList();
     this.bindMasterList();
   }
 
@@ -101,20 +101,20 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
     }
   }
 
-  locationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    try {
-      this.objectService.locationList.forEach(r => {
-        this.locationSearchDropdownList.push({
-          id: r.locationId,
-          code: r.locationCode,
-          description: r.locationDescription
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // locationSearchDropdownList: SearchDropdownList[] = [];
+  // bindLocationList() {
+  //   try {
+  //     this.objectService.locationMasterList.forEach(r => {
+  //       this.locationSearchDropdownList.push({
+  //         id: r.id,
+  //         code: r.code,
+  //         description: r.description
+  //       })
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   customerSearchDropdownList: SearchDropdownList[] = [];
   salesAgentSearchDropdownList: SearchDropdownList[] = [];
@@ -222,7 +222,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
           text: "Proceed",
           cssClass: "success",
           handler: async () => {
-            let customerId = this.objectService.locationList.find(r => r.locationId === event.id)?.customerId;
+            let customerId = Number(this.objectService.locationMasterList.find(r => r.id === event.id)?.attribute13);
             if (customerId) {
               this.onCustomerChanged(customerId)
             }

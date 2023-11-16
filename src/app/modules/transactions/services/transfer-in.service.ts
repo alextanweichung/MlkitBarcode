@@ -18,7 +18,7 @@ const httpObserveHeader = {
 
 export class TransferInService {
 
-  selectedConsignmentLocation: ConsignmentSalesLocation = null;
+  // selectedConsignmentLocation: ConsignmentSalesLocation = null;
 
   fullMasterList: MasterList[] = [];
   interTransferTypeList: MasterListDetails[] = [];
@@ -26,28 +26,31 @@ export class TransferInService {
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
 
+  selectedLocation: number = null;
+
   constructor(
     private http: HttpClient,
     private configService: ConfigService
   ) { }
 
   async loadRequiredMaster() {
-    await this.loadConsignmentLocation();
+    // await this.loadConsignmentLocation();
     await this.loadMasterList();
   }
 
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
+    this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
   }
 
-  locationList: ConsignmentSalesLocation[] = [];
-  async loadConsignmentLocation() {
-    this.locationList = [];
-    this.locationList = await this.getConsignmentLocation();
-  }
+  // locationList: ConsignmentSalesLocation[] = [];
+  // async loadConsignmentLocation() {
+  //   this.locationList = [];
+  //   this.locationList = await this.getConsignmentLocation();
+  // }
 
   /* #region  for insert */
 
@@ -80,9 +83,9 @@ export class TransferInService {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/masterlist").toPromise();
   }
 
-  getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/consignmentLocation").toPromise();
-  }
+  // getConsignmentLocation() {
+  //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/consignmentLocation").toPromise();
+  // }
 
   getStaticLovList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferIn/staticLov");

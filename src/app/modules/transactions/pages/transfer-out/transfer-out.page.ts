@@ -9,6 +9,7 @@ import { TransferOutList } from '../../models/transfer-out';
 import { TransferOutService } from '../../services/transfer-out.service';
 import { FilterPage } from '../filter/filter.page';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-transfer-out',
@@ -26,9 +27,10 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
   uniqueGrouping: Date[] = [];
 
   constructor(
-    private authService: AuthService,
-    private commonService: CommonService,
     private objectService: TransferOutService,
+    private authService: AuthService,
+    private configService: ConfigService,
+    private commonService: CommonService,
     private toastService: ToastService,
     private loadingService: LoadingService,
     private actionSheetController: ActionSheetController,
@@ -56,6 +58,9 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
     }
     if (!this.objectService.filterEndDate) {
       this.objectService.filterEndDate = this.commonService.getTodayDate();
+    }
+    if (this.configService.selected_location) {
+      this.objectService.selectedLocation = this.configService.selected_location;
     }
     await this.loadObjects();
   }

@@ -9,9 +9,8 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransferInScanningList, TransferInScanningRoot } from '../../models/transfer-in-scanning';
 import { TransferInScanningService } from '../../services/transfer-in-scanning.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { ConsignmentSalesLocation } from '../../models/consignment-sales';
-import { LocationChangeListener } from '@angular/common';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-transfer-in-scanning',
@@ -27,6 +26,7 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
   constructor(
     public objectService: TransferInScanningService,
     private authService: AuthService,
+    private configService: ConfigService,
     private commonService: CommonService,
     private toastService: ToastService,
     private loadingService: LoadingService,
@@ -56,14 +56,14 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     if (!this.objectService.filterEndDate) {
       this.objectService.filterEndDate = this.commonService.getTodayDate();
     }
-    await this.bindLocationList();
+    if (this.configService.selected_location) {
+      this.objectService.selectedLocation = this.configService.selected_location;
+    }
+    // await this.bindLocationList();
     await this.loadObjects();
   }
 
   async ionViewDidEnter(): Promise<void> {
-    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
-      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.isPrimary);
-    }
     await this.loadPendingList();
   }
 
@@ -73,25 +73,25 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
 
   /* #region pending objects */
 
-  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    this.consignmentLocationSearchDropdownList = [];
-    try {
-      this.objectService.locationList.forEach(r => {
-        this.consignmentLocationSearchDropdownList.push({
-          id: r.locationId,
-          code: r.locationCode,
-          description: r.locationDescription
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  // bindLocationList() {
+  //   this.consignmentLocationSearchDropdownList = [];
+  //   try {
+  //     this.objectService.locationList.forEach(r => {
+  //       this.consignmentLocationSearchDropdownList.push({
+  //         id: r.locationId,
+  //         code: r.locationCode,
+  //         description: r.locationDescription
+  //       })
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   onLocationChanged(event: any) {
     if (event) {
-      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.locationId === event.id);
+      this.objectService.selectedLocation = event.id;
       this.loadPendingList();
     }
   }
@@ -101,8 +101,8 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     try {
       await this.loadingService.showLoading();
       this.pendingObject = [];
-      if (this.objectService.selectedConsignmentLocation) {
-        this.objectService.getPendingList(this.objectService.selectedConsignmentLocation.locationCode).subscribe(async response => {
+      if (this.objectService.selectedLocation) {
+        this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.objectService.selectedLocation)?.code).subscribe(async response => {
           this.pendingObject = response;
           await this.loadingService.dismissLoading();
         }, async error => {

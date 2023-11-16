@@ -31,7 +31,7 @@
         </ng-template>
       </ion-modal>
 
-      <app-search-dropdown title="Location" optionLabel="description" [searchDropdownList]="consignmentLocationSearchDropdownList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)" [disabled]="objectForm?.controls?.consignmentCountId?.value > 0"></app-search-dropdown>
+      <app-search-dropdown title="Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.locationId?.value" (onActionComplete)="onLocationSelected($event)" [disabled]="objectService.objectHeader?.consignmentCountId > 0"></app-search-dropdown>
       <ion-item>
         <ion-label position="stacked" class="font-bold">Rack</ion-label>
         <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Rack" formControlName="rack"></ion-textarea>

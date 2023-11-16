@@ -4,6 +4,7 @@ import { background_load } from 'src/app/core/interceptors/error-handler.interce
 import { Item, ItemImage } from 'src/app/modules/transactions/models/item';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { TransactionDetail } from '../models/transaction-detail';
+import { SalesItemRequest } from '../models/sales-item-request';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -31,8 +32,8 @@ export class SearchItemService {
     return this.http.get<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId);
   }
 
-  getItemInfoByKeywordfortest(keyword: string, trxDate: string, keyId: number, locationId: number, startIndex: number, size: number) {
-    return this.http.get<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList/" + keyword + "/" + trxDate + "/" + keyId + "/" + locationId + "/" + startIndex + "/" + size);
+  getItemInfoByKeywordfortest(requestObject: SalesItemRequest) {
+    return this.http.post<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + this.apiObject + "/item/itemList", requestObject);
   }
 
   getItemImageFile(keyword: string) {

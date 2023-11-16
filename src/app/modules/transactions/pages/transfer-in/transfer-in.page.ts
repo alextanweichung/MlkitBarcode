@@ -9,8 +9,8 @@ import { TransferInHeader, TransferInList } from '../../models/transfer-in';
 import { TransferInService } from '../../services/transfer-in.service';
 import { FilterPage } from '../filter/filter.page';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { ConsignmentSalesLocation } from '../../models/consignment-sales';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-transfer-in',
@@ -33,6 +33,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
   constructor(
     public objectService: TransferInService,
     private authService: AuthService,
+    private configService: ConfigService,
     private commonService: CommonService,
     private toastService: ToastService,
     private loadingService: LoadingService,
@@ -63,11 +64,11 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     await this.objectService.resetVariables();
     // reload all masterlist whenever user enter listing
     await this.objectService.loadRequiredMaster();
-    await this.bindLocationList();
-    if (this.objectService.locationList.findIndex(r => r.isPrimary) > -1) {
-      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.isPrimary);
+    // await this.bindLocationList();
+    if (this.configService.selected_location) {
+      this.objectService.selectedLocation = this.configService.selected_location;
+      await this.loadPendingList();
     }
-    await this.loadPendingList();
   }
 
   async ionViewDidEnter(): Promise<void> {
@@ -80,25 +81,25 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
   /* #region pending objects */
 
-  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    this.consignmentLocationSearchDropdownList = [];
-    try {
-      this.objectService.locationList.forEach(r => {
-        this.consignmentLocationSearchDropdownList.push({
-          id: r.locationId,
-          code: r.locationCode,
-          description: r.locationDescription
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  // bindLocationList() {
+  //   this.consignmentLocationSearchDropdownList = [];
+  //   try {
+  //     this.objectService.locationList.forEach(r => {
+  //       this.consignmentLocationSearchDropdownList.push({
+  //         id: r.locationId,
+  //         code: r.locationCode,
+  //         description: r.locationDescription
+  //       })
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   onLocationChanged(event: any) {
     if (event) {
-      this.objectService.selectedConsignmentLocation = this.objectService.locationList.find(r => r.locationId === event.id);
+      this.objectService.selectedLocation = event.id;
       this.loadPendingList();
     }
   }
@@ -108,8 +109,8 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
     try {
       await this.loadingService.showLoading();
       this.pendingObject = [];
-      if (this.objectService.selectedConsignmentLocation) {
-        this.objectService.getPendingList(this.objectService.selectedConsignmentLocation.locationCode).subscribe(async response => {
+      if (this.objectService.selectedLocation) {
+        this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.objectService.selectedLocation)?.code).subscribe(async response => {
           this.pendingObject = response;
           await this.loadingService.dismissLoading();
         }, async error => {

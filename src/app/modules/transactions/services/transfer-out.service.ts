@@ -27,6 +27,8 @@ export class TransferOutService {
   itemVariationXMasterList: MasterListDetails[] = [];
   itemVariationYMasterList: MasterListDetails[] = [];
 
+  selectedLocation: number;
+
   constructor(
     private http: HttpClient,
     private configService: ConfigService
@@ -34,20 +36,21 @@ export class TransferOutService {
 
   async loadRequiredMaster() {
     await this.loadMasterList();
-    await this.loadConsignmentLocation();
+    // await this.loadConsignmentLocation();
   }
 
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
+    this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
   }
 
-  locationList: ConsignmentSalesLocation[] = [];
-  async loadConsignmentLocation() {
-    this.locationList = await this.getConsignmentLocation();
-  }
+  // locationList: ConsignmentSalesLocation[] = [];
+  // async loadConsignmentLocation() {
+  //   this.locationList = await this.getConsignmentLocation();
+  // }
 
   /* #region  for insert */
 
@@ -80,9 +83,9 @@ export class TransferOutService {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/masterlist").toPromise();
   }
 
-  getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/consignmentLocation").toPromise();
-  }
+  // getConsignmentLocation() {
+  //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/consignmentLocation").toPromise();
+  // }
 
   getStaticLovList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/staticLov");

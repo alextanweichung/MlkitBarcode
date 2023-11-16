@@ -37,11 +37,15 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter, ViewDidEnter
     private modalController: ModalController,
     private navController: NavController
   ) { 
-    // reload all masterlist whenever user enter listing
-    this.objectService.loadRequiredMaster();
   }
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
+    // reload all masterlist whenever user enter listing
+    try {
+      await this.objectService.loadRequiredMaster();
+    } catch (error) {
+      console.error(error);
+    }
     try {
       if (!this.startDate) {
         this.startDate = this.commonService.getFirstDayOfTodayMonth();
@@ -59,7 +63,7 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter, ViewDidEnter
     // check incomplete trx here
     let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
     if (data !== null) {
-      if (data?.header?.toLocationId === this.configService?.selected_consignment_location) {
+      if (data?.header?.toLocationId === this.configService?.selected_location) {
         this.promptIncompleteTrxAlert();
       } else {
         

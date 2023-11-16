@@ -7,7 +7,6 @@ import { ConsignmentCountRoot } from 'src/app/modules/transactions/models/consig
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -41,7 +40,7 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
       description: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       trxDateTime: [null],
-      locationId: [this.configService.selected_consignment_location ?? 0, [Validators.required]],
+      locationId: [this.configService.selected_location ?? 0, [Validators.required]],
       consignmentCountUDField1: [null],
       consignmentCountUDField2: [null],
       consignmentCountUDField3: [null],
@@ -61,11 +60,13 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
 
   async ionViewWillEnter(): Promise<void> {
     await this.setFormattedDateString();
-    await this.bindLocationList();
+    // await this.bindLocationList();
+    console.log("🚀 ~ file: consignment-count-header.page.ts:66 ~ ConsignmentCountHeaderPage ~ ionViewWillEnter ~ this.objectService.objectHeader:", JSON.stringify( this.objectService.objectHeader))
     if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
 
     } else {
       await this.objectForm.patchValue(this.objectService.objectHeader);
+      console.log("🚀 ~ file: consignment-count-header.page.ts:69 ~ ConsignmentCountHeaderPage ~ ionViewWillEnter ~ this.objectForm:", JSON.stringify(this.objectForm.value))
       this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
       await this.setFormattedDateString();
     }
@@ -79,21 +80,21 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
 
   }
 
-  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    this.consignmentLocationSearchDropdownList = [];
-    try {
-      this.objectService.locationList.forEach(r => {
-        this.consignmentLocationSearchDropdownList.push({
-          id: r.locationId,
-          code: r.locationCode,
-          description: r.locationDescription
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  // bindLocationList() {
+  //   this.consignmentLocationSearchDropdownList = [];
+  //   try {
+  //     this.objectService.locationMasterList.forEach(r => {
+  //       this.consignmentLocationSearchDropdownList.push({
+  //         id: r.id,
+  //         code: r.code,
+  //         description: r.description
+  //       })
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   async onLocationSelected(event) {
     if (event) {
@@ -146,7 +147,7 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
     const { role } = await actionSheet.onWillDismiss();
 
     if (role === "confirm") {
-      if (this.objectService.objectHeader.isLocal) {
+      if (this.objectService?.objectHeader?.isLocal) {
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: 0,
@@ -156,7 +157,7 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
         }
         this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
       }      
-      else if (this.objectService.objectHeader && this.objectService.objectHeader.consignmentCountId > 0) {
+      else if (this.objectService.objectHeader && this.objectService.objectHeader?.consignmentCountId > 0) {
         let navigationExtras: NavigationExtras = {
           queryParams: {
             objectId: this.objectService.objectHeader.consignmentCountId

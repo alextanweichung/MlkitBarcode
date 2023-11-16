@@ -40,12 +40,15 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
   }
   
   async ionViewWillEnter(): Promise<void> {
-    await this.bindLocationList();
+    // await this.bindLocationList();
     if (this.objectService.objectHeader?.transferOutId > 0) {
       this.dateValue = format(new Date(this.objectService.objectHeader?.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
       this.objectForm.patchValue(this.objectService.objectHeader);
     }
-    this.setFormattedDateString();
+    await this.setFormattedDateString();
+    if (this.configService.selected_location) {
+      this.objectService.selectedLocation = this.configService.selected_location;
+    }
   }
 
   ionViewWillLeave(): void {
@@ -53,13 +56,12 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
   }
 
   newObjectForm() {
-    let primaryLocationIndex = this.objectService.locationList.findIndex(r => r.isPrimary);
     this.objectForm = this.formBuilder.group({
       transferOutId: [0],
       transferOutNum: [null],
       trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
       typeCode: ["C"],
-      locationId: [(primaryLocationIndex > -1 ? this.objectService.locationList[primaryLocationIndex].locationId : null), [Validators.required]],
+      locationId: [(this.objectService.selectedLocation ? this.objectService.selectedLocation: null), [Validators.required]],
       toLocationId: [null, [Validators.required]],
       deactivated: [false],
       isCompleted: [false],
@@ -94,24 +96,25 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
     })
   }
 
-  consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-  bindLocationList() {
-    this.consignmentLocationSearchDropdownList = [];
-    try {
-      this.objectService.locationList.forEach(r => {
-        this.consignmentLocationSearchDropdownList.push({
-          id: r.locationId,
-          code: r.locationCode,
-          description: r.locationDescription
-        })
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+  // bindLocationList() {
+  //   this.consignmentLocationSearchDropdownList = [];
+  //   try {
+  //     this.objectService.locationList.forEach(r => {
+  //       this.consignmentLocationSearchDropdownList.push({
+  //         id: r.locationId,
+  //         code: r.locationCode,
+  //         description: r.locationDescription
+  //       })
+  //     })
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   onLocationChanged(event: any) {
     if (event) {
+      this.objectService.selectedLocation = event.id;
       this.objectForm.patchValue({ locationId: event.id });
     }
   }

@@ -53,7 +53,7 @@ export class ConsignmentSalesService {
   async loadRequiredMaster() {
     await this.loadMasterList();
     await this.loadStaticLov();
-    await this.loadConsignmentLocation();
+    // await this.loadConsignmentLocation();
   }
 
   fullMasterList: MasterList[] = [];
@@ -68,6 +68,7 @@ export class ConsignmentSalesService {
     this.fullMasterList = await this.getMasterList();
     this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
     this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -79,18 +80,18 @@ export class ConsignmentSalesService {
 
   }
 
-  locationList: ConsignmentSalesLocation[] = [];
-  async loadConsignmentLocation() {
-    this.locationList = await this.getConsignmentLocation();
-  }
+  // locationList: ConsignmentSalesLocation[] = [];
+  // async loadConsignmentLocation() {
+  //   this.locationList = await this.getConsignmentLocation();
+  // }
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/masterList").toPromise();
   }
 
-  async getConsignmentLocation() {
-    return await this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
-  }
+  // async getConsignmentLocation() {
+  //   return await this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/consignmentLocation").toPromise();
+  // }
 
   getStaticLov() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentSales/staticlov").toPromise();

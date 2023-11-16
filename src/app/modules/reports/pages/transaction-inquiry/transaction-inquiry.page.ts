@@ -46,8 +46,8 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
     this.type.push(
       { id: 0, code: "SO", description: "Sales Order" },
       { id: 1, code: "SI", description: "Sales Invoice" },
-      { id: 2, code: "CN/SR", description: "CN/Sales Return" },
-      { id: 3, code: "DN", description: "Debit Note" }
+      { id: 2, code: "CN/SR", description: "Sales/AR Credit Note & Sales Return" },
+      { id: 3, code: "DN", description: "Sales/AR Debit Note" }
     );
   }
 
@@ -81,7 +81,7 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
       }).subscribe(async response => {
         this.object = response;
         await this.loadingService.dismissLoading();
-        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
+        this.toastService.presentToast("Search Complete", `${response.length} record(s) found.`, "top", "success", 300, true);
       }, async error => {
         await this.loadingService.dismissLoading();
         console.error(error);
@@ -193,51 +193,70 @@ export class TransactionInquiryPage implements OnInit, ViewWillEnter {
   }
 
   async downloadPdf(object: TransactionInquiryObject[]) {
-    if (object && object.length > 0) {
-      let appCode = "";
-      let reportName = "";
-      switch (object[0].type) {
-        case "SalesOrder":
-          appCode = "SMSC002";
-          reportName = "Sales Order";
-          break;
-        case "SalesInvoice":
-          appCode = "SMSC003";
-          reportName = "Sales Invoice";
-          break;
-        case "SalesReturn":
-          appCode = "SMSC004";
-          reportName = "Sales Return";
-          break;
-        case "CreditNote":
-          appCode = "FAAR004";
-          reportName = "AR Credit Note";
-          break;
-        case "DebitNote":
-          appCode = "FAAR003";
-          reportName = "AR Debit Note";
-          break;
-      }
-      if (appCode !== null && appCode.length > 0) {
-        let paramModel: ReportParameterModel = {
-          appCode: appCode,
-          format: "pdf",
-          documentIds: object.flatMap(r => r.docId),
-          reportName: reportName
+    try {
+      if (object && object.length > 0) {
+        let appCode = "";
+        let reportName = "";
+        switch (object[0].type) {
+          case "SalesOrder":
+            appCode = "SMSC002";
+            reportName = "Sales Order";
+            break;
+          case "SalesInvoice":
+            appCode = "SMSC003";
+            reportName = "Sales Invoice";
+            break;
+          case "SalesReturn":
+            appCode = "SMSC004";
+            reportName = "Sales Return";
+            break;
+          case "CreditNote":
+            appCode = "FAAR004";
+            reportName = "AR Credit Note";
+            break;
+          case "SalesCreditNote":
+            appCode = "SMSC013";
+            reportName = "Sales Credit Note";
+            break;
+            case "DebitNote":
+              appCode = "FAAR003";
+              reportName = "AR Debit Note";
+              break;
+          case "SalesDebitNote":
+            appCode = "SMSC010";
+            reportName = "Sales Debit Note";
+            break;
         }
-        let timestart = new Date();
-        await this.objectService.getPdf(paramModel).subscribe(async response => {
-          let timeend = new Date();
-          await this.commonService.commonDownloadPdf(response, (object.length > 1 ? object[0].type.replace(" ", "") : object[0].docNum) + "." + paramModel.format);
-          this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), "top", "success", 1000);
-        }, error => {
-          console.log(error);
-        })
+        if (appCode !== null && appCode.length > 0) {
+          let paramModel: ReportParameterModel = {
+            appCode: appCode,
+            format: "pdf",
+            documentIds: object.flatMap(r => r.docId),
+            reportName: reportName
+          }
+          let timestart = new Date();
+          await this.objectService.getPdf(paramModel).subscribe(async response => {
+            let timeend = new Date();
+            await this.loadingService.dismissLoading();
+            await this.commonService.commonDownloadPdf(response, (object.length > 1 ? object[0].type.replace(" ", "") : object[0].docNum) + "." + paramModel.format);
+            this.toastService.presentToast(`download pdf`, (timeend.getTime() - timestart.getTime()).toString(), "top", "success", 1000);
+          }, async error => {
+            await this.loadingService.dismissLoading();
+            console.log(error);
+          })
+        } else {
+          await this.loadingService.dismissLoading();
+          this.toastService.presentToast("Invalid Key Id", "Please contact adminstrator.", "top", "danger", 1000);
+        }
       } else {
-        this.toastService.presentToast("Invalid Key Id", "Please contact adminstrator.", "top", "danger", 1000);
+        await this.loadingService.dismissLoading();
+        this.toastService.presentToast("Invalid App Code", "Please contact adminstrator.", "top", "danger", 1000);
       }
-    } else {
-      this.toastService.presentToast("Invalid App Code", "Please contact adminstrator.", "top", "danger", 1000);
+    } catch (error) {
+      await this.loadingService.dismissLoading();
+      console.error(error);
+    } finally {
+      await this.loadingService.dismissLoading();
     }
   }
 

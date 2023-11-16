@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { LoginUser } from 'src/app/services/auth/login-user';
 import { format } from 'date-fns';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 SwiperCore.use([Pagination]);
 
@@ -46,7 +47,7 @@ export class CardsPage implements OnInit, AfterContentChecked {
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
-    // private loadingService: LoadingService,
+    private loadingService: LoadingService,
     private commonService: CommonService
   ) {
     this.currentVersion = environment.version;
@@ -101,43 +102,54 @@ export class CardsPage implements OnInit, AfterContentChecked {
   async sync() {
     if (Capacitor.getPlatform() !== "web") {
       try {
+        await this.loadingService.showLoading();
         let loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
         if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length > 1) {
-          if (this.configService.selected_consignment_location) {
-            let response = await this.commonService.syncInboundConsignment(this.configService.selected_consignment_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+          if (this.configService.selected_location) {
+            let response = await this.commonService.syncInboundConsignment(this.configService.selected_location, format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
             let itemMaster: LocalItemMaster[] = response["itemMaster"];
             let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
             await this.configService.syncInboundData(itemMaster, itemBarcode);
-              
-            this.configService.selected_consignment_location = loginUser.locationId[0];
+
+            this.configService.selected_location = loginUser.locationId[0];
             let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
             let marginConfig: LocalMarginConfig[] = response2;
             await this.configService.syncMarginConfig(marginConfig);
+            await this.loadingService.dismissLoading();
+          } else {
+            await this.loadingService.dismissLoading();
+            this.toastService.presentToast("Control Error", "Please go to dashboard and select location", "top", "warning", 1000);
           }
         }
-        else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {    
+        else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 1) {
           // sync by location since only 1 location
           let response = await this.commonService.syncInboundConsignment(loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
           let itemMaster: LocalItemMaster[] = response["itemMaster"];
           let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
           await this.configService.syncInboundData(itemMaster, itemBarcode);
-            
-          this.configService.selected_consignment_location = loginUser.locationId[0];
+
+          this.configService.selected_location = loginUser.locationId[0];
           let response2 = await this.commonService.syncMarginConfig(loginUser.locationId[0]);
           let marginConfig: LocalMarginConfig[] = response2;
           await this.configService.syncMarginConfig(marginConfig);
+          await this.loadingService.dismissLoading();
         } else if (loginUser.loginUserType === "C" && loginUser.locationId && loginUser.locationId.length === 0) {
           // show error if consignment user but no location set
-          this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+          await this.loadingService.dismissLoading();
+          this.toastService.presentToast("Control Error", "Consignment Location not set", "top", "warning", 1000);
         } else {
           // download item master for other user
           let response = await this.commonService.syncInbound();
           let itemMaster: LocalItemMaster[] = response["itemMaster"];
           let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
           await this.configService.syncInboundData(itemMaster, itemBarcode);
+          await this.loadingService.dismissLoading();
         }
       } catch (error) {
+        await this.loadingService.dismissLoading();
         this.toastService.presentToast(error.message, "", "top", "medium", 1000);
+      } finally {
+        await this.loadingService.dismissLoading();
       }
     }
   }

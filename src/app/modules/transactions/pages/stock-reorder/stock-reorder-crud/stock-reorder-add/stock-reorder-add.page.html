@@ -29,7 +29,7 @@
           </ng-template>
         </ion-modal>
         <!-- <app-calendar-input #datefrom title="Doc. Date" [disabled]="true" [date_value]="objectForm.controls.trxDate.value"></app-calendar-input> -->
-        <app-search-dropdown title="From Location" [searchDropdownList]="locationSearchDropdownList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
+        <app-search-dropdown title="From Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked" class="font-bold">Remark</ion-label>
           <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" formControlName="remark"></ion-textarea>

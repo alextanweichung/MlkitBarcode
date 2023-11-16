@@ -30,7 +30,6 @@ export class ConsignmentCountService {
 
   async loadRequiredMaster() {
     await this.loadMasterList();
-    await this.loadConsignmentLocation();
   }
 
   fullMasterList: MasterList[] = [];
@@ -40,11 +39,12 @@ export class ConsignmentCountService {
   locationMasterList: MasterListDetails[] = [];
   async loadMasterList() {
     this.fullMasterList = await this.getMasterList();
-    this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemUOM').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === 'C');
+    this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
+    this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && this.configService.loginUser.locationId.includes(r.id));
+    console.log("🚀 ~ file: consignment-count.service.ts:47 ~ loadMasterList ~ this.locationMasterList:", this.locationMasterList)
   }
 
   objectHeader: ConsignmentCountHeader;
@@ -81,14 +81,14 @@ export class ConsignmentCountService {
     this.configService.removeFromLocalStorage(this.trxKey);
   }
 
-  locationList: ConsignmentSalesLocation[] = [];
-  async loadConsignmentLocation() {
-    this.locationList = await this.getConsignmentLocation();
-  }
+  // locationList: ConsignmentSalesLocation[] = [];
+  // async loadConsignmentLocation() {
+  //   this.locationList = await this.getConsignmentLocation();
+  // }
 
-  getConsignmentLocation() {
-    return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/consignmentLocation").toPromise();
-  }
+  // getConsignmentLocation() {
+  //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/consignmentLocation").toPromise();
+  // }
 
   getMasterList() {
     return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/masterList").toPromise();

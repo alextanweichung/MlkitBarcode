@@ -22,7 +22,7 @@
         <ion-item (click)="popover.dismiss(); presentAlertViewPdf()">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
-            <div>Download Pdf</div>
+            <div>Download PDF</div>
           </ion-label>
         </ion-item>
         <ion-item *ngIf="processType && selectedSegment === 'pending'" (click)="popover.dismiss(); presentConfirmAlert('CONFIRM')">
