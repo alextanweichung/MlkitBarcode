@@ -30,6 +30,7 @@ export class TransactionsPage implements OnInit {
   showTransferOut: boolean = false;
   showTransferIn: boolean = false;
   showTransferInScanning: boolean = false;
+  showPalletAssembly: boolean = false;
 
   constructor(
     private authService: AuthService
@@ -61,6 +62,7 @@ export class TransactionsPage implements OnInit {
           this.showTransferOut = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferOut) > -1;
           this.showTransferIn = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferIn) > -1;
           this.showTransferInScanning = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferInScanning) > -1;
+          this.showPalletAssembly = pageItems.findIndex(r => r.title === trxAppCode.mobilePalletAssembly) > -1;
         }
       })
     } catch (e) {

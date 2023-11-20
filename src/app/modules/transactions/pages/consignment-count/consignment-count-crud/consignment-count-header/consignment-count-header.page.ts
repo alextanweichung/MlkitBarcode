@@ -61,12 +61,10 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
   async ionViewWillEnter(): Promise<void> {
     await this.setFormattedDateString();
     // await this.bindLocationList();
-    console.log("🚀 ~ file: consignment-count-header.page.ts:66 ~ ConsignmentCountHeaderPage ~ ionViewWillEnter ~ this.objectService.objectHeader:", JSON.stringify( this.objectService.objectHeader))
     if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
 
     } else {
       await this.objectForm.patchValue(this.objectService.objectHeader);
-      console.log("🚀 ~ file: consignment-count-header.page.ts:69 ~ ConsignmentCountHeaderPage ~ ionViewWillEnter ~ this.objectForm:", JSON.stringify(this.objectForm.value))
       this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
       await this.setFormattedDateString();
     }

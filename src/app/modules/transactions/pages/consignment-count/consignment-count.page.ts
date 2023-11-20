@@ -240,9 +240,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 				if (Capacitor.getPlatform() !== "web") {
 					Keyboard.hide();
 				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
-					r.consignmentCountNum.toUpperCase().includes(searchText.toUpperCase()))
-				));
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.consignmentCountNum.toUpperCase().includes(searchText.toUpperCase()))));
 				this.filteredObj.sort((x, y) => {
 					if (x.isLocal === y.isLocal) {
 						return x.trxDate < y.trxDate ? 0 : 1;

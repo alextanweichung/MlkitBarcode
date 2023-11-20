@@ -295,6 +295,11 @@ const routes: Routes = [
     path: 'transactions/pos-sales-deposit/pos-sales-deposit-detail',
     loadChildren: () => import('./modules/transactions/pages/pos-sales-deposit/pos-sales-deposit-detail/pos-sales-deposit-detail.module').then( m => m.PosSalesDepositDetailPageModule)
   },
+  {
+    path: 'transactions/pallet-assembly',
+    loadChildren: () => import('./modules/transactions/pages/pallet-assembly/pallet-assembly.module').then( m => m.PalletAssemblyPageModule)
+  },
+
 
 
 
