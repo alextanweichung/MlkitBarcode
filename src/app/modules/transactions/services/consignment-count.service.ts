@@ -44,7 +44,6 @@ export class ConsignmentCountService {
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
     this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && this.configService.loginUser.locationId.includes(r.id));
-    console.log("🚀 ~ file: consignment-count.service.ts:47 ~ loadMasterList ~ this.locationMasterList:", this.locationMasterList)
   }
 
   objectHeader: ConsignmentCountHeader;

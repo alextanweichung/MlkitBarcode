@@ -13,6 +13,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,6 +54,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
   constructor(
     public objectService: DashboardService,
+    private consignmentCountService: ConsignmentCountService,
     private authService: AuthService,
     public configService: ConfigService,
     private commonService: CommonService,
@@ -63,6 +65,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   
   async ionViewWillEnter(): Promise<void> {
     await this.objectService.loadRequiredMaster();
+    await this.consignmentCountService.loadRequiredMaster();
     this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
   }
 
