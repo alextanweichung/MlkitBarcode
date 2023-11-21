@@ -52,10 +52,17 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
 
 	ngOnInit() {
 	}
+
+   onPalletNumClicked(palletNum: number) {
+      if (palletNum.toString() === this.selectedPalletNum.toString()) {
+         this.showPalletInfo = !this.showPalletInfo;
+      }
+   }
 	
 	palletToShow: PalletAssemblyDetail;
 	onPalletNumChanged(event) {
 		if (event) {
+         this.showPalletInfo = true;
 			let found = this.objectService.objectDetail.find(r => r.palletNum.toString() === event.detail.value.toString());
 			if (found) {
 				this.palletToShow = found;

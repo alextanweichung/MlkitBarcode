@@ -49,7 +49,7 @@
 <ion-content [fullscreen]="true" [hidden]="scanActive">
    <div class="p-2">
       <ion-segment class="mb-2" [scrollable]="true" [(ngModel)]="selectedPalletNum" *ngIf="objectService.objectDetail && objectService.objectDetail.length > 0" (ionChange)="onPalletNumChanged($event)">
-         <ion-segment-button *ngFor="let pallet of objectService.objectDetail" [value]="pallet.palletNum">
+         <ion-segment-button *ngFor="let pallet of objectService.objectDetail" [value]="pallet.palletNum" (click)="onPalletNumClicked(pallet.palletNum)">
             <ion-label>Pallet {{pallet.palletNum}}</ion-label>
          </ion-segment-button>
       </ion-segment>

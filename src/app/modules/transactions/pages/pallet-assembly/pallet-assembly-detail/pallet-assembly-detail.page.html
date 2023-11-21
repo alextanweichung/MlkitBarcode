@@ -99,11 +99,31 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
-              <div class="font-bold">Dim.</div>
-              <div>hgt {{palletToShow.palletHeight}}</div>
-              <div>wid {{palletToShow.palletWidth}}</div>
-              <div>len {{palletToShow.palletLength}}</div>
-              <div>wgt {{palletToShow.palletWeight}}</div>
+               <div class="font-bold">Dimension</div>
+               <div>
+                  <ion-grid class="ion-no-padding">
+                     <ion-row>
+                        <ion-col class="ion-flex my-auto justify-content-between">
+                           <div class="font-bold my-auto">H</div>
+                           <div class="mx-2">{{palletToShow.palletHeight}}</div>
+                        </ion-col>
+                        <ion-col class="ion-flex my-auto justify-content-between">
+                           <div class="font-bold my-auto">W</div>
+                           <div class="mx-2">{{palletToShow.palletWidth}}</div>
+                        </ion-col>
+                        <ion-col class="ion-flex my-auto justify-content-between">
+                           <div class="font-bold my-auto">L</div>
+                           <div class="mx-2">{{palletToShow.palletLength}}</div>
+                        </ion-col>
+                     </ion-row>
+                  </ion-grid>
+               </div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto justify-content-between">
+               <div class="font-bold">Weight</div>
+               <div>{{palletToShow.palletWeight}}</div>
             </ion-col>
           </ion-row>
           <ion-row class="mt-2">
