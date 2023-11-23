@@ -97,7 +97,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       this.objects = response;
       this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
     }, error => {
-      console.error(error);;
+      console.error(error);
     })
   }
 
@@ -162,7 +162,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
         });
       }, error => {
         error = error;
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);
@@ -242,7 +242,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     this.objectService.getPdf(paramModel).subscribe(async response => {
       await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format);
     }, error => {
-      console.error(error);;
+      console.error(error);
     })
   }
 
@@ -256,7 +256,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
     this.objectService.getPdf(paramModel).subscribe(async response => {
       await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format);
     }, error => {
-      console.error(error);;
+      console.error(error);
     })
   }
 

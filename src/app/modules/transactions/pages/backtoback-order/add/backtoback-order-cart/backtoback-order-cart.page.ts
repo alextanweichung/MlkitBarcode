@@ -489,7 +489,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.navController.navigateRoot("/transactions/backtoback-order/backtoback-order-summary");
       }, error => {
         this.submit_attempt = false;
-        console.error(error);;
+        console.error(error);
       });
     } catch (e) {
       this.submit_attempt = false;
@@ -513,7 +513,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
         this.navController.navigateRoot("/transactions/backtoback-order/backtoback-order-summary");
       }, error => {
         this.submit_attempt = false;
-        console.error(error);;
+        console.error(error);
       });
     } catch (e) {
       this.submit_attempt = false;

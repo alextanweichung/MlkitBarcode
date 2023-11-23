@@ -66,7 +66,7 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
         await this.loadingService.dismissLoading();
       }, async error => {
         await this.loadingService.dismissLoading();
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       await this.loadingService.dismissLoading();
@@ -287,7 +287,7 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
               this.navController.back();
             }
           }, error => {
-            console.error(error);;
+            console.error(error);
           })
         } catch (error) {
           this.toastService.presentToast("Update error", "", "top", "danger", 1000);

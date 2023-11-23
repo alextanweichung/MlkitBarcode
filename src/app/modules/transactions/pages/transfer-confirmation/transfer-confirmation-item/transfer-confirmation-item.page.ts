@@ -47,7 +47,7 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
           this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
         }
       }, error => {
-        console.error(error);;
+        console.error(error);
       })      
     } catch (e) {
       console.error(e);

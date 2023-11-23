@@ -70,7 +70,7 @@ export class InventoryLevelRetailPage implements OnInit {
           })
         })
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);
@@ -286,7 +286,7 @@ export class InventoryLevelRetailPage implements OnInit {
           }
           // this.toastService.presentToast('Search result has been populated.', '', 'top', 'success', 1000);
         }, error => {
-          console.error(error);;
+          console.error(error);
         })
       }
     } catch (e) {
@@ -304,7 +304,7 @@ export class InventoryLevelRetailPage implements OnInit {
         this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
           this.prices = response;
         }, error => {
-          console.error(error);;
+          console.error(error);
         })
       } catch (e) {
         console.error(e);

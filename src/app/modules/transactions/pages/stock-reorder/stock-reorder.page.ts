@@ -76,7 +76,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
         this.objects = response;
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (error) {
       this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);

@@ -53,7 +53,7 @@ export class DebtorApplicationDetailPage implements OnInit {
         this.object = response;
         this.loadWorkflow(this.object.header.customerPreId);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);
@@ -132,7 +132,7 @@ export class DebtorApplicationDetailPage implements OnInit {
       await this.commonService.commonDownload(response, object);
       this.toastService.presentToast("Download Complete", "", "top", "success", 1000);
     }, error => {
-      console.error(error);;
+      console.error(error);
     })
   }
 

@@ -83,7 +83,7 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
         this.objects = response;
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (error) {
       this.toastService.presentToast("", "Error loading object.", "top", "danger", 1000);
@@ -179,7 +179,7 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
         let filename = doc.salesOrderNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

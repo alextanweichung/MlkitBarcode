@@ -132,7 +132,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
       this.objectService.getDashboard().subscribe(response => {
         this.dashboardData = response;
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);
@@ -190,7 +190,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
         this.objectService.downloadFiles(memoDetail.filesId).subscribe(async response => {
           await this.commonService.commonDownloadPdf(response, filename);
         }, error => {
-          console.error(error);;
+          console.error(error);
         })
       }
     } catch (e) {

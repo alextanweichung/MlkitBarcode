@@ -114,7 +114,7 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
         await this.loadingService.dismissLoading();
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       await this.loadingService.dismissLoading();

@@ -71,7 +71,7 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
         this.object = response;
         // this.loadWorkflow(this.object.header.salesOrderId);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

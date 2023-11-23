@@ -111,7 +111,7 @@ export class CashDepositEditPage implements OnInit {
           this.loadAttachment(this.object.depositFileId);
         }
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);
@@ -125,7 +125,7 @@ export class CashDepositEditPage implements OnInit {
         let objectURL = URL.createObjectURL(blob);
         this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

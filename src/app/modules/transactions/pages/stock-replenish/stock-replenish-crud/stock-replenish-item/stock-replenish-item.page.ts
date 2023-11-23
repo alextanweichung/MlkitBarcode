@@ -77,7 +77,7 @@ export class StockReplenishItemPage implements OnInit, ViewWillEnter {
 //           this.configSalesActivatePromotionEngine = false;
 //         }
 //       }, error => {
-//         console.error(error);;
+//         console.error(error);
 //       })
 //       this.authService.precisionList$.subscribe(precision => {
 //         this.precisionSales = precision.find(x => x.precisionCode == "SALES");

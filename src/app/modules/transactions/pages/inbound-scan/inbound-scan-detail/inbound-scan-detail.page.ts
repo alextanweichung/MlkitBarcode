@@ -54,7 +54,7 @@ export class InboundScanDetailPage implements OnInit, ViewWillEnter {
         //   this.uniqueSalesOrder = [...new Set(this.object.outstandingPickList.flatMap(r => r.salesOrderNum))];
         // }
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

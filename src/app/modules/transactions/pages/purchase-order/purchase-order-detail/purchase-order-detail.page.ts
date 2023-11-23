@@ -79,7 +79,7 @@ export class PurchaseOrderDetailPage implements OnInit {
         this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
         this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (error) {
       this.toastService.presentToast('Error loading master list', '', 'top', 'danger', 1000);
@@ -92,7 +92,7 @@ export class PurchaseOrderDetailPage implements OnInit {
         this.object = response;
         this.flattenPurchaseOrder = this.objectService.unflattenDtoDetail(this.object);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (error) {
       this.toastService.presentToast('Error loading object', '', 'top', 'danger', 1000);
@@ -248,7 +248,7 @@ export class PurchaseOrderDetailPage implements OnInit {
             this.navController.back();
           }
         }, error => {
-          console.error(error);;
+          console.error(error);
         })
       } catch (error) {
         this.toastService.presentToast('Update error', '', 'top', 'danger', 1000);

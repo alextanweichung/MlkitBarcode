@@ -51,7 +51,7 @@ export class RpSalesPerformancePage implements OnInit, ViewWillEnter {
           })
           this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
         }, error => {
-          console.error(error);;
+          console.error(error);
         })
       } catch (e) {
         console.error(e);

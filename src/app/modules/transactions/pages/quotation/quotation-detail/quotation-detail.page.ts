@@ -197,7 +197,7 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
         let filename = this.objectService.objectHeader.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);
@@ -317,7 +317,7 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
               this.navController.back();
             }
           }, error => {
-            console.error(error);;
+            console.error(error);
           })
         } catch (error) {
           this.toastService.presentToast("System Error", "Update error", "top", "danger", 1000);

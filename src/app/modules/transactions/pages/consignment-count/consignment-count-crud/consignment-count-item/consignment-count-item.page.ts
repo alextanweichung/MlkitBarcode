@@ -73,7 +73,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 					this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
 				}
 			}, error => {
-				console.error(error);;
+				console.error(error);
 			})
 		} catch (e) {
 			console.error(e);
@@ -410,7 +410,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 			}, async error => {
 				this.submit_attempt = false;
 				await this.loadingService.dismissLoading();
-				console.error(error);;
+				console.error(error);
 			})
 		} catch (e) {
 			this.submit_attempt = false;

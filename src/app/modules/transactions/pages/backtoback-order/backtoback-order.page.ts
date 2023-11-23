@@ -71,7 +71,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
         this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
       }, async error => {
         await this.loadingService.dismissLoading();
-        console.error(error);;
+        console.error(error);
       })
     } catch (error) {
       await this.loadingService.dismissLoading();
@@ -187,7 +187,7 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   //       let filename = doc.salesOrderNum + ".pdf";
   //       this.commonService.commonDownloadPdf(response, filename);
   //     }, error => {
-  //       console.error(error);;
+  //       console.error(error);
   //     })
   //   } catch (e) {
   //     console.error(e);

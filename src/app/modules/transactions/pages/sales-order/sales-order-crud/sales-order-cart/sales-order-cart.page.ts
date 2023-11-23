@@ -619,7 +619,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       }, async error => {
         await this.loadingService.dismissLoading();
         this.submit_attempt = false;
-        console.error(error);;
+        console.error(error);
       });
     } catch (e) {
       await this.loadingService.dismissLoading();

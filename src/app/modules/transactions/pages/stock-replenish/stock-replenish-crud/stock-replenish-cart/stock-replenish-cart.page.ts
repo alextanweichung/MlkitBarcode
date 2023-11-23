@@ -111,7 +111,7 @@ export class StockReplenishCartPage implements OnInit, ViewWillEnter {
   //         this.orderingPriceApprovalEnabledFields = priceApprovalEnabledFields.ctrlValue;
   //       }
   //     }, error => {
-  //       console.error(error);;
+  //       console.error(error);
   //     })
   //     this.authService.precisionList$.subscribe(precision => {
   //       this.precisionSales = precision.find(x => x.precisionCode == "SALES");
@@ -566,7 +566,7 @@ export class StockReplenishCartPage implements OnInit, ViewWillEnter {
   //       this.navController.navigateRoot('/transactions/stock-replenish/stock-replenish-detail', navigationExtras);
   //     }, error => {
   //       this.submit_attempt = false;
-  //       console.error(error);;
+  //       console.error(error);
   //     });
   //   } catch (e) {
   //     this.submit_attempt = false;

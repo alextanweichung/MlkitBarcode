@@ -81,7 +81,7 @@ export class StockReplenishDetailPage implements OnInit, ViewWillEnter {
         this.objectService.setHeader(this.object.header);
         this.objectService.setChoosenItems(this.object.details);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

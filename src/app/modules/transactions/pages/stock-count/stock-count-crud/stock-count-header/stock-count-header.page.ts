@@ -100,7 +100,7 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter {
             this.inventoryCountBatchDdl = JSON.parse(JSON.stringify(temp));
           }
         }, error => {
-          console.error(error);;
+          console.error(error);
         })
       }
     } catch (e) {

@@ -181,7 +181,7 @@ export class QuotationPage implements OnInit, ViewWillEnter {
         let filename = doc.quotationNum + ".pdf";
         this.commonService.commonDownloadPdf(response, filename);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

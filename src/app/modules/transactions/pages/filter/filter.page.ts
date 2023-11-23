@@ -56,7 +56,7 @@ export class FilterPage implements OnInit {
   onDateFromSelect(event: any) {
     let date = new Date(event.detail.value);
     this.startDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0));
-    this.date_from = format(parseISO(event.detail.value), 'MMM d, yyyy');;
+    this.date_from = format(parseISO(event.detail.value), 'MMM d, yyyy');
     // this.date_from_active = false;
   }
 
@@ -64,7 +64,7 @@ export class FilterPage implements OnInit {
   onDateToSelect(event: any) {
     let date = new Date(event.detail.value);
     this.endDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0));
-    this.date_to = format(parseISO(event.detail.value), 'MMM d, yyyy');;
+    this.date_to = format(parseISO(event.detail.value), 'MMM d, yyyy');
     // this.date_to_active = false;
   }
 

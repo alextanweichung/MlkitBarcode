@@ -53,7 +53,7 @@ export class PurchaseOrderReviewsPage implements OnInit, ViewWillEnter {
         this.completedObjects = response.filter(r => r.isComplete);
         this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (error) {
       this.toastService.presentToast("", "Error Loading", "top", "danger", 1000);

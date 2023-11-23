@@ -174,7 +174,7 @@ export class TruckLoadingAddPage implements OnInit {
           this.navController.navigateRoot ('/transactions/truck-loading/truck-loading-detail', navigationExtras);
         }
       }, error => {
-        console.error(error);;
+        console.error(error);
       })
     } catch (e) {
       console.error(e);

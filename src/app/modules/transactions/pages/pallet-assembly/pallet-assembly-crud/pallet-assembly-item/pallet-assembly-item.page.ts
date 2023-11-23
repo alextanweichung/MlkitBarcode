@@ -393,7 +393,7 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
 			}, async error => {
 				this.submit_attempt = false;
 				await this.loadingService.dismissLoading();
-				console.error(error);;
+				console.error(error);
 			})
 		} catch (e) {
 			this.submit_attempt = false;
