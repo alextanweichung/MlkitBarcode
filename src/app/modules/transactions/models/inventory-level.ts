@@ -1,50 +1,70 @@
 import { ItemPricing } from "src/app/shared/models/transaction-detail"
 
-export interface InventoryLevel {
-  itemId: number
-  itemCode: string
-  locationId: number
-  locationCode: string
-  locationDescription: string
-  qty: number
-  transitQty: number
-  openQty: number
+export interface InventoryLevelRoot {
+   itemInfo: InventoryLevelItemInfo[]
+   priceInfo: InventoryLevelPriceInfo[]
 }
 
-export interface InventoryVariationLevel {
-  locationId: number
-  locationCode: string
-  locationDescription: string
-  variation: InventoryVariation
-  itemVariationXDescription: string[]
-  itemVariationYDescription: string[]
-  itemVariationXCode: string[]
-  itemVariationYCode: string[]
+export interface InventoryLevelItemInfo {
+   itemId: number
+   itemCode: string
+   locationId: number
+   locationCode: string
+   locationDescription: string
+   qty: number
+   transitQty: number
+   openQty: number
 }
 
-export interface InventoryVariation {
-  itemId: number
-  itemCode: string
-  variationDetails: InventoryVariationDetail[]
+export interface InventoryLevelPriceInfo {
+   priceSegmentCode: string
+   unitPrice: number
+   discountGroupCode: string
+   discountPercent: number
+   nettPrice: number
 }
 
-export interface InventoryVariationDetail {
-  itemVariationXId: number
-  itemVariationXCode: string
-  itemVariationXDescription: string
-  variationDetails: InnerIVDetail[]
-}
-
-export interface InnerIVDetail {
-  itemVariationYId: number
-  itemVariationYCode: string
-  itemVariationYDescription: string
-  itemSku: string
-  qty?: number
-  openQty?: number
-}
-
+//// variation
+export interface InventoryLevelVariationRoot {
+   itemInfo: InventoryLevelVariationItemInfo[]
+   priceInfo: InventoryLevelPriceInfo[]
+ }
+ 
+ export interface InventoryLevelVariationItemInfo {
+   locationId: number
+   locationCode: string
+   locationDescription: string
+   variation: InventoryLevelVariation
+   itemVariationXDescription: string[]
+   itemVariationYDescription: string[]
+   itemVariationXCode: string[]
+   itemVariationYCode: string[]
+ }
+ 
+ export interface InventoryLevelVariation {
+   itemId: number
+   itemCode: string
+   variationDetails: InventoryLevelVariationDetail[]
+ }
+ 
+ export interface InventoryLevelVariationDetail {
+   itemVariationXId: number
+   itemVariationXCode: string
+   itemVariationXDescription: string
+   variationDetails: InventoryLevelVariationDetail2[]
+ }
+ 
+ export interface InventoryLevelVariationDetail2 {
+   itemVariationYId: number
+   itemVariationYCode: string
+   itemVariationYDescription: string
+   itemSku: string
+   qty?: number
+   transitQty?: number
+   openQty?: number
+ }
+ 
 export interface ItemPriceBySegment {
-  locationId: number
-  itemPricing: ItemPricing
-}
+   locationId: number
+   itemPricing: ItemPricing
+ }
