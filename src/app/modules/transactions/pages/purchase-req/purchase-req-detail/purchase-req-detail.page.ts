@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, AlertController, IonPopover } from '@ionic/angular';
+import { NavController, AlertController, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -19,7 +19,7 @@ import { TrxChild } from 'src/app/shared/models/trx-child';
    templateUrl: './purchase-req-detail.page.html',
    styleUrls: ['./purchase-req-detail.page.scss'],
 })
-export class PurchaseReqDetailPage implements OnInit {
+export class PurchaseReqDetailPage implements OnInit, ViewWillEnter {
 
    parent: string = "Purchase Req"
 
@@ -51,13 +51,16 @@ export class PurchaseReqDetailPage implements OnInit {
       })
    }
 
+   ionViewWillEnter(): void {
+      this.loadMasterList();
+   }
+
    ngOnInit() {
       this.loadModuleControl();
       if (!this.objectId) {
          this.toastService.presentToast("System Erorr", "Please contact adminstrator", "top", "danger", 1000);
          this.navController.navigateBack("/transactions")
       } else {
-         this.loadMasterList();
          this.loadObject();
       }
    }
@@ -70,12 +73,14 @@ export class PurchaseReqDetailPage implements OnInit {
    }
 
    locationMasterList: MasterListDetails[] = [];
+   vendorMasterList: MasterListDetails[] = [];
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
    loadMasterList() {
       try {
          this.objectService.getMasterList().subscribe(response => {
             this.locationMasterList = response.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
+            this.vendorMasterList = response.filter(x => x.objectName == "Vendor").flatMap(src => src.details).filter(y => y.deactivated == 0);
             this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
             this.itemVariationYMasterList = response.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
          }, error => {

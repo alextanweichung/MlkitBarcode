@@ -82,6 +82,7 @@ export class PurchaseReqService {
             typeCode: object.header.typeCode,
             attention: object.header.attention,
             locationId: object.header.locationId,
+            vendorId: object.header.vendorId,
             termPeriodId: object.header.termPeriodId,
             workFlowTransactionId: object.header.workFlowTransactionId,
             countryId: object.header.countryId,
