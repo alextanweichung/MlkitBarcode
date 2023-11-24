@@ -109,6 +109,14 @@
               <div>{{objectService.objectDetail|sum:'subTotal'|number:'1.2-2'}}</div>
             </ion-col>
           </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Created By</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+               <div>{{objectService.objectHeader.createdBy}} {{objectService.objectHeader.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+            </ion-col>
+          </ion-row>
         </ion-grid>
       </ion-item>
     </ion-list>

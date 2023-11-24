@@ -24,6 +24,7 @@ export interface PosApproval {
    remark: string
    sequence: number
    createdBy: string
+   createdAt: Date
    deactivated: boolean
 }
 

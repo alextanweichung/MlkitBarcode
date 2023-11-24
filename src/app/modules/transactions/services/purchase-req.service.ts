@@ -88,7 +88,10 @@ export class PurchaseReqService {
             countryId: object.header.countryId,
             currencyId: object.header.currencyId,
             currencyRate: object.header.currencyRate,
-            remark: object.header.remark
+            remark: object.header.remark,
+            createdById: object.header.createdById,
+            createdBy: object.header.createdBy,
+            createdAt: object.header.createdAt
          },
          details: line
       }

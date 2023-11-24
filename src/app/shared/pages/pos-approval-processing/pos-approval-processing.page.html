@@ -21,7 +21,7 @@
 							<ng-container *ngIf="rowData.posApprovalType === 'SE'">
 								<span class="font-bold">Exchange: {{rowData.posSpecialExchangeNum}}</span>
 							</ng-container>
-							<ng-container *ngIf="rowData.posApprovalType === 'RF'">
+							<ng-container *ngIf="rowData.posApprovalType === 'RD'">
 								<span class="font-bold">Recall: {{rowData.salesDepositNum}}</span>
 								<!-- <a routerLink="/rm/pos-bill" [queryParams]="{id: item.posBillId}" target="_blank">{{item.posBillNum}} <i class="pi pi-external-link" pTooltip="Browse document"></i></a> -->
 							</ng-container>
@@ -64,6 +64,11 @@
 						<ion-row>
 							<ion-col class="ion-flex ion-margin-auto">
 								<span class="block font-semibold" *ngIf="rowData.remark">HQ Remark: {{rowData.remark}}</span>
+							</ion-col>
+						</ion-row>
+						<ion-row>
+							<ion-col class="ion-flex ion-margin-auto">
+								<span class="block">Created By: {{rowData.createdBy}} {{rowData.createdAt|date:"dd/MM/yy hh:mm a"}}</span>
 							</ion-col>
 						</ion-row>
 					</ng-container>
@@ -113,7 +118,7 @@
 						<ng-container *ngIf="rowData.posApprovalType === 'SE'">
 							<span class="font-bold">Exchange: {{rowData.posSpecialExchangeNum}}</span>
 						</ng-container>
-						<ng-container *ngIf="rowData.posApprovalType === 'RF'">
+						<ng-container *ngIf="rowData.posApprovalType === 'RD'">
 							<span class="font-bold">Recall: {{rowData.salesDepositNum}}</span>
 							<!-- <a routerLink="/rm/pos-bill" [queryParams]="{id: item.posBillId}" target="_blank">{{item.posBillNum}} <i class="pi pi-external-link" pTooltip="Browse document"></i></a> -->
 						</ng-container>
@@ -158,6 +163,11 @@
 							<span class="block font-semibold" *ngIf="rowData.remark">HQ Remark: {{rowData.remark}}</span>
 						</ion-col>
 					</ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <span class="block">Created By: {{rowData.createdBy}} {{rowData.createdAt|date:"dd/MM/yy hh:mm a"}}</span>
+                  </ion-col>
+               </ion-row>
 				</ng-container>
 				<ng-container *ngIf="rowData.posApprovalType === 'RD'">
 					<ion-row>

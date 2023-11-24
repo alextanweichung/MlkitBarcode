@@ -1,6 +1,10 @@
 <ion-header collapse="fade" [translucent]="true">
   <ion-toolbar>
-    <ion-title>Detail</ion-title>
+   <ion-title>
+      <div class="ion-text-wrap">
+         {{object?.header?.nonTradePurchaseReqNum}}
+      </div>
+   </ion-title>
     <ion-buttons slot="start">
       <ion-back-button text=""></ion-back-button>
     </ion-buttons>
@@ -48,11 +52,6 @@
   </ng-template>
 </ion-popover>
 <ion-content fullscreen>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Detail</ion-label>
-    </ion-toolbar>
-  </ion-header>
   <div class="p-2" *ngIf="object">
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
       <ion-item button detail="false" class="ion-no-padding no-ripple">
@@ -96,6 +95,14 @@
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
               <div>{{object.details|sum:'subTotal'|number:'1.2-2'}}</div>
             </ion-col>
+          </ion-row>
+          <ion-row>
+             <ion-col class="ion-flex ion-margin-auto">
+                <div class="font-bold">Created By</div>
+             </ion-col>
+             <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                <div>{{object.header.createdBy}} {{object.header.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+             </ion-col>
           </ion-row>
         </ion-grid>
       </ion-item>

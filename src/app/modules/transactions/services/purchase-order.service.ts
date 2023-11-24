@@ -83,7 +83,10 @@ export class PurchaseOrderService {
         workFlowTransactionId: purchaseOrder.header.workFlowTransactionId,
         countryId: purchaseOrder.header.countryId,
         currencyId: purchaseOrder.header.currencyId,
-        currencyRate: purchaseOrder.header.currencyRate
+        currencyRate: purchaseOrder.header.currencyRate,
+        createdById: purchaseOrder.header.createdById,
+        createdBy: purchaseOrder.header.createdBy,
+        createdAt: purchaseOrder.header.createdAt
       },
       details: line
     }

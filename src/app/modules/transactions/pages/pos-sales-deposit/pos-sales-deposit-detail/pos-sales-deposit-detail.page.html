@@ -71,6 +71,14 @@
 							<div>{{object?.header?.totalAmt|number:"1.2"}}</div>
 						</ion-col>
 					</ion-row>
+					<ion-row>
+						<ion-col class="ion-flex ion-margin-auto">
+							<div class="font-bold">Created By</div>
+						</ion-col>
+						<ion-col class="ion-flex ion-margin-auto justify-content-end">
+							<div>{{object?.header?.createdBy}} {{object?.header?.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+						</ion-col>
+					</ion-row>
 				</ion-grid>
 			</ion-item>
 		</ion-list>
