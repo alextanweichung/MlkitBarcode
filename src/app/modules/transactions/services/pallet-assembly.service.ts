@@ -41,19 +41,17 @@ export class PalletAssemblyService {
     this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
     this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
     this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
+    this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "W" && this.configService.loginUser.locationId.includes(r.id));
   }
 
   objectHeader: PalletAssemblyHeader;
   setHeader(objectHeader: PalletAssemblyHeader) {
     this.objectHeader = objectHeader;
-    console.log("🚀 ~ file: pallet-assembly.service.ts:46 ~ PalletAssemblyService ~ setHeader ~ this.objectHeader:", this.objectHeader)
   }
 
   objectDetail: PalletAssemblyDetail[] = []
   setLines(objectDetail: PalletAssemblyDetail[]) {
     this.objectDetail = objectDetail;
-    console.log("🚀 ~ file: pallet-assembly.service.ts:52 ~ PalletAssemblyService ~ setLines ~ this.objectDetail:", this.objectDetail)
   }
 
   locationBin: string[] = [];
