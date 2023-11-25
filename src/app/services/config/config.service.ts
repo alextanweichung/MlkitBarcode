@@ -209,7 +209,10 @@ export class ConfigService {
    async getLocalTransaction(trxType: string): Promise<LocalTransaction[]> {
       try {
          let ret = await this.commonQueryService.selectAll(inboundDb_Tables.local_Transaction, dbConfig.inbounddb) as LocalTransaction[];
-         return ret.filter(r => r.apiUrl === this.selected_sys_param.apiUrl && r.trxType === trxType);
+         if (ret && ret.length > 0) {
+            return ret.filter(r => r.apiUrl === this.selected_sys_param.apiUrl && r.trxType === trxType);
+         }
+         return null;
       } catch (error) {
          console.error(error);
       }
@@ -218,7 +221,10 @@ export class ConfigService {
    async getLocalTransactionById(trxType: string, guid: string): Promise<LocalTransaction> {
       try {
          let ret = await this.commonQueryService.selectAll(inboundDb_Tables.local_Transaction, dbConfig.inbounddb) as LocalTransaction[];
-         return ret.find(r => r.apiUrl === this.selected_sys_param.apiUrl && r.trxType === trxType && r.id === guid && r.apiUrl === this.selected_sys_param.apiUrl);
+         if (ret) {
+            return ret.find(r => r.apiUrl === this.selected_sys_param.apiUrl && r.trxType === trxType && r.id === guid && r.apiUrl === this.selected_sys_param.apiUrl);
+         }
+         return null;
       } catch (error) {
          console.error(error);
       }

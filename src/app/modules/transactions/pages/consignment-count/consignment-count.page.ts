@@ -141,14 +141,16 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 		try {
 			let localObject = await this.configService.getLocalTransaction("ConsignmentCount");
 			let d: ConsignmentCountHeader[] = [];
-			localObject.forEach(r => {
-				let dd: ConsignmentCountRoot = JSON.parse(r.jsonData);
-				dd.header.isLocal = true;
-				dd.header.guid = r.id;
-				dd.header.lastUpdated = r.lastUpdated;
-				d.push(dd.header);
-			})
-			this.objects = [...this.objects, ...d];
+         if (localObject && localObject.length > 0) {
+            localObject.forEach(r => {
+               let dd: ConsignmentCountRoot = JSON.parse(r.jsonData);
+               dd.header.isLocal = true;
+               dd.header.guid = r.id;
+               dd.header.lastUpdated = r.lastUpdated;
+               d.push(dd.header);
+            })
+            this.objects = [...this.objects, ...d];
+         }
 			await this.resetFilteredObj();
 			if ((await Network.getStatus()).connected) {
 				await this.loadObjects();
