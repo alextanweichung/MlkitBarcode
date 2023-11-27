@@ -50,6 +50,8 @@ export const approvalAppCode = {
    refundAP: "MAMRAP",
    exchangeAP: "MAMERP",
    recallDepositAP: "MAMRDAP",
+   branchReceivingRV: "MABRRV",
+   branchReceivingAP: "MABRAP",
    otpConfig: "MAMAOTP",
 }
 

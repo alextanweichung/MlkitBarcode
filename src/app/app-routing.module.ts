@@ -130,6 +130,15 @@ const routes: Routes = [
     path: 'managements/recall-deposit-approvals',
     loadChildren: () => import('./modules/managements/pages/recall-deposit-approvals/recall-deposit-approvals.module').then( m => m.RecallDepositApprovalsPageModule)
   },
+  //management-branch-receiving
+  {
+    path: 'managements/branch-receiving-approvals',
+    loadChildren: () => import('./modules/managements/pages/branch-receiving-approvals/branch-receiving-approvals.module').then(m => m.BranchReceivingApprovalsPageModule)
+  },
+  {
+    path: 'managements/branch-receiving-reviews',
+    loadChildren: () => import('./modules/managements/pages/branch-receiving-reviews/branch-receiving-reviews.module').then(m => m.BranchReceivingReviewsPageModule)
+  },
   // management-otp-configuration
   {
     path: 'managements/otp-configuration',
@@ -298,6 +307,11 @@ const routes: Routes = [
   {
     path: 'transactions/pallet-assembly',
     loadChildren: () => import('./modules/transactions/pages/pallet-assembly/pallet-assembly.module').then( m => m.PalletAssemblyPageModule)
+  },
+  // transactions-branch-receiving
+  {
+    path: 'transactions/branch-receiving/branch-receiving-detail',
+    loadChildren: () => import('./modules/transactions/pages/branch-receiving/branch-receiving-detail/branch-receiving-detail.module').then(m => m.BranchReceivingDetailPageModule)
   },
 
 
