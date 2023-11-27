@@ -20,7 +20,7 @@ export class TransactionProcessingPage implements OnInit {
   @Output() onObjectUpdated: EventEmitter<number> = new EventEmitter();
 
   @Input() selectedSegment: string = 'pending';
-
+  @Input() showAmount:boolean = true;
   constructor(
     private objectService: TransactionProcessingService,
     private navController: NavController,

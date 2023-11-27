@@ -18,5 +18,5 @@
 <ion-content fullscreen>
   <app-transaction-processing [pendingObjects]="pendingObjects" [completedObjects]="completedObjects"
     (onObjectUpdated)="onObjectUpdated($event)" parentType="Branch-Receiving"
-    processType="REVIEWS"></app-transaction-processing>
+    processType="REVIEWS" [showAmount]="false"></app-transaction-processing>
 </ion-content>
