@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import Decimal from 'decimal.js';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -164,9 +165,9 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
       if (this.objectService.systemWideActivateTaxControl) {
         if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
           trxLine.unitPrice = trxLine.itemPricing.unitPrice;
-          trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+          trxLine.unitPriceExTax = this.commonService.computeAmtExclTax(new Decimal(trxLine.itemPricing.unitPrice ? trxLine.itemPricing.unitPrice : 0), trxLine.taxPct).toNumber();
         } else {
-          trxLine.unitPrice = this.commonService.computeAmtInclTax(trxLine.itemPricing.unitPrice, trxLine.taxPct);
+          trxLine.unitPrice = this.commonService.computeAmtInclTax(new Decimal(trxLine.itemPricing.unitPrice), trxLine.taxPct).toNumber();
           trxLine.unitPriceExTax = trxLine.itemPricing.unitPrice;
         }
       } else {

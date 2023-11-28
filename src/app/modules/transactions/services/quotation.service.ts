@@ -22,271 +22,279 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
-  observe: 'response' as 'response'
+   observe: 'response' as 'response'
 };
 
 @Injectable({
-  providedIn: 'root'
+   providedIn: 'root'
 })
-export class QuotationService { 
-  
-  promotionMaster: PromotionMaster[] = [];
+export class QuotationService {
 
-  fullMasterList: MasterList[] = [];
-  customerMasterList: MasterListDetails[] = [];
-  discountGroupMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  shipMethodMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  areaMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  salesAgentMasterList: MasterListDetails[] = [];
+   promotionMaster: PromotionMaster[] = [];
 
-  customers: Customer[] = [];
+   fullMasterList: MasterList[] = [];
+   customerMasterList: MasterListDetails[] = [];
+   discountGroupMasterList: MasterListDetails[] = [];
+   itemVariationXMasterList: MasterListDetails[] = [];
+   itemVariationYMasterList: MasterListDetails[] = [];
+   shipMethodMasterList: MasterListDetails[] = [];
+   locationMasterList: MasterListDetails[] = [];
+   areaMasterList: MasterListDetails[] = [];
+   currencyMasterList: MasterListDetails[] = [];
+   salesAgentMasterList: MasterListDetails[] = [];
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private configService: ConfigService,
-  ) {
-    
-  }
+   customers: Customer[] = [];
 
-  async loadRequiredMaster() {
-    await this.loadMasterList();
-    await this.loadCustomer();
-    await this.loadModuleControl();
-  }
+   constructor(
+      private http: HttpClient,
+      private authService: AuthService,
+      private configService: ConfigService,
+   ) {
 
-  async loadMasterList() {
-    this.fullMasterList = await this.getMasterList();
-    this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName === "DiscountGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName === "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
-    this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
-    this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
-  }
+   }
 
-  async loadCustomer() {
-    this.customers = await this.getCustomerList();    
-    await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-    this.bindCustomerList();
-  }
+   async loadRequiredMaster() {
+      await this.loadMasterList();
+      await this.loadCustomer();
+      await this.loadModuleControl();
+   }
 
-  customerSearchDropdownList: SearchDropdownList[] = [];
-  bindCustomerList() {
-  this.customerSearchDropdownList = [];
-    this.customers.forEach(r => {
-      this.customerSearchDropdownList.push({
-        id: r.customerId,
-        code: r.customerCode,
-        oldCode: r.oldCustomerCode,
-        description: r.name
+   async loadMasterList() {
+      this.fullMasterList = await this.getMasterList();
+      this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName === "DiscountGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName === "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
+      this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+   }
+
+   async loadCustomer() {
+      this.customers = await this.getCustomerList();
+      await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
+      this.bindCustomerList();
+   }
+
+   customerSearchDropdownList: SearchDropdownList[] = [];
+   bindCustomerList() {
+      this.customerSearchDropdownList = [];
+      this.customers.forEach(r => {
+         this.customerSearchDropdownList.push({
+            id: r.customerId,
+            code: r.customerCode,
+            oldCode: r.oldCustomerCode,
+            description: r.name
+         })
       })
-    })
-  }
-  
-  moduleControl: ModuleControl[];
-  allowDocumentWithEmptyLine: string = "N";
-  salesActivatePromotionEngine: boolean = false;
-  workflowEnablePrintAfterApproved: boolean = false;
-  disableTradeTransactionGenerateGL: boolean  = false;
-  systemWideActivateTaxControl: boolean = false;
-  orderingPriceApprovalEnabledFields: string = "0"
-  precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-  loadModuleControl() {
-    try {
-      this.authService.moduleControlConfig$.subscribe(obj => {
-        this.moduleControl = obj;
+   }
 
-        let allowDocumentWithEmptyLine = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
-        if (allowDocumentWithEmptyLine != undefined) {
-          this.allowDocumentWithEmptyLine = allowDocumentWithEmptyLine.ctrlValue.toUpperCase();
-        }
+   moduleControl: ModuleControl[];
+   allowDocumentWithEmptyLine: string = "N";
+   salesActivatePromotionEngine: boolean = false;
+   workflowEnablePrintAfterApproved: boolean = false;
+   disableTradeTransactionGenerateGL: boolean = false;
+   systemWideActivateTaxControl: boolean = false;
+   orderingPriceApprovalEnabledFields: string = "0"
+   salesActivateTradingMargin: boolean = false;
+   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+   precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+   loadModuleControl() {
+      try {
+         this.authService.moduleControlConfig$.subscribe(obj => {
+            this.moduleControl = obj;
 
-        let workflowEnablePrintAfterApproved = this.moduleControl.find(x => x.ctrlName === "WorkflowEnablePrintAfterApproved")?.ctrlValue;
-        if (workflowEnablePrintAfterApproved && workflowEnablePrintAfterApproved.toUpperCase() === "Y") {
-          this.workflowEnablePrintAfterApproved = true;
-        } else {
-          this.workflowEnablePrintAfterApproved = false;
-        }
+            let allowDocumentWithEmptyLine = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
+            if (allowDocumentWithEmptyLine != undefined) {
+               this.allowDocumentWithEmptyLine = allowDocumentWithEmptyLine.ctrlValue.toUpperCase();
+            }
 
-        let disableTradeTransactionGenerateGL = this.moduleControl.find(x => x.ctrlName === "DisableTradeTransactionGenerateGL")?.ctrlValue;
-        if (disableTradeTransactionGenerateGL && disableTradeTransactionGenerateGL.toUpperCase() === "Y") {
-          this.disableTradeTransactionGenerateGL = true;
-        } else {
-          this.disableTradeTransactionGenerateGL = false;
-        }
+            let workflowEnablePrintAfterApproved = this.moduleControl.find(x => x.ctrlName === "WorkflowEnablePrintAfterApproved")?.ctrlValue;
+            if (workflowEnablePrintAfterApproved && workflowEnablePrintAfterApproved.toUpperCase() === "Y") {
+               this.workflowEnablePrintAfterApproved = true;
+            } else {
+               this.workflowEnablePrintAfterApproved = false;
+            }
 
-        let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
-        if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() === "Y") {
-          this.salesActivatePromotionEngine = true;
-        } else {
-          this.salesActivatePromotionEngine = false;
-        }
+            let disableTradeTransactionGenerateGL = this.moduleControl.find(x => x.ctrlName === "DisableTradeTransactionGenerateGL")?.ctrlValue;
+            if (disableTradeTransactionGenerateGL && disableTradeTransactionGenerateGL.toUpperCase() === "Y") {
+               this.disableTradeTransactionGenerateGL = true;
+            } else {
+               this.disableTradeTransactionGenerateGL = false;
+            }
 
-        let systemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-        if (systemWideActivateTaxControl !== undefined) {
-          this.systemWideActivateTaxControl = systemWideActivateTaxControl.ctrlValue.toUpperCase() === "Y" ? true : false;
-        }
+            let salesActivatePromotionEngine = this.moduleControl.find(x => x.ctrlName === "SalesActivatePromotionEngine")?.ctrlValue;
+            if (salesActivatePromotionEngine && salesActivatePromotionEngine.toUpperCase() === "Y") {
+               this.salesActivatePromotionEngine = true;
+            } else {
+               this.salesActivatePromotionEngine = false;
+            }
 
-        let orderingPriceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
-        if (orderingPriceApprovalEnabledFields) {
-          this.orderingPriceApprovalEnabledFields = orderingPriceApprovalEnabledFields.ctrlValue;
-        }
-      })
-      this.authService.precisionList$.subscribe(precision => {
-        this.precisionSales = precision.find(x => x.precisionCode === "SALES");
-        if (this.precisionSales.localMin === null) this.precisionSales.localMin = 2;
-        if (this.precisionSales.localMax === null) this.precisionSales.localMax = 2;
-        if (this.precisionSales.localFormat === null) this.precisionSales.localFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
-        if (this.precisionSales.foreignMin === null) this.precisionSales.foreignMin = 2;
-        if (this.precisionSales.foreignMax === null) this.precisionSales.foreignMax = 2;
-        if (this.precisionSales.foreignFormat === null) this.precisionSales.foreignFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
+            let systemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+            if (systemWideActivateTaxControl !== undefined) {
+               this.systemWideActivateTaxControl = systemWideActivateTaxControl.ctrlValue.toUpperCase() === "Y" ? true : false;
+            }
 
-        this.precisionSalesUnitPrice = precision.find(x => x.precisionCode === "SALESUNITPRICE");
-        if (this.precisionSalesUnitPrice.localMin === null) this.precisionSalesUnitPrice.localMin = 2;
-        if (this.precisionSalesUnitPrice.localMax === null) this.precisionSalesUnitPrice.localMax = 2;
-        if (this.precisionSalesUnitPrice.localFormat === null) this.precisionSalesUnitPrice.localFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
-        if (this.precisionSalesUnitPrice.foreignMin === null) this.precisionSalesUnitPrice.foreignMin = 2;
-        if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionSalesUnitPrice.foreignMax = 2;
-        if (this.precisionSalesUnitPrice.foreignFormat === null) this.precisionSalesUnitPrice.foreignFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
+            let orderingPriceApprovalEnabledFields = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalEnabledFields");
+            if (orderingPriceApprovalEnabledFields) {
+               this.orderingPriceApprovalEnabledFields = orderingPriceApprovalEnabledFields.ctrlValue;
+            }
 
-        this.precisionTax = precision.find(x => x.precisionCode === "TAX");
-        if (this.precisionTax.localMin === null) this.precisionTax.localMin = 2;
-        if (this.precisionTax.localMax === null) this.precisionTax.localMax = 2;
-        if (this.precisionTax.localFormat === null) this.precisionTax.localFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
-        if (this.precisionTax.foreignMin === null) this.precisionTax.foreignMin = 2;
-        if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionTax.foreignMax = 2;
-        if (this.precisionTax.foreignFormat === null) this.precisionTax.foreignFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+            let isTradingMargin = this.moduleControl.find(x => x.ctrlName === "SalesActivateTradingMargin");
+            if (isTradingMargin && isTradingMargin.ctrlValue.toUpperCase() === "Y") {
+               this.salesActivateTradingMargin = true;
+            } else {
+               this.salesActivateTradingMargin = false;
+            }
+         })
+         this.authService.precisionList$.subscribe(precision => {
+            this.precisionSales = precision.find(x => x.precisionCode === "SALES");
+            if (this.precisionSales.localMin === null) this.precisionSales.localMin = 2;
+            if (this.precisionSales.localMax === null) this.precisionSales.localMax = 2;
+            if (this.precisionSales.localFormat === null) this.precisionSales.localFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
+            if (this.precisionSales.foreignMin === null) this.precisionSales.foreignMin = 2;
+            if (this.precisionSales.foreignMax === null) this.precisionSales.foreignMax = 2;
+            if (this.precisionSales.foreignFormat === null) this.precisionSales.foreignFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
 
-  /* #region  for insert */
+            this.precisionSalesUnitPrice = precision.find(x => x.precisionCode === "SALESUNITPRICE");
+            if (this.precisionSalesUnitPrice.localMin === null) this.precisionSalesUnitPrice.localMin = 2;
+            if (this.precisionSalesUnitPrice.localMax === null) this.precisionSalesUnitPrice.localMax = 2;
+            if (this.precisionSalesUnitPrice.localFormat === null) this.precisionSalesUnitPrice.localFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
+            if (this.precisionSalesUnitPrice.foreignMin === null) this.precisionSalesUnitPrice.foreignMin = 2;
+            if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionSalesUnitPrice.foreignMax = 2;
+            if (this.precisionSalesUnitPrice.foreignFormat === null) this.precisionSalesUnitPrice.foreignFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
 
-  objectHeader: QuotationHeader;
-  objectDetail: TransactionDetail[] = [];
-  async setHeader(objectHeader: QuotationHeader) {
-    this.objectHeader = objectHeader;
-    // load promotion first after customer confirmed or whenever header changed.
-    this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
-  }
+            this.precisionTax = precision.find(x => x.precisionCode === "TAX");
+            if (this.precisionTax.localMin === null) this.precisionTax.localMin = 2;
+            if (this.precisionTax.localMax === null) this.precisionTax.localMax = 2;
+            if (this.precisionTax.localFormat === null) this.precisionTax.localFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
+            if (this.precisionTax.foreignMin === null) this.precisionTax.foreignMin = 2;
+            if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionTax.foreignMax = 2;
+            if (this.precisionTax.foreignFormat === null) this.precisionTax.foreignFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
+         })
+      } catch (e) {
+         console.error(e);
+      }
+   }
 
-  setLine(objectDetail: TransactionDetail[]) {
-    this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
-  }
+   /* #region  for insert */
 
-  objectSummary: QuotationRoot
-  setSummary(objectSummary: QuotationRoot) {
-    this.objectSummary = objectSummary;
-  }
+   objectHeader: QuotationHeader;
+   objectDetail: TransactionDetail[] = [];
+   async setHeader(objectHeader: QuotationHeader) {
+      this.objectHeader = objectHeader;
+      // load promotion first after customer confirmed or whenever header changed.
+      this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
+   }
 
-  removeHeader() {
-    this.objectHeader = null;
-  }
+   setLine(objectDetail: TransactionDetail[]) {
+      this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
+   }
 
-  removeLine() {
-    this.objectDetail = [];
-  }
+   objectSummary: QuotationRoot
+   setSummary(objectSummary: QuotationRoot) {
+      this.objectSummary = objectSummary;
+   }
 
-  removeSummary() {
-    this.objectSummary = null;
-  }
+   removeHeader() {
+      this.objectHeader = null;
+   }
 
-  resetVariables() {
-    this.removeHeader();
-    this.removeLine();
-    this.removeSummary();
-  }
+   removeLine() {
+      this.objectDetail = [];
+   }
 
-  hasSalesAgent(): boolean {
-    let salesAgentId = JSON.parse(localStorage.getItem("loginUser"))?.salesAgentId;
-    if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
-      return false;
-    }
-    return true
-  }
+   removeSummary() {
+      this.objectSummary = null;
+   }
 
-  /* #endregion */
+   resetVariables() {
+      this.removeHeader();
+      this.removeLine();
+      this.removeSummary();
+   }
 
-  getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/masterlist", { context: background_load() }).toPromise();
-  }
+   hasSalesAgent(): boolean {
+      let salesAgentId = JSON.parse(localStorage.getItem("loginUser"))?.salesAgentId;
+      if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
+         return false;
+      }
+      return true
+   }
 
-  getStaticLovList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/staticLov").pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
-  }
+   /* #endregion */
 
-  getCustomerList() {
-    return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/customer", { context: background_load() }).toPromise();
-  }
-  
-  getPromotion(trxDate: string, customerId: number) {
-    return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/promotion/" + trxDate + "/" + customerId).toPromise();
-  }
+   getMasterList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/masterlist", { context: background_load() }).toPromise();
+   }
 
-  getFullItemList() {
-    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/item/itemList", { context: background_load() });
-  }
+   getStaticLovList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/staticLov").pipe(
+         map((response: any) =>
+            response.map((item: any) => item)
+         )
+      );
+   }
 
-  getObjectList() {
-    return this.http.get<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/qtlist");
-  }
+   getCustomerList() {
+      return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/customer", { context: background_load() }).toPromise();
+   }
 
-  getObjectListByDate(searchObject: SalesSearchModal) {
-    return this.http.post<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/listing", searchObject);
-  }
+   getPromotion(trxDate: string, customerId: number) {
+      return this.http.get<PromotionMaster[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/promotion/" + trxDate + "/" + customerId).toPromise();
+   }
 
-  getObjectById(objectId: number) {
-    return this.http.get<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/" + objectId);
-  }
+   getFullItemList() {
+      return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/item/itemList", { context: background_load() });
+   }
 
-  insertObject(object: QuotationRoot) {
-    return this.http.post<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
-  }
+   getObjectList() {
+      return this.http.get<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/qtlist");
+   }
 
-  updateObject(object: QuotationRoot) {
-    return this.http.put<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
-  }
+   getObjectListByDate(searchObject: SalesSearchModal) {
+      return this.http.post<QuotationList[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/listing", searchObject);
+   }
 
-  toggleObject(objectId: number) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileQuotation/deactivate/" + objectId, null, httpObserveHeader);
-  }
+   getObjectById(objectId: number) {
+      return this.http.get<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/" + objectId);
+   }
 
-  getCreditInfo(customerId: number) {
-    return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/creditInfo/" + customerId);
-  }
+   insertObject(object: QuotationRoot) {
+      return this.http.post<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
+   }
 
-  downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation/exportPdf", 
-    {
-      "appCode": appCode,
-      "format": format,
-      "documentIds": [ documentId ]
-    },
-    { responseType: "blob"});
-  }
+   updateObject(object: QuotationRoot) {
+      return this.http.put<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
+   }
 
-  bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + "/bulkUpdate", bulkConfirmReverse, httpObserveHeader);
-  }
+   toggleObject(objectId: number) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileQuotation/deactivate/" + objectId, null, httpObserveHeader);
+   }
 
-  getWorkflow(objectId: number) {
-    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/workflow/" + objectId);
-  }
-  
+   getCreditInfo(customerId: number) {
+      return this.http.get<CreditInfo>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/creditInfo/" + customerId);
+   }
+
+   downloadPdf(appCode: any, format: string = "pdf", documentId: any) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation/exportPdf",
+         {
+            "appCode": appCode,
+            "format": format,
+            "documentIds": [documentId]
+         },
+         { responseType: "blob" });
+   }
+
+   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + "/bulkUpdate", bulkConfirmReverse, httpObserveHeader);
+   }
+
+   getWorkflow(objectId: number) {
+      return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileQuotation/workflow/" + objectId);
+   }
+
 }

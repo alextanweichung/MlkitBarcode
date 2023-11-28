@@ -122,6 +122,7 @@ export class SalesOrderService {
    orderingPriceApprovalEnabledFields: string = "0"
    salesOrderQuantityControl: string = "0";
    orderingActivateMOQControl: boolean = false;
+   salesActivateTradingMargin: boolean = false;
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -176,6 +177,13 @@ export class SalesOrderService {
                this.orderingActivateMOQControl = true;
             } else {
                this.orderingActivateMOQControl = false;
+            }
+
+            let isTradingMargin = this.moduleControl.find(x => x.ctrlName === "SalesActivateTradingMargin");
+            if (isTradingMargin && isTradingMargin.ctrlValue.toUpperCase() === "Y") {
+               this.salesActivateTradingMargin = true;
+            } else {
+               this.salesActivateTradingMargin = false;
             }
          })
          this.authService.precisionList$.subscribe(precision => {

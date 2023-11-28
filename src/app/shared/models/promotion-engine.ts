@@ -7,15 +7,17 @@ export interface PromotionMaster {
    itemType: string,
    promoRuleType: string,
    sortingSequence: string,
-   isRepeat: boolean,  
+   isRepeat: boolean,
    isCheckEligibleAmount: boolean,
    eligibleBillAmount: number,
    startDate: Date,
    endDate: Date,
+   promoType: string,
+   specialRuleType: string,
    line?: PromotionLine[],
-   itemList?: PromotionItemList[]
+   itemList?: PromotionItemList[],
    groupList?: PromotionGroupList[],
-   excludeItemList?:PromotionExcludeItemList[]
+   excludeItemList?: PromotionExcludeItemList[]
 }
 
 export interface PromotionLine {
@@ -24,23 +26,23 @@ export interface PromotionLine {
    promoRuleType: string,
    lineItemType: string,
    rowSequence: number,
-   impactId: number,    
+   impactId: number,
    impactCode: string,
    impactType: string,
    impactDiscExpr: number,
-   discountType: string,   
+   discountType: string,
    lineItemList?: PromotionLineItemList[]
 }
 
 export interface PromotionItemList {
-   promoEventItemListId: number, 
+   promoEventItemListId: number,
    promoEventId: number,
    isImpactOnly: boolean,
    itemId: number
 }
 
 export interface PromotionLineItemList {
-   promoEventLineItemListId: number, 
+   promoEventLineItemListId: number,
    promoEventLineId: number,
    promoEventId: number,
    itemId: number
@@ -54,15 +56,15 @@ export interface PromotionItemInfo {
 }
 
 export interface PromotionGroupList {
-    promoEventGroupListId: number, 
-    promoEventId: number,
-    eventGroupId: number,
-    eventGroupCode: string
+   promoEventGroupListId: number,
+   promoEventId: number,
+   eventGroupId: number,
+   eventGroupCode: string
 }
 
 export interface PromotionExcludeItemList {
-    promoEventExItemListId: number, 
-    promoEventId: number,
-    itemId: number
-    itemCode: string
+   promoEventExItemListId: number,
+   promoEventId: number,
+   itemId: number
+   itemCode: string
 }

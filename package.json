@@ -51,6 +51,7 @@
     "cordova-plugin-file": "^8.0.0",
     "cordova-plugin-file-opener2": "^4.0.0",
     "date-fns": "^2.28.0",
+    "decimal.js": "^10.4.3",
     "jwt-decode": "^3.1.2",
     "ng-circle-progress": "^1.7.1",
     "ng2-charts": "^3.1.2",

@@ -196,7 +196,7 @@
           </ion-item>
           <ion-item *ngIf="selectedItem?.promoEventId">
             <ion-label><div>Promo Applied</div></ion-label>
-            <ion-label slot="end">{{getPromoDesc(selectedItem?.promoEventId)}}</ion-label>
+            <ion-label slot="end"><div class="ion-text-wrap">{{getPromoDesc(selectedItem?.promoEventId)}}</div></ion-label>
           </ion-item>
         </ion-list>
         <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="selectedItem.variationTypeCode==='1' || selectedItem.variationTypeCode==='2'">

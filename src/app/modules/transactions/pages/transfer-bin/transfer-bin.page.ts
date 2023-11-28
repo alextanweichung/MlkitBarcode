@@ -32,6 +32,7 @@ export class TransferBinPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
+      await this.objectService.loadRequiredMaster();
       if (!this.objectService.filterStartDate) {
          this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
       }

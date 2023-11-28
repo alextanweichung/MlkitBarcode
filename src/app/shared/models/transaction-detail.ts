@@ -115,6 +115,9 @@ export interface TransactionDetail {
   marginAmt?: number
   bearPct?: number
   bearAmt?: number
+  shortOverBearPct?: number
+  shortOverBearAmt?: number
+  isShortOver?: boolean
   invoiceAmt?: number
   /* #endregion */
 
@@ -126,20 +129,24 @@ export interface TransactionDetail {
   modifiedBy?: string
   modifiedAt?: Date
   deactivated?: boolean
-  promoImpactedQty?: number;
-  promoImpactedType?: string;
-  brandId?: number;
-  groupId?: number;
-  seasonId?: number;
-  categoryId?: number;
-  deptId?: number;
-  oriDiscId?: number;
+  promoImpactedQty?: number
+  promoImpactedType?: string
+  brandId?: number
+  groupId?: number
+  seasonId?: number
+  categoryId?: number
+  deptId?: number
+  oriDiscId?: number
 
-  newItemId?: number;
+  newItemId?: number
   newItemEffectiveDate?: Date
-  minOrderQty?: number;
+  minOrderQty?: number
   minOrderQtyError?: boolean
   
+  tradingMarginPct?: number
+  tradingMarginAmt?: number
+  tradingMarginAmtExTax?: number
+
   // testing performance
   guid?: string
 }
