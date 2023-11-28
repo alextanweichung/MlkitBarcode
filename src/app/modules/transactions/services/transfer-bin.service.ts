@@ -4,7 +4,8 @@ import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
-import { TransferBinDetail, TransferBinHeader, TransferBinList, TransferBinRoot } from "../models/transfer-bin";
+import { BinList, TransferBinDetail, TransferBinHeader, TransferBinList, TransferBinRoot } from "../models/transfer-bin";
+import { SearchDropdownList } from "src/app/shared/models/search-dropdown-list";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -68,6 +69,44 @@ export class TransferBinService {
       this.configService.removeFromLocalStorage(this.trxKey);
    }
 
+   binList: BinList[] = [];
+   binSearchList: SearchDropdownList[] = [];
+   palletList: string[] = [];
+   palletSearchList: SearchDropdownList[] = [];
+   async onLocationChanged(locationId: number) {
+      if (locationId) {
+         this.binList = await this.getBinList(locationId);
+         await this.bindBinList();
+         this.palletList = await this.getPalletList(locationId);
+         await this.bindPalletList();
+      } else {
+         this.binList = [];
+         this.palletList = [];
+      }
+   }
+
+   bindBinList() {
+      this.binSearchList = [];
+      this.binList.forEach((r, index) => {
+         this.binSearchList.push({
+            id: index,
+            code: r.binCode,
+            description: r.binCode
+         })
+      })
+   }
+
+   bindPalletList() {
+      this.palletSearchList = [];
+      this.palletList.forEach((r, index) => {
+         this.palletSearchList.push({
+            id: index,
+            code: r,
+            description: r
+         })
+      })
+   }
+
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferBin/masterList").toPromise();
    }
@@ -90,6 +129,14 @@ export class TransferBinService {
 
    sendDebug(debugObject: JsonDebug) {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileTransferBin/jsonDebug", debugObject, httpObserveHeader);
+   }
+
+   getBinList(locationId: number) {
+      return this.http.get<BinList[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferBin/binlist/${locationId}`).toPromise();
+   }
+
+   getPalletList(locationId: number) {
+      return this.http.get<string[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferBin/palletlist/${locationId}`).toPromise();
    }
 
 }

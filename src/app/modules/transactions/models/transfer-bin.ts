@@ -1,9 +1,9 @@
 export interface TransferBinRoot {
    header: TransferBinHeader
    details: TransferBinDetail[]
- }
- 
- export interface TransferBinHeader {
+}
+
+export interface TransferBinHeader {
    transferBinId: number
    transferBinNum: string
    trxDate: string
@@ -22,18 +22,18 @@ export interface TransferBinRoot {
    modifiedBy: string
    modifiedAt: string
    deactivated: boolean
- }
- 
- export interface TransferBinDetail {
+}
+
+export interface TransferBinDetail {
    typeCode: string
    fromBinCode: string
    fromPalletCode: string
    toBinCode: string
    toPalletCode: string
    groupList: TransferBinGroupList[]
- }
- 
- export interface TransferBinGroupList {
+}
+
+export interface TransferBinGroupList {
    transferBinId: number
    transferBinLineId: number
    itemId: number
@@ -41,9 +41,9 @@ export interface TransferBinRoot {
    description: string
    qtyRequest: number
    deactivated: boolean
- }
+}
 
- export interface TransferBinList {
+export interface TransferBinList {
    transferBinId: number
    transferBinNum: string
    trxDate: string
@@ -52,5 +52,11 @@ export interface TransferBinRoot {
    warehouseAgentId: number
    warehouseAgentName: any
    deactivated: boolean
- }
- 
+}
+
+
+// bin list
+export interface BinList {
+   binCode: string
+   typeCode: string
+}

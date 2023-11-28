@@ -52,11 +52,11 @@ export class TransferBinDetailPage implements OnInit, ViewWillEnter, ViewDidEnte
 		try {
 			await this.loadingService.showLoading();
 			this.objectService.getObjectById(this.objectId).subscribe(async response => {
-            console.log("🚀 ~ file: transfer-bin-detail.page.ts:64 ~ TransferBinDetailPage ~ this.objectService.getObjectById ~ response:", response)
 				let object = response;
 				object.header = this.commonService.convertObjectAllDateType(object.header);				
 				await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
 				await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
+            await this.objectService.onLocationChanged(this.objectService.objectHeader.locationId);
 				await this.loadingService.dismissLoading();
 			}, async error => {
 				await this.loadingService.dismissLoading();
