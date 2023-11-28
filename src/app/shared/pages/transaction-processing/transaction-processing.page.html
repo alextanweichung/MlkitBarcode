@@ -56,7 +56,7 @@
               <div class="font-bold">{{object.docNum}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="showAmount">
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">Transaction Amount</div>
             </ion-col>

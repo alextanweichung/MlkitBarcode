@@ -27,7 +27,8 @@ export const trxAppCode = {
    mobileTransferOut: "MATRTO",
    mobileTransferIn: "MATRTI",
    mobileTransferInScanning: "MATRTIS",
-   mobilePalletAssembly: "MAMPA"
+   mobilePalletAssembly: "MAMPA",
+   mobileTransferBin: "MAMTB"
 }
 
 export const approvalAppCode = {
