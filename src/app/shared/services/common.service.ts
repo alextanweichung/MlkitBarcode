@@ -442,20 +442,31 @@ export class CommonService {
       }
    }
 
-   computeTradingMargin(trxLine: any, roundingPrecision: number) {
+   computeTradingMargin(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, roundingPrecision: number) {
       let subTotal: Decimal = new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0).mul(new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0)).sub(new Decimal(trxLine.discountAmt ? trxLine.discountAmt : 0)).toDecimalPlaces(roundingPrecision);
       let subTotalExTax: Decimal = new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0).mul(new Decimal(trxLine.unitPriceExTax ? trxLine.unitPriceExTax : 0)).sub(new Decimal(trxLine.discountAmtExTax ? trxLine.discountAmtExTax : 0)).toDecimalPlaces(roundingPrecision);
+      if (useTax) {
+         trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         trxLine.tradingMarginAmtExTax = subTotalExTax.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         if (isItemPriceTaxInclusive) {
+            trxLine.subTotal = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
+            trxLine.subTotalExTax = subTotalExTax.sub(new Decimal(trxLine.tradingMarginAmtExTax)).toDecimalPlaces(roundingPrecision).toNumber();
+            trxLine.taxAmt = new Decimal(trxLine.subTotal ? trxLine.subTotal : 0).sub(trxLine.subTotalExTax).toDecimalPlaces(roundingPrecision).toNumber();
+         } else {
+            trxLine.subTotalExTax = subTotalExTax.sub(new Decimal(trxLine.tradingMarginAmtExTax)).toDecimalPlaces(roundingPrecision).toNumber();
+            trxLine.taxAmt = new Decimal(trxLine.subTotalExTax ? trxLine.subTotalExTax : 0).mul(trxLine.taxPct ? trxLine.taxPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+            trxLine.subTotal = (new Decimal(trxLine.subTotalExTax ? trxLine.subTotalExTax : 0).add(trxLine.taxAmt)).toDecimalPlaces(roundingPrecision).toNumber();
+         }
+      } else {
+         trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         trxLine.tradingMarginAmtExTax = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         trxLine.subTotal = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
+         trxLine.subTotalExTax = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
+      }
 
       if (trxLine.qtyRequest == null || trxLine.tradingMarginPct == null) {
          trxLine.tradingMarginAmt = null;
          trxLine.tradingMarginAmtExTax = null;
-         trxLine.subTotal = subTotal.toNumber();
-         trxLine.subTotalExTax = subTotalExTax.toNumber();
-      } else {
-         trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct).div(100).toDecimalPlaces(roundingPrecision).toNumber();
-         trxLine.tradingMarginAmtExTax = subTotalExTax.mul(trxLine.tradingMarginPct).div(100).toDecimalPlaces(roundingPrecision).toNumber();
-         trxLine.subTotal = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
-         trxLine.subTotalExTax = subTotalExTax.sub(new Decimal(trxLine.tradingMarginAmtExTax)).toDecimalPlaces(roundingPrecision).toNumber();
       }
       return trxLine;
    }

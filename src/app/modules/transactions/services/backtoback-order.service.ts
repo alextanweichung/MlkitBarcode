@@ -19,6 +19,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -355,6 +356,10 @@ export class BackToBackOrderService {
             response.map((item: any) => item)
          )
       );
+   }
+
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileBackToBackOrder/jsonDebug", debugObject, httpObserveHeader);
    }
 
 }

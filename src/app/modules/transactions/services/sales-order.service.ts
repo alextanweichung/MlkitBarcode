@@ -22,6 +22,7 @@ import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -353,6 +354,10 @@ export class SalesOrderService {
             response.map((item: any) => item)
          )
       );
+   }
+
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/jsonDebug", debugObject, httpObserveHeader);
    }
 
    /* #region draft */

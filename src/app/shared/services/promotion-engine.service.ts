@@ -27,7 +27,7 @@ export class PromotionEngineService {
          line = this.commonService.reversePromoImpact(line);
          line = this.commonService.computeDiscTaxAmount(line, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision);
          if (computeTradingMargin && line) {
-            line = this.commonService.computeTradingMargin(line, roundingPrecision);
+            line = this.commonService.computeTradingMargin(line, useTax, isItemPriceTaxInclusive, roundingPrecision);
          }
       })
       //#region "First Loop - Promotion Event"
@@ -1172,7 +1172,7 @@ export class PromotionEngineService {
       salesBillLine.forEach(line => {
          line = this.addInitialDiscountForReplacePromoImpactedLine(line, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, debugFlag);
          if (computeTradingMargin && line) {
-            line = this.commonService.computeTradingMargin(line, roundingPrecision);
+            line = this.commonService.computeTradingMargin(line, useTax, isItemPriceTaxInclusive, roundingPrecision);
          }
       })
       //#endregion "First Loop - Promotion Event"

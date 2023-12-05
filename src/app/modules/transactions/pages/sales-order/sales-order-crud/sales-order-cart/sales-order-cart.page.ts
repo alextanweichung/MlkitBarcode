@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
@@ -286,21 +287,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
    /* #endregion */
 
-   /* #region more action popover */
-
-   isPopoverOpen: boolean = false;
-   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
-   showPopover(event) {
-      try {
-         this.popoverMenu.event = event;
-         this.isPopoverOpen = true;
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   /* #endregion */
-
    /* #region  delete item */
 
    async presentDeleteItemAlert(data: TransactionDetail, index: number) {
@@ -416,7 +402,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    computeTradingMarginAmount(trxLine: TransactionDetail) {
-      trxLine = this.commonService.computeTradingMargin(trxLine, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
+      trxLine = this.commonService.computeTradingMargin(trxLine, this.objectService.systemWideActivateTaxControl, trxLine.taxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
    }
 
    getPromoDesc(promoEventId: number) {
@@ -811,5 +797,51 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    /* #endregion */
+
+   /* #region more action popover */
+
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   isPricingPopoverOpen: boolean = false;
+   @ViewChild("pricingPopover", { static: false }) pricingPopover: IonPopover;
+   showPricingPopover(event) {
+      try {
+         this.pricingPopover.event = event;
+         this.isPricingPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
+
+   sendForDebug() {
+      let trxDto: SalesOrderRoot = {
+         header: this.objectService.objectHeader,
+         details: this.objectService.objectDetail
+      }
+      let jsonObjectString = JSON.stringify(trxDto);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status == 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
+   }
 
 }
