@@ -10,109 +10,109 @@ import { LocalTransaction } from "src/app/shared/models/pos-download";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
-  observe: 'response' as 'response'
+   observe: 'response' as 'response'
 };
 
 @Injectable({
-  providedIn: 'root'
+   providedIn: 'root'
 })
 export class ConsignmentCountService {
 
-  filterStartDate: Date;
-  filterEndDate: Date;
+   filterStartDate: Date;
+   filterEndDate: Date;
 
-  trxKey: string = "consignmentCount";
+   trxKey: string = "consignmentCount";
 
-  constructor(
-    private http: HttpClient,
-    private configService: ConfigService
-  ) { }
+   constructor(
+      private http: HttpClient,
+      private configService: ConfigService
+   ) { }
 
-  async loadRequiredMaster() {
-    await this.loadMasterList();
-  }
+   async loadRequiredMaster() {
+      await this.loadMasterList();
+   }
 
-  fullMasterList: MasterList[] = [];
-  itemUomMasterList: MasterListDetails[] = [];
-  itemVariationXMasterList: MasterListDetails[] = [];
-  itemVariationYMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  async loadMasterList() {
-    this.fullMasterList = await this.getMasterList();
-    this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && this.configService.loginUser.locationId.includes(r.id));
-  }
+   fullMasterList: MasterList[] = [];
+   itemUomMasterList: MasterListDetails[] = [];
+   itemVariationXMasterList: MasterListDetails[] = [];
+   itemVariationYMasterList: MasterListDetails[] = [];
+   locationMasterList: MasterListDetails[] = [];
+   async loadMasterList() {
+      this.fullMasterList = await this.getMasterList();
+      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && this.configService.loginUser.locationId.includes(r.id));
+   }
 
-  objectHeader: ConsignmentCountHeader;
-  setHeader(objectHeader: ConsignmentCountHeader) {
-    this.objectHeader = objectHeader;
-  }
+   objectHeader: ConsignmentCountHeader;
+   setHeader(objectHeader: ConsignmentCountHeader) {
+      this.objectHeader = objectHeader;
+   }
 
-  objectDetail: ConsignmentCountDetail[] = []
-  setLines(objectDetail: ConsignmentCountDetail[]) {
-    this.objectDetail = objectDetail;
-  }
+   objectDetail: ConsignmentCountDetail[] = []
+   setLines(objectDetail: ConsignmentCountDetail[]) {
+      this.objectDetail = objectDetail;
+   }
 
-  localObject: LocalTransaction;
-  setLocalObject(localObject: LocalTransaction) {
-    this.localObject = localObject;
-  }
+   localObject: LocalTransaction;
+   setLocalObject(localObject: LocalTransaction) {
+      this.localObject = localObject;
+   }
 
-  removeHeader() {
-    this.objectHeader = null
-  }
+   removeHeader() {
+      this.objectHeader = null
+   }
 
-  removeLines() {
-    this.objectDetail = [];
-  }
+   removeLines() {
+      this.objectDetail = [];
+   }
 
-  removeLocalObject() {
-    this.localObject = null;
-  }
+   removeLocalObject() {
+      this.localObject = null;
+   }
 
-  resetVariables() {
-    this.removeHeader();
-    this.removeLines();
-    this.removeLocalObject();
-    this.configService.removeFromLocalStorage(this.trxKey);
-  }
+   resetVariables() {
+      this.removeHeader();
+      this.removeLines();
+      this.removeLocalObject();
+      this.configService.removeFromLocalStorage(this.trxKey);
+   }
 
-  // locationList: ConsignmentSalesLocation[] = [];
-  // async loadConsignmentLocation() {
-  //   this.locationList = await this.getConsignmentLocation();
-  // }
+   // locationList: ConsignmentSalesLocation[] = [];
+   // async loadConsignmentLocation() {
+   //   this.locationList = await this.getConsignmentLocation();
+   // }
 
-  // getConsignmentLocation() {
-  //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/consignmentLocation").toPromise();
-  // }
+   // getConsignmentLocation() {
+   //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/consignmentLocation").toPromise();
+   // }
 
-  getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/masterList").toPromise();
-  }
+   getMasterList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/masterList").toPromise();
+   }
 
-  // getObjects() {
-  getObjects(dateStart: string, dateEnd: string) {
-    return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
-    // return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount`);
-  }
+   // getObjects() {
+   getObjects(dateStart: string, dateEnd: string) {
+      return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
+      // return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount`);
+   }
 
-  getObjectById(objectId: number) {
-    return this.http.get<ConsignmentCountRoot>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/" + objectId);
-  }
+   getObjectById(objectId: number) {
+      return this.http.get<ConsignmentCountRoot>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/" + objectId);
+   }
 
-  insertObject(objectRoot: ConsignmentCountRoot) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
-  }
+   insertObject(objectRoot: ConsignmentCountRoot) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
+   }
 
-  updateObject(objectRoot: ConsignmentCountRoot) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
-  }
+   updateObject(objectRoot: ConsignmentCountRoot) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
+   }
 
-  sendDebug(debugObject: JsonDebug) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/jsonDebug", debugObject, httpObserveHeader);
-  }
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/jsonDebug", debugObject, httpObserveHeader);
+   }
 
 }

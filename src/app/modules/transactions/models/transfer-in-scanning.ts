@@ -53,6 +53,7 @@ export interface TransferInScanningRoot {
    // for local use
    qtyRequest?: number
    unitPriceExTax?: number
+   lineTotal?: number
  }
 
  export interface TransferAdjustmentRoot {

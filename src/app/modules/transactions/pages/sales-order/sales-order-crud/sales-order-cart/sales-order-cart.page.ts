@@ -501,7 +501,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          trxDto.header.salesOrderNum = null; // always default to null when insert
-         console.log("🚀 ~ file: sales-order-cart.page.ts:488 ~ SalesOrderCartPage ~ insertObject ~ trxDto:", trxDto)
          if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
             this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(async response => {
                this.objectService.setSummary(response.body);
@@ -542,7 +541,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             header: this.objectService.objectHeader,
             details: this.objectService.objectDetail,
          }
-         console.log("🚀 ~ file: sales-order-cart.page.ts:529 ~ SalesOrderCartPage ~ updateObject ~ trxDto:", trxDto)
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          this.objectService.updateObject(trxDto).subscribe(async response => {
             this.objectService.setSummary(response.body);

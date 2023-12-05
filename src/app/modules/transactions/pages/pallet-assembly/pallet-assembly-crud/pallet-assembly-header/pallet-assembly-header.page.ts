@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, IonDatetime, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
+import { BinList } from 'src/app/modules/transactions/models/transfer-bin';
 import { PalletAssemblyService } from 'src/app/modules/transactions/services/pallet-assembly.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -137,13 +138,13 @@ export class PalletAssemblyHeaderPage implements OnInit, ViewWillEnter, ViewDidE
 	}
 
 	binSearchList: SearchDropdownList[] = [];
-	bindLocationBin(binList: any[]) {
+	bindLocationBin(binList: BinList[]) {
 		this.binSearchList = [];
 		binList.forEach((r, rowIndex) => {
 			this.binSearchList.push({
 				id: rowIndex,
-				code: r,
-				description: r
+				code: r.binCode,
+				description: r.binCode
 			})
 		})
 	}

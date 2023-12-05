@@ -9,16 +9,18 @@ import { TransferBinItemPageRoutingModule } from './transfer-bin-item-routing.mo
 import { TransferBinItemPage } from './transfer-bin-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { GeneralScanInputPageModule } from 'src/app/shared/pages/general-scan-input/general-scan-input.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    TransferBinItemPageRoutingModule,
-    BarcodeScanInputPageModule,
-    SearchDropdownPageModule
-  ],
-  declarations: [TransferBinItemPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      TransferBinItemPageRoutingModule,
+      BarcodeScanInputPageModule,
+      SearchDropdownPageModule,
+      GeneralScanInputPageModule
+   ],
+   declarations: [TransferBinItemPage]
 })
-export class TransferBinItemPageModule {}
+export class TransferBinItemPageModule { }

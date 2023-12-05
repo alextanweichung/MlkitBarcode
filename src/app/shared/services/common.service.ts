@@ -457,7 +457,6 @@ export class CommonService {
          trxLine.subTotal = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
          trxLine.subTotalExTax = subTotalExTax.sub(new Decimal(trxLine.tradingMarginAmtExTax)).toDecimalPlaces(roundingPrecision).toNumber();
       }
-      console.log("🚀 ~ file: common.service.ts:461 ~ CommonService ~ computeTradingMargin ~ trxLine:", trxLine)
       return trxLine;
    }
 

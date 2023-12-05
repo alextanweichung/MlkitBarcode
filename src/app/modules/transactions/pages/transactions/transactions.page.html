@@ -141,10 +141,16 @@
 						<h3>Pallet Assembly</h3>
 					</ion-label>
 				</ion-item>
-				<ion-item button routerLink="transfer-bin" *ngIf="showPalletAssembly">
+				<ion-item button routerLink="transfer-bin" *ngIf="showTransferBin">
 					<ion-icon name="trail-sign-outline" slot="start"></ion-icon>
 					<ion-label>
 						<h3>Transfer Bin</h3>
+					</ion-label>
+				</ion-item>
+				<ion-item button routerLink="bin-count" *ngIf="showBinCount">
+					<ion-icon name="receipt-outline" slot="start"></ion-icon>
+					<ion-label>
+						<h3>Bin Count</h3>
 					</ion-label>
 				</ion-item>
 			</ion-list>

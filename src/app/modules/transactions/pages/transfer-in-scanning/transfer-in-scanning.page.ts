@@ -8,7 +8,6 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransferInScanningList, TransferInScanningRoot } from '../../models/transfer-in-scanning';
 import { TransferInScanningService } from '../../services/transfer-in-scanning.service';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 
@@ -104,6 +103,11 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
       if (this.objectService.selectedLocation) {
         this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.objectService.selectedLocation)?.code).subscribe(async response => {
           this.pendingObject = response;
+          this.pendingObject.forEach(r => {
+            r.line.forEach(rr => {
+               rr.lineTotal = rr.lineQty * rr.unitPrice
+            })
+          })
           await this.loadingService.dismissLoading();
         }, async error => {
           await this.loadingService.dismissLoading();

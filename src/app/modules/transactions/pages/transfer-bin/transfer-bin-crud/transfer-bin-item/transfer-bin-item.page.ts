@@ -1,16 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Capacitor } from '@capacitor/core';
 import { AlertController, NavController, IonPopover, ViewWillEnter, ViewDidEnter } from '@ionic/angular';
-import { TransferBinGroupList, TransferBinRoot } from 'src/app/modules/transactions/models/transfer-bin';
+import { BinFromPalletList, TransferBinGroupList, TransferBinRoot } from 'src/app/modules/transactions/models/transfer-bin';
 import { TransferBinService } from 'src/app/modules/transactions/services/transfer-bin.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
+import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
 
 @Component({
    selector: 'app-transfer-bin-item',
@@ -74,14 +77,19 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
    }
 
    addNewObjectDetail() {
-      this.objectService.objectDetail.unshift({
-         fromBinCode: null,
-         fromPalletCode: null,
-         groupList: [],
-         toBinCode: null,
-         toPalletCode: null,
-         typeCode: "I"
-      });
+      try {
+         this.objectService.objectDetail.unshift({
+            fromBinCode: null,
+            fromPalletCode: null,
+            groupList: [],
+            toBinCode: null,
+            toPalletCode: null,
+            typeCode: "I"
+         });
+         this.showModal(0);
+      } catch (error) {
+         console.error(error);
+      }
    }
 
    /* #region item line */
@@ -106,7 +114,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                   itemId: trxLine.itemId,
                   itemCode: trxLine.itemCode,
                   description: trxLine.description,
-                  qtyRequest: 1,
+                  qtyRequest: trxLine.qtyRequest??0,
                   deactivated: false
                }
                await this.objectService.objectDetail[this.selectedIndex].groupList.unshift(newLine);
@@ -124,17 +132,16 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
          if (this.objectService.objectDetail[index]) {
             const alert = await this.alertController.create({
                cssClass: "custom-alert",
-               header: "Delete this item?",
+               header: "Delete this line?",
                message: "This action cannot be undone.",
                buttons: [
                   {
-                     text: "Delete item",
+                     text: `Delete Line #${index+1}?`,
                      cssClass: "danger",
                      handler: async () => {
                         await this.objectService.objectDetail.splice(index, 1);
+                        this.hideModal();
                         this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
-                        let data: TransferBinRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-                        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
                      }
                   },
                   {
@@ -142,9 +149,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                      role: "cancel",
                      cssClass: "cancel",
                      handler: async () => {
-                        // this.objectService.objectDetail[index].qty = 1;
-                        let data: TransferBinRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-                        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+                        
                      }
                   }
                ]
@@ -162,8 +167,12 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
 
    /* #region detail modal */
 
+   currentStep: number = 1;
    selectedIndex: number = null;
    detailModal: boolean = false;
+   @ViewChild("fromBinScan", { static: false }) fromBinScan: GeneralScanInputPage;
+   @ViewChild("fromPalletScan", { static: false }) fromPalletScan: GeneralScanInputPage;
+   @ViewChild("toBinScan", { static: false }) toBinScan: GeneralScanInputPage;
    async showModal(rowIndex: number) {
       this.selectedIndex = rowIndex;
       this.detailModal = true;
@@ -172,15 +181,62 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
       }
    }
 
+   detailModalDidPresent() {
+      this.fromBinScan.setFocus();
+   }
+
    hideModal() {
+      this.currentStep = 1;
       this.selectedIndex = null;
       this.detailModal = false;
    }
 
-   async onFromBinCodeChanged(event) {
+   detailGoPrevious() {
+      if (this.currentStep >= 2) {
+         this.currentStep -= 1;
+      }
+      setTimeout(() => {
+         this.detailStepSetFocus();
+      }, 10);
+   }
+
+   detailGoNext() {
+      this.currentStep += 1;
+      setTimeout(() => {
+         this.detailStepSetFocus();
+      }, 10);
+   }
+
+   detailStepSetFocus() {
+      switch (this.currentStep) {
+         case 1:
+            this.fromBinScan.setFocus();
+            break;
+         case 2:
+            this.fromPalletScan.setFocus();
+            break;
+         case 3:
+            this.toBinScan.setFocus();
+            break;
+         default:
+            console.error("Step not found");
+            break;
+      }
+   }
+
+   async onFromBinCodeChanged(event: string) {
       if (!(this.selectedIndex === null || this.selectedIndex === undefined) && this.objectService.objectDetail[this.selectedIndex]) {
          if (event) {
-            this.objectService.objectDetail[this.selectedIndex].fromBinCode = event.code;
+            if (this.objectService.objectDetail[this.selectedIndex].fromPalletCode) {
+               this.toastService.presentToast("Control Error", "Unable to modify after Pallet Code inserted", "top", "warning", 1000);
+            } else {
+               let binFound = this.objectService.binList.find(r => r.binCode.toUpperCase() === event.toUpperCase());
+               if (binFound) {
+                  this.objectService.objectDetail[this.selectedIndex].fromBinCode = binFound.binCode;
+               } else {
+                  this.toastService.presentToast("Control Error", "Bin entered does not belong to selected Location", "top", "warning", 1000);
+               }
+            }
          } else {
             this.objectService.objectDetail[this.selectedIndex].fromBinCode = null;
          }
@@ -193,7 +249,12 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
    async onToBinCodeChanged(event) {
       if (!(this.selectedIndex === null || this.selectedIndex === undefined) && this.objectService.objectDetail[this.selectedIndex]) {
          if (event) {
-            this.objectService.objectDetail[this.selectedIndex].toBinCode = event.code;
+            let binFound = this.objectService.binList.find(r => r.binCode.toUpperCase() === event.toUpperCase());
+            if (binFound) {
+               this.objectService.objectDetail[this.selectedIndex].toBinCode = binFound.binCode;
+            } else {
+               this.toastService.presentToast("Control Error", "Bin entered does not belong to selected Location", "top", "warning", 1000);
+            }
          } else {
             this.objectService.objectDetail[this.selectedIndex].toBinCode = null;
          }
@@ -221,16 +282,105 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
       }
    }
 
-   async onFromPalletCodeChanged(event) {
+   async onFromPalletCodeChanged(event: string) {
       if (!(this.selectedIndex === null || this.selectedIndex === undefined) && this.objectService.objectDetail[this.selectedIndex]) {
          if (event) {
-            this.objectService.objectDetail[this.selectedIndex].fromPalletCode = event.code;
+            if (this.objectService.objectDetail[this.selectedIndex].fromPalletCode) { // if pallet code inserted, unable to change, unable to scan item
+               this.toastService.presentToast("Control Error", "Unable to modify after Pallet Code inserted", "top", "warning", 1000);
+            } else {
+               let palletFound = this.objectService.palletList.find(r => r.toUpperCase().includes(event.toUpperCase())); // check if this is pallet
+               if (palletFound) {
+                  if (this.objectService.objectDetail[this.selectedIndex].groupList?.length > 0) {
+                     this.toastService.presentToast("Control Error", "Please remove items before adding pallet code", "top", "warning", 1000);
+                  } else {
+                     this.objectService.objectDetail[this.selectedIndex].fromPalletCode = event;
+                     this.loadPallet(event);
+                  }
+               } else { // item
+                  if (Capacitor.getPlatform() !== "web") {
+                     let itemFound = this.configService.item_Masters.find(r => r.code.toUpperCase().includes(event.toUpperCase()));
+                     let itemBarcodeFound = this.configService.item_Barcodes.find(r => r.barcode.toUpperCase() === event.toUpperCase());
+                     if (itemFound) {
+                        this.addItemToLine({
+                           itemId: itemFound.id,
+                           itemCode: itemFound.code,
+                           description: itemFound.itemDesc,
+                           qtyRequest: 1
+                        });
+                     } else if (itemBarcodeFound) {
+                        itemFound = this.configService.item_Masters.find(r => r.id === itemBarcodeFound.itemId);
+                        if (itemFound) {
+                           this.addItemToLine({
+                              itemId: itemFound.id,
+                              itemCode: itemFound.code,
+                              description: itemFound.itemDesc,
+                              qtyRequest: 1
+                           });
+                        } else {
+                           this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
+                        }
+                     } else {
+                        this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
+                     }
+                  }
+               }
+            }
          } else {
-            this.objectService.objectDetail[this.selectedIndex].fromPalletCode = null;
+            // this.objectService.objectDetail[this.selectedIndex].fromPalletCode = null;
          }
       } else {
          this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       }
+   }
+
+   binFromPallet: BinFromPalletList[] = [];
+   loadPallet(palletCode: string) {
+      this.objectService.getPalletObject(palletCode).subscribe(response => {
+         this.binFromPallet = response;
+         if (this.binFromPallet && this.binFromPallet.length > 0) {
+            if (this.objectService.objectDetail[this.selectedIndex].fromBinCode) {
+               if (this.binFromPallet.flatMap(r => r.binCode).includes(this.objectService.objectDetail[this.selectedIndex].fromBinCode)) { // if found insert item
+                  if (Capacitor.getPlatform() !== "web") {
+                     this.binFromPallet.forEach(r => {
+                        let itemFound = this.configService.item_Masters.find(rr => rr.id === r.itemId);
+                        if (itemFound) {
+                           this.addItemToLine({
+                              itemId: itemFound.id,
+                              itemCode: itemFound.code,
+                              description: itemFound.itemDesc,
+                              qtyRequest: r.qty
+                           });
+                        } else {
+                           this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
+                        }
+                     })
+                  }  
+               } else {
+                  this.toastService.presentToast("Control Error", "Pallet Items doesnt match To Bin Location", "top", "warning", 1000);
+                  this.objectService.objectDetail[this.selectedIndex].fromPalletCode = null;
+               }
+            } else {
+               this.objectService.objectDetail[this.selectedIndex].fromBinCode = this.binFromPallet[0].binCode;
+               if (Capacitor.getPlatform() !== "web") {
+                  this.binFromPallet.forEach(r => {
+                     let itemFound = this.configService.item_Masters.find(rr => rr.id === r.itemId);
+                     if (itemFound) {
+                        this.addItemToLine({
+                           itemId: itemFound.id,
+                           itemCode: itemFound.code,
+                           description: itemFound.itemDesc,
+                           qtyRequest: r.qty
+                        });
+                     } else {
+                        this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
+                     }
+                  })
+               }  
+            }
+         }
+      }, error => {
+         console.error(error);
+      })
    }
 
    deleteItemLine(rowIndex) {
@@ -275,39 +425,53 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
 
    async nextStep() {
       try {
-         this.submit_attempt = true;
-         const alert = await this.alertController.create({
-            cssClass: "custom-alert",
-            header: "Are you sure to proceed?",
-            buttons: [
-               {
-                  text: "Confirm",
-                  cssClass: "success",
-                  handler: async () => {
-                     if (this.objectService.objectHeader.transferBinId > 0) {
-                        this.updateObject();
-                     } else {
-                        this.insertObject();
+         if (this.validateObject()) {
+            this.toastService.presentToast("Control Error", "Please select valid Bin Codes", "top", "warning", 1000);
+         } else {
+            this.submit_attempt = true;
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               header: "Are you sure to proceed?",
+               buttons: [
+                  {
+                     text: "Confirm",
+                     cssClass: "success",
+                     handler: async () => {
+                        if (this.objectService.objectHeader.transferBinId > 0) {
+                           this.updateObject();
+                        } else {
+                           this.insertObject();
+                        }
+                     }
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel",
+                     cssClass: "cancel",
+                     handler: async () => {
+                        this.submit_attempt = false;
                      }
                   }
-               },
-               {
-                  text: "Cancel",
-                  role: "cancel",
-                  cssClass: "cancel",
-                  handler: async () => {
-                     this.submit_attempt = false;
-                  }
-               }
-            ]
-         });
-         await alert.present();
+               ]
+            });
+            await alert.present();
+         }
       } catch (e) {
          this.submit_attempt = false;
          console.error(e);
       } finally {
          this.submit_attempt = false;
       }
+   }
+
+   validateObject() {
+      let hasError: boolean = false;
+      this.objectService.objectDetail.flatMap(r => {
+         if (r.fromBinCode === null || r.fromBinCode === undefined || r.toBinCode === null || r.toBinCode === undefined) {
+            hasError = true;
+         }
+      })
+      return hasError;
    }
 
    async insertObject() {
@@ -389,5 +553,25 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
    }
 
    /* #endregion */
+
+   sendForDebug() {
+      let trxDto: TransferBinRoot = {
+         header: this.objectService.objectHeader,
+         details: this.objectService.objectDetail
+      }
+      let jsonObjectString = JSON.stringify(trxDto);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status === 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
+   }
 
 }

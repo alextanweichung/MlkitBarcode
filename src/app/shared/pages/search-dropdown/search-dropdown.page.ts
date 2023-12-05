@@ -59,6 +59,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 				}
 			}
 		}
+      
 		if (changes.searchDropdownList) {
 			if (this.optionValue === "id") {
 				if (this.selectedId !== null) {
@@ -71,6 +72,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 				}
 			}
 		}
+      console.log("🚀 ~ file: search-dropdown.page.ts:67 ~ SearchDropdownPage ~ ngOnChanges ~ this.selected:", this.selected)
 	}
 
 	ngOnInit() {
@@ -97,7 +99,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 	searchText: string = "";
 	async onKeyDown(event) {
 		if (event.keyCode === 13) {
-			this.searchItem();
+			await this.searchItem();
 		}
 	}
 
@@ -136,7 +138,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 
 	hideModal(object: SearchDropdownList, triggerOutput: boolean = false) {
 		this.searchText = "";
-		this.tempDropdownList = [];
+      this.tempDropdownList = [];
 		if (triggerOutput) {
 			this.onActionComplete.emit(object);
 		}
@@ -155,8 +157,12 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 	}
 
 	assignToTemp(startIndex: number, size: number) {
+      this.tempDropdownList = [];
 		if (this.searchText && this.searchText.length > 0) {
 			this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code?.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description?.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+         if (this.tempDropdownList && this.tempDropdownList.length === 1) {
+            this.chooseThis(this.tempDropdownList[0]);
+         }
 		} else {
 			this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
 		}

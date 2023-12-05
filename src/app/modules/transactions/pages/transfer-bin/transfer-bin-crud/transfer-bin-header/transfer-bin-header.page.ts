@@ -71,32 +71,39 @@ export class TransferBinHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    async onLocationSelected(event) {
       if (event) {
-         const alert = await this.alertController.create({
-            cssClass: "custom-alert",
-            header: "Are you sure to proceed?",
-            subHeader: "Changing Location will remove inserted lines",
-            buttons: [
-               {
-                  text: "Confirm",
-                  cssClass: "success",
-                  handler: async () => {
-                     // reload bin list
-                     this.objectForm.patchValue({ locationId: event.id });
-                     await this.objectService.onLocationChanged(this.objectForm.controls.locationId.value);
-                     this.objectService.removeLines();
-                  }
-               },
-               {
-                  text: "Cancel",
-                  role: "cancel",
-                  cssClass: "cancel",
-                  handler: async () => {
+         if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               header: "Are you sure to proceed?",
+               subHeader: "Changing Location will remove inserted lines",
+               buttons: [
+                  {
+                     text: "Confirm",
+                     cssClass: "success",
+                     handler: async () => {
+                        // reload bin list
+                        this.objectForm.patchValue({ locationId: event.id });
+                        await this.objectService.onLocationChanged(this.objectForm.controls.locationId.value);
+                        this.objectService.removeLines();
+                     }
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel",
+                     cssClass: "cancel",
+                     handler: async () => {
 
+                     }
                   }
-               }
-            ]
-         });
-         await alert.present();
+               ]
+            });
+            await alert.present();
+         } else {
+            // reload bin list
+            this.objectForm.patchValue({ locationId: event.id });
+            await this.objectService.onLocationChanged(this.objectForm.controls.locationId.value);
+            this.objectService.removeLines();            
+         }
       } else {
          this.objectForm.patchValue({ locationId: null });
          await this.objectService.onLocationChanged(this.objectForm.controls.locationId.value);

@@ -5,6 +5,7 @@ import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
 import { PalletAssemblyDetail, PalletAssemblyHeader, PalletAssemblyList, PalletAssemblyRoot } from "../models/pallet-assembly";
+import { BinList } from "../models/transfer-bin";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -54,8 +55,8 @@ export class PalletAssemblyService {
     this.objectDetail = objectDetail;
   }
 
-  locationBin: string[] = [];
-  setLocationBin(locationBin: string[]) {
+  locationBin: BinList[] = [];
+  setLocationBin(locationBin: BinList[]) {
     this.locationBin = locationBin;
   }
 

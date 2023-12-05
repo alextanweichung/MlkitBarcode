@@ -4,8 +4,27 @@
       <ion-buttons slot="start">
          <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
       </ion-buttons>
+      <ion-buttons slot="end">
+         <ion-button (click)="addNewObjectDetail()"><ion-icon slot="icon-only" name="add-outline"></ion-icon></ion-button>
+         <ion-button (click)="showPopover($event)"><ion-icon slot="icon-only" name="menu-outline"></ion-icon></ion-button>
+      </ion-buttons>
    </ion-toolbar>
 </ion-header>
+
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item (click)="popover.dismiss(); sendForDebug()">
+          <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
+          <ion-label>
+            <div>Debug</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 
 <ion-content [fullscreen]="true" [hidden]="scanActive">
    <div class="p-2">
@@ -34,7 +53,7 @@
             <ion-item button detail="false" class="no-ripple ion-no-padding">
                <ion-grid class="ion-no-padding py-2 pl-2">
                   <ion-row class="mb-1">
-                     <ion-col size="1" class="ion-flex ion-margin-auto">
+                     <ion-col size="1" class="ion-flex my-auto">
                         <div>{{rowIndex+1}}</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto">
@@ -58,11 +77,11 @@
                   </ion-row>
                </ion-grid>
             </ion-item>
-            <ion-item-options>
+            <!-- <ion-item-options>
                <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(rowIndex)">
                   <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
                </ion-item-option>
-            </ion-item-options>
+            </ion-item-options> -->
          </ion-item-sliding>
       </ion-list>
    </div>
@@ -73,7 +92,7 @@
       <ion-row>
          <ion-col>
             <ion-button class="ion-margin" expand="block" size="default" color="success" (click)="submit_attempt = true; nextStep()" [disabled]="submit_attempt">
-               Save Online
+               Save
                <ion-icon slot="end" name="cloud-done-outline"></ion-icon>
             </ion-button>
          </ion-col>
@@ -87,7 +106,8 @@
    </ion-col>
 </ion-row>
 <div class="scan-box" [hidden]="!scanActive"></div>
-<ion-modal [isOpen]="detailModal" (didDismiss)="detailModal = false">
+
+<ion-modal [isOpen]="detailModal" (didPresent)="detailModalDidPresent()" (didDismiss)="detailModal = false" *ngIf="!scanActive">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -95,63 +115,130 @@
             <ion-buttons slot="start">
                <ion-button (click)="hideModal()">Done</ion-button>
             </ion-buttons>
+            <ion-buttons slot="primary">
+               <ion-button (click)="deleteLine(selectedIndex)">Delete</ion-button>
+            </ion-buttons>
          </ion-toolbar>
       </ion-header>
       <ion-content>
+
          <div class="p-2" *ngIf="!(selectedIndex === null || selectedIndex === undefined)">
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">  
-               <app-search-dropdown title="From Bin" [searchDropdownList]="objectService.binSearchList" [selectedCode]="objectService.objectDetail[selectedIndex].fromBinCode" optionValue="code" (onActionComplete)="onFromBinCodeChanged($event)"></app-search-dropdown>  
-               <app-search-dropdown title="To Bin" [searchDropdownList]="objectService.binSearchList" [selectedCode]="objectService.objectDetail[selectedIndex].toBinCode" optionValue="code" (onActionComplete)="onToBinCodeChanged($event)"></app-search-dropdown>  
-               <app-search-dropdown title="Pallet" [searchDropdownList]="objectService.palletSearchList" [selectedCode]="objectService.objectDetail[selectedIndex].fromPalletCode" optionValue="code" (onActionComplete)="onFromPalletCodeChanged($event)"></app-search-dropdown>
-            </ion-list>
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-               <ion-label>Item</ion-label>
-            </ion-list-header>
-            <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>            
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item button detail="false" class="ion-no-padding no-ripple">
-                  <ion-grid class="ion-no-padding py-2 pl-2">
-                     <ion-row>
-                        <ion-col size="1" class="ion-flex ion-margin-auto">
-                           <div class="font-bold">#</div>
-                        </ion-col>
-                        <ion-col class="ion-flex ion-margin-auto">
-                           <div class="font-bold">Item Code</div>
-                        </ion-col>
-                        <ion-col class="ion-flex justify-content-center">
-                           <div class="font-bold">Qty</div>
-                        </ion-col>
-                     </ion-row>
-                  </ion-grid>
-               </ion-item>
-            </ion-list>      
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item-sliding #slidingItem *ngFor="let rowData of objectService.objectDetail[selectedIndex].groupList; let rowIndex = index" (click)="qtyInput.setFocus()">
-                  <ion-item button detail="false" class="no-ripple ion-no-padding">
-                     <ion-grid class="ion-no-padding pt-2 pl-2">
+
+            <ng-container>
+               <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+                  <ion-item button detail="false" class="ion-no-padding no-ripple">
+                     <ion-grid class="ion-no-padding py-2 pl-2">
                         <ion-row>
-                           <ion-col size="1" class="ion-flex ion-margin-auto">
-                              <div>{{rowIndex+1}}</div>
+                           <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                              <div class="font-bold">From Bin</div>
+                              <div>{{objectService.objectDetail[selectedIndex].fromBinCode}}</div>
                            </ion-col>
-                           <ion-col class="ion-flex ion-margin-auto">
-                              <div class="ion-flex">
-                                 {{rowData.itemCode}}
-                              </div>
+                        </ion-row>
+                        <ion-row>
+                           <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                              <div class="font-bold">Pallet</div>
+                              <div>{{objectService.objectDetail[selectedIndex].fromPalletCode}}</div>
                            </ion-col>
-                           <ion-col class="ion-flex ion-margin-auto">
-                              <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest"></ion-input>
+                        </ion-row>
+                        <ion-row>
+                           <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                              <div class="font-bold">To Bin</div>
+                              <div>{{objectService.objectDetail[selectedIndex].toBinCode}}</div>
                            </ion-col>
                         </ion-row>
                      </ion-grid>
                   </ion-item>
-                  <ion-item-options>
-                     <ion-item-option color="danger" (click)="slidingItem.close(); deleteItemLine(rowIndex)">
-                        <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
-                     </ion-item-option>
-                  </ion-item-options>
-               </ion-item-sliding>
-            </ion-list>
+               </ion-list>
+            </ng-container>
+
+            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+               <ion-label>Step {{currentStep}}</ion-label>
+            </ion-list-header>
+
+            <ng-container *ngIf="currentStep === 1">
+               <app-general-scan-input #fromBinScan placeholder="Scan or Enter From Bin" (onScanCompleted)="onFromBinCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-general-scan-input>
+            </ng-container>
+
+            <ng-container *ngIf="currentStep === 2">
+               <app-general-scan-input #fromPalletScan placeholder="Scan or Enter Item/Pallet" (onScanCompleted)="onFromPalletCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-general-scan-input>
+            </ng-container>
+
+            <ng-container *ngIf="currentStep === 3">
+               <app-general-scan-input #toBinScan placeholder="Scan or Enter To Bin" (onScanCompleted)="onToBinCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-general-scan-input>
+            </ng-container>
+
+            <ng-container *ngIf="objectService.objectDetail[selectedIndex]?.groupList">
+               <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+                  <ion-label>Item</ion-label>
+               </ion-list-header>
+               <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+                  <ion-item button detail="false" class="ion-no-padding no-ripple">
+                     <ion-grid class="ion-no-padding py-2 pl-2">
+                        <ion-row>
+                           <ion-col size="1" class="ion-flex ion-margin-auto">
+                              <div class="font-bold">#</div>
+                           </ion-col>
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <div class="font-bold">Item Code</div>
+                           </ion-col>
+                           <ion-col class="ion-flex justify-content-center">
+                              <div class="font-bold">Qty</div>
+                           </ion-col>
+                        </ion-row>
+                     </ion-grid>
+                  </ion-item>
+               </ion-list>
+               <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+                  <ion-item-sliding #slidingItem *ngFor="let rowData of objectService.objectDetail[selectedIndex].groupList; let rowIndex = index" (click)="qtyInput.setFocus()">
+                     <ion-item button detail="false" class="no-ripple ion-no-padding">
+                        <ion-grid class="ion-no-padding py-1 pl-2">
+                           <ion-row>
+                              <ion-col size="1" class="ion-flex ion-margin-auto">
+                                 <div>{{rowIndex+1}}</div>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto">
+                                 <div class="ion-flex">
+                                    {{rowData.itemCode}}
+                                 </div>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto">
+                                 <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest"></ion-input>
+                              </ion-col>
+                           </ion-row>
+                        </ion-grid>
+                     </ion-item>
+                     <ion-item-options>
+                        <ion-item-option color="danger" (click)="slidingItem.close(); deleteItemLine(rowIndex)">
+                           <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
+                        </ion-item-option>
+                     </ion-item-options>
+                  </ion-item-sliding>
+               </ion-list>
+            </ng-container>
          </div>
       </ion-content>
+
+      <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
+         <ion-grid class="ion-no-padding">
+            <ion-row>
+               <ion-col *ngIf="currentStep > 1">
+                  <ion-button class="ion-margin" expand="block" size="default" color="primary" (click)="detailGoPrevious()">
+                     Previous
+                  </ion-button>
+               </ion-col>
+               <ion-col *ngIf="currentStep < 3">
+                  <ion-button class="ion-margin" expand="block" size="default" color="primary" (click)="detailGoNext()">
+                     Next
+                  </ion-button>
+               </ion-col>
+               <ion-col *ngIf="currentStep === 3">
+                  <ion-button class="ion-margin" expand="block" size="default" color="primary" (click)="hideModal()">
+                     Done
+                  </ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ion-footer>
+
    </ng-template>
 </ion-modal>

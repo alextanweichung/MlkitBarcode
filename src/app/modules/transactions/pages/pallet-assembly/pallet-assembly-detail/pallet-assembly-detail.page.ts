@@ -47,7 +47,6 @@ export class PalletAssemblyDetailPage implements OnInit, ViewWillEnter, ViewDidE
 			await this.loadingService.showLoading();
 			this.objectService.getObjectById(this.objectId).subscribe(async response => {
 				let object = response;
-				console.log("🚀 ~ file: pallet-assembly-detail.page.ts:45 ~ PalletAssemblyDetailPage ~ this.objectService.getObjectById ~ object:", object)
 				object.header = this.commonService.convertObjectAllDateType(object.header);
 				await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
 				await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));

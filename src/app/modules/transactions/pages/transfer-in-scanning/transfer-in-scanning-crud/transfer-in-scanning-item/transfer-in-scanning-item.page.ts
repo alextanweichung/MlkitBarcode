@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, ActionSheetController, NavController } from '@ionic/angular';
+import { AlertController, ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { TransferInScanningLine, TransferInScanningRoot } from 'src/app/modules/transactions/models/transfer-in-scanning';
 import { TransferInScanningService } from 'src/app/modules/transactions/services/transfer-in-scanning.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
    templateUrl: './transfer-in-scanning-item.page.html',
    styleUrls: ['./transfer-in-scanning-item.page.scss'],
 })
-export class TransferInScanningItemPage implements OnInit, OnDestroy {
+export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEnter {
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage
 
@@ -32,6 +32,10 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
       private actionSheetController: ActionSheetController,
       private navController: NavController,
    ) { }
+
+   ionViewWillEnter(): void {
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:39 ~ TransferInScanningItemPage ~ ionViewWillEnter ~ this.objectService.object:", this.objectService.object)
+   }
 
    ngOnDestroy(): void {
       this.objectService.resetVariables();
@@ -379,7 +383,11 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
                role: "confirm",
                cssClass: "success",
                handler: async () => {
-                  this.insertObject();
+                  if (this.objectService.object.transferInScanningId > 0) {
+                     this.updateObject();
+                  } else {
+                     this.insertObject();
+                  }
                },
             },
             {
@@ -426,6 +434,23 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy {
             let navigationExtras: NavigationExtras = {
                queryParams: {
                   objectId: obj.transferInScanningId
+               }
+            }
+            this.objectService.resetVariables();
+            this.navController.navigateRoot("/transactions/transfer-in-scanning/transfer-in-scanning-detail", navigationExtras);
+         }
+      }, error => {
+         console.error(error);
+      })
+   }
+
+   updateObject() {
+      this.objectService.updateObject(this.objectService.object).subscribe(response => {
+         if (response.status === 204) {
+            this.toastService.presentToast("", "Transfer In Scanning updated", "top", "success", 1000);
+            let navigationExtras: NavigationExtras = {
+               queryParams: {
+                  objectId: this.objectService.object.transferInScanningId
                }
             }
             this.objectService.resetVariables();

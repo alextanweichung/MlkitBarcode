@@ -80,9 +80,9 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ngOnInit() {
       if (Capacitor.getPlatform() === "web") {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
-         // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
+         this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
          // this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
          // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
@@ -242,6 +242,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                         else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
                            // sync by location since only 1 location
                            this.configService.selected_location = this.configService.loginUser.locationId[0];
+                           console.log("🚀 ~ file: signin.page.ts:245 ~ SigninPage ~ this.configService.selected_location:", this.configService.selected_location)
                            await this.loadingService.showLoading("Downloading resources");
 
                            let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));

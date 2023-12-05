@@ -65,7 +65,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
   
   async ionViewWillEnter(): Promise<void> {
     await this.objectService.loadRequiredMaster();
-    await this.consignmentCountService.loadRequiredMaster();
+   //  await this.consignmentCountService.loadRequiredMaster();
     this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
   }
 

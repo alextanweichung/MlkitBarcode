@@ -73,7 +73,7 @@
                 <div class="font-bold">Total Amount</div>
               </ion-col>
               <ion-col class="ion-margin-auto justify-content-end">
-                <div>{{objectService.object.line|sum:"subTotal"|number:"1.2"}}</div>
+                <div>{{objectService.object.line|sum:"lineTotal"|number:"1.2"}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -178,7 +178,7 @@
 
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-    Insert
+    Save
   </ion-button>
 </ion-footer>
 

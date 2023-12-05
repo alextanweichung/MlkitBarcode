@@ -4,7 +4,7 @@ import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
-import { BinList, TransferBinDetail, TransferBinHeader, TransferBinList, TransferBinRoot } from "../models/transfer-bin";
+import { BinFromPalletList, BinList, TransferBinDetail, TransferBinHeader, TransferBinList, TransferBinRoot } from "../models/transfer-bin";
 import { SearchDropdownList } from "src/app/shared/models/search-dropdown-list";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
@@ -29,6 +29,7 @@ export class TransferBinService {
 
    async loadRequiredMaster() {
       await this.loadMasterList();
+      await this.loadStaticLov();
    }
 
    fullMasterList: MasterList[] = [];
@@ -43,6 +44,12 @@ export class TransferBinService {
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.locationMasterList.filter(r => (r.attribute1 === "W" || r.attribute1 === "O") && this.configService.loginUser.locationId.includes(r.id));
       this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+   }
+
+   transferBinTypeMasterList: MasterListDetails[] = [];
+   async loadStaticLov() {
+      let full = await this.getStaticLov();
+      this.transferBinTypeMasterList = full.filter(x => x.objectName === "TransferBinType").flatMap(src => src.details).filter(y => y.deactivated === 0);
    }
 
    objectHeader: TransferBinHeader;
@@ -111,6 +118,10 @@ export class TransferBinService {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferBin/masterList").toPromise();
    }
 
+   getStaticLov() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferBin/staticLov").toPromise();
+   }
+
    getObjects(dateStart: string, dateEnd: string) {
       return this.http.get<TransferBinList[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferBin/tblist/${dateStart}/${dateEnd}`);
    }
@@ -137,6 +148,10 @@ export class TransferBinService {
 
    getPalletList(locationId: number) {
       return this.http.get<string[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferBin/palletlist/${locationId}`).toPromise();
+   }
+
+   getPalletObject(palletCode: string) {
+      return this.http.get<BinFromPalletList[]> (this.configService.selected_sys_param.apiUrl + `MobileTransferBin/pallet/${palletCode}`);
    }
 
 }

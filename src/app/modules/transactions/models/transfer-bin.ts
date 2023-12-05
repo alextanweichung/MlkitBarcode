@@ -60,3 +60,10 @@ export interface BinList {
    binCode: string
    typeCode: string
 }
+
+export interface BinFromPalletList {
+   binCode: string
+   itemId: number
+   qty: number
+}
+ 
