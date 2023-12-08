@@ -84,11 +84,11 @@ export class PickingPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
-      if (this.objectService.hasWarehouseAgent()) {
+      // if (this.objectService.hasWarehouseAgent()) {
         this.navController.navigateForward("/transactions/picking/picking-header");
-      } else {
-        this.toastService.presentToast("", "Warehouse Agent not set.", "top", "danger", 1000);
-      }
+      // } else {
+      //   this.toastService.presentToast("", "Warehouse Agent not set.", "top", "danger", 1000);
+      // }
     } catch (e) {
       console.error(e);
     }

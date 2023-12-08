@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, ActionSheetController, NavController, ViewWillEnter, IonPopover } from '@ionic/angular';
 import { TransferInScanningLine, TransferInScanningRoot } from 'src/app/modules/transactions/models/transfer-in-scanning';
 import { TransferInScanningService } from 'src/app/modules/transactions/services/transfer-in-scanning.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
@@ -70,6 +71,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
             event.forEach(async r => {
                let itemExistInLine = this.objectService.object.line.find(rr => rr.itemSku === r.itemSku);
                if (itemExistInLine) {
+                  itemExistInLine.lineQty = 0;
                   let outputData: TransferInScanningLine = {
                      id: 0,
                      uuid: uuidv4(),
@@ -146,7 +148,8 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       } else {
          this.objectService.object.line[rowIndex].qtyRequest = this.objectService.object.line[rowIndex].lineQty;
-         await this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
+         this.objectService.object.line[rowIndex].unitPriceExTax = this.objectService.object.line[rowIndex].unitPrice; // missing, not sure why
+         this.objectService.object.line[rowIndex] = this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
       }
    }
 
@@ -374,6 +377,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    async nextStep() {
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:387 ~ TransferInScanningItemPage ~ handler: ~ this.objectService.object:", this.objectService.object)
       const alert = await this.alertController.create({
          header: "Are you sure to proceed?",
          cssClass: "custom-action-sheet",
@@ -462,5 +466,36 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    /* #endregion */
+
+   /* #region more action popover */
+
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+	/* #endregion */
+
+	sendForDebug() {
+		let jsonObjectString = JSON.stringify(this.objectService.object);
+		let debugObject: JsonDebug = {
+			jsonDebugId: 0,
+			jsonData: jsonObjectString
+		};
+		this.objectService.sendDebug(debugObject).subscribe(response => {
+			if (response.status == 200) {
+				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+			}
+		}, error => {
+			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+			console.log(error);
+		});
+	}
 
 }

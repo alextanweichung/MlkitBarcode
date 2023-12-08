@@ -92,6 +92,9 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
     if (event) {
       this.objectService.selectedLocation = event.id;
       this.loadPendingList();
+    } else {
+      this.objectService.selectedLocation = null;
+      this.pendingObject = [];
     }
   }
 
@@ -103,11 +106,6 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
       if (this.objectService.selectedLocation) {
         this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.objectService.selectedLocation)?.code).subscribe(async response => {
           this.pendingObject = response;
-          this.pendingObject.forEach(r => {
-            r.line.forEach(rr => {
-               rr.lineTotal = rr.lineQty * rr.unitPrice
-            })
-          })
           await this.loadingService.dismissLoading();
         }, async error => {
           await this.loadingService.dismissLoading();

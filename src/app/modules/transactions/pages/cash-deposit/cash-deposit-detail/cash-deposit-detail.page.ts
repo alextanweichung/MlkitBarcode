@@ -3,7 +3,6 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { NavController, ModalController } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CashDeposit } from '../../../models/cash-deposit';
 import { CashDepositService } from '../../../services/cash-deposit.service';
 

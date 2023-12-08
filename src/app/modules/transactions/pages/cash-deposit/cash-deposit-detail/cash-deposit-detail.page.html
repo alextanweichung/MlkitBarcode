@@ -1,83 +1,104 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Detail</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button text="Back" defaultHref="/transactions/cash-deposit"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="primary">
-      <ion-button (click)="edit()">
-        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+   <ion-toolbar>
+      <ion-title>
+         <div class="ion-text-wrap">{{object?.posCashDepositNum}}</div>
+      </ion-title>
+      <ion-buttons slot="start">
+         <ion-back-button text="" defaultHref="/transactions/cash-deposit"></ion-back-button>
+      </ion-buttons>
+      <ion-buttons slot="primary">
+         <ion-button (click)="edit()">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+         </ion-button>
+      </ion-buttons>
+   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-label class="label-title">Detail</ion-label>
-    </ion-toolbar>
-  </ion-header>
-  <div class="p-2" *ngIf="object">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple">
-        <ion-grid class="ion-no-padding py-2 pl-2">
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Doc. Num.</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.posCashDepositNum}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Doc. Date</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.depositDateTime|date:'dd/MM/yyyy'}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Doc. Time</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.depositDateTime|date:'hh:mm a'}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Bank In Amount</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.depositAmount|number:'1.2'}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Bank In Slip Num.</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.depositSlipNum}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Bank Name</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}</div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
-    </ion-list>
-    <div *ngIf="imageUrl">
-      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-        <ion-label>Details</ion-label>
-      </ion-list-header>
-      <img [src]="imageUrl">
-    </div>
-  </div>
+   <div class="p-2" *ngIf="object">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+         <ion-item button detail="false" class="ion-no-padding no-ripple">
+            <ion-grid class="ion-no-padding py-2 pl-2">
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Doc. Num.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.posCashDepositNum}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Doc. Date</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.depositDateTime|date:'dd/MM/yyyy'}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Doc. Time</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.depositDateTime|date:'hh:mm a'}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Bank In Amount</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.depositAmount|number:'1.2'}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Bank In Slip Num.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.depositSlipNum}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Bank Name</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Location</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.locationId|idMapping:objectService.locationMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Customer</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.customerId|idMapping:objectService.customerMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Created By</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.createdBy}} {{object.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+                  </ion-col>
+               </ion-row>
+            </ion-grid>
+         </ion-item>
+      </ion-list>
+      <div *ngIf="imageUrl">
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+            <ion-label>Details</ion-label>
+         </ion-list-header>
+         <img [src]="imageUrl">
+      </div>
+   </div>
 </ion-content>

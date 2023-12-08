@@ -1,100 +1,108 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Detail</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button text="" defaultHref="/transactions/inter-transfer"></ion-back-button>
-    </ion-buttons>
-  </ion-toolbar>
+   <ion-toolbar>
+      <ion-title>{{object?.header?.interTransferNum}}</ion-title>
+      <ion-buttons slot="start">
+         <ion-back-button text="" defaultHref="/transactions/inter-transfer"></ion-back-button>
+      </ion-buttons>
+   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <div class="p-2" *ngIf="object">
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
-        <ion-grid class="ion-no-padding py-2 pl-2">
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Doc. Num.</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.interTransferNum}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Doc. Date</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.trxDate|date: 'dd/MM/yyyy'}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Ori. Location</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.locationId|idMapping: objectService.locationMasterList}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Dest. Location</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.toLocationId|idMapping: objectService.locationMasterList}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">Ship Method</div>
-            </ion-col>
-            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              <div>{{object.header.shipMethodId|idMapping: objectService.shipMethodMasterList}}</div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
-    </ion-list>
+   <div class="p-2" *ngIf="object">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+         <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full">
+            <ion-grid class="ion-no-padding py-2 pl-2">
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Doc. Num.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.header.interTransferNum}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Doc. Date</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.header.trxDate|date: 'dd/MM/yyyy'}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Ori. Location</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.header.locationId|idMapping: objectService.locationMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Dest. Location</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.header.toLocationId|idMapping: objectService.locationMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Ship Method</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.header.shipMethodId|idMapping: objectService.shipMethodMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Created By</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{object.header.createdBy}} {{object.header.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+                  </ion-col>
+               </ion-row>
+            </ion-grid>
+         </ion-item>
+      </ion-list>
 
-    <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-      <ion-label>Details</ion-label>
-    </ion-list-header>
-    <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of object.details" (click)="showDetails(item)">
-        <ion-grid class="ion-no-padding py-2 pl-2">
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="font-bold">{{item.itemCode}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <div class="ion-text-wrap">{{item.description}}</div>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col class="ion-flex ion-margin-auto">
-              <ion-icon style="position: relative; top: 0.1rem" *ngIf="item.variationTypeCode !== '0'" name="add-circle-outline"></ion-icon>
-              <div>Total Quantity</div>
-            </ion-col>
-            <ion-col>
-              <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} </div>              
-            </ion-col>
-          </ion-row>
-          <div *ngIf="item.isSelected">
-            <div *ngFor="let vd of item.variationDetails">
-             <ion-row *ngFor="let d of filter(vd.details)">
-              <ion-col class="ion-flex ion-margin-auto">
-                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping: objectService.itemVariationXMasterList}}</span>
-                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping: objectService.itemVariationYMasterList}}</span>
-                </ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                  <div>{{d.qtyRequest|number:'1.0'}}</div>
-                </ion-col>
-              </ion-row>
-            </div>
-          </div>
-        </ion-grid>
-      </ion-item>
-    </ion-list>
-  </div>
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+         <ion-label>Details</ion-label>
+      </ion-list-header>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+         <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let item of object.details" (click)="showDetails(item)">
+            <ion-grid class="ion-no-padding py-2 pl-2">
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">{{item.itemCode}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="ion-text-wrap">{{item.description}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <ion-icon style="position: relative; top: 0.1rem" *ngIf="item.variationTypeCode !== '0'" name="add-circle-outline"></ion-icon>
+                     <div>Total Quantity</div>
+                  </ion-col>
+                  <ion-col>
+                     <div class="ion-text-right">{{item.qtyRequest|number:'1.0'}} </div>
+                  </ion-col>
+               </ion-row>
+               <div *ngIf="item.isSelected">
+                  <div *ngFor="let vd of item.variationDetails">
+                     <ion-row *ngFor="let d of filter(vd.details)">
+                        <ion-col class="ion-flex ion-margin-auto">
+                           <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping: objectService.itemVariationXMasterList}}</span>
+                           <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping: objectService.itemVariationYMasterList}}</span>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div>{{d.qtyRequest|number:'1.0'}}</div>
+                        </ion-col>
+                     </ion-row>
+                  </div>
+               </div>
+            </ion-grid>
+         </ion-item>
+      </ion-list>
+   </div>
 </ion-content>

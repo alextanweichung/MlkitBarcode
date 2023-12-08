@@ -7,6 +7,7 @@ import { BinCountBatchList, BinCountDetail, BinCountHeader, BinCountList, BinCou
 import { InventoryCountBatchCriteria } from '../models/stock-count';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { BinList } from '../models/transfer-bin';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -44,15 +45,15 @@ export class BinCountService {
    itemCategoryMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
-      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemUOM').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationX').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemVariationY').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemBrandMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemBrand').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemGroupMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemCategory').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemCategoryMasterList = this.fullMasterList.filter(x => x.objectName == 'ItemGroup').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.rackMasterList = this.fullMasterList.filter(x => x.objectName == 'Rack').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.zoneMasterList = this.fullMasterList.filter(x => x.objectName == 'Zone').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemBrandMasterList = this.fullMasterList.filter(x => x.objectName == "ItemBrand").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemGroupMasterList = this.fullMasterList.filter(x => x.objectName == "ItemCategory").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemCategoryMasterList = this.fullMasterList.filter(x => x.objectName == "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.rackMasterList = this.fullMasterList.filter(x => x.objectName == "Rack").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.zoneMasterList = this.fullMasterList.filter(x => x.objectName == "Zone").flatMap(src => src.details).filter(y => y.deactivated == 0);
    }
 
    objectHeader: BinCountHeader = null;
@@ -143,5 +144,8 @@ export class BinCountService {
       return this.http.get<BinList[]>(this.configService.selected_sys_param.apiUrl + `MobileBinCount/binlist/${locationId}`).toPromise();
    }
 
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileBinCount/jsonDebug", debugObject, httpObserveHeader);
+   }
 
 }

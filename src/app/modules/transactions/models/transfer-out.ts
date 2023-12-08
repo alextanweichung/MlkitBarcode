@@ -15,6 +15,9 @@ export interface TransferOutRoot {
    totalCarton: number
    workFlowTransactionId: number
    line: TransferOutLine[]
+   createdBy?: string
+   createById?: number
+   createdAt?: Date
  }
  
  export interface TransferOutLine {

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { BinCountDetail, BinCountRoot, LocalBinCountBatchList } from 'src/app/modules/transactions/models/bin-count';
 import { InventoryCountBatchCriteria } from 'src/app/modules/transactions/models/stock-count';
 import { BinCountService } from 'src/app/modules/transactions/services/bin-count.service';
@@ -9,6 +9,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
@@ -464,5 +465,35 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       return line.guid;
    }
 
+   /* #region more action popover */
+
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+	/* #endregion */
+
+	sendForDebug() {
+		let jsonObjectString = JSON.stringify({ header: this.objectService.objectHeader, details: this.objectService.objectDetail });
+		let debugObject: JsonDebug = {
+			jsonDebugId: 0,
+			jsonData: jsonObjectString
+		};
+		this.objectService.sendDebug(debugObject).subscribe(response => {
+			if (response.status == 200) {
+				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+			}
+		}, error => {
+			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+			console.log(error);
+		});
+	}
 
 }

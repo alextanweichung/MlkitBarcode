@@ -200,8 +200,12 @@
             </ion-row>
             <ion-row>
               <ion-col class="ion-flex ion-margin-auto">
-                <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive">{{item.unitPrice|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}</div>
-                <div *ngIf="!objectService.objectHeader.isDisplayTaxInclusive">{{item.unitPriceExTax|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}</div>
+                <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === true || objectService.objectHeader.isDisplayTaxInclusive === null">
+                  {{item.unitPrice|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}
+               </div>
+                <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === false">
+                  {{item.unitPriceExTax|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}
+               </div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto">
                 <div class="ion-flex">
@@ -210,8 +214,12 @@
                 </div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive">{{item.discountAmt|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
-                <div *ngIf="!objectService.objectHeader.isDisplayTaxInclusive">{{item.discountAmtExTax|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
+                <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === true || objectService.objectHeader.isDisplayTaxInclusive === null">
+                  {{item.discountAmt|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
+               </div>
+                <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === false">
+                  {{item.discountAmtExTax|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
+               </div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto justify-content-end">
                 <div >{{item.subTotal|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>

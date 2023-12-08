@@ -9,29 +9,30 @@ import { BinList } from 'src/app/modules/transactions/models/transfer-bin';
 import { PalletAssemblyService } from 'src/app/modules/transactions/services/pallet-assembly.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 
 @Component({
-	selector: 'app-pallet-assembly-item',
-	templateUrl: './pallet-assembly-item.page.html',
-	styleUrls: ['./pallet-assembly-item.page.scss'],
+   selector: 'app-pallet-assembly-item',
+   templateUrl: './pallet-assembly-item.page.html',
+   styleUrls: ['./pallet-assembly-item.page.scss'],
 })
 export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
-	submit_attempt: boolean = false;
-	selectedPalletNum: number;
+   submit_attempt: boolean = false;
+   selectedPalletNum: number;
    showPalletInfo: boolean = true;
-	@ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
+   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
-	constructor(
-		public objectService: PalletAssemblyService,
+   constructor(
+      public objectService: PalletAssemblyService,
       private toastService: ToastService,
       private loadingService: LoadingService,
       private alertController: AlertController,
-		private navController: NavController,
-	) { }
+      private navController: NavController,
+   ) { }
 
    async ionViewWillEnter(): Promise<void> {
       if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
@@ -48,44 +49,44 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
    }
 
    ionViewDidEnter(): void {
-      
+
    }
 
-	ngOnInit() {
-	}
+   ngOnInit() {
+   }
 
    onPalletNumClicked(palletNum: number) {
       if (palletNum.toString() === this.selectedPalletNum.toString()) {
          this.showPalletInfo = !this.showPalletInfo;
       }
    }
-	
-	palletToShow: PalletAssemblyDetail;
-	onPalletNumChanged(event) {
-		if (event) {
+
+   palletToShow: PalletAssemblyDetail;
+   onPalletNumChanged(event) {
+      if (event) {
          this.showPalletInfo = true;
-			let found = this.objectService.objectDetail.find(r => r.palletNum.toString() === event.detail.value.toString());
-			if (found) {
-				this.palletToShow = found;
-			} else {
-				this.palletToShow = found;
-				this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
-			}
-		} else {
+         let found = this.objectService.objectDetail.find(r => r.palletNum.toString() === event.detail.value.toString());
+         if (found) {
+            this.palletToShow = found;
+         } else {
+            this.palletToShow = found;
+            this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+         }
+      } else {
          this.palletToShow = null;
       }
-	}
+   }
 
-	binSearchList: SearchDropdownList[] = [];
-	bindLocationBin(binList: BinList[]) {
-		this.binSearchList = [];
-		binList.forEach((r, rowIndex) => {
-			this.binSearchList.push({
-				id: rowIndex,
-				code: r.binCode,
-				description: r.binCode
-			})
-		})
+   binSearchList: SearchDropdownList[] = [];
+   bindLocationBin(binList: BinList[]) {
+      this.binSearchList = [];
+      binList.forEach((r, rowIndex) => {
+         this.binSearchList.push({
+            id: rowIndex,
+            code: r.binCode,
+            description: r.binCode
+         })
+      })
    }
 
    async addPallet() {
@@ -104,15 +105,15 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
 
    async deletePallet() {
       if (this.selectedPalletNum) {
-			const alert = await this.alertController.create({
-				cssClass: "custom-alert",
-				header: "Confirmation",
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            header: "Confirmation",
             subHeader: `Are you sure to delete Pallet Num. ${this.selectedPalletNum}?`,
-				buttons: [
-					{
-						text: "Confirm",
-						cssClass: "success",
-						handler: async () => {
+            buttons: [
+               {
+                  text: "Confirm",
+                  cssClass: "success",
+                  handler: async () => {
                      this.objectService.objectDetail = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => r.palletNum.toString() !== this.selectedPalletNum.toString())));
                      if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
                         let maxPalletNum = Math.max(...this.objectService.objectDetail.flatMap(r => r.palletNum));
@@ -122,19 +123,19 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
                         this.selectedPalletNum = null;
                         this.onPalletNumChanged(null);
                      }
-						}
-					},
-					{
-						text: "Cancel",
-						role: "cancel",
-						cssClass: "cancel",
-						handler: async () => {
+                  }
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel",
+                  handler: async () => {
 
-						}
-					}
-				]
-			});
-			await alert.present();
+                  }
+               }
+            ]
+         });
+         await alert.present();
       } else {
          this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       }
@@ -181,10 +182,10 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
       }
    }
 
-	/* #region item line */
+   /* #region item line */
 
-	onItemAdd(event: TransactionDetail[]) {
-		if (event && event.length > 0) {
+   onItemAdd(event: TransactionDetail[]) {
+      if (event && event.length > 0) {
          if (this.selectedPalletNum && this.palletToShow) {
             event.forEach(r => {
                this.addItemToLine(r);
@@ -192,11 +193,11 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
          } else {
             this.toastService.presentToast("Control Error", "Please select a pallet before adding Item", "top", "warning", 1000);
          }
-		}
-	}
+      }
+   }
 
-	async addItemToLine(trxLine: TransactionDetail) {
-		try {
+   async addItemToLine(trxLine: TransactionDetail) {
+      try {
          if (this.selectedPalletNum) {
             if (this.palletToShow.palletItemList.findIndex(r => r.itemBarcode === trxLine.itemBarcode) === 0) {
                this.palletToShow.palletItemList[0].qtyRequest += 1;
@@ -206,10 +207,10 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
          } else {
             this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
          }
-		} catch (e) {
-			console.error(e);
-		}
-	}
+      } catch (e) {
+         console.error(e);
+      }
+   }
 
    newPalletItem(item: TransactionDetail): PalletItemList {
       let newPalletItem: PalletItemList = {
@@ -221,87 +222,87 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
          itemUomId: item.itemUomId,
          itemBarcode: item.itemBarcode,
          description: item.description,
-         sequence: this.palletToShow.palletItemList.length??0,
+         sequence: this.palletToShow.palletItemList.length ?? 0,
          qtyRequest: 1
       }
       return newPalletItem;
    }
 
-	/* #endregion */
+   /* #endregion */
 
-	/* #region  barcode scanner */
+   /* #region  barcode scanner */
 
-	scanActive: boolean = false;
-	onCameraStatusChanged(event) {
-		this.scanActive = event;
-		if (this.scanActive) {
-			document.body.style.background = "transparent";
-		}
-	}
-
-	async onDoneScanning(barcode: string) {
-		if (barcode) {
-			await this.barcodescaninput.validateBarcode(barcode);
-		}
-	}
-
-	stopScanner() {
-		BarcodeScanner.stopScan();
-		// this.scanActive = false;
-		this.onCameraStatusChanged(false);
-	}
-
-	/* #endregion */
-
-   async deletePalletItemList(rowIndex: number) {
-		try {
-			if (this.selectedPalletNum && this.palletToShow && this.palletToShow.palletItemList[rowIndex]) {
-				const alert = await this.alertController.create({
-					cssClass: "custom-alert",
-					header: "Delete this item?",
-					message: "This action cannot be undone.",
-					buttons: [
-						{
-							text: "Delete item",
-							cssClass: "danger",
-							handler: async () => {
-								await this.palletToShow.palletItemList.splice(rowIndex, 1);
-								this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
-							}
-						},
-						{
-							text: "Cancel",
-							role: "cancel",
-							cssClass: "cancel",
-							handler: async () => {
-								this.palletToShow.palletItemList[rowIndex].qtyRequest = 1;
-							}
-						}
-					]
-				});
-				await alert.present();
-			} else {
-				this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
-			}
-		} catch (e) {
-			console.error(e);
-		}
+   scanActive: boolean = false;
+   onCameraStatusChanged(event) {
+      this.scanActive = event;
+      if (this.scanActive) {
+         document.body.style.background = "transparent";
+      }
    }
 
-	eventHandler(keyCode, line) {
-		if (keyCode === 13) {
-			if (Capacitor.getPlatform() !== "web") {
-				Keyboard.hide();
-			}
-		}
-	}
+   async onDoneScanning(barcode: string) {
+      if (barcode) {
+         await this.barcodescaninput.validateBarcode(barcode);
+      }
+   }
+
+   stopScanner() {
+      BarcodeScanner.stopScan();
+      // this.scanActive = false;
+      this.onCameraStatusChanged(false);
+   }
+
+   /* #endregion */
+
+   async deletePalletItemList(rowIndex: number) {
+      try {
+         if (this.selectedPalletNum && this.palletToShow && this.palletToShow.palletItemList[rowIndex]) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               header: "Delete this item?",
+               message: "This action cannot be undone.",
+               buttons: [
+                  {
+                     text: "Delete item",
+                     cssClass: "danger",
+                     handler: async () => {
+                        await this.palletToShow.palletItemList.splice(rowIndex, 1);
+                        this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
+                     }
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel",
+                     cssClass: "cancel",
+                     handler: async () => {
+                        this.palletToShow.palletItemList[rowIndex].qtyRequest = 1;
+                     }
+                  }
+               ]
+            });
+            await alert.present();
+         } else {
+            this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   eventHandler(keyCode, line) {
+      if (keyCode === 13) {
+         if (Capacitor.getPlatform() !== "web") {
+            Keyboard.hide();
+         }
+      }
+   }
 
    previousStep() {
       this.navController.navigateBack("/transactions/pallet-assembly/pallet-assembly-header");
    }
 
-	async nextStep() {
-		try {
+   async nextStep() {
+      try {
          if (this.isObjectValid()) {
             this.submit_attempt = true;
             const alert = await this.alertController.create({
@@ -333,78 +334,78 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
          } else {
 
          }
-		} catch (e) {
-			this.submit_attempt = false;
-			console.error(e);
-		} finally {
-			this.submit_attempt = false;
-		}
-	}
+      } catch (e) {
+         this.submit_attempt = false;
+         console.error(e);
+      } finally {
+         this.submit_attempt = false;
+      }
+   }
 
-	async insertObject() {
-		try {
-			await this.loadingService.showLoading();
+   async insertObject() {
+      try {
+         await this.loadingService.showLoading();
          this.objectService.objectHeader.totalPallet = this.objectService.objectDetail.length;
-			this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
-				if (response.status === 201) {
-					this.submit_attempt = false;
-					let object = response.body as PalletAssemblyRoot;
-					this.toastService.presentToast("", "Pallet Assembly added", "top", "success", 1000);
-					let navigationExtras: NavigationExtras = {
-						queryParams: {
-							objectId: object.header.palletAssemblyId
-						}
-					}
-					await this.objectService.resetVariables();
-					await this.loadingService.dismissLoading();
-					this.navController.navigateRoot("/transactions/pallet-assembly/pallet-assembly-detail", navigationExtras);
-				}
-			}, async error => {
-				this.submit_attempt = false;
-				await this.loadingService.dismissLoading();
-				console.error(error);
-			})
-		} catch (e) {
-			this.submit_attempt = false;
-			await this.loadingService.dismissLoading();
-			console.error(e);
-		} finally {
-			this.submit_attempt = false;
-			await this.loadingService.dismissLoading();
-		}
-	}
+         this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
+            if (response.status === 201) {
+               this.submit_attempt = false;
+               let object = response.body as PalletAssemblyRoot;
+               this.toastService.presentToast("", "Pallet Assembly added", "top", "success", 1000);
+               let navigationExtras: NavigationExtras = {
+                  queryParams: {
+                     objectId: object.header.palletAssemblyId
+                  }
+               }
+               await this.objectService.resetVariables();
+               await this.loadingService.dismissLoading();
+               this.navController.navigateRoot("/transactions/pallet-assembly/pallet-assembly-detail", navigationExtras);
+            }
+         }, async error => {
+            this.submit_attempt = false;
+            await this.loadingService.dismissLoading();
+            console.error(error);
+         })
+      } catch (e) {
+         this.submit_attempt = false;
+         await this.loadingService.dismissLoading();
+         console.error(e);
+      } finally {
+         this.submit_attempt = false;
+         await this.loadingService.dismissLoading();
+      }
+   }
 
-	async updateObject() {
-		try {
-			await this.loadingService.showLoading();
+   async updateObject() {
+      try {
+         await this.loadingService.showLoading();
          this.objectService.objectHeader.totalPallet = this.objectService.objectDetail.length;
-			this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
-				if (response.status === 204) {
-					this.submit_attempt = false;
-					this.toastService.presentToast("", "Pallet Assembly updated", "top", "success", 1000);
-					let navigationExtras: NavigationExtras = {
-						queryParams: {
-							objectId: this.objectService.objectHeader.palletAssemblyId
-						}
-					}
-					await this.objectService.resetVariables();
-					await this.loadingService.dismissLoading();
-					this.navController.navigateRoot("/transactions/pallet-assembly/pallet-assembly-detail", navigationExtras);
-				}
-			}, async error => {
-				this.submit_attempt = false;
-				await this.loadingService.dismissLoading();
-				console.error(error);
-			})
-		} catch (e) {
-			this.submit_attempt = false;
-			await this.loadingService.dismissLoading();
-			console.error(e);
-		} finally {
-			this.submit_attempt = false;
-			await this.loadingService.dismissLoading();
-		}
-	}
+         this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
+            if (response.status === 204) {
+               this.submit_attempt = false;
+               this.toastService.presentToast("", "Pallet Assembly updated", "top", "success", 1000);
+               let navigationExtras: NavigationExtras = {
+                  queryParams: {
+                     objectId: this.objectService.objectHeader.palletAssemblyId
+                  }
+               }
+               await this.objectService.resetVariables();
+               await this.loadingService.dismissLoading();
+               this.navController.navigateRoot("/transactions/pallet-assembly/pallet-assembly-detail", navigationExtras);
+            }
+         }, async error => {
+            this.submit_attempt = false;
+            await this.loadingService.dismissLoading();
+            console.error(error);
+         })
+      } catch (e) {
+         this.submit_attempt = false;
+         await this.loadingService.dismissLoading();
+         console.error(e);
+      } finally {
+         this.submit_attempt = false;
+         await this.loadingService.dismissLoading();
+      }
+   }
 
    isObjectValid(): boolean {
       let result = false;
@@ -414,7 +415,7 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
                result = true;
             } else {
                this.toastService.presentToast("Control Error", `Pallet ${r.palletNum} has invalid Bin Code`, "top", "warning", 1000);
-               return;               
+               return;
             }
          })
       } else {
@@ -423,19 +424,35 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
       return result;
    }
 
-	/* #region more action popover */
+   /* #region more action popover */
 
-	isPopoverOpen: boolean = false;
-	@ViewChild("popover", { static: false }) popoverMenu: IonPopover;
-	showPopover(event) {
-		try {
-			this.popoverMenu.event = event;
-			this.isPopoverOpen = true;
-		} catch (e) {
-			console.error(e);
-		}
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
+
+	sendForDebug() {
+		let jsonObjectString = JSON.stringify({ header: this.objectService.objectHeader, details: this.objectService.objectDetail });
+		let debugObject: JsonDebug = {
+			jsonDebugId: 0,
+			jsonData: jsonObjectString
+		};
+		this.objectService.sendDebug(debugObject).subscribe(response => {
+			if (response.status == 200) {
+				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+			}
+		}, error => {
+			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+			console.log(error);
+		});
 	}
-
-	/* #endregion */
 
 }

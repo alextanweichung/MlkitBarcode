@@ -5,6 +5,7 @@ import { BarcodeTag, ItemBarcodeModel } from 'src/app/shared/models/item-barcode
 import { MasterList } from 'src/app/shared/models/master-list';
 import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCount, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -124,6 +125,10 @@ export class StockCountService {
 
    updateInventoryCount(inventoryCountRoot: StockCountRoot) {
       return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
+   }
+
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount/jsonDebug", debugObject, httpObserveHeader);
    }
 
 }

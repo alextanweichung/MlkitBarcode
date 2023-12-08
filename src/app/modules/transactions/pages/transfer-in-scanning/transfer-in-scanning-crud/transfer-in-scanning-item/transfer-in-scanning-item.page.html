@@ -4,8 +4,26 @@
     <ion-buttons slot="start">
       <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
+    <ion-buttons slot="primary">
+       <ion-button (click)="showPopover($event)"><ion-icon slot="icon-only" name="menu-outline"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+   <ng-template>
+      <ion-content class="p-2">
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item (click)="popover.dismiss(); sendForDebug()">
+               <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
+               <ion-label>
+                  <div>Debug</div>
+               </ion-label>
+            </ion-item>
+         </ion-list>
+      </ion-content>
+   </ng-template>
+</ion-popover>
 
 <ion-content [fullscreen]="true" [hidden]="scanActive">
 
@@ -65,7 +83,7 @@
                 <div class="font-bold">Total Quantity</div>
               </ion-col>
               <ion-col class="ion-margin-auto justify-content-end">
-                <div>{{objectService.object.line|sum:"lineQty"|number:"1.0"}}</div>
+                <div>{{getInsertedLine()|sum:"lineQty"|number:"1.0"}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -73,7 +91,7 @@
                 <div class="font-bold">Total Amount</div>
               </ion-col>
               <ion-col class="ion-margin-auto justify-content-end">
-                <div>{{objectService.object.line|sum:"lineTotal"|number:"1.2"}}</div>
+                <div>{{getInsertedLine()|sum:"subTotal"|number:"1.2"}}</div>
               </ion-col>
             </ion-row>
             <ion-row>

@@ -5,7 +5,7 @@
          <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
       </ion-buttons>
       <ion-buttons slot="primary">
-         <ion-button (click)="addNewObjectDetail(null)"><ion-icon slot="icon-only" name="add-outline"></ion-icon></ion-button>
+         <ion-button (click)="showPopover($event)"><ion-icon slot="icon-only" name="menu-outline"></ion-icon></ion-button>
          <ion-button id="info-trigger">
             <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
          </ion-button>
@@ -31,6 +31,28 @@
       </ion-buttons>
    </ion-toolbar>
 </ion-header>
+
+<ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+   <ng-template>
+      <ion-content class="p-2">
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item (click)="popover.dismiss(); addNewObjectDetail(null)">
+               <ion-icon slot="end" name="add-outline"></ion-icon>
+               <ion-label>
+                  <div>Add New</div>
+               </ion-label>
+            </ion-item>
+            <ion-item (click)="popover.dismiss(); sendForDebug()">
+               <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
+               <ion-label>
+                  <div>Debug</div>
+               </ion-label>
+            </ion-item>
+         </ion-list>
+      </ion-content>
+   </ng-template>
+</ion-popover>
+
 <ion-content fullscreen [hidden]="scanActive">
    <div class="p-2">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
