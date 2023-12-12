@@ -236,6 +236,20 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                })
             }
             if (found_item_barcode && found_item_barcode.length > 0) {
+               found_item_barcode.sort((a, b) => {
+                  if (a.xSeq === b.xSeq) {
+                     if (a.ySeq < b.ySeq) {
+                        return -1;
+                     } else if (a.ySeq > b.ySeq) {
+                        return 1;
+                     }
+                     return 0;
+                  } else if (a.xSeq < b.xSeq) {
+                     return -1;
+                  } else {
+                     return 1;
+                  }
+               })
                found_item_barcode.forEach(async r => {
                   if (this.availableVariations.findIndex(rr => rr.itemSku === r.sku) < 0) {
                      let outputData: TransactionDetail = {
