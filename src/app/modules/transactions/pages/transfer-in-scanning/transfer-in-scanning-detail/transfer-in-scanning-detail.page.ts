@@ -51,6 +51,7 @@ export class TransferInScanningDetailPage implements OnInit, ViewWillEnter {
       await this.loadingService.showLoading();
       this.objectService.getObjectById(this.objectId).subscribe(async response => {
         this.object = response;
+        this.object.line.forEach(r => r.qtyRequest = r.lineQty);
         await this.objectService.setObject(this.object);
         await this.loadingService.dismissLoading();
       }, async error => {

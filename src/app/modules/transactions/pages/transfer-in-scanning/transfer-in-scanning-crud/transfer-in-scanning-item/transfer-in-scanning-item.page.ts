@@ -71,7 +71,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
             event.forEach(async r => {
                let itemExistInLine = this.objectService.object.line.find(rr => rr.itemSku === r.itemSku);
                if (itemExistInLine) {
-                  itemExistInLine.lineQty = 0;
                   let outputData: TransferInScanningLine = {
                      id: 0,
                      uuid: uuidv4(),
@@ -160,8 +159,8 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
             if (this.objectService.object.line[index].uuid === null) {
                this.objectService.object.line[index].uuid = event.uuid;
             }
-            this.objectService.object.line[index].lineQty += event.lineQty;
-            this.objectService.object.line[index].qtyRequest = this.objectService.object.line[index].lineQty;
+            this.objectService.object.line[index].qtyRequest += event.qtyRequest;
+            this.objectService.object.line[index].lineQty = this.objectService.object.line[index].qtyRequest;
             this.objectService.object.line[index].unitPrice = event?.unitPrice;
             this.objectService.object.line[index].unitPriceExTax = event?.unitPrice;
             this.objectService.object.line[index].discountGroupCode = event?.discountGroupCode;
@@ -295,6 +294,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      yDesc: itemExistInLine.yDesc,
                      barcode: itemExistInLine.barcode,
                      lineQty: 1,
+                     qtyRequest: 1,
                      qtyReceive: null,
                      isDeleted: itemExistInLine.isDeleted
                   }
@@ -320,6 +320,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === response.itemVariationLineYId)?.description,
                      barcode: response.itemBarcode,
                      lineQty: 1,
+                     qtyRequest: 1,
                      qtyReceive: null,
                      isDeleted: false
                   }
@@ -377,7 +378,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    async nextStep() {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:387 ~ TransferInScanningItemPage ~ handler: ~ this.objectService.object:", this.objectService.object)
       const alert = await this.alertController.create({
          header: "Are you sure to proceed?",
          cssClass: "custom-action-sheet",

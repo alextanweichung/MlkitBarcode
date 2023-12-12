@@ -83,7 +83,7 @@
                 <div class="font-bold">Total Quantity</div>
               </ion-col>
               <ion-col class="ion-margin-auto justify-content-end">
-                <div>{{getInsertedLine()|sum:"lineQty"|number:"1.0"}}</div>
+                <div>{{getInsertedLine()|sum:"qtyRequest"|number:"1.0"}}</div>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -137,7 +137,7 @@
                 </ion-grid>
               </ion-col>
               <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="line.lineQty" placeholder="0" (ionBlur)="qtyInputBlur($event, i)"></ion-input>
+                <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" [(ngModel)]="line.qtyRequest" placeholder="0" (ionBlur)="qtyInputBlur($event, i)"></ion-input>
               </ion-col>
             </ion-row>
             <ion-row>

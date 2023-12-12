@@ -379,7 +379,6 @@ export class CommonService {
    }
 
    computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
-      console.log("🚀 ~ file: common.service.ts:382 ~ CommonService ~ computeDiscTaxAmount ~ trxLine:", trxLine)
       try {
          let totalDiscAmt: Decimal = new Decimal(0);
          let unitPrice: Decimal = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0);
