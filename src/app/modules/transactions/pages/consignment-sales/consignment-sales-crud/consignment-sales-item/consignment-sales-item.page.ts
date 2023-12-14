@@ -73,6 +73,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    consignmentSalesActivateMarginCalculation: boolean = false;
    consignmentSalesBlockItemWithoutMargin: string = "0";
+   consignBearingComputeGrossMargin: boolean = false;
    systemWideBlockConvertedCode: boolean;
    loadModuleControl() {
       try {
@@ -99,6 +100,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
             } else {
                this.systemWideBlockConvertedCode = false;
+            }
+
+            let computationMethod = this.moduleControl.find(x => x.ctrlName === "ConsignBearingComputeGrossMargin");
+            if (computationMethod && computationMethod.ctrlValue.toUpperCase() == 'Y') {
+               this.consignBearingComputeGrossMargin = true;
+            } else {
+               this.consignBearingComputeGrossMargin = false;
             }
          })
          this.authService.precisionList$.subscribe(precision => {
@@ -336,7 +344,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async computeMarginAmount(trxLine: TransactionDetail) {
-      trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.objectHeader, true);
+      trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.objectHeader, this.consignBearingComputeGrossMargin, true);
       let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
       await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
