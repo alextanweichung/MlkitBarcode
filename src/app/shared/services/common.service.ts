@@ -472,7 +472,7 @@ export class CommonService {
       return trxLine;
    }
 
-   computeMarginAmtByConsignmentConfig(trxLine: TransactionDetail, objectHeader: any, computeInvoiceAmt: boolean): TransactionDetail {
+   computeMarginAmtByConsignmentConfig(trxLine: TransactionDetail, objectHeader: any, bearPromoUseGross: boolean, computeInvoiceAmt?: boolean): TransactionDetail {
       //To read bearPct from trxLine
       let bearPct: number = 0;
       if (trxLine.bearPct) {
@@ -501,6 +501,9 @@ export class CommonService {
          case true:
             trxLine.bearPct = bearPct;
             trxLine.bearAmt = beforeBearingAmt.toNumber();
+            if (bearPromoUseGross && trxLine.bearAmt) {
+               trxLine.marginAmt = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).mul(new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0)).mul(new Decimal(trxLine.marginPct ? trxLine.marginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+            }
             break;
          case false:
             trxLine.bearPct = 0;
@@ -521,6 +524,75 @@ export class CommonService {
       }
       return trxLine;
    }
+
+   // computeMarginAmtByConsignmentConfigFlat(trxLine: GeneralCsEstimation, headerObject: any, bearPromoUseGross: boolean) {
+   //    //To read bearPct from trxLine
+   //    let bearPct: number = 0;
+   //    let promoBearPct: number = 0;
+   //    if (trxLine.normalBearPct) {
+   //       bearPct = trxLine.normalBearPct;
+   //    }
+   //    if (trxLine.promoBearPct) {
+   //       promoBearPct = trxLine.promoBearPct;
+   //    }
+   //    let beforeBearingAmt = new Decimal(trxLine.normalDiscountAmt ? trxLine.normalDiscountAmt : 0).mul(new Decimal(bearPct ? bearPct : 0)).div(100).toDecimalPlaces(2);
+   //    let promoBeforeBearingAmt = new Decimal(trxLine.promoDiscountAmt ? trxLine.promoDiscountAmt : 0).mul(new Decimal(bearPct ? bearPct : 0)).div(100).toDecimalPlaces(2);
+   //    switch (headerObject.marginMode) {
+   //       case 'G':
+   //          trxLine.normalMarginAmt = new Decimal(trxLine.normalUnitPrice ? trxLine.normalUnitPrice : 0).mul(new Decimal(trxLine.normalQtyRequest ? trxLine.normalQtyRequest : 0)).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+   //          trxLine.promoMarginAmt = new Decimal(trxLine.promoUnitPrice ? trxLine.promoUnitPrice : 0).mul(new Decimal(trxLine.promoQtyRequest ? trxLine.promoQtyRequest : 0)).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+   //          break;
+   //       case 'N':
+   //          trxLine.normalMarginAmt = new Decimal(trxLine.normalSubTotal ? trxLine.normalSubTotal : 0).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+   //          trxLine.promoMarginAmt = new Decimal(trxLine.promoSubTotal ? trxLine.promoSubTotal : 0).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+   //          break;
+   //       case 'A':
+   //          let afterBearingAmt = new Decimal(trxLine.normalDiscountAmt ? trxLine.normalDiscountAmt : 0).mul(new Decimal(100 - bearPct)).div(100).toDecimalPlaces(2);
+   //          let promoAfterBearingAmt = new Decimal(trxLine.promoDiscountAmt ? trxLine.promoDiscountAmt : 0).mul(new Decimal(100 - promoBearPct)).div(100).toDecimalPlaces(2);
+
+   //          trxLine.normalBearPct = bearPct;
+   //          trxLine.normalBearAmt = beforeBearingAmt.toNumber();
+   //          trxLine.normalMarginAmt = (new Decimal(trxLine.normalSubTotal ? trxLine.normalSubTotal : 0).add(afterBearingAmt ? afterBearingAmt : 0)).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0).div(100)).toDecimalPlaces(2).toNumber();
+
+   //          trxLine.promoBearPct = promoBearPct;
+   //          trxLine.promoBearAmt = promoBeforeBearingAmt.toNumber();
+   //          trxLine.promoMarginAmt = (new Decimal(trxLine.promoSubTotal ? trxLine.promoSubTotal : 0).add(promoAfterBearingAmt ? promoAfterBearingAmt : 0)).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0).div(100)).toDecimalPlaces(2).toNumber();
+   //          break;
+   //       case null:
+   //          trxLine.normalBearAmt = 0;
+   //          trxLine.normalMarginAmt = 0;
+   //          trxLine.promoBearAmt = 0;
+   //          trxLine.promoMarginAmt = 0;
+   //          break;
+   //    }
+   //    switch (headerObject.isBearPromo) {
+   //       case true:
+   //          trxLine.normalBearPct = bearPct;
+   //          trxLine.normalBearAmt = beforeBearingAmt.toNumber();
+   //          trxLine.promoBearPct = promoBearPct;
+   //          trxLine.promoBearAmt = promoBeforeBearingAmt.toNumber();
+   //          if (bearPromoUseGross) {
+   //             if (trxLine.normalBearAmt) {
+   //                trxLine.normalMarginAmt = new Decimal(trxLine.normalUnitPrice ? trxLine.normalUnitPrice : 0).mul(new Decimal(trxLine.normalQtyRequest ? trxLine.normalQtyRequest : 0)).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+   //             }
+   //             if (trxLine.promoBearAmt) {
+   //                trxLine.promoMarginAmt = new Decimal(trxLine.promoUnitPrice ? trxLine.promoUnitPrice : 0).mul(new Decimal(trxLine.promoQtyRequest ? trxLine.promoQtyRequest : 0)).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+   //             }
+
+   //          }
+   //          break;
+   //       case false:
+   //          trxLine.normalBearPct = 0;
+   //          trxLine.normalBearAmt = 0;
+   //          trxLine.promoBearPct = 0;
+   //          trxLine.promoBearAmt = 0;
+   //          break;
+   //    }
+   //    trxLine.totalMarginAmt = new Decimal(trxLine.normalMarginAmt ? trxLine.normalMarginAmt : 0).add(trxLine.promoMarginAmt ? trxLine.promoMarginAmt : 0).toDecimalPlaces(2).toNumber();
+   //    trxLine.totalBearAmt = new Decimal(trxLine.normalBearAmt ? trxLine.normalBearAmt : 0).add(trxLine.promoBearAmt ? trxLine.promoBearAmt : 0).toDecimalPlaces(2).toNumber();
+   //    trxLine.invoiceAmt = new Decimal(trxLine.lineSubTotal ? trxLine.lineSubTotal : 0).sub(new Decimal(trxLine.totalMarginAmt ? trxLine.totalMarginAmt : 0)).add(new Decimal(trxLine.totalBearAmt ? trxLine.totalBearAmt : 0)).toDecimalPlaces(2).toNumber();
+   //    return trxLine;
+   // }
 
    reversePromoImpact(receiptLine: TransactionDetail) {
       try {
