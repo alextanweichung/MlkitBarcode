@@ -620,8 +620,10 @@ export class CommonService {
             allMatch = JSON.parse(JSON.stringify(allMatch.filter(r => r.discCode === item.discountGroupCode)));
             await allMatch.sort((a, b) => (b.id - a.id) || ((new Date(a.trxDate) < new Date(b.trxDate)) ? 1 : -1) || (b.hLevel - a.hLevel));
             // take newest trxDate only, if same trxDate but id different, sort again by id, take first one
-            item.marginPct = allMatch[0].mPct;
-            item.bearPct = allMatch[0].bPct;
+            if (allMatch && allMatch.length > 0) {
+               item.marginPct = allMatch[0].mPct;
+               item.bearPct = allMatch[0].bPct;
+            }
          }
          return item;
       }

@@ -60,6 +60,7 @@ export class ConfigService {
                // apiUrl: "https://idcp.rcb.com/api/",
                // apiUrl: "https://tfsb-sys.com:1000/api/",
                // apiUrl: "https://adt-sys.com/api/",
+               // apiUrl: "https://rcb-sys.com/api/",
                imgUrl: null,
                lastDownloadAt: null
             })

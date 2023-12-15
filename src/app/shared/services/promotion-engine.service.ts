@@ -144,6 +144,15 @@ export class PromotionEngineService {
             console.log("[Before impact] Only Impact Sales Bill Line: ")
             console.log(onlyImpactSalesBillLine)
          }
+         //Assign promoEventId for those line eligible promotion
+         if (affectedSalesBillLine.length > 0 && eventItemType != 'A') {
+            affectedSalesBillLine.forEach(line => {
+               let actualBillLine = salesBillLine.find(x => x.uuid == line.uuid);
+               if (actualBillLine && !actualBillLine.eligiblePromoId) {
+                  actualBillLine.eligiblePromoId = event.promoEventId;
+               }
+            })
+         }    
          //Continue with remaining promotion calculation only when scanned item is in itemList, & passing the eligible amount checking
          if ((affectedSalesBillLine.length > 0 && eligibleAmtCheck) || (eventItemType != "S" && itemRuleTypeCheck == "Q" && eligibleAmtCheck)) {
             //Check promoRuleType is Quantity or Amount: For Quantity, start 2nd loop. For Amount, no need loop.
