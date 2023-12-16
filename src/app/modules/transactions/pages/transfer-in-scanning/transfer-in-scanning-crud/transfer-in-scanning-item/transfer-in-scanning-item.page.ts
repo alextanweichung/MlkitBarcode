@@ -35,7 +35,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    ) { }
 
    ionViewWillEnter(): void {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:39 ~ TransferInScanningItemPage ~ ionViewWillEnter ~ this.objectService.object:", this.objectService.object)
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:39 ~ TransferInScanningItemPage ~ ionViewWillEnter ~ this.objectService.object:", JSON.stringify(this.objectService.object))
    }
 
    ngOnDestroy(): void {
@@ -66,6 +66,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    async onItemAdd(event: TransactionDetail[]) {
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:69 ~ TransferInScanningItemPage ~ onItemAdd ~ event:", JSON.stringify(event))
       try {
          if (event) {
             event.forEach(async r => {
@@ -90,7 +91,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      yCd: itemExistInLine.yCd,
                      yDesc: itemExistInLine.yDesc,
                      barcode: itemExistInLine.barcode,
-                     lineQty: 1,
+                     lineQty: null,
                      qtyRequest: 1,
                      qtyReceive: null,
                      isDeleted: itemExistInLine.isDeleted,
@@ -99,7 +100,8 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      discountGroupCode: itemExistInLine?.discountGroupCode,
                      discountExpression: itemExistInLine?.discountExpression
                   }
-                  await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
+                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:103 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", outputData)
+                  // await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                   await this.insertIntoLine(outputData);
                } else {
                   let outputData: TransferInScanningLine = {
@@ -121,7 +123,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      yCd: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.code,
                      yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
                      barcode: r.itemBarcode,
-                     lineQty: 1,
+                     lineQty: null,
                      qtyRequest: 1,
                      qtyReceive: null,
                      isDeleted: false,
@@ -130,7 +132,8 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      discountGroupCode: r.itemPricing?.discountGroupCode,
                      discountExpression: r.itemPricing?.discountExpression
                   }
-                  await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
+                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:135 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", outputData)
+                  // await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                   await this.insertIntoLine(outputData);
                }
             })
@@ -146,21 +149,24 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
       if (rowIndex === null || rowIndex === undefined) {
          this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       } else {
-         this.objectService.object.line[rowIndex].qtyRequest = this.objectService.object.line[rowIndex].lineQty;
+         this.objectService.object.line[rowIndex].lineQty = this.objectService.object.line[rowIndex].qtyRequest;
+         this.objectService.object.line[rowIndex].qtyReceive = this.objectService.object.line[rowIndex].qtyRequest;
          this.objectService.object.line[rowIndex].unitPriceExTax = this.objectService.object.line[rowIndex].unitPrice; // missing, not sure why
          this.objectService.object.line[rowIndex] = this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
       }
    }
 
    async insertIntoLine(event: TransferInScanningLine) {
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:156 ~ TransferInScanningItemPage ~ insertIntoLine ~ event:", JSON.stringify(event))
       if (event) {
          if (this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
             let index = this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku);
             if (this.objectService.object.line[index].uuid === null) {
                this.objectService.object.line[index].uuid = event.uuid;
             }
-            this.objectService.object.line[index].qtyRequest += event.qtyRequest;
+            this.objectService.object.line[index].qtyRequest = event.qtyRequest;
             this.objectService.object.line[index].lineQty = this.objectService.object.line[index].qtyRequest;
+            this.objectService.object.line[index].qtyReceive = this.objectService.object.line[index].qtyRequest;
             this.objectService.object.line[index].unitPrice = event?.unitPrice;
             this.objectService.object.line[index].unitPriceExTax = event?.unitPrice;
             this.objectService.object.line[index].discountGroupCode = event?.discountGroupCode;
@@ -171,7 +177,8 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                this.objectService.object.line.forEach(r => r.sequence += 1);
             }
             event.sequence = 0;
-            this.objectService.object.line.unshift(event);
+            await this.objectService.object.line.unshift(event);
+            await this.commonService.computeDiscTaxAmount(this.objectService.object.line[0], false, false, false, 2);
          }
       }
    }
@@ -189,8 +196,9 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                   let lineToDelete = this.objectService.object.line[rowIndex];
                   if (lineToDelete !== null && (lineToDelete.interTransferId !== null || lineToDelete.interTransferId > 0)) {
                      this.objectService.object.line[rowIndex].uuid = null;
-                     this.objectService.object.line[rowIndex].lineQty = null;
                      this.objectService.object.line[rowIndex].qtyRequest = null;
+                     this.objectService.object.line[rowIndex].lineQty = this.objectService.object.line[rowIndex].qtyRequest;
+                     this.objectService.object.line[rowIndex].qtyReceive = this.objectService.object.line[rowIndex].qtyRequest;
                      await this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
                   } else {
                      await this.objectService.object.line.splice(rowIndex, 1);
@@ -254,14 +262,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
       })
    }
 
-   async qtyOnBlur(rowIndex: number, qty: any) {
-      if (qty && Number(qty) > 0) {
-         this.objectService.object.line[rowIndex].lineQty = Number(qty);
-         this.objectService.object.line[rowIndex].qtyRequest = this.objectService.object.line[rowIndex].lineQty;
-         await this.commonService.computeDiscTaxAmount(this.objectService.object.line[rowIndex], false, false, false, 2);
-      }
-   }
-
    /* #endregion */
 
    /* #region for web testing */
@@ -293,11 +293,12 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      yCd: itemExistInLine.yCd,
                      yDesc: itemExistInLine.yDesc,
                      barcode: itemExistInLine.barcode,
-                     lineQty: 1,
+                     lineQty: null,
                      qtyRequest: 1,
                      qtyReceive: null,
                      isDeleted: itemExistInLine.isDeleted
                   }
+                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:297 ~ TransferInScanningItemPage ~ this.objectService.validateBarcode ~ outputData:", outputData)
                   this.insertIntoLine(outputData);
                } else {
                   let outputData: TransferInScanningLine = {
@@ -319,11 +320,12 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      yCd: this.objectService.itemVariationYMasterList.find(rr => rr.id === response.itemVariationLineYId)?.code,
                      yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === response.itemVariationLineYId)?.description,
                      barcode: response.itemBarcode,
-                     lineQty: 1,
+                     lineQty: null,
                      qtyRequest: 1,
                      qtyReceive: null,
                      isDeleted: false
                   }
+                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:324 ~ TransferInScanningItemPage ~ this.objectService.validateBarcode ~ outputData:", outputData)
                   this.insertIntoLine(outputData);
                }
             }
@@ -430,6 +432,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          line: this.objectService.object.line.filter(r => r.uuid !== null),
          transferAdjustment: null
       }
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:449 ~ TransferInScanningItemPage ~ this.objectService.insertObject ~ insertObject:", JSON.stringify(insertObject))
 
       this.objectService.insertObject(insertObject).subscribe(response => {
          if (response.status === 201) {
@@ -449,6 +452,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    updateObject() {
+      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:454 ~ TransferInScanningItemPage ~ this.objectService.updateObject ~ this.objectService.object:", JSON.stringify(this.objectService.object))
       this.objectService.updateObject(this.objectService.object).subscribe(response => {
          if (response.status === 204) {
             this.toastService.presentToast("", "Transfer In Scanning updated", "top", "success", 1000);

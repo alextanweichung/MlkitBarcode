@@ -167,10 +167,12 @@
                 </ion-row>
               </ion-grid>
             </ion-col>
-            <ion-col size="2" class="ion-margin-auto justify-content-center">
-              <div >
-                <ion-badge mode="ios" class="justify-content-center">{{line.lineQty|number:"1.0"}}</ion-badge>
-              </div>
+            <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+               <div class="ion-flex my-auto">
+                 <ion-badge>
+                   <div class="ion-text-right">{{line.lineQty|number:'1.0'}}</div>
+                 </ion-badge>
+               </div>
             </ion-col>
           </ion-row>
           <ion-row>

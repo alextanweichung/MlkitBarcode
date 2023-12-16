@@ -186,7 +186,7 @@
             <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
               <div class="ion-flex my-auto">
                 <ion-badge>
-                  <div class="ion-text-right">{{line.lineQty|number:'1.0'}}</div>
+                  <div class="ion-text-right">{{line.qtyRequest|number:'1.0'}}</div>
                 </ion-badge>
               </div>
             </ion-col>
@@ -215,7 +215,7 @@
           </ion-row>
           <ion-row>
             <ion-col>
-              <div>{{line.unitPrice|number:"1.0-2"}}</div>
+              <div>{{line.unitPrice|number:"1.2"}}</div>
             </ion-col>
             <ion-col>
               <div class="ion-flex">
@@ -224,10 +224,10 @@
               </div>
             </ion-col>
             <ion-col class="justify-content-end">
-              <div >{{(line.discountAmt??0)|number:"1.0-2"}}</div>
+              <div >{{(line.discountAmt??0)|number:"1.2"}}</div>
             </ion-col>
             <ion-col class="justify-content-end">
-              <div >{{(line.subTotal??0)|number:"1.0-2"}}</div>
+              <div >{{(line.subTotal??0)|number:"1.2"}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>
