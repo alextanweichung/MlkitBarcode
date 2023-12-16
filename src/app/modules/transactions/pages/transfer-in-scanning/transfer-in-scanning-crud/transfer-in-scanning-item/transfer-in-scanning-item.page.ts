@@ -164,7 +164,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
             if (this.objectService.object.line[index].uuid === null) {
                this.objectService.object.line[index].uuid = event.uuid;
             }
-            this.objectService.object.line[index].qtyRequest = event.qtyRequest;
+            this.objectService.object.line[index].qtyRequest += event.qtyRequest;
             this.objectService.object.line[index].lineQty = this.objectService.object.line[index].qtyRequest;
             this.objectService.object.line[index].qtyReceive = this.objectService.object.line[index].qtyRequest;
             this.objectService.object.line[index].unitPrice = event?.unitPrice;
