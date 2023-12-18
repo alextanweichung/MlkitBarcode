@@ -100,7 +100,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      discountGroupCode: itemExistInLine?.discountGroupCode,
                      discountExpression: itemExistInLine?.discountExpression
                   }
-                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:103 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", outputData)
+                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:103 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", JSON.stringify(outputData))
                   // await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                   await this.insertIntoLine(outputData);
                } else {
@@ -132,7 +132,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      discountGroupCode: r.itemPricing?.discountGroupCode,
                      discountExpression: r.itemPricing?.discountExpression
                   }
-                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:135 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", outputData)
+                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:135 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", JSON.stringify(outputData))
                   // await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                   await this.insertIntoLine(outputData);
                }
@@ -149,6 +149,9 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
       if (rowIndex === null || rowIndex === undefined) {
          this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       } else {
+         if (this.objectService.object.line[rowIndex].qtyRequest === null || this.objectService.object.line[rowIndex].qtyReceive === undefined) {
+            this.objectService.object.line[rowIndex].qtyRequest = 0;
+         }
          this.objectService.object.line[rowIndex].lineQty = this.objectService.object.line[rowIndex].qtyRequest;
          this.objectService.object.line[rowIndex].qtyReceive = this.objectService.object.line[rowIndex].qtyRequest;
          this.objectService.object.line[rowIndex].unitPriceExTax = this.objectService.object.line[rowIndex].unitPrice; // missing, not sure why
@@ -164,7 +167,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
             if (this.objectService.object.line[index].uuid === null) {
                this.objectService.object.line[index].uuid = event.uuid;
             }
-            this.objectService.object.line[index].qtyRequest += event.qtyRequest;
+            this.objectService.object.line[index].qtyRequest = (this.objectService.object.line[index].qtyRequest??0) + event.qtyRequest;
             this.objectService.object.line[index].lineQty = this.objectService.object.line[index].qtyRequest;
             this.objectService.object.line[index].qtyReceive = this.objectService.object.line[index].qtyRequest;
             this.objectService.object.line[index].unitPrice = event?.unitPrice;
