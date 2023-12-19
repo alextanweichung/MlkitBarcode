@@ -321,6 +321,11 @@ const routes: Routes = [
      path: 'transactions/bin-count',
      loadChildren: () => import('./modules/transactions/pages/bin-count/bin-count.module').then( m => m.BinCountPageModule)
    },
+   //transactions-do-acknowledgement
+   {
+      path: 'transactions/do-acknowledgement',
+      loadChildren: () => import('./modules/transactions/pages/do-acknowledgement/do-acknowledgement.module').then(m => m.DoAcknowledgementPageModule)
+   },
 
 
 
@@ -435,9 +440,14 @@ const routes: Routes = [
    {
       path: 'pos-approval-processing',
       loadChildren: () => import('./shared/pages/pos-approval-processing/pos-approval-processing.module').then(m => m.PosApprovalProcessingPageModule)
-   },  {
+   },
+  {
     path: 'general-scan-input',
     loadChildren: () => import('./shared/pages/general-scan-input/general-scan-input.module').then( m => m.GeneralScanInputPageModule)
+  },
+  {
+    path: 'do-acknowledgement',
+    loadChildren: () => import('./modules/transactions/pages/do-acknowledgement/do-acknowledgement.module').then( m => m.DoAcknowledgementPageModule)
   },
 
 

@@ -1,0 +1,106 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Delivery Order Acknowledgement</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="" defaultHref="/transactions"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <div class="p-2">
+    <ion-list lines="none">
+      <app-search-multi-dropdown title="Vehicle" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true"
+        [searchDropdownList]="vehicleSearchDropdownList"
+        (onActionComplete)="onVechicleSelected($event)"></app-search-multi-dropdown>
+      <ion-item>
+        <ion-label position="stacked" class="font-bold">Carton Truck Loading Num</ion-label>
+        <ion-input [(ngModel)]="cartonTruckLoadingNum" placeholder="Enter Carton Truck Loading Num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked" class="font-bold">Delivery Order Num</ion-label>
+        <ion-input [(ngModel)]="deliveryOrderNum" class="mb-0" placeholder="Enter Delivery Order Num"></ion-input>
+      </ion-item>
+    </ion-list>
+  </div>
+  <div class="p-2">
+    <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="objects && objects.length === 0">
+      <ion-label>Nothing found!</ion-label>
+    </ion-list-header>
+    <ng-container *ngIf="objects?.length > 0">
+      <ion-list *ngFor="let object of objects" class="list-custom animate__animated animate__fadeIn" lines="full">
+        <ion-item detail="false" class="ion-no-padding">
+          <ion-grid class="ion-no-padding py-2 pl-2">
+            <ion-row>
+              <ion-col>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto font-bold">
+                      {{object.deliveryOrderNum}}
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="auto" class="ion-flex ion-margin-auto">
+                    <ion-badge>{{object.customerId | idToCodeMapping: objectService.customerMasterList}}</ion-badge>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div class="ion-flex my-auto ml-2">{{object.customerId | idMapping: objectService.customerMasterList}}</div>
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+              <ion-col size="auto" class="ion-flex ion-margin-auto justify-content-end" (click)="acknowledge(object)">
+                <ion-button fill="clear" size="default">
+                    <ion-icon slot="icon-only" name="checkmark-done-circle-sharp" ></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+  </div>
+    <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
+      <ion-fab-button>
+        <ion-icon name="search"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+</ion-content>
+
+<ion-modal [isOpen]="signatureModal" (didDismiss)="signatureModal = false" [keyboardClose]="true" [showBackdrop]="true" [backdropDismiss]="false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cancel()">
+            Cancel
+          </ion-button>
+        </ion-buttons>
+        <ion-title>
+          E-signature
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="clear()">
+            Clear
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content [fullscreen]="true">
+      <div class="p-2">
+        <div class="border-dotted">
+          <signature-pad #signaturePad [options]="signaturePadOptions"></signature-pad>
+        </div>
+      </div>
+    </ion-content>
+    <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0"
+      style="background-color: white;">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" (click)="save()">
+              Save
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
