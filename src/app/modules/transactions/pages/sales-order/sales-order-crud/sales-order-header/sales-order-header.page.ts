@@ -81,7 +81,17 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
         remark: [null],
         isHomeCurrency: [null],
         isOpeningBalance: [false],
-        isPricingApproval: [false]
+        isPricingApproval: [false],
+        isTrackerComplete: [null],
+        trackerCompleteDate: [null],
+        closeRemark: [null],
+        isPriority: [null],
+        isPriorityDate: [null],
+        deliveryDate: [null],
+        orderLifeCycle: [null],
+        customerPo: [null],
+        totalCarton: [null],
+        isAutoPromotion: [true],
       });
       this.setDefaultValue();
     } catch (e) {

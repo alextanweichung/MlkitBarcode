@@ -102,7 +102,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    forgetPassword(event) {
-      this.navController.navigateRoot("/forget-password");
+      this.navController.navigateRoot("/forget-password")
    }
 
    setSelectedParam() {

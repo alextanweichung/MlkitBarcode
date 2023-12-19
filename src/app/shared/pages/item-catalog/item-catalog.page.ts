@@ -10,7 +10,7 @@ import { MasterList } from '../../models/master-list';
 import { MasterListDetails } from '../../models/master-list-details';
 import { ModuleControl } from '../../models/module-control';
 import { PrecisionList } from '../../models/precision-list';
-import { TransactionDetail } from '../../models/transaction-detail';
+import { LineAssembly, TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
@@ -205,6 +205,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    computeQtyInCart() {
+      console.log("🚀 ~ file: item-catalog.page.ts:211 ~ ItemCatalogPage ~ computeQtyInCart ~ this.itemInCart:", this.itemInCart)
       if (this.availableItems && this.availableItems.length > 0) {
          this.availableItems.forEach(r => {
             if (this.itemInCart.findIndex(rr => rr.itemId === r.itemId) > -1) {
@@ -270,6 +271,28 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             item.minOrderQty = item.minOrderQty;
          } else {
             item.minOrderQty = 0;
+         }
+      }
+      if (item.typeCode === "AS") {
+         if (item.component && item.component.length > 0) {
+            item.assembly = [];
+            item.component.forEach((comp, index) => {
+               let newLine: LineAssembly = {
+                  sequence: 0,
+                  headerId: 0,
+                  lineId: 0,
+                  assemblyId: 0,
+                  assemblyItemId: item.itemId,
+                  itemComponentId: comp.itemComponentId,
+                  itemComponentQty: comp.qty,
+                  qtyRequest: null
+               }
+               item.assembly.push(newLine);
+            })
+         } else {
+            if (item.hasOwnProperty("assembly")) {
+               item.assembly = [];
+            }
          }
       }
    }

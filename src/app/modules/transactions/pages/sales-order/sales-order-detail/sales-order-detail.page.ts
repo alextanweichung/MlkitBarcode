@@ -14,6 +14,7 @@ import { TrxChild } from 'src/app/shared/models/trx-child';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { format, parseISO } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
    selector: 'app-sales-order-detail',
@@ -37,6 +38,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
    constructor(
       public objectService: SalesOrderService,
       private authService: AuthService,
+      public configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
       private loadingService: LoadingService,
@@ -212,10 +214,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
    selectedItem: TransactionDetail;
    showDetails(item: TransactionDetail) {
-      if (item.variationTypeCode === "1" || item.variationTypeCode === "2") {
-         this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
-         item.isSelected = !item.isSelected;
-      }
+      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      item.isSelected = !item.isSelected;
    }
 
    /* #endregion */

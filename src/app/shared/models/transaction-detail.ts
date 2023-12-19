@@ -8,6 +8,7 @@ export interface TransactionDetail {
    itemCode?: string
    oldItemCode?: string
    vendorItemCode?: string
+   typeCode: string
    description?: string
    extendedDescription?: string
    shortDescription?: string
@@ -147,12 +148,19 @@ export interface TransactionDetail {
    tradingMarginAmt?: number
    tradingMarginAmtExTax?: number
 
+   component?: ItemLineComponent[]
    assembly?: LineAssembly[]
    eligiblePromoId?: number
 
    // testing performance
    guid?: string
 }
+
+export interface ItemLineComponent {
+   itemComponentId: number
+   qty: number
+}
+
 export interface LineAssembly {
    sequence: number
    headerId: number

@@ -82,6 +82,7 @@ export interface BackToBackOrderHeader {
   isPricingApproval: boolean
   posLocationId: any
   posLocationCode: any
+  isAutoPromotion: boolean
   sequence: number
   createdById: number
   createdBy: string

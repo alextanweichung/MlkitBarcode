@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { MultiPickingHeader, MultiPickingList, MultiPickingObject, MultiPickingRoot, MultiPickingSORequest, MultiPickingSalesOrder } from '../models/picking';
+import { MultiPickingHeader, MultiPickingList, MultiPickingObject, MultiPickingRoot } from '../models/picking';
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ItemImage } from '../models/item';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -101,12 +102,12 @@ export class PickingService {
       if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
          let location = "";
          let found = this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode);
-         if (found && found.rack) {
-            location += found.rack;
-         }
-         if (found && found.subRack) {
-            location += " - " + found.subRack;
-         }
+         // if (found && found.rack) {
+         //    location += found.rack;
+         // }
+         // if (found && found.subRack) {
+         //    location += " - " + found.subRack;
+         // }
          return location;
       }
       return null;
@@ -271,7 +272,7 @@ export class PickingService {
       return this.http.get<any>(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/" + objectId);
    }
 
-   getSOHeader(object: MultiPickingSORequest) {
+   getSOHeader(object: string[]) {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/getSOHeader", object, httpObserveHeader);
    }
 
@@ -306,7 +307,7 @@ export class PickingService {
 
    // for web testing 
    validateBarcode(barcode: string) {
-      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/itemByBarcode/" + barcode);
+      return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/itemByBarcode/" + barcode);
    }
 
 }

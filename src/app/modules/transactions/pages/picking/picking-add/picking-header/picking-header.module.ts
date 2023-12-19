@@ -12,20 +12,22 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import HideKeyboardModule from 'src/app/shared/utilities/hide-keyboard.module';
+import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    IonicModule,
-    PickingHeaderPageRoutingModule,
-    SearchDropdownPageModule,
-    CameraScanInputPageModule,
-    IdMappingModule,
-    NgCircleProgressModule,
-    HideKeyboardModule
-  ],
-  declarations: [PickingHeaderPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      ReactiveFormsModule,
+      IonicModule,
+      PickingHeaderPageRoutingModule,
+      SearchDropdownPageModule,
+      CameraScanInputPageModule,
+      IdMappingModule,
+      NgCircleProgressModule,
+      HideKeyboardModule,
+      OfflineItemIdMappingModule
+   ],
+   declarations: [PickingHeaderPage]
 })
-export class PickingHeaderPageModule {}
+export class PickingHeaderPageModule { }

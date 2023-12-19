@@ -21,6 +21,12 @@
                   <div>Shipping Info</div>
                </ion-label>
             </ion-item>
+            <ion-item button="false" (click)="popover.dismiss()" *ngIf="objectService.salesActivatePromotionEngine && (objectService.objectHeader.businessModelType === 'T' || objectService.objectHeader.businessModelType === 'B')">
+               <ion-label>
+                  <div class="ion-text-wrap">Auto Promotion</div>
+               </ion-label>
+               <ion-checkbox [(ngModel)]="objectService.objectHeader.isAutoPromotion" (ionChange)="onDisablePromotionCheck($event)"></ion-checkbox>
+            </ion-item>
             <ion-item (click)="popover.dismiss(); sendForDebug()">
                <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
                <ion-label>
@@ -386,44 +392,89 @@
                   <ion-label slot="end">{{getPromoDesc(selectedItem?.promoEventId)}}</ion-label>
                </ion-item>
             </ion-list>
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center"
-               *ngIf="selectedItem.variationTypeCode === '1' || selectedItem.variationTypeCode === '2'">
-               <ion-label>Variations</ion-label>
-            </ion-list-header>
-            <ion-item class="no-ripple" lines="none"
-               *ngIf="selectedItem.variationTypeCode === '1' || selectedItem.variationTypeCode === '2'">
-               <ion-grid class="p-0">
-                  <div *ngFor="let vd of selectedItem.variationDetails">
-                     <div *ngFor="let d of vd.details">
-                        <ion-row class="py-0" *ngIf="d.deactivated === false">
-                           <ion-col class="ion-flex ion-margin-auto">
-                              <span class="badge-green ion-text-wrap ion-flex my-auto px-1" *ngIf="vd.itemVariationXId">{{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                              <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId">{{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+            <ng-container *ngIf="selectedItem.variationTypeCode === '0' && selectedItem.assembly && selectedItem.assembly.length > 0">
+               <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+                  <ion-label>Assembly</ion-label>
+               </ion-list-header>
+               <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+                  <ion-item button detail="false" class="no-ripple" lines="none">
+                     <ion-grid class="p-0">
+                        <ion-row>
+                           <ion-col size="1" class="ion-flex ion-margin-auto">
+                              <div class="font-bold">#</div>
                            </ion-col>
-                           <ion-col class="ion-flex ion-margin-auto p-0">
-                              <ion-grid class="ion-no-padding">
-                                 <ion-row>
-                                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseVariationQty(d)">
-                                          <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                                       </ion-button>
-                                    </ion-col>
-                                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                       <ion-input #input class="ion-text-center" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="d.qtyRequest" (ionBlur)="computeQty()" placeholder="0"></ion-input>
-                                    </ion-col>
-                                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(d)">
-                                          <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                                       </ion-button>
-                                    </ion-col>
-                                 </ion-row>
-                              </ion-grid>
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <div class="font-bold">Compon.</div>
+                           </ion-col>
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <div class="font-bold">Desc.</div>
+                           </ion-col>
+                           <ion-col class="ion-margin-auto ion-text-right">
+                              <div class="font-bold">Ratio</div>
+                           </ion-col>
+                           <ion-col class="ion-margin-auto ion-text-right">
+                              <div class="font-bold">Qty.</div>
                            </ion-col>
                         </ion-row>
+                        <ion-row *ngFor="let rowData of selectedItem.assembly; let rowIndex = index">
+                           <ion-col size="1" class="ion-flex ion-margin-auto">
+                              <div>{{rowIndex+1}}</div>
+                           </ion-col>
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <div>{{rowData.itemComponentId|offlineItemIdMapping:configService.item_Masters}}</div>
+                           </ion-col>
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <div>{{rowData.itemComponentId|offlineItemIdDescMapping:configService.item_Masters}}</div>
+                           </ion-col>
+                           <ion-col class="ion-margin-auto ion-text-right">
+                              <div>{{rowData.itemComponentQty}}</div>
+                           </ion-col>
+                           <ion-col class="ion-margin-auto ion-text-right">
+                              <div>{{rowData.qtyRequest}}</div>
+                           </ion-col>
+                        </ion-row>
+                     </ion-grid>
+                  </ion-item>
+               </ion-list>
+            </ng-container>
+            <ng-container *ngIf="selectedItem.variationTypeCode==='1' || selectedItem.variationTypeCode==='2'">
+               <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+                  <ion-label>Variations</ion-label>
+               </ion-list-header>
+               <ion-item class="no-ripple" lines="none">
+                  <ion-grid class="p-0">
+                     <div *ngFor="let vd of selectedItem.variationDetails">
+                        <div *ngFor="let d of vd.details">
+                           <ion-row class="py-0" *ngIf="d.deactivated === false">
+                              <ion-col class="ion-flex ion-margin-auto">
+                                 <span class="badge-green ion-text-wrap ion-flex my-auto px-1" *ngIf="vd.itemVariationXId">{{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                                 <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId">{{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto p-0">
+                                 <ion-grid class="ion-no-padding">
+                                    <ion-row>
+                                       <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                                          <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseVariationQty(d)">
+                                             <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                                          </ion-button>
+                                       </ion-col>
+                                       <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                                          <ion-input #input class="ion-text-center" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="d.qtyRequest" (ionBlur)="computeQty()" placeholder="0"></ion-input>
+                                       </ion-col>
+                                       <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                                          <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(d)">
+                                             <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                                          </ion-button>
+                                       </ion-col>
+                                    </ion-row>
+                                 </ion-grid>
+                              </ion-col>
+                           </ion-row>
+                        </div>
                      </div>
-                  </div>
-               </ion-grid>
-            </ion-item>
+                  </ion-grid>
+               </ion-item>
+            </ng-container>
          </div>
       </ion-content>
       <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color:white;">

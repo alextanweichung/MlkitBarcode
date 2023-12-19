@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonDatetime, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
+import Decimal from 'decimal.js';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
@@ -28,6 +30,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    constructor(
       public objectService: SalesOrderService,
       private authService: AuthService,
+      public configService: ConfigService,
       private commonService: CommonService,
       private promotionEngineService: PromotionEngineService,
       private toastService: ToastService,
@@ -45,9 +48,9 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       await this.objectService.loadRequiredMaster();
-      if (this.objectService.salesActivatePromotionEngine) {
-         await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-      }
+      // if (this.objectService.salesActivatePromotionEngine) {
+      //    await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+      // }
       if (this.objectService.objectHeader.deliveryDate) {
          this.dateValue = format(new Date(this.objectService.objectHeader.deliveryDate), "yyyy-MM-dd") + "T08:00:00.000Z";
          this.setFormattedDateString();
@@ -119,7 +122,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    async onModalHide() {
       this.selectedIndex = null;
       this.selectedItem = null;
-      if (this.objectService.salesActivatePromotionEngine) {
+      if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
          await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
       }
    }
@@ -320,7 +323,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          this.toastService.presentToast("", "Line removed", "top", "success", 1000);
          this.validateMinOrderQty();
       }, 1);
-      if (this.objectService.salesActivatePromotionEngine) {
+      if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
          await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
       }
    }
@@ -373,32 +376,45 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async computeAllAmount(data: TransactionDetail) {
-      data.qtyRequest = Number(data.qtyRequest.toFixed(0));
+   async computeAllAmount(trxLine: TransactionDetail) {
+      trxLine.qtyRequest = Number(trxLine.qtyRequest.toFixed(0));
       try {
          if (this.objectService.salesOrderQuantityControl === "1") {
-            if (data.qtyRequest && data.qtyRequest > data.actualQty) {
-               data.qtyRequest = null;
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+            if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.actualQty) {
+               trxLine.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${trxLine.actualQty}]`, "top", "warning", 1000);
             }
          } else if (this.objectService.salesOrderQuantityControl === "2") {
-            if (data.qtyRequest && data.qtyRequest > data.availableQty) {
-               data.qtyRequest = null;
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+            if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.availableQty) {
+               trxLine.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${trxLine.availableQty}]`, "top", "warning", 1000);
             }
          } else {
-            await this.computeDiscTaxAmount(data);
-            if (this.objectService.salesActivateTradingMargin) {
-               this.computeTradingMarginAmount(data);
+            if (trxLine.assembly && trxLine.assembly.length > 0) {
+               this.computeAssemblyQty(trxLine);
             }
-            if (this.objectService.salesActivatePromotionEngine) {
+            await this.computeDiscTaxAmount(trxLine);
+            if (this.objectService.salesActivateTradingMargin) {
+               this.computeTradingMarginAmount(trxLine);
+            }
+            if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
                await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
             }
          }
-         this.computeDiscTaxAmount(data);
+         this.computeDiscTaxAmount(trxLine);
       } catch (e) {
          console.error(e);
       }
+   }
+
+   computeAssemblyQty(trxLine: TransactionDetail) {
+      trxLine.assembly.forEach(assembly => {
+         if (trxLine.qtyRequest) {
+            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
+         } else {
+            assembly.qtyRequest = null;
+         }
+      });
    }
 
    computeTradingMarginAmount(trxLine: TransactionDetail) {
@@ -846,6 +862,17 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
          console.log(error);
       });
+   }
+
+   async onDisablePromotionCheck(event: any) {
+      if (event.detail.checked) {
+         await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+      } else {
+         this.objectService.objectDetail.forEach(async line => {
+            line = this.commonService.reversePromoImpact(line);
+            await this.computeDiscTaxAmount(line);
+         })
+      }
    }
 
 }

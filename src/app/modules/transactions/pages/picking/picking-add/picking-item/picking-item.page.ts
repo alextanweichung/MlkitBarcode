@@ -393,6 +393,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      itemId: found_item_master.id,
                      itemCode: found_item_master.code,
                      description: found_item_master.itemDesc,
+                     typeCode: found_item_master.typeCode,
                      variationTypeCode: found_item_master.varCd,
                      discountGroupCode: found_item_master.discCd,
                      discountExpression: (found_item_master.discPct ?? "0") + '%',
@@ -749,21 +750,21 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       return trxDto;
    }
 
-	sendForDebug() {
+   sendForDebug() {
       let trxDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
-		let jsonObjectString = JSON.stringify(trxDto);
-		let debugObject: JsonDebug = {
-			jsonDebugId: 0,
-			jsonData: jsonObjectString
-		};
-		this.objectService.sendDebug(debugObject).subscribe(response => {
-			if (response.status == 200) {
-				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
-			}
-		}, error => {
-			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
-			console.log(error);
-		});
-	}
+      let jsonObjectString = JSON.stringify(trxDto);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status == 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
+   }
 
 }

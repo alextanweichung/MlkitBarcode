@@ -1,33 +1,33 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Item</ion-title>
-    <ion-buttons slot="start" *ngIf="objectService.objectHeader.quotationId === 0">
-      <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
-    </ion-buttons>
-    <ion-buttons slot="start" *ngIf="objectService.objectHeader.quotationId > 0">
-      <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
-    </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="!showImage">
-      <ion-button (click)="toggleShowImage()">Grid</ion-button>
-    </ion-buttons>
-    <ion-buttons slot="primary" *ngIf="showImage">
-      <ion-button (click)="toggleShowImage()">List</ion-button>
-    </ion-buttons>
-  </ion-toolbar>  
+   <ion-toolbar>
+      <ion-title>Item</ion-title>
+      <ion-buttons slot="start" *ngIf="objectService.objectHeader.quotationId === 0">
+         <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
+      </ion-buttons>
+      <ion-buttons slot="start" *ngIf="objectService.objectHeader.quotationId > 0">
+         <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
+      </ion-buttons>
+      <ion-buttons slot="primary" *ngIf="!showImage">
+         <ion-button (click)="toggleShowImage()">Grid</ion-button>
+      </ion-buttons>
+      <ion-buttons slot="primary" *ngIf="showImage">
+         <ion-button (click)="toggleShowImage()">List</ion-button>
+      </ion-buttons>
+   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <div class="p-2">
-    <app-item-catalog #itemCatalog [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive"(onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="false" [itemInCart]="objectService.objectDetail"></app-item-catalog>
-  </div>
+   <div class="p-2">
+      <app-item-catalog #itemCatalog [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="false" [itemInCart]="objectService.objectDetail"></app-item-catalog>
+   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
-  <ion-grid class="ion-no-padding">
-    <ion-row>
-      <ion-col>
-        <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-          View Cart ({{objectService.objectDetail.length|number:'1.0'}})
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+   <ion-grid class="ion-no-padding">
+      <ion-row>
+         <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
+               View Cart ({{objectService.objectDetail.length|number:'1.0'}})
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </ion-grid>
 </ion-footer>

@@ -77,6 +77,7 @@ export interface QuotationHeader {
   isDisplayTaxInclusive: boolean
   isHomeCurrency: boolean
   isPricingApproval: boolean
+  isAutoPromotion: boolean
   sequence: number
   createdById: number
   createdBy: string
