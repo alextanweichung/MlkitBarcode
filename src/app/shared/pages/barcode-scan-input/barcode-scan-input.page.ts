@@ -110,10 +110,12 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    barcodeSearchValue: string;
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
    async validateBarcode(barcode: string) {
+      console.log("🚀 ~ file: barcode-scan-input.page.ts:113 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode:", barcode)
       if (barcode) {
          this.barcodeSearchValue = "";
          if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
             let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
+            console.log("🚀 ~ file: barcode-scan-input.page.ts:118 ~ BarcodeScanInputPage ~ validateBarcode ~ found_barcode:", JSON.stringify(found_barcode))
             if (found_barcode) {
                let found_item_master = this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
                let outputData: TransactionDetail = {

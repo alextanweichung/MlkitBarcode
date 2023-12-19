@@ -9,7 +9,7 @@
       <div class="p-2 ion-full-height ion-flex ion-flex-center">
         <ion-img src="../../../../assets/idcp/logo-idcp.svg" class="animate__animated animate__fadeInDown" style="margin-top: 82px" alt="iDCP Logo"></ion-img>
         <h3>Activation Code</h3>
-        <ion-grid class="mx-2 px-2">
+        <ion-grid class="px-2">
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
               <ion-input #input1 id="input1" class="ion-text-center" type="text" inputmode="text" enterkeyhint="next" clearOnEdit="true" [maxlength]="1" [(ngModel)]="activationCode[0]" (ionChange)="uppercase($event); setFocus(input1, input2)" (keydown)="handleKeydown($event, null, input1)"></ion-input>
