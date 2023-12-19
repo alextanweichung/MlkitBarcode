@@ -80,8 +80,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ngOnInit() {
       if (Capacitor.getPlatform() === "web") {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
-         this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
+         this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
          // this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
@@ -101,7 +101,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    forgetPassword(event) {
-      this.navController.navigateRoot("/forget-password");
+      this.navController.navigateRoot("/forget-password")
    }
 
    setSelectedParam() {

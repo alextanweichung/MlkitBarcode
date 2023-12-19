@@ -4,6 +4,7 @@ import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ioni
 import { BackToBackOrderRoot } from 'src/app/modules/transactions/models/backtoback-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
@@ -25,6 +26,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
    constructor(
       public objectService: BackToBackOrderService,
       private authService: AuthService,
+      public configService: ConfigService,
       private commonService: CommonService,
       private promotionEngineService: PromotionEngineService,
       private toastService: ToastService,
@@ -40,9 +42,9 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      if (this.objectService.salesActivatePromotionEngine) {
-         await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-      }
+      // if (this.objectService.salesActivatePromotionEngine) {
+      //    await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+      // }
       await this.validateMinOrderQty();
    }
 
@@ -173,7 +175,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
    async onModalHide() {
       this.selectedIndex = null;
       this.selectedItem = null;
-      if (this.objectService.salesActivatePromotionEngine) {
+      if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
          await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
       }
    }
@@ -319,7 +321,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
          this.toastService.presentToast("", "Line removed", "top", "success", 1000);
          this.validateMinOrderQty();
       }, 1);
-      if (this.objectService.salesActivatePromotionEngine) {
+      if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
          await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
       }
    }
@@ -390,7 +392,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
             if (this.objectService.salesActivateTradingMargin) {
                this.computeTradingMarginAmount(data);
             }
-            if (this.objectService.salesActivatePromotionEngine) {
+            if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
                await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
             }
             this.computeDiscTaxAmount(data);
@@ -677,5 +679,16 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 			console.log(error);
 		});
 	}
+
+   async onDisablePromotionCheck(event: any) {
+      if (event.detail.checked) {
+         await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+      } else {
+         this.objectService.objectDetail.forEach(async line => {
+            line = this.commonService.reversePromoImpact(line);
+            await this.computeDiscTaxAmount(line);
+         })
+      }
+   }
 
 }

@@ -4,6 +4,7 @@ import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { InboundScanDocRoot, InboundScanList, InboundScanRoot } from "../models/inbound-scan";
+import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -108,7 +109,7 @@ export class InboundScanService {
 
   // for web testing 
   validateBarcode(barcode: string) {
-    return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/itemByBarcode/" + barcode);
+    return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/itemByBarcode/" + barcode);
   }
 
 }

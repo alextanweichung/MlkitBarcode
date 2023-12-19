@@ -9,6 +9,8 @@ import { SalesOrderDetailPageRoutingModule } from './sales-order-detail-routing.
 import { SalesOrderDetailPage } from './sales-order-detail.page';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
+import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
 
 @NgModule({
   imports: [
@@ -17,7 +19,9 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     IonicModule,
     SalesOrderDetailPageRoutingModule,
     SumModule,
-    IdMappingModule
+    IdMappingModule,
+    OfflineItemIdMappingModule,
+    OfflineItemIdDescMappingModule
   ],
   declarations: [SalesOrderDetailPage]
 })

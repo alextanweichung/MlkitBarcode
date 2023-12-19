@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { MultiPickingOutstandingPickList, MultiPickingSORequest, MultiPickingSalesOrder } from 'src/app/modules/transactions/models/picking';
+import { MultiPickingOutstandingPickList, MultiPickingSalesOrder } from 'src/app/modules/transactions/models/picking';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -10,32 +10,38 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { Keyboard } from '@capacitor/keyboard';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
    selector: 'app-picking-header',
    templateUrl: './picking-header.page.html',
    styleUrls: ['./picking-header.page.scss']
 })
-export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
+export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter {
 
    objectForm: FormGroup;
-   loginUser: any;
    warehouseAgentId: number
-
+   isMobile: boolean = true;
    isButtonVisible: boolean = true;
 
    constructor(
-      private authService: AuthService,
       public objectService: PickingService,
+      private authService: AuthService,
+      public configService: ConfigService,
       private commonService: CommonService,
-      private navController: NavController,
-      private actionSheetController: ActionSheetController,
       private toastService: ToastService,
-      private formBuilder: FormBuilder,
+      private navController: NavController,
       private alertController: AlertController,
-      private modalController: ModalController
+      private modalController: ModalController,
+      private actionSheetController: ActionSheetController,
+      private formBuilder: FormBuilder,
    ) {
       this.newObjectForm();
+   }
+
+   ionViewWillEnter(): void {
+      this.isMobile = Capacitor.getPlatform() !== "web";
    }
 
    ngOnDestroy(): void {
@@ -62,15 +68,13 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
    }
 
    ngOnInit() {
-      this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-      this.warehouseAgentId = this.loginUser.warehouseAgentId;
+      this.warehouseAgentId = this.configService.loginUser.warehouseAgentId;
       if (this.warehouseAgentId === null || this.warehouseAgentId === undefined) {
          this.toastService.presentToast("System Error", "Warehouse Agent not set.", "top", "danger", 1000);
          this.navController.navigateRoot("/transactions/picking");
       }
       this.loadModuleControl();
       this.setDefaultValue();
-
       if (this.objectService.header && this.objectService.header.multiPickingId > 0) {
          this.objectForm.patchValue(this.objectService.object.header);
          this.loadExisitingSO(this.objectService.object.outstandingPickList.flatMap(r => r.salesOrderNum));
@@ -103,11 +107,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
    }
 
    loadExisitingSO(salesOrderNums: string[]) {
-      let request: MultiPickingSORequest = {
-         salesOrderNums: salesOrderNums,
-         warehouseAgentId: this.warehouseAgentId
-      }
-      this.objectService.getSOHeader(request).subscribe(response => {
+      this.objectService.getSOHeader(salesOrderNums).subscribe(response => {
          if (response.status === 200) {
             let so = response.body[0] as MultiPickingSalesOrder;
             if (so === undefined) {
@@ -125,7 +125,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
             }
             this.selectedSalesOrders.unshift(so);
             if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
-               this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId });
+               this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId }, false);
             }
             // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
             this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
@@ -149,7 +149,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
       let defaultCustomer = this.objectService.customerMasterList.find(r => r.isPrimary);
       if (defaultCustomer) {
          this.objectForm.patchValue({ customerId: defaultCustomer.id });
-         this.onCustomerSelected(defaultCustomer);
+         this.onCustomerSelected(defaultCustomer, true);
       }
    }
 
@@ -177,14 +177,10 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
    validateSalesOrder(input: string) {
       if (input && input.length > 0) {
          this.itemSearchValue = null;
-         let request: MultiPickingSORequest = {
-            salesOrderNums: [input],
-            warehouseAgentId: this.warehouseAgentId
-         }
          if (this.selectedSalesOrders.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
             this.toastService.presentToast("Document already selected.", "", "top", "warning", 1000);
          } else {
-            this.objectService.getSOHeader(request).subscribe(response => {
+            this.objectService.getSOHeader([input]).subscribe(response => {
                if (response.status === 200) {
                   let so = response.body[0] as MultiPickingSalesOrder;
                   if (so === undefined) {
@@ -200,9 +196,12 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
                      this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
                      return;
                   }
+                  so.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.selectedSalesOrders.unshift(so);
+                  console.log("🚀 ~ file: picking-header.page.ts:197 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.selectedSalesOrders:", this.selectedSalesOrders)
                   if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
-                     this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId });
+                     this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId }, false);
+                     this.onDestinationChanged({ id: this.selectedSalesOrders[0].toLocationId });
                   }
                   this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
                   this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
@@ -211,10 +210,13 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
                   })
                   this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
                   this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+                  console.log("🚀 ~ file: picking-header.page.ts:207 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueItemCode:", this.uniqueItemCode)
                   this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
                   this.uniqueSku.forEach(r => {
                      this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
                   })
+                  console.log("🚀 ~ file: picking-header.page.ts:209 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueSku:", this.uniqueSku)
+                  console.log("🚀 ~ file: picking-header.page.ts:211 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueItemSkuAndCode:", this.uniqueItemSkuAndCode)
                }
             }, error => {
                console.error(error);
@@ -270,7 +272,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
    }
 
    getUniqueItemBySoNum(salesOrderNum: string) {
-      return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum).flatMap(r => r.itemCode))];
+      return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum))];
    }
 
    getSoLineByItemCode(itemCode: string): MultiPickingOutstandingPickList[] {
@@ -292,7 +294,8 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
                   itemVariationYDescription: r.itemVariationYDescription,
                   qtyRequest: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyRequest).reduce((a, c) => Number(a) + Number(c), 0),
                   qtyCurrent: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyCurrent).reduce((a, c) => Number(a) + Number(c), 0),
-                  qtyPicked: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyPicked).reduce((a, c) => Number(a) + Number(c), 0)
+                  qtyPicked: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyPicked).reduce((a, c) => Number(a) + Number(c), 0),
+                  isComponentScan: false // todo : aychia
                }
                if (ret.findIndex(rr => rr.itemSku === t.itemSku) === -1) {
                   ret.push(t);
@@ -354,7 +357,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
    selectedCustomerId: number;
    selectedCustomerLocationList: MasterListDetails[] = [];
    fLocationMasterList: MasterListDetails[] = [];
-   onCustomerSelected(event) {
+   onCustomerSelected(event, bindToLocationId: boolean) {
       try {
          this.selectedCustomerId = event ? event.id : null;
          this.objectForm.patchValue({ customerId: this.selectedCustomerId });
@@ -369,7 +372,9 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
                }
                this.objectForm.patchValue({ locationId: parseFloat(lookupValue.attribute6), toLocationId: null });
                this.selectedLocationId = parseFloat(lookupValue.attribute6);
-               this.selectedToLocationId = null;
+               if (bindToLocationId) {
+                  this.selectedToLocationId = null;
+               }
             }
             if (lookupValue.attribute5 == "T") {
                this.objectForm.controls.toLocationId.clearValidators();
@@ -377,7 +382,9 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
             }
             if (lookupValue.attributeArray1.length == 1) {
                this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
-               this.selectedToLocationId = this.selectedCustomerLocationList[0].id;
+               if (bindToLocationId) {
+                  this.selectedToLocationId = this.selectedCustomerLocationList[0].id;
+               }
             }
 
             //Auto map object type code
@@ -414,6 +421,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewDidEnter {
          this.selectedToLocationId = null;
          this.objectForm.patchValue({ toLocationId: this.selectedToLocationId });
       }
+      console.log("🚀 ~ file: picking-header.page.ts:419 ~ PickingHeaderPage ~ onDestinationChanged ~ this.selectedToLocationId:", this.selectedToLocationId)
    }
 
    @ViewChild('segment', { static: false }) segment: IonSegment;

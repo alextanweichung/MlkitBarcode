@@ -2,6 +2,7 @@ export interface LocalItemMaster {
   id: number
   code: string
   itemDesc: string
+  typeCode: string
   newId: number
   newDate: Date
   brandId: number

@@ -9,6 +9,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { ItemCatalogPage } from 'src/app/shared/pages/item-catalog/item-catalog.page';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
 import { SearchItemService } from 'src/app/shared/services/search-item.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,8 +24,9 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    @ViewChild("itemCatalog", { static: false }) itemCatalog: ItemCatalogPage;
 
    constructor(
-      private authService: AuthService,
       public objectService: QuotationService,
+      private authService: AuthService,
+      private promotionEngineService: PromotionEngineService,
       private navController: NavController,
       private commonService: CommonService,
       private toastService: ToastService,
@@ -45,6 +47,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async ionViewDidEnter(): Promise<void> {
       await this.itemCatalog.setFocus();
+      await this.itemCatalog.computeQtyInCart();
    }
 
    ngOnInit() {
@@ -62,6 +65,9 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          }
          await this.objectService.objectDetail.unshift(trxLine);
          await this.computeAllAmount(this.objectService.objectDetail[0]);
+         if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
+            await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+         }
          await this.assignSequence();
          this.toastService.presentToast("", "Item added", "top", "success", 1000);
       } catch (e) {
@@ -73,6 +79,11 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       let index = 0;
       this.objectService.objectDetail.forEach(r => {
          r.sequence = index;
+         if (r.typeCode === "AS" && r.assembly && r.assembly.length > 0) {
+            r.assembly.forEach(rr => {
+               rr.sequence = index;
+            })
+         }
          index++;
       })
    }
@@ -91,10 +102,30 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    disablePromotionCheckBox: boolean = false;
    async computeAllAmount(trxLine: TransactionDetail) {
       try {
+         if (trxLine.assembly && trxLine.assembly.length > 0) {
+            this.computeAssemblyQty(trxLine);
+         }
          await this.computeDiscTaxAmount(trxLine);
+         if (this.objectService.salesActivateTradingMargin) {
+            this.computeTradingMarginAmount(trxLine);
+         }
       } catch (e) {
          console.error(e);
       }
+   }
+
+   computeAssemblyQty(trxLine: TransactionDetail) {
+      trxLine.assembly.forEach(assembly => {
+         if (trxLine.qtyRequest) {
+            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
+         } else {
+            assembly.qtyRequest = null;
+         }
+      });
+   }
+
+   computeTradingMarginAmount(trxLine: TransactionDetail) {
+      trxLine = this.commonService.computeTradingMargin(trxLine, this.objectService.systemWideActivateTaxControl, trxLine.taxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
    }
 
    getVariationSum(trxLine: TransactionDetail) {
@@ -135,6 +166,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    assignTrxItemToDataLine(trxLine: TransactionDetail) {
+      console.log("🚀 ~ file: quotation-item.page.ts:158 ~ QuotationItemPage ~ assignTrxItemToDataLine ~ trxLine:", trxLine)
       try {
          trxLine.lineId = 0;
          trxLine.headerId = this.objectService.objectHeader.quotationId;
@@ -177,7 +209,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          trxLine.oriUnitPriceExTax = trxLine.unitPriceExTax;
          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
          trxLine.oriDiscountExpression = trxLine.discountExpression;
-
          return trxLine;
       } catch (e) {
          console.error(e);

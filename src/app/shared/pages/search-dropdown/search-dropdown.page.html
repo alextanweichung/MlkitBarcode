@@ -38,7 +38,9 @@
    <ng-template>
       <ion-header>
          <ion-toolbar>
-            <ion-title>{{title}}</ion-title>
+            <ion-title>
+               <div class="ion-text-wrap">{{title}}</div>
+            </ion-title>
             <ion-buttons slot="start">
                <ion-button (click)="apply()">Done</ion-button>
             </ion-buttons>

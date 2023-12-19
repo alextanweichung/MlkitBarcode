@@ -122,6 +122,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   itemId: found_item_master.id,
                   itemCode: found_item_master.code,
                   description: found_item_master.itemDesc,
+                  typeCode: found_item_master.typeCode,
                   variationTypeCode: found_item_master.varCd,
                   discountGroupCode: found_item_master.discCd,
                   discountExpression: (found_item_master.discPct ?? "0") + "%",
@@ -206,6 +207,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                            itemId: r.id,
                            itemCode: r.code,
                            description: r.itemDesc,
+                           typeCode: r.typeCode,
                            variationTypeCode: r.varCd,
                            discountGroupCode: r.discCd,
                            discountExpression: (r.discPct ?? "0") + "%",
@@ -258,6 +260,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                         itemId: r.itemId,
                         itemCode: found_item_master.find(rr => rr.id === r.itemId)?.code,
                         description: found_item_master.find(rr => rr.id === r.itemId)?.itemDesc,
+                        typeCode: found_item_master.find(rr => rr.id === r.itemId)?.typeCode,
                         variationTypeCode: found_item_master.find(rr => rr.id === r.itemId)?.varCd,
                         discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
                         discountExpression: (found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? "0") + "%",
@@ -377,7 +380,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    addVariations() {
       let found = this.availableVariationsByItemId.filter(r => r.isSelected)
       if (found.length > 0) {
-         let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]);
+         let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]?.itemId);
          this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
       }
       else {

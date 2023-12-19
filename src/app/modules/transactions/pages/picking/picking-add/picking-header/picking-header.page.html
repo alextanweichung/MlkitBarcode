@@ -29,7 +29,7 @@
          </ion-segment>
          <div class="mt-2" *ngIf="isWithSo === 'false'" [formGroup]="objectForm">
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
+               <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event, true)"></app-search-dropdown>
                <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
                <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
                <ion-item>
@@ -91,6 +91,7 @@
                   </ion-item>
                </ion-list>
                <ion-list class="list-custom animate__animated animate__fadeIn ion-no-padding" lines="none" [formGroup]="objectForm">
+                  <!-- <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown> -->
                   <ion-item class="ion-no-padding pl-2">
                      <ion-label class="font-bold" position="stacked">Remark</ion-label>
                      <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
@@ -100,17 +101,19 @@
             <div *ngIf="groupType === 'S'">
                <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
                   <!-- <ion-item-sliding #slidingItem *ngFor="let o of uniqueSo"> -->
-                  <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let so of uniqueSo"
-                     (click)="showDetail()">
-                     <circle-progress [percent]="objectService.getProgressBySoNum(so)"></circle-progress>
+                  <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let so of uniqueSo" (click)="showDetail()">
+                     <!-- <circle-progress [percent]="objectService.getProgressBySoNum(so)"></circle-progress> -->
                      <ion-grid class="ion-no-padding py-2 pl-2">
                         <ion-row>
                            <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                              <div class="font-bold">{{so}}</div>
+                              <div class="font-bold color-blue">{{so}}</div>
                            </ion-col>
                         </ion-row>
                         <ion-row>
-                           <ion-col size="6" class="ion-flex ion-margin-auto">
+                           <ion-col size="1" class="ion-flex ion-margin-auto">
+                              <div class="font-bold">#</div>
+                           </ion-col>
+                           <ion-col size="5" class="ion-flex ion-margin-auto">
                               <div class="font-bold">Item Code</div>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto justify-content-end">
@@ -120,19 +123,43 @@
                               <div class="font-bold">Current (Other)</div>
                            </ion-col>
                         </ion-row>
-                        <ion-row class="mt-1" *ngFor="let i of getUniqueItemBySoNum(so)">
-                           <ion-col size="6" class="ion-flex ion-margin-auto">
-                              <div>{{i}}</div>
-                           </ion-col>
-                           <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                              <div>{{getSoQtyBySoItemCode(so, i)}}</div>
-                           </ion-col>
-                           <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                              <div>{{getCurrentBySoItemCode(so, i)}}</div>
-                              <div>({{getPickedBySoItemCode(so, i)}})</div>
-                              <div></div>
-                           </ion-col>
-                        </ion-row>
+                        <ng-container *ngFor="let rowData of getUniqueItemBySoNum(so); let rowIndex = index">
+                           <ion-row class="mt-1">
+                              <ion-col size="1" class="ion-flex ion-margin-auto">
+                                 <div [ngClass]="{'font-underline font-bold color-blue':(rowData.assembly && rowData.assembly.length > 0)}">{{rowIndex+1}}</div>
+                              </ion-col>
+                              <ion-col size="5" class="ion-flex ion-margin-auto">
+                                 <div [ngClass]="{'font-underline font-bold color-blue':(rowData.assembly && rowData.assembly.length > 0)}">{{rowData.itemCode}}</div>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                 <div [ngClass]="{'font-underline font-bold color-blue':(rowData.assembly && rowData.assembly.length > 0)}">{{getSoQtyBySoItemCode(so, rowData.itemCode)}}</div>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                 <div [ngClass]="{'font-underline font-bold color-blue':(rowData.assembly && rowData.assembly.length > 0)}">{{getCurrentBySoItemCode(so, rowData.itemCode)}}</div>
+                                 <div [ngClass]="{'font-underline font-bold color-blue':(rowData.assembly && rowData.assembly.length > 0)}">({{getPickedBySoItemCode(so, rowData.itemCode)}})</div>
+                              </ion-col>
+                           </ion-row>
+                           <ng-container *ngIf="rowData.assembly && rowData.assembly.length > 0;">
+                              <ion-row class="mt-1" *ngFor="let rowData2 of rowData.assembly; let rowIndex2 = index">
+                                 <ion-col size="1" class="ion-flex ion-margin-auto">
+                                    <div class="font-italic font-bold">{{rowIndex+1}}.{{rowIndex2+1}}</div>
+                                 </ion-col>
+                                 <ion-col size="5" class="ion-flex ion-margin-auto" *ngIf="isMobile">
+                                    <div class="font-italic font-bold">{{(rowData2.itemComponentId|offlineItemIdMapping:configService.item_Masters)}}</div>
+                                 </ion-col>
+                                 <ion-col size="5" class="ion-flex ion-margin-auto" *ngIf="!isMobile">
+                                    <div class="font-italic font-bold">N/A</div>
+                                 </ion-col>
+                                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                    <div class="font-italic font-bold">{{rowData2.qtyRequest}}</div>
+                                 </ion-col>
+                                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                    <div class="font-italic font-bold">{{rowData2.qtyCurrent??0}}</div>
+                                    <div class="font-italic font-bold">({{rowData2.qtyPicked}})</div>
+                                 </ion-col>
+                              </ion-row>
+                           </ng-container>
+                        </ng-container>
                      </ion-grid>
                   </ion-item>
                   <!-- <ion-item-options>

@@ -9,16 +9,20 @@ import { QuotationCartPageRoutingModule } from './quotation-cart-routing.module'
 import { QuotationCartPage } from './quotation-cart.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
+import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    QuotationCartPageRoutingModule,
-    IdMappingModule,
-    SumModule
-  ],
-  declarations: [QuotationCartPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      QuotationCartPageRoutingModule,
+      IdMappingModule,
+      SumModule,
+      OfflineItemIdMappingModule,
+      OfflineItemIdDescMappingModule
+   ],
+   declarations: [QuotationCartPage]
 })
-export class QuotationCartPageModule {}
+export class QuotationCartPageModule { }

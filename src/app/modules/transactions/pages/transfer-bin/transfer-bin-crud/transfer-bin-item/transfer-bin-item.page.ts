@@ -304,6 +304,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                         this.addItemToLine({
                            itemId: itemFound.id,
                            itemCode: itemFound.code,
+                           typeCode: itemFound.typeCode,
                            description: itemFound.itemDesc,
                            qtyRequest: 1
                         });
@@ -313,6 +314,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                            this.addItemToLine({
                               itemId: itemFound.id,
                               itemCode: itemFound.code,
+                              typeCode: itemFound.typeCode,
                               description: itemFound.itemDesc,
                               qtyRequest: 1
                            });
@@ -347,6 +349,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                            this.addItemToLine({
                               itemId: itemFound.id,
                               itemCode: itemFound.code,
+                              typeCode: itemFound.typeCode,
                               description: itemFound.itemDesc,
                               qtyRequest: r.qty
                            });
@@ -368,6 +371,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                         this.addItemToLine({
                            itemId: itemFound.id,
                            itemCode: itemFound.code,
+                           typeCode: itemFound.typeCode,
                            description: itemFound.itemDesc,
                            qtyRequest: r.qty
                         });

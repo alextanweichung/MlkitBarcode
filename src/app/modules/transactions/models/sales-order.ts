@@ -93,6 +93,8 @@ export interface SalesOrderHeader {
   deliveryDate?: Date
   orderLifeCycle: string
   customerPo?: string
+  totalCarton?: number
+  isAutoPromotion: boolean
   sequence: number
   createdById: number
   createdBy: string

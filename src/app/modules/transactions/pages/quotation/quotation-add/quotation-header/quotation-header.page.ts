@@ -79,7 +79,8 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
         businessModelType: [null],
         remark: [null],
         isHomeCurrency: [null],
-        isPricingApproval: [false]
+        isPricingApproval: [false],
+        isAutoPromotion: [true]
       });
     } catch (e) {
       console.error(e);

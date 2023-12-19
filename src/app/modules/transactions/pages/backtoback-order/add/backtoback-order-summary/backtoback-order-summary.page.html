@@ -78,6 +78,7 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
+               <ion-icon style="position:relative; top:0.1rem" *ngIf="item.variationTypeCode === '0' && item.assembly && item.assembly.length > 0" name="list-circle-outline"></ion-icon>
               <div class="ion-text-wrap">{{item.description}}</div>
             </ion-col>
           </ion-row>
@@ -91,17 +92,55 @@
             </ion-col>
           </ion-row>
           <div *ngIf="item.isSelected">
-            <div *ngFor="let vd of item.variationDetails">
-              <ion-row *ngFor="let d of filter(vd.details)">
-                <ion-col size="auto" class="ion-flex ion-margin-auto">
-                  <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                  <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
-                </ion-col>
-                <ion-col>
-                  <div class="ion-text-right">{{d.qtyRequest|number:'1.0'}}</div>
-                </ion-col>
-              </ion-row>
-            </div>
+            <ng-container *ngIf="item.variationTypeCode === '0' && item.assembly && item.assembly.length > 0">
+               <ion-row>
+                  <ion-col size="1" class="ion-flex ion-margin-auto">
+                     <div class="font-italic font-bold">#</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-italic font-bold">Compon.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-italic font-bold">Desc.</div>
+                  </ion-col>
+                  <ion-col class="ion-margin-auto ion-text-right">
+                     <div class="font-italic font-bold">Ratio</div>
+                  </ion-col>
+                  <ion-col class="ion-margin-auto ion-text-right">
+                     <div class="font-italic font-bold">Qty.</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row *ngFor="let rowData of item.assembly; let rowIndex = index">
+                  <ion-col size="1" class="ion-flex ion-margin-auto">
+                     <div class="font-italic">{{rowIndex+1}}</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-italic">{{rowData.itemComponentId|offlineItemIdMapping:configService.item_Masters}}</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-italic">{{rowData.itemComponentId|offlineItemIdDescMapping:configService.item_Masters}}</div>
+                  </ion-col>
+                  <ion-col class="ion-margin-auto ion-text-right">
+                     <div class="font-italic">{{rowData.itemComponentQty}}</div>
+                  </ion-col>
+                  <ion-col class="ion-margin-auto ion-text-right">
+                     <div class="font-italic">{{rowData.qtyRequest}}</div>
+                  </ion-col>
+               </ion-row>
+            </ng-container>
+            <ng-container *ngIf="item.variationTypeCode !== '0'">
+               <div *ngFor="let vd of item.variationDetails">
+                 <ion-row *ngFor="let d of filter(vd.details)">
+                   <ion-col size="auto" class="ion-flex ion-margin-auto">
+                     <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="vd.itemVariationXId"> {{vd.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                     <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="d.itemVariationYId"> {{d.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                   </ion-col>
+                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{d.qtyRequest|number:'1.0'}}</div>
+                   </ion-col>
+                 </ion-row>
+               </div>
+            </ng-container>
           </div>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
