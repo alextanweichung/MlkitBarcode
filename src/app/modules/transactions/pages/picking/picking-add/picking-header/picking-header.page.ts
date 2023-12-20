@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { MultiPickingOutstandingPickList, MultiPickingSalesOrder } from 'src/app/modules/transactions/models/picking';
+import { SalesOrderHeaderForWD, SalesOrderLineForWD } from 'src/app/modules/transactions/models/picking';
 import { PickingService } from 'src/app/modules/transactions/services/picking.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -51,7 +51,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
    ionViewDidEnter(): void {
       try {
-         if (this.isWithSo) {
+         if (this.isWithType === "SO" || this.isWithType === "B2B") {
             this.barcodeInput?.nativeElement.focus();
          }
       } catch (e) {
@@ -89,7 +89,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.moduleControl = obj;
          let config = this.moduleControl.find(x => x.ctrlName === "SOSelectionEnforceSameOrigin");
          if (config != undefined) {
-            if (config.ctrlValue.toUpperCase() == 'Y') {
+            if (config.ctrlValue.toUpperCase() == "Y") {
                this.configSOSelectionEnforceSameOrigin = true;
             } else {
                this.configSOSelectionEnforceSameOrigin = false;
@@ -97,7 +97,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          }
          let config2 = this.moduleControl.find(x => x.ctrlName === "SOSelectionEnforceSameDestination");
          if (config2 != undefined) {
-            if (config2.ctrlValue.toUpperCase() == 'Y') {
+            if (config2.ctrlValue.toUpperCase() == "Y") {
                this.configSOSelectionEnforceSameDestination = true;
             } else {
                this.configSOSelectionEnforceSameDestination = false;
@@ -108,27 +108,29 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    loadExisitingSO(salesOrderNums: string[]) {
       this.objectService.getSOHeader(salesOrderNums).subscribe(response => {
+         console.log("🚀 ~ file: picking-header.page.ts:111 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ response:", JSON.stringify(response))
          if (response.status === 200) {
-            let so = response.body[0] as MultiPickingSalesOrder;
-            if (so === undefined) {
+            let doc = response.body[0] as SalesOrderHeaderForWD;
+            if (doc === undefined) {
                this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
                return;
             }
             // checking for picking, refer to base system
-            if (this.selectedSalesOrders.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedSalesOrders[0].locationId != so.locationId) {
+            if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
                this.toastService.presentToast("", "Not allow to combine sales order with different origin location.", "top", "warning", 1000);
                return;
             }
-            if (this.selectedSalesOrders.length > 0 && this.selectedSalesOrders[0].customerId != so.customerId) {
+            if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
                this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
                return;
             }
-            this.selectedSalesOrders.unshift(so);
-            if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
-               this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId }, false);
+            this.seletcedDocs.unshift(doc);
+            if (this.seletcedDocs && this.seletcedDocs.length === 1) {
+               this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
+               this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
             }
             // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
-            this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
+            this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
             this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
             this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
             this.uniqueSku.forEach(r => {
@@ -160,97 +162,150 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       if (e.keyCode === 13) {
          e.preventDefault();
          this.barcodeInput.nativeElement.focus();
-         this.validateSalesOrder(this.itemSearchValue);
+         if (this.isWithType === "SO") {
+            this.validateSalesOrder(this.itemSearchValue);
+         } else if (this.isWithType === "B2B") {
+            this.validateB2B(this.itemSearchValue);
+         } else {
+            this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+         }
       }
    }
 
    /* #endregion */
 
-   /* #region handle SO */
+   /* #region handle Doc */
 
-   selectedSalesOrders: MultiPickingSalesOrder[] = [];
-   // outstandingPickList: MultiPickingOutstandingPickList[] = [];
-   uniqueSo: string[] = [];
+   seletcedDocs: SalesOrderHeaderForWD[] = [];
+   uniqueDoc: string[] = [];
    uniqueItemCode: string[] = [];
    uniqueSku: string[] = [];
    uniqueItemSkuAndCode: Map<string, string> = new Map([]);
    validateSalesOrder(input: string) {
       if (input && input.length > 0) {
          this.itemSearchValue = null;
-         if (this.selectedSalesOrders.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
-            this.toastService.presentToast("Document already selected.", "", "top", "warning", 1000);
+         if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
+            this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
          } else {
             this.objectService.getSOHeader([input]).subscribe(response => {
+               console.log("🚀 ~ file: picking-header.page.ts:190 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ response:", JSON.stringify(response))
                if (response.status === 200) {
-                  let so = response.body[0] as MultiPickingSalesOrder;
-                  if (so === undefined) {
-                     this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
+                  let doc = response.body[0] as SalesOrderHeaderForWD;
+                  if (doc === undefined) {
+                     this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
                      return;
                   }
                   // checking for picking, refer to base system
-                  if (this.selectedSalesOrders.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedSalesOrders[0].locationId != so.locationId) {
-                     this.toastService.presentToast("", "Not allow to combine sales order with different origin location.", "top", "warning", 1000);
+                  if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
+                     this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
                      return;
                   }
-                  if (this.selectedSalesOrders.length > 0 && this.selectedSalesOrders[0].customerId != so.customerId) {
-                     this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
+                  if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
+                     this.toastService.presentToast("", "Not allow to combine Doc with different customer.", "top", "warning", 1000);
                      return;
                   }
-                  so.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
-                  this.selectedSalesOrders.unshift(so);
-                  console.log("🚀 ~ file: picking-header.page.ts:197 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.selectedSalesOrders:", this.selectedSalesOrders)
-                  if (this.selectedSalesOrders && this.selectedSalesOrders.length === 1) {
-                     this.onCustomerSelected({ id: this.selectedSalesOrders[0].customerId }, false);
-                     this.onDestinationChanged({ id: this.selectedSalesOrders[0].toLocationId });
+                  this.objectForm.patchValue({ copyFrom: "S" });
+                  doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                  this.seletcedDocs.unshift(doc);
+                  if (this.seletcedDocs && this.seletcedDocs.length === 1) {
+                     this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
+                     this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
                   }
-                  this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
+                  this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
                   this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
                      if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
                      r.multiPickingId = this.objectForm.controls.multiPickingId.value;
                   })
-                  this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
+                  this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
                   this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
-                  console.log("🚀 ~ file: picking-header.page.ts:207 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueItemCode:", this.uniqueItemCode)
                   this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
                   this.uniqueSku.forEach(r => {
                      this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
                   })
-                  console.log("🚀 ~ file: picking-header.page.ts:209 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueSku:", this.uniqueSku)
-                  console.log("🚀 ~ file: picking-header.page.ts:211 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueItemSkuAndCode:", this.uniqueItemSkuAndCode)
                }
             }, error => {
                console.error(error);
             });
          }
       } else {
-         this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
+         this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
       }
+   }
+
+   validateB2B(input: string) {if (input && input.length > 0) {
+         this.itemSearchValue = null;
+         if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
+            this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
+         } else {
+            this.objectService.getB2BHeader([input]).subscribe(response => {
+               if (response.status === 200) {
+                  let doc = response.body[0] as SalesOrderHeaderForWD;
+                  if (doc === undefined) {
+                     this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+                     return;
+                  }
+                  // checking for picking, refer to base system
+                  if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
+                     this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
+                     return;
+                  }
+                  if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
+                     this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
+                     return;
+                  }
+                  this.objectForm.patchValue({ copyFrom: "B" });
+                  doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                  this.seletcedDocs.unshift(doc);
+                  if (this.seletcedDocs && this.seletcedDocs.length === 1) {
+                     this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
+                     this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+                  }
+                  this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+                  this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
+                     if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
+                     r.multiPickingId = this.objectForm.controls.multiPickingId.value;
+                  })
+                  this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
+                  this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+                  this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
+                  this.uniqueSku.forEach(r => {
+                     this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
+                  })
+               }
+            }, error => {
+               console.error(error);
+            });
+         }
+      } else {
+         this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+      }
+
    }
 
    async deleteSo(salesOrderNum) {
       try {
          const alert = await this.alertController.create({
-            cssClass: 'custom-alert',
-            header: 'Are you sure to delete?',
-            subHeader: 'Changes made will be discard.',
+            cssClass: "custom-alert",
+            header: "Are you sure to delete?",
+            subHeader: "Changes made will be discard.",
             buttons: [
                {
-                  text: 'OK',
-                  role: 'confirm',
-                  cssClass: 'danger',
+                  text: "OK",
+                  role: "confirm",
+                  cssClass: "danger",
                   handler: async () => {
-                     // this.selectedSalesOrders = this.selectedSalesOrders.filter(r => r.salesOrderNum !== salesOrderNum);
+                     // this.seletcedDocs = this.seletcedDocs.filter(r => r.salesOrderNum !== salesOrderNum);
                      // this.objectService.multiPickingObject.outstandingPickList = this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum != salesOrderNum);
                      // this.uniqueSo = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
                      // this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
-                     // if (this.selectedSalesOrders && this.selectedSalesOrders.length === 0) {
+                     // if (this.seletcedDocs && this.seletcedDocs.length === 0) {
                      //   this.setDefaultValue();
                      // }
                   },
                },
                {
-                  text: 'Cancel',
-                  role: 'cancel',
+                  text: "Cancel",
+                  role: "cancel",
                   handler: () => {
 
                   }
@@ -275,17 +330,18 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum))];
    }
 
-   getSoLineByItemCode(itemCode: string): MultiPickingOutstandingPickList[] {
-      let ret: MultiPickingOutstandingPickList[] = [];
+   getSoLineByItemCode(itemCode: string): SalesOrderLineForWD[] {
+      let ret: SalesOrderLineForWD[] = [];
       let l = this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode);
       if (l && l.length > 0) {
          l.forEach(r => {
             let y = [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode).flatMap(r => r.itemSku))];
             y.forEach(rr => {
-               let t: MultiPickingOutstandingPickList = {
+               let t: SalesOrderLineForWD = {
                   itemId: r.itemId,
                   itemCode: r.itemCode,
                   itemSku: r.itemSku,
+                  itemBarcode: r.itemBarcode,
                   description: r.description,
                   variationTypeCode: r.variationTypeCode,
                   itemVariationXId: r.itemVariationXId,
@@ -295,7 +351,9 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   qtyRequest: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyRequest).reduce((a, c) => Number(a) + Number(c), 0),
                   qtyCurrent: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyCurrent).reduce((a, c) => Number(a) + Number(c), 0),
                   qtyPicked: l.filter(rrr => rrr.itemSku === rr).flatMap(rrr => rrr.qtyPicked).reduce((a, c) => Number(a) + Number(c), 0),
-                  isComponentScan: false // todo : aychia
+                  isComponentScan: r.isComponentScan,
+                  rack: r.rack,
+                  subRack: r.subRack
                }
                if (ret.findIndex(rr => rr.itemSku === t.itemSku) === -1) {
                   ret.push(t);
@@ -307,7 +365,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    getSoNumByItemCode(itemCode: string) {
-      return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode).flatMap(r => r.salesOrderNum))].join(', ');
+      return [...new Set(this.objectService.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode).flatMap(r => r.salesOrderNum))].join(", ");
    }
 
    getSoQtyBySoItemCode(salesOrderNum: string, itemCode: string) {
@@ -389,16 +447,16 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
             //Auto map object type code
             if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
-               this.objectForm.patchValue({ typeCode: 'S' });
-               this.objectForm.controls['typeCode'].disable();
+               this.objectForm.patchValue({ typeCode: "S" });
+               this.objectForm.controls["typeCode"].disable();
             } else {
-               this.objectForm.patchValue({ typeCode: 'T' });
-               this.objectForm.controls['typeCode'].disable();
+               this.objectForm.patchValue({ typeCode: "T" });
+               this.objectForm.controls["typeCode"].disable();
             }
 
             if (lookupValue.attribute5 === "T") {
                // handle location
-               this.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === 'W');
+               this.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === "W");
                if (lookupValue !== undefined) {
                   this.objectForm.patchValue({ locationId: parseFloat(lookupValue.attribute6) });
                   this.selectedLocationId = parseFloat(lookupValue.attribute6);
@@ -421,14 +479,13 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.selectedToLocationId = null;
          this.objectForm.patchValue({ toLocationId: this.selectedToLocationId });
       }
-      console.log("🚀 ~ file: picking-header.page.ts:419 ~ PickingHeaderPage ~ onDestinationChanged ~ this.selectedToLocationId:", this.selectedToLocationId)
    }
 
-   @ViewChild('segment', { static: false }) segment: IonSegment;
-   isWithSo: string = 'true';
-   async isWithSoChanged(event) {
+   @ViewChild("segment", { static: false }) segment: IonSegment;
+   isWithType: string = "SO";
+   async isWithDocChanged(event) {
       try {
-         if (event.detail.value === 'true') {
+         if (event.detail.value === "SO" || event.detail.value === "B2B") {
             this.objectForm.patchValue({ isWithSo: true });
          } else {
             this.objectForm.patchValue({ isWithSo: false });
@@ -439,7 +496,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       }
    }
 
-   groupType: string = "S";
+   groupType: string = "S"; // use S for doc, I for non-doc
    groupTypeChanged(event) {
       if (event) {
          this.objectForm.patchValue({ groupType: event.detail.value });
@@ -460,7 +517,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             toLocationId: [null],
             customerId: [null, [Validators.required]],
             typeCode: [null],
-            warehouseAgentId: [JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId, [Validators.required]],
+            warehouseAgentId: [JSON.parse(localStorage.getItem("loginUser"))?.warehouseAgentId, [Validators.required]],
             deactivated: [null],
             workFlowTransactionId: [null],
             masterUDGroup1: [null],
@@ -468,9 +525,10 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             masterUDGroup3: [null],
             businessModelType: [null],
             isWithSo: [true],
-            sourceType: ['M'],
+            sourceType: ["M"],
             remark: [null],
-            groupType: ['S']
+            groupType: ["S"],
+            copyFrom: [null]
          });
       } catch (e) {
          console.error(e);
@@ -497,7 +555,13 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       try {
          if (event) {
             this.barcodeInput.nativeElement.focus();
-            this.validateSalesOrder(event);
+            if (this.isWithType === "SO") {
+               this.validateSalesOrder(event);
+            } else if (this.isWithType === "B2B") {
+               this.validateB2B(event);
+            } else {
+               this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+            }
          }
       } catch (e) {
          console.error(e);
@@ -517,24 +581,24 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    async cancelInsert() {
       try {
          const actionSheet = await this.actionSheetController.create({
-            header: 'Are you sure to cancel?',
-            subHeader: 'Changes made will be discard.',
-            cssClass: 'custom-action-sheet',
+            header: "Are you sure to cancel?",
+            subHeader: "Changes made will be discard.",
+            cssClass: "custom-action-sheet",
             buttons: [
                {
-                  text: 'Yes',
-                  role: 'confirm',
+                  text: "Yes",
+                  role: "confirm",
                },
                {
-                  text: 'No',
-                  role: 'cancel',
+                  text: "No",
+                  role: "cancel",
                }]
          });
          await actionSheet.present();
 
          const { role } = await actionSheet.onWillDismiss();
 
-         if (role === 'confirm') {
+         if (role === "confirm") {
             this.objectService.resetVariables();
             this.navController.navigateBack("/transactions/picking");
          }

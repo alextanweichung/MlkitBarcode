@@ -276,6 +276,10 @@ export class PickingService {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/getSOHeader", object, httpObserveHeader);
    }
 
+   getB2BHeader(object: string[]) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/getB2bHeader", object, httpObserveHeader);
+   }
+
    insertObject(object: MultiPickingRoot) {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking", object, httpObserveHeader);
    }

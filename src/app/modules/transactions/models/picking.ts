@@ -1,3 +1,5 @@
+import { LineAssembly } from "src/app/shared/models/transaction-detail"
+
 export interface MultiPickingList {
    multiPickingId: number
    multiPickingNum: string
@@ -13,7 +15,7 @@ export interface MultiPickingList {
 export interface MultiPickingRoot {
    header: MultiPickingHeader
    details: MultiPickingCarton[]
-   outstandingPickList: MultiPickingOutstandingPickList[]
+   outstandingPickList: SalesOrderLineForWD[]
    attachmentFile?: any[]
    comment?: any[]
    otp?: any
@@ -22,7 +24,7 @@ export interface MultiPickingRoot {
 export interface MultiPickingHeader {
    multiPickingId: number
    multiPickingNum: string
-   trxDate: string
+   trxDate: Date
    groupType: string
    warehouseAgentId: number
    externalDocNum: any
@@ -81,6 +83,7 @@ export interface CurrentPickList {
    cartonNum: number
    deactivated: boolean
    variations: PickingLineVariation[]
+   assemblyItemId?: number
 }
 
 export interface PickingLineVariation {
@@ -91,71 +94,103 @@ export interface PickingLineVariation {
 }
 
 export interface MultiPickingObject {
-   outstandingPickList: MultiPickingOutstandingPickList[],
+   outstandingPickList: SalesOrderLineForWD[],
    pickingCarton: MultiPickingCarton[];
 }
 
 /* #region from getheader */
 
-export interface MultiPickingSalesOrder {
+// export interface MultiPickingSalesOrder {
+//    salesOrderId: number
+//    salesOrderNum: string
+//    trxDate: string
+//    locationId: number
+//    locationDesc: string
+//    customerId: number
+//    customerDesc: string
+//    toLocationId: any
+//    toLocationDesc: any
+//    currencyId: number
+//    currencyDesc: string
+//    businessModelType: string
+//    line: MultiPickingOutstandingPickList[]
+// }
+
+// export interface MultiPickingOutstandingPickList {
+//    multiPickingOutstandingId?: number
+//    multiPickingId?: number
+//    itemId: number
+//    variationTypeCode: string
+//    itemVariationXId: any
+//    itemVariationYId: any
+//    itemCode: string
+//    itemSku: string
+//    description: any
+//    itemVariationXDescription: any
+//    itemVariationYDescription: any
+//    salesOrderId?: number
+//    salesOrderNum?: string
+//    salesOrderLineId?: number
+//    salesOrderVariationId?: number
+//    qtyRequest: number
+//    qtyCommit?: number
+//    qtyPicked: number
+//    qtyCurrent?: number
+//    isComponentScan: boolean
+//    assembly?: LineAssembly[]
+//    sequence?: number
+// }
+
+/* #endregion */
+
+
+/* #region interface from base */
+
+export interface SalesOrderHeaderForWD {
    salesOrderId: number
    salesOrderNum: string
-   trxDate: string
+   trxDate: Date
    locationId: number
    locationDesc: string
    customerId: number
    customerDesc: string
-   toLocationId: any
-   toLocationDesc: any
+   toLocationId: number
+   toLocationDesc: string
    currencyId: number
    currencyDesc: string
    businessModelType: string
-   line: MultiPickingOutstandingPickList[]
+   isLoaded: boolean
+   line: SalesOrderLineForWD[]
 }
 
-export interface MultiPickingOutstandingPickList {
+export interface SalesOrderLineForWD {
    multiPickingOutstandingId?: number
+   multiPackingOutstandingId?: number
    multiPickingId?: number
+   multiPackingId?: number
    itemId: number
    variationTypeCode: string
-   itemVariationXId: any
-   itemVariationYId: any
+   itemVariationXId: number
+   itemVariationYId: number
    itemCode: string
    itemSku: string
-   description: any
-   itemVariationXDescription: any
-   itemVariationYDescription: any
-   salesOrderId?: number
-   salesOrderNum?: string
+   description: string
+   itemVariationXDescription: string
+   itemVariationYDescription: string
+   itemBarcode: string
+   rack: string
+   subRack: string
+   qtyRequest: number
    salesOrderLineId?: number
    salesOrderVariationId?: number
-   qtyRequest: number
-   qtyCommit?: number
-   qtyPicked: number
-   qtyCurrent: number
-   isComponentScan: boolean
-   assembly?: Assembly[]
-   sequence?: number
-}
-
-export interface Assembly {
-   headerId: number
-   lineId: number
-   assemblyId: number
-   assemblyItemId: number
-   itemComponentId: number
-   itemComponentQty: number
-   qtyRequest: number
-   qtyPicked: number
+   salesOrderId?: number
+   salesOrderNum?: string
+   qtyPicked?: number
+   qtyPacked?: number
    qtyCurrent?: number
-   sequence: number
-   createdById?: number
-   createdBy?: string
-   createdAt?: string
-   modifiedById?: number
-   modifiedBy?: string
-   modifiedAt?: string
-   deactivated?: boolean
+   reasonId?: number
+   isComponentScan?: boolean
+   assembly?: LineAssembly[]
 }
 
 /* #endregion */
