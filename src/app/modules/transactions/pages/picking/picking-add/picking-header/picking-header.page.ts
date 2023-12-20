@@ -129,7 +129,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
                this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
             }
-            // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as MultiPickingSalesOrder[]).flatMap(x => x.line)];
+            this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
             this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
             this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
             this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
@@ -212,6 +212,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                      this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
                   }
                   this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+                  console.log("🚀 ~ file: picking-header.page.ts:215 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPickingObject.outstandingPickList:", this.objectService.multiPickingObject.outstandingPickList)
                   this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
                      if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
                      r.multiPickingId = this.objectForm.controls.multiPickingId.value;

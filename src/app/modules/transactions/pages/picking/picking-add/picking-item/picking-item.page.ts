@@ -30,7 +30,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    constructor(
       private authService: AuthService,
-      private configService: ConfigService,
+      public configService: ConfigService,
       private commonService: CommonService,
       public objectService: PickingService,
       private navController: NavController,
@@ -100,6 +100,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             return;
          }
          let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku == itemFound.itemSku);
+         console.log("🚀 ~ file: picking-item.page.ts:103 ~ PickingItemPage ~ runPickingEngine ~ outstandingLines:", JSON.stringify(outstandingLines));
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             console.log("🚀 ~ file: picking-item.page.ts:104 ~ PickingItemPage ~ runPickingEngine ~ osTotalQtyRequest:", osTotalQtyRequest)
@@ -136,8 +137,10 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                   break;
             }
          } else {
-            this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
-            // this.barcodeScan.setInputFocus();
+            let operationSuccess = this.runAssemblyPickingEngine(itemFound, inputQty, findAssemblyItem);
+            if (!operationSuccess) {
+               this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+            }
          }
       } else {
          this.toastService.presentToast("Control Validation", "Invalid Item Barcode", "top", "warning", 1000);

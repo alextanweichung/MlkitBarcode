@@ -10,17 +10,19 @@ import { PickingItemPage } from './picking-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { NgCircleProgressModule } from 'ng-circle-progress';
+import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ItemPageRoutingModule,
-    BarcodeScanInputPageModule,
-    ItemAddListFlatPageModule,
-    NgCircleProgressModule
-  ],
-  declarations: [PickingItemPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      ItemPageRoutingModule,
+      BarcodeScanInputPageModule,
+      ItemAddListFlatPageModule,
+      NgCircleProgressModule,
+      OfflineItemIdMappingModule
+   ],
+   declarations: [PickingItemPage]
 })
-export class PickingItemPageModule {}
+export class PickingItemPageModule { }

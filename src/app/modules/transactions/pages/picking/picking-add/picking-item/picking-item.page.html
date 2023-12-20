@@ -52,10 +52,16 @@
                      <div class="font-bold">{{i}}</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{objectService.getQtyPickedByItemCode(i)}} / {{objectService.getQtyRequestByItemCode(i)}}
-                     </div>
+                     <div>{{objectService.getQtyPickedByItemCode(i)}} / {{objectService.getQtyRequestByItemCode(i)}}</div>
                   </ion-col>
                </ion-row>
+               <ng-container *ngIf="objectService.isItemComponentScan(i)">
+                  <ion-row *ngFor="let rowData2 of objectService.getItemAssembly(i)">
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>{{rowData2.itemComponentId|offlineItemIdMapping:configService.item_Masters}}</div>
+                     </ion-col>
+                  </ion-row>
+               </ng-container>
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
                      <div>{{objectService.getItemDescriptionByItemCode(i)}}</div>
@@ -101,9 +107,6 @@
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto">
                      <div class="font-bold">Item Code</div>
-                  </ion-col>
-                  <ion-col class="ion-flex ion-margin-auto">
-                     
                   </ion-col>
                   <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
                      <div class="font-bold">Qty</div>

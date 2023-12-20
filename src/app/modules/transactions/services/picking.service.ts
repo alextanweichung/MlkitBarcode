@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, asNativeElements } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
@@ -123,11 +123,16 @@ export class PickingService {
    getQtyPickedByItemCode(itemCode: string): number {
       if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
          let qtyPickedByOther = this.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode).flatMap(r => r.qtyPicked).reduce((a, c) => a + c, 0);
-         if (this.multiPickingObject && this.multiPickingObject.pickingCarton.length > 0) {
-            let qtyPickedCurrent = this.multiPickingObject.pickingCarton.flatMap(r => r.pickList).filter(r => r.itemCode === itemCode).flatMap(r => r.qtyPicked).reduce((a, c) => a + c, 0);
-            return qtyPickedByOther + qtyPickedCurrent;
-         }
-         return qtyPickedByOther;
+         if (this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode)?.isComponentScan) { // here to return isComponentScan item
+            let assemblyComputedQty = this.multiPickingObject.outstandingPickList.filter(r => r.itemCode === itemCode).flatMap(r => r.qtyCurrent).reduce((a, c) => a + c, 0);
+            return Math.trunc(qtyPickedByOther + assemblyComputedQty);
+         } else {
+            if (this.multiPickingObject && this.multiPickingObject.pickingCarton.length > 0) { // this part cannot calculate isComponentScan item
+               let qtyPickedCurrent = this.multiPickingObject.pickingCarton.flatMap(r => r.pickList).filter(r => r.itemCode === itemCode && (r.assemblyItemId??null) === null).flatMap(r => r.qtyPicked).reduce((a, c) => a + c, 0);
+               return Math.trunc(qtyPickedByOther + qtyPickedCurrent);
+            }
+         }         
+         return Math.trunc(qtyPickedByOther);
       }
       return 0;
    }
@@ -215,6 +220,14 @@ export class PickingService {
          return [];
       }
       return [];
+   }
+
+   isItemComponentScan(itemCode: string) {
+      return this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode)?.isComponentScan;
+   }
+
+   getItemAssembly(itemCode: string) {
+      return this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode)?.assembly;
    }
 
    /* #endregion */
