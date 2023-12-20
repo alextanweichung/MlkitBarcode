@@ -377,6 +377,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    async computeAllAmount(trxLine: TransactionDetail) {
+      console.log("🚀 ~ file: sales-order-cart.page.ts:380 ~ SalesOrderCartPage ~ computeAllAmount ~ trxLine:", trxLine)
       trxLine.qtyRequest = Number(trxLine.qtyRequest.toFixed(0));
       try {
          if (this.objectService.salesOrderQuantityControl === "1") {
@@ -389,17 +390,16 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
                trxLine.qtyRequest = null;
                this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${trxLine.availableQty}]`, "top", "warning", 1000);
             }
-         } else {
-            if (trxLine.assembly && trxLine.assembly.length > 0) {
-               this.computeAssemblyQty(trxLine);
-            }
-            await this.computeDiscTaxAmount(trxLine);
-            if (this.objectService.salesActivateTradingMargin) {
-               this.computeTradingMarginAmount(trxLine);
-            }
-            if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-               await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-            }
+         }
+         if (trxLine.assembly && trxLine.assembly.length > 0) {
+            this.computeAssemblyQty(trxLine);
+         }
+         await this.computeDiscTaxAmount(trxLine);
+         if (this.objectService.salesActivateTradingMargin) {
+            this.computeTradingMarginAmount(trxLine);
+         }
+         if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
+            await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
          }
          this.computeDiscTaxAmount(trxLine);
       } catch (e) {

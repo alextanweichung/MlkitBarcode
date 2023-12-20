@@ -379,18 +379,12 @@ export class CommonService {
    }
 
    computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
-      console.log("🚀 ~ file: common.service.ts:382 ~ CommonService ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
       try {
          let totalDiscAmt: Decimal = new Decimal(0);
-         console.log("🚀 ~ file: common.service.ts:384 ~ CommonService ~ computeDiscTaxAmount ~ totalDiscAmt:", JSON.stringify(totalDiscAmt))
          let unitPrice: Decimal = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0);
-         console.log("🚀 ~ file: common.service.ts:386 ~ CommonService ~ computeDiscTaxAmount ~ unitPrice:", JSON.stringify(unitPrice))
          let unitPriceExTax: Decimal = new Decimal(trxLine.unitPriceExTax ? trxLine.unitPriceExTax : 0);
-         console.log("🚀 ~ file: common.service.ts:388 ~ CommonService ~ computeDiscTaxAmount ~ unitPriceExTax:", JSON.stringify(unitPriceExTax))
          let discExpression = trxLine.discountExpression;
-         console.log("🚀 ~ file: common.service.ts:390 ~ CommonService ~ computeDiscTaxAmount ~ discExpression:", discExpression)
          let quantity: Decimal = new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0);
-         console.log("🚀 ~ file: common.service.ts:392 ~ CommonService ~ computeDiscTaxAmount ~ quantity:", JSON.stringify(quantity))
          let subTotal: Decimal;
 
          if (isItemPriceTaxInclusive) {
@@ -398,7 +392,6 @@ export class CommonService {
          } else {
             subTotal = unitPriceExTax.mul(quantity);
          }
-         console.log("🚀 ~ file: common.service.ts:449 ~ CommonService ~ computeDiscTaxAmount ~ subTotal:", JSON.stringify(subTotal))
 
          //To split the expression with multi level discount, for eg. (10%/5%/3%)
          if (discExpression != "" && discExpression != null) {
@@ -418,7 +411,6 @@ export class CommonService {
          }
          if (trxLine.qtyRequest == 0) {
             totalDiscAmt = new Decimal(0);
-            console.log("🚀 ~ file: common.service.ts:420 ~ CommonService ~ computeDiscTaxAmount ~ totalDiscAmt:", totalDiscAmt)
          }
          if (useTax) {
             if (isItemPriceTaxInclusive) {
@@ -444,7 +436,6 @@ export class CommonService {
             trxLine.taxAmt = null;
             trxLine.taxInclusive = null;
          }
-         console.log("🚀 ~ file: common.service.ts:440 ~ CommonService ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
          return trxLine;
       } catch (e) {
          console.error(e);

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import Decimal from 'decimal.js';
 import { BackToBackOrderRoot } from 'src/app/modules/transactions/models/backtoback-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -374,32 +375,44 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async computeAllAmount(data: TransactionDetail) {
-      data.qtyRequest = Number(data.qtyRequest.toFixed(0));
+   async computeAllAmount(trxLine: TransactionDetail) {
+      trxLine.qtyRequest = Number(trxLine.qtyRequest.toFixed(0));
       try {
          if (this.objectService.salesOrderQuantityControl === "1") {
-            if (data.qtyRequest && data.qtyRequest > data.actualQty) {
-               data.qtyRequest = null;
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+            if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.actualQty) {
+               trxLine.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${trxLine.actualQty}]`, "top", "warning", 1000);
             }
          } else if (this.objectService.salesOrderQuantityControl === "2") {
-            if (data.qtyRequest && data.qtyRequest > data.availableQty) {
-               data.qtyRequest = null;
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+            if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.availableQty) {
+               trxLine.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${trxLine.availableQty}]`, "top", "warning", 1000);
             }
-         } else {
-            await this.computeDiscTaxAmount(data);
-            if (this.objectService.salesActivateTradingMargin) {
-               this.computeTradingMarginAmount(data);
-            }
-            if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-               await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-            }
-            this.computeDiscTaxAmount(data);
          }
+         if (trxLine.assembly && trxLine.assembly.length > 0) {
+            this.computeAssemblyQty(trxLine);
+         }
+         await this.computeDiscTaxAmount(trxLine);
+         if (this.objectService.salesActivateTradingMargin) {
+            this.computeTradingMarginAmount(trxLine);
+         }
+         if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
+            await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+         }
+         this.computeDiscTaxAmount(trxLine);
       } catch (e) {
          console.error(e);
       }
+   }
+
+   computeAssemblyQty(trxLine: TransactionDetail) {
+      trxLine.assembly.forEach(assembly => {
+         if (trxLine.qtyRequest) {
+            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
+         } else {
+            assembly.qtyRequest = null;
+         }
+      });
    }
 
    computeTradingMarginAmount(trxLine: TransactionDetail) {

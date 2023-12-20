@@ -125,10 +125,30 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
    async computeAllAmount(trxLine: TransactionDetail) {
       try {
+         if (trxLine.assembly && trxLine.assembly.length > 0) {
+            this.computeAssemblyQty(trxLine);
+         }
          await this.computeDiscTaxAmount(trxLine);
+         if (this.objectService.salesActivateTradingMargin) {
+            this.computeTradingMarginAmount(trxLine);
+         }
       } catch (e) {
          console.error(e);
       }
+   }
+
+   computeAssemblyQty(trxLine: TransactionDetail) {
+      trxLine.assembly.forEach(assembly => {
+         if (trxLine.qtyRequest) {
+            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
+         } else {
+            assembly.qtyRequest = null;
+         }
+      });
+   }
+
+   computeTradingMarginAmount(trxLine: TransactionDetail) {
+      trxLine = this.commonService.computeTradingMargin(trxLine, this.objectService.systemWideActivateTaxControl, trxLine.taxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
    }
 
    getVariationSum(trxLine: TransactionDetail) {
