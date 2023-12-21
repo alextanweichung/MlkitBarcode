@@ -33,6 +33,7 @@ export class TransactionsPage implements OnInit {
    showPalletAssembly: boolean = false;
    showTransferBin: boolean = false;
    showBinCount: boolean = false;
+   showDoAck: boolean = false;
 
    constructor(
       private authService: AuthService
@@ -67,6 +68,8 @@ export class TransactionsPage implements OnInit {
                this.showPalletAssembly = pageItems.findIndex(r => r.title === trxAppCode.mobilePalletAssembly) > -1;
                this.showTransferBin = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferBin) > -1;
                this.showBinCount = pageItems.findIndex(r => r.title === trxAppCode.mobileBinCount) > -1;
+               this.showDoAck = pageItems.findIndex(r => r.title === trxAppCode.mobileDoAck) > -1;
+               
             }
          })
       } catch (e) {

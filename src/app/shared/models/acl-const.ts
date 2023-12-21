@@ -29,7 +29,8 @@ export const trxAppCode = {
    mobileTransferInScanning: "MATRTIS",
    mobilePalletAssembly: "MAMPA",
    mobileTransferBin: "MAMTB",
-   mobileBinCount: "MAMBC"
+   mobileBinCount: "MAMBC",
+   mobileDoAck: "MAMDOACK",
 }
 
 export const approvalAppCode = {

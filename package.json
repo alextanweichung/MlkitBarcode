@@ -44,6 +44,7 @@
     "@ionic/angular": "^6.2.8",
     "@ionic/storage": "^3.0.6",
     "@swimlane/ngx-datatable": "^20.1.0",
+    "angular2-signaturepad": "^4.0.2",
     "animate.css": "^4.1.1",
     "boostrap": "^2.0.0",
     "chart.js": "^3.7.0",
