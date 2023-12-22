@@ -8,6 +8,7 @@ import { PackingDetailPageRoutingModule } from './packing-detail-routing.module'
 
 import { PackingDetailPage } from './packing-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     FormsModule,
     IonicModule,
     PackingDetailPageRoutingModule,
-    IdMappingModule
+    IdMappingModule,
+    OfflineItemIdMappingModule
   ],
   declarations: [PackingDetailPage]
 })

@@ -10,6 +10,9 @@ import { PackingItemPage } from './packing-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
+import { NgCircleProgressModule } from 'ng-circle-progress';
+import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
@@ -18,7 +21,10 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
     IonicModule,
     PackingItemPageRoutingModule,
     BarcodeScanInputPageModule,
-    ItemAddListFlatPageModule
+    ItemAddListFlatPageModule,
+    NgCircleProgressModule,
+    SearchDropdownPageModule,
+    OfflineItemIdMappingModule
   ],
   declarations: [PackingItemPage]
 })

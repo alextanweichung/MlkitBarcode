@@ -9,17 +9,13 @@ const routes: Routes = [
     component: PackingPage
   },
   {
-    path: 'packing-sales-order',
-    loadChildren: () => import('./packing-add/packing-sales-order/packing-sales-order.module').then( m => m.PackingSalesOrderPageModule)
+    path: 'packing-header',
+    loadChildren: () => import('./packing-add/packing-header/packing-header.module').then(m => m.PackingHeaderPageModule)
   },
   {
     path: 'packing-item',
-    loadChildren: () => import('./packing-add/packing-item/packing-item.module').then( m => m.PackingItemPageModule)
-  },
-  {
-    path: 'packing-summary',
-    loadChildren: () => import('./packing-add/packing-summary/packing-summary.module').then( m => m.PackingSummaryPageModule)
-  },
+    loadChildren: () => import('./packing-add/packing-item/packing-item.module').then(m => m.PackingItemPageModule)
+  }
 ];
 
 @NgModule({

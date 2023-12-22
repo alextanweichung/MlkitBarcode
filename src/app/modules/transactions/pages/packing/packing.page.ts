@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
-import { ConfigService } from 'src/app/services/config/config.service';
-import { ToastService } from 'src/app/services/toast/toast.service';
-import { CommonService } from 'src/app/shared/services/common.service';
-import { GoodsPackingList } from '../../models/packing';
-import { PackingService } from '../../services/packing.service';
-import { FilterPage } from '../filter/filter.page';
+import { MultiPackingList } from '../../models/packing';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { PackingService } from '../../services/packing.service';
+import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { format } from 'date-fns';
+import { FilterPage } from '../filter/filter.page';
+import { NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-packing',
@@ -16,7 +17,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 })
 export class PackingPage implements OnInit, ViewWillEnter {
 
-  objects: GoodsPackingList[] = [];
+  objects: MultiPackingList[] = [];
 
   startDate: Date;
   endDate: Date;
@@ -40,7 +41,7 @@ export class PackingPage implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void {
     try {
       if (!this.startDate) {
-        this.startDate = this.commonService.getFirstDayOfTodayMonth();
+        this.startDate = this.commonService.getTodayDate();
       }
       if (!this.endDate) {
         this.endDate = this.commonService.getTodayDate();
@@ -52,14 +53,13 @@ export class PackingPage implements OnInit, ViewWillEnter {
   }
 
   ngOnInit() {
-    
+
   }
 
   /* #region  crud */
-
   loadObjects() {
     try {
-      this.objectService.getObjectListByDate(this.startDate, this.endDate).subscribe(async response => {
+      this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
         this.objects = response;
         let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
         this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -79,15 +79,15 @@ export class PackingPage implements OnInit, ViewWillEnter {
 
   /* #endregion */
 
-  /* #region  add packing */
+  /* #region add goods packing */
 
   async addObject() {
     try {
-      if (this.objectService.hasWarehouseAgent()) {
-        this.navController.navigateForward("/transactions/packing/packing-sales-order");
-      } else {
-        this.toastService.presentToast("Warehouse Agent not set.", "", "top", "danger", 1000);
-      }
+      // if (this.objectService.hasWarehouseAgent()) {
+      this.navController.navigateForward("/transactions/packing/packing-header");
+      // } else {
+      //   this.toastService.presentToast("", "Warehouse Agent not set.", "top", "danger", 1000);
+      // }
     } catch (e) {
       console.error(e);
     }
@@ -137,7 +137,7 @@ export class PackingPage implements OnInit, ViewWillEnter {
         this.startDate = new Date(data.startDate);
         this.endDate = new Date(data.endDate);
         this.loadObjects();
-      }      
+      }
     } catch (e) {
       console.error(e);
     }

@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { PackingPageRoutingModule } from './packing-routing.module';
 
 import { PackingPage } from './packing.page';
+import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    PackingPageRoutingModule
+    PackingPageRoutingModule,
+    ListingSkeletonPageModule
   ],
   declarations: [PackingPage]
 })

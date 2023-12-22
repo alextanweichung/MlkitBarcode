@@ -1,75 +1,155 @@
-export interface GoodsPackingList {
-   packingId: number
-   packingNum: string
-   trxDate: string
-   locationCode: string
-   locationDescription: string
-   warehouseAgentId: number
-   warehouseAgentName: string
-   deactivated: boolean
-   createdById: number
- }
- 
- export interface GoodsPackingRoot {
-  header: GoodsPackingHeader
-  details?: GoodsPackingLine[]
-  // otp?: OtpLine
-}
+import { LineAssembly } from "src/app/shared/models/transaction-detail"
 
-export interface GoodsPackingHeader {
-  packingId: number
-  packingNum: string
-  trxDate: Date,
-  locationId: number
-  toLocationId: number
-  customerId: number
+export interface MultiPackingList {
+  multiPackingId: number
+  multiPackingNum: string
+  trxDate: string
+  locationCode: string
+  locationDescription: string
   warehouseAgentId: number
-  packingUDField1?: string
-  packingUDField2?: string
-  packingUDField3?: string
-  packingUDOption1?: number
-  packingUDOption2?: number
-  packingUDOption3?: number
-  deactivated?: boolean,
-  workFlowTransactionId?: number
-  createdBy?: string
-  createdAt?: Date,
-  masterUDGroup1?: number
-  masterUDGroup2?: number
-  masterUDGroup3?: number
-  businessModelType: string
-  sourceType: string
-  typeCode: string
-  isWithSo: boolean
-  remark: string
-  totalCarton: number
+  warehouseAgentName: string
+  deactivated: boolean
+  createdById: number
 }
 
-export interface GoodsPackingLine {
-  packingLineId?: number
-  packingId?: number
-  salesOrderId: number
+export interface MultiPackingRoot {
+  header: MultiPackingHeader
+  details: MultiPackingCarton[]
+  outstandingPackList: SalesOrderLineForWD[]
+  attachmentFile?: any[]
+  comment?: any[]
+  otp?: any
+}
+
+export interface MultiPackingHeader {
+  multiPackingId: number
+  multiPackingNum: string
+  trxDate: Date
+  groupType: string
+  warehouseAgentId: number
+  externalDocNum: any
+  masterUDGroup1: any
+  masterUDGroup2: any
+  masterUDGroup3: any
+  locationId: number
+  workFlowTransactionId: any
+  customerId: number
+  typeCode: string
+  trxDateTime: string
+  printCount: number
+  toLocationId: number
+  businessModelType: string
+  isWithSo: boolean
+  sourceType: string
+  remark: any
+  totalCarton: number
+  childId: any
+  childNum: any
+  sequence: number
+  createdById: number
+  createdBy: string
+  createdAt: string
+  modifiedById: any
+  modifiedBy: any
+  modifiedAt: any
+  deactivated: boolean
+}
+
+export interface MultiPackingCarton {
+  cartonNum: number
+  cartonHeight: number
+  cartonWidth: number
+  cartonLength: number
+  cartonWeight: number
+  cartonCbm: number
+  packagingId: number
+  cartonBarcode: string
+  packList: CurrentPackList[]
+}
+
+export interface CurrentPackList {
+  multiPackingLineId: number
+  multiPackingId: number
   itemId: number
+  itemCode: string
   itemVariationXId?: number
   itemVariationYId?: number
+  itemVariationXDescription: string
+  itemVariationYDescription: string
+  itemUomId: number
   itemSku: string
   itemBarcode: string
-  itemUomId?: number
-  qtyRequest: number
-  soRowIndex?: number
+  description: string
+  qtyPacked: number
   sequence: number
-  lineUDDate?: Date
+  lineUDDate: Date
   masterUDGroup1?: number
   masterUDGroup2?: number
   masterUDGroup3?: number
   locationId: number
-  cartonNum: number;
-  deactivated?: boolean
+  cartonNum: number
+  deactivated: boolean
+  variations: PackingLineVariation[]
+  assemblyItemId?: number
 }
 
-export interface GoodsPackingSummary {
-  packingNum: string
-  customerId: number
-  locationId: number
+export interface PackingLineVariation {
+  salesOrderId: number
+  salesOrderLineId: number
+  salesOrderVariationId: number
+  qtyPacked: number
+}
+
+export interface MultiPackingObject {
+  outstandingPackList: SalesOrderLineForWD[],
+  packingCarton: MultiPackingCarton[];
+}
+
+/* #region interface from base */
+
+export interface SalesOrderHeaderForWD {
+  salesOrderId: number
+  salesOrderNum: string
   trxDate: Date
+  locationId: number
+  locationDesc: string
+  customerId: number
+  customerDesc: string
+  toLocationId: number
+  toLocationDesc: string
+  currencyId: number
+  currencyDesc: string
+  businessModelType: string
+  isLoaded: boolean
+  line: SalesOrderLineForWD[]
+}
+
+export interface SalesOrderLineForWD {
+  multiPickingOutstandingId?: number
+  multiPackingOutstandingId?: number
+  multiPickingId?: number
+  multiPackingId?: number
+  itemId: number
+  variationTypeCode: string
+  itemVariationXId: number
+  itemVariationYId: number
+  itemCode: string
+  itemSku: string
+  description: string
+  itemVariationXDescription: string
+  itemVariationYDescription: string
+  itemBarcode: string
+  rack: string
+  subRack: string
+  qtyRequest: number
+  salesOrderLineId?: number
+  salesOrderVariationId?: number
+  salesOrderId?: number
+  salesOrderNum?: string
+  qtyPicked?: number
+  qtyPacked?: number
+  qtyCurrent?: number
+  reasonId?: number
+  isComponentScan?: boolean
+  assembly?: LineAssembly[]
 }
