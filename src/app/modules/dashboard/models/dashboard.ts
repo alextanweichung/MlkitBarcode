@@ -26,6 +26,13 @@ export interface Dashboard {
   nonTradePurchaseOrderReviewCount: TransactionProcessingCount
   nonTradePurchaseOrderApprovalCount: TransactionProcessingCount
 
+  branchReceivingReviewCount: TransactionProcessingCount
+  branchReceivingApprovalCount: TransactionProcessingCount
+
+  refundApprovalCount: TransactionProcessingCount
+  exchangeApprovalCount: TransactionProcessingCount
+  recallDepositApprovalCount: TransactionProcessingCount
+
   quotationList: QuotationList[]
   salesOrderList: SalesOrderList[]
 }

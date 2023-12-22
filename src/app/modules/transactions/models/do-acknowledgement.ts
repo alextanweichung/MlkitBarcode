@@ -1,11 +1,12 @@
 export interface DoAcknowledgement {
-    deliveryOrderId: number
-    deliveryOrderNum: string
-    customerId: number
+   truckArrangementNum: string
+   deliveryOrderId: number
+   deliveryOrderNum: string
+   customerId: number
 }
 
 export interface DOAcknowledegementRequest {
-    cartonTruckLoadingNum: string
-    vehicledId: number[]
-    deliveryOrderNum: string
+   truckArrangementNum: string
+   vehicledId: number[]
+   deliveryOrderNum: string
 }

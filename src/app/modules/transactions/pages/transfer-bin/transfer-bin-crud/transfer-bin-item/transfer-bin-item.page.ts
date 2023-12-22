@@ -12,7 +12,6 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
 
 @Component({
@@ -23,8 +22,6 @@ import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/ge
 export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    submit_attempt: boolean = false;
-
-   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
    constructor(
       public objectService: TransferBinService,
@@ -407,9 +404,24 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
       }
    }
 
-   async onDoneScanning(barcode: string) {
-      if (barcode) {
-         await this.barcodescaninput.validateBarcode(barcode);
+   async onFromBinDoneScanning(event: string) {
+      console.log("🚀 ~ file: transfer-bin-item.page.ts:408 ~ TransferBinItemPage ~ onFromBinDoneScanning ~ event:", event)
+      if (event) {
+         await this.onFromBinCodeChanged(event);
+      }
+   }
+
+   async onFromPalletDoneScanning(event: string) {
+      console.log("🚀 ~ file: transfer-bin-item.page.ts:422 ~ TransferBinItemPage ~ onFromPalletDoneScanning ~ event:", event)
+      if (event) {
+         await this.onFromPalletCodeChanged(event);
+      }
+   }
+
+   async onToBinDoneScanning(event: string) {
+      console.log("🚀 ~ file: transfer-bin-item.page.ts:429 ~ TransferBinItemPage ~ onToBinDoneScanning ~ event:", event)
+      if (event) {
+         await this.onToBinCodeChanged(event);
       }
    }
 

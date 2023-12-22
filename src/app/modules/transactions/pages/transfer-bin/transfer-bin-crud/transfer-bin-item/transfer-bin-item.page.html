@@ -107,7 +107,7 @@
 </ion-row>
 <div class="scan-box" [hidden]="!scanActive"></div>
 
-<ion-modal [isOpen]="detailModal" (didPresent)="detailModalDidPresent()" (didDismiss)="detailModal = false" *ngIf="!scanActive">
+<ion-modal [isOpen]="detailModal" (didPresent)="detailModalDidPresent()" (didDismiss)="detailModal = false" [hidden]="scanActive">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -156,15 +156,15 @@
             </ion-list-header>
 
             <ng-container *ngIf="currentStep === 1">
-               <app-general-scan-input #fromBinScan placeholder="Scan or Enter From Bin" (onScanCompleted)="onFromBinCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-general-scan-input>
+               <app-general-scan-input #fromBinScan placeholder="Scan or Enter From Bin" (onScanCompleted)="onFromBinCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onFromBinDoneScanning($event)"></app-general-scan-input>
             </ng-container>
 
             <ng-container *ngIf="currentStep === 2">
-               <app-general-scan-input #fromPalletScan placeholder="Scan or Enter Item/Pallet" (onScanCompleted)="onFromPalletCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-general-scan-input>
+               <app-general-scan-input #fromPalletScan placeholder="Scan or Enter Item/Pallet" (onScanCompleted)="onFromPalletCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onFromPalletDoneScanning($event)"></app-general-scan-input>
             </ng-container>
 
             <ng-container *ngIf="currentStep === 3">
-               <app-general-scan-input #toBinScan placeholder="Scan or Enter To Bin" (onScanCompleted)="onToBinCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-general-scan-input>
+               <app-general-scan-input #toBinScan placeholder="Scan or Enter To Bin" (onScanCompleted)="onToBinCodeChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onToBinDoneScanning($event)"></app-general-scan-input>
             </ng-container>
 
             <ng-container *ngIf="objectService.objectDetail[selectedIndex]?.groupList">

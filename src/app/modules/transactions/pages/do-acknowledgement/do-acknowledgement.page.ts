@@ -1,128 +1,305 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DoAcknowledgementService } from '../../services/do-acknowledgement.service';
-import { ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { DOAcknowledegementRequest, DoAcknowledgement } from '../../models/do-acknowledgement';
 import { SignaturePad } from 'angular2-signaturepad';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { Directory, FileInfo, Filesystem } from '@capacitor/filesystem';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+
+const IMAGE_DIR = 'stored-images';
+
+interface LocalFile {
+   name: string;
+   path: string;
+   data: string;
+}
 
 @Component({
-  selector: 'app-do-acknowledgement',
-  templateUrl: './do-acknowledgement.page.html',
-  styleUrls: ['./do-acknowledgement.page.scss'],
+   selector: 'app-do-acknowledgement',
+   templateUrl: './do-acknowledgement.page.html',
+   styleUrls: ['./do-acknowledgement.page.scss'],
 })
-export class DoAcknowledgementPage implements OnInit, ViewWillEnter {
+export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
-  cartonTruckLoadingNum:string
-  deliveryOrderNum:string
-  vehicleSearchDropdownList: SearchDropdownList[] = [];
+   cartonTruckLoadingNum: string
+   deliveryOrderNum: string
+   vehicleSearchDropdownList: SearchDropdownList[] = [];
 
-  uniqueGrouping: Date[] = [];
+   uniqueGrouping: Date[] = [];
 
-  objects: DoAcknowledgement[] = [];
+   objects: DoAcknowledgement[] = [];
 
-  constructor(
-    public objectService: DoAcknowledgementService,
-    private toastService: ToastService,
-    private modalController: ModalController,
-    private navController: NavController,
-  ) { }
+   @ViewChild("ctln", { static: false }) ctln: GeneralScanInputPage;
+   @ViewChild("don", { static: false }) don: GeneralScanInputPage;
 
-  async ionViewWillEnter(): Promise<void> {
-    await this.objectService.loadRequiredMaster();
-    this.bindVehicleList();
-    this.selectAction();
-  }
+   constructor(
+      public objectService: DoAcknowledgementService,
+      private authService: AuthService,
+      private toastService: ToastService,
+      private loadingService: LoadingService,
+      private modalController: ModalController,
+      private navController: NavController,
+   ) { }
 
-  ngOnInit() {
-  }
+   async ionViewWillEnter(): Promise<void> {
+      await this.objectService.loadRequiredMaster();
+      this.bindVehicleList();
+      // this.selectAction();
+   }
 
-  vehicleIds: number[] = [];
-  onVechicleSelected(event: any[]) {
-    if (event && event !== undefined) {
-      this.vehicleIds = event.flatMap(r => r.id);
-    }
-  }
+   ionViewDidEnter(): void {
+      this.ctln.setFocus();
+   }
 
-  bindVehicleList() {
-    this.objectService.vehicleMasterList.forEach(r => {
-      this.vehicleSearchDropdownList.push({
-        id: r.id,
-        code: r.code,
-        description: r.description
-      })
-    })
-  }
+   ngOnInit() {
 
-  // Select action
-  async selectAction() {
-    let object: DOAcknowledegementRequest = {
-      cartonTruckLoadingNum : this.cartonTruckLoadingNum,
-      vehicledId : this.vehicleIds,
-      deliveryOrderNum: this.deliveryOrderNum
-    }
-    this.getObject(object);
-  }
+   }
 
-  getObject(request: DOAcknowledegementRequest){
-    this.objectService.loadObjects(request).subscribe({
-      next:(response)=>{
-        this.objects = response.body
+   moduleControl: ModuleControl[] = [];
+   fileSizeLimit: number = 1 * 1024 * 1024;
+   loadModuleControl() {
+      try {
+         this.authService.moduleControlConfig$.subscribe(obj => {
+            this.moduleControl = obj;
+            let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
+            this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
+         })
+      } catch (e) {
+         console.error(e);
       }
-    })
-  }
+   }
 
-  signatureModal: boolean = false;
-  selectedDo:DoAcknowledgement;
-  acknowledge(object:DoAcknowledgement) {
-    this.selectedDo = object;
-    this.openSignatureModal();
-  }
-
-  openSignatureModal(){
-    this.signatureModal = true;
-  }
-
-  hideSignatureModal(){
-    this.signatureModal = false;
-  }
-
-  @ViewChild('signaturePad') signaturePad: SignaturePad;
-  signaturePadOptions: Object = {
-    'minWidth': 5,
-    'canvasWidth': 600,
-    'canvasHeight': 400
-  };
-
-  cancel() {
-    this.signaturePad.clear();
-    this.signatureModal = false;
-  }
-
-  clear() {
-    this.signaturePad.clear();
-  }
-
-  save() {
-    if (!this.signaturePad.isEmpty()) {
-      const imageName = this.selectedDo.deliveryOrderNum + '_Acknowledgement_' + 'signature.png';
-      const base64 = this.signaturePad.toDataURL();
-      const splitDataURI = base64.split(',')
-      const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
-      const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
-      const ia = new Uint8Array(byteString.length)
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i)
+   vehicleIds: number[] = [];
+   onVechicleSelected(event: any[]) {
+      if (event && event !== undefined) {
+         this.vehicleIds = event.flatMap(r => r.id);
       }
-      var blob = new Blob([ia], { type: mimeString })
-      var file = new File([blob], imageName, { type: mimeString });
-      this.objectService.postFile(file, this.selectedDo.deliveryOrderId, 0).subscribe({
-        next: (response) => {
-          this.selectedDo = null;
-          this.toastService.presentToast("", "DO Acknowledged", "top", "success", 1000);
-          this.hideSignatureModal();
-        }
+   }
+
+   bindVehicleList() {
+      this.objectService.vehicleMasterList.forEach(r => {
+         this.vehicleSearchDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+         })
       })
-    }
-  }
+   }
+
+   // Select action
+   async selectAction() {
+      let object: DOAcknowledegementRequest = {
+         truckArrangementNum: this.cartonTruckLoadingNum,
+         vehicledId: this.vehicleIds,
+         deliveryOrderNum: this.deliveryOrderNum
+      }
+      this.getObject(object);
+   }
+
+   async getObject(request: DOAcknowledegementRequest) {
+      try {
+         await this.loadingService.showLoading();
+         this.objectService.loadObjects(request).subscribe({
+            next: async (response) => {
+               this.objects = response.body
+               await this.loadingService.dismissLoading();
+            },
+            error: async (error) => {
+               await this.loadingService.dismissLoading();
+               console.error(error);
+            }
+         })
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
+   }
+
+   signatureModal: boolean = false;
+   selectedDo: DoAcknowledgement;
+   acknowledge(object: DoAcknowledgement) {
+      this.selectedDo = object;
+      this.openSignatureModal();
+   }
+
+   openSignatureModal() {
+      this.signatureModal = true;
+   }
+
+   hideSignatureModal() {
+      this.signatureModal = false;
+   }
+
+   @ViewChild("signaturePad") signaturePad: SignaturePad;
+   signaturePadOptions: Object = {
+      "minWidth": 5,
+      "canvasWidth": 600,
+      "canvasHeight": 400
+   };
+
+   cancel() {
+      this.signaturePad.clear();
+      this.signatureModal = false;
+   }
+
+   clear() {
+      this.signaturePad.clear();
+   }
+
+   images: LocalFile[] = [];
+   async save() {
+      if (!this.signaturePad.isEmpty()) {
+         const fileName = this.selectedDo.deliveryOrderNum + "_Acknowledgement_" + "signature.png";
+         const base64Data = this.signaturePad.toDataURL();
+         try {
+            this.images = [];
+            await this.loadingService.showLoading();
+            const savedFile = await Filesystem.writeFile({
+               path: `${IMAGE_DIR}/${fileName}`,
+               data: base64Data,
+               directory: Directory.Data,
+               recursive: true
+            });
+            Filesystem.readdir({
+               path: IMAGE_DIR,
+               directory: Directory.Data
+            })
+               .then(
+                  async (result) => {
+                     await this.loadFileData(result.files);
+                  },
+                  async (err) => {
+                     // Folder does not yet exists!
+                     await Filesystem.mkdir({
+                        path: IMAGE_DIR,
+                        directory: Directory.Data
+                     });
+                  }
+               )
+               .then(async (_) => {
+                  await this.loadingService.dismissLoading();
+               });
+         } catch (e) {
+            console.error(e);
+            await this.loadingService.dismissLoading();
+         }
+         finally {
+            await this.loadingService.dismissLoading();
+         }
+      }
+   }
+
+   fileToDelete: LocalFile[] = [];
+   async loadFileData(fileNames: FileInfo[]) {
+      try {
+         this.fileToDelete = [];
+         for (let f of fileNames) {
+            const filePath = `${IMAGE_DIR}/${f.name}`;
+            const readFile = await Filesystem.readFile({
+               path: filePath,
+               directory: Directory.Data
+            });
+            if (f.size > this.fileSizeLimit) {
+               this.fileToDelete.push({
+                  name: f.name,
+                  path: filePath,
+                  data: `data:image/jpeg;base64,${readFile.data}`
+               });
+               this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
+            } else {
+               this.images.push({
+                  name: f.name,
+                  path: filePath,
+                  data: `data:image/jpeg;base64,${readFile.data}`
+               });
+               if (this.images && this.images.length > 0) {
+                  const response = await fetch(this.images[0].data);
+                  const blob = await response.blob();
+                  const formData = new FormData();
+                  formData.append('file', blob, this.images[0].name);
+                  this.objectService.postFile(formData, this.selectedDo.deliveryOrderId, 0).subscribe({
+                     next: (response) => {
+                        this.selectedDo = null;
+                        this.toastService.presentToast("", "DO Acknowledged", "top", "success", 1000);
+                        this.hideSignatureModal();
+                        this.selectAction();
+                     }
+                  })
+               }
+            }
+         }
+         this.fileToDelete.forEach(e => {
+            this.deleteImage(e);
+         });
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async deleteImage(file: LocalFile) {
+      try {
+         await Filesystem.deleteFile({
+            directory: Directory.Data,
+            path: file.path
+         });
+         this.signaturePad.clear();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onCTLNChanged(event) {
+      if (event) {
+         this.cartonTruckLoadingNum = event;
+      } else {
+         this.cartonTruckLoadingNum = null;
+      }
+   }
+
+   onDONChanged(event) {
+      if (event) {
+         this.deliveryOrderNum = event;
+      } else {
+         this.deliveryOrderNum = null;
+      }
+   }
+
+   /* #region  barcode scanner */
+
+   scanActive: boolean = false;
+   onCameraStatusChanged(event) {
+      this.scanActive = event;
+      if (this.scanActive) {
+         document.body.style.background = "transparent";
+      }
+   }
+
+   async onCTLNDoneScanning(event: string) {
+      if (event) {
+         await this.onCTLNChanged(event);
+      }
+   }
+
+   async onDONDoneScanning(event: string) {
+      if (event) {
+         await this.onDONChanged(event);
+      }
+   }
+
+   stopScanner() {
+      BarcodeScanner.stopScan();
+      // this.scanActive = false;
+      this.onCameraStatusChanged(false);
+   }
+
+   /* #endregion */
+
 }

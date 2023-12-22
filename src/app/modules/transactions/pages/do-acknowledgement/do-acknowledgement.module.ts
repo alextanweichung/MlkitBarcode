@@ -11,18 +11,20 @@ import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { IdToCodeMappingModule } from 'src/app/shared/pipes/id-to-code-mapping/id-to-code-mapping.module';
 import { SignaturePadModule } from 'angular2-signaturepad';
+import { GeneralScanInputPageModule } from 'src/app/shared/pages/general-scan-input/general-scan-input.module';
 
 @NgModule({
-    declarations: [DoAcknowledgementPage],
-    imports: [
-        CommonModule,
-        FormsModule,
-        IonicModule,
-        DoAcknowledgementPageRoutingModule,
-        SearchMultiDropdownPageModule,
-        IdMappingModule,
-        IdToCodeMappingModule,
-        SignaturePadModule
-    ]
+   declarations: [DoAcknowledgementPage],
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      DoAcknowledgementPageRoutingModule,
+      SearchMultiDropdownPageModule,
+      IdMappingModule,
+      IdToCodeMappingModule,
+      SignaturePadModule,
+      GeneralScanInputPageModule
+   ]
 })
-export class DoAcknowledgementPageModule {}
+export class DoAcknowledgementPageModule { }

@@ -16,6 +16,7 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
 
    @Input() title: string = "Selection";
    @Input() placeholder: string = "Scan or Enter";
+   @Input() clearSearchValue: boolean = true;
 
    @Output() onScanCompleted = new EventEmitter<any>();
 
@@ -45,10 +46,20 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
    async onKeyDown(e: any, key: string) {
       if (e.keyCode === 13) {
          this.onScanCompleted.emit(key);
-         this.searchValue = "";
+         if (this.clearSearchValue) {
+            this.searchValue = "";
+         }
          e.preventDefault();
          this.setFocus();
       }
+   }
+
+   onBlur(e: any, key: string) {
+      this.onScanCompleted.emit(key);
+      if (this.clearSearchValue) {
+         this.searchValue = "";
+      }
+      e.preventDefault();
    }
 
    showKeyboard(event) {
@@ -61,7 +72,6 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
 
    /* #region focus */
 
-   @Input() scanActive: boolean;
    @Output() onCameraStatusChanged = new EventEmitter<boolean>();
    @Output() onDoneScanning = new EventEmitter<string>();
 
@@ -87,8 +97,11 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
          const result = await BarcodeScanner.startScan();
          if (result.hasContent) {
             let value = result.content;
+            if (!this.clearSearchValue) {
+               this.searchValue = value;
+            }
             // this.scanActive = false;
-            this.onCameraStatusChanged.emit(false);
+            await this.onCameraStatusChanged.emit(false);
             await this.onDoneScanning.emit(value);
          }
       }

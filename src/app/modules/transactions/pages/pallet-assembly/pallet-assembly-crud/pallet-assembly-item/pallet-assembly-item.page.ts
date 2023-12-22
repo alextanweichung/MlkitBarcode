@@ -187,9 +187,14 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
    onItemAdd(event: TransactionDetail[]) {
       if (event && event.length > 0) {
          if (this.selectedPalletNum && this.palletToShow) {
-            event.forEach(r => {
-               this.addItemToLine(r);
-            })
+            if (event.filter(r => r.typeCode === "AS")?.length > 0) {
+               this.toastService.presentToast("Control Validation", `Item ${event[0].itemCode} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
+               return;
+            } else {
+               event.forEach(r => {
+                  this.addItemToLine(r);
+               })
+            }
          } else {
             this.toastService.presentToast("Control Error", "Please select a pallet before adding Item", "top", "warning", 1000);
          }

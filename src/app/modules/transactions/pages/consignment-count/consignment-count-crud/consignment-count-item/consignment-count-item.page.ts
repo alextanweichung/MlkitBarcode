@@ -82,11 +82,17 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 
 	/* #region item line */
 
-	onItemAdd(event: TransactionDetail[]) {
+	async onItemAdd(event: TransactionDetail[]) {
 		if (event && event.length > 0) {
-			event.forEach(r => {
-				this.addItemToLine(r);
-			})
+         if (event.filter(r => r.typeCode === "AS")?.length > 0) {
+            this.toastService.presentToast("Control Validation", `Item ${event[0].itemCode} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
+            return;
+         } else {
+            event.forEach(r => {
+               this.addItemToLine(r);
+            })
+            await this.barcodescaninput.setFocus();
+         }
 		}
 	}
 

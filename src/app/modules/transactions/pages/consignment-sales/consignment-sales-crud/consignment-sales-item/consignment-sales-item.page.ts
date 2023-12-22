@@ -141,10 +141,15 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
    async onItemAdd(event: TransactionDetail[]) {
       if (event && event.length > 0) {
-         event.forEach(async r => {
-            await this.addItemToLine(r);
-         })
-         await this.barcodescaninput.setFocus();
+         if (event.filter(r => r.typeCode === "AS")?.length > 0) {
+            this.toastService.presentToast("Control Validation", `Item ${event[0].itemCode} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
+            return;
+         } else {
+            event.forEach(async r => {
+               await this.addItemToLine(r);
+            })
+            await this.barcodescaninput.setFocus();
+         }
       }
    }
 
