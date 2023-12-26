@@ -42,6 +42,13 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    ionViewWillEnter(): void {
       this.isMobile = Capacitor.getPlatform() !== "web";
+      this.isWithType = this.objectService.header.isWithSo ? "SO" : "NONE";
+      if (this.objectService.header && this.objectService.header.multiPickingId > 0) {
+         this.objectForm.patchValue(this.objectService.object.header);
+         this.loadExisitingSO(this.objectService.object.outstandingPickList.flatMap(r => r.salesOrderNum));
+      } else {
+         this.setDefaultValue();
+      }
    }
 
    ngOnDestroy(): void {
@@ -74,11 +81,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.navController.navigateRoot("/transactions/picking");
       }
       this.loadModuleControl();
-      this.setDefaultValue();
-      if (this.objectService.header && this.objectService.header.multiPickingId > 0) {
-         this.objectForm.patchValue(this.objectService.object.header);
-         this.loadExisitingSO(this.objectService.object.outstandingPickList.flatMap(r => r.salesOrderNum));
-      }
    }
 
    moduleControl: ModuleControl[];
@@ -108,7 +110,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    loadExisitingSO(salesOrderNums: string[]) {
       this.objectService.getSOHeader(salesOrderNums).subscribe(response => {
-         console.log("🚀 ~ file: picking-header.page.ts:111 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ response:", JSON.stringify(response))
          if (response.status === 200) {
             let doc = response.body[0] as SalesOrderHeaderForWD;
             if (doc === undefined) {
@@ -129,7 +130,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
                this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
             }
-            this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+            // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
             this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
             this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
             this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];

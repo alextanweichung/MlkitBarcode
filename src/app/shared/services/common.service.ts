@@ -363,6 +363,14 @@ export class CommonService {
       }
    }
 
+   roundToTwoDecimal(inputNumber: number): number {
+      if (inputNumber) {
+         return Math.round(Number(inputNumber * 100)) / 100;
+      } else {
+         return null;
+      }
+   }
+
    roundToPrecision(inputNumber: number, precision: number): number {
       try {
          let factor = Math.pow(10, precision);
