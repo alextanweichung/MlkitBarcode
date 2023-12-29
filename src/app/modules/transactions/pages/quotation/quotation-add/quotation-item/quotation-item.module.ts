@@ -8,8 +8,6 @@ import { QuotationItemPageRoutingModule } from './quotation-item-routing.module'
 
 import { QuotationItemPage } from './quotation-item.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
-import { GeneralSalesGridPageModule } from 'src/app/shared/pages/general-sales-grid/general-sales-grid.module';
-import { GeneralSalesListPageModule } from 'src/app/shared/pages/general-sales-list/general-sales-list.module';
 import { ItemCartPageModule } from 'src/app/shared/pages/item-cart/item-cart.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { ItemCatalogPageModule } from 'src/app/shared/pages/item-catalog/item-catalog.module';
@@ -21,8 +19,6 @@ import { ItemCatalogPageModule } from 'src/app/shared/pages/item-catalog/item-ca
     IonicModule,
     QuotationItemPageRoutingModule,
     ListingSkeletonPageModule,
-    GeneralSalesGridPageModule,
-    GeneralSalesListPageModule,
     ItemCartPageModule,
     SumModule,
     ItemCatalogPageModule

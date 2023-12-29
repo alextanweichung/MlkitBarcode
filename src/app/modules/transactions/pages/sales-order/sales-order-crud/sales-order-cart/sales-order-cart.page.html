@@ -25,7 +25,13 @@
                <ion-label>
                   <div class="ion-text-wrap">Auto Promotion</div>
                </ion-label>
-               <ion-checkbox [(ngModel)]="objectService.objectHeader.isAutoPromotion" (ionChange)="onDisablePromotionCheck($event)"></ion-checkbox>
+               <ion-checkbox [(ngModel)]="objectService.objectHeader.isAutoPromotion"></ion-checkbox>
+            </ion-item>
+            <ion-item button="false" (click)="popover.dismiss()" *ngIf="objectService.configSalesTransactionShowHistory">
+               <ion-label>
+                  <div>Latest Price</div>
+               </ion-label>
+               <ion-checkbox [(ngModel)]="objectService.showLatestPrice"></ion-checkbox>
             </ion-item>
             <ion-item (click)="popover.dismiss(); sendForDebug()">
                <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
@@ -40,7 +46,18 @@
 
 <ion-content fullscreen>
    <div class="p-2">
-      <ion-list class="list-custom" *ngIf="objectService.objectDetail && objectService.objectDetail.length > 0">
+      <app-sales-cart [isSalesOrder]="true" [objectHeader]="objectService.objectHeader" [objectDetail]="objectService.objectDetail" [showLatestPrice]="objectService.showLatestPrice" 
+
+      [discountGroupMasterList]="objectService.discountGroupMasterList" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [uomMasterList]="objectService.uomMasterList"
+      
+      [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" 
+      
+      [isAutoPromotion]="objectService.objectHeader.isAutoPromotion" [promotionMaster]="objectService.promotionMaster" 
+      
+      [restrictTrxFields]="restrictTrxFields" [objectHistory]="objectService.objectSalesHistory"
+      
+      (onLineEditComplete)="onLineEditComplete($event)"></app-sales-cart>
+      <!-- <ion-list class="list-custom" *ngIf="objectService.objectDetail && objectService.objectDetail.length > 0">
          <ng-container *ngFor="let item of objectService.objectDetail; let i = index">
             <ion-item-sliding #slidingItem>
                <ion-item [ngClass]="{'color-blue':item.isPricingApproval}" class="ion-no-padding no-ripple" (click)="showEditModal(item, i)">
@@ -143,7 +160,7 @@
                </ion-item-options>
             </ion-item-sliding>
          </ng-container>
-      </ion-list>
+      </ion-list> -->
       <ng-container *ngIf="objectService.objectDetail === null || objectService.objectDetail.length === 0">
          <ion-list-header class="ion-list-header ion-flex ion-text-center">
             <ion-label>Your cart is empty</ion-label>
@@ -312,7 +329,7 @@
 </ion-modal>
 
 <!-- change line price, disc, disc code, qty -->
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
+<!-- <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -381,17 +398,93 @@
                </ng-container>
                <ion-item>
                   <ion-label>
+                     <div>UOM</div>
+                  </ion-label>
+                  <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.itemUomId|idMapping:objectService.uomMasterList}}" [disabled]="true"></ion-input>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
                      <div>Remark</div>
                   </ion-label>
                   <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="selectedItem.remark" placeholder="Enter remark" [autoGrow]="true"></ion-textarea>
                </ion-item>
-               <ion-item *ngIf="selectedItem?.promoEventId">
-                  <ion-label>
-                     <div>Promo Applied</div>
-                  </ion-label>
-                  <ion-label slot="end">{{getPromoDesc(selectedItem?.promoEventId)}}</ion-label>
-               </ion-item>
+               <ng-container *ngIf="selectedItem?.promoEventId">
+                  <ion-item>
+                     <ion-label style="display: flex !important;">
+                        <div>Promo Applied</div>
+                     </ion-label>
+                     <ion-label slot="end">
+                        <div class="ion-text-wrap">{{getPromoInfo(selectedItem?.promoEventId).description}}</div>
+                     </ion-label>
+                  </ion-item>
+               </ng-container>
             </ion-list>
+            <ng-container *ngIf="selectedItem?.promoEventId">
+               <ion-grid class="py-2 color-medium font-size-smallest">
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>Priority</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                        <ng-container *ngFor="let number of [1,2,3,4,5,6,7,8,9,10]">
+                           <ng-container *ngIf="getPromoInfo(selectedItem.promoEventId).priority === number; then icon1 else icon2"></ng-container>
+                           <ng-template #icon1><ion-icon name="star" class="icon-smaller"></ion-icon></ng-template>
+                           <ng-template #icon2><ion-icon name="star-outline" class="icon-smaller"></ion-icon></ng-template>                           
+                        </ng-container>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>Start Date</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                        <div>{{getPromoInfo(selectedItem.promoEventId).startDate|date:"dd/MM/yyyy"}}</div>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>Start Date</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                        <div>{{getPromoInfo(selectedItem.promoEventId).endDate|date:"dd/MM/yyyy"}}</div>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>Affected Item</div>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col size="1" class="ion-flex ion-margin-auto">
+                        <div>#</div>
+                     </ion-col>
+                     <ion-col size="3" class="ion-flex ion-margin-auto">
+                        <div>Code</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>Desc.</div>
+                     </ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+                        <div>Impact</div>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row *ngFor="let rowData of getPromoInfo(selectedItem.promoEventId)?.itemList; let rowIndex = index">
+                     <ion-col size="1" class="ion-flex ion-margin-auto">
+                        <div>{{rowIndex+1}}</div>
+                     </ion-col>
+                     <ion-col size="3" class="ion-flex ion-margin-auto">
+                        <div>{{rowData.itemId|offlineItemIdMapping:configService.item_Masters}}</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>{{rowData.itemId|offlineItemIdDescMapping:configService.item_Masters}}</div>
+                     </ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
+                        <div *ngIf="rowData.isImpactOnly"><ion-icon name="checkmark-circle-outline" class="icon-smaller"></ion-icon></div>
+                        <div *ngIf="!rowData.isImpactOnly"><ion-icon name="close-circle-outline" class="icon-smaller"></ion-icon></div>
+                     </ion-col>
+                  </ion-row>
+               </ion-grid>
+            </ng-container>
             <ng-container *ngIf="selectedItem.variationTypeCode === '0' && selectedItem.assembly && selectedItem.assembly.length > 0">
                <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                   <ion-label>Assembly</ion-label>
@@ -489,9 +582,10 @@
          </ion-grid>
       </ion-footer>
    </ng-template>
-</ion-modal>
+</ion-modal> -->
+
 <!-- for isPricingApproval -->
-<ion-popover #pricingPopover [isOpen]="isPricingPopoverOpen" (didDismiss)="isPricingPopoverOpen = false">
+<!-- <ion-popover #pricingPopover [isOpen]="isPricingPopoverOpen" (didDismiss)="isPricingPopoverOpen = false">
    <ng-template>
       <ion-content class="p-2">
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -504,4 +598,4 @@
          </ion-list>
       </ion-content>
    </ng-template>
-</ion-popover>
+</ion-popover> -->

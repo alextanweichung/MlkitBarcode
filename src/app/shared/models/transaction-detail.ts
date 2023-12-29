@@ -1,3 +1,4 @@
+import { SalesItemInfoRoot } from "./sales-item-info"
 import { VariationDetail } from "./variation-detail"
 
 export interface TransactionDetail {
@@ -142,6 +143,7 @@ export interface TransactionDetail {
    newItemId?: number
    newItemEffectiveDate?: Date
    minOrderQty?: number
+   casePackQty?: number;
    minOrderQtyError?: boolean
 
    tradingMarginPct?: number
@@ -175,7 +177,6 @@ export interface LineAssembly {
    qtyCurrent?: number
    qtyPossible?: number
 }
-
 
 export interface ItemPricing {
    itemId: number

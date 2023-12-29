@@ -30,6 +30,9 @@ const httpObserveHeader = {
    providedIn: 'root'
 })
 export class BackToBackOrderService {
+   
+   showLatestPrice: boolean = false;
+   showQuantity: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 
@@ -45,6 +48,7 @@ export class BackToBackOrderService {
    salesAgentMasterList: MasterListDetails[] = [];
    termPeriodMasterList: MasterListDetails[] = [];
    countryMasterList: MasterListDetails[] = [];
+   uomMasterList: MasterListDetails[] = [];
 
    salesTypeList: MasterListDetails[] = [];
 
@@ -79,6 +83,7 @@ export class BackToBackOrderService {
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
    }
 
    async loadStaticLovList() {

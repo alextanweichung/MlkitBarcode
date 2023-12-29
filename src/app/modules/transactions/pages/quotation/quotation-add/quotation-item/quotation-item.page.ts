@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import Decimal from 'decimal.js';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { ItemCatalogPage } from 'src/app/shared/pages/item-catalog/item-catalog.page';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -56,7 +57,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async onItemAdded(event: TransactionDetail) {
       try {
-         let trxLine = JSON.parse(JSON.stringify(event));
+         let trxLine = JSON.parse(JSON.stringify(event)) as TransactionDetail;
          trxLine = this.assignTrxItemToDataLine(trxLine);
          if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
             await this.computeUnitPriceExTax(trxLine);
@@ -66,10 +67,23 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          await this.objectService.objectDetail.unshift(trxLine);
          await this.computeAllAmount(this.objectService.objectDetail[0]);
          if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-            await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+            await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
          }
          await this.assignSequence();
          this.toastService.presentToast("", "Item added", "top", "success", 1000);
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async onHistoryCopied(event: SalesItemInfoRoot) {
+      try {
+         if (event) {
+            if (this.objectService.objectSalesHistory === null || this.objectService.objectSalesHistory === undefined) {
+               this.objectService.objectSalesHistory = [];
+            }
+            this.objectService.objectSalesHistory = [...this.objectService.objectSalesHistory, event];
+         }
       } catch (e) {
          console.error(e);
       }
@@ -87,15 +101,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          index++;
       })
    }
-
-   /* #region  toggle show image */
-
-   showImage: boolean = false;
-   toggleShowImage() {
-      this.showImage = !this.showImage;
-   }
-
-   /* #endregion */
 
    /* #region  tax handle here */
 
@@ -166,7 +171,6 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    assignTrxItemToDataLine(trxLine: TransactionDetail) {
-      console.log("🚀 ~ file: quotation-item.page.ts:158 ~ QuotationItemPage ~ assignTrxItemToDataLine ~ trxLine:", trxLine)
       try {
          trxLine.lineId = 0;
          trxLine.headerId = this.objectService.objectHeader.quotationId;
@@ -262,6 +266,38 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.objectService.resetVariables();
             this.navController.navigateRoot("/transactions/quotation/quotation-detail", navigationExtras);
          }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
+
+   /* #region  toggle show image */
+
+   showImage: boolean = false;
+   toggleShowImage() {
+      this.showImage = !this.showImage;
+   }
+
+   /* #endregion */
+
+   /* #region toggle show latest price */
+
+   toggleShowLatestPrice() {
+      this.objectService.showLatestPrice = !this.objectService.showLatestPrice;
+   }
+
+   /* #endregion */
+
+   /* #region more action popover */
+
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
       } catch (e) {
          console.error(e);
       }

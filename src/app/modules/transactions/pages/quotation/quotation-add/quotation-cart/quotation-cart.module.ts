@@ -11,6 +11,7 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
+import { SalesCartPageModule } from 'src/app/shared/pages/sales-cart/sales-cart.module';
 
 @NgModule({
    imports: [
@@ -21,7 +22,8 @@ import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-ite
       IdMappingModule,
       SumModule,
       OfflineItemIdMappingModule,
-      OfflineItemIdDescMappingModule
+      OfflineItemIdDescMappingModule,
+      SalesCartPageModule
    ],
    declarations: [QuotationCartPage]
 })

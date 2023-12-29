@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
-import { MenuGuard } from './core/guards/menu.guard';
 
 const routes: Routes = [
    {
@@ -318,8 +316,8 @@ const routes: Routes = [
       loadChildren: () => import('./modules/transactions/pages/branch-receiving/branch-receiving-detail/branch-receiving-detail.module').then(m => m.BranchReceivingDetailPageModule)
    },
    {
-     path: 'transactions/bin-count',
-     loadChildren: () => import('./modules/transactions/pages/bin-count/bin-count.module').then( m => m.BinCountPageModule)
+      path: 'transactions/bin-count',
+      loadChildren: () => import('./modules/transactions/pages/bin-count/bin-count.module').then(m => m.BinCountPageModule)
    },
    //transactions-do-acknowledgement
    {
@@ -394,14 +392,6 @@ const routes: Routes = [
       loadChildren: () => import('./shared/pages/search-multi-dropdown/search-multi-dropdown.module').then(m => m.SearchMultiDropdownPageModule)
    },
    {
-      path: 'item-add-grid',
-      loadChildren: () => import('./shared/pages/general-sales-grid/general-sales-grid.module').then(m => m.GeneralSalesGridPageModule)
-   },
-   {
-      path: 'item-add-list',
-      loadChildren: () => import('./shared/pages/general-sales-list/general-sales-list.module').then(m => m.GeneralSalesListPageModule)
-   },
-   {
       path: 'item-cart',
       loadChildren: () => import('./shared/pages/item-cart/item-cart.module').then(m => m.ItemCartPageModule)
    },
@@ -441,14 +431,23 @@ const routes: Routes = [
       path: 'pos-approval-processing',
       loadChildren: () => import('./shared/pages/pos-approval-processing/pos-approval-processing.module').then(m => m.PosApprovalProcessingPageModule)
    },
-  {
-    path: 'general-scan-input',
-    loadChildren: () => import('./shared/pages/general-scan-input/general-scan-input.module').then( m => m.GeneralScanInputPageModule)
+   {
+      path: 'general-scan-input',
+      loadChildren: () => import('./shared/pages/general-scan-input/general-scan-input.module').then(m => m.GeneralScanInputPageModule)
+   },
+   {
+      path: 'do-acknowledgement',
+      loadChildren: () => import('./modules/transactions/pages/do-acknowledgement/do-acknowledgement.module').then(m => m.DoAcknowledgementPageModule)
+   },
+   {
+      path: 'item-sales-history',
+      loadChildren: () => import('./shared/pages/item-sales-history/item-sales-history.module').then(m => m.ItemSalesHistoryPageModule)
+   },  {
+    path: 'sales-cart',
+    loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then( m => m.SalesCartPageModule)
   },
-  {
-    path: 'do-acknowledgement',
-    loadChildren: () => import('./modules/transactions/pages/do-acknowledgement/do-acknowledgement.module').then( m => m.DoAcknowledgementPageModule)
-  },
+
+
 
 
 

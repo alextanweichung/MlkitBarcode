@@ -39,7 +39,7 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.loadRequiredMaster();
+      // await this.objectService.loadRequiredMaster();
       this.route.queryParams.subscribe(params => {
          this.objectId = params["objectId"];
          this.processType = params["processType"];

@@ -49,7 +49,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       try {
-         await this.objectService.loadRequiredMaster();
+         // await this.objectService.loadRequiredMaster();
          this.route.queryParams.subscribe(params => {
             this.isDraft = params["isDraft"];
             if (this.isDraft) {

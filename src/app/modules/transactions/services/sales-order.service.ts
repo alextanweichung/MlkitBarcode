@@ -23,6 +23,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -33,6 +34,9 @@ const httpObserveHeader = {
    providedIn: 'root'
 })
 export class SalesOrderService {
+   
+   showLatestPrice: boolean = false;   
+   showQuantity: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 
@@ -46,6 +50,7 @@ export class SalesOrderService {
    areaMasterList: MasterListDetails[] = [];
    currencyMasterList: MasterListDetails[] = [];
    salesAgentMasterList: MasterListDetails[] = [];
+   uomMasterList: MasterListDetails[] = [];
 
    customers: Customer[] = [];
 
@@ -73,6 +78,7 @@ export class SalesOrderService {
       this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.bindSalesAgentList();
    }
 
@@ -124,6 +130,7 @@ export class SalesOrderService {
    salesOrderQuantityControl: string = "0";
    orderingActivateMOQControl: boolean = false;
    salesActivateTradingMargin: boolean = false;
+   configSalesTransactionShowHistory: boolean = false;
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -186,6 +193,14 @@ export class SalesOrderService {
             } else {
                this.salesActivateTradingMargin = false;
             }
+
+            let salesTransactionShowHistory = this.moduleControl.find(x => x.ctrlName === "SalesTransactionShowHistory");
+            if (salesTransactionShowHistory && salesTransactionShowHistory.ctrlValue.toUpperCase() === 'Y') {
+               this.configSalesTransactionShowHistory = true;
+            } else {
+               this.configSalesTransactionShowHistory = false;
+            }
+            
          })
          this.authService.precisionList$.subscribe(precision => {
             this.precisionSales = precision.find(x => x.precisionCode === "SALES");
@@ -221,6 +236,7 @@ export class SalesOrderService {
 
    objectHeader: SalesOrderHeader;
    objectDetail: TransactionDetail[] = [];
+   objectSalesHistory: SalesItemInfoRoot[] = [];
    objectSummary: SalesOrderRoot;
    async setHeader(objectHeader: SalesOrderHeader) {
       this.objectHeader = objectHeader;
@@ -249,6 +265,7 @@ export class SalesOrderService {
 
    removeLine() {
       this.objectDetail = [];
+      this.objectSalesHistory = [];
    }
 
    removeSummary() {

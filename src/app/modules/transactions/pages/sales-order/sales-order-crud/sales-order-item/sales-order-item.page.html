@@ -28,17 +28,17 @@
             <div>List</div>
           </ion-label>
         </ion-item>
-        <ion-item button="false" (click)="popover.dismiss(); toggleShowAvailQty()" *ngIf="!showAvailQty">
-          <ion-icon name="information-circle-outline" slot="end"></ion-icon>
+        <ion-item button="false">
           <ion-label>
             <div>Show Qty</div>
           </ion-label>
+          <ion-checkbox [(ngModel)]="objectService.showQuantity"></ion-checkbox>
         </ion-item>
-        <ion-item button="false" (click)="popover.dismiss(); toggleShowAvailQty()" *ngIf="showAvailQty">
-          <ion-icon name="information-circle-outline" slot="end"></ion-icon>
-          <ion-label>
-            <div>Hide Qty</div>
-          </ion-label>
+        <ion-item button="false" *ngIf="objectService.configSalesTransactionShowHistory">
+           <ion-label>
+              <div>Latest Price</div>
+           </ion-label>
+           <ion-checkbox [(ngModel)]="objectService.showLatestPrice"></ion-checkbox>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -46,7 +46,7 @@
 </ion-popover>
 <ion-content fullscreen>
   <div class="p-2">
-    <app-item-catalog [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [isSalesOrder]="true" [showAvailQty]="showAvailQty" [itemInCart]="objectService.objectDetail"></app-item-catalog>
+    <app-item-catalog [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" (onHistoryCopied)="onHistoryCopied($event)" [showImage]="showImage" [showLatestPrice]="objectService.showLatestPrice && objectService.configSalesTransactionShowHistory" [isSalesOrder]="true" [showAvailQty]="objectService.showQuantity" [itemInCart]="objectService.objectDetail"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

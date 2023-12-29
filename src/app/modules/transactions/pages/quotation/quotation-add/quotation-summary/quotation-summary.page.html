@@ -45,7 +45,7 @@
                <div class="font-bold">Total Quantity</div>
              </ion-col>
              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-               <div>{{objectService.objectDetail|sum:"qtyRequest"|number:"1.0"}}</div>
+               <div>{{objectService.objectSummary.details|sum:"qtyRequest"|number:"1.0"}}</div>
              </ion-col>
            </ion-row>
            <ion-row *ngIf="objectService.systemWideActivateTaxControl">
@@ -53,7 +53,7 @@
                <div class="font-bold">Tax Amt.</div>
              </ion-col>
              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-               <div>{{objectService.objectDetail|sum:"taxAmt"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
+               <div>{{objectService.objectSummary.details|sum:"taxAmt"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
              </ion-col>
            </ion-row>
            <ion-row>
@@ -61,7 +61,7 @@
                <div class="font-bold">Grand Total</div>
              </ion-col>
              <ion-col class="ion-flex ion-margin-auto justify-content-end">
-               <div>{{objectService.objectDetail|sum:"subTotal"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
+               <div>{{objectService.objectSummary.details|sum:"subTotal"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
              </ion-col>
            </ion-row>
          </ion-grid>

@@ -7,17 +7,19 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterList } from '../../models/master-list';
-import { MasterListDetails } from '../../models/master-list-details';
+import { HistoryInfo, MasterListDetails } from '../../models/master-list-details';
 import { ModuleControl } from '../../models/module-control';
 import { PrecisionList } from '../../models/precision-list';
 import { LineAssembly, TransactionDetail } from '../../models/transaction-detail';
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
-import { InfiniteScrollCustomEvent, IonSearchbar, ViewWillEnter } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonSearchbar, ModalController } from '@ionic/angular';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { SalesItemRequest } from '../../models/sales-item-request';
 import Decimal from 'decimal.js';
+import { SalesHistoryInfo, SalesItemInfoRoot } from '../../models/sales-item-info';
+import { ItemSalesHistoryPage } from '../item-sales-history/item-sales-history.page';
 
 @Component({
    selector: 'app-item-catalog',
@@ -37,6 +39,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    @Input() isItemPriceTaxInclusive: boolean;
    @Input() showImage: boolean = false;
    @Input() showAvailQty: boolean = false;
+   @Input() showLatestPrice: boolean = false;
+   @Input() isQuotation: boolean = false;
    @Input() isSalesOrder: boolean = false;
    @Input() isBackToBackOrder: boolean = false;
    @Input() disableIfPricingNotSet: boolean = true;
@@ -50,14 +54,16 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
    @ViewChild("searchbar", { static: false }) searchbar: IonSearchbar;
    @Output() onItemAdded: EventEmitter<TransactionDetail> = new EventEmitter();
+   @Output() onHistoryCopied: EventEmitter<SalesItemInfoRoot> = new EventEmitter();
 
    constructor(
-      private authService: AuthService,
       private searchItemService: SearchItemService,
+      private authService: AuthService,
       private commonService: CommonService,
       private configService: ConfigService,
       private toastService: ToastService,
-      private loadingService: LoadingService
+      private loadingService: LoadingService,
+      private modalController: ModalController
    ) { }
 
    ngOnChanges(changes: SimpleChanges): void {
@@ -74,7 +80,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    moduleControl: ModuleControl[] = [];
-   configOrderingActivateMOQControl: boolean;
+   configOrderingActivateMOQControl: boolean;   
+   configSalesTransactionShowHistory: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -111,23 +118,30 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.configOrderingActivateMOQControl = false;
          }
 
+         let salesTransactionShowHistory = this.moduleControl.find(x => x.ctrlName === "SalesTransactionShowHistory");
+         if (salesTransactionShowHistory && salesTransactionShowHistory.ctrlValue.toUpperCase() === 'Y') {
+            this.configSalesTransactionShowHistory = true;
+         } else {
+            this.configSalesTransactionShowHistory = false;
+         }
+
       })
    }
 
    /* #region  search item */
 
    itemSearchText: string;
-   availableItems: TransactionDetail[] = [];
+   availableItem: TransactionDetail[] = [];
    availableImages: ItemImage[] = [];
    searchTextChanged() {
-      this.availableItems = [];
+      this.availableItem = [];
       this.availableImages = [];
    }
 
    startIndex: number = 0;
    async searchItem(searchText: string, newSearch: boolean) {
       if (newSearch) {
-         this.availableItems = [];
+         this.availableItem = [];
       }
       this.itemSearchText = searchText;
       try {
@@ -147,21 +161,24 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
                let rrr = response;
                if (rrr && rrr.length > 0) {
-                  rrr.forEach(r => {
+                  rrr.forEach(async r => {
                      if (r.itemPricing !== null) {
-                        this.assignTrxItemToDataLine(r)
+                        await this.assignTrxItemToDataLine(r)
                      }
                   })
                } else {
-                  this.startIndex = this.availableItems.length;
+                  this.startIndex = this.availableItem.length;
                }
-               this.availableItems = [...this.availableItems, ...rrr];
+               this.availableItem = [...this.availableItem, ...rrr];
                await this.computeQtyInCart();
+               if (this.configSalesTransactionShowHistory && (this.isQuotation || this.isSalesOrder)) {
+                  await this.loadSalesHistory(newSearch);
+               }
                await this.loadingService.dismissLoading()
-               this.toastService.presentToast("Search Complete", `${this.availableItems.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+               this.toastService.presentToast("Search Complete", `${this.availableItem.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
             })
             if (Capacitor.getPlatform() !== "web") {
-               await this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItems
+               await this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItem
             }
          } else {
             await this.loadingService.dismissLoading()
@@ -173,6 +190,65 @@ export class ItemCatalogPage implements OnInit, OnChanges {
          console.error(e);
       } finally {
          await this.loadingService.dismissLoading()
+      }
+   }
+
+   availableSalesHistory: SalesItemInfoRoot[] = [];
+   loadSalesHistory(newSearch: boolean) {
+      if (newSearch) {
+         this.availableSalesHistory = []
+      }
+      let requestObject: SalesItemRequest = {
+         itemId: this.availableItem.flatMap(r => r.itemId),
+         search: null,
+         trxDate: this.commonService.getTodayDate(),
+         customerId: this.keyId,
+         locationId: this.objectHeader?.locationId ?? 0,
+         startIndex: this.startIndex,
+         size: this.itemListLoadSize
+      }
+      this.searchItemService.getSalesHistoryInfo(requestObject).subscribe({
+         next: (response) => {
+            console.log("🚀 ~ file: item-catalog.page.ts:200 ~ ItemCatalogPage ~ this.searchItemService.getSalesHistoryInfo ~ response:", response)
+            if (response && response.flatMap(r => r.historyInfo) && response.flatMap(r => r.historyInfo).length > 0) {
+               this.availableSalesHistory = [...this.availableSalesHistory, ...response];
+            }
+         },
+         error: (error) => {
+            console.error(error);
+         }
+      })
+   }
+
+   getSalesHistoryByItemId(itemId: number): SalesHistoryInfo[] {
+      let found = this.availableSalesHistory.filter(r => r.masterInfo.itemId === itemId);
+      if (found && found.length > 0) {
+         return found.flatMap(r => r.historyInfo);
+      }
+      return null;
+   }
+
+   getLatestSalesHistoryByItemId(itemId: number): SalesHistoryInfo {
+      let found = this.availableSalesHistory.filter(r => r.masterInfo.itemId === itemId);
+      if (found && found.length > 0) {
+         return found.flatMap(r => r.historyInfo)[0];
+      }
+      return null;
+   }
+
+   async showPriceHistoryModal(itemId: number) {
+      let found = this.getSalesHistoryByItemId(itemId);
+      if (found) {
+         const modal = await this.modalController.create({
+            component: ItemSalesHistoryPage,
+            componentProps: {
+               selectedHistory: found
+            },
+            canDismiss: true
+         })
+         modal.present();
+      } else {
+         this.toastService.presentToast("", "Sales History not found", "top", "warning", 1000);
       }
    }
 
@@ -205,9 +281,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    computeQtyInCart() {
-      console.log("🚀 ~ file: item-catalog.page.ts:211 ~ ItemCatalogPage ~ computeQtyInCart ~ this.itemInCart:", this.itemInCart)
-      if (this.availableItems && this.availableItems.length > 0) {
-         this.availableItems.forEach(r => {
+      if (this.availableItem && this.availableItem.length > 0) {
+         this.availableItem.forEach(r => {
             if (this.itemInCart.findIndex(rr => rr.itemId === r.itemId) > -1) {
                r.qtyInCart = this.itemInCart.filter(rr => rr.itemId === r.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
                if (r.variationTypeCode === "1" || r.variationTypeCode === "2") {
@@ -363,9 +438,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       let isBlock = this.validateNewItemConversion(data);
       if (!isBlock) {
          await this.validateMinOrderQty(data);
-         this.availableItems.find(r => r.itemId === data.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
+         this.availableItem.find(r => r.itemId === data.itemId).qtyInCart = this.availableItem.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + data.qtyRequest;
          setTimeout(() => {
             this.onItemAdded.emit(JSON.parse(JSON.stringify(data)));
+            if (this.configSalesTransactionShowHistory && (this.isQuotation || this.isSalesOrder)) {
+               if (this.availableSalesHistory.findIndex(r => r.masterInfo.itemId === data.itemId) > -1) {
+                  this.onHistoryCopied.emit(JSON.parse(JSON.stringify(this.availableSalesHistory.find(r => r.masterInfo.itemId === data.itemId))));
+               }
+            }
             data.qtyRequest = null;
          }, 10);
       }
@@ -385,7 +465,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
    showModal(data: TransactionDetail) {
-      this.selectedItem = JSON.parse(JSON.stringify(data));
+      this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.isModalOpen = true;
@@ -447,15 +527,18 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             await this.validateMinOrderQty(this.selectedItem);
             if (this.selectedItem.qtyRequest > 0) {
                // count total in cart
-               this.availableItems.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItems.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + this.selectedItem.qtyRequest;
+               this.availableItem.find(r => r.itemId === this.selectedItem.itemId).qtyInCart = this.availableItem.filter(r => r.itemId === this.selectedItem.itemId).flatMap(r => r.qtyInCart ?? 0).reduce((a, c) => a + c, 0) + this.selectedItem.qtyRequest;
                // count variation in cart
-               this.availableItems.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
+               this.availableItem.find(r => r.itemId === this.selectedItem.itemId).variationDetails.forEach(x => {
                   x.details.forEach(y => {
                      y.qtyInCart = (y.qtyInCart ?? 0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
                   })
                })
                setTimeout(() => {
                   this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
+                  if (this.isQuotation || this.isSalesOrder) {
+                     this.onHistoryCopied.emit(JSON.parse(JSON.stringify(this.availableSalesHistory.find(r => r.masterInfo.itemId === this.selectedItem.itemId))));
+                  }
                   this.hideModal();
                }, 10);
             } else {
@@ -505,7 +588,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       if (this.configOrderingActivateMOQControl) {
          if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B") {
             if (data.qtyRequest && data.minOrderQty && data.qtyRequest < data.minOrderQty) {
-               let sameItemInCart = this.availableItems.find(r => r.itemId === data.itemId);
+               let sameItemInCart = this.availableItem.find(r => r.itemId === data.itemId);
                if (sameItemInCart && (sameItemInCart.qtyInCart ?? 0) > 0) {
                   // check if qtyincart has same item if yes then check minorderqty again
                   if (data.qtyRequest && data.minOrderQty && (data.qtyRequest + (sameItemInCart.qtyInCart ?? 0)) < data.minOrderQty) {

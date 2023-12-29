@@ -6,6 +6,7 @@ import Decimal from 'decimal.js';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
@@ -76,6 +77,19 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
       }
    }
 
+   onHistoryCopied(event: SalesItemInfoRoot) {
+      try {
+         if (event) {
+            if (this.objectService.objectSalesHistory === null || this.objectService.objectSalesHistory === undefined) {
+               this.objectService.objectSalesHistory = [];
+            }
+            this.objectService.objectSalesHistory = [...this.objectService.objectSalesHistory, event];
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
    assignSequence() {
       let index = 0;
       this.objectService.objectDetail.forEach(r => {
@@ -94,15 +108,6 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
    showImage: boolean = false;
    toggleShowImage() {
       this.showImage = !this.showImage;
-   }
-
-   /* #endregion */
-
-   /* #region toggle show available qty */
-
-   showAvailQty: boolean = false;
-   toggleShowAvailQty() {
-      this.showAvailQty = !this.showAvailQty;
    }
 
    /* #endregion */

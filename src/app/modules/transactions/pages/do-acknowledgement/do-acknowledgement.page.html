@@ -16,7 +16,7 @@
 
          <app-search-multi-dropdown title="Vehicle" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" [searchDropdownList]="vehicleSearchDropdownList" (onActionComplete)="onVechicleSelected($event)"></app-search-multi-dropdown>
          
-         <app-general-scan-input #ctln placeholder="Carton Truck Loading Num" [clearSearchValue]="false" (onScanCompleted)="onCTLNChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onCTLNDoneScanning($event)"></app-general-scan-input>
+         <app-general-scan-input #ctln placeholder="Truck Arrangement Num" [clearSearchValue]="false" (onScanCompleted)="onCTLNChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onCTLNDoneScanning($event)"></app-general-scan-input>
          
          <app-general-scan-input #don placeholder="Delivery Order Num" [clearSearchValue]="false" (onScanCompleted)="onDONChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDONDoneScanning($event)"></app-general-scan-input>
 

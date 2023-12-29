@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import Decimal from 'decimal.js';
+import { AlertController, IonPopover, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationRoot } from 'src/app/modules/transactions/models/quotation';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -11,15 +10,20 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
+import { SalesItemRequest } from 'src/app/shared/models/sales-item-request';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
+import { ItemSalesHistoryPage } from 'src/app/shared/pages/item-sales-history/item-sales-history.page';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { GeneralTransactionService } from 'src/app/shared/services/general-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
+import { SearchItemService } from 'src/app/shared/services/search-item.service';
 
 @Component({
    selector: 'app-quotation-cart',
    templateUrl: './quotation-cart.page.html',
    styleUrls: ['./quotation-cart.page.scss'],
+   providers: [SearchItemService, GeneralTransactionService, { provide: 'apiObject', useValue: 'mobileQuotation' }]
 })
 export class QuotationCartPage implements OnInit, ViewWillEnter {
 
@@ -33,10 +37,12 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       public configService: ConfigService,
       private commonService: CommonService,
       private promotionEngineService: PromotionEngineService,
+      private searchItemService: SearchItemService,
       private toastService: ToastService,
       private loadingService: LoadingService,
       private alertController: AlertController,
-      private navController: NavController
+      private navController: NavController,
+      private modalController: ModalController
    ) {
       if (Capacitor.getPlatform() === "android") {
          this.inputType = "number";
@@ -48,11 +54,37 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       await this.objectService.loadRequiredMaster();
-      // if (this.objectService.salesActivatePromotionEngine) {
-      //    await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-      // }
-      this.loadRestrictColumms();
-      this.loadAvailableAddresses();
+      if (this.objectService.objectHeader && this.objectService.objectHeader.quotationId > 0) {
+         await this.loadSalesHistory();
+      }
+      await this.loadRestrictColumms();
+      await this.loadAvailableAddresses();
+   }
+
+   loadSalesHistory() {
+      if (this.objectService.configSalesTransactionShowHistory) {
+         if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+            let requestObject: SalesItemRequest = {
+               itemId: this.objectService.objectDetail.flatMap(r => r.itemId),
+               search: null,
+               trxDate: this.commonService.getTodayDate(),
+               customerId: this.objectService.objectHeader.customerId,
+               locationId: this.objectService.objectHeader.locationId ?? 0,
+               startIndex: null,
+               size: null
+            }
+            this.searchItemService.getSalesHistoryInfo(requestObject).subscribe({
+               next: (response) => {
+                  if (response && response.flatMap(r => r.historyInfo) && response.flatMap(r => r.historyInfo).length > 0) {
+                     this.objectService.objectSalesHistory = [...this.objectService.objectSalesHistory, ...response];
+                  }
+               },
+               error: (error) => {
+                  console.error(error);
+               }
+            })
+         }
+      }
    }
 
    ngOnInit() {
@@ -100,142 +132,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       }
    }
 
-   /* #region  modal to edit each item */
-
-   isModalOpen: boolean = false;
-   selectedItem: TransactionDetail;
-   selectedIndex: number;
-   showEditModal(data: TransactionDetail, rowIndex: number) {
-      this.selectedItem = JSON.parse(JSON.stringify(data));
-      // this.selectedItem = data;
-      this.selectedIndex = rowIndex;
-      this.isModalOpen = true;
-   }
-
-   async saveChanges() {
-      if (this.selectedIndex === null || this.selectedIndex === undefined) {
-         this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
-         return;
-      } else {
-         let hasQtyError: boolean = false;
-         let totalQty: number = 0;
-         if (this.selectedItem.variationTypeCode === "0") {
-            hasQtyError = (this.selectedItem.qtyRequest ?? 0) <= 0;
-         } else {
-            this.selectedItem.variationDetails.forEach(r => {
-               r.details.forEach(rr => {
-                  totalQty += (rr.qtyRequest ?? 0)
-               })
-            })
-            hasQtyError = totalQty <= 0;
-         }
-         if (hasQtyError) {
-            this.toastService.presentToast("Controll Error", "Invalid quantity", "top", "warning", 1000);
-         } else {
-            this.objectService.objectDetail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-            await this.computeDiscTaxAmount(this.objectService.objectDetail[this.selectedIndex]);
-            if (this.objectService.salesActivateTradingMargin) {
-               this.computeTradingMarginAmount(this.objectService.objectDetail[this.selectedIndex]);
-            }
-            this.hideEditModal();
-            if (this.selectedItem.isPricingApproval) {
-               this.objectService.objectHeader.isPricingApproval = true;
-            }
-         }
-      }
-   }
-
-   async cancelChanges() {
-      try {
-         const alert = await this.alertController.create({
-            cssClass: "custom-alert",
-            header: "Are you sure to discard changes?",
-            buttons: [
-               {
-                  text: "OK",
-                  role: "confirm",
-                  cssClass: "success",
-                  handler: () => {
-                     this.isModalOpen = false;
-                  },
-               },
-               {
-                  text: "Cancel",
-                  role: "cancel",
-                  handler: () => {
-
-                  }
-               },
-            ],
-         });
-         await alert.present();
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   hideEditModal() {
-      this.isModalOpen = false;
-   }
-
-   async onModalHide() {
-      this.selectedIndex = null;
-      this.selectedItem = null;
-      if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-         await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-      }
-   }
-
-   /* #endregion */
-
-   /* #region  edit qty */
-
-   computeQty() {
-      try {
-         if (this.selectedItem.variationTypeCode === "1" || this.selectedItem.variationTypeCode === "2") {
-            var totalQty = 0;
-            if (this.selectedItem.variationDetails) {
-               this.selectedItem.variationDetails.forEach(x => {
-                  x.details.forEach(y => {
-                     if (y.qtyRequest && y.qtyRequest < 0) {
-                        this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
-                     }
-                     totalQty = totalQty + y.qtyRequest;
-                  });
-               })
-            }
-            this.selectedItem.qtyRequest = totalQty;
-            this.computeAllAmount(this.selectedItem);
-         }
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   decreaseVariationQty(data: InnerVariationDetail) {
-      try {
-         if ((data.qtyRequest - 1) < 0) {
-            data.qtyRequest = 0;
-         } else {
-            data.qtyRequest -= 1;
-         }
-         this.computeQty();
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   increaseVariationQty(data: InnerVariationDetail) {
-      try {
-         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-         this.computeQty();
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   /* #endregion */
-
    /* #region  extra info e.g. shipping and address */
 
    isExtraInfoModal: boolean = false;
@@ -269,148 +165,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
          }
       } catch (e) {
          console.error(e);
-      }
-   }
-
-   /* #endregion */
-
-   /* #region  delete item */
-
-   async presentDeleteItemAlert(data: TransactionDetail, index: number) {
-      try {
-         const alert = await this.alertController.create({
-            cssClass: "custom-alert",
-            header: "Are you sure to delete?",
-            buttons: [
-               {
-                  text: "OK",
-                  role: "confirm",
-                  cssClass: "danger",
-                  handler: () => {
-                     this.removeItem(data, index);
-                  },
-               },
-               {
-                  text: "Cancel",
-                  role: "cancel",
-                  handler: () => {
-
-                  }
-               },
-            ],
-         });
-         await alert.present();
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   async removeItem(data: TransactionDetail, index: number) {
-      try {
-         await this.objectService.objectDetail.splice(index, 1);
-         if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-            await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-         }
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   /* #endregion */
-
-   /* #region  unit price, tax, discount */
-
-   computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
-      try {
-         trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax));
-         trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
-         this.computeDiscTaxAmount(trxLine);
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
-      try {
-         trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax));
-         trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
-         this.computeDiscTaxAmount(trxLine);
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   computeDiscTaxAmount(trxLine: TransactionDetail) {
-      try {
-         trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
-      try {
-         let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
-         if (discPct) {
-            if (discPct === "0") {
-               trxLine.discountExpression = null;
-            } else {
-               trxLine.discountExpression = discPct + "%";
-            }
-            this.computeAllAmount(trxLine);
-         }
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   async computeAllAmount(trxLine: TransactionDetail) {
-      trxLine.qtyRequest = Number(trxLine.qtyRequest.toFixed(0));
-      try {
-         if (trxLine.qtyRequest <= 0) {
-            this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
-         } else {
-            if (trxLine.assembly && trxLine.assembly.length > 0) {
-               this.computeAssemblyQty(trxLine);
-            }
-            await this.computeDiscTaxAmount(trxLine);
-            if (this.objectService.salesActivateTradingMargin) {
-               this.computeTradingMarginAmount(trxLine);
-            }
-            if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-               await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-            }
-         }
-         this.computeDiscTaxAmount(trxLine);
-      } catch (e) {
-         console.error(e);
-      }
-   }
-
-   computeAssemblyQty(trxLine: TransactionDetail) {
-      trxLine.assembly.forEach(assembly => {
-         if (trxLine.qtyRequest) {
-            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
-         } else {
-            assembly.qtyRequest = null;
-         }
-      });
-   }
-
-   computeTradingMarginAmount(trxLine: TransactionDetail) {
-      trxLine = this.commonService.computeTradingMargin(trxLine, this.objectService.systemWideActivateTaxControl, trxLine.taxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
-   }
-
-   getPromoDesc(promoEventId: number) {
-      if (this.objectService.promotionMaster.length > 0) {
-         let find = this.objectService.promotionMaster.find(x => x.promoEventId === promoEventId);
-         if (find) {
-            return find.description;
-         } else {
-            return null;
-         }
-      } else {
-         return null;
       }
    }
 
@@ -530,12 +284,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
 
    /* #region  misc */
 
-   highlight(event) {
-      event.getInputElement().then(r => {
-         r.select();
-      })
-   }
-
    checkPricingApprovalLines(trxDto: QuotationRoot, trxLineArray: TransactionDetail[]) {
       if (trxDto.header.businessModelType === "R" || trxDto.header.businessModelType === "C") {
          trxDto.header.isPricingApproval = false;
@@ -550,56 +298,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
          }
       }
       return trxDto;
-   }
-
-   onPricingApprovalSwitch(event: any) {
-      if (event.detail.checked) {
-         switch (this.objectService.orderingPriceApprovalEnabledFields) {
-            case "0":
-               if (this.restrictTrxFields.unitPrice) {
-                  this.restrictTrxFields.unitPrice = false;
-               }
-               if (this.restrictTrxFields.unitPriceExTax) {
-                  this.restrictTrxFields.unitPriceExTax = false;
-               }
-               if (this.restrictTrxFields.discountExpression) {
-                  this.restrictTrxFields.discountExpression = false;
-               }
-               if (this.restrictTrxFields.discountGroupCode) {
-                  this.restrictTrxFields.discountGroupCode = false;
-               }
-               break;
-            case "1":
-               if (this.restrictTrxFields.unitPrice) {
-                  this.restrictTrxFields.unitPrice = false;
-               }
-               if (this.restrictTrxFields.unitPriceExTax) {
-                  this.restrictTrxFields.unitPriceExTax = false;
-               }
-               break;
-            case "2":
-               if (this.restrictTrxFields.discountExpression) {
-                  this.restrictTrxFields.discountExpression = false;
-               }
-               if (this.restrictTrxFields.discountGroupCode) {
-                  this.restrictTrxFields.discountGroupCode = false;
-               }
-               break;
-         }
-      } else {
-         if (this.restrictTrxFields.unitPrice === false) {
-            this.restrictTrxFields.unitPrice = true;
-         }
-         if (this.restrictTrxFields.unitPriceExTax === false) {
-            this.restrictTrxFields.unitPriceExTax = true;
-         }
-         if (this.restrictTrxFields.discountExpression === false) {
-            this.restrictTrxFields.discountExpression = true;
-         }
-         if (this.restrictTrxFields.discountGroupCode === false) {
-            this.restrictTrxFields.discountGroupCode = true;
-         }
-      }
    }
 
    /* #endregion */
@@ -617,48 +315,67 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       }
    }
 
-   isPricingPopoverOpen: boolean = false;
-   @ViewChild("pricingPopover", { static: false }) pricingPopover: IonPopover;
-   showPricingPopover(event) {
-      try {
-         this.pricingPopover.event = event;
-         this.isPricingPopoverOpen = true;
-      } catch (e) {
-         console.error(e);
+   /* #endregion */
+
+   sendForDebug() {
+      let trxDto: QuotationRoot = {
+         header: this.objectService.objectHeader,
+         details: this.objectService.objectDetail
       }
+      let jsonObjectString = JSON.stringify(trxDto);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status == 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
    }
 
-	/* #endregion */
+   // async onDisablePromotionCheck(event: any) {
+   //    if (event.detail.checked) {
+   //       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.priceModel.qtyRequest > 0).flatMap(r => r.priceModel), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
+   //    } else {
+   //       this.objectService.objectDetail.forEach(async line => {
+   //          line.priceModel = this.commonService.reversePromoImpact(line.priceModel);
+   //          await this.computeDiscTaxAmount(line.priceModel);
+   //       })
+   //    }
+   // }
 
-	sendForDebug() {
-		let trxDto: QuotationRoot = {
-			header: this.objectService.objectHeader,
-			details: this.objectService.objectDetail
-		}
-		let jsonObjectString = JSON.stringify(trxDto);
-		let debugObject: JsonDebug = {
-			jsonDebugId: 0,
-			jsonData: jsonObjectString
-		};
-		this.objectService.sendDebug(debugObject).subscribe(response => {
-			if (response.status == 200) {
-				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
-			}
-		}, error => {
-			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
-			console.log(error);
-		});
+   onLineEditComplete(event: TransactionDetail[]) {
+      this.objectService.objectDetail = JSON.parse(JSON.stringify(event));
+   }
+   
+   /* #region toggle show latest price */
+
+   toggleShowLatestPrice() {
+      this.objectService.showLatestPrice = !this.objectService.showLatestPrice;
    }
 
-   async onDisablePromotionCheck(event: any) {
-      if (event.detail.checked) {
-         await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-      } else {
-         this.objectService.objectDetail.forEach(async line => {
-            line = this.commonService.reversePromoImpact(line);
-            await this.computeDiscTaxAmount(line);
-         })
+   /* #endregion */
+
+   getLatestHistory(history: SalesItemInfoRoot) {
+      if (history.historyInfo && history.historyInfo.length > 0) {
+         return history.historyInfo[0];
       }
+      return null;
+   }
+
+   async showPriceHistoryModal(history: SalesItemInfoRoot) {
+      const modal = await this.modalController.create({
+         component: ItemSalesHistoryPage,
+         componentProps: {
+            selectedHistory: history
+         },
+         canDismiss: true
+      })
+      modal.present();
    }
 
 }

@@ -39,7 +39,7 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
    ) { }
 
    ionViewWillEnter(): void {
-      this.objectService.loadRequiredMaster();
+      // this.objectService.loadRequiredMaster();
       this.route.queryParams.subscribe(params => {
          this.objectId = params["objectId"];
          this.processType = params["processType"];
@@ -135,7 +135,7 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
 
    selectedItem: TransactionDetail;
    showDetails(item: TransactionDetail) {
-      this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      // this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;
    }
 

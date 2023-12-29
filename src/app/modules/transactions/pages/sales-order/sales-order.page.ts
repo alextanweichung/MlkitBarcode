@@ -13,292 +13,293 @@ import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
-  selector: 'app-sales-order',
-  templateUrl: './sales-order.page.html',
-  styleUrls: ['./sales-order.page.scss']
+   selector: 'app-sales-order',
+   templateUrl: './sales-order.page.html',
+   styleUrls: ['./sales-order.page.scss']
 })
 export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
-  private objectDiffer: any;
-  objects: SalesOrderList[] = [];
-  draftObjects: DraftTransaction[] = [];
+   private objectDiffer: any;
+   objects: SalesOrderList[] = [];
+   draftObjects: DraftTransaction[] = [];
 
-  startDate: Date;
-  endDate: Date;
-  customerIds: number[] = [];
-  salesAgentIds: number[] = [];
+   startDate: Date;
+   endDate: Date;
+   customerIds: number[] = [];
+   salesAgentIds: number[] = [];
 
-  uniqueGrouping: Date[] = [];
+   uniqueGrouping: Date[] = [];
 
-  constructor(
-    private authService: AuthService,
-    private commonService: CommonService,
-    private objectService: SalesOrderService,
-    private toastService: ToastService,
-    private loadingService: LoadingService,
-    private actionSheetController: ActionSheetController,
-    private alertController: AlertController,
-    private modalController: ModalController,
-    private navController: NavController,
-    private differs: IterableDiffers
-  ) {
-    // reload all masterlist whenever user enter listing
-    this.objectDiffer = this.differs.find(this.objects).create();
-  }
+   constructor(
+      private authService: AuthService,
+      private commonService: CommonService,
+      private objectService: SalesOrderService,
+      private toastService: ToastService,
+      private loadingService: LoadingService,
+      private actionSheetController: ActionSheetController,
+      private alertController: AlertController,
+      private modalController: ModalController,
+      private navController: NavController,
+      private differs: IterableDiffers
+   ) {
+      // reload all masterlist whenever user enter listing
+      this.objectDiffer = this.differs.find(this.objects).create();
+   }
 
-  ngDoCheck(): void {
-    const objectChanges = this.objectDiffer.diff(this.objects);
-    if (objectChanges) {
-      this.bindUniqueGrouping();
-    }
-  }
-
-  ionViewWillEnter(): void {
-    this.objectService.resetVariables();
-    this.objectService.loadRequiredMaster();
-    this.objects = []; // clear list when enter
-    if (!this.startDate) {
-      this.startDate = this.commonService.getFirstDayOfTodayMonth();
-    }
-    if (!this.endDate) {
-      this.endDate = this.commonService.getTodayDate();
-    }
-  }
-
-  async ionViewDidEnter(): Promise<void> {
-    if (this.showDraftOnly) {
-      await this.loadDraftObjects();
-    } else {
-      await this.loadObjects();
-      await this.loadDraftObjects();
-    }
-  }
-
-  ngOnInit() {
-
-  }
-
-  /* #region  crud */
-
-  async loadObjects() {
-    try {
-      await this.loadingService.showLoading();
-      let obj: SalesSearchModal = {
-        dateStart: format(this.startDate, "yyyy-MM-dd"),
-        dateEnd: format(this.endDate, "yyyy-MM-dd"),
-        customerId: this.customerIds,
-        salesAgentId: this.salesAgentIds
+   ngDoCheck(): void {
+      const objectChanges = this.objectDiffer.diff(this.objects);
+      if (objectChanges) {
+         this.bindUniqueGrouping();
       }
-      this.objectService.getObjectListByDate(obj).subscribe(async response => {
-        this.objects = [...this.objects, ...response];
-        await this.loadingService.dismissLoading();
-        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-      }, async error => {
-        await this.loadingService.dismissLoading();
-        console.log(error);
-      })
-    } catch (error) {
-      await this.loadingService.dismissLoading();
-      this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
-    } finally {
-      await this.loadingService.dismissLoading();
-    }
-  }
+   }
 
-  async loadDraftObjects() {
-    try {
-      await this.loadingService.showLoading();
-      this.objectService.getDraftObjects().subscribe(async response => {
-        this.draftObjects = response;
-        for (let index = 0; index < this.draftObjects.length; index++) {
-          const element = this.draftObjects[index];
-          let objRoot: SalesOrderRoot = JSON.parse(element.jsonData);
-          objRoot.header = this.commonService.convertObjectAllDateType(objRoot.header);
-          let obj: SalesOrderList = {
-            salesOrderId: objRoot.header.salesOrderId,
-            salesOrderNum: element.draftTransactionNum,
-            trxDate: objRoot.header.trxDate,
-            customerCode: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.code,
-            customerName: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.description,
-            salesAgentName: await this.objectService.salesAgentMasterList.find(r => r.id === objRoot.header.salesAgentId)?.description,
-            countryDescription: null,
-            currencyCode: await this.objectService.currencyMasterList.find(r => r.id === objRoot.header.currencyId)?.code,
-            grandTotal: objRoot.details.flatMap(r => r.subTotal).reduce((a, c) => a + c, 0),
-            qty: objRoot.details.flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0),
-            otherAmountCount: objRoot.otherAmount?.length,
-            deactivated: objRoot.header.deactivated,
-            createdById: objRoot.header.createdById,
-            isDraft: true,
-            draftTransactionId: element.draftTransactionId
-          }
-          this.objects = [...this.objects, obj];
-        }
-        await this.loadingService.dismissLoading();
-        this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-      }, async error => {
-        await this.loadingService.dismissLoading();
-        console.log(error);
-      })
-    } catch (error) {
-      await this.loadingService.dismissLoading();
-      this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
-    } finally {
-      await this.loadingService.dismissLoading();
-    }
-  }
+   async ionViewWillEnter(): Promise<void> {
+      if (!this.startDate) {
+         this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      }
+      if (!this.endDate) {
+         this.endDate = this.commonService.getTodayDate();
+      }
+      await this.objectService.loadRequiredMaster();
+      await this.objectService.resetVariables();
+      this.objects = []; // clear list when enter
+   }
 
-  getObjects(date: Date) {
-    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-  }
+   async ionViewDidEnter(): Promise<void> {
+      if (this.showDraftOnly) {
+         await this.loadDraftObjects();
+      } else {
+         await this.loadObjects();
+         await this.loadDraftObjects();
+      }
+   }
 
-  async bindUniqueGrouping() {
-    let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-    this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-    await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-  }
+   ngOnInit() {
 
-  /* #endregion */
+   }
 
-  /* #region  add quotation */
+   /* #region  crud */
 
-  async addObject() {
-    try {
-      // if (this.objectService.hasSalesAgent()) {
-      this.navController.navigateForward("/transactions/sales-order/sales-order-header");
-      // } else {
-      //   this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);
-      // }
-    } catch (e) {
-      console.error(e);
-    }
-  }
+   async loadObjects() {
+      try {
+         await this.loadingService.showLoading();
+         let obj: SalesSearchModal = {
+            dateStart: format(this.startDate, "yyyy-MM-dd"),
+            dateEnd: format(this.endDate, "yyyy-MM-dd"),
+            customerId: this.customerIds,
+            salesAgentId: this.salesAgentIds
+         }
+         this.objectService.getObjectListByDate(obj).subscribe(async response => {
+            this.objects = [...this.objects, ...response];
+            await this.loadingService.dismissLoading();
+            this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+         }, async error => {
+            await this.loadingService.dismissLoading();
+            console.log(error);
+         })
+      } catch (error) {
+         console.log(error);
+         await this.loadingService.dismissLoading();
+         this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
+   }
 
-  // Select action
-  async selectAction() {
-    try {
-      const actionSheet = await this.actionSheetController.create({
-        header: "Choose an action",
-        cssClass: "custom-action-sheet",
-        buttons: [
-          {
-            text: "Add Sales Order",
-            icon: "document-outline",
-            handler: () => {
-              this.addObject();
+   async loadDraftObjects() {
+      try {
+         await this.loadingService.showLoading();
+         this.objectService.getDraftObjects().subscribe(async response => {
+            this.draftObjects = response;
+            for (let index = 0; index < this.draftObjects.length; index++) {
+               const element = this.draftObjects[index];
+               let objRoot: SalesOrderRoot = JSON.parse(element.jsonData);
+               objRoot.header = this.commonService.convertObjectAllDateType(objRoot.header);
+               let obj: SalesOrderList = {
+                  salesOrderId: objRoot.header.salesOrderId,
+                  salesOrderNum: element.draftTransactionNum,
+                  trxDate: objRoot.header.trxDate,
+                  customerCode: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.code,
+                  customerName: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.description,
+                  salesAgentName: await this.objectService.salesAgentMasterList.find(r => r.id === objRoot.header.salesAgentId)?.description,
+                  countryDescription: null,
+                  currencyCode: await this.objectService.currencyMasterList.find(r => r.id === objRoot.header.currencyId)?.code,
+                  grandTotal: objRoot.details.flatMap(r => r.subTotal).reduce((a, c) => a + c, 0),
+                  qty: objRoot.details.flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0),
+                  otherAmountCount: objRoot.otherAmount?.length,
+                  deactivated: objRoot.header.deactivated,
+                  createdById: objRoot.header.createdById,
+                  isDraft: true,
+                  draftTransactionId: element.draftTransactionId
+               }
+               this.objects = [...this.objects, obj];
             }
-          },
-          {
-            text: "Cancel",
-            icon: "close",
-            role: "cancel"
-          }]
-      });
-      await actionSheet.present();
-    } catch (e) {
-      console.error(e);
-    }
-  }
+            await this.loadingService.dismissLoading();
+            this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+         }, async error => {
+            await this.loadingService.dismissLoading();
+            console.log(error);
+         })
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
+   }
 
-  /* #endregion */
+   getObjects(date: Date) {
+      return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
+   }
 
-  /* #region download pdf */
+   async bindUniqueGrouping() {
+      let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
+      this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
+      await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+   }
 
-  async presentAlertViewPdf(doc) {
-    try {
-      const alert = await this.alertController.create({
-        header: "Download PDF?",
-        message: "",
-        buttons: [
-          {
-            text: "OK",
-            cssClass: "success",
-            role: "confirm",
-            handler: async () => {
-              await this.downloadPdf(doc);
+   /* #endregion */
+
+   /* #region  add quotation */
+
+   async addObject() {
+      try {
+         // if (this.objectService.hasSalesAgent()) {
+         this.navController.navigateForward("/transactions/sales-order/sales-order-header");
+         // } else {
+         //   this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);
+         // }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   // Select action
+   async selectAction() {
+      try {
+         const actionSheet = await this.actionSheetController.create({
+            header: "Choose an action",
+            cssClass: "custom-action-sheet",
+            buttons: [
+               {
+                  text: "Add Sales Order",
+                  icon: "document-outline",
+                  handler: () => {
+                     this.addObject();
+                  }
+               },
+               {
+                  text: "Cancel",
+                  icon: "close",
+                  role: "cancel"
+               }]
+         });
+         await actionSheet.present();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
+
+   /* #region download pdf */
+
+   async presentAlertViewPdf(doc) {
+      try {
+         const alert = await this.alertController.create({
+            header: "Download PDF?",
+            message: "",
+            buttons: [
+               {
+                  text: "OK",
+                  cssClass: "success",
+                  role: "confirm",
+                  handler: async () => {
+                     await this.downloadPdf(doc);
+                  },
+               },
+               {
+                  cssClass: "cancel",
+                  text: "Cancel",
+                  role: "cancel"
+               },
+            ]
+         });
+         await alert.present();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async downloadPdf(doc) {
+      try {
+         this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId, "Proforma Invoice").subscribe(response => {
+            let filename = doc.salesOrderNum + ".pdf";
+            this.commonService.commonDownloadPdf(response, filename);
+         }, error => {
+            console.error(error);
+         })
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
+
+   showDraftOnly: boolean = false;
+   async filter() {
+      try {
+         const modal = await this.modalController.create({
+            component: FilterPage,
+            componentProps: {
+               startDate: this.startDate,
+               endDate: this.endDate,
+               customerFilter: true,
+               customerList: this.objectService.customerSearchDropdownList,
+               selectedCustomerId: this.customerIds,
+               salesAgentFilter: true,
+               salesAgentList: this.objectService.salesAgentDropdownList,
+               selectedSalesAgentId: this.salesAgentIds,
+               useDraft: true,
+               showDraftOnly: this.showDraftOnly
             },
-          },
-          {
-            cssClass: "cancel",
-            text: "Cancel",
-            role: "cancel"
-          },
-        ]
-      });
-      await alert.present();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async downloadPdf(doc) {
-    try {
-      this.objectService.downloadPdf("SMSC002", "pdf", doc.salesOrderId, "Proforma Invoice").subscribe(response => {
-        let filename = doc.salesOrderNum + ".pdf";
-        this.commonService.commonDownloadPdf(response, filename);
-      }, error => {
-        console.error(error);
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  /* #endregion */
-
-  showDraftOnly: boolean = false;
-  async filter() {
-    try {
-      const modal = await this.modalController.create({
-        component: FilterPage,
-        componentProps: {
-          startDate: this.startDate,
-          endDate: this.endDate,
-          customerFilter: true,
-          customerList: this.objectService.customerSearchDropdownList,
-          selectedCustomerId: this.customerIds,
-          salesAgentFilter: true,
-          salesAgentList: this.objectService.salesAgentDropdownList,
-          selectedSalesAgentId: this.salesAgentIds,
-          useDraft: true,
-          showDraftOnly: this.showDraftOnly
-        },
-        canDismiss: true
-      })
-      await modal.present();
-      let { data } = await modal.onWillDismiss();
-      if (data && data !== undefined) {
-        this.objects = [];
-        this.uniqueGrouping = [];
-        this.startDate = new Date(data.startDate);
-        this.endDate = new Date(data.endDate);
-        this.customerIds = data.customerIds;
-        this.salesAgentIds = data.salesAgentIds;
-        this.showDraftOnly = data.showDraftOnly ?? false;
-        if (data.showDraftOnly) {
-          this.loadDraftObjects();
-        } else {
-          await this.loadObjects();
-          await this.loadDraftObjects();
-        }
+            canDismiss: true
+         })
+         await modal.present();
+         let { data } = await modal.onWillDismiss();
+         if (data && data !== undefined) {
+            this.objects = [];
+            this.uniqueGrouping = [];
+            this.startDate = new Date(data.startDate);
+            this.endDate = new Date(data.endDate);
+            this.customerIds = data.customerIds;
+            this.salesAgentIds = data.salesAgentIds;
+            this.showDraftOnly = data.showDraftOnly ?? false;
+            if (data.showDraftOnly) {
+               this.loadDraftObjects();
+            } else {
+               await this.loadObjects();
+               await this.loadDraftObjects();
+            }
+         }
+      } catch (e) {
+         console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
-  }
+   }
 
-  goToDetail(objectId: number, isDraft: boolean, draftTransactionId: number) {
-    try {
-      let navigationExtras: NavigationExtras = {
-        queryParams: {
-          objectId: objectId,
-          isDraft: isDraft,
-          draftTransactionId: draftTransactionId
-        }
+   goToDetail(objectId: number, isDraft: boolean, draftTransactionId: number) {
+      try {
+         let navigationExtras: NavigationExtras = {
+            queryParams: {
+               objectId: objectId,
+               isDraft: isDraft,
+               draftTransactionId: draftTransactionId
+            }
+         }
+         this.navController.navigateForward("/transactions/sales-order/sales-order-detail", navigationExtras);
+      } catch (e) {
+         console.error(e);
       }
-      this.navController.navigateForward("/transactions/sales-order/sales-order-detail", navigationExtras);
-    } catch (e) {
-      console.error(e);
-    }
-  }
+   }
 
 }

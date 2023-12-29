@@ -42,14 +42,14 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
   ) { }
 
   async ionViewWillEnter(): Promise<void> {
-    // reload all masterlist whenever user enter listing
-    await this.objectService.loadRequiredMaster();
     if (!this.startDate) {
       this.startDate = this.commonService.getFirstDayOfTodayMonth();
     }
     if (!this.endDate) {
       this.endDate = this.commonService.getTodayDate();
     }
+    // reload all masterlist whenever user enter listing
+    await this.objectService.loadRequiredMaster();
     this.loadObjects();
   }
 

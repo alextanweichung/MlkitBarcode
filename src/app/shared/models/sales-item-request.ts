@@ -1,4 +1,5 @@
 export interface SalesItemRequest {
+   itemId?: number[]
    search: string
    trxDate: Date
    customerId: number

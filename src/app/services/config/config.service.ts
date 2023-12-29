@@ -61,6 +61,7 @@ export class ConfigService {
                // apiUrl: "https://tfsb-sys.com:1000/api/",
                // apiUrl: "https://adt-sys.com/api/",
                // apiUrl: "https://rcb-sys.com/api/",
+               // apiUrl: "https://test.pmkt-erp.com/api/",
                imgUrl: null,
                lastDownloadAt: null
             })

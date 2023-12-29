@@ -97,15 +97,6 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
    /* #endregion */
 
-   /* #region toggle show available qty */
-
-   showAvailQty: boolean = false;
-   toggleShowAvailQty() {
-      this.showAvailQty = !this.showAvailQty;
-   }
-
-   /* #endregion */
-
    /* #region more action popover */
 
    isPopoverOpen: boolean = false;
