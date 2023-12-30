@@ -290,8 +290,8 @@ export class CommonService {
          } else {
             trxLine.unitPriceExTax = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).toNumber();
          }
-         trxLine.unitPriceExTax = trxLine.unitPriceExTax.toDecimalPlaces(roundingPrecision);
-         return trxLine.unitPriceExTax.toNumber();
+         // trxLine.unitPriceExTax = trxLine.unitPriceExTax.toDecimalPlaces(roundingPrecision);
+         return new Decimal(trxLine.unitPriceExTax ? trxLine.unitPriceExTax : 0).toDecimalPlaces(roundingPrecision).toNumber();
       } catch (e) {
          console.error(e);
       }
@@ -304,8 +304,8 @@ export class CommonService {
          } else {
             trxLine.unitPrice = new Decimal(trxLine.unitPriceExTax ? trxLine.unitPriceExTax : 0);
          }
-         trxLine.unitPrice = trxLine.unitPrice.toDecimalPlaces(roundingPrecision);
-         return trxLine.unitPrice.toNumber();
+         // trxLine.unitPrice = trxLine.unitPrice.toDecimalPlaces(roundingPrecision);
+         return new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).toDecimalPlaces(roundingPrecision).toNumber();
       } catch (e) {
          console.error(e);
       }
