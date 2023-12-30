@@ -183,8 +183,6 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
          } else {
             this.objectService.getSOHeader([input]).subscribe(response => {
-               console.log("🚀 ~ file: packing-header.page.ts:190 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ response:", JSON.stringify(response))
-               console.log("🚀 ~ file: packing-header.page.ts:190 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ response:", response)
                if (response.status === 200) {
                   let doc = response.body[0] as SalesOrderHeaderForWD;
                   if (doc === undefined) {
@@ -208,7 +206,6 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                      this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
                   }
                   this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
-                  console.log("🚀 ~ file: packing-header.page.ts:215 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPackingObject.outstandingPackList:", this.objectService.multiPackingObject.outstandingPackList)
                   this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
                      if (r.multiPackingOutstandingId === null) r.multiPackingOutstandingId = 0;
                      r.multiPackingId = this.objectForm.controls.multiPackingId.value;

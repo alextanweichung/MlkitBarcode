@@ -111,7 +111,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             return;
          }
          let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemSku == itemFound.itemSku);
-         console.log("🚀 ~ file: packing-item.page.ts:103 ~ PackingItemPage ~ runPackingEngine ~ outstandingLines:", JSON.stringify(outstandingLines));
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
@@ -181,7 +180,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          let mainItemFound = this.objectService.multiPackingObject.outstandingPackList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
          let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
          let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
-         console.log("🚀 ~ file: packing-item.page.ts:150 ~ PackingItemPage ~ runAssemblyPackingEngine ~ assemblyOutstandingLines:", JSON.stringify(assemblyOutstandingLines))
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
             let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
@@ -298,10 +296,8 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    }
 
    insertAssemblyPackingLine(itemFound: TransactionDetail, inputQty: number, outstandingLines: SalesOrderLineForWD[], assemblyItemId: number) {
-      console.log("🚀 ~ file: packing-item.page.ts:199 ~ PackingItemPage ~ insertAssemblyPackingLine ~ inputQty:", inputQty)
       //When scanning the same item, add the quantity to first line, instead of adding new row
       let packingCartonTag = this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
-      console.log("🚀 ~ file: packing-item.page.ts:202 ~ PackingItemPage ~ insertAssemblyPackingLine ~ packingCartonTag:", JSON.stringify(packingCartonTag))
       if (packingCartonTag && packingCartonTag.packList.length > 0 && itemFound.itemBarcode && itemFound.itemBarcode == packingCartonTag?.packList[0]?.itemBarcode && packingCartonTag?.packList[0]?.assemblyItemId == assemblyItemId) {
          let firstPickingLine = packingCartonTag.packList[0];
          firstPickingLine.qtyPacked = (firstPickingLine.qtyPacked ?? 0) + inputQty;
@@ -317,7 +313,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    }
 
    computeAssemblyPackingAssignment(inputQty: number, outstandingLines: SalesOrderLineForWD[], currentPackListLines: CurrentPackList[]) {
-      console.log("🚀 ~ file: packing-item.page.ts:219 ~ PackingItemPage ~ computeAssemblyPackingAssignment ~ inputQty:", inputQty)
       //Update left side qtyCurrent
       for (let os of outstandingLines) {
          for (let assembly of os.assembly) {
@@ -402,7 +397,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    insertPackingLine(itemFound: TransactionDetail, inputQty: number, outstandingLines: SalesOrderLineForWD[], packingQtyControl: string) {
       // When scanning the same item, add the quantity to first line, instead of adding new row
       let packingCartonTag = this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
-      if (packingCartonTag && packingCartonTag.packList.length > 0 && itemFound.itemBarcode == packingCartonTag?.packList[0]?.itemBarcode) {
+      if (packingCartonTag && packingCartonTag.packList.length > 0 && itemFound.itemBarcode == packingCartonTag?.packList[0]?.itemBarcode && !packingCartonTag.packList[0].assemblyItemId) {
          let firstPickingLine = packingCartonTag.packList[0];
          firstPickingLine.qtyPacked = (firstPickingLine.qtyPacked ?? 0) + inputQty;
       } else {
@@ -411,7 +406,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          packingCartonTag.packList.unshift(newLine);
       }
       // Filter out currentPickList with same item
-      let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == itemFound.itemSku);
+      let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == itemFound.itemSku && !x.assemblyItemId);
       this.computePickingAssignment(inputQty, outstandingLines, packListLines);
       // this.setDataEntryState();
       // this.objectForm.markAsDirty();
@@ -874,7 +869,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       let inputQty: number = item.qtyPacked - this.clonedQty[rowIndex].qtyPacked;
       if (!item.assemblyItemId) {
          let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemSku == item.itemSku);
-         let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == item.itemSku);
+         let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == item.itemSku && !x.assemblyItemId);
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
@@ -997,22 +992,22 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    computePackingAssignment(inputQty: number, outstandingLines: SalesOrderLineForWD[], currentPackListLines: CurrentPackList[]) {
       //Update left side qtyCurrent
       for (let os of outstandingLines) {
-        let availableQty = os.qtyRequest - os.qtyPacked - os.qtyCurrent;
-        if (availableQty >= inputQty) {
-          os.qtyCurrent += inputQty;
-          inputQty = 0;
-        } else {
-          os.qtyCurrent += availableQty;
-          inputQty -= availableQty
-        }
+         let availableQty = os.qtyRequest - os.qtyPacked - os.qtyCurrent;
+         if (availableQty >= inputQty) {
+            os.qtyCurrent += inputQty;
+            inputQty = 0;
+         } else {
+            os.qtyCurrent += availableQty;
+            inputQty -= availableQty
+         }
       }
       //This condition only applies to packing without control. User will be able to overscan  
       if (inputQty != 0) {
-        outstandingLines[0].qtyCurrent += inputQty;
-        inputQty = 0;
+         outstandingLines[0].qtyCurrent += inputQty;
+         inputQty = 0;
       }
       this.mapPackingAssignment(outstandingLines, currentPackListLines);
-    }
+   }
 
    validateNewItemConversion(itemList: TransactionDetail) {
       if (itemList.newItemId && itemList.newItemEffectiveDate && this.commonService.convertUtcDate(itemList.newItemEffectiveDate) <= this.objectService.header.trxDate) {
@@ -1032,49 +1027,49 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       }
    }
 
-  mapPackingAssignment(outstandingLines: SalesOrderLineForWD[], currentPackListLines: CurrentPackList[]) {
-    currentPackListLines.forEach(x => {
-      x.variations = [];
-    })
-   currentPackListLines.reverse();
-    let duplicateOutstandingLines = JSON.parse(JSON.stringify(outstandingLines));
-    currentPackListLines.forEach(current => {
-      let balanceQty: number = current.qtyPacked;
-      let rightLoopCount: number = 0;
-      for (let os of duplicateOutstandingLines) {
-        let currentPackAssignment: CurrentPackAssignment = {
-          qtyPacked: os.qtyCurrent,
-          salesOrderId: os.salesOrderId,
-          salesOrderLineId: os.salesOrderLineId,
-          salesOrderVariationId: os.salesOrderVariationId
-        }
-        if (balanceQty != 0) {
-          if (balanceQty == os.qtyCurrent) {
-            currentPackAssignment.qtyPacked = balanceQty;
-            current.variations.push(currentPackAssignment);
-            duplicateOutstandingLines.shift();
-            balanceQty = 0;
-            break;
-          }
-          else if (balanceQty > os.qtyCurrent) {
-            currentPackAssignment.qtyPacked = os.qtyCurrent;
-            current.variations.push(currentPackAssignment);
-            balanceQty -= os.qtyCurrent;
-            rightLoopCount++;
-          }
-          else if (balanceQty < os.qtyCurrent) {
-            currentPackAssignment.qtyPacked = balanceQty;
-            current.variations.push(currentPackAssignment);
-            os.qtyCurrent -= balanceQty;
-            balanceQty = 0;
-          }
-        }
-      }
-      if (rightLoopCount > 0) {
-        duplicateOutstandingLines.splice(0, rightLoopCount);
-      }
-    })
-  }
+   mapPackingAssignment(outstandingLines: SalesOrderLineForWD[], currentPackListLines: CurrentPackList[]) {
+      currentPackListLines.forEach(x => {
+         x.variations = [];
+      })
+      currentPackListLines.reverse();
+      let duplicateOutstandingLines = JSON.parse(JSON.stringify(outstandingLines));
+      currentPackListLines.forEach(current => {
+         let balanceQty: number = current.qtyPacked;
+         let rightLoopCount: number = 0;
+         for (let os of duplicateOutstandingLines) {
+            let currentPackAssignment: CurrentPackAssignment = {
+               qtyPacked: os.qtyCurrent,
+               salesOrderId: os.salesOrderId,
+               salesOrderLineId: os.salesOrderLineId,
+               salesOrderVariationId: os.salesOrderVariationId
+            }
+            if (balanceQty != 0) {
+               if (balanceQty == os.qtyCurrent) {
+                  currentPackAssignment.qtyPacked = balanceQty;
+                  current.variations.push(currentPackAssignment);
+                  duplicateOutstandingLines.shift();
+                  balanceQty = 0;
+                  break;
+               }
+               else if (balanceQty > os.qtyCurrent) {
+                  currentPackAssignment.qtyPacked = os.qtyCurrent;
+                  current.variations.push(currentPackAssignment);
+                  balanceQty -= os.qtyCurrent;
+                  rightLoopCount++;
+               }
+               else if (balanceQty < os.qtyCurrent) {
+                  currentPackAssignment.qtyPacked = balanceQty;
+                  current.variations.push(currentPackAssignment);
+                  os.qtyCurrent -= balanceQty;
+                  balanceQty = 0;
+               }
+            }
+         }
+         if (rightLoopCount > 0) {
+            duplicateOutstandingLines.splice(0, rightLoopCount);
+         }
+      })
+   }
 
    /* #endregion */
 

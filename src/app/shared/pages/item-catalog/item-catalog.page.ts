@@ -209,7 +209,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       }
       this.searchItemService.getSalesHistoryInfo(requestObject).subscribe({
          next: (response) => {
-            console.log("🚀 ~ file: item-catalog.page.ts:200 ~ ItemCatalogPage ~ this.searchItemService.getSalesHistoryInfo ~ response:", response)
             if (response && response.flatMap(r => r.historyInfo) && response.flatMap(r => r.historyInfo).length > 0) {
                this.availableSalesHistory = [...this.availableSalesHistory, ...response];
             }

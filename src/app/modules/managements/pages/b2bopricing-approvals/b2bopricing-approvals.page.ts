@@ -48,7 +48,6 @@ export class B2bopricingApprovalsPage implements OnInit, ViewWillEnter {
   loadObjects() {
     try {
       this.transactionProcessingService.getProcessingDocumentByDateRange(format(parseISO(this.startDate.toISOString()), "yyyy-MM-dd"), format(parseISO(this.endDate.toISOString()), "yyyy-MM-dd")).subscribe(response => {
-        console.log("🚀 ~ file: b2bopricing-approvals.page.ts:51 ~ B2bopricingApprovalsPage ~ this.transactionProcessingService.getProcessingDocumentByDateRange ~ response:", response)
         this.pendingObjects = response.filter(r => !r.isComplete && !r.deactivated);
         this.completedObjects = response.filter(r => r.isComplete);
         this.toastService.presentToast("", "Search Complete", "top", "success", 1000, this.authService.showSearchResult);

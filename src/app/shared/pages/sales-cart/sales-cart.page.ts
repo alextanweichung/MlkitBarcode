@@ -445,7 +445,6 @@ export class SalesCartPage implements OnInit, OnChanges {
 
    async computeAllAmount(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
       let validate = this.discExprRegex.exec(trxLine.discountExpression);
-      console.log("🚀 ~ file: sales-cart.page.ts:441 ~ SalesCartPage ~ computeAllAmount ~ validate:", validate)
       if (validate.input !== validate[0]) {
          trxLine.discountExpression = validate[0]
          this.toastService.presentToast("Validation Error", "Disc. Expr replaced to valid format", "top", "warning", 1000);

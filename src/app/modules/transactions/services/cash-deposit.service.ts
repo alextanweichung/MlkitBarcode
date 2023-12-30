@@ -42,7 +42,6 @@ export class CashDepositService {
       this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
       // attribute6 = locationId
-      console.log("🚀 ~ file: cash-deposit.service.ts:43 ~ CashDepositService ~ loadMasterList ~ this.customerMasterList:", this.customerMasterList)
    }
 
    async loadCustomer() {

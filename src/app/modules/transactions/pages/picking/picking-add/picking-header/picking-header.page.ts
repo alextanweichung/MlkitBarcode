@@ -189,7 +189,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
          } else {
             this.objectService.getSOHeader([input]).subscribe(response => {
-               console.log("🚀 ~ file: picking-header.page.ts:190 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ response:", JSON.stringify(response))
                if (response.status === 200) {
                   let doc = response.body[0] as SalesOrderHeaderForWD;
                   if (doc === undefined) {
@@ -213,7 +212,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                      this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
                   }
                   this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
-                  console.log("🚀 ~ file: picking-header.page.ts:215 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.objectService.multiPickingObject.outstandingPickList:", this.objectService.multiPickingObject.outstandingPickList)
                   this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
                      if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
                      r.multiPickingId = this.objectForm.controls.multiPickingId.value;

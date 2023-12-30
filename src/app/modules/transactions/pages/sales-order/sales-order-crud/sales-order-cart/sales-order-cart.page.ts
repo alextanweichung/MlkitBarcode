@@ -408,7 +408,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    // }
 
    // async computeAllAmount(trxLine: TransactionDetail) {
-   //    console.log("🚀 ~ file: sales-order-cart.page.ts:380 ~ SalesOrderCartPage ~ computeAllAmount ~ trxLine:", trxLine)
    //    trxLine.qtyRequest = Number(trxLine.qtyRequest.toFixed(0));
    //    try {
    //       if (this.objectService.salesOrderQuantityControl === "1") {

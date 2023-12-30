@@ -405,21 +405,18 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
    }
 
    async onFromBinDoneScanning(event: string) {
-      console.log("🚀 ~ file: transfer-bin-item.page.ts:408 ~ TransferBinItemPage ~ onFromBinDoneScanning ~ event:", event)
       if (event) {
          await this.onFromBinCodeChanged(event);
       }
    }
 
    async onFromPalletDoneScanning(event: string) {
-      console.log("🚀 ~ file: transfer-bin-item.page.ts:422 ~ TransferBinItemPage ~ onFromPalletDoneScanning ~ event:", event)
       if (event) {
          await this.onFromPalletCodeChanged(event);
       }
    }
 
    async onToBinDoneScanning(event: string) {
-      console.log("🚀 ~ file: transfer-bin-item.page.ts:429 ~ TransferBinItemPage ~ onToBinDoneScanning ~ event:", event)
       if (event) {
          await this.onToBinCodeChanged(event);
       }

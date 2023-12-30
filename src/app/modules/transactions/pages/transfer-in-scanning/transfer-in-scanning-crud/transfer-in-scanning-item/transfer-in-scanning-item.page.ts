@@ -35,7 +35,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    ) { }
 
    ionViewWillEnter(): void {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:39 ~ TransferInScanningItemPage ~ ionViewWillEnter ~ this.objectService.object:", JSON.stringify(this.objectService.object))
+      
    }
 
    ngOnDestroy(): void {
@@ -66,7 +66,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    async onItemAdd(event: TransactionDetail[]) {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:69 ~ TransferInScanningItemPage ~ onItemAdd ~ event:", JSON.stringify(event))
       try {
          if (event) {
             event.forEach(async r => {
@@ -100,7 +99,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      discountGroupCode: itemExistInLine?.discountGroupCode,
                      discountExpression: itemExistInLine?.discountExpression
                   }
-                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:103 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", JSON.stringify(outputData))
                   // await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                   await this.insertIntoLine(outputData);
                } else {
@@ -132,7 +130,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      discountGroupCode: r.itemPricing?.discountGroupCode,
                      discountExpression: r.itemPricing?.discountExpression
                   }
-                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:135 ~ TransferInScanningItemPage ~ onItemAdd ~ outputData:", JSON.stringify(outputData))
                   // await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                   await this.insertIntoLine(outputData);
                }
@@ -160,7 +157,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    async insertIntoLine(event: TransferInScanningLine) {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:156 ~ TransferInScanningItemPage ~ insertIntoLine ~ event:", JSON.stringify(event))
       if (event) {
          if (this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku) > -1) {
             let index = this.objectService.object.line.findIndex(r => r.itemSku === event.itemSku);
@@ -301,7 +297,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      qtyReceive: null,
                      isDeleted: itemExistInLine.isDeleted
                   }
-                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:297 ~ TransferInScanningItemPage ~ this.objectService.validateBarcode ~ outputData:", outputData)
                   this.insertIntoLine(outputData);
                } else {
                   let outputData: TransferInScanningLine = {
@@ -328,7 +323,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
                      qtyReceive: null,
                      isDeleted: false
                   }
-                  console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:324 ~ TransferInScanningItemPage ~ this.objectService.validateBarcode ~ outputData:", outputData)
                   this.insertIntoLine(outputData);
                }
             }
@@ -435,7 +429,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          line: this.objectService.object.line.filter(r => r.uuid !== null),
          transferAdjustment: null
       }
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:449 ~ TransferInScanningItemPage ~ this.objectService.insertObject ~ insertObject:", JSON.stringify(insertObject))
 
       this.objectService.insertObject(insertObject).subscribe(response => {
          if (response.status === 201) {
@@ -455,7 +448,6 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    }
 
    updateObject() {
-      console.log("🚀 ~ file: transfer-in-scanning-item.page.ts:454 ~ TransferInScanningItemPage ~ this.objectService.updateObject ~ this.objectService.object:", JSON.stringify(this.objectService.object))
       this.objectService.updateObject(this.objectService.object).subscribe(response => {
          if (response.status === 204) {
             this.toastService.presentToast("", "Transfer In Scanning updated", "top", "success", 1000);

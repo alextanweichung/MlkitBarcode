@@ -42,13 +42,11 @@ export class StockCountService {
    itemGroupMasterList: MasterListDetails[] = [];
    itemCategoryMasterList: MasterListDetails[] = [];
    async loadMasterList() {
-      console.log("🚀 ~ file: stock-count.service.ts:51 ~ StockCountService ~ loadMasterList ~ this.configService.loginUser:", this.configService.loginUser)
       this.fullMasterList = await this.getMasterList();
       this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      console.log("🚀 ~ file: stock-count.service.ts:49 ~ StockCountService ~ loadMasterList ~ ", this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0))
       this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
       this.itemBrandMasterList = this.fullMasterList.filter(x => x.objectName === "ItemBrand").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemGroupMasterList = this.fullMasterList.filter(x => x.objectName === "ItemCategory").flatMap(src => src.details).filter(y => y.deactivated === 0);

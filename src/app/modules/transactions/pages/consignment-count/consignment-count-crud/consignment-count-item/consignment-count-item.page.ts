@@ -97,7 +97,6 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 	}
 
 	async addItemToLine(trxLine: TransactionDetail) {
-		console.log("🚀 ~ file: consignment-count-item.page.ts:94 ~ ConsignmentCountItemPage ~ addItemToLine ~ trxLine:", JSON.stringify(trxLine))
 		try {
 			if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
 				this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += 1;

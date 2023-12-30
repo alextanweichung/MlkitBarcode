@@ -55,7 +55,6 @@ export class PackingDetailPage implements OnInit, ViewWillEnter {
       this.uniqueSalesOrder = []
       try {
          this.objectService.getObjectById(this.objectId).subscribe(response => {
-            console.log("🚀 ~ file: packing-detail.page.ts:58 ~ PackingDetailPage ~ this.objectService.getObjectById ~ response:", response)
             this.object = response;
             this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
             if (this.object.outstandingPackList && this.object.outstandingPackList.length > 0) {

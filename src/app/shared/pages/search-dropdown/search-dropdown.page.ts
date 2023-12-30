@@ -72,7 +72,6 @@ export class SearchDropdownPage implements OnInit, OnChanges {
 				}
 			}
 		}
-      console.log("🚀 ~ file: search-dropdown.page.ts:67 ~ SearchDropdownPage ~ ngOnChanges ~ this.selected:", this.selected)
 	}
 
 	ngOnInit() {

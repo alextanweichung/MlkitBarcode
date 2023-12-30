@@ -145,7 +145,6 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       try {
          await this.loadingService.showLoading();
          this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
-            console.log("🚀 ~ file: transfer-in.page.ts:156 ~ TransferInPage ~ this.objectService.getObjectList ~ response:", response)
             this.objects = response;
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
