@@ -240,6 +240,7 @@ export class SalesOrderService {
    objectSummary: SalesOrderRoot;
    async setHeader(objectHeader: SalesOrderHeader) {
       this.objectHeader = objectHeader;
+      console.log("🚀 ~ file: sales-order.service.ts:243 ~ SalesOrderService ~ setHeader ~ this.objectHeader:", this.objectHeader)
       // load promotion first after customer confirmed or whenever header changed.
       await this.loadPromotion();
    }
@@ -261,6 +262,7 @@ export class SalesOrderService {
 
    removeHeader() {
       this.objectHeader = null;
+      console.log("🚀 ~ file: sales-order.service.ts:265 ~ SalesOrderService ~ removeHeader ~ this.objectHeader:", this.objectHeader)
    }
 
    removeLine() {

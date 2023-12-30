@@ -29,6 +29,7 @@ import { ItemSalesHistoryPage } from '../item-sales-history/item-sales-history.p
 export class ItemCatalogPage implements OnInit, OnChanges {
 
    @Input() itemInCart: TransactionDetail[] = [];
+   @Input() objectId: number;
    @Input() keyId: number;
    @Input() locationId: number;
    @Input() fullMasterList: MasterList[] = [];
@@ -153,6 +154,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             let requestObject: SalesItemRequest = {
                search: this.itemSearchText,
                trxDate: this.commonService.getTodayDate(),
+               keyId: this.objectId,
                customerId: this.keyId,
                locationId: this.objectHeader?.locationId ?? 0,
                startIndex: this.startIndex,
@@ -202,6 +204,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
          itemId: this.availableItem.flatMap(r => r.itemId),
          search: null,
          trxDate: this.commonService.getTodayDate(),
+         keyId: this.objectId,
          customerId: this.keyId,
          locationId: this.objectHeader?.locationId ?? 0,
          startIndex: this.startIndex,

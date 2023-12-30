@@ -387,13 +387,14 @@ export class CommonService {
    }
 
    computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
+      console.log("🚀 ~ file: common.service.ts:390 ~ CommonService ~ computeDiscTaxAmount ~ roundingPrecision:", roundingPrecision)
       try {
          let totalDiscAmt: Decimal = new Decimal(0);
          let unitPrice: Decimal = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0);
          let unitPriceExTax: Decimal = new Decimal(trxLine.unitPriceExTax ? trxLine.unitPriceExTax : 0);
          let discExpression = trxLine.discountExpression;
          let quantity: Decimal = new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0);
-         let subTotal: Decimal;
+         let subTotal: Decimal = new Decimal(0);
 
          if (isItemPriceTaxInclusive) {
             subTotal = unitPrice.mul(quantity);

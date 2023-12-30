@@ -2,7 +2,7 @@
    <ion-toolbar>
       <ion-title>
          <div class="ion-text-wrap">
-            {{objectService?.objectHeader?.salesOrderNum}}
+            {{objectService.objectHeader?.salesOrderNum}}
          </div>
       </ion-title>
       <ion-buttons slot="start">
@@ -17,7 +17,7 @@
    <ng-template>
       <ion-content class="p-2">
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <ion-item *ngIf="!(object?.isWorkFlowDone??false)" (click)="popover.dismiss(); editObject()">
+            <ion-item *ngIf="!(workflowDone)" (click)="popover.dismiss(); editObject()">
                <ion-icon name="create-outline" slot="end"></ion-icon>
                <ion-label>
                   <div>Edit</div>
@@ -29,16 +29,16 @@
                   <div>Delete</div>
                </ion-label>
             </ion-item>
-            <ion-item *ngIf="!(object?.isWorkFlowDone??false) && isDraft" (click)="popover.dismiss(); presentConfirmAlert();">
+            <ion-item *ngIf="!(workflowDone) && isDraft" (click)="popover.dismiss(); presentConfirmAlert();">
                <ion-icon name="checkmark-outline" slot="end"></ion-icon>
                <ion-label>
                   <div>Confirm</div>
                </ion-label>
             </ion-item>
-            <ion-item *ngIf="!(object.isWorkFlowDone??false) && !isDraft" (click)="popover.dismiss(); toggleObject();">
-               <ion-icon [name]="object.header.deactivated?'checkmark-circle-outline':'close-circle-outline'" slot="end"></ion-icon>
+            <ion-item *ngIf="!(workflowDone) && !isDraft" (click)="popover.dismiss(); toggleObject();">
+               <ion-icon [name]="objectService.objectHeader?.deactivated?'checkmark-circle-outline':'close-circle-outline'" slot="end"></ion-icon>
                <ion-label>
-                  <div>{{object.header.deactivated?'Enable':'Disable'}}</div>
+                  <div>{{objectService.objectHeader?.deactivated?'Enable':'Disable'}}</div>
                </ion-label>
             </ion-item>
             <ion-item *ngIf="!isDraft" (click)="popover.dismiss(); showHistoryModal()">
@@ -47,7 +47,7 @@
                   <div>Approval History</div>
                </ion-label>
             </ion-item>
-            <ion-item *ngIf="object.isWorkFlowDone??false && !isDraft" (click)="popover.dismiss(); presentAlertViewPdf('Sales Order')">
+            <ion-item *ngIf="workflowDone && !isDraft" (click)="popover.dismiss(); presentAlertViewPdf('Sales Order')">
                <ion-icon name="download-outline" slot="end"></ion-icon>
                <ion-label>
                   <div>Sales Order</div>
@@ -100,7 +100,7 @@
    </ng-template>
 </ion-popover>
 <ion-content fullscreen>
-   <div class="p-2" *ngIf="object">
+   <div class="p-2" *ngIf="objectService.objectHeader">
       <div *ngIf="workFlowState && workFlowState.length > 0">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>Workflow</ion-label>
@@ -148,8 +148,8 @@
                <ion-row>
                   <ion-col class="ion-flex font-bold">Doc. Num.</ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="object.header.deactivated?'color-danger':'color-success'"></ion-icon>
-                     {{object.header.salesOrderNum}}
+                     <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="objectService.objectHeader.deactivated?'color-danger':'color-success'"></ion-icon>
+                     {{objectService.objectHeader.salesOrderNum}}
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -157,7 +157,7 @@
                      <div class="font-bold">Doc. Date</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+                     <div>{{objectService.objectHeader.trxDate|date:'dd/MM/yyyy'}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -165,7 +165,7 @@
                      <div class="font-bold">Location</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+                     <div>{{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -173,7 +173,7 @@
                      <div class="font-bold">Customer</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+                     <div>{{objectService.objectHeader.customerId|idMapping:objectService.customerMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -181,7 +181,7 @@
                      <div class="font-bold">Total Quantity</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.details|sum:"qtyRequest"|number}}</div>
+                     <div>{{objectService.objectDetail|sum:"qtyRequest"|number}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -190,7 +190,7 @@
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
                      <div>
-                        {{object.details|sum:"discountAmt"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
+                        {{objectService.objectDetail|sum:"discountAmt"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
                      </div>
                   </ion-col>
                </ion-row>
@@ -210,7 +210,7 @@
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
                      <div>
-                        {{object.details|sum:"subTotal"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
+                        {{objectService.objectDetail|sum:"subTotal"|number:(objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
                      </div>
                   </ion-col>
                </ion-row>
@@ -238,7 +238,7 @@
                         <div class="font-bold">Remark</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.remark}}</div>
+                        <div>{{objectService.objectHeader.remark}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -246,7 +246,7 @@
                         <div class="font-bold">Ship Method</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipMethodId|idMapping:objectService.shipMethodMasterList}}</div>
+                        <div>{{objectService.objectHeader.shipMethodId|idMapping:objectService.shipMethodMasterList}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -262,7 +262,7 @@
                         <div class="font-bold">Customer PO</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.customerPo}}</div>
+                        <div>{{objectService.objectHeader.customerPo}}</div>
                      </ion-col>
                   </ion-row>
                </ion-grid>
@@ -279,7 +279,7 @@
                         <div class="font-bold">Address</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipAddress}}</div>
+                        <div>{{objectService.objectHeader.shipAddress}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -287,7 +287,7 @@
                         <div class="font-bold">Postcode</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipPostCode}}</div>
+                        <div>{{objectService.objectHeader.shipPostCode}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -295,7 +295,7 @@
                         <div class="font-bold">Phone</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipPhone}}</div>
+                        <div>{{objectService.objectHeader.shipPhone}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -303,7 +303,7 @@
                         <div class="font-bold">Email</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipEmail}}</div>
+                        <div>{{objectService.objectHeader.shipEmail}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -311,7 +311,7 @@
                         <div class="font-bold">Fax</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipFax}}</div>
+                        <div>{{objectService.objectHeader.shipFax}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -319,7 +319,7 @@
                         <div class="font-bold">Area</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.shipAreaId|idMapping:objectService.areaMasterList}}</div>
+                        <div>{{objectService.objectHeader.shipAreaId|idMapping:objectService.areaMasterList}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row>
@@ -327,7 +327,7 @@
                         <div class="font-bold">Attention</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div>{{object.header.attention}}</div>
+                        <div>{{objectService.objectHeader.attention}}</div>
                      </ion-col>
                   </ion-row>
                </ion-grid>
@@ -339,7 +339,7 @@
          <ion-label>Details</ion-label>
       </ion-list-header>
       <ion-list slot="content" class="list-custom animate__animated animate__fadeIn" items="full">
-         <ng-container *ngFor="let item of object.details">
+         <ng-container *ngFor="let item of objectService.objectDetail">
             <ion-item [ngClass]="{'color-blue':(item.isPricingApproval && !item.deactivated), 'color-danger':item.deactivated }" class="ion-no-padding no-ripple" (click)="showDetails(item)" *ngIf="!item.deactivated || showDisabledLine">
                <ion-grid class="ion-no-padding py-2 pl-2">
                   <ion-row>
@@ -446,10 +446,10 @@
                   </ion-row>
                   <ion-row>
                      <ion-col class="ion-flex ion-margin-auto">
-                        <div *ngIf="object.header.isDisplayTaxInclusive === true || object.header.isDisplayTaxInclusive === null">
+                        <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === true || objectService.objectHeader.isDisplayTaxInclusive === null">
                            {{item.unitPrice|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}
                         </div>
-                        <div *ngIf="object.header.isDisplayTaxInclusive === false">
+                        <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === false">
                            {{item.unitPriceExTax|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSalesUnitPrice.localFormat:objectService.precisionSalesUnitPrice.foreignFormat)}}
                         </div>
                      </ion-col>
@@ -460,10 +460,10 @@
                         </div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                        <div *ngIf="object.header.isDisplayTaxInclusive === true || object.header.isDisplayTaxInclusive === null">
+                        <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === true || objectService.objectHeader.isDisplayTaxInclusive === null">
                            {{item.discountAmt|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
                         </div>
-                        <div *ngIf="object.header.isDisplayTaxInclusive === false">
+                        <div *ngIf="objectService.objectHeader.isDisplayTaxInclusive === false">
                            {{item.discountAmtExTax|number:(objectService.objectHeader?.isHomeCurrency?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}
                         </div>
                      </ion-col>
@@ -477,11 +477,11 @@
             </ion-item>
          </ng-container>
       </ion-list>
-      <div *ngIf="object.otherAmount && object.otherAmount?.length > 0">
+      <div *ngIf="otherAmount && otherAmount?.length > 0">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>Other Amount</ion-label>
          </ion-list-header>
-         <ion-item class="ion-no-padding no-ripple" *ngFor="let om of object.otherAmount">
+         <ion-item class="ion-no-padding no-ripple" *ngFor="let om of otherAmount">
             <ion-grid class="ion-no-padding py-2 pl-2">
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
@@ -533,11 +533,11 @@
       <ion-content>
          <div class="p-2">
             <ion-list-header class="ion-list-header-small ion-flex ion-text-center"
-               *ngIf="object?.approvalHistory && object?.approvalHistory.length === 0">
+               *ngIf="approvalHistory && approvalHistory?.length === 0">
                <ion-label>Approval History Not Available.</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item class="ion-no-padding no-ripple" *ngFor="let h of object?.approvalHistory">
+               <ion-item class="ion-no-padding no-ripple" *ngFor="let h of approvalHistory">
                   <ion-grid class="ion-no-padding py-2 pl-2">
                      <ion-row>
                         <ion-col class="ion-flex ion-margin-auto">

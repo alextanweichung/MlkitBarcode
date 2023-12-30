@@ -5,7 +5,7 @@ import { SalesOrderService } from 'src/app/modules/transactions/services/sales-o
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
-import { SalesOrderRoot } from '../../../models/sales-order';
+import { OtherAmount, SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -15,6 +15,7 @@ import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { format, parseISO } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { ApprovalHistory } from 'src/app/shared/models/approval-history';
 
 @Component({
    selector: 'app-sales-order-detail',
@@ -24,9 +25,12 @@ import { ConfigService } from 'src/app/services/config/config.service';
 export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
    objectId: any;
-   object: SalesOrderRoot;
    processType: string;
    selectedSegment: string;
+
+   workflowDone: boolean = false;
+   otherAmount: OtherAmount[] = [];
+   approvalHistory: ApprovalHistory[] = [];
 
    isDraft: boolean = false;
    draftTransactionId: number;
@@ -52,6 +56,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
          // await this.objectService.loadRequiredMaster();
          this.route.queryParams.subscribe(params => {
             this.isDraft = params["isDraft"];
+            console.log("🚀 ~ file: sales-order-detail.page.ts:55 ~ SalesOrderDetailPage ~ ionViewWillEnter ~ this.isDraft:", this.isDraft)
             if (this.isDraft) {
                this.draftTransactionId = params["draftTransactionId"];
                this.loadDraftObject();
@@ -80,11 +85,14 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       try {
          await this.loadingService.showLoading();
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
-            this.object = response;
-            this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
-            this.loadWorkflow(this.object.header.salesOrderId);
-            this.objectService.setHeader(this.object.header);
-            this.objectService.setLine(this.object.details);
+            let object = response;
+            object.header = this.commonService.convertObjectAllDateType(object.header);
+            this.workflowDone = object.isWorkFlowDone;
+            this.otherAmount = object.otherAmount;
+            this.approvalHistory = object.approvalHistory;
+            await this.loadWorkflow(object.header.salesOrderId);
+            await this.objectService.setHeader(object.header);
+            await this.objectService.setLine(object.details);
             await this.loadingService.dismissLoading();
          }, async error => {
             await this.loadingService.dismissLoading();
@@ -154,7 +162,6 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
             let object = JSON.parse(this.draftObject.jsonData) as SalesOrderRoot;
             object.header.salesOrderNum = this.draftObject.draftTransactionNum;
             this.isDraft = true;
-            this.object = object;
             this.objectService.setHeader(object.header);
             this.objectService.setLine(object.details);
             this.objectService.setDraftObject(this.draftObject);
@@ -170,12 +177,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       if (this.isDraft) {
          this.objectService.setDraftObject(this.draftObject);
       }
-      let navigationExtras: NavigationExtras = {
-         queryParams: {
-            objectId: this.objectService.objectHeader.salesOrderId
-         }
-      }
-      this.navController.navigateRoot("/transactions/sales-order/sales-order-cart", navigationExtras);
+      this.navController.navigateRoot("/transactions/sales-order/sales-order-cart");
    }
 
    toggleObject() {
@@ -214,7 +216,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
    selectedItem: TransactionDetail;
    showDetails(item: TransactionDetail) {
-      this.object.details.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
+      this.objectService.objectDetail.filter(r => r.lineId !== item.lineId).flatMap(r => r.isSelected = false);
       item.isSelected = !item.isSelected;
    }
 

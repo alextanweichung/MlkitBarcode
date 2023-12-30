@@ -70,6 +70,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
                itemId: this.objectService.objectDetail.flatMap(r => r.itemId),
                search: null,
                trxDate: this.commonService.getTodayDate(),
+               keyId: this.objectService.objectHeader.salesOrderId,
                customerId: this.objectService.objectHeader.customerId,
                locationId: this.objectService.objectHeader.locationId ?? 0,
                startIndex: null,

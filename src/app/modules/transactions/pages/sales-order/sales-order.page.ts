@@ -11,6 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { SalesOrderLineForWD } from '../../models/picking';
 
 @Component({
    selector: 'app-sales-order',
@@ -19,8 +20,9 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 })
 export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
-   private objectDiffer: any;
+   // private objectDiffer: any;
    objects: SalesOrderList[] = [];
+   draftObjectList: SalesOrderList[] = [];
    draftObjects: DraftTransaction[] = [];
 
    startDate: Date;
@@ -43,14 +45,14 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       private differs: IterableDiffers
    ) {
       // reload all masterlist whenever user enter listing
-      this.objectDiffer = this.differs.find(this.objects).create();
+      // this.objectDiffer = this.differs.find(this.objects).create();
    }
 
    ngDoCheck(): void {
-      const objectChanges = this.objectDiffer.diff(this.objects);
-      if (objectChanges) {
-         this.bindUniqueGrouping();
-      }
+      // const objectChanges = this.objectDiffer.diff(this.objects);
+      // if (objectChanges) {
+      //    this.bindUniqueGrouping();
+      // }
    }
 
    async ionViewWillEnter(): Promise<void> {
@@ -61,8 +63,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          this.endDate = this.commonService.getTodayDate();
       }
       await this.objectService.loadRequiredMaster();
-      await this.objectService.resetVariables();
-      this.objects = []; // clear list when enter
+      // this.objects = []; // clear list when enter
    }
 
    async ionViewDidEnter(): Promise<void> {
@@ -82,6 +83,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
    async loadObjects() {
       try {
+         this.objects = [];
          await this.loadingService.showLoading();
          let obj: SalesSearchModal = {
             dateStart: format(this.startDate, "yyyy-MM-dd"),
@@ -90,9 +92,11 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
             salesAgentId: this.salesAgentIds
          }
          this.objectService.getObjectListByDate(obj).subscribe(async response => {
-            this.objects = [...this.objects, ...response];
+            this.objects = response;
+            console.log("🚀 ~ file: sales-order.page.ts:93 ~ SalesOrderPage ~ this.objectService.getObjectListByDate ~ this.objects:", this.objects)
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+            this.bindUniqueGrouping();
          }, async error => {
             await this.loadingService.dismissLoading();
             console.log(error);
@@ -132,7 +136,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
                   isDraft: true,
                   draftTransactionId: element.draftTransactionId
                }
-               this.objects = [...this.objects, obj];
+               this.draftObjectList.push(obj);
             }
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
@@ -267,6 +271,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          })
          await modal.present();
          let { data } = await modal.onWillDismiss();
+         console.log("🚀 ~ file: sales-order.page.ts:273 ~ SalesOrderPage ~ filter ~ data:", data)
          if (data && data !== undefined) {
             this.objects = [];
             this.uniqueGrouping = [];
