@@ -538,8 +538,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                })
                setTimeout(() => {
                   this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
-                  if (this.isQuotation || this.isSalesOrder) {
-                     this.onHistoryCopied.emit(JSON.parse(JSON.stringify(this.availableSalesHistory.find(r => r.masterInfo.itemId === this.selectedItem.itemId))));
+                  if (this.configSalesTransactionShowHistory && (this.isQuotation || this.isSalesOrder)) {
+                     if (this.availableSalesHistory.findIndex(r => r.masterInfo.itemId === this.selectedItem.itemId) > -1) {
+                        this.onHistoryCopied.emit(JSON.parse(JSON.stringify(this.availableSalesHistory.find(r => r.masterInfo.itemId === this.selectedItem.itemId))));
+                     }
                   }
                   this.hideModal();
                }, 10);
