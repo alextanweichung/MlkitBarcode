@@ -94,6 +94,32 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    // Select action
    async selectAction() {
+      try {      
+         Filesystem.readdir({
+            path: IMAGE_DIR,
+            directory: Directory.Data
+         }).then(
+            async (result) => {
+               result.files.forEach(async f => {
+                  await Filesystem.deleteFile({
+                     directory: Directory.Data,
+                     path: `${IMAGE_DIR}/${f.name}`
+                  })
+               })
+            },
+            async (err) => {
+               // Folder does not yet exists!
+               await Filesystem.mkdir({
+                  path: IMAGE_DIR,
+                  directory: Directory.Data
+               });
+            }
+         ).then(async (_) => {
+               await this.loadingService.dismissLoading();
+            });
+      } catch (error) {
+         console.error(error);
+      }
       let object: DOAcknowledegementRequest = {
          truckArrangementNum: this.cartonTruckLoadingNum,
          vehicledId: this.vehicleIds,
@@ -135,6 +161,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    }
 
    hideSignatureModal() {
+      this.signaturePad.clear();
       this.signatureModal = false;
    }
 
@@ -171,20 +198,18 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
             Filesystem.readdir({
                path: IMAGE_DIR,
                directory: Directory.Data
-            })
-               .then(
-                  async (result) => {
-                     await this.loadFileData(result.files);
-                  },
-                  async (err) => {
-                     // Folder does not yet exists!
-                     await Filesystem.mkdir({
-                        path: IMAGE_DIR,
-                        directory: Directory.Data
-                     });
-                  }
-               )
-               .then(async (_) => {
+            }).then(
+               async (result) => {
+                  await this.loadFileData(result.files);
+               },
+               async (err) => {
+                  // Folder does not yet exists!
+                  await Filesystem.mkdir({
+                     path: IMAGE_DIR,
+                     directory: Directory.Data
+                  });
+               }
+            ).then(async (_) => {
                   await this.loadingService.dismissLoading();
                });
          } catch (e) {
@@ -208,11 +233,11 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                directory: Directory.Data
             });
             if (f.size > this.fileSizeLimit) {
-               this.fileToDelete.push({
-                  name: f.name,
-                  path: filePath,
-                  data: `data:image/jpeg;base64,${readFile.data}`
-               });
+               // this.fileToDelete.push({
+               //    name: f.name,
+               //    path: filePath,
+               //    data: `data:image/jpeg;base64,${readFile.data}`
+               // });
                this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
             } else {
                this.images.push({
@@ -226,19 +251,24 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                   const formData = new FormData();
                   formData.append('file', blob, this.images[0].name);
                   this.objectService.postFile(formData, this.selectedDo.deliveryOrderId, 0).subscribe({
-                     next: (response) => {
+                     next: async (response) => {
                         this.selectedDo = null;
                         this.toastService.presentToast("", "DO Acknowledged", "top", "success", 1000);
                         this.hideSignatureModal();
-                        this.selectAction();
+                        await this.selectAction();
+                        await this.deleteImage({
+                           name: f.name,
+                           path: filePath,
+                           data: `data:image/jpeg;base64,${readFile.data}`
+                        });
+                     },
+                     error: (error) => {
+                        console.error(error);
                      }
                   })
                }
             }
          }
-         this.fileToDelete.forEach(e => {
-            this.deleteImage(e);
-         });
       } catch (e) {
          console.error(e);
       }

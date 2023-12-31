@@ -52,7 +52,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.loadRequiredMaster();
+      // await this.objectService.loadRequiredMaster();
       if (this.objectService.objectHeader && this.objectService.objectHeader.salesOrderId > 0) {
          await this.loadSalesHistory();
       }

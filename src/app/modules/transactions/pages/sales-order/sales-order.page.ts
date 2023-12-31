@@ -20,7 +20,7 @@ import { SalesOrderLineForWD } from '../../models/picking';
 })
 export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
 
-   // private objectDiffer: any;
+   private objectDiffer: any;
    objects: SalesOrderList[] = [];
    draftObjectList: SalesOrderList[] = [];
    draftObjects: DraftTransaction[] = [];
@@ -45,14 +45,14 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       private differs: IterableDiffers
    ) {
       // reload all masterlist whenever user enter listing
-      // this.objectDiffer = this.differs.find(this.objects).create();
+      this.objectDiffer = this.differs.find(this.objects).create();
    }
 
    ngDoCheck(): void {
-      // const objectChanges = this.objectDiffer.diff(this.objects);
-      // if (objectChanges) {
-      //    this.bindUniqueGrouping();
-      // }
+      const objectChanges = this.objectDiffer.diff(this.objects);
+      if (objectChanges) {
+         this.bindUniqueGrouping();
+      }
    }
 
    async ionViewWillEnter(): Promise<void> {
@@ -62,11 +62,10 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       if (!this.endDate) {
          this.endDate = this.commonService.getTodayDate();
       }
-      await this.objectService.loadRequiredMaster();
-      // this.objects = []; // clear list when enter
    }
 
    async ionViewDidEnter(): Promise<void> {
+      await this.objectService.loadRequiredMaster();
       if (this.showDraftOnly) {
          await this.loadDraftObjects();
       } else {
@@ -92,11 +91,9 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
             salesAgentId: this.salesAgentIds
          }
          this.objectService.getObjectListByDate(obj).subscribe(async response => {
-            this.objects = response;
-            console.log("🚀 ~ file: sales-order.page.ts:93 ~ SalesOrderPage ~ this.objectService.getObjectListByDate ~ this.objects:", this.objects)
+            this.objects = [...this.objects, ...response];
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-            this.bindUniqueGrouping();
          }, async error => {
             await this.loadingService.dismissLoading();
             console.log(error);
@@ -136,7 +133,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
                   isDraft: true,
                   draftTransactionId: element.draftTransactionId
                }
-               this.draftObjectList.push(obj);
+               this.objects.push(obj);
             }
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);

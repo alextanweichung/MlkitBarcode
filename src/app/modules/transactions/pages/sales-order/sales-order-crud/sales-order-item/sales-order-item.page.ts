@@ -32,7 +32,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
    ) { }
 
    ionViewWillEnter(): void {
-      this.objectService.loadRequiredMaster();
+      // this.objectService.loadRequiredMaster();
       try {
          if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
             this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
@@ -238,6 +238,9 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
          trxLine.oriUnitPriceExTax = trxLine.unitPriceExTax;
          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
          trxLine.oriDiscountExpression = trxLine.discountExpression;
+
+         // update qtyToShip
+         trxLine.qtyToShip = trxLine.qtyRequest;
 
          return trxLine;
       } catch (e) {

@@ -142,17 +142,17 @@
                                  </ion-col>
                                  <ion-col class="ion-flex ion-margin-auto justify-content-center">
                                     <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
-                                       {{getSoQtyBySoItemCode(so, rowData.itemCode)}}</div>
+                                       {{rowData.qtyRequest}}</div>
                                  </ion-col>
                                  <ion-col class="ion-flex ion-margin-auto justify-content-center">
                                     <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
-                                       {{getPickedBySoItemCode(so, rowData.itemCode)}}</div>
+                                       {{rowData.qtyPicked}}</div>
                                  </ion-col>
                                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
                                     <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
-                                       {{getCurrentBySoItemCode(so, rowData.itemCode)}}</div>
+                                       {{rowData.qtyCurrent}}</div>
                                     <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
-                                       ({{getPackedBySoItemCode(so, rowData.itemCode)}})</div>
+                                       ({{rowData.qtyPacked}})</div>
                                  </ion-col>
                               </ion-row>
                               <ng-container *ngIf="rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0;">

@@ -154,6 +154,8 @@ export interface TransactionDetail {
    assembly?: LineAssembly[]
    eligiblePromoId?: number
 
+   qtyToShip?: number
+
    // testing performance
    guid?: string
 }

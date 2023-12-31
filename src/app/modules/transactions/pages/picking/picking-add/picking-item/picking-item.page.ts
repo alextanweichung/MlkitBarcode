@@ -123,7 +123,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      let operationSuccess = this.runAssemblyPickingEngine(itemFound, inputQty, findAssemblyItem);
                      if (!operationSuccess) {
-                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity. 11", "top", "warning", 1000);
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
                      }
                   }
                   break;
@@ -171,7 +171,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity. 22", "top", "warning", 1000);
+                     this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
                   }
                   break;
             }
@@ -766,7 +766,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      if (this.objectService.multiPickingObject.pickingCarton.findIndex(r => Number(r.cartonNum) === Number(this.selectedCartonNum)) > -1) {
                         this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList[rowIndex] = this.clonedQty[rowIndex];
                         this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList = [...this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList];
-                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity. 44", "top", "warning", 1000);
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
                      }
                   }
                   break;
@@ -810,7 +810,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      if (this.objectService.multiPickingObject.pickingCarton.findIndex(r => Number(r.cartonNum) === Number(this.selectedCartonNum)) > -1) {
                         this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList[rowIndex] = this.clonedQty[rowIndex];
                         this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList = [...this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList];
-                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity. 33", "top", "warning", 1000);
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
                      }
                   }
                   break;

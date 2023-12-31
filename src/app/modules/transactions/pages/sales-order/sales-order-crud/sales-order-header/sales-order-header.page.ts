@@ -37,7 +37,7 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
    }
 
    ionViewWillEnter(): void {
-      this.objectService.loadRequiredMaster();
+      // this.objectService.loadRequiredMaster();
    }
 
    newForm() {

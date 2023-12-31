@@ -24,6 +24,7 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -57,14 +58,24 @@ export class SalesOrderService {
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
-      private authService: AuthService
+      private authService: AuthService,
+      private loadingService: LoadingService
    ) { }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
-      await this.loadCustomer();
-      await this.loadModuleControl();
-      await this.loadPromotion();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadCustomer();
+         await this.loadMasterList();
+         await this.loadModuleControl();
+         await this.loadPromotion();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
 
    async loadMasterList() {
@@ -85,7 +96,7 @@ export class SalesOrderService {
    async loadCustomer() {
       this.customers = await this.getCustomerList();
       await this.customers.sort((a, c) => { return a.name > c.name ? 1 : -1 });
-      this.bindCustomerList();
+      await this.bindCustomerList();
    }
 
    async loadPromotion() {

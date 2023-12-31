@@ -415,6 +415,9 @@ export class SalesCartPage implements OnInit, OnChanges {
             this.toastService.presentToast("Invalid Min Order Quantity", "Requested quantity [" + trxLine.qtyRequest + "] exceeded actual quantity [" + trxLine.actualQty + "]", "top", "warning", 1000);
             setTimeout(() => {
                trxLine.qtyRequest = null;
+               if (this.isSalesOrder) {
+                  trxLine.qtyToShip = null;
+               }
                this.computeAllAmount(trxLine);
             }, 1);
          }
@@ -423,6 +426,9 @@ export class SalesCartPage implements OnInit, OnChanges {
             this.toastService.presentToast("Invalid Min Order Quantity", "Requested quantity [" + trxLine.qtyRequest + "] exceeded available quantity [" + trxLine.availableQty + "]", "top", "warning", 1000);
             setTimeout(() => {
                trxLine.qtyRequest = null;
+               if (this.isSalesOrder) {
+                  trxLine.qtyToShip = null;
+               }
                this.computeAllAmount(trxLine);
             }, 1);
          }
@@ -435,22 +441,46 @@ export class SalesCartPage implements OnInit, OnChanges {
                if (!this.isCasePackQtyControlWarningOnly) {
                   setTimeout(() => {
                      trxLine.qtyRequest = null;
+                     if (this.isSalesOrder) {
+                        trxLine.qtyToShip = null;
+                     }
                      this.computeAllAmount(trxLine);
                   }, 1);
                }
             }
          }
       }
+
+      if (this.configOrderingActivateMOQControl) {
+         if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B") {
+            let totalQtySum = this.objectDetail.reduce((sum, current) => sum + current.qtyRequest, 0);
+            if (trxLine.minOrderQty && totalQtySum >= trxLine.minOrderQty) {
+               return;
+            }
+            if (trxLine.qtyRequest && trxLine.minOrderQty && trxLine.qtyRequest < trxLine.minOrderQty) {
+               this.toastService.presentToast("Invalid Quantity", "ReqRequested quantity [" + trxLine.qtyRequest + "] is lower than minimum order quantity [" + trxLine.minOrderQty + "]", "top", "warning", 1000);
+               setTimeout(() => {
+                  trxLine.qtyRequest = null;
+                  if (this.isSalesOrder) {
+                     trxLine.qtyToShip = null;
+                  }
+                  this.computeAllAmount(trxLine);
+               }, 1);
+            }
+         }
+      }
+      if (this.isSalesOrder) {
+         trxLine.qtyToShip = trxLine.qtyRequest;
+      }
    }
 
    async computeAllAmount(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
       let validate = this.discExprRegex.exec(trxLine.discountExpression);
-      console.log("🚀 ~ file: sales-cart.page.ts:448 ~ SalesCartPage ~ computeAllAmount ~ validate:", validate)
       if (validate && validate.input !== validate[0]) {
          trxLine.discountExpression = validate[0]
          this.toastService.presentToast("Validation Error", "Disc. Expr replaced to valid format", "top", "warning", 1000);
       }
-      
+
       // trxLine is actually selectedItem
       if (trxLineArray) {
          this.objectDetail = trxLineArray
@@ -551,7 +581,7 @@ export class SalesCartPage implements OnInit, OnChanges {
       let discPct = this.discountGroupMasterList.find(x => x.code === discountGroupCode);
       if (discPct) {
          if (discPct.attribute1 === "0") {
-            item.discountExpression = null;            
+            item.discountExpression = null;
             if (this.configSystemWideActivateExtraDiscount) {
                if (discPct.attribute4) {
                   item.discountExpression = discPct.attribute4;
@@ -630,6 +660,7 @@ export class SalesCartPage implements OnInit, OnChanges {
                })
             }
             this.selectedItem.qtyRequest = totalQty;
+            this.selectedItem.qtyToShip = this.selectedItem.qtyRequest;
             this.computeAllAmount(this.selectedItem);
          }
       } catch (e) {
@@ -761,5 +792,14 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    /* #endregion */
+
+   validateToShipQty(trxLine: TransactionDetail) {
+      if (trxLine.qtyToShip > (trxLine.qtyRequest - (trxLine.qtyCommit??0))) {
+         this.toastService.presentToast("Invalid To Ship Quantity", `To Ship quantity [${trxLine.qtyToShip}] is higher than open quantity [${(trxLine.qtyRequest - (trxLine.qtyCommit??0))}]`, "top", "warning", 1000);
+         setTimeout(() => {
+            trxLine.qtyToShip = trxLine.qtyRequest - (trxLine.qtyCommit??0);
+         }, 1);
+      }
+   }
 
 }

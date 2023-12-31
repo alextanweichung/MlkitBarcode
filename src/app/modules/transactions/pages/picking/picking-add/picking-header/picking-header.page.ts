@@ -218,6 +218,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   })
                   this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
                   this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+                  console.log("🚀 ~ file: picking-header.page.ts:221 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ this.uniqueItemCode:", this.uniqueItemCode)
                   this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
                   this.uniqueSku.forEach(r => {
                      this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);

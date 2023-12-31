@@ -147,7 +147,13 @@
                   <ion-label>
                      <div>Quantity</div>
                   </ion-label>
-                  <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionBlur)="computeQty()" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
+                  <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionBlur)="checkQtyInput(selectedItem); computeQty()" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
+               </ion-item>
+               <ion-item *ngIf="isSalesOrder">
+                  <ion-label>
+                     <div>To Ship Qty.</div>
+                  </ion-label>
+                  <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyToShip" (ionBlur)="validateToShipQty(selectedItem)" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
                </ion-item>
                <ion-item>
                   <ion-label>
