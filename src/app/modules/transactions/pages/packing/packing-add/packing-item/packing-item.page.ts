@@ -170,59 +170,133 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    }
 
    runAssemblyPackingEngine(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[]) {
+      // let findComponentItem: LineAssembly;
+      // if (findAssemblyItem) {
+      //    findAssemblyItem.forEach(item => {
+      //       findComponentItem = item.assembly.find(x => x.itemComponentId == itemFound.itemId);
+      //    })
+      // }
+      // if (findComponentItem) {
+      //    let mainItemFound = this.objectService.multiPackingObject.outstandingPackList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+      //    let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+      //    let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
+      //    if (outstandingLines.length > 0) {
+      //       let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
+      //       let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
+      //       let osTotalQtyPacked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPacked ?? 0), 0);
+      //       let osTotalQtyCurrent = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
+      //       let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPacked - osTotalQtyCurrent;
+      //       let osTotalAvailableQtyPicked = osTotalQtyPicked - osTotalQtyPacked - osTotalQtyCurrent;
+      //       switch (this.packingQtyControl.toUpperCase()) {
+      //          //No control
+      //          case "0":
+      //             this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+      //             break;
+      //          //Not allow pick quantity more than SO quantity
+      //          case "1":
+      //             if (osTotalAvailableQty >= inputQty) {
+      //                this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+      //                let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
+      //                let totalQtyPacked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPacked, 0);
+      //                let totalQtyRequest = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyRequest, 0);
+      //                if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
+      //                   this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
+      //                }
+      //             } else {
+      //                this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity. 22", "top", "warning", 1000);
+      //             }
+      //             break;
+      //          //Not allow pack quantity more than pick quantity
+      //          case "2":
+      //             if (osTotalAvailableQtyPicked >= inputQty) {
+      //                this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+      //                let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyCurrent, 0);
+      //                let totalQtyPacked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPacked, 0);
+      //                let totalQtyPicked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPicked, 0);
+      //                if (totalQtyCurrent + totalQtyPacked == totalQtyPicked) {
+      //                   this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
+      //                }
+      //             } else {
+      //                this.toastService.presentToast("Control Validation", "Input quantity exceeded picking quantity.", "top", "warning", 1000);
+      //             }
+      //             break;
+      //       }
+      //    }
+      //    return true;
+      // } else {
+      //    return false;
+      // }    
       let findComponentItem: LineAssembly;
       if (findAssemblyItem) {
-         findAssemblyItem.forEach(item => {
+         let anyOperationSuccess: boolean = false;
+         for (let item of findAssemblyItem) {
+            let componentOperationSuccess: boolean = false;
             findComponentItem = item.assembly.find(x => x.itemComponentId == itemFound.itemId);
-         })
-      }
-      if (findComponentItem) {
-         let mainItemFound = this.objectService.multiPackingObject.outstandingPackList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-         let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-         let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
-         if (outstandingLines.length > 0) {
-            let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
-            let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
-            let osTotalQtyPacked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPacked ?? 0), 0);
-            let osTotalQtyCurrent = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
-            let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPacked - osTotalQtyCurrent;
-            let osTotalAvailableQtyPicked = osTotalQtyPicked - osTotalQtyPacked - osTotalQtyCurrent;
-            switch (this.packingQtyControl.toUpperCase()) {
-               //No control
-               case "0":
-                  this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
-                  break;
-               //Not allow pick quantity more than SO quantity
-               case "1":
-                  if (osTotalAvailableQty >= inputQty) {
-                     this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
-                     let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
-                     let totalQtyPacked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPacked, 0);
-                     let totalQtyRequest = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyRequest, 0);
-                     if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
-                        this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
-                     }
-                  } else {
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity. 22", "top", "warning", 1000);
+            if (findComponentItem) {
+               let mainItemFound = this.objectService.multiPackingObject.outstandingPackList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+               let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
+               if (outstandingLines.length > 0) {
+                  let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
+                  let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
+                  let osTotalQtyPacked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPacked ?? 0), 0);
+                  let osTotalQtyCurrent = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
+                  let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPacked - osTotalQtyCurrent;
+                  let osTotalAvailableQtyPicked = osTotalQtyPicked - osTotalQtyPacked - osTotalQtyCurrent;
+                  switch (this.packingQtyControl) {
+                     //No control
+                     case "0":
+                        this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+                        componentOperationSuccess = true;
+                        break;
+                     //Not allow pack quantity more than SO quantity
+                     case "1":
+                        if (osTotalAvailableQty >= inputQty) {
+                           this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+                           componentOperationSuccess = true;
+                           let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
+                           let totalQtyPacked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPacked, 0);
+                           let totalQtyRequest = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyRequest, 0);
+                           if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
+                              this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
+                           }
+                        } else {
+                           componentOperationSuccess = false;
+                        }
+                        break;
+                     //Not allow pack quantity more than pick quantity
+                     case "2":
+                        if (osTotalAvailableQtyPicked >= inputQty) {
+                           this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+                           componentOperationSuccess = true;
+                           let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyCurrent, 0);
+                           let totalQtyPacked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPacked, 0);
+                           let totalQtyPicked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPicked, 0);
+                           if (totalQtyCurrent + totalQtyPacked == totalQtyPicked) {
+                              this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
+                           }
+                        } else {
+                           componentOperationSuccess = false;
+                        }
+                        break;
                   }
-                  break;
-               //Not allow pack quantity more than pick quantity
-               case "2":
-                  if (osTotalAvailableQtyPicked >= inputQty) {
-                     this.insertAssemblyPackingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
-                     let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyCurrent, 0);
-                     let totalQtyPacked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPacked, 0);
-                     let totalQtyPicked = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyPicked, 0);
-                     if (totalQtyCurrent + totalQtyPacked == totalQtyPicked) {
-                        this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
-                     }
+                  if (componentOperationSuccess) {
+                     anyOperationSuccess = true;
+                     break;
                   } else {
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded picking quantity.", "top", "warning", 1000);
+                     anyOperationSuccess = false;
+                     continue;
                   }
-                  break;
+               }
+               return true;
             }
          }
-         return true;
+         if (anyOperationSuccess) {
+            return true;
+         } else {
+            this.toastService.presentToast("Control Validation", "Input quantity exceeded picking quantity.", "top", "warning", 1000);
+            return false;
+         }
       } else {
          return false;
       }
@@ -347,6 +421,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    }
 
    mapAssemblyPackingAssignment(outstandingLines: SalesOrderLineForWD[], currentPackListLines: CurrentPackList[]) {
+      currentPackListLines = currentPackListLines.filter(x => x.assemblyItemId == outstandingLines[0].itemId)
       currentPackListLines.forEach(x => {
          x.variations = [];
       })
@@ -357,7 +432,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          let rightLoopCount: number = 0;
          for (let os of duplicateOutstandingLines) {
             for (let assembly of os.assembly) {
-               if (assembly.itemComponentId == currentPackListLines[0].itemId) {
+               if (assembly.itemComponentId == currentPackListLines[0].itemId && assembly.assemblyItemId == currentPackListLines[0].assemblyItemId) {
                   let currentPackAssignment: CurrentPackAssignment = {
                      qtyPacked: assembly.qtyCurrent,
                      salesOrderId: os.salesOrderId,
@@ -924,7 +999,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       } else {
          let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == item.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
          let outstandingLines = findAssemblyItem.flatMap(x => x.assembly).filter(y => y.itemComponentId == item.itemId);
-         let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemId == item.itemId && x.assemblyItemId);
+         let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemId == item.itemId && x.assemblyItemId == outstandingLines[0].assemblyItemId);
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);

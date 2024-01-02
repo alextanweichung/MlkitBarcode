@@ -142,41 +142,57 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    runAssemblyPickingEngine(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[]) {
       let findComponentItem: LineAssembly;
       if (findAssemblyItem) {
-         findAssemblyItem.forEach(item => {
+         let anyOperationSuccess: boolean = false;
+         for (let item of findAssemblyItem) {
+            let componentOperationSuccess: boolean = false;
             findComponentItem = item.assembly.find(x => x.itemComponentId == itemFound.itemId);
-         })
-      }
-      if (findComponentItem) {
-         let mainItemFound = this.objectService.multiPickingObject.outstandingPickList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-         let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-         let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
-         if (outstandingLines.length > 0) {
-            let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
-            let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
-            let osTotalQtyCurrent = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
-            let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPicked - osTotalQtyCurrent;
-            switch (this.pickingQtyControl.toUpperCase()) {
-               //No control
-               case "N":
-                  this.insertAssemblyPickingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
-                  break;
-               //Not allow pick quantity more than SO quantity
-               case "Y":
-                  if (osTotalAvailableQty >= inputQty) {
-                     this.insertAssemblyPickingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
-                     let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
-                     let totalQtyPicked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
-                     let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
-                     if (totalQtyCurrent + totalQtyPicked == totalQtyRequest) {
-                        this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
-                     }
-                  } else {
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+            if (findComponentItem) {
+               let mainItemFound = this.objectService.multiPickingObject.outstandingPickList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+               let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
+               if (outstandingLines.length > 0) {
+                  let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
+                  let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
+                  let osTotalQtyCurrent = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
+                  let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPicked - osTotalQtyCurrent;
+                  switch (this.pickingQtyControl.toUpperCase()) {
+                     //No control
+                     case "N":
+                        this.insertAssemblyPickingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+                        componentOperationSuccess = true;
+                        break;
+                     //Not allow pick quantity more than SO quantity
+                     case "Y":
+                        if (osTotalAvailableQty >= inputQty) {
+                           this.insertAssemblyPickingLine(itemFound, inputQty, outstandingLines, mainItemFound.itemId);
+                           componentOperationSuccess = true;
+                           let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
+                           let totalQtyPicked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
+                           let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
+                           if (totalQtyCurrent + totalQtyPicked == totalQtyRequest) {
+                              this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
+                           }
+                        } else {
+                           componentOperationSuccess = false;
+                        }
+                        break;
                   }
-                  break;
+                  if (componentOperationSuccess) {
+                     anyOperationSuccess = true;
+                     break;
+                  } else {
+                     anyOperationSuccess = false;
+                     continue;
+                  }
+               }
             }
          }
-         return true;
+         if (anyOperationSuccess) {
+            return true;
+         } else {
+            this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+            return false;
+         }
       } else {
          return false;
       }
@@ -236,6 +252,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    }
 
    mapAssemblyPickingAssignment(outstandingLines: SalesOrderLineForWD[], currentPickListLines: CurrentPickList[]) {
+      currentPickListLines = currentPickListLines.filter(x => x.assemblyItemId == outstandingLines[0].itemId)
       currentPickListLines.forEach(x => {
          x.variations = [];
       })
@@ -246,7 +263,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          let rightLoopCount: number = 0;
          for (let os of duplicateOutstandingLines) {
             for (let assembly of os.assembly) {
-               if (assembly.itemComponentId == currentPickListLines[0].itemId) {
+               if (assembly.itemComponentId == currentPickListLines[0].itemId && assembly.assemblyItemId == currentPickListLines[0].assemblyItemId) {
                   let currentPickAssignment: PickingLineVariation = {
                      qtyPicked: assembly.qtyCurrent,
                      salesOrderId: os.salesOrderId,
@@ -777,7 +794,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       } else {
          let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == item.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
          let outstandingLines = findAssemblyItem.flatMap(x => x.assembly).filter(y => y.itemComponentId == item.itemId);
-         let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemId == item.itemId && x.assemblyItemId);
+         let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemId == item.itemId && x.assemblyItemId == outstandingLines[0].assemblyItemId);
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
