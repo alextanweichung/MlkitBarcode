@@ -51,6 +51,9 @@ export class RpCheckQohPage implements OnInit {
             }
             this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
                this.objects = response;
+               console.log("🚀 ~ file: rp-check-qoh.page.ts:54 ~ RpCheckQohPage ~ this.objectService.getCheckQoh ~ this.objects:", JSON.stringify(this.objects))
+               // let blob = new Blob([JSON.stringify(this.objects)], {type: "text/plain"});
+               // this.file.writeFile(this.file.dataDirectory, "debug", blob, { replace: true, append: false });
                await this.massageData();
                await this.loadingService.dismissLoading();
                this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
@@ -85,6 +88,7 @@ export class RpCheckQohPage implements OnInit {
             qoh: r.inventoryLevel.reduce((a, c) => a + (c.qty - c.openQty), 0),
             price: price
          })
+         console.log("🚀 ~ file: rp-check-qoh.page.ts:91 ~ RpCheckQohPage ~ forawait ~ this.realObject:", JSON.stringify(this.realObject))
       }
 
       // this.objects.forEach(r => {

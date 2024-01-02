@@ -405,8 +405,6 @@ export class CommonQueryService<T> {
                   values: []
                })
             }
-            let blob = new Blob([JSON.stringify(statements)], {type: 'text/plain'});
-            this.file.writeFile(this.file.dataDirectory, 'tettst', blob, { replace: true, append: false });
             let timestart = new Date();
             await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
                let ret: any = await db.executeSet(statements, true);

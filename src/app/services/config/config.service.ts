@@ -50,7 +50,7 @@ export class ConfigService {
          if (Capacitor.getPlatform() === "web") {
             this.sys_parameter.push({
                Sys_ParameterId: 1,
-               apiUrl: "https://localhost:44351/api/",
+               // apiUrl: "https://localhost:44351/api/",
                // apiUrl: "https://idcp-demo.com/api/",
                //  apiUrl: "https://demo.idcp-demo.com/api/",
                // apiUrl: "https://idcp-testing.motorparts.asia/api/",
@@ -58,7 +58,7 @@ export class ConfigService {
                // apiUrl: "https://idcp.motorparts.asia/api/",
                // apiUrl: "https://idcp.umaracing.com/api/",
                // apiUrl: "https://idcp-ararat.com:8081/api/",
-               // apiUrl: "https://idcp.rcb.com/api/",
+               apiUrl: "https://idcp.rcb.com/api/",
                // apiUrl: "https://tfsb-sys.com:1000/api/",
                // apiUrl: "https://adt-sys.com/api/",
                // apiUrl: "https://rcb-sys.com/api/",
