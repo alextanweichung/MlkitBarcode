@@ -145,6 +145,12 @@ export class BinCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
    itemSearchText: string;
    filteredObj: BinCountList[] = [];
    search(searchText, newSearch: boolean = false) {

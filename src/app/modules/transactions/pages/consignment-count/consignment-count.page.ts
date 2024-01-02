@@ -230,6 +230,12 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 		}
 	}
 
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
 	itemSearchText: string;
 	filteredObj: ConsignmentCountHeader[] = [];
 	search(searchText, newSearch: boolean = false) {

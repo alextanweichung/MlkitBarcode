@@ -138,6 +138,12 @@ export class PalletAssemblyPage implements OnInit, ViewWillEnter, ViewDidEnter {
 		this.navController.navigateForward("/transactions/pallet-assembly/pallet-assembly-detail", navigationExtras);
 	}
 
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
 	itemSearchText: string;
 	search(searchText, newSearch: boolean = false) {
 		if (newSearch) {

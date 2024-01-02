@@ -189,6 +189,12 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
     }
   }
 
+  async onKeyDown(event, searchText) {
+     if (event.keyCode === 13) {
+        await this.search(searchText, true);
+     }
+  }
+
   itemSearchText: string;
   filteredObj: StockCount[] = [];
   search(searchText, newSearch: boolean = false) {

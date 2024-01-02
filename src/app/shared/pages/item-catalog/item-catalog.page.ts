@@ -270,9 +270,9 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       })
    }
 
-   onKeyDown(event) {
+   onKeyDown(event, searchText) {
       if (event.keyCode === 13) {
-         this.searchItem(this.itemSearchText, true);
+         this.searchItem(searchText, true);
          event.preventDefault();
       }
    }
