@@ -36,6 +36,12 @@ export class RpCheckQohPage implements OnInit {
       ]
    }
 
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
    itemSearchText: string;
    async search(searchText, newSearch: boolean = false) {
       if (newSearch) {
