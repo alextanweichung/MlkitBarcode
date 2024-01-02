@@ -80,17 +80,17 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ngOnInit() {
       if (Capacitor.getPlatform() === "web") {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         this.signin_form.get("userEmail").setValue("aychia@idcp.my");
          // this.signin_form.get("userEmail").setValue("john@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
          // this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
-         this.signin_form.get("userEmail").setValue("wayne@idcp.my");
+         // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
          // this.signin_form.get("userEmail").setValue("waynecon@idcp.my");
-         // this.signin_form.get("password").setValue("Dev8888");
+         this.signin_form.get("password").setValue("Dev8888");
          // this.signin_form.get("password").setValue("i@Dmin7026");
-         this.signin_form.get("password").setValue("c0nnecT#7026");
+         // this.signin_form.get("password").setValue("c0nnecT#7026");
          // this.signin_form.get("password").setValue("String1234");
       } else {
          this.setSelectedParam();
@@ -206,7 +206,6 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      })
 
                      this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-                     console.log("🚀 ~ file: signin.page.ts:209 ~ SigninPage ~ this.configService.loginUser:", JSON.stringify(this.configService.loginUser))
                      if (this.configService.loginUser.loginUserType === "C") {
                         if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
                            // for consignment user more than 1 location, go to dashboard and let user select then only sync
@@ -264,7 +263,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                         let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
                         await this.configService.syncInboundData(itemMaster, itemBarcode);
                         await this.loadingService.dismissLoading();
-                        // await this.navController.navigateRoot("/dashboard");
+                        await this.navController.navigateRoot("/dashboard");
                      }
                   } catch (error) {
                      this.submit_attempt = false;

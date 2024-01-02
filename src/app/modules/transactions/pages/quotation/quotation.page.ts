@@ -48,8 +48,8 @@ export class QuotationPage implements OnInit, ViewWillEnter {
          this.endDate = this.commonService.getTodayDate();
       }
       await this.objectService.loadRequiredMaster();
-      this.loadObjects();
-      this.bindCustomerList();
+      await this.loadObjects();
+      await this.bindCustomerList();
    }
 
    ngOnInit() {

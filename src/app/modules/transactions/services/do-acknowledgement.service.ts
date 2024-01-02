@@ -6,6 +6,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { DOAcknowledegementRequest, DoAcknowledgement } from '../models/do-acknowledgement';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -24,17 +25,33 @@ export class DoAcknowledgementService {
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
-      private authService: AuthService
+      private authService: AuthService,
+      private loadingService: LoadingService
    ) { }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadMasterList();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
 
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.vehicleMasterList = this.fullMasterList.filter(x => x.objectName === "Vehicle").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         }
+      })
    }
 
    getMasterList() {

@@ -11,6 +11,8 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { MenuItem, MenuItemRoot } from './menu-item';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { RestrictedColumn } from 'src/app/shared/models/restricted-column';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { MasterList } from 'src/app/shared/models/master-list';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -30,6 +32,9 @@ export class AuthService {
    moduleControlConfig: ModuleControl[];
    model: MenuItem[];
    precisionList: PrecisionList[];
+
+   systemWideGetCustomerUponLogin: boolean = false;
+   customerMasterList: MasterListDetails[];
 
    // dashboardItem: MenuItem;
 
@@ -55,6 +60,9 @@ export class AuthService {
    // Create precisionListSubject to observe from value of HTTP Get for Precision Config
    private precisionListSubject = new ReplaySubject<PrecisionList[]>(1);
    precisionList$ = this.precisionListSubject.asObservable();
+
+   private customerMasterListSubject = new ReplaySubject<MasterListDetails[]>(1);
+   customerMasterList$ = this.customerMasterListSubject.asObservable();
 
    constructor(
       private navController: NavController,
@@ -142,6 +150,15 @@ export class AuthService {
       // this.buildMasterDefinedGroup();  
    }
 
+   buildMasterList() {
+      this.getMasterList().subscribe(response => {
+         let masterList = response;
+         this.customerMasterList = masterList.filter(x => x.objectName === "Customer").flatMap(src => src.details);
+         console.log("🚀 ~ file: auth.service.ts:157 ~ AuthService ~ this.getMasterList ~ this.customerMasterList:", this.customerMasterList)
+         this.setCustomerMasterList(this.customerMasterList);
+      });
+   }
+
    buildMenuModel() {
       this.getMenuHierachy().subscribe(response => {
          this.model = response;
@@ -168,6 +185,15 @@ export class AuthService {
       this.getModuleControl().subscribe(response => {
          this.moduleControlConfig = response;
          this.setModuleControl(this.moduleControlConfig);
+         let getCustomerList = this.moduleControlConfig.find(x => x.ctrlName === "SystemWideGetCustomerUponLogin");
+         console.log("🚀 ~ file: auth.service.ts:188 ~ AuthService ~ this.getModuleControl ~ getCustomerList:", getCustomerList)
+         if (getCustomerList && getCustomerList.ctrlValue.toUpperCase() === "Y") {
+            this.systemWideGetCustomerUponLogin = true;
+            this.buildMasterList();
+         } else {
+            this.systemWideGetCustomerUponLogin = false;
+            this.setCustomerMasterList(null);
+         }
       });
    }
 
@@ -210,10 +236,6 @@ export class AuthService {
       )
    }
 
-   getPrecisionList() {
-      return this.http.get<PrecisionList[]>(this.configService.selected_sys_param.apiUrl + "account/precision");
-   }
-
    setModuleControl(item: any) {
       this.moduleControlSubject.next(item);
       let showSearchResult = item.find(x => x.ctrlName === "ShowSearchResult");
@@ -222,8 +244,20 @@ export class AuthService {
       }
    }
 
+   getPrecisionList() {
+      return this.http.get<PrecisionList[]>(this.configService.selected_sys_param.apiUrl + "account/precision");
+   }
+
    setPrecisionList(item: any) {
       this.precisionListSubject.next(item);
+   }
+
+   getMasterList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "account/customerlist");
+   }
+
+   setCustomerMasterList(item: any) {
+      this.customerMasterListSubject.next(item);
    }
 
    isTokenExpired(token?: string): boolean {
@@ -255,6 +289,7 @@ export class AuthService {
       this.currentUserTokenSource.next(null);
       this.menuItemSubject.next(null);
       this.precisionListSubject.next(null);
+      this.customerMasterListSubject.next(null);
       this.isLoggedIn = false;
       this.isAdmin = false;
       this.configService.loginUser = null;

@@ -61,9 +61,8 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          this.endDate = this.commonService.getTodayDate();
       }
       await this.objectService.resetVariables();
-      // reload all masterlist whenever user enter listing
       await this.objectService.loadRequiredMaster();
-      // await this.bindLocationList();
+      await this.loadObjects();
       if (this.configService.selected_location) {
          this.objectService.selectedLocation = this.configService.selected_location;
          await this.loadPendingList();
@@ -71,7 +70,7 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
    }
 
    async ionViewDidEnter(): Promise<void> {
-      await this.loadObjects();
+      
    }
 
    ngOnInit() {

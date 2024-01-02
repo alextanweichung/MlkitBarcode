@@ -39,15 +39,14 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-      // await this.objectService.loadRequiredMaster();
-      this.route.queryParams.subscribe(params => {
+      this.route.queryParams.subscribe(async params => {
          this.objectId = params["objectId"];
          this.processType = params["processType"];
          this.selectedSegment = params["selectedSegment"];
          if (!this.objectId) {
             this.navController.navigateBack("/transactions/backtoback-order");
          } else {
-            this.loadObject();
+            await this.loadObject();
          }
       })
    }

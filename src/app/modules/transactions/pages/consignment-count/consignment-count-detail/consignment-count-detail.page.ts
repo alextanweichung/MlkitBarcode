@@ -38,19 +38,19 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 		if ((await Network.getStatus()).connected) {
 			await this.objectService.loadRequiredMaster();
 		}
-		this.route.queryParams.subscribe(params => {
+		this.route.queryParams.subscribe(async params => {
 			this.isLocal = params["isLocal"];
 			this.guid = params["guid"];
 			if (this.isLocal) {
 				if (this.guid) {
-					this.loadLocalObject();
+					await this.loadLocalObject();
 				} else {
 					this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
 				}
 			} else {
 				this.objectId = params["objectId"];
 				if (this.objectId) {
-					this.loadObject();
+					await this.loadObject();
 				}
 			}
 		})

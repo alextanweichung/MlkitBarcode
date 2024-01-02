@@ -71,7 +71,7 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async ionViewWillEnter(): Promise<void> {
       await this.objectService.loadRequiredMaster();
-      //  await this.consignmentCountService.loadRequiredMaster();
+      await this.loadAnnouncements();
       this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
    }
 
@@ -94,7 +94,6 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.showLocationModal();
          }
       }
-      await this.loadAnnouncements();
       this.last_sync_datetime = this.configService.selected_sys_param.lastDownloadAt;
    }
 

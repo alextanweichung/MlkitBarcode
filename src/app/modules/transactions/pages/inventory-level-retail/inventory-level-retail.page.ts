@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonAccordionGroup, IonPopover } from '@ionic/angular';
+import { IonAccordionGroup, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
@@ -7,13 +7,14 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { InventoryLevelService } from '../../services/inventory-level.service';
 import { InventoryLevelRoot, InventoryLevelVariationRoot, ItemPriceBySegment } from '../../models/inventory-level';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
    selector: 'app-inventory-level-retail',
    templateUrl: './inventory-level-retail.page.html',
    styleUrls: ['./inventory-level-retail.page.scss'],
 })
-export class InventoryLevelRetailPage implements OnInit {
+export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
 
    @ViewChild("accordionGroup", { static: false }) accordionGroup: IonAccordionGroup;
 
@@ -26,21 +27,21 @@ export class InventoryLevelRetailPage implements OnInit {
    object: InventoryLevelRoot;
    variationObject: InventoryLevelVariationRoot;
 
-   loginUser: any;
-
    constructor(
       public objectService: InventoryLevelService,
+      private authService: AuthService,
+      private configService: ConfigService,
       private toastService: ToastService,
-      private authService: AuthService
-   ) {
-      this.loginUser = JSON.parse(localStorage.getItem("loginUser"));
-      // reload all masterlist whenever user enter listing
-      this.objectService.loadRequiredMaster();
+   ) { }
+
+   async ionViewWillEnter(): Promise<void> {
+      await this.objectService.loadRequiredMaster();
+      await this.loadModuleControl();
+      await this.loadItemList();
    }
 
    ngOnInit() {
-      this.loadModuleControl();
-      this.loadItemList();
+
    }
 
    moduleControl: ModuleControl[] = [];
@@ -115,14 +116,14 @@ export class InventoryLevelRetailPage implements OnInit {
          if (lookUpItem) {
             this.itemInfo = lookUpItem;
             this.hideEmpty = false;
-            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
+            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId).subscribe(async response => {
                this.object = response;
                await this.computeLocationList();
             }, error => {
                console.log(error);
             })
             if (lookUpItem.variationTypeCode !== "0") {
-               this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
+               this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId).subscribe(async response => {
                   this.variationObject = response;
                   await this.computeLocationList();
                   await this.computeVariationXY();
@@ -199,7 +200,7 @@ export class InventoryLevelRetailPage implements OnInit {
    advancedFilter() {
       try {
          if (this.selectedViewOptions === "item") {
-            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.object = response;
                if (this.selectedLocation !== "all") {
                   this.object.itemInfo = this.object.itemInfo.filter(r => r.locationCode === this.selectedLocation);
@@ -213,7 +214,7 @@ export class InventoryLevelRetailPage implements OnInit {
             })
          }
          else {
-            this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+            this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.variationObject = response;
                // location filter
                if (this.selectedLocation !== "all") {
@@ -295,7 +296,7 @@ export class InventoryLevelRetailPage implements OnInit {
       if (itemId) {
          this.prices = [];
          try {
-            this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+            this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.prices = response;
             }, error => {
                console.error(error);

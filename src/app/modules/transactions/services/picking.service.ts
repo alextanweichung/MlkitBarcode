@@ -8,6 +8,8 @@ import { background_load } from 'src/app/core/interceptors/error-handler.interce
 import { ItemImage } from '../models/item';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,7 +23,9 @@ export class PickingService {
 
    constructor(
       private http: HttpClient,
-      private configService: ConfigService
+      private configService: ConfigService,
+      private authService: AuthService,
+      private loadingService: LoadingService
    ) { }
 
    /* #region store as one set data for each picking */
@@ -241,8 +245,17 @@ export class PickingService {
    }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
-      await this.loadStaticLov();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadMasterList();
+         await this.loadStaticLov();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
 
    fullMasterList: MasterList[] = [];
@@ -260,6 +273,12 @@ export class PickingService {
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         }
+      })
    }
 
    fullStaticLovList: MasterList[] = [];

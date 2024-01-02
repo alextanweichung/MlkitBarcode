@@ -42,7 +42,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    ionViewWillEnter(): void {
       this.isMobile = Capacitor.getPlatform() !== "web";
-      this.isWithType = this.objectService.header.isWithSo ? "SO" : "NONE";
+      this.isWithType = this.objectService.header?.isWithSo ? "SO" : "NONE";
       if (this.objectService.header && this.objectService.header.multiPickingId > 0) {
          this.objectForm.patchValue(this.objectService.object.header);
          this.loadExisitingSO(this.objectService.object.outstandingPickList.flatMap(r => r.salesOrderNum));

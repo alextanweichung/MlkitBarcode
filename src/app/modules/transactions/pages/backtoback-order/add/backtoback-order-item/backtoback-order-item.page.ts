@@ -32,7 +32,6 @@ export class BacktobackOrderItemPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       try {
-         await this.objectService.loadRequiredMaster();
          if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
             this.navController.navigateBack("/transactions/backtoback-order/backtoback-order-header");
          }

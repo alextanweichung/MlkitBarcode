@@ -20,6 +20,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -30,7 +31,7 @@ const httpObserveHeader = {
    providedIn: 'root'
 })
 export class BackToBackOrderService {
-   
+
    showLatestPrice: boolean = false;
    showQuantity: boolean = false;
 
@@ -57,17 +58,25 @@ export class BackToBackOrderService {
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
-      private authService: AuthService
-   ) {
-
-   }
+      private authService: AuthService,
+      private loadingService: LoadingService
+   ) { }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
-      await this.loadStaticLovList();
-      await this.loadCustomer();
-      await this.loadModuleControl();
-      await this.loadPromotion();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadMasterList();
+         await this.loadStaticLovList();
+         await this.loadCustomer();
+         await this.loadModuleControl();
+         await this.loadPromotion();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
 
    async loadMasterList() {
@@ -84,6 +93,12 @@ export class BackToBackOrderService {
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         }
+      })
    }
 
    async loadStaticLovList() {

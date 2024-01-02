@@ -38,7 +38,6 @@ export class PackingPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       // reload all masterlist whenever user enter listing
-      await this.objectService.loadRequiredMaster();
       try {
          if (!this.startDate) {
             this.startDate = this.commonService.getFirstDayOfTodayMonth();
@@ -46,7 +45,8 @@ export class PackingPage implements OnInit, ViewWillEnter {
          if (!this.endDate) {
             this.endDate = this.commonService.getTodayDate();
          }
-         this.loadObjects();
+         await this.objectService.loadRequiredMaster();
+         await this.loadObjects();
       } catch (e) {
          console.error(e);
       }

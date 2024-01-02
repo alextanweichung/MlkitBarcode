@@ -38,16 +38,15 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
       private alertController: AlertController
    ) { }
 
-   ionViewWillEnter(): void {
-      // this.objectService.loadRequiredMaster();
-      this.route.queryParams.subscribe(params => {
+   ionViewWillEnter(): void {      
+      this.route.queryParams.subscribe(async params => {
          this.objectId = params["objectId"];
          this.processType = params["processType"];
          this.selectedSegment = params["selectedSegment"];
          if (!this.objectId) {
             this.navController.navigateBack("/transactions/quotation");
          } else {
-            this.loadObject();
+            await this.loadObject();
          }
       })
    }

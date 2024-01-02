@@ -35,8 +35,8 @@ const httpObserveHeader = {
    providedIn: 'root'
 })
 export class SalesOrderService {
-   
-   showLatestPrice: boolean = false;   
+
+   showLatestPrice: boolean = false;
    showQuantity: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
@@ -90,6 +90,12 @@ export class SalesOrderService {
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         }
+      })
       this.bindSalesAgentList();
    }
 
@@ -211,7 +217,7 @@ export class SalesOrderService {
             } else {
                this.configSalesTransactionShowHistory = false;
             }
-            
+
          })
          this.authService.precisionList$.subscribe(precision => {
             this.precisionSales = precision.find(x => x.precisionCode === "SALES");
@@ -251,7 +257,6 @@ export class SalesOrderService {
    objectSummary: SalesOrderRoot;
    async setHeader(objectHeader: SalesOrderHeader) {
       this.objectHeader = objectHeader;
-      console.log("🚀 ~ file: sales-order.service.ts:243 ~ SalesOrderService ~ setHeader ~ this.objectHeader:", this.objectHeader)
       // load promotion first after customer confirmed or whenever header changed.
       await this.loadPromotion();
    }
@@ -273,7 +278,6 @@ export class SalesOrderService {
 
    removeHeader() {
       this.objectHeader = null;
-      console.log("🚀 ~ file: sales-order.service.ts:265 ~ SalesOrderService ~ removeHeader ~ this.objectHeader:", this.objectHeader)
    }
 
    removeLine() {

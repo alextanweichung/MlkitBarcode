@@ -36,7 +36,7 @@ export class QuotationItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    ionViewWillEnter(): void {
       try {
-         this.objectService.loadRequiredMaster();
+         // this.objectService.loadRequiredMaster();
          if (!this.objectService.objectHeader || this.objectService.objectHeader === undefined || this.objectService.objectHeader === null) {
             this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
             this.navController.navigateBack("/transactions/quotation/quotation-header");

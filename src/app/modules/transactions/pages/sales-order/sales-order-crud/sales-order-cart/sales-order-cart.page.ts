@@ -52,7 +52,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      // await this.objectService.loadRequiredMaster();
       if (this.objectService.objectHeader && this.objectService.objectHeader.salesOrderId > 0) {
          await this.loadSalesHistory();
       }
@@ -60,7 +59,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          this.dateValue = format(new Date(this.objectService.objectHeader.deliveryDate), "yyyy-MM-dd") + "T08:00:00.000Z";
          this.setFormattedDateString();
       }
-      this.validateMinOrderQty();
+      await this.validateMinOrderQty();
    }
 
    loadSalesHistory() {

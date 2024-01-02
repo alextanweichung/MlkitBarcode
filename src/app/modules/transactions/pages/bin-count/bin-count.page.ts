@@ -41,8 +41,6 @@ export class BinCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.resetVariables();
-      await this.objectService.loadRequiredMaster();
       try {
          if (!this.objectService.filterStartDate) {
             this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
@@ -50,7 +48,9 @@ export class BinCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
          if (!this.objectService.filterEndDate) {
             this.objectService.filterEndDate = this.commonService.getTodayDate();
          }
-         this.loadObjects();
+         await this.objectService.resetVariables();
+         await this.objectService.loadRequiredMaster();
+         await this.loadObjects();
       } catch (e) {
          console.error(e);
       }

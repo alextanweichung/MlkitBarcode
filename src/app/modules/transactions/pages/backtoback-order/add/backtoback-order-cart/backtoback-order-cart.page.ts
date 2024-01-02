@@ -52,7 +52,6 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
    }
 
    ngOnInit() {
-      this.objectService.loadRequiredMaster();
       this.loadRestrictColumms();
       this.loadAvailableAddresses();
    }

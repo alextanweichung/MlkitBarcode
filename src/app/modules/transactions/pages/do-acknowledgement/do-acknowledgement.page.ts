@@ -49,7 +49,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    async ionViewWillEnter(): Promise<void> {
       await this.objectService.loadRequiredMaster();
-      this.bindVehicleList();
+      await this.bindVehicleList();
       // this.selectAction();
    }
 

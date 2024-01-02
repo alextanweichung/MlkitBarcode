@@ -53,7 +53,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.loadRequiredMaster();
       if (this.objectService.objectHeader && this.objectService.objectHeader.quotationId > 0) {
          await this.loadSalesHistory();
       }
@@ -352,7 +351,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
    onLineEditComplete(event: TransactionDetail[]) {
       this.objectService.objectDetail = JSON.parse(JSON.stringify(event));
    }
-   
+
    /* #region toggle show latest price */
 
    toggleShowLatestPrice() {

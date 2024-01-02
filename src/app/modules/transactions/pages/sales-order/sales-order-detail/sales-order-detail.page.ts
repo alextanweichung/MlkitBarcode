@@ -53,19 +53,17 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       try {
-         // await this.objectService.loadRequiredMaster();
-         this.route.queryParams.subscribe(params => {
+         this.route.queryParams.subscribe(async params => {
             this.isDraft = params["isDraft"];
-            console.log("🚀 ~ file: sales-order-detail.page.ts:55 ~ SalesOrderDetailPage ~ ionViewWillEnter ~ this.isDraft:", this.isDraft)
             if (this.isDraft) {
                this.draftTransactionId = params["draftTransactionId"];
-               this.loadDraftObject();
+               await this.loadDraftObject();
             } else {
                this.objectId = params["objectId"];
                this.processType = params["processType"];
                this.selectedSegment = params["selectedSegment"];
                if (this.objectId && this.objectId > 0) {
-                  this.loadObject();
+                  await this.loadObject();
                } else {
                   this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "warning", 1000);
                   this.navController.navigateBack("/transactions/sales-order");

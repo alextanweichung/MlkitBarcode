@@ -6,6 +6,8 @@ import { CashDeposit } from '../models/cash-deposit';
 import { Customer } from '../models/customer';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,14 +23,25 @@ export class CashDepositService {
 
    constructor(
       private http: HttpClient,
-      private configService: ConfigService
+      private configService: ConfigService,
+      private authService: AuthService,
+      private loadingService: LoadingService
    ) {
 
    }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
-      // await this.loadCustomer();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadCustomer();
+         await this.loadMasterList();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
 
    fullMasterList: MasterList[] = [];
@@ -41,6 +54,12 @@ export class CashDepositService {
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         }
+      })
       // attribute6 = locationId
    }
 

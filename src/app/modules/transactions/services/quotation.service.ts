@@ -21,6 +21,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SalesHistoryInfo, SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -54,14 +55,24 @@ export class QuotationService {
       private http: HttpClient,
       private authService: AuthService,
       private configService: ConfigService,
+      private loadingService: LoadingService
    ) {
 
    }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
-      await this.loadCustomer();
-      await this.loadModuleControl();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadCustomer();
+         await this.loadMasterList();
+         await this.loadModuleControl();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
 
    async loadMasterList() {
@@ -76,6 +87,12 @@ export class QuotationService {
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         }
+      })
    }
 
    async loadCustomer() {
@@ -109,7 +126,7 @@ export class QuotationService {
    isCasePackQtyControlWarningOnly: boolean = false;
    consignBearingComputeGrossMargin: boolean = false;
    configSalesTransactionShowHistory: boolean = false;
-   
+
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };

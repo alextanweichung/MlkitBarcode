@@ -51,7 +51,6 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
    }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.loadRequiredMaster();
       this.objectService.resetVariables();
       if (!this.objectService.filterStartDate) {
          this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
@@ -62,6 +61,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
       if (this.configService.selected_location) {
          this.objectService.selectedLocation = this.configService.selected_location;
       }
+      await this.objectService.loadRequiredMaster();
       await this.loadObjects();
    }
 
