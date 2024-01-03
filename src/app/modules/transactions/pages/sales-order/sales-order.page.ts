@@ -44,7 +44,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       private navController: NavController,
       private differs: IterableDiffers
    ) {
-      // reload all masterlist whenever user enter listing
       this.objectDiffer = this.differs.find(this.objects).create();
    }
 

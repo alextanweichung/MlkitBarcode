@@ -1,4 +1,4 @@
-<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (search)="searchItem()" (keydown)="onKeyDown($event)"></ion-searchbar>
+<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event)"></ion-searchbar>
 
 <div class="main-card">
   <ion-grid class="ion-no-padding" *ngIf="availableItems.length > 0">

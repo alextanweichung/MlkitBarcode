@@ -15,7 +15,7 @@
         </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
-        <ion-searchbar #searchBar class="p-0" enterkeyhint="search" [(ngModel)]="searchText" showCancelButton="never" animated="true" [placeholder]="title ? 'Search for ' + title : 'Search'" (keydown)="onKeyDown($event)" (ionClear)="resetFilter();" (search)="searchItem()"></ion-searchbar>
+        <ion-searchbar #searchBar class="p-0" enterkeyhint="search" [(ngModel)]="searchText" showCancelButton="never" animated="true" [placeholder]="title ? 'Search for ' + title : 'Search'" (keydown)="onKeyDown($event)" (ionClear)="resetFilter();"></ion-searchbar>
       </ion-toolbar>
     </ion-header>
     <ion-content>

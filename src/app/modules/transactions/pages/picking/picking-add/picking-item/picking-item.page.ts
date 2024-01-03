@@ -742,7 +742,11 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             },
          ],
       });
-      await alert.present();
+      await alert.present().then(() => {
+         const firstInput: any = document.querySelector("ion-alert input");
+         firstInput.focus();
+         return;
+      });
    }
 
    clonedQty: { [s: number]: CurrentPickList } = {};
@@ -963,7 +967,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    insertObject() {
       try {
-         let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
+         let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);         
+         console.log("🚀 ~ file: picking-item.page.ts:968 ~ PickingItemPage ~ insertObject ~ :", JSON.stringify(this.objectService.multiPickingObject.outstandingPickList))
          let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPickingObject)
          if (!checkFullComponentScan) {
             this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);

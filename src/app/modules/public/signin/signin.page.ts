@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, IterableDiffers, OnInit, ViewChild } from '@angular/core';
 import { ActionSheetController, AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
@@ -38,7 +38,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       private loadingService: LoadingService,
       private alertController: AlertController,
       private navController: NavController,
-      private actionSheetController: ActionSheetController
+      private actionSheetController: ActionSheetController,
+      private differs: IterableDiffers
    ) {
       this.currentVersion = environment.version;
       this.newForm();
@@ -70,9 +71,12 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
-   loadCompanyNames() {
+   async loadCompanyNames() {
       if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
-         this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)));
+         for await (const r of this.configService.sys_parameter) {
+            this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl));
+            console.log("🚀 ~ file: signin.page.ts:78 ~ SigninPage ~ forawait ~ this.companyNames:", JSON.stringify(this.companyNames))
+         }
       }
    }
 

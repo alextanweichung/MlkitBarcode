@@ -1,4 +1,4 @@
-<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItem = []; startIndex = 0" (search)="searchItem(searchbar.value, true)" (keydown)="onKeyDown($event, searchbar.value)"></ion-searchbar>
+<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItem = []; startIndex = 0" (keydown)="onKeyDown($event, searchbar.value)"></ion-searchbar>
 
 <ng-container>   
    <ion-list class="list-custom animate__animated animate__fadeIn">
