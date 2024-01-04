@@ -170,7 +170,8 @@
            <ion-row>
              <ion-col class="ion-flex ion-margin-auto">
                 <ion-icon style="position:relative; top:0.1rem" *ngIf="rowData.variationTypeCode === '0' && rowData.assembly && rowData.assembly.length > 0" name="list-circle-outline"></ion-icon>
-                <div class="ion-text-wrap">{{rowData.description}}</div>
+                <!-- <div class="ion-text-wrap">{{rowData.description}}</div> -->
+               <div><ion-textarea [value]="rowData.description" autoGrow readonly></ion-textarea></div>
              </ion-col>
            </ion-row>
            <ion-row>

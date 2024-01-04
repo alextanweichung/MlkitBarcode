@@ -49,8 +49,9 @@
                            </ng-container>
                         </ion-row>
                         <ion-row>
-                           <ion-col class="ion-flex ion-margin-auto font-smaller">
-                              <div>{{rowData.description}}</div>
+                           <ion-col>
+                              <!-- <div>{{rowData.description}}</div> -->
+                              <div><ion-textarea [value]="rowData.description" autoGrow readonly></ion-textarea></div>
                            </ion-col>
                         </ion-row>
                         <ion-row>
@@ -363,7 +364,7 @@
             <ion-grid class="p-0">
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto font-smaller">
-                     <div>{{selectedItem.itemCode}} - {{selectedItem.description}}</div>
+                     <div>{{selectedItem.itemCode}}</div>
                   </ion-col>
                </ion-row>
                <div *ngFor="let vd of selectedItem.variationDetails">

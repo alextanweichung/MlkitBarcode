@@ -267,7 +267,6 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          })
          await modal.present();
          let { data } = await modal.onWillDismiss();
-         console.log("🚀 ~ file: sales-order.page.ts:273 ~ SalesOrderPage ~ filter ~ data:", data)
          if (data && data !== undefined) {
             this.objects = [];
             this.uniqueGrouping = [];

@@ -93,12 +93,12 @@ export class BackToBackOrderService {
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.authService.customerMasterList$.subscribe(obj => {
-         let savedCustomerList = obj;
-         if (savedCustomerList) {
-            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-         }
-      })
+      // this.authService.customerMasterList$.subscribe(obj => {
+      //    let savedCustomerList = obj;
+      //    if (savedCustomerList) {
+      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+      //    }
+      // })
    }
 
    async loadStaticLovList() {

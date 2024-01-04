@@ -46,12 +46,12 @@ export class DoAcknowledgementService {
       this.fullMasterList = await this.getMasterList();
       this.vehicleMasterList = this.fullMasterList.filter(x => x.objectName === "Vehicle").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.authService.customerMasterList$.subscribe(obj => {
-         let savedCustomerList = obj;
-         if (savedCustomerList) {
-            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-         }
-      })
+      // this.authService.customerMasterList$.subscribe(obj => {
+      //    let savedCustomerList = obj;
+      //    if (savedCustomerList) {
+      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+      //    }
+      // })
    }
 
    getMasterList() {

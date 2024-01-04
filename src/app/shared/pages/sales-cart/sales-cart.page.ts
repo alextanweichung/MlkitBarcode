@@ -626,7 +626,6 @@ export class SalesCartPage implements OnInit, OnChanges {
 
    async promotionCheck() {
       if (this.isAutoPromotion) {
-         console.log("🚀 ~ file: sales-cart.page.ts:598 ~ SalesCartPage ~ promotionCheck ~ this.isAutoPromotion:", this.isAutoPromotion)
          if (this.configSalesActivatePromotionEngine && this.objectHeader.isAutoPromotion && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
             await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, false, this.configSalesActivateTradingMargin)
          }

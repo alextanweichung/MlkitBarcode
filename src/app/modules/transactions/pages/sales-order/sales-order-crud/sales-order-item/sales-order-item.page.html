@@ -45,7 +45,7 @@
   </ng-template>
 </ion-popover>
 <ion-content fullscreen>
-  <div class="p-2">
+  <div class="px-2">
     <app-item-catalog [objectId]="objectService.objectHeader.salesOrderId" [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" (onHistoryCopied)="onHistoryCopied($event)" [showImage]="showImage" [showLatestPrice]="objectService.showLatestPrice && objectService.configSalesTransactionShowHistory" [isSalesOrder]="true" [showAvailQty]="objectService.showQuantity" [itemInCart]="objectService.objectDetail"></app-item-catalog>
   </div>
 </ion-content>

@@ -88,12 +88,12 @@ export class InboundScanService {
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.authService.customerMasterList$.subscribe(obj => {
-         let savedCustomerList = obj;
-         if (savedCustomerList) {
-            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-         }
-      })
+      // this.authService.customerMasterList$.subscribe(obj => {
+      //    let savedCustomerList = obj;
+      //    if (savedCustomerList) {
+      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+      //    }
+      // })
    }
 
    fullStaticLovList: MasterList[] = [];

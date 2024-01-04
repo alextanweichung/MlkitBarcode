@@ -73,10 +73,10 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async loadCompanyNames() {
       if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
-         for await (const r of this.configService.sys_parameter) {
-            this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl));
-            console.log("🚀 ~ file: signin.page.ts:78 ~ SigninPage ~ forawait ~ this.companyNames:", JSON.stringify(this.companyNames))
-         }
+         this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)))
+         // for await (const r of this.configService.sys_parameter) {
+         //    this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl));
+         // }
       }
    }
 
@@ -84,17 +84,17 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ngOnInit() {
       if (Capacitor.getPlatform() === "web") {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
          // this.signin_form.get("userEmail").setValue("john@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
-         // this.signin_form.get("userEmail").setValue("admin@idcp.my");
+         this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
          // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
          // this.signin_form.get("userEmail").setValue("waynecon@idcp.my");
-         this.signin_form.get("password").setValue("Dev8888");
+         // this.signin_form.get("password").setValue("Dev8888");
          // this.signin_form.get("password").setValue("i@Dmin7026");
-         // this.signin_form.get("password").setValue("c0nnecT#7026");
+         this.signin_form.get("password").setValue("c0nnecT#7026");
          // this.signin_form.get("password").setValue("String1234");
       } else {
          this.setSelectedParam();

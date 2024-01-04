@@ -267,12 +267,12 @@ export class PackingService {
       this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.authService.customerMasterList$.subscribe(obj => {
-         let savedCustomerList = obj;
-         if (savedCustomerList) {
-            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-         }
-      })
+      // this.authService.customerMasterList$.subscribe(obj => {
+      //    let savedCustomerList = obj;
+      //    if (savedCustomerList) {
+      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+      //    }
+      // })
    }
 
    fullStaticLovList: MasterList[] = [];

@@ -61,8 +61,8 @@ export class AuthService {
    private precisionListSubject = new ReplaySubject<PrecisionList[]>(1);
    precisionList$ = this.precisionListSubject.asObservable();
 
-   private customerMasterListSubject = new ReplaySubject<MasterListDetails[]>(1);
-   customerMasterList$ = this.customerMasterListSubject.asObservable();
+   // private customerMasterListSubject = new ReplaySubject<MasterListDetails[]>(1);
+   // customerMasterList$ = this.customerMasterListSubject.asObservable();
 
    constructor(
       private navController: NavController,
@@ -150,14 +150,13 @@ export class AuthService {
       // this.buildMasterDefinedGroup();  
    }
 
-   buildMasterList() {
-      this.getMasterList().subscribe(response => {
-         let masterList = response;
-         this.customerMasterList = masterList.filter(x => x.objectName === "Customer").flatMap(src => src.details);
-         console.log("🚀 ~ file: auth.service.ts:157 ~ AuthService ~ this.getMasterList ~ this.customerMasterList:", this.customerMasterList)
-         this.setCustomerMasterList(this.customerMasterList);
-      });
-   }
+   // buildMasterList() {
+   //    this.getMasterList().subscribe(response => {
+   //       let masterList = response;
+   //       this.customerMasterList = masterList.filter(x => x.objectName === "Customer").flatMap(src => src.details);
+   //       this.setCustomerMasterList(this.customerMasterList);
+   //    });
+   // }
 
    buildMenuModel() {
       this.getMenuHierachy().subscribe(response => {
@@ -185,15 +184,14 @@ export class AuthService {
       this.getModuleControl().subscribe(response => {
          this.moduleControlConfig = response;
          this.setModuleControl(this.moduleControlConfig);
-         let getCustomerList = this.moduleControlConfig.find(x => x.ctrlName === "SystemWideGetCustomerUponLogin");
-         console.log("🚀 ~ file: auth.service.ts:188 ~ AuthService ~ this.getModuleControl ~ getCustomerList:", getCustomerList)
-         if (getCustomerList && getCustomerList.ctrlValue.toUpperCase() === "Y") {
-            this.systemWideGetCustomerUponLogin = true;
-            this.buildMasterList();
-         } else {
-            this.systemWideGetCustomerUponLogin = false;
-            this.setCustomerMasterList(null);
-         }
+         // let getCustomerList = this.moduleControlConfig.find(x => x.ctrlName === "SystemWideGetCustomerUponLogin");
+         // if (getCustomerList && getCustomerList.ctrlValue.toUpperCase() === "Y") {
+         //    this.systemWideGetCustomerUponLogin = true;
+         //    this.buildMasterList();
+         // } else {
+         //    this.systemWideGetCustomerUponLogin = false;
+         //    this.setCustomerMasterList(null);
+         // }
       });
    }
 
@@ -252,13 +250,13 @@ export class AuthService {
       this.precisionListSubject.next(item);
    }
 
-   getMasterList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "account/customerlist");
-   }
+   // getMasterList() {
+   //    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "account/customerlist");
+   // }
 
-   setCustomerMasterList(item: any) {
-      this.customerMasterListSubject.next(item);
-   }
+   // setCustomerMasterList(item: any) {
+   //    this.customerMasterListSubject.next(item);
+   // }
 
    isTokenExpired(token?: string): boolean {
       if (!token) token = this.getToken();
@@ -289,7 +287,7 @@ export class AuthService {
       this.currentUserTokenSource.next(null);
       this.menuItemSubject.next(null);
       this.precisionListSubject.next(null);
-      this.customerMasterListSubject.next(null);
+      // this.customerMasterListSubject.next(null);
       this.isLoggedIn = false;
       this.isAdmin = false;
       this.configService.loginUser = null;

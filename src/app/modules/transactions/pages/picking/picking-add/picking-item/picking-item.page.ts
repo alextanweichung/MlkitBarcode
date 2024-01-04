@@ -967,8 +967,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    insertObject() {
       try {
-         let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);         
-         console.log("🚀 ~ file: picking-item.page.ts:968 ~ PickingItemPage ~ insertObject ~ :", JSON.stringify(this.objectService.multiPickingObject.outstandingPickList))
+         let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
          let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPickingObject)
          if (!checkFullComponentScan) {
             this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);

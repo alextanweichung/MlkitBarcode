@@ -56,12 +56,12 @@ export class PosSalesDepositDetailPage implements OnInit, ViewWillEnter {
          this.customerMasterList = response.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
          this.paymentTypeMasterList = response.filter(x => x.objectName == "PaymentType").flatMap(src => src.details).filter(y => y.deactivated == 0);
          this.cardMerchantMasterList = response.filter(x => x.objectName == "CardMerchant").flatMap(src => src.details).filter(y => y.deactivated == 0);
-         this.authService.customerMasterList$.subscribe(obj => {
-            let savedCustomerList = obj;
-            if (savedCustomerList) {
-               this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-            }
-         })
+         // this.authService.customerMasterList$.subscribe(obj => {
+         //    let savedCustomerList = obj;
+         //    if (savedCustomerList) {
+         //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         //    }
+         // })
       }, error => {
          console.log(error);
       })

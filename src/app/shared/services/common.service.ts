@@ -387,7 +387,6 @@ export class CommonService {
    }
 
    computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
-      console.log("🚀 ~ file: common.service.ts:390 ~ CommonService ~ computeDiscTaxAmount ~ roundingPrecision:", roundingPrecision)
       try {
          let totalDiscAmt: Decimal = new Decimal(0);
          let unitPrice: Decimal = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0);
@@ -645,18 +644,20 @@ export class CommonService {
       let mimeType = this.getMimeType(object.filesType);
       try {
          await this.loadingService.showLoading("Downloading");
+         let filename = object.filesName;
+         filename = filename.replace(" ", "").replace("/", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
          if (Capacitor.getPlatform() === "android") {
-            await this.file.writeFile(this.file.externalApplicationStorageDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
-               await this.opener.open(this.file.externalApplicationStorageDirectory + object.filesName + object.filesType, "application/pdf");
+            await this.file.writeFile(this.file.externalApplicationStorageDirectory, filename + object.filesType, file, { replace: true }).then(async () => {
+               await this.opener.open(this.file.externalApplicationStorageDirectory + filename + object.filesType, "application/pdf");
                await this.loadingService.dismissLoading();
             }).catch(async (error) => {
                console.log(`this.file.writeFile ${JSON.stringify(error)}`);
                await this.loadingService.dismissLoading();
             })
          } else if (Capacitor.getPlatform() === "ios") {
-            this.file.writeFile(this.file.tempDirectory, object.filesName + object.filesType, file, { replace: true }).then(async () => {
+            this.file.writeFile(this.file.tempDirectory, filename + object.filesType, file, { replace: true }).then(async () => {
                if (mimeType) {
-                  await this.opener.open(this.file.tempDirectory + object.filesName + object.filesType, mimeType);
+                  await this.opener.open(this.file.tempDirectory + filename + object.filesType, mimeType);
                }
                await this.loadingService.dismissLoading();
             }).catch(async (error) => {
@@ -666,7 +667,7 @@ export class CommonService {
             const url = window.URL.createObjectURL(file);
             const link = window.document.createElement("a");
             link.href = url;
-            link.setAttribute("download", object.filesName + object.filesType);
+            link.setAttribute("download", filename + object.filesType);
             window.document.body.appendChild(link);
             link.click();
             link.remove();
@@ -709,7 +710,7 @@ export class CommonService {
    async commonDownloadPdf(file: Blob, filename: string) { // this filename already with extensions
       try {
          await this.loadingService.showLoading("Downloading");
-         filename = filename.replace(" ", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
+         filename = filename.replace(" ", "").replace("/", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
          if (Capacitor.getPlatform() === "android") {
             await this.file.writeFile(this.file.externalApplicationStorageDirectory, filename, file, { replace: true }).then(async () => {
                await this.opener.open(this.file.externalApplicationStorageDirectory + filename, "application/pdf");

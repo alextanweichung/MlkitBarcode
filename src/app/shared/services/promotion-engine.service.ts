@@ -1181,7 +1181,6 @@ export class PromotionEngineService {
       salesBillLine.forEach(line => {
          line = this.addInitialDiscountForReplacePromoImpactedLine(line, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, debugFlag);
          if (computeTradingMargin && line) {
-            console.log("🚀 ~ file: promotion-engine.service.ts:1184 ~ PromotionEngineService ~ runPromotionEngine ~ computeTradingMargin:", computeTradingMargin)
             line = this.commonService.computeTradingMargin(line, useTax, isItemPriceTaxInclusive, roundingPrecision);
          }
       })

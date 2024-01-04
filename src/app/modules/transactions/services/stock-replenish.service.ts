@@ -72,12 +72,12 @@ export class StockReplenishService {
       this.areaMasterList = this.fullMasterList.filter(x => x.objectName == "Area").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == "Currency").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.authService.customerMasterList$.subscribe(obj => {
-         let savedCustomerList = obj;
-         if (savedCustomerList) {
-            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-         }
-      })
+      // this.authService.customerMasterList$.subscribe(obj => {
+      //    let savedCustomerList = obj;
+      //    if (savedCustomerList) {
+      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+      //    }
+      // })
       this.bindSalesAgentList();
    }
 

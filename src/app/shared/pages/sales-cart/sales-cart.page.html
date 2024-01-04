@@ -11,7 +11,8 @@
             </ion-row>
             <ion-row>
                <ion-col>
-                  <div class="ion-text-wrap">{{rowData.description}}</div>
+                  <!-- <div class="ion-text-wrap">{{rowData.description}}</div> -->                  
+                  <div><ion-textarea [value]="rowData.description" autoGrow readonly></ion-textarea></div>
                </ion-col>
             </ion-row>
             <ng-container *ngIf="(isQuotation || isSalesOrder) && showLatestPrice && getLatestSalesHistoryByItemId(rowData.itemId)">
@@ -138,9 +139,9 @@
          </ion-toolbar>
       </ion-header>
       <ion-content *ngIf="selectedItem">
-         <div class="p-2">
+         <div class="px-2">
             <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-               <ion-label>{{selectedItem?.itemCode}} - {{selectedItem?.description}}</ion-label>
+               <ion-label>{{selectedItem?.itemCode}}</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
                <ion-item>
