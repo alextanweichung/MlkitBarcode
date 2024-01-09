@@ -25,6 +25,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { Subscription } from 'rxjs';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -62,6 +63,13 @@ export class SalesOrderService {
       private loadingService: LoadingService
    ) { }
 
+   // Method to clean up the subscription
+   stopListening() {
+      if (this.custSubscription) {
+         this.custSubscription.unsubscribe();
+      }
+   }
+
    async loadRequiredMaster() {
       try {
          await this.loadingService.showLoading();
@@ -78,6 +86,7 @@ export class SalesOrderService {
       }
    }
 
+   custSubscription: Subscription;
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -89,14 +98,16 @@ export class SalesOrderService {
       this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      // this.authService.customerMasterList$.subscribe(obj => {
-      //    let savedCustomerList = obj;
-      //    if (savedCustomerList) {
-      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-      //    }
-      // })
-      this.bindSalesAgentList();
+      this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);      
+      this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         } else {
+            await this.authService.rebuildCustomerList();
+         }
+      })
+      await this.bindSalesAgentList();
    }
 
    async loadCustomer() {
@@ -108,6 +119,7 @@ export class SalesOrderService {
    async loadPromotion() {
       if (this.objectHeader?.trxDate && this.objectHeader?.customerId) {
          this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
+         console.log("🚀 ~ file: sales-order.service.ts:122 ~ SalesOrderService ~ loadPromotion ~ this.promotionMaster:", this.promotionMaster)
       } else {
          this.promotionMaster = [];
       }
@@ -257,12 +269,14 @@ export class SalesOrderService {
    objectSummary: SalesOrderRoot;
    async setHeader(objectHeader: SalesOrderHeader) {
       this.objectHeader = objectHeader;
+      console.log("🚀 ~ file: sales-order.service.ts:271 ~ SalesOrderService ~ setHeader ~ this.objectHeader:", this.objectHeader)
       // load promotion first after customer confirmed or whenever header changed.
       await this.loadPromotion();
    }
 
    setLine(objectDetail: TransactionDetail[]) {
       this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
+      console.log("🚀 ~ file: sales-order.service.ts:279 ~ SalesOrderService ~ setLine ~ this.objectDetail:", this.objectDetail)
    }
 
    setSummary(objectSummary: SalesOrderRoot) {

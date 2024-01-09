@@ -26,52 +26,52 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { NgxPaginationModule } from 'ngx-pagination';
 
 export function initializeFactory(init: InitializeAppService) {
-    return () => init.initializeApp();
+   return () => init.initializeApp();
 }
 
 @NgModule({
-    declarations: [
-        AppComponent
-    ],
-    imports: [
-        BrowserModule,
-        NgxSpinnerModule,
-        IonicModule.forRoot({ mode: 'ios' }),
-        ReactiveFormsModule,
-        AppRoutingModule,
-        NgChartsModule,
-        HttpClientModule,
-        BrowserAnimationsModule,
-        NgCircleProgressModule.forRoot({
-            // set defaults here
-            radius: 30,
-            outerStrokeWidth: 5,
-            innerStrokeWidth: 3,
-            space: 2,
-            titleFontSize: "15",
-            outerStrokeColor: "#78C000",
-            innerStrokeColor: "#C7E596",
-            animation: false,
-            animationDuration: 0,
-            showSubtitle: false
-        }),
-        NgxPaginationModule
-    ],
-    providers: [
-        File,
-        FileOpener,
-        AndroidPermissions,
-        SQLiteService,
-        DetailService,
-        DatabaseService,
-        InitializeAppService,
-        { provide: APP_INITIALIZER, useFactory: initializeFactory, deps: [InitializeAppService], multi: true },
-        MigrationService,
-        { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
-        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        Storage,
-        // Badge
-    ],
-    bootstrap: [AppComponent]
+   declarations: [
+      AppComponent
+   ],
+   imports: [
+      BrowserModule,
+      NgxSpinnerModule,
+      IonicModule.forRoot({ mode: 'ios' }),
+      ReactiveFormsModule,
+      AppRoutingModule,
+      NgChartsModule,
+      HttpClientModule,
+      BrowserAnimationsModule,
+      NgCircleProgressModule.forRoot({
+         // set defaults here
+         radius: 30,
+         outerStrokeWidth: 5,
+         innerStrokeWidth: 3,
+         space: 2,
+         titleFontSize: "15",
+         outerStrokeColor: "#78C000",
+         innerStrokeColor: "#C7E596",
+         animation: false,
+         animationDuration: 0,
+         showSubtitle: false
+      }),
+      NgxPaginationModule
+   ],
+   providers: [
+      File,
+      FileOpener,
+      AndroidPermissions,
+      SQLiteService,
+      DetailService,
+      DatabaseService,
+      InitializeAppService,
+      { provide: APP_INITIALIZER, useFactory: initializeFactory, deps: [InitializeAppService], multi: true },
+      MigrationService,
+      { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
+      { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+      Storage,
+      // Badge
+   ],
+   bootstrap: [AppComponent]
 })
 export class AppModule { }

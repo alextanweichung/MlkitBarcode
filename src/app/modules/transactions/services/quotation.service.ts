@@ -20,8 +20,9 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
-import { SalesHistoryInfo, SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
+import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { Subscription } from 'rxjs';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -60,6 +61,13 @@ export class QuotationService {
 
    }
 
+   // Method to clean up the subscription
+   stopListening() {
+      if (this.custSubscription) {
+         this.custSubscription.unsubscribe();
+      }
+   }
+
    async loadRequiredMaster() {
       try {
          await this.loadingService.showLoading();
@@ -74,7 +82,8 @@ export class QuotationService {
          await this.loadingService.dismissLoading();
       }
    }
-
+   
+   custSubscription: Subscription;
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -87,12 +96,14 @@ export class QuotationService {
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      // this.authService.customerMasterList$.subscribe(obj => {
-      //    let savedCustomerList = obj;
-      //    if (savedCustomerList) {
-      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-      //    }
-      // })
+      this.custSubscription = this.authService.customerMasterList$.subscribe(obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         } else {
+            this.authService.rebuildCustomerList();
+         }
+      })
    }
 
    async loadCustomer() {

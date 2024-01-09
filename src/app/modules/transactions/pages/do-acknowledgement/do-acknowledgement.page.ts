@@ -34,6 +34,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    uniqueGrouping: Date[] = [];
 
    objects: DoAcknowledgement[] = [];
+   submit_attempt: boolean = false;
 
    @ViewChild("ctln", { static: false }) ctln: GeneralScanInputPage;
    @ViewChild("don", { static: false }) don: GeneralScanInputPage;
@@ -122,7 +123,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       }
       let object: DOAcknowledegementRequest = {
          truckArrangementNum: this.cartonTruckLoadingNum,
-         vehicledId: this.vehicleIds,
+         vehicleId: this.vehicleIds,
          deliveryOrderNum: this.deliveryOrderNum
       }
       this.getObject(object);
@@ -184,7 +185,8 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    images: LocalFile[] = [];
    async save() {
       if (!this.signaturePad.isEmpty()) {
-         const fileName = this.selectedDo.deliveryOrderNum + "_Acknowledgement_" + "signature.png";
+         const fileName = this.selectedDo.deliveryOrderNum.replace(" ", "").replace("/","") + "_Acknowledgement_" + "signature.png";
+         console.log("🚀 ~ file: do-acknowledgement.page.ts:189 ~ DoAcknowledgementPage ~ save ~ fileName:", fileName)
          const base64Data = this.signaturePad.toDataURL();
          try {
             this.images = [];
@@ -210,14 +212,17 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                   });
                }
             ).then(async (_) => {
-                  await this.loadingService.dismissLoading();
-               });
+               await this.loadingService.dismissLoading();
+               this.submit_attempt = false;
+            });
          } catch (e) {
             console.error(e);
             await this.loadingService.dismissLoading();
+            this.submit_attempt = false;
          }
          finally {
             await this.loadingService.dismissLoading();
+            this.submit_attempt = false;
          }
       }
    }
@@ -238,7 +243,8 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                //    path: filePath,
                //    data: `data:image/jpeg;base64,${readFile.data}`
                // });
-               this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
+               this.toastService.presentToast("", "File size too large", "top", "danger", 1500);
+               this.submit_attempt = false;
             } else {
                this.images.push({
                   name: f.name,
@@ -249,7 +255,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                   const response = await fetch(this.images[0].data);
                   const blob = await response.blob();
                   const formData = new FormData();
-                  formData.append('file', blob, this.images[0].name);
+                  formData.append("file", blob, this.images[0].name);
                   this.objectService.postFile(formData, this.selectedDo.deliveryOrderId, 0).subscribe({
                      next: async (response) => {
                         this.selectedDo = null;
@@ -261,16 +267,19 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                            path: filePath,
                            data: `data:image/jpeg;base64,${readFile.data}`
                         });
+                        this.submit_attempt = false;
                      },
                      error: (error) => {
                         console.error(error);
+                        this.submit_attempt = false;
                      }
                   })
                }
             }
          }
-      } catch (e) {
-         console.error(e);
+      } catch (error) {
+         console.error(error);
+         this.submit_attempt = false;
       }
    }
 

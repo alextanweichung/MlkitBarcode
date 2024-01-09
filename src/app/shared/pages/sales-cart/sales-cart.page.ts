@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, asNativeElements } from '@angular/core';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { SalesHistoryInfo, SalesItemInfoRoot } from '../../models/sales-item-info';
 import { AlertController, IonPopover, ModalController } from '@ionic/angular';
@@ -325,7 +325,9 @@ export class SalesCartPage implements OnInit, OnChanges {
    selectedIndex: number;
    showEditModal(data: TransactionDetail, rowIndex: number) {
       this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
+      console.log("🚀 ~ file: sales-cart.page.ts:328 ~ SalesCartPage ~ showEditModal ~ this.selectedItem:", this.selectedItem)
       this.selectedIndex = rowIndex;
+      this.onPricingApprovalSwitch({ detail: { checked: this.selectedItem.isPricingApproval } });
       this.isModalOpen = true;
    }
 
@@ -350,7 +352,7 @@ export class SalesCartPage implements OnInit, OnChanges {
             this.toastService.presentToast("Controll Error", "Invalid quantity", "top", "warning", 1000);
          } else {
             this.objectDetail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-            this.computeAllAmount(this.objectDetail[this.selectedIndex], this.objectDetail);
+            await this.computeAllAmount(this.objectDetail[this.selectedIndex], this.objectDetail);
             // await this.computeDiscTaxAmount(this.objectDetail[this.selectedIndex]);
             // if (this.configSalesActivateTradingMargin) {
             //    this.computeTradingMarginAmount(this.objectDetail[this.selectedIndex]);
@@ -475,6 +477,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    async computeAllAmount(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
+      console.log("🚀 ~ file: sales-cart.page.ts:480 ~ SalesCartPage ~ computeAllAmount ~ trxLine:", trxLine)
       let validate = this.discExprRegex.exec(trxLine.discountExpression);
       if (validate && validate.input !== validate[0]) {
          trxLine.discountExpression = validate[0]
@@ -486,17 +489,18 @@ export class SalesCartPage implements OnInit, OnChanges {
          this.objectDetail = trxLineArray
       }
       if (trxLine.assembly && trxLine.assembly.length > 0) {
-         this.computeAssemblyQty(trxLine);
+         await this.computeAssemblyQty(trxLine);
       }
       await this.computeDiscTaxAmount(trxLine);
       if (this.isCalculateMargin) {
-         this.computeMarginAmount(trxLine);
+         await this.computeMarginAmount(trxLine);
       }
       if (this.configSalesActivateTradingMargin) {
-         this.computeTradingMarginAmount(trxLine);
+         await this.computeTradingMarginAmount(trxLine);
       }
+      console.log("🚀 ~ file: sales-cart.page.ts:502 ~ SalesCartPage ~ computeAllAmount ~ this.objectHeader:", this.objectHeader)
       if (this.configSalesActivatePromotionEngine && this.objectHeader.isAutoPromotion && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
-         await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, false, this.configSalesActivateTradingMargin)
+         await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, true, this.configSalesActivateTradingMargin)
       }
    }
 
@@ -506,46 +510,46 @@ export class SalesCartPage implements OnInit, OnChanges {
       // this.onEditComplete();
    }
 
-   computeUnitPriceExTax(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
+   async computeUnitPriceExTax(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
       if (trxLineArray) {
          this.objectDetail = trxLineArray
       }
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
       trxLine.oriUnitPriceExTax = this.commonService.computeOriUnitPriceExTax(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
 
-      this.computeDiscTaxAmount(trxLine);
+      await this.computeDiscTaxAmount(trxLine);
       if (this.isCalculateMargin) {
-         this.computeMarginAmount(trxLine);
+         await this.computeMarginAmount(trxLine);
       }
       if (this.configSalesActivateTradingMargin) {
-         this.computeTradingMarginAmount(trxLine);
+         await this.computeTradingMarginAmount(trxLine);
       }
       // this.onEditComplete();
    }
 
-   computeUnitPrice(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
+   async computeUnitPrice(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
       if (trxLineArray) {
          this.objectDetail = trxLineArray
       }
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
       trxLine.oriUnitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
-      this.computeDiscTaxAmount(trxLine);
+      await this.computeDiscTaxAmount(trxLine);
       if (this.isCalculateMargin) {
-         this.computeMarginAmount(trxLine);
+         await this.computeMarginAmount(trxLine);
       }
       if (this.configSalesActivateTradingMargin) {
-         this.computeTradingMarginAmount(trxLine);
+         await this.computeTradingMarginAmount(trxLine);
       }
       // this.onEditComplete();
    }
 
-   onDiscCodeChanged(item: TransactionDetail, event: any) {
+   async onDiscCodeChanged(item: TransactionDetail, event: any) {
       if (this.isCalculateMargin && item.itemId) {
          this.transactionService.getConsignmentMarginForConsignmentSales(item.itemId, format(new Date, "yyyy-MM-dd"), this.objectHeader.toLocationId, event.detail.value).subscribe({
-            next: (response) => {
+            next: async (response) => {
                item.bearPct = response.bearPct;
                item.marginPct = response.marginPct;
-               this.assignDiscPct(item, event.detail.value);
+               await this.assignDiscPct(item, event.detail.value);
             },
             error: (error) => {
                console.error(error);
@@ -559,25 +563,24 @@ export class SalesCartPage implements OnInit, OnChanges {
             keyId = this.objectHeader.toLocationId;
          }
          this.transactionService.getTradingMargin(item.itemId, format(new Date, "yyyy-MM-dd"), keyId, event.detail.value).subscribe({
-            next: (response) => {
+            next: async (response) => {
                if (response.tradingMarginPct) {
                   item.tradingMarginPct = response.tradingMarginPct;
                } else {
                   item.tradingMarginPct = 0;
                }
-               this.assignDiscPct(item, event.detail.value);
+               await this.assignDiscPct(item, event.detail.value);
             },
             error: (error) => {
                console.error(error);
             }
          })
-
       } else {
-         this.assignDiscPct(item, event.detail.value);
+         await this.assignDiscPct(item, event.detail.value);
       }
    }
 
-   assignDiscPct(item: TransactionDetail, discountGroupCode: any) {
+   async assignDiscPct(item: TransactionDetail, discountGroupCode: any) {
       let discPct = this.discountGroupMasterList.find(x => x.code === discountGroupCode);
       if (discPct) {
          if (discPct.attribute1 === "0") {
@@ -595,7 +598,7 @@ export class SalesCartPage implements OnInit, OnChanges {
                }
             }
          }
-         this.computeAllAmount(item);
+         await this.computeAllAmount(item);
       }
    }
 
@@ -616,8 +619,8 @@ export class SalesCartPage implements OnInit, OnChanges {
 
    computeAssemblyQty(trxLine: TransactionDetail) {
       trxLine.assembly.forEach(assembly => {
-         if (trxLine.qtyRequest) {
-            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
+         if (trxLine.qtyRequest && assembly.itemComponentQty > 0 && trxLine.qtyRequest > 0) {
+            assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0)).toNumber();
          } else {
             assembly.qtyRequest = null;
          }
@@ -707,7 +710,9 @@ export class SalesCartPage implements OnInit, OnChanges {
    /* #endregion */
 
    onPricingApprovalSwitch(event: any) {
+      console.log("🚀 ~ file: sales-cart.page.ts:711 ~ SalesCartPage ~ onPricingApprovalSwitch ~ event:", event)
       if (event.detail.checked) {
+         console.log("🚀 ~ file: sales-cart.page.ts:713 ~ SalesCartPage ~ onPricingApprovalSwitch ~ event.detail.checked:", event.detail.checked)
          switch (this.orderingPriceApprovalEnabledFields) {
             case "0":
                if (this.restrictTrxFields.unitPrice) {

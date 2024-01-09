@@ -52,10 +52,10 @@
                         </ion-row>
                         <ion-row>
                            <ion-col size="auto" class="ion-flex ion-margin-auto">
-                              <ion-badge>{{object.customerId | idToCodeMapping: objectService.customerMasterList}}</ion-badge>
+                              <ion-badge>{{object.customerCode}}</ion-badge>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto">
-                              <div class="ion-flex my-auto ml-2">{{object.customerId | idMapping: objectService.customerMasterList}}</div>
+                              <div class="ion-flex my-auto ml-2">{{object.customerName}}</div>
                            </ion-col>
                         </ion-row>
                      </ion-col>
@@ -101,13 +101,13 @@
             <div class="border-dotted">
                <signature-pad #signaturePad [options]="signaturePadOptions"></signature-pad>
             </div>
-         </div>
+      </div>
       </ion-content>
       <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
          <ion-grid class="ion-no-padding">
             <ion-row>
                <ion-col>
-                  <ion-button class="ion-margin" expand="block" size="default" (click)="save()">
+                  <ion-button class="ion-margin" expand="block" size="default" (click)="submit_attempt = true; save()" [disabled]="submit_attempt">
                      Save
                   </ion-button>
                </ion-col>

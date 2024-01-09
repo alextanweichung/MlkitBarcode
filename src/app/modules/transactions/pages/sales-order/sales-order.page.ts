@@ -1,4 +1,4 @@
-import { Component, DoCheck, IterableDiffers, OnInit } from '@angular/core';
+import { Component, DoCheck, IterableDiffers, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -11,14 +11,15 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
 import { LoadingService } from 'src/app/services/loading/loading.service';
-import { SalesOrderLineForWD } from '../../models/picking';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
    selector: 'app-sales-order',
    templateUrl: './sales-order.page.html',
    styleUrls: ['./sales-order.page.scss']
 })
-export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
+export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, DoCheck {
 
    private objectDiffer: any;
    objects: SalesOrderList[] = [];
@@ -31,6 +32,9 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
    salesAgentIds: number[] = [];
 
    uniqueGrouping: Date[] = [];
+
+	currentPage: number = 1;
+	itemsPerPage: number = 12;
 
    constructor(
       private authService: AuthService,
@@ -50,7 +54,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
    ngDoCheck(): void {
       const objectChanges = this.objectDiffer.diff(this.objects);
       if (objectChanges) {
-         this.bindUniqueGrouping();
+         // this.bindUniqueGrouping();
       }
    }
 
@@ -61,6 +65,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       if (!this.endDate) {
          this.endDate = this.commonService.getTodayDate();
       }
+      this.itemSearchText = null;
    }
 
    async ionViewDidEnter(): Promise<void> {
@@ -77,6 +82,10 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
    }
 
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
+   }
+
    /* #region  crud */
 
    async loadObjects() {
@@ -91,6 +100,7 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          }
          this.objectService.getObjectListByDate(obj).subscribe(async response => {
             this.objects = [...this.objects, ...response];
+            this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
@@ -98,9 +108,9 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
             console.log(error);
          })
       } catch (error) {
-         console.log(error);
          await this.loadingService.dismissLoading();
          this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+         console.log(error);
       } finally {
          await this.loadingService.dismissLoading();
       }
@@ -111,13 +121,12 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          await this.loadingService.showLoading();
          this.objectService.getDraftObjects().subscribe(async response => {
             this.draftObjects = response;
-            for (let index = 0; index < this.draftObjects.length; index++) {
-               const element = this.draftObjects[index];
-               let objRoot: SalesOrderRoot = JSON.parse(element.jsonData);
+            for await (let rowData of this.draftObjects) {               
+               let objRoot: SalesOrderRoot = JSON.parse(rowData.jsonData);
                objRoot.header = this.commonService.convertObjectAllDateType(objRoot.header);
                let obj: SalesOrderList = {
                   salesOrderId: objRoot.header.salesOrderId,
-                  salesOrderNum: element.draftTransactionNum,
+                  salesOrderNum: rowData.draftTransactionNum,
                   trxDate: objRoot.header.trxDate,
                   customerCode: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.code,
                   customerName: await this.objectService.customerMasterList.find(r => r.id === objRoot.header.customerId)?.description,
@@ -130,9 +139,10 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
                   deactivated: objRoot.header.deactivated,
                   createdById: objRoot.header.createdById,
                   isDraft: true,
-                  draftTransactionId: element.draftTransactionId
+                  draftTransactionId: rowData.draftTransactionId
                }
-               this.objects.push(obj);
+               this.objects.unshift(obj);
+               this.resetFilteredObj();
             }
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
@@ -148,15 +158,9 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       }
    }
 
-   getObjects(date: Date) {
-      return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-   }
-
-   async bindUniqueGrouping() {
-      let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-      this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-      await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
-   }
+   // getObjects(date: Date) {
+   //    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
+   // }
 
    /* #endregion */
 
@@ -301,5 +305,44 @@ export class SalesOrderPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          console.error(e);
       }
    }
+
+	highlight(event) {
+		event.getInputElement().then(r => {
+			r.select();
+		})
+	}
+
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
+	itemSearchText: string;
+	filteredObj: SalesOrderList[] = [];
+	search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.salesOrderNum.toUpperCase().includes(searchText.toUpperCase()))));            
+				this.currentPage = 1;
+			} else {
+				this.resetFilteredObj();
+				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+	}
 
 }

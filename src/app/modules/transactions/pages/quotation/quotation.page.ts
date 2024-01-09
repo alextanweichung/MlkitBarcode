@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { QuotationList } from '../../models/quotation';
 import { CommonService } from '../../../../shared/services/common.service';
@@ -18,7 +18,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
    templateUrl: './quotation.page.html',
    styleUrls: ['./quotation.page.scss']
 })
-export class QuotationPage implements OnInit, ViewWillEnter {
+export class QuotationPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, ViewDidLeave {
 
    objects: QuotationList[] = [];
 
@@ -52,8 +52,20 @@ export class QuotationPage implements OnInit, ViewWillEnter {
       await this.bindCustomerList();
    }
 
+   ionViewDidEnter(): void {
+
+   }
+
+   ionViewDidLeave(): void {
+      
+   }
+
    ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

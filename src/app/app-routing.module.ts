@@ -324,6 +324,11 @@ const routes: Routes = [
       path: 'transactions/do-acknowledgement',
       loadChildren: () => import('./modules/transactions/pages/do-acknowledgement/do-acknowledgement.module').then(m => m.DoAcknowledgementPageModule)
    },
+   {
+      path: 'transactions/carton-truck-loading',
+      loadChildren: () => import('./modules/transactions/pages/carton-truck-loading/carton-truck-loading.module').then(m => m.CartonTruckLoadingPageModule)
+   },
+
 
 
 
@@ -442,14 +447,11 @@ const routes: Routes = [
    {
       path: 'item-sales-history',
       loadChildren: () => import('./shared/pages/item-sales-history/item-sales-history.module').then(m => m.ItemSalesHistoryPageModule)
-   },  {
-    path: 'sales-cart',
-    loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then( m => m.SalesCartPageModule)
-  },
-
-
-
-
+   },
+   {
+      path: 'sales-cart',
+      loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
+   },
 
 ];
 @NgModule({

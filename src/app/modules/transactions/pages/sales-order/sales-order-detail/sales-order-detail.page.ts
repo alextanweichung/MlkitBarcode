@@ -554,4 +554,8 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       }
    }
 
+   previousStep() {
+      this.objectService.resetVariables();
+   }
+
 }

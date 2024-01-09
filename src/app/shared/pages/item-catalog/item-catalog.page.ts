@@ -176,7 +176,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                if (this.configSalesTransactionShowHistory && (this.isQuotation || this.isSalesOrder)) {
                   await this.loadSalesHistory(newSearch);
                }
-               await this.loadingService.dismissLoading()
+               await this.loadingService.dismissLoading();
                this.toastService.presentToast("Search Complete", `${this.availableItem.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
             })
             if (Capacitor.getPlatform() !== "web") {
@@ -326,6 +326,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    /* #region  unit price, tax, discount */
 
    assignTrxItemToDataLine(item: TransactionDetail) {
+      console.log("🚀 ~ file: item-catalog.page.ts:329 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ item:", item)
       if (this.useTax) {
          if (this.isItemPriceTaxInclusive) {
             item.unitPrice = item.itemPricing.unitPrice;

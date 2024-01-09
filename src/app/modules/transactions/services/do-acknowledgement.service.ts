@@ -20,7 +20,7 @@ export class DoAcknowledgementService {
 
    fullMasterList: MasterList[] = [];
    vehicleMasterList: MasterListDetails[] = [];
-   customerMasterList: MasterListDetails[] = [];
+   // customerMasterList: MasterListDetails[] = [];
 
    constructor(
       private http: HttpClient,
@@ -45,7 +45,7 @@ export class DoAcknowledgementService {
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.vehicleMasterList = this.fullMasterList.filter(x => x.objectName === "Vehicle").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      // this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
       // this.authService.customerMasterList$.subscribe(obj => {
       //    let savedCustomerList = obj;
       //    if (savedCustomerList) {

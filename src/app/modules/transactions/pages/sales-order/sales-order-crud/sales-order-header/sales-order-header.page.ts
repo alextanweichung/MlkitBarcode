@@ -37,7 +37,10 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
    }
 
    ionViewWillEnter(): void {
-      // this.objectService.loadRequiredMaster();
+      if (this.objectService.objectHeader) {
+         this.objectForm.patchValue(this.objectService.objectHeader);
+         this.onCustomerSelected({ id: this.objectService.objectHeader.customerId });
+      }
    }
 
    newForm() {
@@ -113,8 +116,8 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
          console.error(e);
       }
    }
-   selectedCustomer: Customer;
 
+   selectedCustomer: Customer;
    selectedCustomerLocationList: MasterListDetails[] = [];
    creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
    availableAddress: ShippingInfo[] = [];

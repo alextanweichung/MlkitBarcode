@@ -8,15 +8,17 @@ import { SalesOrderPageRoutingModule } from './sales-order-routing.module';
 
 import { SalesOrderPage } from './sales-order.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    SalesOrderPageRoutingModule,
-    ListingSkeletonPageModule
-  ],
-  declarations: [SalesOrderPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      SalesOrderPageRoutingModule,
+      ListingSkeletonPageModule,      
+      NgxPaginationModule
+   ],
+   declarations: [SalesOrderPage]
 })
-export class SalesOrderPageModule {}
+export class SalesOrderPageModule { }

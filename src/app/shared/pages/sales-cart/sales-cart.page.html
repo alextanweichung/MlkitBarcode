@@ -1,5 +1,4 @@
-
-<ion-list class="list-custom animate__animated animate__fadeIn">
+<ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
    <ion-item-sliding #sliding *ngFor="let rowData of objectDetail; let rowIndex = index">
       <ion-item [ngClass]="{'color-blue':rowData.isPricingApproval }" class="ion-no-padding no-ripple" (click)="showEditModal(rowData, rowIndex)">
          <ion-grid class="ion-no-padding p-2">
@@ -12,7 +11,7 @@
             <ion-row>
                <ion-col>
                   <!-- <div class="ion-text-wrap">{{rowData.description}}</div> -->                  
-                  <div><ion-textarea [value]="rowData.description" autoGrow readonly></ion-textarea></div>
+                  <div><ion-textarea [value]="rowData.description" [rows]="1" autoGrow readonly></ion-textarea></div>
                </ion-col>
             </ion-row>
             <ng-container *ngIf="(isQuotation || isSalesOrder) && showLatestPrice && getLatestSalesHistoryByItemId(rowData.itemId)">

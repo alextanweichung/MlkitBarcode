@@ -31,6 +31,7 @@ export const trxAppCode = {
    mobileTransferBin: "MAMTB",
    mobileBinCount: "MAMBC",
    mobileDoAck: "MAMDOACK",
+   mobileCartonTruckLoading: "MAMCTL"
 }
 
 export const approvalAppCode = {

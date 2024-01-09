@@ -159,6 +159,12 @@
 						<h3>Delivery Order Ack.</h3>
 					</ion-label>
 				</ion-item>
+				<ion-item button routerLink="carton-truck-loading" *ngIf="showCartonTruckLoading">
+					<ion-icon name="file-tray-outline" slot="start"></ion-icon>
+					<ion-label>
+						<h3>Carton Truck Loading</h3>
+					</ion-label>
+				</ion-item>
 			</ion-list>
 		</ng-container>
 	</div>

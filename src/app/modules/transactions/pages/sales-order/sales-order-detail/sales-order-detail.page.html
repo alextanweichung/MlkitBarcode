@@ -6,7 +6,7 @@
          </div>
       </ion-title>
       <ion-buttons slot="start">
-         <ion-back-button text="" defaultHref="/transactions/sales-order"></ion-back-button>
+         <ion-back-button text="" defaultHref="/transactions/sales-order" (click)="previousStep()"></ion-back-button>
       </ion-buttons>
       <ion-buttons slot="end">
          <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
@@ -351,7 +351,7 @@
                      <ion-col class="ion-flex ion-margin-auto">
                         <ion-icon style="position:relative; top:0.1rem" *ngIf="rowData.variationTypeCode === '0' && rowData.assembly && rowData.assembly.length > 0" name="list-circle-outline"></ion-icon>
                         <!-- <div class="ion-text-wrap">{{rowData.description}}</div> -->
-                        <div><ion-textarea [value]="rowData.description" autoGrow readonly></ion-textarea></div>
+                        <div><ion-textarea [value]="rowData.description" [rows]="1" autoGrow readonly></ion-textarea></div>
                      </ion-col>
                   </ion-row>
                   <ion-row *ngIf="rowData.remark && rowData.remark.length > 0">
