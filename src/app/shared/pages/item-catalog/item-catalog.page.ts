@@ -41,6 +41,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    @Input() showImage: boolean = false;
    @Input() showAvailQty: boolean = false;
    @Input() showLatestPrice: boolean = false;
+   @Input() showStandardPackingInfo: boolean = false;
    @Input() isQuotation: boolean = false;
    @Input() isSalesOrder: boolean = false;
    @Input() isBackToBackOrder: boolean = false;

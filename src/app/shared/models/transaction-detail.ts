@@ -155,6 +155,7 @@ export interface TransactionDetail {
    eligiblePromoId?: number
 
    qtyToShip?: number
+   standardPackingInfo?: string
 
    // testing performance
    guid?: string

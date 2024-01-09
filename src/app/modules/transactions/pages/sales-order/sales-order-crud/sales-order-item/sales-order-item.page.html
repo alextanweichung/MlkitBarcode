@@ -40,13 +40,19 @@
            </ion-label>
            <ion-checkbox [(ngModel)]="objectService.showLatestPrice"></ion-checkbox>
         </ion-item>
+        <ion-item button="false">
+           <ion-label>
+              <div>Std. Pack'g Info</div>
+           </ion-label>
+           <ion-checkbox [(ngModel)]="objectService.showStandardPackingInfo"></ion-checkbox>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ng-template>
 </ion-popover>
 <ion-content fullscreen>
   <div class="px-2">
-    <app-item-catalog [objectId]="objectService.objectHeader.salesOrderId" [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" (onHistoryCopied)="onHistoryCopied($event)" [showImage]="showImage" [showLatestPrice]="objectService.showLatestPrice && objectService.configSalesTransactionShowHistory" [isSalesOrder]="true" [showAvailQty]="objectService.showQuantity" [itemInCart]="objectService.objectDetail"></app-item-catalog>
+    <app-item-catalog [objectId]="objectService.objectHeader.salesOrderId" [keyId]="objectService.objectHeader.customerId" [locationId]="objectService.objectHeader.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" (onHistoryCopied)="onHistoryCopied($event)" [showImage]="showImage" [showLatestPrice]="objectService.showLatestPrice && objectService.configSalesTransactionShowHistory" [showStandardPackingInfo]="objectService.showStandardPackingInfo" [isSalesOrder]="true" [showAvailQty]="objectService.showQuantity" [itemInCart]="objectService.objectDetail"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

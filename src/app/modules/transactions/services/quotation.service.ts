@@ -35,6 +35,7 @@ const httpObserveHeader = {
 export class QuotationService {
 
    showLatestPrice: boolean = false;
+   showStandardPackingInfo: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 

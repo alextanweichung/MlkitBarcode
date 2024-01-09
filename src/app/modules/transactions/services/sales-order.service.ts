@@ -39,6 +39,7 @@ export class SalesOrderService {
 
    showLatestPrice: boolean = false;
    showQuantity: boolean = false;
+   showStandardPackingInfo: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 
