@@ -26,11 +26,6 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    draftObjectList: SalesOrderList[] = [];
    draftObjects: DraftTransaction[] = [];
 
-   startDate: Date;
-   endDate: Date;
-   customerIds: number[] = [];
-   salesAgentIds: number[] = [];
-
    uniqueGrouping: Date[] = [];
 
 	currentPage: number = 1;
@@ -59,18 +54,18 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    }
 
    async ionViewWillEnter(): Promise<void> {
-      if (!this.startDate) {
-         this.startDate = this.commonService.getFirstDayOfTodayMonth();
+      if (this.objectService.filterStartDate === null || this.objectService.filterStartDate === undefined) {
+         this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
       }
-      if (!this.endDate) {
-         this.endDate = this.commonService.getTodayDate();
+      if (this.objectService.filterEndDate === null || this.objectService.filterEndDate === undefined) {
+         this.objectService.filterEndDate = this.commonService.getTodayDate();
       }
       this.itemSearchText = null;
    }
 
    async ionViewDidEnter(): Promise<void> {
       await this.objectService.loadRequiredMaster();
-      if (this.showDraftOnly) {
+      if (this.objectService.filterShowDraftOnly) {
          await this.loadDraftObjects();
       } else {
          await this.loadObjects();
@@ -93,10 +88,10 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
          this.objects = [];
          await this.loadingService.showLoading();
          let obj: SalesSearchModal = {
-            dateStart: format(this.startDate, "yyyy-MM-dd"),
-            dateEnd: format(this.endDate, "yyyy-MM-dd"),
-            customerId: this.customerIds,
-            salesAgentId: this.salesAgentIds
+            dateStart: format(this.objectService.filterStartDate, "yyyy-MM-dd"),
+            dateEnd: format(this.objectService.filterEndDate, "yyyy-MM-dd"),
+            customerId: this.objectService.filterCustomerIds,
+            salesAgentId: this.objectService.filterSalesAgentIds
          }
          this.objectService.getObjectListByDate(obj).subscribe(async response => {
             this.objects = [...this.objects, ...response];
@@ -139,6 +134,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
                   deactivated: objRoot.header.deactivated,
                   createdById: objRoot.header.createdById,
                   isDraft: true,
+                  isClosed: objRoot.header.isClosed,
                   draftTransactionId: rowData.draftTransactionId
                }
                this.objects.unshift(obj);
@@ -250,22 +246,23 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
 
    /* #endregion */
 
-   showDraftOnly: boolean = false;
    async filter() {
       try {
          const modal = await this.modalController.create({
             component: FilterPage,
             componentProps: {
-               startDate: this.startDate,
-               endDate: this.endDate,
+               startDate: this.objectService.filterStartDate,
+               endDate: this.objectService.filterEndDate,
                customerFilter: true,
                customerList: this.objectService.customerSearchDropdownList,
-               selectedCustomerId: this.customerIds,
+               selectedCustomerId: this.objectService.filterCustomerIds,
                salesAgentFilter: true,
                salesAgentList: this.objectService.salesAgentDropdownList,
-               selectedSalesAgentId: this.salesAgentIds,
+               selectedSalesAgentId: this.objectService.filterSalesAgentIds,
                useDraft: true,
-               showDraftOnly: this.showDraftOnly
+               showDraftOnly: this.objectService.filterShowDraftOnly,
+               useShowClosed: true,
+               showClosed: this.objectService.filterShowClosed
             },
             canDismiss: true
          })
@@ -274,11 +271,12 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
          if (data && data !== undefined) {
             this.objects = [];
             this.uniqueGrouping = [];
-            this.startDate = new Date(data.startDate);
-            this.endDate = new Date(data.endDate);
-            this.customerIds = data.customerIds;
-            this.salesAgentIds = data.salesAgentIds;
-            this.showDraftOnly = data.showDraftOnly ?? false;
+            this.objectService.filterStartDate = new Date(data.startDate);
+            this.objectService.filterEndDate = new Date(data.endDate);
+            this.objectService.filterCustomerIds = data.customerIds;
+            this.objectService.filterSalesAgentIds = data.salesAgentIds;
+            this.objectService.filterShowDraftOnly = data.showDraftOnly ?? false;
+            this.objectService.filterShowClosed = data.showClosed ?? false;
             if (data.showDraftOnly) {
                this.loadDraftObjects();
             } else {
@@ -342,7 +340,10 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
 	}
 
 	resetFilteredObj() {
-		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      if (!this.objectService.filterShowClosed) {
+         this.filteredObj = this.filteredObj.filter(r => !r.isClosed);
+      }
 	}
 
 }

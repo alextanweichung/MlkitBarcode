@@ -37,6 +37,13 @@ const httpObserveHeader = {
 })
 export class SalesOrderService {
 
+   filterStartDate: Date;
+   filterEndDate: Date;
+   filterCustomerIds: number[] = [];
+   filterSalesAgentIds: number[] = [];
+   filterShowClosed: boolean = false;
+   filterShowDraftOnly: boolean = false;
+
    showLatestPrice: boolean = false;
    showQuantity: boolean = false;
    showStandardPackingInfo: boolean = false;
@@ -141,6 +148,7 @@ export class SalesOrderService {
 
    salesAgentDropdownList: SearchDropdownList[] = [];
    bindSalesAgentList() {
+      this.salesAgentDropdownList = [];
       this.salesAgentMasterList.forEach(r => {
          this.salesAgentDropdownList.push({
             id: r.id,

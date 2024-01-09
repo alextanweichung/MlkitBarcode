@@ -30,6 +30,9 @@ export class FilterPage implements OnInit {
    useDraft: boolean = false;
    showDraftOnly: boolean = true;
 
+   useShowClosed: boolean = false;
+   showClosed: boolean = true;
+
    constructor(
       private commonService: CommonService,
       private modalController: ModalController
@@ -99,7 +102,7 @@ export class FilterPage implements OnInit {
       // Add filter logic here...
       // ...
       // if (this.customerFilter || this.salesAgentFilter) {
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly };
+      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
       // } else {
       //   this.filters = { startDate: this.startDate, endDate: this.endDate };
       // }
