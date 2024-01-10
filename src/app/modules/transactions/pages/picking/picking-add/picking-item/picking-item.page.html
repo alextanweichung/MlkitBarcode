@@ -30,7 +30,7 @@
                </ion-label>
                <ion-checkbox [(ngModel)]="showItemList"></ion-checkbox>
             </ion-item>
-            <ion-item (click)="popover.dismiss(); showCopyModal()">
+            <ion-item (click)="popover.dismiss(); showCopyModal()" *ngIf="pickPackAllowCopyCode">
                <ion-label>
                   <div>Copy from List</div>
                </ion-label>
