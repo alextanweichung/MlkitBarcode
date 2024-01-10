@@ -109,7 +109,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    barcodeSearchValue: string;
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
-   async validateBarcode(barcode: string) {
+   async validateBarcode(barcode: string, emit: boolean = true) {
       if (barcode) {
          this.barcodeSearchValue = "";
          if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
@@ -155,7 +155,11 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   newItemId: found_item_master.newId,
                   newItemEffectiveDate: found_item_master.newDate
                }
-               this.onItemAdd.emit([outputData]);
+               if (emit) {
+                  this.onItemAdd.emit([outputData]);
+               } else {
+                  return outputData;
+               }
             } else {
                this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
             }

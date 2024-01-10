@@ -30,6 +30,11 @@
                </ion-label>
                <ion-checkbox [(ngModel)]="showItemList"></ion-checkbox>
             </ion-item>
+            <ion-item (click)="popover.dismiss(); showCopyModal()">
+               <ion-label>
+                  <div>Copy from List</div>
+               </ion-label>
+            </ion-item>
             <ion-item (click)="popover.dismiss(); sendForDebug()">
                <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
                <ion-label>
@@ -152,10 +157,103 @@
 </ion-row>
 <div class="scan-box" [hidden]="!scanActive"></div>
 
-<ion-modal [isOpen]="isImageModalOpen" [initialBreakpoint]="1" [breakpoints]="[0, 1]" (ionModalDidDismiss)="isImageModalOpen = false">
+<ion-modal class="image-modal" [isOpen]="isImageModalOpen" [initialBreakpoint]="1" [breakpoints]="[0, 1]" (ionModalDidDismiss)="isImageModalOpen = false">
    <ng-template>
       <div class="block">
          <ion-img [src]="imageUrl"></ion-img>
       </div>
+   </ng-template>
+</ion-modal>
+
+<ion-modal [isOpen]="copyModal" (didDismiss)="copyModal = false">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>
+               <div class="ion-text-wrap">
+                  O/S Picked List
+               </div>
+            </ion-title>
+            <ion-buttons slot="start">
+               <ion-button (click)="hideCopyModal()">Done</ion-button>
+            </ion-buttons>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content>
+         <div class="p-2">
+            <!-- <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+               <ion-label>Outstanding Picked List</ion-label>
+            </ion-list-header> -->
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <ion-item class="ion-no-padding no-ripple">
+                  <ion-grid class="ion-no-padding py-2 pl-2">
+                     <ion-row>
+                        <ion-col size="1" class="ion-flex ion-margin-auto">
+                           <div class="font-bold">#</div>
+                        </ion-col>
+                        <ion-col size="5" class="ion-flex ion-margin-auto">
+                           <div class="font-bold">Item Code</div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div class="font-bold">SO Qty</div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div class="font-bold">Current (Other)</div>
+                        </ion-col>
+                        <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
+
+                        </ion-col>
+                     </ion-row>
+                  </ion-grid>
+               </ion-item>
+               <ion-item class="ion-no-padding no-ripple" *ngFor="let rowData of objectService.multiPickingObject.outstandingPickList let rowIndex = index">
+                  <ion-grid class="ion-no-padding py-2 pl-2">
+                     <ion-row class="mt-1">
+                        <ion-col size="1" class="ion-flex ion-margin-auto">
+                           <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">{{rowIndex+1}}</div>
+                        </ion-col>
+                        <ion-col size="5" class="ion-flex ion-margin-auto">
+                           <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">{{rowData.itemCode}}</div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">{{rowData.qtyRequest}}</div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">{{rowData.qtyCurrent|number:"1.0-0"}}</div>
+                           <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">({{rowData.qtyPicked}})</div>
+                        </ion-col>
+                        <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
+                           <ion-button fill="clear" class="ion-button-small" *ngIf="pickPackAllowCopyCode && !(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0) && (rowData.qtyRequest > (rowData.qtyPicked+rowData.qtyCurrent))" (click)="cloneItemToRight(rowData,'I')">
+                              <ion-icon slot="icon-only" name="copy-outline"></ion-icon>
+                           </ion-button>
+                        </ion-col>
+                     </ion-row>
+                     <ng-container *ngIf="rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0">
+                        <ion-row class="mt-1" *ngFor="let rowData2 of rowData.assembly; let rowIndex2 = index">
+                           <ion-col size="1" class="ion-flex ion-margin-auto">
+                              <div class="font-italic font-bold">{{rowIndex+1}}.{{rowIndex2+1}}</div>
+                           </ion-col>
+                           <ion-col size="5" class="ion-flex ion-margin-auto">
+                              <div class="font-italic font-bold">{{(rowData2.itemComponentId|offlineItemIdMapping:configService.item_Masters)}}</div>
+                           </ion-col>
+                           <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                              <div class="font-italic font-bold">{{rowData2.qtyRequest}}</div>
+                           </ion-col>
+                           <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                              <div class="font-italic font-bold">{{rowData2.qtyCurrent??0|number:"1.0-0"}}</div>
+                              <div class="font-italic font-bold">({{rowData2.qtyPicked}})</div>
+                           </ion-col>
+                           <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
+                              <ion-button fill="clear" class="ion-button-small" *ngIf="pickPackAllowCopyCode && (rowData2.qtyRequest > (rowData2.qtyPicked+(rowData2.qtyCurrent??0)))" (click)="cloneItemToRight(rowData2,'C')">
+                                 <ion-icon slot="icon-only" name="copy-outline"></ion-icon>
+                              </ion-button>
+                           </ion-col>
+                        </ion-row>
+                     </ng-container>
+                  </ion-grid>
+               </ion-item>
+            </ion-list>
+         </div>
+      </ion-content>
    </ng-template>
 </ion-modal>

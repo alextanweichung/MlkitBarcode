@@ -149,7 +149,7 @@
                                  </ion-col>
                                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
                                     <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
-                                       {{rowData.qtyCurrent}}</div>
+                                       {{rowData.qtyCurrent|number:"1.0-0"}}</div>
                                     <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
                                        ({{rowData.qtyPacked}})</div>
                                  </ion-col>
@@ -174,7 +174,7 @@
                                        <div class="font-italic font-bold">{{rowData2.qtyPicked??0}}</div>
                                     </ion-col>
                                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                                       <div class="font-italic font-bold">{{rowData2.qtyCurrent??0}}</div>
+                                       <div class="font-italic font-bold">{{rowData2.qtyCurrent??0|number:"1.0-0"}}</div>
                                        <div class="font-italic font-bold">({{rowData2.qtyPacked}})</div>
                                     </ion-col>
                                  </ion-row>
@@ -232,14 +232,14 @@
                               </ion-grid>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                              <div>{{rowData.qtyRequest|number:'1.0'}}</div>
+                              <div>{{rowData.qtyRequest|number:"1.0-0"}}</div>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                              <div>{{rowData.qtyPicked|number:'1.0'}}</div>
+                              <div>{{rowData.qtyPicked|number:"1.0-0"}}</div>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                              <div>{{rowData.qtyCurrent|number:'1.0'}}</div>
-                              <div>({{rowData.qtyPacked??0|number:'1.0'}})</div>
+                              <div>{{rowData.qtyCurrent|number:"1.0-0"}}</div>
+                              <div>({{rowData.qtyPacked??0|number:"1.0-0"}})</div>
                            </ion-col>
                         </ion-row>
                      </ion-grid>

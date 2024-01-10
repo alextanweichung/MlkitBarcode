@@ -17,4 +17,4 @@ export interface ItemList {
    taxInclusive?: boolean
    variationTypeCode: string
    qtyRequest?: number
- }
+}

@@ -61,6 +61,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    pickingQtyControl: string = "0";
    systemWideScanningMethod: string;
    systemWideBlockConvertedCode: boolean;
+   pickPackAllowCopyCode: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -74,7 +75,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          }
          let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
          if (ignoreCheckdigit != undefined) {
-            this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+            this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
          }
          let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
          if (scanningMethod != undefined) {
@@ -86,6 +87,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          } else {
             this.systemWideBlockConvertedCode = false;
          }
+         let allowCopyCode = this.moduleControl.find(x => x.ctrlName === "PickPackAllowCopyCode")
+         if (allowCopyCode && allowCopyCode.ctrlValue.toUpperCase() === "Y") {
+            this.pickPackAllowCopyCode = true;
+         } else {
+            this.pickPackAllowCopyCode = false;
+         }
       })
    }
 
@@ -94,12 +101,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    runPickingEngine(itemFound: TransactionDetail, inputQty: number) {
       if (itemFound) {
          let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.isComponentScan && x.assembly && x.assembly.length > 0);
-         let findMainCodeScanned = findAssemblyItem.find(x => x.itemId == itemFound.itemId);
+         let findMainCodeScanned = findAssemblyItem.find(x => x.itemId === itemFound.itemId);
          if (findMainCodeScanned) {
             this.toastService.presentToast("Control Validation", "Please scan component item code instead of main assembly code.", "top", "warning", 1000);
             return;
          }
-         let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku == itemFound.itemSku);
+         let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku === itemFound.itemSku);
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
@@ -117,7 +124,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
                      let totalQtyPicked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
                      let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
-                     if (totalQtyCurrent + totalQtyPicked == totalQtyRequest) {
+                     if (totalQtyCurrent + totalQtyPicked === totalQtyRequest) {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
@@ -145,11 +152,11 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          let anyOperationSuccess: boolean = false;
          for (let item of findAssemblyItem) {
             let componentOperationSuccess: boolean = false;
-            findComponentItem = item.assembly.find(x => x.itemComponentId == itemFound.itemId);
+            findComponentItem = item.assembly.find(x => x.itemComponentId === itemFound.itemId);
             if (findComponentItem) {
-               let mainItemFound = this.objectService.multiPickingObject.outstandingPickList.find(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-               let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
+               let mainItemFound = this.objectService.multiPickingObject.outstandingPickList.find(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+               let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId === itemFound.itemId);
                if (outstandingLines.length > 0) {
                   let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
                   let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
@@ -169,7 +176,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                            let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
                            let totalQtyPicked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
                            let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
-                           if (totalQtyCurrent + totalQtyPicked == totalQtyRequest) {
+                           if (totalQtyCurrent + totalQtyPicked === totalQtyRequest) {
                               this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                            }
                         } else {
@@ -201,7 +208,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    insertAssemblyPickingLine(itemFound: TransactionDetail, inputQty: number, outstandingLines: SalesOrderLineForWD[], assemblyItemId: number) {
       //When scanning the same item, add the quantity to first line, instead of adding new row
       let pickingCartonTag = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
-      if (pickingCartonTag && pickingCartonTag.pickList.length > 0 && itemFound.itemBarcode && itemFound.itemBarcode == pickingCartonTag?.pickList[0]?.itemBarcode && pickingCartonTag?.pickList[0]?.assemblyItemId == assemblyItemId) {
+      if (pickingCartonTag && pickingCartonTag.pickList.length > 0 && itemFound.itemBarcode && itemFound.itemBarcode === pickingCartonTag?.pickList[0]?.itemBarcode && pickingCartonTag?.pickList[0]?.assemblyItemId === assemblyItemId) {
          let firstPickingLine = pickingCartonTag.pickList[0];
          firstPickingLine.qtyPicked = (firstPickingLine.qtyPicked ?? 0) + inputQty;
       } else {
@@ -211,7 +218,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       }
 
       //Filter out currentPickList with same item
-      let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemId == itemFound.itemId && x.assemblyItemId);
+      let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemId === itemFound.itemId && x.assemblyItemId);
       this.computeAssemblyPickingAssignment(inputQty, outstandingLines, pickListLines);
    }
 
@@ -219,7 +226,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       //Update left side qtyCurrent
       for (let os of outstandingLines) {
          for (let assembly of os.assembly) {
-            if (assembly.itemComponentId == currentPickListLines[0].itemId) {
+            if (assembly.itemComponentId === currentPickListLines[0].itemId) {
                let availableQty = (assembly.qtyRequest ?? 0) - (assembly.qtyPicked ?? 0) - (assembly.qtyCurrent ?? 0);
                if (availableQty >= inputQty) {
                   console.log("availableQty >= inputQty");
@@ -242,7 +249,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       }
       //This condition only applies to picking without control. User will be able to overscan  
       if (inputQty != 0) {
-         let findFirstAssembly = outstandingLines[0].assembly.find(x => x.itemComponentId == currentPickListLines[0].itemId);
+         let findFirstAssembly = outstandingLines[0].assembly.find(x => x.itemComponentId === currentPickListLines[0].itemId);
          if (findFirstAssembly) {
             findFirstAssembly.qtyCurrent = (findFirstAssembly.qtyCurrent ?? 0) + inputQty;
             inputQty = 0;
@@ -252,7 +259,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    }
 
    mapAssemblyPickingAssignment(outstandingLines: SalesOrderLineForWD[], currentPickListLines: CurrentPickList[]) {
-      currentPickListLines = currentPickListLines.filter(x => x.assemblyItemId == outstandingLines[0].itemId)
+      currentPickListLines = currentPickListLines.filter(x => x.assemblyItemId === outstandingLines[0].itemId)
       currentPickListLines.forEach(x => {
          x.variations = [];
       })
@@ -263,7 +270,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          let rightLoopCount: number = 0;
          for (let os of duplicateOutstandingLines) {
             for (let assembly of os.assembly) {
-               if (assembly.itemComponentId == currentPickListLines[0].itemId && assembly.assemblyItemId == currentPickListLines[0].assemblyItemId) {
+               if (assembly.itemComponentId === currentPickListLines[0].itemId && assembly.assemblyItemId === currentPickListLines[0].assemblyItemId) {
                   let currentPickAssignment: PickingLineVariation = {
                      qtyPicked: assembly.qtyCurrent,
                      salesOrderId: os.salesOrderId,
@@ -271,7 +278,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      salesOrderVariationId: os.salesOrderVariationId
                   }
                   if (balanceQty != 0) {
-                     if (balanceQty == assembly.qtyCurrent) {
+                     if (balanceQty === assembly.qtyCurrent) {
                         currentPickAssignment.qtyPicked = balanceQty;
                         current.variations.push(currentPickAssignment);
                         duplicateOutstandingLines.shift();
@@ -303,7 +310,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    insertPickingLine(itemFound: TransactionDetail, inputQty: number, outstandingLines: SalesOrderLineForWD[], pickingQtyControl: string) {
       // When scanning the same item, add the quantity to first line, instead of adding new row
       let pickingCartonTag = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
-      if (pickingCartonTag && pickingCartonTag.pickList.length > 0 && itemFound.itemBarcode == pickingCartonTag?.pickList[0]?.itemBarcode && !pickingCartonTag.pickList[0].assemblyItemId) {
+      if (pickingCartonTag && pickingCartonTag.pickList.length > 0 && itemFound.itemBarcode === pickingCartonTag?.pickList[0]?.itemBarcode && !pickingCartonTag.pickList[0].assemblyItemId) {
          let firstPickingLine = pickingCartonTag.pickList[0];
          firstPickingLine.qtyPicked = (firstPickingLine.qtyPicked ?? 0) + inputQty;
       } else {
@@ -312,7 +319,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          pickingCartonTag.pickList.unshift(newLine);
       }
       // Filter out currentPickList with same item
-      let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemSku == itemFound.itemSku && !x.assemblyItemId);
+      let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemSku === itemFound.itemSku && !x.assemblyItemId);
       this.computePickingAssignment(inputQty, outstandingLines, pickListLines);
       // this.setDataEntryState();
       // this.objectForm.markAsDirty();
@@ -387,7 +394,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                salesOrderVariationId: os.salesOrderVariationId
             }
             if (balanceQty != 0) {
-               if (balanceQty == os.qtyCurrent) {
+               if (balanceQty === os.qtyCurrent) {
                   currentPickAssignment.qtyPicked = balanceQty;
                   current.variations.push(currentPickAssignment);
                   duplicateOutstandingLines.shift();
@@ -416,7 +423,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    insertPickingLineWithoutSo(itemFound: TransactionDetail, inputQty: number) {
       let pickingCartonTag = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
-      if (pickingCartonTag && pickingCartonTag.pickList.length > 0 && itemFound.itemBarcode == pickingCartonTag?.pickList[0]?.itemBarcode) {
+      if (pickingCartonTag && pickingCartonTag.pickList.length > 0 && itemFound.itemBarcode === pickingCartonTag?.pickList[0]?.itemBarcode) {
          let firstPickingLine = pickingCartonTag.pickList[0];
          firstPickingLine.qtyPicked = (firstPickingLine.qtyPicked ?? 0) + inputQty;
       } else {
@@ -427,8 +434,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    }
 
    lookupItemInfo(itemId: number, lookupInfoType: string) {
-      if (lookupInfoType == "CODE" && Capacitor.getPlatform() !== "web") {
-         let findItem = this.configService.item_Masters.find(x => x.id == itemId);
+      if (lookupInfoType === "CODE" && Capacitor.getPlatform() !== "web") {
+         let findItem = this.configService.item_Masters.find(x => x.id === itemId);
          if (findItem) {
             return findItem.code;
          } else {
@@ -528,7 +535,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                         this.resetOutstandingListQuantityCurrent(item);
                         let pickingCartonTag = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum));
                         if (pickingCartonTag) {
-                           let rowIndex = pickingCartonTag.pickList.findIndex(x => x == item);
+                           let rowIndex = pickingCartonTag.pickList.findIndex(x => x === item);
                            pickingCartonTag.pickList.splice(rowIndex, 1);
                            pickingCartonTag.pickList = [...pickingCartonTag.pickList];
                         }
@@ -554,12 +561,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    resetOutstandingListQuantityCurrent(item: CurrentPickList) {
       if (item.assemblyItemId) {
-         let findOs = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.isComponentScan && x.assembly && x.assembly.length > 0 && x.itemId == item.assemblyItemId);
+         let findOs = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.isComponentScan && x.assembly && x.assembly.length > 0 && x.itemId === item.assemblyItemId);
          if (findOs.length > 0) {
             let inputQty = item.qtyPicked;
             findOs.forEach(os => {
                os.assembly.forEach(assembly => {
-                  if (assembly.itemComponentId == item.itemId) {
+                  if (assembly.itemComponentId === item.itemId) {
                      if (assembly.qtyCurrent >= inputQty) {
                         assembly.qtyCurrent -= inputQty;
                         inputQty = 0;
@@ -580,7 +587,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       } else {
          if (item.variations) {
             item.variations.forEach(inner => {
-               let findOs = this.objectService.multiPickingObject.outstandingPickList.find(x => x.salesOrderVariationId == inner.salesOrderVariationId);
+               let findOs = this.objectService.multiPickingObject.outstandingPickList.find(x => x.salesOrderVariationId === inner.salesOrderVariationId);
                if (findOs) {
                   findOs.qtyCurrent -= inner.qtyPicked;
                }
@@ -751,16 +758,16 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    clonedQty: { [s: number]: CurrentPickList } = {};
    clonePickingQty(item: CurrentPickList) {
-      let rowIndex = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList.findIndex(x => x == item);
+      let rowIndex = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).pickList.findIndex(x => x === item);
       this.clonedQty[rowIndex] = { ...item };
    }
 
    updatePickingQty(item: CurrentPickList) {
-      let rowIndex = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum))?.pickList.findIndex(x => x == item);
+      let rowIndex = this.objectService.multiPickingObject.pickingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum))?.pickList.findIndex(x => x === item);
       let inputQty: number = item.qtyPicked - this.clonedQty[rowIndex].qtyPicked
       if (!item.assemblyItemId) {
-         let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemSku == item.itemSku && !x.assemblyItemId);
-         let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku == item.itemSku);
+         let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemSku === item.itemSku && !x.assemblyItemId);
+         let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemSku === item.itemSku);
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
@@ -780,7 +787,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
                      let totalQtyPacked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
                      let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
-                     if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
+                     if (totalQtyCurrent + totalQtyPacked === totalQtyRequest) {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
@@ -796,9 +803,9 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
          }
       } else {
-         let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == item.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-         let outstandingLines = findAssemblyItem.flatMap(x => x.assembly).filter(y => y.itemComponentId == item.itemId);
-         let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemId == item.itemId && x.assemblyItemId == outstandingLines[0].assemblyItemId);
+         let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId === item.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+         let outstandingLines = findAssemblyItem.flatMap(x => x.assembly).filter(y => y.itemComponentId === item.itemId);
+         let pickListLines = this.objectService.multiPickingObject.pickingCarton.flatMap(x => x.pickList).filter(x => x.itemId === item.itemId && x.assemblyItemId === outstandingLines[0].assemblyItemId);
          if (outstandingLines.length > 0) {
             let osTotalQtyRequest = outstandingLines.reduce((sum, current) => sum + current.qtyRequest, 0);
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
@@ -824,7 +831,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
                      let totalQtyPacked = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyPicked, 0);
                      let totalQtyRequest = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + current.qtyRequest, 0);
-                     if (totalQtyCurrent + totalQtyPacked == totalQtyRequest) {
+                     if (totalQtyCurrent + totalQtyPacked === totalQtyRequest) {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
@@ -973,14 +980,14 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);
             return;
          }
-         if (this.allowDocumentWithEmptyLine == "N") {
+         if (this.allowDocumentWithEmptyLine === "N") {
             if (newObjectDto.details.length < 1) {
                this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "danger", 1000);
                return;
             }
          }
          this.objectService.insertObject(newObjectDto).subscribe(response => {
-            if (response.status == 201) {
+            if (response.status === 201) {
                let object = response.body as MultiPickingRoot;
                this.toastService.presentToast("Insert Complete", "New picking has been created.", "top", "success", 1000);
                this.objectService.resetVariables();
@@ -1014,7 +1021,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             }
          }
          this.objectService.updateObject(updateObjectDto).subscribe(response => {
-            if (response.status == 201) {
+            if (response.status === 201) {
                let object = response.body as MultiPickingRoot;
                this.toastService.presentToast("Update Complete", "Picking has been updated.", "top", "success", 1000);
                this.objectService.resetVariables();
@@ -1044,7 +1051,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    }
 
    transformObjectToTrxDto(multiPickingObject: MultiPickingObject): MultiPickingRoot {
-      if (this.allowDocumentWithEmptyLine == "N") {
+      if (this.allowDocumentWithEmptyLine === "N") {
          multiPickingObject.pickingCarton.forEach(carton => {
             carton.pickList = carton.pickList.filter(x => x.qtyPicked > 0);
          })
@@ -1081,13 +1088,32 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          jsonData: jsonObjectString
       };
       this.objectService.sendDebug(debugObject).subscribe(response => {
-         if (response.status == 200) {
+         if (response.status === 200) {
             this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
          }
       }, error => {
          this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
          console.log(error);
       });
+   }
+
+   copyModal: boolean = false;
+   showCopyModal() {
+      this.copyModal = true;
+   }
+
+   hideCopyModal() {
+      this.copyModal = false;
+   }
+
+   async cloneItemToRight(rowData: any, typeCode: string) {
+      console.log("🚀 ~ file: picking-item.page.ts:1111 ~ PickingItemPage ~ cloneItemToRight ~ rowData:", JSON.stringify(rowData))
+      let udItemList: TransactionDetail;
+      udItemList = await this.barcodescaninput.validateBarcode(rowData.itemBarcode, false);      
+      console.log("🚀 ~ file: picking-item.page.ts:1114 ~ PickingItemPage ~ cloneItemToRight ~ udItemList:", JSON.stringify(udItemList))
+      let itemQty: number
+      itemQty = rowData.qtyRequest - (rowData.qtyCurrent??0) - rowData.qtyPicked;
+      await this.runPickingEngine(udItemList, itemQty);
    }
 
 }

@@ -42,8 +42,8 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    ionViewWillEnter(): void {
       this.isMobile = Capacitor.getPlatform() !== "web";
-      this.isWithType = this.objectService.header?.isWithSo ? "SO" : "NONE";
       if (this.objectService.header && this.objectService.header.multiPickingId > 0) {
+         this.isWithType = this.objectService.header?.isWithSo ? "SO" : "NONE";
          this.objectForm.patchValue(this.objectService.object.header);
          this.loadExisitingSO(this.objectService.object.outstandingPickList.flatMap(r => r.salesOrderNum));
       } else {
@@ -205,7 +205,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                      return;
                   }
                   this.objectForm.patchValue({ copyFrom: "S" });
-                  doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                  // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.seletcedDocs.unshift(doc);
                   if (this.seletcedDocs && this.seletcedDocs.length === 1) {
                      this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
@@ -254,7 +254,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                      return;
                   }
                   this.objectForm.patchValue({ copyFrom: "B" });
-                  doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                  // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.seletcedDocs.unshift(doc);
                   if (this.seletcedDocs && this.seletcedDocs.length === 1) {
                      this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
@@ -407,6 +407,11 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    onWarehouseAgentSelected(event) {
       if (event) {
          this.objectForm.patchValue({ warehouseAgentId: event.id });
+         setTimeout(() => {
+            if (this.isWithType === "SO" || this.isWithType === "B2B") {
+               this.barcodeInput.nativeElement.focus();
+            }
+         }, 10);
       } else {
          this.objectForm.patchValue({ warehouseAgentId: null });
       }
@@ -487,6 +492,11 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       try {
          if (event.detail.value === "SO" || event.detail.value === "B2B") {
             this.objectForm.patchValue({ isWithSo: true });
+            setTimeout(() => {
+               if (this.isWithType === "SO" || this.isWithType === "B2B") {
+                  this.barcodeInput.nativeElement.focus();
+               }
+            }, 10);
          } else {
             this.objectForm.patchValue({ isWithSo: false });
          }
