@@ -9,6 +9,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { MultiPickingList } from '../../models/picking';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
    selector: 'app-picking',
@@ -25,14 +26,15 @@ export class PickingPage implements OnInit, ViewWillEnter {
    uniqueGrouping: Date[] = [];
 
    constructor(
+      private objectService: PickingService,
       private authService: AuthService,
       private commonService: CommonService,
       private configService: ConfigService,
-      private objectService: PickingService,
+      private toastService: ToastService,
+      private loadingService: LoadingService,
       private modalController: ModalController,
       private actionSheetController: ActionSheetController,
       private navController: NavController,
-      private toastService: ToastService
    ) {
       // reload all masterlist whenever user enter listing
    }
@@ -40,7 +42,7 @@ export class PickingPage implements OnInit, ViewWillEnter {
    async ionViewWillEnter(): Promise<void> {
       try {
          if (!this.startDate) {
-            this.startDate = this.commonService.getTodayDate();
+            this.startDate = this.commonService.getFirstDayOfTodayMonth();
          }
          if (!this.endDate) {
             this.endDate = this.commonService.getTodayDate();
@@ -58,19 +60,25 @@ export class PickingPage implements OnInit, ViewWillEnter {
 
    /* #region  crud */
 
-   loadObjects() {
+   async loadObjects() {
       try {
+         await this.loadingService.showLoading();
          this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
             let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
             this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
             await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+            await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-         }, error => {
+         }, async error => {
             console.error(error);
+            await this.loadingService.dismissLoading();
          })
-      } catch (e) {
-         console.error(e);
+      } catch (error) {
+         console.error(error);
+         await this.loadingService.dismissLoading();
+      } finally {         
+         await this.loadingService.dismissLoading();
       }
    }
 

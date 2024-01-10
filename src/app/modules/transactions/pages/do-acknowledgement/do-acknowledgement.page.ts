@@ -186,7 +186,6 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    async save() {
       if (!this.signaturePad.isEmpty()) {
          const fileName = this.selectedDo.deliveryOrderNum.replace(" ", "").replace("/","") + "_Acknowledgement_" + "signature.png";
-         console.log("🚀 ~ file: do-acknowledgement.page.ts:189 ~ DoAcknowledgementPage ~ save ~ fileName:", fileName)
          const base64Data = this.signaturePad.toDataURL();
          try {
             this.images = [];

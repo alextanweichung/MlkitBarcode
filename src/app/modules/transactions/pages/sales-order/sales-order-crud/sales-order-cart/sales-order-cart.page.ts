@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonDatetime, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
-import Decimal from 'decimal.js';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { SalesOrderService } from 'src/app/modules/transactions/services/sales-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -14,7 +13,6 @@ import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { SalesItemRequest } from 'src/app/shared/models/sales-item-request';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { GeneralTransactionService } from 'src/app/shared/services/general-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
@@ -536,30 +534,30 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
             this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(async response => {
                this.objectService.setSummary(response.body);
-               await this.loadingService.dismissLoading();
                this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
+               await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/sales-order/sales-order-summary");
             }, async error => {
                this.submit_attempt = false;
-               await this.loadingService.dismissLoading();
                console.error(error);
+               await this.loadingService.dismissLoading();
             })
          } else {
             this.objectService.insertObject(trxDto).subscribe(async response => {
                this.objectService.setSummary(response.body);
-               await this.loadingService.dismissLoading();
                this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
+               await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/sales-order/sales-order-summary");
             }, async error => {
                this.submit_attempt = false;
-               await this.loadingService.dismissLoading();
                console.error(error);
+               await this.loadingService.dismissLoading();
             })
          }
       } catch (e) {
          this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
          console.error(e);
+         await this.loadingService.dismissLoading();
       } finally {
          this.submit_attempt = false;
          await this.loadingService.dismissLoading();
@@ -576,18 +574,18 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          this.objectService.updateObject(trxDto).subscribe(async response => {
             this.objectService.setSummary(response.body);
-            await this.loadingService.dismissLoading();
             this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
+            await this.loadingService.dismissLoading();
             this.navController.navigateRoot("/transactions/sales-order/sales-order-summary");
          }, async error => {
             this.submit_attempt = false;
-            await this.loadingService.dismissLoading();
             console.error(error);
+            await this.loadingService.dismissLoading();
          });
       } catch (e) {
          this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
          console.error(e);
+         await this.loadingService.dismissLoading();
       } finally {
          this.submit_attempt = false;
          await this.loadingService.dismissLoading();

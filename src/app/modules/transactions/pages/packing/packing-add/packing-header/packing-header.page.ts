@@ -42,6 +42,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    ionViewWillEnter(): void {
       this.isMobile = Capacitor.getPlatform() !== "web";
+      this.isWithType = this.objectService.header?.isWithSo ? "SO" : "NONE";
       if (this.objectService.header && this.objectService.header.multiPackingId > 0) {
          this.objectForm.patchValue(this.objectService.object.header);
          this.loadExisitingSO(this.objectService.object.outstandingPackList.flatMap(r => r.salesOrderNum));

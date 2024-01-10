@@ -164,11 +164,11 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
                let rrr = response;
                if (rrr && rrr.length > 0) {
-                  rrr.forEach(async r => {
+                  for await (const r of rrr) {
                      if (r.itemPricing !== null) {
                         await this.assignTrxItemToDataLine(r)
                      }
-                  })
+                  }
                } else {
                   this.startIndex = this.availableItem.length;
                }
@@ -327,7 +327,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    /* #region  unit price, tax, discount */
 
    assignTrxItemToDataLine(item: TransactionDetail) {
-      console.log("🚀 ~ file: item-catalog.page.ts:329 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ item:", item)
       if (this.useTax) {
          if (this.isItemPriceTaxInclusive) {
             item.unitPrice = item.itemPricing.unitPrice;

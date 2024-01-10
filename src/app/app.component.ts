@@ -54,7 +54,6 @@ export class AppComponent {
             await BarcodeScanner.checkPermission({ force: true });
 
             // App.addListener("appStateChange", (state: AppState) => {
-            //    console.log("🚀 ~ file: app.component.ts:57 ~ AppComponent ~ App.addListener ~ state:", JSON.stringify(state))
             //    if (state.isActive) {
 
             //    } else {

@@ -17,7 +17,6 @@ import { GeneralTransactionService } from '../../services/general-transaction.se
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from '../../models/module-control';
-import { Validators } from '@angular/forms';
 
 @Component({
    selector: 'app-sales-cart',
@@ -325,7 +324,6 @@ export class SalesCartPage implements OnInit, OnChanges {
    selectedIndex: number;
    showEditModal(data: TransactionDetail, rowIndex: number) {
       this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
-      console.log("🚀 ~ file: sales-cart.page.ts:328 ~ SalesCartPage ~ showEditModal ~ this.selectedItem:", this.selectedItem)
       this.selectedIndex = rowIndex;
       this.onPricingApprovalSwitch({ detail: { checked: this.selectedItem.isPricingApproval } });
       this.isModalOpen = true;
@@ -477,7 +475,6 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    async computeAllAmount(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
-      console.log("🚀 ~ file: sales-cart.page.ts:480 ~ SalesCartPage ~ computeAllAmount ~ trxLine:", trxLine)
       let validate = this.discExprRegex.exec(trxLine.discountExpression);
       if (validate && validate.input !== validate[0]) {
          trxLine.discountExpression = validate[0]
@@ -498,7 +495,6 @@ export class SalesCartPage implements OnInit, OnChanges {
       if (this.configSalesActivateTradingMargin) {
          await this.computeTradingMarginAmount(trxLine);
       }
-      console.log("🚀 ~ file: sales-cart.page.ts:502 ~ SalesCartPage ~ computeAllAmount ~ this.objectHeader:", this.objectHeader)
       if (this.configSalesActivatePromotionEngine && this.objectHeader.isAutoPromotion && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
          await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, true, this.configSalesActivateTradingMargin)
       }
@@ -628,8 +624,8 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    async promotionCheck() {
-      if (this.isAutoPromotion) {
-         if (this.configSalesActivatePromotionEngine && this.objectHeader.isAutoPromotion && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
+      if ((this.isAutoPromotion??true)) {
+         if (this.configSalesActivatePromotionEngine && (this.objectHeader.isAutoPromotion??true) && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
             await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, false, this.configSalesActivateTradingMargin)
          }
       } else {
@@ -710,9 +706,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    /* #endregion */
 
    onPricingApprovalSwitch(event: any) {
-      console.log("🚀 ~ file: sales-cart.page.ts:711 ~ SalesCartPage ~ onPricingApprovalSwitch ~ event:", event)
       if (event.detail.checked) {
-         console.log("🚀 ~ file: sales-cart.page.ts:713 ~ SalesCartPage ~ onPricingApprovalSwitch ~ event.detail.checked:", event.detail.checked)
          switch (this.orderingPriceApprovalEnabledFields) {
             case "0":
                if (this.restrictTrxFields.unitPrice) {

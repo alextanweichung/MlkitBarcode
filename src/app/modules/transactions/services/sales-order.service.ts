@@ -127,7 +127,6 @@ export class SalesOrderService {
    async loadPromotion() {
       if (this.objectHeader?.trxDate && this.objectHeader?.customerId) {
          this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
-         console.log("🚀 ~ file: sales-order.service.ts:122 ~ SalesOrderService ~ loadPromotion ~ this.promotionMaster:", this.promotionMaster)
       } else {
          this.promotionMaster = [];
       }
@@ -278,14 +277,12 @@ export class SalesOrderService {
    objectSummary: SalesOrderRoot;
    async setHeader(objectHeader: SalesOrderHeader) {
       this.objectHeader = objectHeader;
-      console.log("🚀 ~ file: sales-order.service.ts:271 ~ SalesOrderService ~ setHeader ~ this.objectHeader:", this.objectHeader)
       // load promotion first after customer confirmed or whenever header changed.
       await this.loadPromotion();
    }
 
    setLine(objectDetail: TransactionDetail[]) {
       this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
-      console.log("🚀 ~ file: sales-order.service.ts:279 ~ SalesOrderService ~ setLine ~ this.objectDetail:", this.objectDetail)
    }
 
    setSummary(objectSummary: SalesOrderRoot) {
