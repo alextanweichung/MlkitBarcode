@@ -232,7 +232,8 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       }
    }
 
-   validateB2B(input: string) {if (input && input.length > 0) {
+   validateB2B(input: string) {
+      if (input && input.length > 0) {
          this.itemSearchValue = null;
          if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
             this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
@@ -631,5 +632,33 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    /* #endregion */
+
+   onWAScanCompleted(event: string) { // warehouse agent
+      try {
+         let found = this.objectService.warehouseAgentMasterList.find(r => r.code.toUpperCase() === event.toUpperCase());
+         if (found) {
+            this.onWarehouseAgentSelected({ id: found.id });
+         } else {
+            this.toastService.presentToast("", "Invalid Warehouse Agent", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onWADoneScanning(event) { // warehouse agent
+      try {
+         if (event) {
+            let found = this.objectService.warehouseAgentMasterList.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found) {
+               this.onWarehouseAgentSelected({ id: found.id });
+            } else {
+               this.toastService.presentToast("", "Invalid Warehouse Agent", "top", "warning", 1000);
+            }            
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
 
 }

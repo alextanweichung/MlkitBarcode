@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
@@ -16,7 +16,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
    templateUrl: './consignment-sales.page.html',
    styleUrls: ['./consignment-sales.page.scss'],
 })
-export class ConsignmentSalesPage implements OnInit, ViewWillEnter, ViewDidEnter {
+export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter {
 
    objects: ConsignmentSalesList[] = [];
 
@@ -67,6 +67,10 @@ export class ConsignmentSalesPage implements OnInit, ViewWillEnter, ViewDidEnter
 
    async ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    async promptIncompleteTrxAlert() {

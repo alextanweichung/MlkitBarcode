@@ -10,6 +10,7 @@ import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { background_load } from "src/app/core/interceptors/error-handler.interceptor";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { LoadingService } from "src/app/services/loading/loading.service";
+import { Subscription } from "rxjs";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -27,6 +28,13 @@ export class PackingService {
       private authService: AuthService,
       private loadingService: LoadingService,
    ) { }
+
+   // Method to clean up the subscription
+   stopListening() {
+      if (this.custSubscription) {
+         this.custSubscription.unsubscribe();
+      }
+   }
 
    /* #region store as one set data for each packing */
 
@@ -248,6 +256,7 @@ export class PackingService {
       }
    }
 
+   custSubscription: Subscription;
    fullMasterList: MasterList[] = [];
    customerMasterList: MasterListDetails[] = [];
    itemUomMasterList: MasterListDetails[] = [];
@@ -267,12 +276,14 @@ export class PackingService {
       this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      // this.authService.customerMasterList$.subscribe(obj => {
-      //    let savedCustomerList = obj;
-      //    if (savedCustomerList) {
-      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-      //    }
-      // })
+      this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         } else {
+            await this.authService.rebuildCustomerList();
+         }
+      })
    }
 
    fullStaticLovList: MasterList[] = [];

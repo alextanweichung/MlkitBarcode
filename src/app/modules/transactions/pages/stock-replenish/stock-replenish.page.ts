@@ -1,4 +1,4 @@
-import { Component, DoCheck, IterableDiffers, OnInit } from '@angular/core';
+import { Component, DoCheck, IterableDiffers, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ViewWillEnter, ViewDidEnter, ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
 import { format } from 'date-fns';
@@ -15,7 +15,7 @@ import { SalesOrderList } from '../../models/sales-order';
    templateUrl: './stock-replenish.page.html',
    styleUrls: ['./stock-replenish.page.scss'],
 })
-export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
+export class StockReplenishPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, DoCheck {
 
    private objectDiffer: any;
    objects: SalesOrderList[] = [];
@@ -67,6 +67,10 @@ export class StockReplenishPage implements OnInit, ViewWillEnter, ViewDidEnter, 
 
    ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

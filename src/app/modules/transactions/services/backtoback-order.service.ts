@@ -21,6 +21,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { Subscription } from 'rxjs';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -63,6 +64,13 @@ export class BackToBackOrderService {
       private loadingService: LoadingService
    ) { }
 
+   // Method to clean up the subscription
+   stopListening() {
+      if (this.custSubscription) {
+         this.custSubscription.unsubscribe();
+      }
+   }
+
    async loadRequiredMaster() {
       try {
          await this.loadingService.showLoading();
@@ -80,6 +88,7 @@ export class BackToBackOrderService {
       }
    }
 
+   custSubscription: Subscription;
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -94,12 +103,14 @@ export class BackToBackOrderService {
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      // this.authService.customerMasterList$.subscribe(obj => {
-      //    let savedCustomerList = obj;
-      //    if (savedCustomerList) {
-      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-      //    }
-      // })
+      this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         } else {
+            await this.authService.rebuildCustomerList();
+         }
+      })
    }
 
    async loadStaticLovList() {

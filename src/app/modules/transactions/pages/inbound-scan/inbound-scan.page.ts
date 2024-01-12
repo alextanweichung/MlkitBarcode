@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { InboundScanService } from '../../services/inbound-scan.service';
@@ -14,7 +14,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
    templateUrl: './inbound-scan.page.html',
    styleUrls: ['./inbound-scan.page.scss'],
 })
-export class InboundScanPage implements OnInit, ViewWillEnter {
+export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter {
 
    objects: InboundScanList[] = [];
 
@@ -49,6 +49,10 @@ export class InboundScanPage implements OnInit, ViewWillEnter {
    }
 
    ngOnInit() {
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

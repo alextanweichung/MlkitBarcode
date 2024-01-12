@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MultiPackingList } from '../../models/packing';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -16,7 +16,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
    templateUrl: './packing.page.html',
    styleUrls: ['./packing.page.scss'],
 })
-export class PackingPage implements OnInit, ViewWillEnter {
+export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
 
    objects: MultiPackingList[] = [];
 
@@ -55,6 +55,10 @@ export class PackingPage implements OnInit, ViewWillEnter {
 
    ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

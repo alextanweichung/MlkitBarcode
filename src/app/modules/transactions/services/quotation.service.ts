@@ -58,9 +58,7 @@ export class QuotationService {
       private authService: AuthService,
       private configService: ConfigService,
       private loadingService: LoadingService
-   ) {
-
-   }
+   ) { }
 
    // Method to clean up the subscription
    stopListening() {

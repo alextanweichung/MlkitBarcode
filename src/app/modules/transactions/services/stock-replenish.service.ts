@@ -12,6 +12,7 @@ import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { SalesOrderHeader, SalesOrderRoot, SalesOrderList } from "../models/sales-order";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { LoadingService } from "src/app/services/loading/loading.service";
+import { Subscription } from "rxjs";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -46,6 +47,13 @@ export class StockReplenishService {
       private loadingService: LoadingService
    ) { }
 
+   // Method to clean up the subscription
+   stopListening() {
+      if (this.custSubscription) {
+         this.custSubscription.unsubscribe();
+      }
+   }
+
    async loadRequiredMaster() {
       try {
          await this.loadingService.showLoading();
@@ -60,6 +68,7 @@ export class StockReplenishService {
       //   await this.loadCustomer();
    }
 
+   custSubscription: Subscription;
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
@@ -72,12 +81,14 @@ export class StockReplenishService {
       this.areaMasterList = this.fullMasterList.filter(x => x.objectName == "Area").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == "Currency").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      // this.authService.customerMasterList$.subscribe(obj => {
-      //    let savedCustomerList = obj;
-      //    if (savedCustomerList) {
-      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-      //    }
-      // })
+      this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         } else {
+            await this.authService.rebuildCustomerList();
+         }
+      })
       this.bindSalesAgentList();
    }
 

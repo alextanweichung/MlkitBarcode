@@ -646,5 +646,31 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       
    }
 
+   onWAScanCompleted(event: string) { // warehouse agent
+      try {
+         let found = this.objectService.warehouseAgentMasterList.find(r => r.code.toUpperCase() === event.toUpperCase());
+         if (found) {
+            this.onWarehouseAgentSelected({ id: found.id });
+         } else {
+            this.toastService.presentToast("", "Invalid Warehouse Agent", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onWADoneScanning(event) { // warehouse agent
+      try {
+         let found = this.objectService.warehouseAgentMasterList.find(r => r.code.toUpperCase() === event.toUpperCase());
+         if (found) {
+            this.onWarehouseAgentSelected({ id: found.id });
+         } else {
+            this.toastService.presentToast("", "Invalid Warehouse Agent", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
 }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
    templateUrl: './cash-deposit.page.html',
    styleUrls: ['./cash-deposit.page.scss'],
 })
-export class CashDepositPage implements OnInit, ViewWillEnter {
+export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
 
    objects: CashDeposit[] = [];
 
@@ -34,6 +34,10 @@ export class CashDepositPage implements OnInit, ViewWillEnter {
 
    ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    loadObjects() {

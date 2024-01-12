@@ -85,7 +85,8 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
          isCompleted: [null],
          posLocationId: [null],
          posLocationCode: [null],
-         sourceType: ["M"]
+         sourceType: ["M"],
+         shipName: [null]
       });
    }
 
@@ -156,50 +157,82 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
    availableAddress: ShippingInfo[] = [];
    creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
    onCustomerSelected(event: any, ignoreCurrencyRate?: boolean) {
-      var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
-      if (lookupValue != undefined) {
-         this.objectService.removeLine();
-         this.objectForm.patchValue({ customerId: lookupValue.id });
-         this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
-         if (lookupValue.attributeArray1.length > 0) {
-            this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
-         } else {
-            this.selectedCustomerLocationList = [];
-         }
-         this.objectForm.patchValue({ salesAgentId: parseFloat(lookupValue.attribute1), termPeriodId: parseFloat(lookupValue.attribute2), countryId: parseFloat(lookupValue.attribute3), locationId: parseFloat(lookupValue.attribute6), toLocationId: null, isItemPriceTaxInclusive: lookupValue.attribute8 === "1" ? true : false, isDisplayTaxInclusive: lookupValue.attribute9 === "1" ? true : false });
-         // this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList);
-         if (!ignoreCurrencyRate) {
-            this.objectForm.patchValue({ currencyId: parseFloat(lookupValue.attribute4) });
-         }
+      try {
+         if (event) {
+            var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
+            if (lookupValue != undefined) {
+               this.objectService.removeLine();
+               this.objectForm.patchValue({ customerId: lookupValue.id });
+               this.objectForm.patchValue({ shipName: lookupValue.description });
+               this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
+               if (lookupValue.attributeArray1.length > 0) {
+                  this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
+               } else {
+                  this.selectedCustomerLocationList = [];
+               }
+               this.objectForm.patchValue({ 
+                  salesAgentId: parseFloat(lookupValue.attribute1), 
+                  termPeriodId: parseFloat(lookupValue.attribute2), 
+                  countryId: parseFloat(lookupValue.attribute3), 
+                  locationId: parseFloat(lookupValue.attribute6), 
+                  toLocationId: null, 
+                  isItemPriceTaxInclusive: lookupValue.attribute8 === "1" ? true : false, isDisplayTaxInclusive: lookupValue.attribute9 === "1" ? true : false 
+               });
+               // this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList);
+               if (!ignoreCurrencyRate) {
+                  this.objectForm.patchValue({ currencyId: parseFloat(lookupValue.attribute4) });
+               }
 
-         this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
-         this.onCurrencySelected(this.objectForm.controls.currencyId.value);
-         if (lookupValue.attribute5 === "T") {
-            this.objectForm.controls.toLocationId.clearValidators();
-            this.objectForm.controls.toLocationId.updateValueAndValidity();
-         }
-         if (lookupValue.attributeArray1.length === 1) {
-            this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
-         }
-         //Auto map object type code
-         if (lookupValue.attribute5 === "T" || lookupValue.attribute5 === "F") {
-            this.objectForm.patchValue({ typeCode: "S" });
-            this.objectForm.controls["typeCode"].disable();
-         } else {
-            this.objectForm.patchValue({ typeCode: "T" });
-            this.objectForm.controls["typeCode"].disable();
-         }
-         this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls["customerId"].value).flatMap(r => r.shippingInfo);// handle location
-      }
-      if (!this.objectService.disableTradeTransactionGenerateGL) {
-         this.objectService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
-            if (response) {
-               this.creditInfo = response;
+               this.commonService.lookUpSalesAgent(this.objectForm, this.objectService.customerMasterList)
+               this.onCurrencySelected(this.objectForm.controls.currencyId.value);
+               if (lookupValue.attribute5 === "T") {
+                  this.objectForm.controls.toLocationId.clearValidators();
+                  this.objectForm.controls.toLocationId.updateValueAndValidity();
+               }
+               if (lookupValue.attributeArray1.length === 1) {
+                  this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
+               }
+               //Auto map object type code
+               if (lookupValue.attribute5 === "T" || lookupValue.attribute5 === "F") {
+                  this.objectForm.patchValue({ typeCode: "S" });
+                  this.objectForm.controls["typeCode"].disable();
+               } else {
+                  this.objectForm.patchValue({ typeCode: "T" });
+                  this.objectForm.controls["typeCode"].disable();
+               }
+               this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectForm.controls["customerId"].value).flatMap(r => r.shippingInfo);// handle location
             }
-         })
-      }
-      if (this.objectService.salesActivatePromotionEngine) {
-         // this.loadPromotion(this.objectForm.controls.customerId.value);
+            if (!this.objectService.disableTradeTransactionGenerateGL) {
+               this.objectService.getCreditInfo(this.objectForm.controls.customerId.value).subscribe(response => {
+                  if (response) {
+                     this.creditInfo = response;
+                  }
+               })
+            }
+            if (this.objectService.salesActivatePromotionEngine) {
+               // this.loadPromotion(this.objectForm.controls.customerId.value);
+            }
+         } else {
+            this.objectForm.patchValue({ customerId: null });
+            this.objectForm.patchValue({ shipName: null });
+            this.objectForm.patchValue({ businessModelType: null });
+            this.objectForm.patchValue({
+               salesAgentId: null,
+               termPeriodId: null,
+               countryId: null,
+               currencyId: null,
+               locationId: null,
+               toLocationId: null,
+               isItemPriceTaxInclusive: null,
+               isDisplayTaxInclusive: null
+            });
+            this.objectForm.patchValue({ toLocationId: null });
+            this.objectForm.patchValue({ typeCode: null });
+            this.onCurrencySelected(null);
+            this.creditInfo = null;
+         }
+      } catch (e) {
+         console.error(e);
       }
    }
 
@@ -215,6 +248,9 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
                   this.objectForm.patchValue({ isHomeCurrency: false });
                }
             }
+         } else {
+            this.objectForm.patchValue({ currencyRate: null });
+            this.objectForm.patchValue({ isHomeCurrency: null });
          }
       } catch (e) {
          console.error(e);

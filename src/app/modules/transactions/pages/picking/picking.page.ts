@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -16,7 +16,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
    templateUrl: './picking.page.html',
    styleUrls: ['./picking.page.scss'],
 })
-export class PickingPage implements OnInit, ViewWillEnter {
+export class PickingPage implements OnInit, OnDestroy, ViewWillEnter {
 
    objects: MultiPickingList[] = [];
 
@@ -56,6 +56,10 @@ export class PickingPage implements OnInit, ViewWillEnter {
 
    ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

@@ -1,38 +1,109 @@
-<ion-item (click)="showModal()" [disabled]="disabled">
-   <ion-label class="font-bold" position="stacked">{{title}}</ion-label>
-   <div *ngIf="selected && selected?.oldCode">
-      <ion-grid class="ion-no-padding">
-         <ion-row class="mt-2">
-            <ion-col class="ion-flex ion-margin-auto">
-               <ion-badge *ngIf="selected && selected?.code">
-                  <div>{{selected?.code}}</div>
-               </ion-badge>
-               <ion-badge color="tertiary" *ngIf="selected && selected?.oldCode">
-                  <div>{{selected?.oldCode}}</div>
-               </ion-badge>
-            </ion-col>
-         </ion-row>
-         <ion-row class="my-2">
-            <ion-col class="ion-margin-auto">
-               <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
-            </ion-col>
-         </ion-row>
-      </ion-grid>
-   </div>
-   <div *ngIf="selected && !selected?.oldCode">
-      <ion-grid class="ion-no-padding">
-         <ion-row class="my-2">
-            <ion-col class="ion-flex ion-margin-auto">
-               <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code">
-                  <div>{{selected?.code}}</div>
-               </ion-badge>
-               <div class="my-auto ml-2">{{selected?.[optionLabel]}}</div>
-            </ion-col>
-         </ion-row>
-      </ion-grid>
-   </div>
-   <ion-input *ngIf="!selected" [placeholder]="'Select ' + title" readonly></ion-input>
-</ion-item>
+<ng-container *ngIf="inputReadOnly">
+   <ion-item button detail="false" class="no-ripple" (click)="showModal()" [disabled]="disabled">
+      <ion-label class="font-bold" position="stacked">{{title}}</ion-label>
+      <ng-container *ngIf="selected && selected?.oldCode">
+         <ion-grid class="ion-no-padding m-0 w-full">
+            <ion-row class="mt-2">
+               <ion-col class="ion-flex ion-margin-auto">
+                  <ion-badge *ngIf="selected && selected?.code">
+                     <div>{{selected?.code}}</div>
+                  </ion-badge>
+                  <ion-badge color="tertiary" *ngIf="selected && selected?.oldCode">
+                     <div>{{selected?.oldCode}}</div>
+                  </ion-badge>
+               </ion-col>
+            </ion-row>
+            <ion-row class="my-2">
+               <ion-col class="ion-margin-auto">
+                  <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ng-container>
+      <ng-container *ngIf="selected && !selected?.oldCode">
+         <ion-grid class="ion-no-padding m-0 w-full">
+            <ion-row class="my-2">
+               <ion-col class="ion-flex ion-margin-auto">
+                  <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code">
+                     <div>{{selected?.code}}</div>
+                  </ion-badge>
+                  <div class="my-auto ml-2">{{selected?.[optionLabel]}}</div>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ng-container>
+      <ion-input *ngIf="!selected" [placeholder]="'Select ' + title" [readonly]="inputReadOnly"></ion-input>
+   </ion-item>
+</ng-container>
+<ng-container *ngIf="!inputReadOnly">
+   <ion-item button detail="false" class="no-ripple" [disabled]="disabled">
+      <ion-label class="font-bold" position="stacked">{{title}}</ion-label>
+      <ng-container *ngIf="selected && selected?.oldCode">
+         <ion-grid class="ion-no-padding m-0 w-full">
+            <ion-row class="mt-2">
+               <ion-col class="ion-flex ion-margin-auto">
+                  <ion-badge *ngIf="selected && selected?.code">
+                     <div>{{selected?.code}}</div>
+                  </ion-badge>
+                  <ion-badge color="tertiary" *ngIf="selected && selected?.oldCode">
+                     <div>{{selected?.oldCode}}</div>
+                  </ion-badge>
+               </ion-col>
+            </ion-row>
+            <ion-row class="my-2">
+               <ion-col size="8" class="ion-flex ion-margin-auto">
+                  <div class="ion-text-wrap">{{selected?.[optionLabel]}}</div>
+               </ion-col>
+               <ion-col size="4" class="ion-flex my-auto justify-content-end">
+                  <ion-button fill="clear" (click)="startScanning()">
+                     <i slot="icon-only" class="fas fa-camera"></i>
+                  </ion-button>
+                  <ion-button fill="clear" (click)="showModal()">
+                     <i slot="icon-only" class="fas fa-filter"></i>
+                  </ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ng-container>
+      <ng-container *ngIf="selected && !selected?.oldCode">
+         <ion-grid class="ion-no-padding m-0 w-full">
+            <ion-row class="my-2">
+               <ion-col size="8" class="ion-flex my-auto">
+                  <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code">
+                     <div>{{selected?.code}}</div>
+                  </ion-badge>
+                  <div class="my-auto ml-2">{{selected?.[optionLabel]}}</div>
+               </ion-col>
+               <ion-col size="4" class="ion-flex my-auto justify-content-end">
+                  <ion-button fill="clear" (click)="startScanning()">
+                     <i slot="icon-only" class="fas fa-camera"></i>
+                  </ion-button>
+                  <ion-button fill="clear" (click)="showModal()">
+                     <i slot="icon-only" class="fas fa-filter"></i>
+                  </ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ng-container>
+      <ng-container *ngIf="!selected">
+         <ion-grid class="ion-no-padding m-0 w-full">
+            <ion-row class="my-2">
+               <ion-col size="8" class="ion-flex my-auto">
+                  <input #scanInput hideKeyboard class="my-auto" [type]="'text'" enterkeyhint="enter" [(ngModel)]="searchValue" [placeholder]="'Select ' + title" (blur)="onBlur($event, searchValue)" (keydown)="onScanInputKeyDown($event, searchValue)">
+               </ion-col>
+               <ion-col size="4" class="ion-flex my-auto justify-content-end">
+                  <ion-button fill="clear" (click)="startScanning()">
+                     <i slot="icon-only" class="fas fa-camera"></i>
+                  </ion-button>
+                  <ion-button fill="clear" (click)="showModal()">
+                     <i slot="icon-only" class="fas fa-filter"></i>
+                  </ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ng-container>
+   </ion-item>
+</ng-container>
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidPresent)="setFocus()">
    <ng-template>

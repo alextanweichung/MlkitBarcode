@@ -22,11 +22,11 @@
    </ng-template>
 </ion-popover>
 <ion-content [fullscreen]="true">
-   <div class="p-2">
+   <div class="px-2 pb-2">
 
       <ng-container *ngIf="dashboardData?.memo && dashboardData?.memo.length > 0">
-         <ion-list-header>
-            <ion-label class="pl-2" color="dark">Announcement</ion-label>
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+            <ion-label>Announcement</ion-label>
          </ion-list-header>
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
             <ion-item button *ngFor="let rowData of dashboardData?.memo" (click)="showModal(rowData)">
@@ -36,9 +36,10 @@
          </ion-list>
       </ng-container>
 
-      <div         *ngIf="showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseReqReview || showPurchaseReqApproval || showPurchaseOrderReview || showPurchaseOrderApproval || showSalesOrderPricingApproval || showBackToBackOrderPricingApproval || showNonTradePurchaseOrderReview || showNonTradePurchaseOrderApproval || showBranchReceivingReview || showBranchReceivingApproval || showRefundApproval || showExchangeApproval || showRecallDepositApproval">
-         <ion-list-header>
-            <ion-label class="pl-2" color="dark">Pending Task</ion-label>
+      <div *ngIf="showQuotationReview || showQuotationApproval || showSalesOrderReview || showSalesOrderApproval || showPurchaseReqReview || showPurchaseReqApproval || showPurchaseOrderReview || showPurchaseOrderApproval || showSalesOrderPricingApproval || showBackToBackOrderPricingApproval || showNonTradePurchaseOrderReview || showNonTradePurchaseOrderApproval || showBranchReceivingReview || showBranchReceivingApproval || showRefundApproval || showExchangeApproval || showRecallDepositApproval">
+         
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+            <ion-label>Pending Task</ion-label>
          </ion-list-header>
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
 
@@ -213,8 +214,8 @@
       </div>
 
       <div *ngIf="showQuotation || showSalesOrder">
-         <ion-list-header>
-            <ion-label class="pl-2" color="dark">Current Month Transaction</ion-label>
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+            <ion-label>Current Month Transaction</ion-label>
          </ion-list-header>
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
             <ion-item *ngIf="showQuotation" (click)="goToTransaction('quotation')">
@@ -235,7 +236,7 @@
       </div>
       <hr class="hr-medium">
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-         <ion-label class="pl-2">Item Last Sync: {{last_sync_datetime|date:'yyyy-MM-dd hh:mm:ss'}}</ion-label>
+         <ion-label>Item Last Sync: {{last_sync_datetime|date:'yyyy-MM-dd hh:mm:ss'}}</ion-label>
       </ion-list-header>
       <ion-item *ngIf="false">
          <ion-label floating>Badge Number</ion-label>

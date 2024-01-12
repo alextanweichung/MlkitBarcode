@@ -36,7 +36,7 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      
+
    }
 
    newForm() {
@@ -80,7 +80,8 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
             remark: [null],
             isHomeCurrency: [null],
             isPricingApproval: [false],
-            isAutoPromotion: [true]
+            isAutoPromotion: [true],
+            shipName: [null]
          });
       } catch (e) {
          console.error(e);
@@ -108,11 +109,12 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
    availableAddress: ShippingInfo[] = [];
    async onCustomerSelected(event) {
       try {
-         if (event && event !== undefined) {
+         if (event) {
             var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
             if (lookupValue != undefined) {
                this.objectService.removeLine();
                this.objectForm.patchValue({ customerId: lookupValue.id });
+               this.objectForm.patchValue({ shipName: lookupValue.description });
                this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
                if (lookupValue.attributeArray1.length > 0) {
                   this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
@@ -157,6 +159,24 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
                   }
                })
             }
+         } else {
+            this.objectForm.patchValue({ customerId: null });
+            this.objectForm.patchValue({ shipName: null });
+            this.objectForm.patchValue({ businessModelType: null });
+            this.objectForm.patchValue({
+               salesAgentId: null,
+               termPeriodId: null,
+               countryId: null,
+               currencyId: null,
+               locationId: null,
+               toLocationId: null,
+               isItemPriceTaxInclusive: null,
+               isDisplayTaxInclusive: null
+            });
+            this.objectForm.patchValue({ toLocationId: null });
+            this.objectForm.patchValue({ typeCode: null });
+            this.onCurrencySelected(null);
+            this.creditInfo = null;
          }
       } catch (e) {
          console.error(e);
@@ -175,6 +195,9 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
                   this.objectForm.patchValue({ isHomeCurrency: false });
                }
             }
+         } else {
+            this.objectForm.patchValue({ currencyRate: null });
+            this.objectForm.patchValue({ isHomeCurrency: null });
          }
       } catch (e) {
          console.error(e);

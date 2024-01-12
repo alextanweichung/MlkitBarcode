@@ -7,7 +7,7 @@
          </ion-button>
       </ion-buttons>
       <ion-buttons slot="primary">
-         <app-camera-scan-input #cameraScanInput *ngIf="isButtonVisible && (isWithType ==='SO' || isWithType === 'B2B')" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
+         <app-camera-scan-input #cameraScanInput *ngIf="isButtonVisible && objectForm.controls.warehouseAgentId?.value && (isWithType ==='SO' || isWithType === 'B2B')" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
       </ion-buttons>
    </ion-toolbar>
 </ion-header>
@@ -15,7 +15,7 @@
    <div class="p-2">
 
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <app-search-dropdown title="Warehouse Agent" optionLabel="description" [searchDropdownList]="objectService.warehouseAgentMasterList" [selectedId]="objectForm.controls.warehouseAgentId?.value" (onActionComplete)="onWarehouseAgentSelected($event)"></app-search-dropdown>
+         <app-search-dropdown title="Warehouse Agent" optionLabel="description" [searchDropdownList]="objectService.warehouseAgentMasterList" [selectedId]="objectForm.controls.warehouseAgentId?.value" (onActionComplete)="onWarehouseAgentSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onWAScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onWADoneScanning($event)"></app-search-dropdown>
       </ion-list>
 
       <ng-container *ngIf="objectForm.controls.warehouseAgentId?.value">

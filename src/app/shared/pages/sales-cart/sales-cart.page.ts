@@ -496,7 +496,7 @@ export class SalesCartPage implements OnInit, OnChanges {
          await this.computeTradingMarginAmount(trxLine);
       }
       if (this.configSalesActivatePromotionEngine && this.objectHeader.isAutoPromotion && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
-         await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, true, this.configSalesActivateTradingMargin)
+         await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, false, this.configSalesActivateTradingMargin)
       }
    }
 

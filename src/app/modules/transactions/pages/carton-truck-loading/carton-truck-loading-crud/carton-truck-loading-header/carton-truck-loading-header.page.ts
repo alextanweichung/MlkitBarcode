@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NavController, ActionSheetController, ViewWillEnter, ViewDidEnter, AlertController } from '@ionic/angular';
 import { CartonInfo, CartonTruckLoadingDetail, CartonTruckLoadingRoot, TruckArrangementListForCTL, TruckArrangementRootForCTL } from 'src/app/modules/transactions/models/carton-truck-loading';
 import { CartonTruckLoadingService } from 'src/app/modules/transactions/services/carton-truck-loading.service';
@@ -343,6 +344,12 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
       }
    }
 
+   stopScanner() {
+      BarcodeScanner.stopScan();
+      // this.scanActive = false;
+      this.onCameraStatusChanged(false);
+   }
+
    async cancelInsert() {
       try {
          const actionSheet = await this.actionSheetController.create({
@@ -503,6 +510,36 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
          }
       }
       return valid;
+   }
+
+   onTAScanCompleted(event: string) { // truck arrangement
+      try {
+         if (event) {
+            let found = this.pendingListSearch.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found) {
+               this.onTruckArrangmentSelected({ id: found.id });
+            } else {
+               this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
+            }            
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onTADoneScanning(event) { // truck arrangement
+      try {
+         if (event) {
+            let found = this.pendingListSearch.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found) {
+               this.onTruckArrangmentSelected({ id: found.id });
+            } else {
+               this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
+            }            
+         }
+      } catch (e) {
+         console.error(e);
+      }
    }
 
 }

@@ -104,6 +104,7 @@ export interface SalesOrderHeader {
   modifiedBy?: string
   modifiedAt?: Date
   deactivated: boolean
+  shipName?: string
 }
 
 export interface OtherAmount {

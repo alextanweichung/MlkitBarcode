@@ -82,7 +82,7 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
    setFocus() {
       setTimeout(() => {
          this.scanInput.nativeElement.focus();
-      }, 100);
+      }, 10);
    }
 
    /* #endregion */

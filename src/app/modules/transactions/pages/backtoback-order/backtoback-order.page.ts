@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { FilterPage } from '../filter/filter.page';
 import { ViewWillEnter, ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
@@ -16,7 +16,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
    templateUrl: './backtoback-order.page.html',
    styleUrls: ['./backtoback-order.page.scss'],
 })
-export class BackToBackOrderPage implements OnInit, ViewWillEnter {
+export class BackToBackOrderPage implements OnInit, OnDestroy, ViewWillEnter {
 
    objects: BackToBackOrderList[] = [];
 
@@ -55,6 +55,10 @@ export class BackToBackOrderPage implements OnInit, ViewWillEnter {
 
    ngOnInit() {
 
+   }
+
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

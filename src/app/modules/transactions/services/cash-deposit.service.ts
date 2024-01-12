@@ -8,6 +8,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { Subscription } from 'rxjs';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -26,8 +27,13 @@ export class CashDepositService {
       private configService: ConfigService,
       private authService: AuthService,
       private loadingService: LoadingService
-   ) {
+   ) { }
 
+   // Method to clean up the subscription
+   stopListening() {
+      if (this.custSubscription) {
+         this.custSubscription.unsubscribe();
+      }
    }
 
    async loadRequiredMaster() {
@@ -44,6 +50,7 @@ export class CashDepositService {
       }
    }
 
+   custSubscription: Subscription;
    fullMasterList: MasterList[] = [];
    paymentMethodMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
@@ -54,12 +61,14 @@ export class CashDepositService {
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      // this.authService.customerMasterList$.subscribe(obj => {
-      //    let savedCustomerList = obj;
-      //    if (savedCustomerList) {
-      //       this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
-      //    }
-      // })
+      this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
+         let savedCustomerList = obj;
+         if (savedCustomerList) {
+            this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+         } else {
+            await this.authService.rebuildCustomerList();
+         }
+      })
       // attribute6 = locationId
    }
 
