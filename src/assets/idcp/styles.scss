@@ -788,3 +788,7 @@ ion-modal.ion-modal-calendar {
 :host ::ng-deep .icon-smaller {
    font-size: 12px !important;
 }
+
+pagination-controls.pagination-top {
+   margin-top: -1rem;
+}
