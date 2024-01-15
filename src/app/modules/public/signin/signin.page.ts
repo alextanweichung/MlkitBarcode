@@ -84,17 +84,17 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ngOnInit() {
       if (Capacitor.getPlatform() === "web") {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         this.signin_form.get("userEmail").setValue("aychia@idcp.my");
          // this.signin_form.get("userEmail").setValue("john@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
-         this.signin_form.get("userEmail").setValue("admin@idcp.my");
+         // this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
          // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
          // this.signin_form.get("userEmail").setValue("waynecon@idcp.my");
-         // this.signin_form.get("password").setValue("Dev8888");
+         this.signin_form.get("password").setValue("Dev8888");
          // this.signin_form.get("password").setValue("i@Dmin7026");
-         this.signin_form.get("password").setValue("c0nnecT#7026");
+         // this.signin_form.get("password").setValue("c0nnecT#7026");
          // this.signin_form.get("password").setValue("String1234");
       } else {
          this.setSelectedParam();
@@ -219,7 +219,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                         else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
                            // sync by location since only 1 location
                            this.configService.selected_location = this.configService.loginUser.locationId[0];
-                           await this.loadingService.showLoading("Downloading resources");
+                           await this.loadingService.showLoading("Downloading resources", false);
 
                            let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
                            let itemMaster: LocalItemMaster[] = response["itemMaster"];
@@ -246,7 +246,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                         else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
                            // sync by location since only 1 location
                            this.configService.selected_location = this.configService.loginUser.locationId[0];
-                           await this.loadingService.showLoading("Downloading resources");
+                           await this.loadingService.showLoading("Downloading resources", false);
 
                            let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
                            let itemMaster: LocalItemMaster[] = response["itemMaster"];
@@ -261,7 +261,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                            await this.navController.navigateRoot("/dashboard");
                         }
                      } else { // for base user
-                        await this.loadingService.showLoading("Downloading resources");
+                        await this.loadingService.showLoading("Downloading resources", false);
                         let response = await this.commonService.syncInbound();
                         let itemMaster: LocalItemMaster[] = response["itemMaster"];
                         let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];

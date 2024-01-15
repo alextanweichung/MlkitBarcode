@@ -1,24 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
-import { CommonService } from 'src/app/shared/services/common.service';
-import { ReportSOListing } from '../../../models/rp-so-listing';
-import { ReportsService } from '../../../services/reports.service';
-import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
-import { Customer } from 'src/app/modules/transactions/models/customer';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { DebtorOutstandingRequest } from '../../../models/debtor-outstanding';
-import { format, parseISO } from 'date-fns';
-import { ToastService } from 'src/app/services/toast/toast.service';
 import { DatePipe } from '@angular/common';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
+import { DebtorOutstandingRequest } from 'src/app/modules/reports/models/debtor-outstanding';
+import { ReportSOListing } from 'src/app/modules/reports/models/rp-so-listing';
+import { ReportsService } from 'src/app/modules/reports/services/reports.service';
+import { Customer } from 'src/app/modules/transactions/models/customer';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-   selector: 'app-rp-so-listing',
-   templateUrl: './rp-so-listing.page.html',
-   styleUrls: ['./rp-so-listing.page.scss'],
-   providers: [DatePipe]
+  selector: 'app-rp-bo-listing',
+  templateUrl: './rp-bo-listing.page.html',
+  styleUrls: ['./rp-bo-listing.page.scss'],
+  providers: [DatePipe]
 })
-export class RpSoListingPage implements OnInit, ViewWillEnter {
+export class RpBoListingPage implements OnInit, ViewWillEnter {
 
    customers: Customer[] = [];
    customerSearchDropdownList: SearchDropdownList[] = [];
@@ -96,7 +96,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
             isOverdueOnly: this.isOverdueOnly,
             trxDateFrom: this.startDateValue ? format(new Date(this.startDateValue), 'yyyy-MM-dd') : null
          }
-         this.objects = await this.objectService.getSOListing(obj);
+         this.objects = await this.objectService.getBOListing(obj);
          await this.loadingService.dismissLoading();
       } catch (error) {
          console.error(error);
@@ -154,10 +154,10 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
    async downloadPdf(objectId: number, objectName: string) {
       try {
          let paramModel: ReportParameterModel = {
-            appCode: 'SMSC002',
+            appCode: 'SMSC006',
             format: 'pdf',
             documentIds: [Number(objectId)],
-            reportName: 'Sales Order'
+            reportName: 'Back To Back Order'
          }
          this.objectService.getPdf(paramModel).subscribe(async response => {
             await this.commonService.commonDownloadPdf(response, objectName + "." + paramModel.format).then((ret) => {

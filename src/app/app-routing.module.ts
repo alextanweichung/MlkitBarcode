@@ -347,6 +347,11 @@ const routes: Routes = [
       loadChildren: () => import('./modules/reports/pages/reports/rp-so-listing/rp-so-listing.module').then(m => m.RpSoListingPageModule)
    },
    {
+     path: 'reports/rp-bo-listing',
+     loadChildren: () => import('./modules/report/pages/reports/rp-bo-listing/rp-bo-listing.module').then( m => m.RpBoListingPageModule)
+   },
+ 
+   {
       path: 'reports/rp-sales-customer',
       loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then(m => m.RpSalesCustomerPageModule)
    },

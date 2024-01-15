@@ -12,17 +12,17 @@ import HideKeyboardModule from '../../utilities/hide-keyboard.module';
 import { CameraScanInputPageModule } from '../camera-scan-input/camera-scan-input.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    BarcodeScanInputPageRoutingModule,
-    IdMappingModule,
-    HideKeyboardModule
-  ],
-  exports: [
-    BarcodeScanInputPage
-  ],
-  declarations: [BarcodeScanInputPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      BarcodeScanInputPageRoutingModule,
+      IdMappingModule,
+      HideKeyboardModule
+   ],
+   exports: [
+      BarcodeScanInputPage
+   ],
+   declarations: [BarcodeScanInputPage]
 })
-export class BarcodeScanInputPageModule {}
+export class BarcodeScanInputPageModule { }

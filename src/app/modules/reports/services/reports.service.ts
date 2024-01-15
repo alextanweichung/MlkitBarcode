@@ -36,7 +36,10 @@ export class ReportsService {
 
    getSOListing(object: DebtorOutstandingRequest) {
       return this.http.post<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing", object).toPromise();
-      // return this.http.get<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/soListing");
+   }
+
+   getBOListing(object: DebtorOutstandingRequest) {
+      return this.http.post<ReportSOListing[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/boListing", object).toPromise();
    }
 
    getSAPerformance() {

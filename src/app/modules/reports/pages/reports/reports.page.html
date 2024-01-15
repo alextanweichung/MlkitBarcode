@@ -19,6 +19,11 @@
           <div>SO Listing</div>
         </ion-label>
       </ion-item>
+      <ion-item button (click)="goToReport('rp-bo-listing')" *ngIf="showBOListing">
+        <ion-label>
+          <div>B2B Listing</div>
+        </ion-label>
+      </ion-item>
       <ion-item button (click)="goToReport('rp-sales-performance')" *ngIf="showSalesAgentPerformanceAll">
         <ion-label>
           <div>Sales Agent Performance (All)</div>

@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Item</ion-title>
-    <ion-buttons slot="start" *ngIf="objectService.objectHeader.salesOrderId === 0">
+    <ion-buttons slot="start" *ngIf="!(objectService.objectHeader.salesOrderId > 0 || objectService.isDraft)">
       <ion-button (click)="previousStep()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
-    <ion-buttons slot="start" *ngIf="objectService.objectHeader.salesOrderId > 0">
+    <ion-buttons slot="start" *ngIf="objectService.objectHeader.salesOrderId > 0 || objectService.isDraft">
       <ion-button (click)="backToDetail()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
@@ -14,7 +14,7 @@
 </ion-header>
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
   <ng-template>
-    <ion-content class="p-2">      
+    <ion-content class="p-2">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         <ion-item button="false" (click)="popover.dismiss(); toggleShowImage()" *ngIf="!showImage">
           <ion-icon name="image-outline" slot="end"></ion-icon>

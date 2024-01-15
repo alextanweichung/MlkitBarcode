@@ -82,6 +82,10 @@ export class DebtorApplicationService {
       return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication", object, httpObserveHeader);
    }
 
+   toggleObject(objectId: number) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileDebtorApplication/deactivate/${objectId}`, null, httpObserveHeader);
+   }
+
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileDebtorApplication/masterlist").toPromise();
    }

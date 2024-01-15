@@ -65,6 +65,7 @@ export const reportAppCode = {
 
    mobileDebtorLatestOutstanding: "MARPDLO",
    mobileSOListing: "MARPSOL",
+   mobileB2BListing: "MARPBOL",
    mobileSAPerformance: "MARPSAPA",
    mobileSalesByDebtor: "MARPSBD",
    mobileCheckQOH: "MARPCQOH",

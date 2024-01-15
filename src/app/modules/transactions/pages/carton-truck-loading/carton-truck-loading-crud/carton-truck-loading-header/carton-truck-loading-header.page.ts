@@ -143,6 +143,10 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
                         transportAgentId2: response.header.transportAgentId2
                      });
                      this.objectService.setHeader(this.objectForm.value);
+                     setTimeout(() => {
+                        this.generalscan.setFocus();
+                        console.log("🚀 ~ CartonTruckLoadingHeaderPage ~ setTimeout ~ this.generalscan:", this.generalscan)
+                     }, 10);
                   }
                },
                error: (error) => {

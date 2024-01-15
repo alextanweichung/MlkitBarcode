@@ -6,7 +6,7 @@ import { SalesOrderList, SalesOrderRoot } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
@@ -328,7 +328,12 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
 				if (Capacitor.getPlatform() !== "web") {
 					Keyboard.hide();
 				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.salesOrderNum.toUpperCase().includes(searchText.toUpperCase()))));            
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
+               r.salesOrderNum.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerCode.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerName.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.salesAgentName.toUpperCase().includes(searchText.toUpperCase())
+            )));            
 				this.currentPage = 1;
 			} else {
 				this.resetFilteredObj();

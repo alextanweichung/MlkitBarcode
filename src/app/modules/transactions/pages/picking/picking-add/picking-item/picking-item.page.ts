@@ -62,6 +62,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    systemWideScanningMethod: string;
    systemWideBlockConvertedCode: boolean;
    pickPackAllowCopyCode: boolean = false;
+   mobilePickPackAutoFocusQtyUponScan: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -92,6 +93,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             this.pickPackAllowCopyCode = true;
          } else {
             this.pickPackAllowCopyCode = false;
+         }
+         let mobilePickPackAutoFocusQtyUponScan = this.moduleControl.find(x => x.ctrlName === "MobilePickPackAutoFocusQtyUponScan")
+         if (mobilePickPackAutoFocusQtyUponScan && mobilePickPackAutoFocusQtyUponScan.ctrlValue.toUpperCase() === "Y") {
+            this.mobilePickPackAutoFocusQtyUponScan = true;
+         } else {
+            this.mobilePickPackAutoFocusQtyUponScan = false;
          }
       })
    }
@@ -690,7 +697,13 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      let isBlock: boolean = false;
                      isBlock = this.validateNewItemConversion(r);
                      if (!isBlock) {
-                        await this.runPickingEngine(r, Number(1));
+                        if (this.mobilePickPackAutoFocusQtyUponScan) {
+                           await this.cartonLineQtyInput().then(async res => {
+                              await this.runPickingEngine(r, Number(res));
+                           })
+                        } else {
+                           await this.runPickingEngine(r, Number(1));
+                        }
                      }
                   })
                } else {
@@ -703,7 +716,13 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      let isBlock: boolean = false;
                      isBlock = this.validateNewItemConversion(r);
                      if (!isBlock) {
-                        await this.insertPickingLineWithoutSo(r, Number(1));
+                        if (this.mobilePickPackAutoFocusQtyUponScan) {
+                           await this.cartonLineQtyInput().then(async res => {
+                              await this.insertPickingLineWithoutSo(r, Number(res));
+                           }) 
+                        } else {
+                           await this.insertPickingLineWithoutSo(r, Number(1));
+                        }
                      }
                   })
                }
@@ -712,6 +731,50 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
       } catch (e) {
          console.error(e);
       }
+   }
+
+   /* #endregion */
+
+   /* #region line qty alert during insert */
+
+   async cartonLineQtyInput() {
+      return new Promise(async (resolve) => {
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            backdropDismiss: false,
+            header: "Enter Quantity",
+            inputs: [
+               {
+                  name: "inputQty",
+                  type: "number",
+                  placeholder: "Enter Quantity",
+                  value: 1,
+                  min: 1
+               }
+            ],
+            buttons: [
+               {
+                  text: "OK",
+                  role: "confirm",
+                  cssClass: "success",
+                  handler: async (data) => {
+                     resolve(data.inputQty);
+                  },
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel"
+               },
+            ],
+         });
+         await alert.present().then(() => {
+            const firstInput: any = document.querySelector("ion-alert input");
+            setTimeout(() => {
+               firstInput.focus();               
+            }, 1000);
+            return;
+         });
+      })
    }
 
    /* #endregion */

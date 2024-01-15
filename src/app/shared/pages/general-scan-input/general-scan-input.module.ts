@@ -7,15 +7,17 @@ import { IonicModule } from '@ionic/angular';
 import { GeneralScanInputPageRoutingModule } from './general-scan-input-routing.module';
 
 import { GeneralScanInputPage } from './general-scan-input.page';
+import HideKeyboardModule from '../../utilities/hide-keyboard.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    GeneralScanInputPageRoutingModule
-  ],
-  exports: [GeneralScanInputPage],
-  declarations: [GeneralScanInputPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      GeneralScanInputPageRoutingModule,
+      HideKeyboardModule
+   ],
+   exports: [GeneralScanInputPage],
+   declarations: [GeneralScanInputPage]
 })
-export class GeneralScanInputPageModule {}
+export class GeneralScanInputPageModule { }
