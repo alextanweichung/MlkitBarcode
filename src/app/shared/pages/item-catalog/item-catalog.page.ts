@@ -154,7 +154,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             }
             let requestObject: SalesItemRequest = {
                search: this.itemSearchText,
-               trxDate: this.commonService.getTodayDate(),
+               trxDate: this.objectHeader?.trxDate,
                keyId: this.objectId,
                customerId: this.keyId,
                locationId: this.objectHeader?.locationId ?? 0,
