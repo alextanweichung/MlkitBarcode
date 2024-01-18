@@ -10,59 +10,59 @@ import { InventoryLevelRoot, InventoryLevelVariationRoot, ItemPriceBySegment } f
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
-  observe: 'response' as 'response'
+   observe: 'response' as 'response'
 };
 
 @Injectable({
-  providedIn: 'root'
+   providedIn: 'root'
 })
 export class InventoryLevelService {
-  
-  constructor(
-    private http: HttpClient,
-    private configService: ConfigService
-  ) {
-    
-  }
 
-  async loadRequiredMaster() {
-    await this.loadMasterList();
-  }
+   constructor(
+      private http: HttpClient,
+      private configService: ConfigService
+   ) {
 
-  fullMasterList: MasterList[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  async loadMasterList() {
-    this.fullMasterList = await this.getMasterList();
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details);
-  }
+   }
 
-  //Load item list in background
-  getItemList() {
-    return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/itemlist", { context: background_load() }).pipe(
-      map((response: any) =>
-        response.map((item: any) => item)
-      )
-    );
-  }
+   async loadRequiredMaster() {
+      await this.loadMasterList();
+   }
 
-  getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/masterlist").toPromise();
-  }
+   fullMasterList: MasterList[] = [];
+   locationMasterList: MasterListDetails[] = [];
+   async loadMasterList() {
+      this.fullMasterList = await this.getMasterList();
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details);
+   }
 
-  // getItemThumbnailById(itemId: number) {
-  //   return this.http.get(this.configService.selected_sys_param.apiUrl + "inventoryLevel/itemInfoThumbnail/" + itemId, { observe: "response" as "response", responseType: "blob" });
-  // }
+   //Load item list in background
+   getItemList() {
+      return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/itemlist", { context: background_load() }).pipe(
+         map((response: any) =>
+            response.map((item: any) => item)
+         )
+      );
+   }
 
-  getInventoryLevelByItem(itemId: number, loginUserType: string, salesAgentId?: number) {
-    return this.http.get<InventoryLevelRoot>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/item/" + itemId + "/" + loginUserType + "/" + salesAgentId);
-  }
+   getMasterList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/masterlist").toPromise();
+   }
 
-  getInventoryLevelByVariation(itemId: number, loginUserType: string, salesAgentId?: number) {
-    return this.http.get<InventoryLevelVariationRoot>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/variation/" + itemId + "/" + loginUserType + "/" + salesAgentId);
-  }
+   // getItemThumbnailById(itemId: number) {
+   //   return this.http.get(this.configService.selected_sys_param.apiUrl + "inventoryLevel/itemInfoThumbnail/" + itemId, { observe: "response" as "response", responseType: "blob" });
+   // }
 
-  getSegmentItemPriceBySalesAgent(itemId: number, loginUserType: string, salesAgentId?: number) {
-    return this.http.get<ItemPriceBySegment[]>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/price/" + itemId + "/" + loginUserType + "/" + salesAgentId);
-  }
-  
+   getInventoryLevelByItem(itemId: number, loginUserType: string, salesAgentId?: number) {
+      return this.http.get<InventoryLevelRoot>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/item/" + itemId + "/" + loginUserType + "/" + salesAgentId);
+   }
+
+   getInventoryLevelByVariation(itemId: number, loginUserType: string, salesAgentId?: number) {
+      return this.http.get<InventoryLevelVariationRoot>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/variation/" + itemId + "/" + loginUserType + "/" + salesAgentId);
+   }
+
+   getSegmentItemPriceBySalesAgent(itemId: number, loginUserType: string, salesAgentId?: number) {
+      return this.http.get<ItemPriceBySegment[]>(this.configService.selected_sys_param.apiUrl + "mobileInventoryLevel/price/" + itemId + "/" + loginUserType + "/" + salesAgentId);
+   }
+
 }

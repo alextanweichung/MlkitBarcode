@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonAccordionGroup, IonPopover } from '@ionic/angular';
+import { IonAccordionGroup, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ItemList } from 'src/app/shared/models/item-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
@@ -7,13 +7,15 @@ import { InventoryLevelRoot, InventoryLevelVariationRoot, ItemPriceBySegment } f
 import { InventoryLevelService } from '../../services/inventory-level.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
    selector: 'app-inventory-level',
    templateUrl: './inventory-level-trading.page.html',
    styleUrls: ['./inventory-level-trading.page.scss'],
 })
-export class InventoryLevelTradingPage implements OnInit {
+export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
 
    @ViewChild("accordionGroup", { static: false }) accordionGroup: IonAccordionGroup;
 
@@ -26,21 +28,22 @@ export class InventoryLevelTradingPage implements OnInit {
    object: InventoryLevelRoot;
    variationObject: InventoryLevelVariationRoot;
 
-   loginUser: any;
-
    constructor(
       public objectService: InventoryLevelService,
+      private authService: AuthService,
+      private configService: ConfigService,
       private toastService: ToastService,
-      private authService: AuthService
-   ) {
-      this.loginUser = JSON.parse(localStorage.getItem("loginUser"));
-      // reload all masterlist whenever user enter listing
-      this.objectService.loadRequiredMaster();
+      private loadingService: LoadingService,
+   ) { }
+
+   async ionViewWillEnter(): Promise<void> {
+      await this.loadModuleControl();
+      await this.objectService.loadRequiredMaster();
+      await this.loadItemList();
    }
 
    ngOnInit() {
-      this.loadModuleControl();
-      this.loadItemList();
+
    }
 
    moduleControl: ModuleControl[] = [];
@@ -58,22 +61,28 @@ export class InventoryLevelTradingPage implements OnInit {
    }
 
    itemSearchDropdownList: SearchDropdownList[] = [];
-   loadItemList() {
+   async loadItemList() {
       try {
-         this.objectService.getItemList().subscribe(response => {
+         await this.loadingService.showLoading("Loading", false);
+         this.objectService.getItemList().subscribe(async response => {
             this.itemList = response;
-            this.itemList.forEach(r => {
+            for await (const r of this.itemList) {
                this.itemSearchDropdownList.push({
                   id: r.itemId,
                   code: r.itemCode,
                   description: r.description
                })
-            })
-         }, error => {
+            }
+            await this.loadingService.dismissLoading();
+         }, async error => {
             console.error(error);
+            await this.loadingService.dismissLoading();
          })
       } catch (e) {
          console.error(e);
+         await this.loadingService.dismissLoading();
+      } finally {
+         await this.loadingService.dismissLoading();
       }
    }
 
@@ -115,14 +124,14 @@ export class InventoryLevelTradingPage implements OnInit {
          if (lookUpItem) {
             this.itemInfo = lookUpItem;
             this.hideEmpty = false;
-            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
+            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId).subscribe(async response => {
                this.object = response;
                await this.computeLocationList();
             }, error => {
                console.log(error);
             })
             if (lookUpItem.variationTypeCode !== "0") {
-               this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
+               this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId).subscribe(async response => {
                   this.variationObject = response;
                   await this.computeLocationList();
                   await this.computeVariationXY();
@@ -199,7 +208,7 @@ export class InventoryLevelTradingPage implements OnInit {
    advancedFilter() {
       try {
          if (this.selectedViewOptions === "item") {
-            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+            this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.object = response;
                if (this.selectedLocation !== "all") {
                   this.object.itemInfo = this.object.itemInfo.filter(r => r.locationCode === this.selectedLocation);
@@ -213,7 +222,7 @@ export class InventoryLevelTradingPage implements OnInit {
             })
          }
          else {
-            this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+            this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.variationObject = response;
                // location filter
                if (this.selectedLocation !== "all") {
@@ -295,7 +304,7 @@ export class InventoryLevelTradingPage implements OnInit {
       if (itemId) {
          this.prices = [];
          try {
-            this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.loginUser.loginUserType, this.loginUser.salesAgentId ?? 0).subscribe(response => {
+            this.objectService.getSegmentItemPriceBySalesAgent(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.prices = response;
             }, error => {
                console.error(error);

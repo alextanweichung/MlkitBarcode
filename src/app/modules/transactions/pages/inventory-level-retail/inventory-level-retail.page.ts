@@ -8,6 +8,7 @@ import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { InventoryLevelService } from '../../services/inventory-level.service';
 import { InventoryLevelRoot, InventoryLevelVariationRoot, ItemPriceBySegment } from '../../models/inventory-level';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
    selector: 'app-inventory-level-retail',
@@ -32,11 +33,12 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
       private authService: AuthService,
       private configService: ConfigService,
       private toastService: ToastService,
+      private loadingService: LoadingService,
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.loadRequiredMaster();
       await this.loadModuleControl();
+      await this.objectService.loadRequiredMaster();
       await this.loadItemList();
    }
 
@@ -59,25 +61,31 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
    }
 
    itemSearchDropdownList: SearchDropdownList[] = [];
-   loadItemList() {
+   async loadItemList() {
       try {
-         this.objectService.getItemList().subscribe(response => {
+         await this.loadingService.showLoading("Loading", false);
+         this.objectService.getItemList().subscribe(async response => {
             this.itemList = response;
-            this.itemList.forEach(r => {
+            for await (const r of this.itemList) {
                this.itemSearchDropdownList.push({
                   id: r.itemId,
                   code: r.itemCode,
                   description: r.description
                })
-            })
-         }, error => {
+            }
+            await this.loadingService.dismissLoading();
+         }, async error => {
             console.error(error);
+            await this.loadingService.dismissLoading();
          })
       } catch (e) {
          console.error(e);
+         await this.loadingService.dismissLoading();
+      } finally {
+         await this.loadingService.dismissLoading();
       }
    }
-
+   
    onItemChanged(event) {
       if (event) {
          this.itemCode = event.code;
