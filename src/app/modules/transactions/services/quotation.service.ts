@@ -369,4 +369,8 @@ export class QuotationService {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileQuotation/jsonDebug", debugObject, httpObserveHeader);
    }
 
+   generateDocument(objectId: number){
+     return this.http.post(this.configService.selected_sys_param.apiUrl + `MobileQuotation/generateDocument/${objectId}`, null, httpObserveHeader);
+   }
+
 }

@@ -29,6 +29,12 @@
              <div>{{objectService.objectHeader.deactivated?'Enable':'Disable'}}</div>
            </ion-label>
          </ion-item>
+         <ion-item (click)="popover.dismiss(); generateSOConfirmation()">
+            <ion-icon name="chevron-forward-circle-outline" slot="end"></ion-icon>
+            <ion-label>
+              <div>Generate To SO</div>
+            </ion-label>
+         </ion-item>
          <ion-item (click)="popover.dismiss(); showHistoryModal()">
            <ion-icon name="time-outline" slot="end"></ion-icon>
            <ion-label>

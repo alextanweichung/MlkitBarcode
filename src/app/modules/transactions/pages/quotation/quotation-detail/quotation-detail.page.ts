@@ -38,7 +38,7 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
       private alertController: AlertController
    ) { }
 
-   ionViewWillEnter(): void {      
+   ionViewWillEnter(): void {
       this.route.queryParams.subscribe(async params => {
          this.objectId = params["objectId"];
          this.processType = params["processType"];
@@ -331,5 +331,69 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
    }
 
    /* #endregion */
+
+   async generateSOConfirmation() {
+      try {
+         if (this.objectService.objectHeader.quotationId > 0) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               backdropDismiss: false,
+               header: "Are you sure to proceed with SO Generate?",
+               buttons: [
+                  {
+                     text: "OK",
+                     role: "confirm",
+                     cssClass: "success",
+                     handler: async (data) => {
+                        await this.generateSOButtonClicked();
+                     },
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel"
+                  },
+               ],
+            });
+            await alert.present();
+         } else {
+            this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   generateSOButtonClicked() {
+      if (this.objectService.objectHeader) {
+         if (this.workFlowState) {
+            let isReviewComplete = this.workFlowState.find(x => x.stateType == "REVIEW")?.isCompleted == undefined ? true : this.workFlowState.find(x => x.stateType == "REVIEW")?.isCompleted
+            let isApprovalComplete = this.workFlowState.find(x => x.stateType == "APPROVAL")?.isCompleted == undefined ? true : this.workFlowState.find(x => x.stateType == "APPROVAL")?.isCompleted
+            let poTrxId = this.workFlowState.find(x => x.routerLink == "/sm/sales-order")?.trxId
+            if (poTrxId) {
+               this.toastService.presentToast("Validation", "SO is already generated", "top", "warning", 1000);
+            } else if (!isReviewComplete) {
+               this.toastService.presentToast("Validation", "Quotation pending for review", "top", "warning", 1000);
+            } else if (!isApprovalComplete) {
+               this.toastService.presentToast("Validation", "Quotation pending for approval", "top", "warning", 1000);
+            } else {
+               this.generateSO();
+            }
+         } else {
+            this.generateSO();
+         }
+      } else {
+         this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+      }
+   }
+
+   generateSO() {
+      this.objectService.generateDocument(this.objectService.objectHeader.quotationId).subscribe(response => {
+         if (response.status === 204) {
+            this.toastService.presentToast("Generate Complete", "Sales Order has been generated.", "top", "success", 1000);
+         }
+      }, error => {
+         console.log(error);
+      });
+   }
 
 }
