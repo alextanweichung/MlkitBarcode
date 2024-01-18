@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info';
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -24,13 +25,14 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
    };
 
    constructor(
-      private authService: AuthService,
       public objectService: QuotationService,
+      private authService: AuthService,
       private commonService: CommonService,
       private toastService: ToastService,
+      private alertController: AlertController,
+      private actionSheetController: ActionSheetController,
       private navController: NavController,
       private formBuilder: FormBuilder,
-      private actionSheetController: ActionSheetController
    ) {
       this.newForm();
    }
@@ -81,7 +83,8 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
             isHomeCurrency: [null],
             isPricingApproval: [false],
             isAutoPromotion: [true],
-            shipName: [null]
+            shipName: [null],
+            priceSegmentCode: [null]
          });
       } catch (e) {
          console.error(e);
@@ -92,6 +95,7 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
    ngOnInit() {
 
    }
+
    setDefaultValue() {
       try {
          let defaultShipMethod = this.objectService.shipMethodMasterList.find(r => r.isPrimary);
@@ -103,6 +107,72 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
       }
    }
 
+   async onCustomerConfirmation(event) {
+      if (event) {
+         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
+         if (lookupValue) {
+            if (lookupValue.attribute14 && this.objectForm.controls.customerId.value && this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+               if (lookupValue.attribute14 !== this.objectForm.controls.priceSegmentCode.value) {
+                  const alert = await this.alertController.create({
+                     cssClass: "custom-alert",
+                     header: "Price Segment changes detected!",
+                     subHeader: `Changing to this customer ${lookupValue.code} will remove item(s) in cart, this action cannot be undone.`,
+                     buttons: [{
+                        text: "Proceed",
+                        cssClass: "danger",
+                        handler: async () => {
+                           await this.objectService.removeLine();
+                           await this.onCustomerSelected(event);
+                        },
+                     },
+                     {
+                        text: "Cancel",
+                        role: "cancel",
+                        cssClass: "cancel",
+                        handler: async () => {
+                           this.onCustomerSelected({ id: this.objectForm.controls.customerId.value });
+                        }
+                     }]
+                  });
+                  await alert.present();
+               }
+            } else {
+               this.onCustomerSelected(event);
+            }
+         } else {
+            this.toastService.presentToast("Unable to lookup Customer", "Please contact administrator", "top", "danger", 1000);
+         }
+      } else {
+         if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               header: "Alert!",
+               subHeader: `Unselect Customer will remove item(s) in cart, this action cannot be undone.`,
+               buttons: [{
+                  text: "Proceed",
+                  cssClass: "danger",
+                  handler: async () => {
+                     await this.objectService.removeLine();
+                     await this.onCustomerSelected(null);
+                  },
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel",
+                  handler: async () => {
+                     this.onCustomerSelected({ id: this.objectForm.controls.customerId.value });
+                  }
+               }]
+            });
+            await alert.present();
+         } else {
+            await this.onCustomerSelected(null);
+         }
+      }
+   }
+
+   @ViewChild("customersd", { static: false }) customersd: SearchDropdownPage;
    selectedCustomer: Customer;
    selectedCustomerLocationList: MasterListDetails[] = [];
    creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
@@ -112,8 +182,10 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
          if (event) {
             var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
             if (lookupValue != undefined) {
-               this.objectService.removeLine();
                this.objectForm.patchValue({ customerId: lookupValue.id });
+               if (this.customersd) {
+                  await this.customersd.manuallyTrigger();
+               }
                this.objectForm.patchValue({ shipName: lookupValue.description });
                this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
                if (lookupValue.attributeArray1.length > 0) {
@@ -127,6 +199,7 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
                   countryId: parseFloat(lookupValue.attribute3),
                   currencyId: parseFloat(lookupValue.attribute4),
                   locationId: parseFloat(lookupValue.attribute6),
+                  priceSegmentCode: lookupValue.attribute14,
                   toLocationId: null,
                   isItemPriceTaxInclusive: lookupValue.attribute8 == "1" ? true : false,
                   isDisplayTaxInclusive: lookupValue.attribute9 == "1" ? true : false

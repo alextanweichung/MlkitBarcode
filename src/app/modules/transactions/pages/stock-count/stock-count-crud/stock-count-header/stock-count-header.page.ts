@@ -92,6 +92,7 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
             this.inventoryCountBatchDdl = [];
             this.objectService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
                this.inventoryCountBatchList = response;
+               this.inventoryCountBatchList = this.inventoryCountBatchList.filter(r => !r.isClosed);
                if (this.objectService.objectHeader?.inventoryCountId && this.objectService.objectHeader?.inventoryCountId > 0) {
                   this.objectService.objectHeader.inventoryCountBatchNum = this.inventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.objectService.objectHeader.inventoryCountBatchId)?.inventoryCountBatchNum;
                   this.objectService.objectHeader.inventoryCountBatchDescription = this.inventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.objectService.objectHeader.inventoryCountBatchId)?.description;

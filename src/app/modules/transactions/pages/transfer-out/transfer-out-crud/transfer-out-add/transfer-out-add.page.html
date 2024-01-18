@@ -13,7 +13,7 @@
 
       <form [formGroup]="objectForm">
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <ion-item id="open-calendar-modal" [disabled]="true">
+            <ion-item id="open-calendar-modal" [disabled]="!editableTrxDate">
                <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
                <ion-label position="stacked" class="font-bold">Doc. Date</ion-label>
                <ion-text class="ion-no-padding-end pb-3">{{formattedDateString}}</ion-text>

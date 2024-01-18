@@ -59,7 +59,7 @@ export class CashDepositService {
       this.fullMasterList = await this.getMasterList();
       this.paymentMethodMasterList = this.fullMasterList.filter(x => x.objectName == "PaymentMethod").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = this.locationMasterList.filter(r => this.configService.loginUser.locationId.includes(r.id));
+      this.locationMasterList = this.locationMasterList.filter(r => (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName == "Customer").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;

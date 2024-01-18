@@ -278,6 +278,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
                {
                   text: "Yes",
                   role: "confirm",
+                  cssClass: "danger",
                },
                {
                   text: "No",

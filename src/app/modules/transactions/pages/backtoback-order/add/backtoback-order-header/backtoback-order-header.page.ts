@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { NavController, ActionSheetController, ModalController, ViewWillEnter } from '@ionic/angular';
+import { NavController, ActionSheetController, ModalController, ViewWillEnter, AlertController } from '@ionic/angular';
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info';
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -29,6 +30,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
       private commonService: CommonService,
       private toastService: ToastService,
       private navController: NavController,
+      private alertController: AlertController,
       private actionSheetController: ActionSheetController,
       private formBuilder: UntypedFormBuilder,
       private modalController: ModalController
@@ -37,9 +39,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      //  await this.objectService.loadRequiredMaster();
-      await this.loadRestrictColumms();
-      await this.setDefaultValue();
+      
    }
 
    newForm() {
@@ -49,7 +49,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
          salesAgentId: [null],
          trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
          typeCode: [null],
-         customerId: [null],
+         customerId: [null, [Validators.required]],
          shipAddress: [null, [Validators.maxLength(500)]],
          shipPostCode: [null],
          shipPhone: [null],
@@ -86,7 +86,8 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
          posLocationId: [null],
          posLocationCode: [null],
          sourceType: ["M"],
-         shipName: [null]
+         shipName: [null],
+         priceSegmentCode: [null]
       });
    }
 
@@ -152,17 +153,85 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
       }
    }
 
+   async onCustomerConfirmation(event) {
+      if (event) {
+         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
+         if (lookupValue) {
+            if (lookupValue.attribute14 && this.objectForm.controls.customerId.value && this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+               if (lookupValue.attribute14 !== this.objectForm.controls.priceSegmentCode.value) {
+                  const alert = await this.alertController.create({
+                     cssClass: "custom-alert",
+                     header: "Price Segment changes detected!",
+                     subHeader: `Changing to this customer ${lookupValue.code} will remove item(s) in cart, this action cannot be undone.`,
+                     buttons: [{
+                        text: "Proceed",
+                        cssClass: "danger",
+                        handler: async () => {
+                           await this.objectService.removeLine();
+                           await this.onCustomerSelected(event);
+                        },
+                     },
+                     {
+                        text: "Cancel",
+                        role: "cancel",
+                        cssClass: "cancel",
+                        handler: async () => {
+                           this.onCustomerSelected({ id: this.objectForm.controls.customerId.value });
+                        }
+                     }]
+                  });
+                  await alert.present();
+               }
+            } else {
+               this.onCustomerSelected(event);
+            }
+         } else {
+            this.toastService.presentToast("Unable to lookup Customer", "Please contact administrator", "top", "danger", 1000);
+         }
+      } else {
+         if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               header: "Alert!",
+               subHeader: `Unselect Customer will remove item(s) in cart, this action cannot be undone.`,
+               buttons: [{
+                  text: "Proceed",
+                  cssClass: "danger",
+                  handler: async () => {
+                     await this.objectService.removeLine();
+                     await this.onCustomerSelected(null);
+                  },
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel",
+                  handler: async () => {
+                     this.onCustomerSelected({ id: this.objectForm.controls.customerId.value });
+                  }
+               }]
+            });
+            await alert.present();
+         } else {
+            await this.onCustomerSelected(null);
+         }
+      }
+   }
+
+   @ViewChild("customersd", { static: false }) customersd: SearchDropdownPage;
    selectedCustomer: Customer;
    selectedCustomerLocationList: MasterListDetails[] = [];
    availableAddress: ShippingInfo[] = [];
    creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
-   onCustomerSelected(event: any, ignoreCurrencyRate?: boolean) {
+   async onCustomerSelected(event: any, ignoreCurrencyRate?: boolean) {
       try {
          if (event) {
             var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
             if (lookupValue != undefined) {
-               this.objectService.removeLine();
                this.objectForm.patchValue({ customerId: lookupValue.id });
+               if (this.customersd) {
+                  await this.customersd.manuallyTrigger();
+               }
                this.objectForm.patchValue({ shipName: lookupValue.description });
                this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
                if (lookupValue.attributeArray1.length > 0) {
@@ -175,6 +244,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
                   termPeriodId: parseFloat(lookupValue.attribute2), 
                   countryId: parseFloat(lookupValue.attribute3), 
                   locationId: parseFloat(lookupValue.attribute6), 
+                  priceSegmentCode: lookupValue.attribute14,
                   toLocationId: null, 
                   isItemPriceTaxInclusive: lookupValue.attribute8 === "1" ? true : false, isDisplayTaxInclusive: lookupValue.attribute9 === "1" ? true : false 
                });

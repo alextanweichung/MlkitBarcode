@@ -43,7 +43,7 @@ export class ConsignmentCountService {
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && this.configService.loginUser.locationId.includes(r.id));
+      this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
    }
 
    objectHeader: ConsignmentCountHeader;

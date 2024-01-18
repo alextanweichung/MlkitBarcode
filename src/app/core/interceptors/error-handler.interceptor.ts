@@ -100,7 +100,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                   default:
                      this.toastService.presentToast('Error', 'Something went wrong', 'top', 'danger', 2000);
                      // this.messageService.add({ severity: 'error', summary: 'Something went wrong' });
-                     console.log(error);
+                     console.log(JSON.stringify(error));
                      break;
                }
             }

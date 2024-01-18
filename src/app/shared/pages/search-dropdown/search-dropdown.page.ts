@@ -53,6 +53,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
       }
 
       if (changes.selectedId || changes.selectedCode) {
+         console.log("🚀 ~ SearchDropdownPage ~ ngOnChanges ~ changes.selectedId:", changes.selectedId)
          if (this.optionValue === "id") {
             if (this.selectedId !== null) {
                this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
@@ -84,6 +85,19 @@ export class SearchDropdownPage implements OnInit, OnChanges {
          setTimeout(() => {
             this.scanInput.nativeElement.focus();            
          }, 10);
+      }
+   }
+
+   manuallyTrigger() {
+      if (this.optionValue === "id") {
+         if (this.selectedId !== null) {
+            this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);
+         }
+      }
+      if (this.optionValue === "code") {
+         if (this.selectedCode !== null) {
+            this.selected = this.searchDropdownList?.find(r => r.code === this.selectedCode);
+         }
       }
    }
 

@@ -1,12 +1,12 @@
 import { Component, DoCheck, IterableDiffers, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SalesOrderList, SalesOrderRoot } from '../../models/sales-order';
 import { CommonService } from '../../../../shared/services/common.service';
 import { SalesOrderService } from '../../services/sales-order.service';
 import { FilterPage } from '../filter/filter.page';
-import { format, set } from 'date-fns';
+import { format } from 'date-fns';
 import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftTransaction } from 'src/app/shared/models/draft-transaction';
@@ -19,7 +19,7 @@ import { Keyboard } from '@capacitor/keyboard';
    templateUrl: './sales-order.page.html',
    styleUrls: ['./sales-order.page.scss']
 })
-export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, DoCheck {
+export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, DoCheck, ViewDidLeave {
 
    private objectDiffer: any;
    objects: SalesOrderList[] = [];
@@ -45,7 +45,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    ) {
       this.objectDiffer = this.differs.find(this.objects).create();
    }
-
+   
    ngDoCheck(): void {
       const objectChanges = this.objectDiffer.diff(this.objects);
       if (objectChanges) {
@@ -73,12 +73,15 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
       }
    }
 
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
+   }
+
    ngOnInit() {
 
    }
 
-   ngOnDestroy(): void {
-      this.objectService.stopListening();
+   async ngOnDestroy(): Promise<void> {
    }
 
    /* #region  crud */

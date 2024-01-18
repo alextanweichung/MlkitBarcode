@@ -121,11 +121,11 @@ export class QuotationPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidE
 
    async addObject() {
       try {
-         if (this.objectService.hasSalesAgent()) {
+         // if (this.objectService.hasSalesAgent()) {
             this.navController.navigateForward("/transactions/quotation/quotation-header");
-         } else {
-            this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "danger", 1000);
-         }
+         // } else {
+         //    this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "danger", 1000);
+         // }
       } catch (e) {
          console.error(e);
       }

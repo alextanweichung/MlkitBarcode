@@ -106,6 +106,7 @@ export interface InventoryCountBatchList {
   endDate: string
   deactivated: boolean
   isCompleted: boolean
+  isClosed: boolean
 }
 
 export interface InventoryCountBatchCriteria {

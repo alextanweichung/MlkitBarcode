@@ -240,29 +240,31 @@ export class SalesOrderService {
 
          })
          this.authService.precisionList$.subscribe(precision => {
-            this.precisionSales = precision.find(x => x.precisionCode === "SALES");
-            if (this.precisionSales.localMin === null) this.precisionSales.localMin = 2;
-            if (this.precisionSales.localMax === null) this.precisionSales.localMax = 2;
-            if (this.precisionSales.localFormat === null) this.precisionSales.localFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
-            if (this.precisionSales.foreignMin === null) this.precisionSales.foreignMin = 2;
-            if (this.precisionSales.foreignMax === null) this.precisionSales.foreignMax = 2;
-            if (this.precisionSales.foreignFormat === null) this.precisionSales.foreignFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
-
-            this.precisionSalesUnitPrice = precision.find(x => x.precisionCode === "SALESUNITPRICE");
-            if (this.precisionSalesUnitPrice.localMin === null) this.precisionSalesUnitPrice.localMin = 2;
-            if (this.precisionSalesUnitPrice.localMax === null) this.precisionSalesUnitPrice.localMax = 2;
-            if (this.precisionSalesUnitPrice.localFormat === null) this.precisionSalesUnitPrice.localFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
-            if (this.precisionSalesUnitPrice.foreignMin === null) this.precisionSalesUnitPrice.foreignMin = 2;
-            if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionSalesUnitPrice.foreignMax = 2;
-            if (this.precisionSalesUnitPrice.foreignFormat === null) this.precisionSalesUnitPrice.foreignFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
-
-            this.precisionTax = precision.find(x => x.precisionCode === "TAX");
-            if (this.precisionTax.localMin === null) this.precisionTax.localMin = 2;
-            if (this.precisionTax.localMax === null) this.precisionTax.localMax = 2;
-            if (this.precisionTax.localFormat === null) this.precisionTax.localFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
-            if (this.precisionTax.foreignMin === null) this.precisionTax.foreignMin = 2;
-            if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionTax.foreignMax = 2;
-            if (this.precisionTax.foreignFormat === null) this.precisionTax.foreignFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
+            if (precision) {
+               this.precisionSales = precision.find(x => x.precisionCode === "SALES");
+               if (this.precisionSales.localMin === null) this.precisionSales.localMin = 2;
+               if (this.precisionSales.localMax === null) this.precisionSales.localMax = 2;
+               if (this.precisionSales.localFormat === null) this.precisionSales.localFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
+               if (this.precisionSales.foreignMin === null) this.precisionSales.foreignMin = 2;
+               if (this.precisionSales.foreignMax === null) this.precisionSales.foreignMax = 2;
+               if (this.precisionSales.foreignFormat === null) this.precisionSales.foreignFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
+   
+               this.precisionSalesUnitPrice = precision.find(x => x.precisionCode === "SALESUNITPRICE");
+               if (this.precisionSalesUnitPrice.localMin === null) this.precisionSalesUnitPrice.localMin = 2;
+               if (this.precisionSalesUnitPrice.localMax === null) this.precisionSalesUnitPrice.localMax = 2;
+               if (this.precisionSalesUnitPrice.localFormat === null) this.precisionSalesUnitPrice.localFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
+               if (this.precisionSalesUnitPrice.foreignMin === null) this.precisionSalesUnitPrice.foreignMin = 2;
+               if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionSalesUnitPrice.foreignMax = 2;
+               if (this.precisionSalesUnitPrice.foreignFormat === null) this.precisionSalesUnitPrice.foreignFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
+   
+               this.precisionTax = precision.find(x => x.precisionCode === "TAX");
+               if (this.precisionTax.localMin === null) this.precisionTax.localMin = 2;
+               if (this.precisionTax.localMax === null) this.precisionTax.localMax = 2;
+               if (this.precisionTax.localFormat === null) this.precisionTax.localFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
+               if (this.precisionTax.foreignMin === null) this.precisionTax.foreignMin = 2;
+               if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionTax.foreignMax = 2;
+               if (this.precisionTax.foreignFormat === null) this.precisionTax.foreignFormat = `1.${this.precisionTax.localMin}-${this.precisionTax.localMax}`;
+            }
          })
       } catch (e) {
          console.error(e);

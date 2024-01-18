@@ -92,4 +92,5 @@ export interface BackToBackOrderHeader {
   modifiedAt: string
   deactivated: boolean
   shipName?: string
+  priceSegmentCode: string
 }
