@@ -86,6 +86,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
          posLocationId: [null],
          posLocationCode: [null],
          sourceType: ["M"],
+         isAutoPromotion: [true],
          shipName: [null],
          priceSegmentCode: [null]
       });
@@ -181,6 +182,8 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
                      }]
                   });
                   await alert.present();
+               } else {
+                  this.onCustomerSelected(event);
                }
             } else {
                this.onCustomerSelected(event);

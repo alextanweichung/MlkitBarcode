@@ -6,9 +6,9 @@ export interface CheckQohRoot {
    itemDescription: string
    inventoryLevel: CheckQohRootInventoryLevel[]
    segmentPricing: CheckQohRootSegmentPricing[]
- }
- 
- export interface CheckQohRootInventoryLevel {
+}
+
+export interface CheckQohRootInventoryLevel {
    itemId: number
    itemCode: string
    locationId: number
@@ -17,10 +17,9 @@ export interface CheckQohRoot {
    qty: number
    transitQty: number
    openQty: number
- }
- 
- export interface CheckQohRootSegmentPricing {
+}
+
+export interface CheckQohRootSegmentPricing {
    locationId: any
    itemPricing: ItemPricing
- }
- 
+}

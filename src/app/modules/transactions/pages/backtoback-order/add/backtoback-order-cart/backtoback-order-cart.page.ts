@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
-import Decimal from 'decimal.js';
+import { AlertController, IonPopover, IonSearchbar, NavController, ViewWillEnter } from '@ionic/angular';
 import { BackToBackOrderRoot } from 'src/app/modules/transactions/models/backtoback-order';
+import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { GeneralTransactionService } from 'src/app/shared/services/general-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
@@ -22,6 +22,8 @@ import { PromotionEngineService } from 'src/app/shared/services/promotion-engine
    providers: [GeneralTransactionService, { provide: 'apiObject', useValue: 'MobileBackToBackOrder' }]
 })
 export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
+
+   Math: any;
 
    submit_attempt: boolean = false;
    inputType: string = "number";
@@ -36,6 +38,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       private alertController: AlertController,
       private navController: NavController
    ) {
+      this.Math = Math;
       if (Capacitor.getPlatform() === "android") {
          this.inputType = "number";
       }
@@ -94,160 +97,6 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       }
    }
 
-   /* #region  modal to edit each item */
-
-   // isModalOpen: boolean = false;
-   // selectedItem: TransactionDetail;
-   // selectedIndex: number;
-   // showEditModal(data: TransactionDetail, rowIndex: number) {
-   //    this.selectedItem = JSON.parse(JSON.stringify(data));
-   //    this.selectedIndex = rowIndex;
-   //    this.isModalOpen = true;
-   // }
-
-   // saveChanges() {
-   //    if (this.selectedIndex === null || this.selectedIndex === undefined) {
-   //       this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
-   //       return;
-   //    } else {
-   //       let hasQtyError: boolean = false;
-   //       let totalQty: number = 0;
-   //       if (this.selectedItem.variationTypeCode === "0") {
-   //          hasQtyError = (this.selectedItem.qtyRequest ?? 0) <= 0;
-   //       } else {
-   //          this.selectedItem.variationDetails.forEach(r => {
-   //             r.details.forEach(rr => {
-   //                totalQty += (rr.qtyRequest ?? 0)
-   //             })
-   //          })
-   //          hasQtyError = totalQty <= 0;
-   //       }
-   //       if (hasQtyError) {
-   //          this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
-   //       } else {
-   //          this.objectService.objectDetail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
-   //          setTimeout(async () => {
-   //             await this.validateMinOrderQty();
-   //             await this.computeDiscTaxAmount(this.objectService.objectDetail[this.selectedIndex]);
-   //             if (this.objectService.salesActivateTradingMargin) {
-   //                this.computeTradingMarginAmount(this.objectService.objectDetail[this.selectedIndex]);
-   //             }
-   //             this.hideEditModal();
-   //             if (this.selectedItem.isPricingApproval) {
-   //                this.objectService.objectHeader.isPricingApproval = true;
-   //             }
-   //          }, 10);
-   //       }
-   //    }
-   // }
-
-   // async cancelChanges() {
-   //    try {
-   //       const alert = await this.alertController.create({
-   //          cssClass: "custom-alert",
-   //          header: "Are you sure to discard changes?",
-   //          buttons: [
-   //             {
-   //                text: "OK",
-   //                role: "confirm",
-   //                cssClass: "success",
-   //                handler: () => {
-   //                   this.isModalOpen = false;
-   //                },
-   //             },
-   //             {
-   //                text: "Cancel",
-   //                role: "cancel",
-   //                handler: () => {
-
-   //                }
-   //             },
-   //          ],
-   //       });
-   //       await alert.present();
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // hideEditModal() {
-   //    this.isModalOpen = false;
-   // }
-
-   // async onModalHide() {
-   //    this.selectedIndex = null;
-   //    this.selectedItem = null;
-   //    if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-   //       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-   //    }
-   // }
-
-   /* #endregion */
-
-   /* #region  edit qty */
-
-   // computeQty() {
-   //    try {
-   //       if (this.selectedItem.variationTypeCode === "1" || this.selectedItem.variationTypeCode === "2") {
-   //          var totalQty = 0;
-   //          if (this.selectedItem.variationDetails) {
-   //             this.selectedItem.variationDetails.forEach(x => {
-   //                x.details.forEach(y => {
-   //                   if (y.qtyRequest && y.qtyRequest < 0) {
-   //                      this.toastService.presentToast("Control Error", "Invalid quantity", "top", "warning", 1000);
-   //                   }
-   //                   totalQty = totalQty + y.qtyRequest;
-   //                });
-   //             })
-   //          }
-   //          this.selectedItem.qtyRequest = totalQty;
-   //          this.computeAllAmount(this.selectedItem);
-   //       }
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // decreaseVariationQty(data: InnerVariationDetail) {
-   //    try {
-   //       if ((data.qtyRequest - 1) < 0) {
-   //          data.qtyRequest = null;
-   //       } else {
-   //          data.qtyRequest -= 1;
-   //       }
-   //       this.computeQty();
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // increaseVariationQty(data: InnerVariationDetail) {
-   //    try {
-   //       if (this.objectService.salesOrderQuantityControl === "1") {
-   //          if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
-   //             data.qtyRequest = null;
-   //             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
-   //          } else {
-   //             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-   //          }
-   //       } else if (this.objectService.salesOrderQuantityControl === "2") {
-   //          if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
-   //             data.qtyRequest = null;
-   //             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
-   //          } else {
-   //             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-   //          }
-   //       } else {
-   //          data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-   //       }
-   //       this.computeQty();
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   /* #endregion */
-
    /* #region  extra info e.g. shipping and address */
 
    isExtraInfoModal: boolean = false;
@@ -283,155 +132,6 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
          console.error(e);
       }
    }
-
-   /* #endregion */
-
-   /* #region  delete item */
-
-   // async presentDeleteItemAlert(data: TransactionDetail, index: number) {
-   //    try {
-   //       const alert = await this.alertController.create({
-   //          cssClass: "custom-alert",
-   //          header: "Are you sure to delete?",
-   //          buttons: [
-   //             {
-   //                text: "OK",
-   //                role: "confirm",
-   //                cssClass: "danger",
-   //                handler: () => {
-   //                   this.removeItem(data, index);
-   //                },
-   //             },
-   //             {
-   //                text: "Cancel",
-   //                role: "cancel",
-   //                handler: () => {
-
-   //                }
-   //             },
-   //          ],
-   //       });
-   //       await alert.present();
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // async removeItem(data: TransactionDetail, index: number) {
-   //    setTimeout(() => {
-   //       this.objectService.objectDetail.splice(index, 1);
-   //       this.toastService.presentToast("", "Line removed", "top", "success", 1000);
-   //       this.validateMinOrderQty();
-   //    }, 1);
-   //    if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-   //       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-   //    }
-   // }
-
-   /* #endregion */
-
-   /* #region  unit price, tax, discount */
-
-   // computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
-   //    try {
-   //       trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax));
-   //       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
-   //       this.computeDiscTaxAmount(trxLine);
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
-   //    try {
-   //       trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax));
-   //       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSalesUnitPrice.localMax : this.objectService.precisionSalesUnitPrice.foreignMax);
-   //       this.computeDiscTaxAmount(trxLine);
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // computeDiscTaxAmount(trxLine: TransactionDetail) {
-   //    try {
-   //       trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
-   //    try {
-   //       let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
-   //       if (discPct) {
-   //          if (discPct === "0") {
-   //             trxLine.discountExpression = null;
-   //          } else {
-   //             trxLine.discountExpression = discPct + "%";
-   //          }
-   //          this.computeAllAmount(trxLine);
-   //       }
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // async computeAllAmount(trxLine: TransactionDetail) {
-   //    trxLine.qtyRequest = Number(trxLine.qtyRequest.toFixed(0));
-   //    try {
-   //       if (this.objectService.salesOrderQuantityControl === "1") {
-   //          if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.actualQty) {
-   //             trxLine.qtyRequest = null;
-   //             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${trxLine.actualQty}]`, "top", "warning", 1000);
-   //          }
-   //       } else if (this.objectService.salesOrderQuantityControl === "2") {
-   //          if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.availableQty) {
-   //             trxLine.qtyRequest = null;
-   //             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${trxLine.availableQty}]`, "top", "warning", 1000);
-   //          }
-   //       }
-   //       if (trxLine.assembly && trxLine.assembly.length > 0) {
-   //          this.computeAssemblyQty(trxLine);
-   //       }
-   //       await this.computeDiscTaxAmount(trxLine);
-   //       if (this.objectService.salesActivateTradingMargin) {
-   //          this.computeTradingMarginAmount(trxLine);
-   //       }
-   //       if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
-   //          await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-   //       }
-   //       this.computeDiscTaxAmount(trxLine);
-   //    } catch (e) {
-   //       console.error(e);
-   //    }
-   // }
-
-   // computeAssemblyQty(trxLine: TransactionDetail) {
-   //    trxLine.assembly.forEach(assembly => {
-   //       if (trxLine.qtyRequest) {
-   //          assembly.qtyRequest = new Decimal(assembly.itemComponentQty).mul(trxLine.qtyRequest).toNumber();
-   //       } else {
-   //          assembly.qtyRequest = null;
-   //       }
-   //    });
-   // }
-
-   // computeTradingMarginAmount(trxLine: TransactionDetail) {
-   //    trxLine = this.commonService.computeTradingMargin(trxLine, this.objectService.systemWideActivateTaxControl, trxLine.taxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax);
-   // }
-
-   // getPromoInfo(promoEventId: number) {
-   //    if (this.objectService.promotionMaster.length > 0) {
-   //       let found = this.objectService.promotionMaster.find(x => x.promoEventId === promoEventId);
-   //       if (found) {
-   //          return found;
-   //       } else {
-   //          return null;
-   //       }
-   //    } else {
-   //       return null;
-   //    }
-   // }
 
    /* #endregion */
 
@@ -497,7 +197,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       try {
          let trxDto: BackToBackOrderRoot = {
             header: this.objectService.objectHeader,
-            details: this.objectService.objectDetail
+            details: this.objectService.objectDetail,
+            otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          this.objectService.insertObject(trxDto).subscribe(response => {
@@ -521,7 +222,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       try {
          let trxDto: BackToBackOrderRoot = {
             header: this.objectService.objectHeader,
-            details: this.objectService.objectDetail
+            details: this.objectService.objectDetail,
+            otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          this.objectService.updateObject(trxDto).subscribe(response => {
@@ -566,56 +268,6 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
       }
       return trxDto;
    }
-
-   // onPricingApprovalSwitch(event: any) {
-   //    if (event.detail.checked) {
-   //       switch (this.objectService.orderingPriceApprovalEnabledFields) {
-   //          case "0":
-   //             if (this.restrictTrxFields.unitPrice) {
-   //                this.restrictTrxFields.unitPrice = false;
-   //             }
-   //             if (this.restrictTrxFields.unitPriceExTax) {
-   //                this.restrictTrxFields.unitPriceExTax = false;
-   //             }
-   //             if (this.restrictTrxFields.discountExpression) {
-   //                this.restrictTrxFields.discountExpression = false;
-   //             }
-   //             if (this.restrictTrxFields.discountGroupCode) {
-   //                this.restrictTrxFields.discountGroupCode = false;
-   //             }
-   //             break;
-   //          case "1":
-   //             if (this.restrictTrxFields.unitPrice) {
-   //                this.restrictTrxFields.unitPrice = false;
-   //             }
-   //             if (this.restrictTrxFields.unitPriceExTax) {
-   //                this.restrictTrxFields.unitPriceExTax = false;
-   //             }
-   //             break;
-   //          case "2":
-   //             if (this.restrictTrxFields.discountExpression) {
-   //                this.restrictTrxFields.discountExpression = false;
-   //             }
-   //             if (this.restrictTrxFields.discountGroupCode) {
-   //                this.restrictTrxFields.discountGroupCode = false;
-   //             }
-   //             break;
-   //       }
-   //    } else {
-   //       if (this.restrictTrxFields.unitPrice === false) {
-   //          this.restrictTrxFields.unitPrice = true;
-   //       }
-   //       if (this.restrictTrxFields.unitPriceExTax === false) {
-   //          this.restrictTrxFields.unitPriceExTax = true;
-   //       }
-   //       if (this.restrictTrxFields.discountExpression === false) {
-   //          this.restrictTrxFields.discountExpression = true;
-   //       }
-   //       if (this.restrictTrxFields.discountGroupCode === false) {
-   //          this.restrictTrxFields.discountGroupCode = true;
-   //       }
-   //    }
-   // }
 
    /* #endregion */
 
@@ -694,19 +346,101 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
 		});
 	}
 
-   // async onDisablePromotionCheck(event: any) {
-   //    if (event.detail.checked) {
-   //       await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
-   //    } else {
-   //       this.objectService.objectDetail.forEach(async line => {
-   //          line = this.commonService.reversePromoImpact(line);
-   //          await this.computeDiscTaxAmount(line);
-   //       })
-   //    }
-   // }
-
    onLineEditComplete(event: TransactionDetail[]) {
       this.objectService.objectDetail = JSON.parse(JSON.stringify(event));
    }
+
+   onTrxOtherAmountEditComplete(event: OtherAmount[]) {
+      this.objectService.setOtherAmt(event);
+   }
+
+   /* #region remark */
+
+   remarkModal: boolean = false;
+   remarkSearchText: string;
+   remarkSearchDropdownList: SearchDropdownList[] = [];
+   remarkTempDropdownList: SearchDropdownList[] = [];
+   selectedRemark: SearchDropdownList;
+   async showRemarkModal() {
+      this.remarkSearchDropdownList = [];
+      for await (const r of this.objectService.remarkMasterList) {
+         this.remarkSearchDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+         })
+      }
+      this.remarkTempDropdownList = this.remarkSearchDropdownList;
+      this.remarkModal = true;
+   }
+
+   @ViewChild("remarkSearchBar", { static: false }) remarkSearchBar: IonSearchbar;
+   setFocus() {
+      if (this.remarkSearchBar) {
+         this.remarkSearchBar.setFocus();
+      }
+   }
+
+   async onRemarkKeyDown(event) {
+      if (event.keyCode === 13) {
+         await this.searchItem();
+      }
+   }
+
+   startIndex: number = 0;
+   readonly size: number = 20;
+   searchItem() {
+      this.startIndex = 0;
+      this.remarkTempDropdownList = []
+      this.assignToTemp(this.startIndex, this.size);
+   }
+
+   resetRemarkFilter() {
+      this.remarkSearchText = "";
+      this.startIndex = 0;
+      this.remarkTempDropdownList = [];
+      this.assignToTemp(this.startIndex, this.size);
+   }
+
+   assignToTemp(startIndex: number, size: number) {
+      if (this.remarkSearchText && this.remarkSearchText.length > 0) {
+         this.remarkTempDropdownList = [...this.remarkTempDropdownList, ...this.remarkSearchDropdownList.filter(r => r.code?.toLowerCase().includes(this.remarkSearchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.remarkSearchText.toLowerCase()) || r.description?.toLowerCase().includes(this.remarkSearchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+         if (this.remarkTempDropdownList && this.remarkTempDropdownList.length === 1) {
+            this.remarkChooseThis(this.remarkTempDropdownList[0]);
+         }
+      } else {
+         this.remarkTempDropdownList = [...this.remarkTempDropdownList, ...this.remarkSearchDropdownList.slice(startIndex, startIndex + size)];
+      }
+   }
+
+   remarkChooseThis(object: SearchDropdownList) {
+      if (this.selectedRemark && this.selectedRemark.id === object.id) {
+         this.hideRemarkModal(this.selectedRemark, false);
+      } else {
+         this.selectedRemark = object;
+         this.hideRemarkModal(object, true);
+      }
+   }
+
+   applyRemark() {
+      this.hideRemarkModal(null);
+   }
+
+   clearRemark() {
+      this.hideRemarkModal(null, true);
+   }
+
+   hideRemarkModal(object: SearchDropdownList, triggerOutput: boolean = false) {
+      this.remarkSearchText = "";
+      this.remarkTempDropdownList = [];
+      if (object) {
+         this.objectService.objectHeader.remark = object.description;
+      } else {
+         this.objectService.objectHeader.remark = null;
+      }
+      this.remarkModal = false;
+   }
+
+   /* #endregion */
 
 }

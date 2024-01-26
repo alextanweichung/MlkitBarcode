@@ -23,6 +23,7 @@ import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
+import { OtherAmount } from '../models/sales-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -35,7 +36,9 @@ const httpObserveHeader = {
 export class QuotationService {
 
    showLatestPrice: boolean = false;
+   showQuantity: boolean = false;
    showStandardPackingInfo: boolean = false;
+   showOtherAmt: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 
@@ -50,6 +53,8 @@ export class QuotationService {
    currencyMasterList: MasterListDetails[] = [];
    salesAgentMasterList: MasterListDetails[] = [];
    uomMasterList: MasterListDetails[] = [];
+   otherAmtMasterList: MasterListDetails[] =[];
+   remarkMasterList: MasterListDetails[] = [];
 
    customers: Customer[] = [];
 
@@ -95,6 +100,9 @@ export class QuotationService {
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.otherAmtMasterList = this.fullMasterList.filter(x => x.objectName === "OtherAmount").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.remarkMasterList = this.fullMasterList.filter(x => x.objectName === "Remark").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      console.log("🚀 ~ QuotationService ~ loadMasterList ~ this.remarkMasterList:", this.remarkMasterList)
       this.custSubscription = this.authService.customerMasterList$.subscribe(obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -249,16 +257,21 @@ export class QuotationService {
    /* #region  for insert */
 
    objectHeader: QuotationHeader;
+   objectOtherAmt: OtherAmount[] = [];
+   objectDetail: TransactionDetail[] = [];
+   objectSalesHistory: SalesItemInfoRoot[] = [];
    async setHeader(objectHeader: QuotationHeader) {
       this.objectHeader = objectHeader;
       // load promotion first after customer confirmed or whenever header changed.
       this.promotionMaster = await this.getPromotion(format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"), this.objectHeader.customerId);
    }
 
-   objectDetail: TransactionDetail[] = [];
-   objectSalesHistory: SalesItemInfoRoot[] = [];
    setLine(objectDetail: TransactionDetail[]) {
       this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
+   }
+
+   setOtherAmt(otherAmt: OtherAmount[]) {
+      this.objectOtherAmt = JSON.parse(JSON.stringify(otherAmt));
    }
 
    objectSummary: QuotationRoot
@@ -275,6 +288,10 @@ export class QuotationService {
       this.objectSalesHistory = [];
    }
 
+   removeOtherAmt() {
+      this.objectOtherAmt = [];
+   }
+
    removeSummary() {
       this.objectSummary = null;
    }
@@ -282,6 +299,7 @@ export class QuotationService {
    resetVariables() {
       this.removeHeader();
       this.removeLine();
+      this.removeOtherAmt();
       this.removeSummary();
    }
 

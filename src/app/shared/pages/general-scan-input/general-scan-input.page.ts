@@ -62,6 +62,10 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
       e.preventDefault();
    }
 
+   manualClearSearchValue() {
+      this.searchValue = "";
+   }
+
    showKeyboard(event) {
       event.preventDefault();
       this.setFocus();

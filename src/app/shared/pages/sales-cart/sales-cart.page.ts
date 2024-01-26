@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, asNativeElements } from '@angular/core';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { SalesHistoryInfo, SalesItemInfoRoot } from '../../models/sales-item-info';
-import { AlertController, IonPopover, ModalController } from '@ionic/angular';
+import { AlertController, IonInput, IonPopover, ModalController } from '@ionic/angular';
 import { ItemSalesHistoryPage } from '../item-sales-history/item-sales-history.page';
 import { MasterListDetails } from '../../models/master-list-details';
 import { PrecisionList } from '../../models/precision-list';
@@ -17,6 +17,7 @@ import { GeneralTransactionService } from '../../services/general-transaction.se
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from '../../models/module-control';
+import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
 
 @Component({
    selector: 'app-sales-cart',
@@ -25,12 +26,16 @@ import { ModuleControl } from '../../models/module-control';
 })
 export class SalesCartPage implements OnInit, OnChanges {
 
+   Math: any;
+
    inputType: string = "number";
    discExprRegex: RegExp = /[\d./+%]+/;
+   discExprRegex2: RegExp = /[-\d.+%]+/;
 
    @Input() objectHeader: any;
    @Input() objectDetail: TransactionDetail[] = [];
    @Input() objectHistory: SalesItemInfoRoot[] = [];
+   @Input() objectOtherAmount: OtherAmount[] = [];
 
    @Input() isQuotation: boolean = false;
    @Input() isSalesOrder: boolean = false;
@@ -38,6 +43,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    @Input() isConsignmentInvoice: boolean = false;
    @Input() showLatestPrice: boolean = false;
    @Input() isAutoPromotion: boolean = true;
+   @Input() showOtherAmount: boolean = false;
 
    @Input() isCalculateMargin: boolean = false;
 
@@ -45,12 +51,14 @@ export class SalesCartPage implements OnInit, OnChanges {
    @Input() itemVariationXMasterList: MasterListDetails[] = [];
    @Input() itemVariationYMasterList: MasterListDetails[] = [];
    @Input() uomMasterList: MasterListDetails[] = [];
+   @Input() otherAmtMasterList: MasterListDetails[] = [];
    @Input() precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    @Input() precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    @Input() promotionMaster: PromotionMaster[] = [];
    @Input() restrictTrxFields: any = {};
 
    @Output() onLineEditComplete: EventEmitter<TransactionDetail[]> = new EventEmitter();
+   @Output() onTrxOtherAmountEditComplete: EventEmitter<OtherAmount[]> = new EventEmitter();
    @Output() onHeaderEditComplete: EventEmitter<any> = new EventEmitter();
 
    constructor(
@@ -63,6 +71,7 @@ export class SalesCartPage implements OnInit, OnChanges {
       private alertController: AlertController,
       private modalController: ModalController
    ) {
+      this.Math = Math;
       if (Capacitor.getPlatform() === "android") {
          this.inputType = "number";
       }
@@ -103,6 +112,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    orderingPriceApprovalEnabledFields: string = "0";
    configSystemWideActivateExtraDiscount: boolean = false;
    configSalesTransactionShowHistory: boolean = false;
+   configTradingActivateMarginExpr: boolean = false
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -230,6 +240,13 @@ export class SalesCartPage implements OnInit, OnChanges {
             this.configSalesActivateTradingMargin = false;
          }
 
+         let useMarginExpr = this.moduleControl.find(x => x.ctrlName === "TradingActivateMarginExpr");
+         if (useMarginExpr && useMarginExpr.ctrlValue.toUpperCase() === "Y") {
+            this.configTradingActivateMarginExpr = true;
+         } else {
+            this.configTradingActivateMarginExpr = false;
+         }  
+
          let activateItemSpec = this.moduleControl.find(x => x.ctrlName === "POSOActivateItemSpecification");
          if (activateItemSpec && activateItemSpec.ctrlValue.toUpperCase() === "Y" && (this.isBackToBackOrder || this.isSalesOrder)) {
             this.configPOSOActivateItemSpecification = true;
@@ -255,12 +272,11 @@ export class SalesCartPage implements OnInit, OnChanges {
          }
 
          let salesTransactionShowHistory = this.moduleControl.find(x => x.ctrlName === "SalesTransactionShowHistory");
-         if (salesTransactionShowHistory && salesTransactionShowHistory.ctrlValue.toUpperCase() === 'Y') {
+         if (salesTransactionShowHistory && salesTransactionShowHistory.ctrlValue.toUpperCase() === "Y") {
             this.configSalesTransactionShowHistory = true;
          } else {
             this.configSalesTransactionShowHistory = false;
          }
-
       })
    }
 
@@ -474,7 +490,7 @@ export class SalesCartPage implements OnInit, OnChanges {
       }
    }
 
-   async computeAllAmount(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
+   async computeAllAmount(trxLine: TransactionDetail, objectDetail?: TransactionDetail[]) {
       let validate = this.discExprRegex.exec(trxLine.discountExpression);
       if (validate && validate.input !== validate[0]) {
          trxLine.discountExpression = validate[0]
@@ -482,8 +498,8 @@ export class SalesCartPage implements OnInit, OnChanges {
       }
 
       // trxLine is actually selectedItem
-      if (trxLineArray) {
-         this.objectDetail = trxLineArray
+      if (objectDetail) {
+         this.objectDetail = objectDetail
       }
       if (trxLine.assembly && trxLine.assembly.length > 0) {
          await this.computeAssemblyQty(trxLine);
@@ -506,9 +522,9 @@ export class SalesCartPage implements OnInit, OnChanges {
       // this.onEditComplete();
    }
 
-   async computeUnitPriceExTax(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
-      if (trxLineArray) {
-         this.objectDetail = trxLineArray
+   async computeUnitPriceExTax(trxLine: TransactionDetail, objectDetail?: TransactionDetail[]) {
+      if (objectDetail) {
+         this.objectDetail = objectDetail
       }
       trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
       trxLine.oriUnitPriceExTax = this.commonService.computeOriUnitPriceExTax(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
@@ -523,9 +539,9 @@ export class SalesCartPage implements OnInit, OnChanges {
       // this.onEditComplete();
    }
 
-   async computeUnitPrice(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
-      if (trxLineArray) {
-         this.objectDetail = trxLineArray
+   async computeUnitPrice(trxLine: TransactionDetail, objectDetail?: TransactionDetail[]) {
+      if (objectDetail) {
+         this.objectDetail = objectDetail
       }
       trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
       trxLine.oriUnitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.objectHeader.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
@@ -598,9 +614,9 @@ export class SalesCartPage implements OnInit, OnChanges {
       }
    }
 
-   computeDiscTaxAmount(trxLine: TransactionDetail, trxLineArray?: TransactionDetail[]) {
-      if (trxLineArray) {
-         this.objectDetail = trxLineArray
+   computeDiscTaxAmount(trxLine: TransactionDetail, objectDetail?: TransactionDetail[]) {
+      if (objectDetail) {
+         this.objectDetail = objectDetail
       }
       trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
       if (this.isConsignmentInvoice) {
@@ -624,8 +640,8 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    async promotionCheck() {
-      if ((this.isAutoPromotion??true)) {
-         if (this.configSalesActivatePromotionEngine && (this.objectHeader.isAutoPromotion??true) && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
+      if ((this.isAutoPromotion ?? true)) {
+         if (this.configSalesActivatePromotionEngine && (this.objectHeader.isAutoPromotion ?? true) && (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B")) {
             await this.promotionEngineService.runPromotionEngine(this.objectDetail.filter(x => x.qtyRequest > 0).flatMap(r => r), this.promotionMaster, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax, this.discountGroupMasterList, false, this.configSalesActivateTradingMargin)
          }
       } else {
@@ -792,12 +808,237 @@ export class SalesCartPage implements OnInit, OnChanges {
    /* #endregion */
 
    validateToShipQty(trxLine: TransactionDetail) {
-      if (trxLine.qtyToShip > (trxLine.qtyRequest - (trxLine.qtyCommit??0))) {
-         this.toastService.presentToast("Invalid To Ship Quantity", `To Ship quantity [${trxLine.qtyToShip}] is higher than open quantity [${(trxLine.qtyRequest - (trxLine.qtyCommit??0))}]`, "top", "warning", 1000);
+      if (trxLine.qtyToShip > (trxLine.qtyRequest - (trxLine.qtyCommit ?? 0))) {
+         this.toastService.presentToast("Invalid To Ship Quantity", `To Ship quantity [${trxLine.qtyToShip}] is higher than open quantity [${(trxLine.qtyRequest - (trxLine.qtyCommit ?? 0))}]`, "top", "warning", 1000);
          setTimeout(() => {
-            trxLine.qtyToShip = trxLine.qtyRequest - (trxLine.qtyCommit??0);
+            trxLine.qtyToShip = trxLine.qtyRequest - (trxLine.qtyCommit ?? 0);
          }, 1);
       }
    }
+
+   /* #region other amount */
+
+   otherAmtModal: boolean = false;
+   selectedOtherAmt: OtherAmount = null;
+   showOtherAmtModal(rowIndex) {
+      this.selectedOtherAmt = this.objectOtherAmount[rowIndex];
+      this.otherAmtModal = true;
+   }
+
+   hideOtherAmtModal() {
+      this.otherAmtModal = false;
+   }
+
+   applyOtherAmt() {
+      this.hideOtherAmtModal();
+      // this.objectOtherAmount.push(this.selectedOtherAmt);
+   }
+
+   cancelOtherAmt() {
+      
+   }
+
+   addOtherAmount() {
+      let newOtherAmountLine = this.newOtherAmountRow();
+      this.objectOtherAmount.push(newOtherAmountLine);      
+      this.showOtherAmtModal(this.objectOtherAmount.length - 1);
+   }
+
+   onOtherAmtModalHide() {
+      this.selectedOtherAmt = null;
+   }
+
+   newOtherAmountRow() {
+      let currentSum = 0;
+      if (!this.isConsignmentInvoice) {
+         currentSum = this.objectDetail.reduce((sum, current) => sum + current.subTotal, 0);
+      } else {
+         if (this.objectHeader.hasOwnProperty("consignmentSettlementId") && this.objectHeader.consignmentSettlementId) {
+            currentSum = this.objectDetail.reduce((sum, current) => sum + current.subTotal, 0);
+         } else {
+            currentSum = this.objectDetail.reduce((sum, current) => sum + current.invoiceAmt, 0);
+         }
+      }
+      let otherAmountTransactionLine: OtherAmount = {
+         lineId: 0,
+         headerId: 0,
+         amountCode: null,
+         amountDescription: null,
+         amountExpression: null,
+         currentSubtotal: this.objectOtherAmount.length > 0 ? this.objectOtherAmount[this.objectOtherAmount.length - 1].cumulativeAmount : currentSum,
+         totalAmount: null,
+         cumulativeAmount: this.objectOtherAmount.length > 0 ? this.objectOtherAmount[this.objectOtherAmount.length - 1].cumulativeAmount : currentSum,
+         sequence: null,
+         remark: null
+      }
+      return otherAmountTransactionLine;
+   }
+
+   onOtherAmtCodeChanged(item: OtherAmount, event: any) {
+      let amtExpression = this.otherAmtMasterList.find(x => x.code === event.detail.value)
+      if (amtExpression) {
+         item.amountDescription = amtExpression.description;
+         if (amtExpression.attribute1 === "0") {
+            item.amountExpression = null;
+         } else {
+            item.amountExpression = amtExpression.attribute1;
+         }
+         if (!this.isConsignmentInvoice) {
+            this.commonService.computeOtherAmount(this.objectDetail, this.objectOtherAmount, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+         } else {
+            if (this.objectHeader.hasOwnProperty("consignmentSettlementId") && this.objectHeader.consignmentSettlementId) {
+               this.commonService.computeOtherAmount(this.objectDetail.filter(x => !x.isShortOver), this.objectOtherAmount, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+            } else {
+               this.commonService.computeOtherAmountFromInvoiceAmt(this.objectDetail, this.objectOtherAmount, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+            }
+         }
+      }
+   }
+   
+   showExtraInfo(object: OtherAmount) {
+      if (object.amountCode) {
+         let t = this.otherAmtMasterList.find(r => r.code === object.amountCode);
+         if (t && (t.attribute3 || t.attribute4)) {
+            return true;
+         } else {
+            return false;
+         }
+      }
+      return false;
+   }
+
+   isExtraInfoPopoverOpen: boolean = false;
+   @ViewChild("extraInfoPopover", { static: false }) extraInfoPopover: IonPopover;
+   showExtraInfoPopover(event) {
+      this.extraInfoPopover.event = event;
+      this.isExtraInfoPopoverOpen = true;
+   }
+
+   retrieveExtraInfo(object: OtherAmount) {
+      if (object.amountCode) {
+         let t = this.otherAmtMasterList.find(r => r.code === object.amountCode);
+         if (t) {
+            if (t.attribute3 && t.attribute4) {
+               let tFrom = Number(t.attribute3);
+               let tTo = Number(t.attribute4);
+               return "Amount Expression in between of " + tFrom + " and" + tTo;
+            }
+            else if (t.attribute3 && (t.attribute4 === null || t.attribute4 === "")) {
+               let tFrom = Number(t.attribute3);
+               return "Amount expression greater than or equal to " + tFrom;
+            }
+            else if (t.attribute4 && (t.attribute3 === null || t.attribute3 === "")) {
+               let tTo = Number(t.attribute4);
+               return "Please enter expression less than or equal to " + tTo;
+            }
+         } else {
+            return "";
+         }
+      }
+   }
+
+   onAmountExpressionBlur(object: OtherAmount, ctrl: IonInput) {
+      let validate = this.discExprRegex2.exec(object.amountExpression);
+      if (validate && validate.input !== validate[0]) {
+         object.amountExpression = validate[0]
+         this.toastService.presentToast("Validation Error", "Amt. Expr. replaced to valid format", "top", "warning", 1000);
+      }
+
+      let t = this.otherAmtMasterList.find(r => r.code === object.amountCode);
+      if (!t) {
+         object.amountExpression = null;
+         this.toastService.presentToast("Invalid Selection", "Please select other amount code.", "top", "warning", 1000);
+         return;
+      }
+      if (t.attribute2 === "P") {
+         object.amountExpression = object.amountExpression.includes("%") ? object.amountExpression.replace("%", "") : object.amountExpression;
+      }
+      if (t.attribute3 && t.attribute4) {
+         let tFrom = Number(t.attribute3);
+         let tTo = Number(t.attribute4);
+         if (Number(object.amountExpression) >= tFrom && Number(object.amountExpression) <= tTo) {
+
+         } else {
+            object.amountExpression = t.attribute1;
+            this.toastService.presentToast("Invalid Amount Expression", `Please enter expression in between of ${tFrom} and ${tTo}.`, "top", "warning", 1000);
+            ctrl.setFocus();
+         }
+      }
+      else if (t.attribute3 && (t.attribute4 === null || t.attribute4 === "")) {
+         let tFrom = Number(t.attribute3);
+         if (Number(object.amountExpression) >= tFrom) {
+
+         } else {
+            object.amountExpression = t.attribute1;
+            this.toastService.presentToast("Invalid Amount Expression", `Please enter expression greater than or equal to ${tFrom}`, "top", "warning", 1000);
+            ctrl.setFocus();
+         }
+      }
+      else if (t.attribute4 && (t.attribute3 === null || t.attribute3 === "")) {
+         let tTo = Number(t.attribute4);
+         if (Number(object.amountExpression) <= tTo) {
+
+         } else {
+            object.amountExpression = t.attribute1;
+            this.toastService.presentToast("Invalid Amount Expression", `Please enter expression less than or equal to ${tTo}`, "top", "warning", 1000);
+            ctrl.setFocus();
+         }
+      }
+      if (t.attribute2 === "P") {
+         object.amountExpression = object.amountExpression.includes("%") ? object.amountExpression : object.amountExpression + "%";
+      }
+      this.onOtherAmountEditComplete();
+   }
+
+   onOtherAmountEditComplete() {
+      let index: number = 0;
+      this.objectOtherAmount.forEach(member => {
+         member.sequence = index;
+         index++;
+      })
+      if (!this.isConsignmentInvoice) {
+         this.objectOtherAmount = this.commonService.computeOtherAmount(this.objectDetail, this.objectOtherAmount, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+      } else {
+         if (this.objectHeader.hasOwnProperty("consignmentSettlementId") && this.objectHeader.consignmentSettlementId) {
+            this.commonService.computeOtherAmount(this.objectDetail.filter(x => !x.isShortOver), this.objectOtherAmount, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+         } else {
+            this.commonService.computeOtherAmountFromInvoiceAmt(this.objectDetail, this.objectOtherAmount, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+         }
+      }
+      this.onTrxOtherAmountEditComplete.emit(this.objectOtherAmount);
+   }
+
+   async removeOtherAmtConfirmation(rowData, rowIndex) {
+      try {
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            header: "Are you sure to delete?",
+            buttons: [
+               {
+                  text: "OK",
+                  role: "confirm",
+                  cssClass: "danger",
+                  handler: () => {
+                     this.objectOtherAmount.splice(rowIndex, 1);
+                     this.objectOtherAmount = [...this.objectOtherAmount];
+                     this.onOtherAmountEditComplete();
+                  },
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  handler: () => {
+
+                  }
+               },
+            ],
+         });
+         await alert.present();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
 
 }

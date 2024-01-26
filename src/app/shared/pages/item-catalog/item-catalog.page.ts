@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterList } from '../../models/master-list';
-import { HistoryInfo, MasterListDetails } from '../../models/master-list-details';
+import { MasterListDetails } from '../../models/master-list-details';
 import { ModuleControl } from '../../models/module-control';
 import { PrecisionList } from '../../models/precision-list';
 import { LineAssembly, TransactionDetail } from '../../models/transaction-detail';
@@ -75,15 +75,17 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    ngOnInit() {
-      this.brandMasterList = this.fullMasterList.filter(x => x.objectName == "ItemBrand").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.groupMasterList = this.fullMasterList.filter(x => x.objectName == "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.categoryMasterList = this.fullMasterList.filter(x => x.objectName == "ItemCategory").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.brandMasterList = this.fullMasterList.filter(x => x.objectName === "ItemBrand").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.groupMasterList = this.fullMasterList.filter(x => x.objectName === "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.categoryMasterList = this.fullMasterList.filter(x => x.objectName === "ItemCategory").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.loadModuleControl();
    }
 
    moduleControl: ModuleControl[] = [];
    configOrderingActivateMOQControl: boolean;   
    configSalesTransactionShowHistory: boolean = false;
+   configSalesActivateTradingMargin: boolean;
+   configTradingActivateMarginExpr: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -110,7 +112,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
          }
 
          let moqCtrl = this.moduleControl.find(x => x.ctrlName === "OrderingActivateMOQControl");
-         if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() == 'Y') {
+         if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() === 'Y') {
             if (this.isSalesOrder || this.isBackToBackOrder) {
                this.configOrderingActivateMOQControl = true;
             } else {
@@ -125,6 +127,24 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.configSalesTransactionShowHistory = true;
          } else {
             this.configSalesTransactionShowHistory = false;
+         }
+
+         let isTradingMargin = this.moduleControl.find(x => x.ctrlName === "SalesActivateTradingMargin");
+         if (isTradingMargin && isTradingMargin.ctrlValue.toUpperCase() === "Y") {
+            if (this.isQuotation || this.isSalesOrder || this.isBackToBackOrder) {
+               this.configSalesActivateTradingMargin = true;
+            } else {
+               this.configSalesActivateTradingMargin = false;
+            }
+         } else {
+            this.configSalesActivateTradingMargin = false;
+         }
+
+         let useMarginExpr = this.moduleControl.find(x => x.ctrlName === "TradingActivateMarginExpr");
+         if (useMarginExpr && useMarginExpr.ctrlValue.toUpperCase() === "Y") {
+            this.configTradingActivateMarginExpr = true;
+         } else {
+            this.configTradingActivateMarginExpr = false;
          }
 
       })
@@ -344,6 +364,23 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       item.oriUnitPrice = item.unitPrice;
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
+      console.log("🚀 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ this.objectHeader:", this.objectHeader)
+      if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B" || this.objectHeader.businessModelType === "F") {
+         if (this.configSalesActivateTradingMargin || this.configTradingActivateMarginExpr) {
+            if (this.configSalesActivateTradingMargin && !this.configTradingActivateMarginExpr && item.tradingMarginPct) {
+               item.tradingMarginPct = item.tradingMarginPct;
+               item.tradingMarginExpression = item.tradingMarginPct + "%";
+            }
+            if (this.configSalesActivateTradingMargin && this.configTradingActivateMarginExpr && item.tradingMarginExpression) {
+               item.tradingMarginExpression = item.tradingMarginExpression;
+            }
+         } else {
+            item.tradingMarginPct = null;
+            item.tradingMarginExpression = null;
+         }
+         console.log("🚀 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ item:", item)
+      }
+
       if (this.configOrderingActivateMOQControl) {
          if (item.minOrderQty) {
             item.minOrderQty = item.minOrderQty;
@@ -404,12 +441,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    isValidQty(data: TransactionDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
+      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
          if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
          }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
+      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
          if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
@@ -418,14 +455,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    increaseQty(data: TransactionDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
+      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
          if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
          } else {
             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
          }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
+      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
          if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
@@ -469,8 +506,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    itemVariationYMasterList: MasterListDetails[] = [];
    showModal(data: TransactionDetail) {
       this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
-      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.isModalOpen = true;
    }
 
@@ -483,12 +520,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    isValidVariationQty(data: InnerVariationDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
+      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
          if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
          }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
+      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
          if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
@@ -497,14 +534,14 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    increaseVariationQty(data: InnerVariationDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl == "1") {
+      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
          if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
          } else {
             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
          }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl == "2") {
+      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
          if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
@@ -569,7 +606,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
    validateNewItemConversion(found: TransactionDetail) {
       if (found.newItemId && found.newItemEffectiveDate && new Date(found.newItemEffectiveDate) <= new Date(this.objectHeader.trxDate)) {
-         let newItemCode = this.configService.item_Masters.find(x => x.id == found.newItemId);
+         let newItemCode = this.configService.item_Masters.find(x => x.id === found.newItemId);
          if (newItemCode) {
             this.toastService.presentToast("Converted Code Detected", `Item ${found.itemCode} has been converted to ${newItemCode.code} effective from ${format(new Date(found.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1000);
             if (this.systemWideBlockConvertedCode) {

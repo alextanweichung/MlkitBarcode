@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonPopover, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, IonSearchbar, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { QuotationRoot } from 'src/app/modules/transactions/models/quotation';
+import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
 import { QuotationService } from 'src/app/modules/transactions/services/quotation.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -12,8 +13,10 @@ import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { SalesItemRequest } from 'src/app/shared/models/sales-item-request';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { ItemSalesHistoryPage } from 'src/app/shared/pages/item-sales-history/item-sales-history.page';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { GeneralTransactionService } from 'src/app/shared/services/general-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
@@ -26,6 +29,8 @@ import { SearchItemService } from 'src/app/shared/services/search-item.service';
    providers: [SearchItemService, GeneralTransactionService, { provide: 'apiObject', useValue: 'mobileQuotation' }]
 })
 export class QuotationCartPage implements OnInit, ViewWillEnter {
+
+   Math: any;
 
    moduleControl: ModuleControl[] = [];
    submit_attempt: boolean = false;
@@ -44,6 +49,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       private navController: NavController,
       private modalController: ModalController
    ) {
+      this.Math = Math;
       if (Capacitor.getPlatform() === "android") {
          this.inputType = "number";
       }
@@ -227,7 +233,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
          await this.loadingService.showLoading();
          let trxDto: QuotationRoot = {
             header: this.objectService.objectHeader,
-            details: this.objectService.objectDetail
+            details: this.objectService.objectDetail,
+            otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          this.objectService.insertObject(trxDto).subscribe(async response => {
@@ -256,7 +263,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
          await this.loadingService.showLoading();
          let trxDto: QuotationRoot = {
             header: this.objectService.objectHeader,
-            details: this.objectService.objectDetail
+            details: this.objectService.objectDetail,
+            otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
          this.objectService.updateObject(trxDto).subscribe(async response => {
@@ -352,6 +360,10 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       this.objectService.objectDetail = JSON.parse(JSON.stringify(event));
    }
 
+   onTrxOtherAmountEditComplete(event: OtherAmount[]) {
+      this.objectService.setOtherAmt(event);
+   }
+
    /* #region toggle show latest price */
 
    toggleShowLatestPrice() {
@@ -377,5 +389,94 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       })
       modal.present();
    }
+
+   /* #region remark */
+
+   remarkModal: boolean = false;
+   remarkSearchText: string;
+   remarkSearchDropdownList: SearchDropdownList[] = [];
+   remarkTempDropdownList: SearchDropdownList[] = [];
+   selectedRemark: SearchDropdownList;
+   async showRemarkModal() {
+      this.remarkSearchDropdownList = [];
+      for await (const r of this.objectService.remarkMasterList) {
+         this.remarkSearchDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+         })
+      }
+      this.remarkTempDropdownList = this.remarkSearchDropdownList;
+      this.remarkModal = true;
+   }
+
+   @ViewChild("remarkSearchBar", { static: false }) remarkSearchBar: IonSearchbar;
+   setFocus() {
+      if (this.remarkSearchBar) {
+         this.remarkSearchBar.setFocus();
+      }
+   }
+
+   async onRemarkKeyDown(event) {
+      if (event.keyCode === 13) {
+         await this.searchItem();
+      }
+   }
+
+   startIndex: number = 0;
+   readonly size: number = 20;
+   searchItem() {
+      this.startIndex = 0;
+      this.remarkTempDropdownList = []
+      this.assignToTemp(this.startIndex, this.size);
+   }
+
+   resetRemarkFilter() {
+      this.remarkSearchText = "";
+      this.startIndex = 0;
+      this.remarkTempDropdownList = [];
+      this.assignToTemp(this.startIndex, this.size);
+   }
+
+   assignToTemp(startIndex: number, size: number) {
+      if (this.remarkSearchText && this.remarkSearchText.length > 0) {
+         this.remarkTempDropdownList = [...this.remarkTempDropdownList, ...this.remarkSearchDropdownList.filter(r => r.code?.toLowerCase().includes(this.remarkSearchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.remarkSearchText.toLowerCase()) || r.description?.toLowerCase().includes(this.remarkSearchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+         if (this.remarkTempDropdownList && this.remarkTempDropdownList.length === 1) {
+            this.remarkChooseThis(this.remarkTempDropdownList[0]);
+         }
+      } else {
+         this.remarkTempDropdownList = [...this.remarkTempDropdownList, ...this.remarkSearchDropdownList.slice(startIndex, startIndex + size)];
+      }
+   }
+
+   remarkChooseThis(object: SearchDropdownList) {
+      if (this.selectedRemark && this.selectedRemark.id === object.id) {
+         this.hideRemarkModal(this.selectedRemark, false);
+      } else {
+         this.selectedRemark = object;
+         this.hideRemarkModal(object, true);
+      }
+   }
+
+   applyRemark() {
+      this.hideRemarkModal(null);
+   }
+
+   clearRemark() {
+      this.hideRemarkModal(null, true);
+   }
+
+   hideRemarkModal(object: SearchDropdownList, triggerOutput: boolean = false) {
+      this.remarkSearchText = "";
+      this.remarkTempDropdownList = [];
+      if (object) {
+         this.objectService.objectHeader.remark = object.description;
+      } else {
+         this.objectService.objectHeader.remark = null;
+      }
+      this.remarkModal = false;
+   }
+
+   /* #endregion */
 
 }

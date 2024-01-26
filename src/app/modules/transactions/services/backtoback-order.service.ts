@@ -22,6 +22,7 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
+import { OtherAmount } from '../models/sales-order';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -36,6 +37,7 @@ export class BackToBackOrderService {
    showLatestPrice: boolean = false;
    showQuantity: boolean = false;
    showStandardPackingInfo: boolean = false;
+   showOtherAmt: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 
@@ -52,6 +54,8 @@ export class BackToBackOrderService {
    termPeriodMasterList: MasterListDetails[] = [];
    countryMasterList: MasterListDetails[] = [];
    uomMasterList: MasterListDetails[] = [];
+   otherAmtMasterList: MasterListDetails[] = [];
+   remarkMasterList: MasterListDetails[] = [];
 
    salesTypeList: MasterListDetails[] = [];
 
@@ -103,6 +107,8 @@ export class BackToBackOrderService {
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.otherAmtMasterList = this.fullMasterList.filter(x => x.objectName === "OtherAmount").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.remarkMasterList = this.fullMasterList.filter(x => x.objectName === "Remark").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -264,6 +270,7 @@ export class BackToBackOrderService {
 
    objectHeader: BackToBackOrderHeader;
    objectDetail: TransactionDetail[] = [];
+   objectOtherAmt: OtherAmount[] = [];
    objectSummary: BackToBackOrderRoot;
    async setHeader(objectHeader: BackToBackOrderHeader) {
       this.objectHeader = objectHeader;
@@ -273,6 +280,10 @@ export class BackToBackOrderService {
 
    setLine(objectDetail: TransactionDetail[]) {
       this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
+   }
+
+   setOtherAmt(otherAmt: OtherAmount[]) {
+      this.objectOtherAmt = JSON.parse(JSON.stringify(otherAmt));
    }
 
    setSummary(objectSummary: BackToBackOrderRoot) {
@@ -287,6 +298,10 @@ export class BackToBackOrderService {
       this.objectDetail = [];
    }
 
+   removeOtherAmt() {
+      this.objectOtherAmt = [];
+   }
+
    removeSummary() {
       this.objectSummary = null;
    }
@@ -294,6 +309,7 @@ export class BackToBackOrderService {
    resetVariables() {
       this.removeHeader();
       this.removeLine();
+      this.removeOtherAmt();
       this.removeSummary();
    }
 

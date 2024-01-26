@@ -41,6 +41,11 @@
                   <div>Copy from List</div>
                </ion-label>
             </ion-item>
+            <ion-item (click)="popover.dismiss(); duplicateCartonConfirmation()">
+               <ion-label>
+                  <div>Duplicate Carton</div>
+               </ion-label>
+            </ion-item>
             <ion-item (click)="popover.dismiss(); sendForDebug()">
                <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
                <ion-label>

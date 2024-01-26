@@ -139,15 +139,29 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    setDefaultValue() {
-      let defaultLocation = this.objectService.locationMasterList.find(item => item.isPrimary);
+      let defaultLocation = this.fLocationMasterList.find(item => item.isPrimary)?.id;
       if (defaultLocation) {
-         this.objectForm.patchValue({ locationId: defaultLocation?.id });
-         this.selectedLocationId = defaultLocation?.id;
+         this.objectForm.patchValue({ locationId: defaultLocation });
+      } else {
+         let findWh = this.fLocationMasterList.find(x => x.attribute1 == 'W');
+         if (findWh) {
+            this.objectForm.patchValue({ locationId: findWh.id });
+         }
+      }
+      if (this.configService.loginUser.defaultLocationId) {
+         let findLocation = this.objectService.locationMasterList.find(x => x.id == this.configService.loginUser.defaultLocationId);
+         if (findLocation) {
+            this.objectForm.patchValue({ locationId: findLocation.id });
+         }
+      }
+      let defaultAgent = this.objectService.warehouseAgentMasterList.find(item => item.isPrimary)?.id;
+      if (defaultAgent) {
+         this.objectForm.patchValue({ warehouseAgentId: defaultAgent });
       }
       let defaultCustomer = this.objectService.customerMasterList.find(r => r.isPrimary);
       if (defaultCustomer) {
          this.objectForm.patchValue({ customerId: defaultCustomer.id });
-         this.onCustomerSelected(defaultCustomer, true);
+         this.onCustomerSelected(defaultCustomer.id, true);
       }
    }
 
@@ -451,7 +465,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             }
 
             //Auto map object type code
-            if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F") {
+            if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F" || lookupValue.attribute5 == "B") {
                this.objectForm.patchValue({ typeCode: "S" });
                this.objectForm.controls["typeCode"].disable();
             } else {

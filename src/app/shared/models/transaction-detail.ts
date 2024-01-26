@@ -147,6 +147,7 @@ export interface TransactionDetail {
    minOrderQtyError?: boolean
 
    tradingMarginPct?: number
+   tradingMarginExpression?: string
    tradingMarginAmt?: number
    tradingMarginAmtExTax?: number
 

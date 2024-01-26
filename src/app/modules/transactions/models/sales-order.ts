@@ -120,4 +120,5 @@ export interface OtherAmount {
    totalAmount: number
    cumulativeAmount: number
    sequence: number
+   remark: string
 }

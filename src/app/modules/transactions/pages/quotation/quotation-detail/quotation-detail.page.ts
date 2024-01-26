@@ -13,6 +13,7 @@ import { TrxChild } from 'src/app/shared/models/trx-child';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ApprovalHistory } from 'src/app/shared/models/approval-history';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { OtherAmount } from '../../../models/sales-order';
 
 @Component({
    selector: 'app-quotation-detail',
@@ -21,10 +22,13 @@ import { ConfigService } from 'src/app/services/config/config.service';
 })
 export class QuotationDetailPage implements OnInit, ViewWillEnter {
 
+   Math: any;
+
    objectId: number
    processType: string;
    selectedSegment: string;
-   objectApprovalHistory: ApprovalHistory[];
+   otherAmount: OtherAmount[] = [];
+   approvalHistory: ApprovalHistory[];
 
    constructor(
       public objectService: QuotationService,
@@ -36,7 +40,9 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
       private route: ActivatedRoute,
       private navController: NavController,
       private alertController: AlertController
-   ) { }
+   ) {
+      this.Math = Math;
+   }
 
    ionViewWillEnter(): void {
       this.route.queryParams.subscribe(async params => {
@@ -61,7 +67,8 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
             let object = response;
             object.header = this.commonService.convertObjectAllDateType(object.header);
-            this.objectApprovalHistory = object.approvalHistory;
+            this.otherAmount = object.otherAmount;
+            this.approvalHistory = object.approvalHistory;
             this.loadWorkflow(object.header.quotationId);
             await this.objectService.setHeader(object.header);
             await this.objectService.setLine(object.details);

@@ -146,6 +146,8 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
                      }]
                   });
                   await alert.present();
+               } else {
+                  this.onCustomerSelected(event);
                }
             } else {
                this.onCustomerSelected(event);

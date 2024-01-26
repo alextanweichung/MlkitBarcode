@@ -1,5 +1,6 @@
 import { CreditInfo } from "src/app/shared/models/credit-info"
 import { TransactionDetail } from "src/app/shared/models/transaction-detail"
+import { OtherAmount } from "./sales-order"
 
 export interface BackToBackOrderList {
    backToBackOrderId: number
@@ -13,6 +14,7 @@ export interface BackToBackOrderList {
    deactivated: boolean
    isCompleted: boolean
    grandTotal: number
+   otherAmountCount: number
  }
 
  export interface BackToBackOrderRoot {
@@ -24,6 +26,7 @@ export interface BackToBackOrderList {
   otp?: any
   attachmentFile?: any[]
   comment?: any[]
+  otherAmount?: OtherAmount[]
 }
 
 export interface BackToBackOrderHeader {

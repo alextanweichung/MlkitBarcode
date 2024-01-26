@@ -14,13 +14,17 @@ import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 })
 export class BacktobackOrderSummaryPage implements OnInit, ViewWillEnter {
 
+   Math: any;
+
    constructor(
       public objectService: BackToBackOrderService,
       private authService: AuthService,
       public configService: ConfigService,
       private navController: NavController,
       private toastService: ToastService
-   ) { }
+   ) {
+      this.Math = Math;
+   }
 
    ionViewWillEnter(): void {
 

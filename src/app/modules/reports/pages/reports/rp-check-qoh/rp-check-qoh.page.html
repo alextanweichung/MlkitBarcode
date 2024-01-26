@@ -15,23 +15,30 @@
         <ion-label>Nothing found!</ion-label>
       </ion-list-header>
       <ngx-datatable
-      class="fullscreen material mt-2"
-      [rows]="realObject" 
-      [rowHeight]="'auto'" 
-      [columns]="columns"
-      [columnMode]="'force'" 
-      [scrollbarH]="true">
+         class="fullscreen material mt-2"
+         [rows]="realObject" 
+         [rowHeight]="'auto'" 
+         [columns]="columns"
+         [columnMode]="'force'" 
+         [scrollbarH]="true">
         <ngx-datatable-column prop="itemCode" name="Stock" [width]="100">
           <ng-template let-row="row" ngx-datatable-cell-template>
             <div class="flex ion-text-wrap font-half-size">
               <div class="font-bold">{{row.itemCode}}</div> - {{row.itemDescription}}</div>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="qoh" name="QOH" [width]="70">
+        <ngx-datatable-column prop="qoh" name="QOH" [width]="200">
           <ng-template let-row="row" ngx-datatable-cell-template>
-            <div class="flex ion-text-wrap font-half-size">{{row.qoh|number:'1.0'}}</div>
+            <div class="flex ion-text-wrap font-half-size font-bold">{{row.qoh|number:'1.0'}}</div>
+            <ng-container *ngIf="hasInventoryLevel(row)">
+               <div class="ion-flex font-x-smaller" *ngFor="let rowData of getInventoryLevel(row)">
+                  <span class="font-bold mr-2">{{rowData.locationCode}} </span> 
+                  <div class="font-align-right" [ngClass]="{'color-danger': (rowData.qty - rowData.openQty) < 0 }"><span *ngIf="(rowData.qty - rowData.openQty) < 0">{{'('}}</span>{{Math.abs(rowData.qty - rowData.openQty) | number: "1.0"}}<span *ngIf="(rowData.qty - rowData.openQty) < 0">{{')'}}</span></div>
+               </div>
+            </ng-container>
           </ng-template>
         </ngx-datatable-column>
+
         <ngx-datatable-column prop="price" name="Segment">
           <ng-template ngx-datatable-header-template>
             <div class="flex ion-text-wrap font-half-size">Price</div>

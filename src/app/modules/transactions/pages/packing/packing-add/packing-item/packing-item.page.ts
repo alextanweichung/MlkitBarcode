@@ -642,23 +642,25 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    /* #region carton segment */
 
    selectedCartonNum: number = 0;
-   addCarton() {
+   addCarton(duplicateFrom?: MultiPackingCarton, autoSelectCarton: boolean = true) {
       let nextCartonNum = this.objectService.multiPackingObject.packingCarton.length > 0 ? this.objectService.multiPackingObject.packingCarton[0].cartonNum + 1 : 1;
-      let newPickList: CurrentPackList[] = [];
+      let newPackList: CurrentPackList[] = [];
       let defaultPackaging = this.objectService.packagingMasterList.find(x => x.isPrimary);
       let newCarton: MultiPackingCarton = {
          cartonNum: nextCartonNum,
-         packList: newPickList,
-         cartonHeight: null,
-         cartonWidth: null,
-         cartonLength: null,
-         cartonWeight: null,
-         cartonCbm: null,
-         packagingId: defaultPackaging ? defaultPackaging.id : null,
-         cartonBarcode: null
+         cartonHeight: duplicateFrom ? duplicateFrom.cartonHeight : null,
+         cartonWidth: duplicateFrom ? duplicateFrom.cartonWidth : null,
+         cartonLength: duplicateFrom ? duplicateFrom.cartonLength : null,
+         cartonWeight: duplicateFrom ? duplicateFrom.cartonWeight : null,
+         cartonCbm: duplicateFrom ? duplicateFrom.cartonCbm : null,
+         cartonBarcode: null,
+         packagingId: duplicateFrom ? duplicateFrom.packagingId : (defaultPackaging ? defaultPackaging.id : null),
+         packList: newPackList
       };
       this.objectService.multiPackingObject.packingCarton.unshift(newCarton);
-      this.selectedCartonNum = nextCartonNum;
+      if (autoSelectCarton) {
+         this.selectedCartonNum = nextCartonNum;
+      }
    }
 
    async deleteCarton() {
@@ -954,7 +956,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          await alert.present().then(() => {
             const firstInput: any = document.querySelector("ion-alert input");
             setTimeout(() => {
-               firstInput.focus();               
+               firstInput.focus();
             }, 1000);
             return;
          });
@@ -1533,6 +1535,108 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       let itemQty: number
       itemQty = rowData.qtyRequest - (rowData.qtyCurrent ?? 0) - rowData.qtyPacked;
       await this.runPackingEngine(udItemList, itemQty);
+   }
+
+   async duplicateCartonConfirmation() {
+      if (this.selectedCartonNum) {
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            backdropDismiss: false,
+            header: "Enter Quantity",
+            inputs: [
+               {
+                  name: "inputQty",
+                  type: "number",
+                  placeholder: "Enter Quantity",
+                  value: 1,
+                  min: 1
+               }
+            ],
+            buttons: [
+               {
+                  text: "OK",
+                  role: "confirm",
+                  cssClass: "success",
+                  handler: async (data) => {
+                     if (data.inputQty) {
+                        await this.duplicateCarton(data.inputQty)
+                     }
+                  },
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel"
+               },
+            ],
+         });
+         await alert.present().then(() => {
+            const firstInput: any = document.querySelector("ion-alert input");
+            setTimeout(() => {
+               firstInput.focus();
+            }, 500);
+            return;
+         });
+      } else {
+         this.toastService.presentToast("Control Error", "No Carton selected.", "top", "warning", 1000);
+      }
+   }
+
+   duplicateCarton(inputNumber) {
+      if (inputNumber) {
+         for (let i = 0; i < inputNumber; i++) {
+            let packingCartonPackList = this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum))?.packList;
+            if (packingCartonPackList) {
+               let duplicatedList: CurrentPackList[] = JSON.parse(JSON.stringify(packingCartonPackList));
+               this.addCarton(this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)), false);
+               if (this.objectService.header.isWithSo) {
+                  let allLinesDuplicated: boolean = true;
+                  let nonComponentList: CurrentPackList[] = duplicatedList.filter(x => !x.assemblyItemId);
+                  let componentList: CurrentPackList[] = duplicatedList.filter(x => x.assemblyItemId);
+                  nonComponentList.forEach(line => {
+                     line.multiPackingLineId = 0;
+                     line.multiPackingId = 0;
+                     line.cartonNum = this.objectService.multiPackingObject.packingCarton[0].cartonNum;
+                     let checking = this.checkPackingRules(line.itemSku, line.qtyPacked);
+                     if (checking) {
+                        this.objectService.multiPackingObject.packingCarton[0].packList.push(line);
+                        let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemSku == line.itemSku);
+                        let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == line.itemSku);
+                        this.computePackingAssignment(line.qtyPacked, outstandingLines, packListLines);
+                     } else {
+                        allLinesDuplicated = false;
+                     }
+                  })
+                  componentList.forEach(line => {
+                     line.multiPackingLineId = 0;
+                     line.multiPackingId = 0;
+                     line.cartonNum = this.objectService.multiPackingObject.packingCarton[0].cartonNum;
+                     let checking = this.checkAssemblyPackingRules(line.assemblyItemId, line.itemId, line.qtyPacked);
+                     if (checking) {
+                        this.objectService.multiPackingObject.packingCarton[0].packList.push(line);
+                        let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == line.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
+                        let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemId == line.itemId && x.assemblyItemId);
+                        this.computeAssemblyPackingAssignment(line.qtyPacked, outstandingLines, packListLines);
+                     } else {
+                        allLinesDuplicated = false;
+                     }
+                  })
+                  if (!allLinesDuplicated) {
+                     this.toastService.presentToast("Control Validation", "Complete duplication is not possible due to quantity control.", "top", "warning", 1000);
+                     break;
+                  }
+               } else {
+                  duplicatedList.forEach(line => {
+                     line.multiPackingLineId = 0;
+                     line.multiPackingId = 0;
+                     line.cartonNum = this.objectService.multiPackingObject.packingCarton[0].cartonNum;
+                  })
+                  this.objectService.multiPackingObject.packingCarton[0].packList = [...duplicatedList];
+               }
+            } else {
+               this.toastService.presentToast("System Error", "Unable to locate Pack List.", "top", "danger", 1000);
+            }
+         }
+      }
    }
 
 }

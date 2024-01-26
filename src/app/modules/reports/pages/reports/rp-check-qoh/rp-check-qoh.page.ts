@@ -14,6 +14,8 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 })
 export class RpCheckQohPage implements OnInit {
 
+   Math: any;
+
    objects: CheckQohRoot[] = [];
    loginUser: any;
    columns: any;
@@ -24,6 +26,7 @@ export class RpCheckQohPage implements OnInit {
       private toastService: ToastService,
       private loadingService: LoadingService
    ) {
+      this.Math = Math;
       this.loginUser = JSON.parse(localStorage.getItem("loginUser"));
    }
 
@@ -57,8 +60,7 @@ export class RpCheckQohPage implements OnInit {
             }
             this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
                this.objects = response;
-               // let blob = new Blob([JSON.stringify(this.objects)], {type: "text/plain"});
-               // this.file.writeFile(this.file.dataDirectory, "debug", blob, { replace: true, append: false });
+               console.log("🚀 ~ RpCheckQohPage ~ this.objectService.getCheckQoh ~ this.objects:", this.objects)
                await this.massageData();
                await this.loadingService.dismissLoading();
                this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);
@@ -88,34 +90,27 @@ export class RpCheckQohPage implements OnInit {
             })
          }
          this.realObject.push({
+            itemId: r.itemId,
             itemCode: r.itemCode,
             itemDescription: r.itemDescription,
             qoh: r.inventoryLevel.reduce((a, c) => a + (c.qty - c.openQty), 0),
             price: price
          })
       }
-
-      // this.objects.forEach(r => {
-      //    let price: any[] = [];
-      //    r.segmentPricing.forEach(rr => {
-      //       price.push({
-      //          segmentCode: rr.itemPricing.priceSegmentCode,
-      //          price: rr.itemPricing.unitPrice
-      //       })
-      //    })
-      //    this.realObject.push({
-      //       itemCode: r.itemCode,
-      //       itemDescription: r.itemDescription,
-      //       qoh: r.inventoryLevel.reduce((a, c) => a + (c.qty - c.openQty), 0),
-      //       price: price
-      //    })
-      // })
    }
 
    highlight(event) {
       event.getInputElement().then(r => {
          r.select();
       })
+   }
+
+   hasInventoryLevel(row) {
+      return (this.objects.find(r => r.itemId === row.itemId).inventoryLevel && this.objects.find(r => r.itemId === row.itemId).inventoryLevel.length > 0);
+   }
+
+   getInventoryLevel(row) {
+      return this.objects.find(r => r.itemId === row.itemId).inventoryLevel;
    }
 
 }

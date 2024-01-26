@@ -10,6 +10,8 @@ import { SalesCartPage } from './sales-cart.page';
 import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
 import { OfflineItemIdMappingModule } from '../../pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { OfflineItemIdDescMappingModule } from '../../pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
+import { IdToCodeMappingModule } from '../../pipes/id-to-code-mapping/id-to-code-mapping.module';
+import { CodeMappingModule } from '../../pipes/code-mapping/code-mapping.module';
 
 @NgModule({
    imports: [
@@ -18,6 +20,8 @@ import { OfflineItemIdDescMappingModule } from '../../pipes/offline-item-id-desc
       IonicModule,
       SalesCartPageRoutingModule,
       IdMappingModule,
+      IdToCodeMappingModule,
+      CodeMappingModule,
       OfflineItemIdMappingModule,
       OfflineItemIdDescMappingModule
    ],

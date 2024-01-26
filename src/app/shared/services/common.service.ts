@@ -15,6 +15,7 @@ import { MasterList } from '../models/master-list';
 import { format } from 'date-fns';
 import { LocalMarginConfig } from '../models/pos-download';
 import { Decimal } from 'decimal.js';
+import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
 
 @Injectable({
    providedIn: 'root'
@@ -454,8 +455,15 @@ export class CommonService {
       let subTotal: Decimal = new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0).mul(new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0)).sub(new Decimal(trxLine.discountAmt ? trxLine.discountAmt : 0)).toDecimalPlaces(roundingPrecision);
       let subTotalExTax: Decimal = new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0).mul(new Decimal(trxLine.unitPriceExTax ? trxLine.unitPriceExTax : 0)).sub(new Decimal(trxLine.discountAmtExTax ? trxLine.discountAmtExTax : 0)).toDecimalPlaces(roundingPrecision);
       if (useTax) {
-         trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
-         trxLine.tradingMarginAmtExTax = subTotalExTax.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         if (trxLine.tradingMarginPct) {
+            trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+            trxLine.tradingMarginAmtExTax = subTotalExTax.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         } else if (trxLine.tradingMarginExpression) {
+            this.computeTradingMarginExpression(trxLine, subTotal, subTotalExTax, roundingPrecision);
+         } else {
+            trxLine.tradingMarginAmt = 0
+            trxLine.tradingMarginAmtExTax = 0;
+         }
          if (isItemPriceTaxInclusive) {
             trxLine.subTotal = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
             trxLine.subTotalExTax = subTotalExTax.sub(new Decimal(trxLine.tradingMarginAmtExTax)).toDecimalPlaces(roundingPrecision).toNumber();
@@ -468,15 +476,52 @@ export class CommonService {
       } else {
          trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
          trxLine.tradingMarginAmtExTax = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         if (trxLine.tradingMarginPct) {
+            trxLine.tradingMarginAmt = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+            trxLine.tradingMarginAmtExTax = subTotal.mul(trxLine.tradingMarginPct ? trxLine.tradingMarginPct : 0).div(100).toDecimalPlaces(roundingPrecision).toNumber();
+         } else if (trxLine.tradingMarginExpression) {
+            this.computeTradingMarginExpression(trxLine, subTotal, subTotal, roundingPrecision);
+         } else {
+            trxLine.tradingMarginAmt = 0
+            trxLine.tradingMarginAmtExTax = 0;
+         }
          trxLine.subTotal = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
          trxLine.subTotalExTax = subTotal.sub(new Decimal(trxLine.tradingMarginAmt)).toDecimalPlaces(roundingPrecision).toNumber();
       }
-
-      if (trxLine.qtyRequest == null || trxLine.tradingMarginPct == null) {
+      if (trxLine.qtyRequest == null || (trxLine.tradingMarginPct == null && trxLine.tradingMarginExpression == null)) {
          trxLine.tradingMarginAmt = null;
          trxLine.tradingMarginAmtExTax = null;
       }
       return trxLine;
+   }
+
+   computeTradingMarginExpression(trxLine: any, subTotal: Decimal, subTotalExTax: Decimal, roundingPrecision: number) {
+      let marginExpression = trxLine.tradingMarginExpression;
+      let totalMarginAmt: Decimal = new Decimal(0);
+      let totalMarginAmtExTax: Decimal = new Decimal(0);
+      //To split the expression with multi level discount, for eg. (10%/5%/3%)
+      if (marginExpression != "" && marginExpression != null) {
+         let splittedDisc = marginExpression.split(/[+/]/g);
+         splittedDisc.forEach(x => {
+            let xDecimal: Decimal = new Decimal(parseFloat(x) ? parseFloat(x) : 0);
+            if (x.includes('%')) {
+               let currentMarginPct: Decimal = xDecimal.div(100);
+               let currentMargincAmt: Decimal = subTotal.mul(currentMarginPct);
+               let currentMargincAmtExTax: Decimal = subTotalExTax.mul(currentMarginPct);
+               totalMarginAmt = totalMarginAmt.add(currentMargincAmt);
+               totalMarginAmtExTax = totalMarginAmtExTax.add(currentMargincAmtExTax);
+               subTotal = subTotal.sub(currentMargincAmt);
+               subTotalExTax = subTotalExTax.sub(currentMargincAmt);
+            } else {
+               totalMarginAmt = totalMarginAmt.add(xDecimal);
+               totalMarginAmtExTax = totalMarginAmtExTax.add(xDecimal);
+               subTotal = subTotal.sub(xDecimal);
+               subTotalExTax = subTotalExTax.sub(xDecimal);
+            }
+         })
+      }
+      trxLine.tradingMarginAmt = totalMarginAmt.toDecimalPlaces(roundingPrecision).toNumber();
+      trxLine.tradingMarginAmtExTax = totalMarginAmtExTax.toDecimalPlaces(roundingPrecision).toNumber();
    }
 
    computeMarginAmtByConsignmentConfig(trxLine: TransactionDetail, objectHeader: any, bearPromoUseGross: boolean, computeInvoiceAmt?: boolean): TransactionDetail {
@@ -782,6 +827,60 @@ export class CommonService {
             }
          }
       }
+   }
+
+   /* #endregion */
+
+   /* #region other amount */
+
+   computeOtherAmount(trxLineArray: any[], otherAmtTrxArray: OtherAmount[], roundingPrecision: number) {
+      for (let i = 0; i < otherAmtTrxArray.length; i++) {
+         if (i == 0) {
+            otherAmtTrxArray[i].currentSubtotal = trxLineArray.filter(x => !x.deactivated).reduce((sum, current) => sum + current.subTotal, 0);
+            otherAmtTrxArray[i] = this.computeOtherAmountExpression(otherAmtTrxArray[i]);
+            otherAmtTrxArray[i].cumulativeAmount = otherAmtTrxArray[i].currentSubtotal + otherAmtTrxArray[i].totalAmount;
+         } else {
+            otherAmtTrxArray[i].currentSubtotal = otherAmtTrxArray[i - 1].cumulativeAmount;
+            otherAmtTrxArray[i] = this.computeOtherAmountExpression(otherAmtTrxArray[i]);
+            otherAmtTrxArray[i].cumulativeAmount = otherAmtTrxArray[i].currentSubtotal + otherAmtTrxArray[i].totalAmount;
+         }
+         otherAmtTrxArray[i].currentSubtotal = this.roundToPrecision(otherAmtTrxArray[i].currentSubtotal, roundingPrecision);
+         otherAmtTrxArray[i].totalAmount = this.roundToPrecision(otherAmtTrxArray[i].totalAmount, roundingPrecision);
+         otherAmtTrxArray[i].cumulativeAmount = this.roundToPrecision(otherAmtTrxArray[i].cumulativeAmount, roundingPrecision);
+      }
+      return otherAmtTrxArray;
+   }
+
+   computeOtherAmountFromInvoiceAmt(trxLineArray: any[], otherAmtTrxArray: OtherAmount[], roundingPrecision: number) {
+      for (let i = 0; i < otherAmtTrxArray.length; i++) {
+         if (i == 0) {
+            otherAmtTrxArray[i].currentSubtotal = trxLineArray.filter(x => !x.deactivated).reduce((sum, current) => sum + current.invoiceAmt, 0);
+            otherAmtTrxArray[i] = this.computeOtherAmountExpression(otherAmtTrxArray[i]);
+            otherAmtTrxArray[i].cumulativeAmount = otherAmtTrxArray[i].currentSubtotal + otherAmtTrxArray[i].totalAmount;
+         } else {
+            otherAmtTrxArray[i].currentSubtotal = otherAmtTrxArray[i - 1].cumulativeAmount;
+            otherAmtTrxArray[i] = this.computeOtherAmountExpression(otherAmtTrxArray[i]);
+            otherAmtTrxArray[i].cumulativeAmount = otherAmtTrxArray[i].currentSubtotal + otherAmtTrxArray[i].totalAmount;
+         }
+         otherAmtTrxArray[i].currentSubtotal = this.roundToPrecision(otherAmtTrxArray[i].currentSubtotal, roundingPrecision);
+         otherAmtTrxArray[i].totalAmount = this.roundToPrecision(otherAmtTrxArray[i].totalAmount, roundingPrecision);
+         otherAmtTrxArray[i].cumulativeAmount = this.roundToPrecision(otherAmtTrxArray[i].cumulativeAmount, roundingPrecision);
+      }
+      return otherAmtTrxArray;
+   }
+
+   computeOtherAmountExpression(line: OtherAmount) {
+      if (line.amountExpression) {
+         let expressionValue: Decimal
+         let expressionDecimal: Decimal = new Decimal(parseFloat(line.amountExpression) ? parseFloat(line.amountExpression) : 0);
+         if (line.amountExpression.includes('%')) {
+            expressionValue = expressionDecimal.div(100);
+            line.totalAmount = new Decimal(line.currentSubtotal ? line.currentSubtotal : 0).mul(expressionValue).toNumber();
+         } else {
+            line.totalAmount = expressionDecimal.toNumber();
+         }
+      }
+      return line;
    }
 
    /* #endregion */

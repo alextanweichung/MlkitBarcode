@@ -14,9 +14,9 @@
    <div class="p-2">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
 
-         <app-search-multi-dropdown title="Vehicle" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" [searchDropdownList]="vehicleSearchDropdownList" (onActionComplete)="onVechicleSelected($event)"></app-search-multi-dropdown>
+         <!-- <app-search-multi-dropdown title="Vehicle" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" [searchDropdownList]="vehicleSearchDropdownList" (onActionComplete)="onVechicleSelected($event)"></app-search-multi-dropdown>
          
-         <app-general-scan-input #ctln placeholder="Truck Arrangement Num" [clearSearchValue]="false" (onScanCompleted)="onCTLNChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onCTLNDoneScanning($event)"></app-general-scan-input>
+         <app-general-scan-input #ctln placeholder="Truck Arrangement Num" [clearSearchValue]="false" (onScanCompleted)="onCTLNChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onCTLNDoneScanning($event)"></app-general-scan-input> -->
          
          <app-general-scan-input #don placeholder="Delivery Order Num" [clearSearchValue]="false" (onScanCompleted)="onDONChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDONDoneScanning($event)"></app-general-scan-input>
 
@@ -77,7 +77,7 @@
    </ion-fab>
 </ion-content>
 
-<ion-modal [isOpen]="signatureModal" (didDismiss)="signatureModal = false" [keyboardClose]="true" [showBackdrop]="true" [backdropDismiss]="false">
+<ion-modal [isOpen]="signatureModal" (didDismiss)="signModalDidDismiss();" [keyboardClose]="true" [showBackdrop]="true" [backdropDismiss]="false">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -101,7 +101,7 @@
             <div class="border-dotted">
                <signature-pad #signaturePad [options]="signaturePadOptions"></signature-pad>
             </div>
-      </div>
+         </div>
       </ion-content>
       <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
          <ion-grid class="ion-no-padding">

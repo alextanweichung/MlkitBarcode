@@ -36,7 +36,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    objects: DoAcknowledgement[] = [];
    submit_attempt: boolean = false;
 
-   @ViewChild("ctln", { static: false }) ctln: GeneralScanInputPage;
+   // @ViewChild("ctln", { static: false }) ctln: GeneralScanInputPage;
    @ViewChild("don", { static: false }) don: GeneralScanInputPage;
 
    constructor(
@@ -49,13 +49,23 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
+      await this.loadModuleControl();
       await this.objectService.loadRequiredMaster();
       await this.bindVehicleList();
       // this.selectAction();
    }
 
    ionViewDidEnter(): void {
-      this.ctln.setFocus();
+      // if (this.configDOAckFocus) {
+      //    if (this.configDOAckFocus === "TA") {
+      //       this.ctln.setFocus();
+      //    } else if (this.configDOAckFocus === "DO") {
+      //       this.don.setFocus();
+      //    } else {
+      //       this.don.setFocus();
+      //    }
+      // }
+      this.don.setFocus();
    }
 
    ngOnInit() {
@@ -64,12 +74,18 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    moduleControl: ModuleControl[] = [];
    fileSizeLimit: number = 1 * 1024 * 1024;
+   // configDOAckFocus: string;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
             this.moduleControl = obj;
             let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
             this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
+
+            // let focus = this.moduleControl.find(x => x.ctrlName === "DOAckFocus")?.ctrlValue;
+            // if (focus) {
+            //    this.configDOAckFocus = focus.toUpperCase();
+            // }
          })
       } catch (e) {
          console.error(e);
@@ -166,6 +182,20 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       this.signatureModal = false;
    }
 
+   signModalDidDismiss() {
+      this.signatureModal = false;
+      // if (this.configDOAckFocus) {
+      //    if (this.configDOAckFocus === "TA") {
+      //       this.ctln.setFocus();
+      //    } else if (this.configDOAckFocus === "DO") {
+      //       this.don.setFocus();
+      //    } else {
+      //       this.don.setFocus();
+      //    }
+      // }
+      this.don.setFocus();
+   }
+
    @ViewChild("signaturePad") signaturePad: SignaturePad;
    signaturePadOptions: Object = {
       "minWidth": 5,
@@ -185,6 +215,8 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    images: LocalFile[] = [];
    async save() {
       if (!this.signaturePad.isEmpty()) {
+         // this.ctln.manualClearSearchValue();
+         this.don.manualClearSearchValue();
          const fileName = this.selectedDo.deliveryOrderNum.replace(" ", "").replace("/","") + "_Acknowledgement_" + "signature.png";
          const base64Data = this.signaturePad.toDataURL();
          try {

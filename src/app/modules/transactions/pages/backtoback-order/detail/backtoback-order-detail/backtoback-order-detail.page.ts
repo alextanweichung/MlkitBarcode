@@ -20,6 +20,8 @@ import { CommonService } from 'src/app/shared/services/common.service';
 })
 export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
 
+   Math: any;
+
    objectId: number
    processType: string;
    selectedSegment: string;
@@ -36,7 +38,9 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
       private navController: NavController,
       private alertController: AlertController,
       private route: ActivatedRoute,
-   ) { }
+   ) {
+      this.Math = Math;
+   }
 
    async ionViewWillEnter(): Promise<void> {
       this.route.queryParams.subscribe(async params => {
@@ -64,6 +68,7 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
             this.loadWorkflow(object.header.backToBackOrderId);
             await this.objectService.setHeader(object.header);
             await this.objectService.setLine(object.details);
+            await this.objectService.setOtherAmt(object.otherAmount);
             await this.loadingService.dismissLoading();
          }, async error => {
             await this.loadingService.dismissLoading();

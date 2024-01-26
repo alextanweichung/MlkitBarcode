@@ -14,13 +14,17 @@ import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 })
 export class SalesOrderSummaryPage implements OnInit {
 
+   Math: any;
+
    constructor(
       public objectService: SalesOrderService,
       private authService: AuthService,
       public configService: ConfigService,
       private navController: NavController,
       private toastService: ToastService
-   ) { }
+   ) { 
+      this.Math = Math;
+   }
 
    ngOnInit() {
 

@@ -24,6 +24,8 @@ import { ApprovalHistory } from 'src/app/shared/models/approval-history';
 })
 export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
 
+   Math: any;
+
    objectId: any;
    processType: string;
    selectedSegment: string;
@@ -49,7 +51,9 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
       private navController: NavController,
       private alertController: AlertController,
       private route: ActivatedRoute,
-   ) { }
+   ) {
+      this.Math = Math;
+   }
 
    async ionViewWillEnter(): Promise<void> {
       try {
@@ -91,6 +95,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
             await this.loadWorkflow(object.header.salesOrderId);
             await this.objectService.setHeader(object.header);
             await this.objectService.setLine(object.details);
+            await this.objectService.setOtherAmt(object.otherAmount);
             await this.loadingService.dismissLoading();
          }, async error => {
             await this.loadingService.dismissLoading();

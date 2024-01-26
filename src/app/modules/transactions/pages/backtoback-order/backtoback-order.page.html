@@ -35,6 +35,12 @@
                 <ion-col class="ion-flex ion-margin-auto">{{object.customerName}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.salesAgentName}}</ion-col>
               </ion-row>
+              <ion-row *ngIf="object.otherAmountCount && object.otherAmountCount > 0">
+                 <ion-col class="ion-flex ion-margin-auto">
+                    <ion-icon class="ion-flex my-auto" name="star" color="success"></ion-icon>
+                    <div class="ion-flex ion-text-wrap ml-1">Charges Assigned</div>
+                 </ion-col>
+              </ion-row>
             </ion-grid>
           </ion-item>
         </ion-list>

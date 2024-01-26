@@ -11,7 +11,7 @@ import { SalesSearchModal } from 'src/app/shared/models/sales-search-modal';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { Customer } from '../models/customer';
-import { SalesOrderHeader, SalesOrderList, SalesOrderRoot } from '../models/sales-order';
+import { OtherAmount, SalesOrderHeader, SalesOrderList, SalesOrderRoot } from '../models/sales-order';
 import { format } from 'date-fns';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
@@ -47,6 +47,7 @@ export class SalesOrderService {
    showLatestPrice: boolean = false;
    showQuantity: boolean = false;
    showStandardPackingInfo: boolean = false;
+   showOtherAmt: boolean = false;
 
    promotionMaster: PromotionMaster[] = [];
 
@@ -61,6 +62,8 @@ export class SalesOrderService {
    currencyMasterList: MasterListDetails[] = [];
    salesAgentMasterList: MasterListDetails[] = [];
    uomMasterList: MasterListDetails[] = [];
+   otherAmtMasterList: MasterListDetails[] =[];
+   remarkMasterList: MasterListDetails[] = [];
 
    customers: Customer[] = [];
 
@@ -107,6 +110,8 @@ export class SalesOrderService {
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.otherAmtMasterList = this.fullMasterList.filter(x => x.objectName === "OtherAmount").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.remarkMasterList = this.fullMasterList.filter(x => x.objectName === "Remark").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -275,6 +280,7 @@ export class SalesOrderService {
 
    objectHeader: SalesOrderHeader;
    objectDetail: TransactionDetail[] = [];
+   objectOtherAmt: OtherAmount[] = [];
    objectSalesHistory: SalesItemInfoRoot[] = [];
    objectSummary: SalesOrderRoot;
    async setHeader(objectHeader: SalesOrderHeader) {
@@ -285,6 +291,10 @@ export class SalesOrderService {
 
    setLine(objectDetail: TransactionDetail[]) {
       this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
+   }
+
+   setOtherAmt(otherAmt: OtherAmount[]) {
+      this.objectOtherAmt = JSON.parse(JSON.stringify(otherAmt));
    }
 
    setSummary(objectSummary: SalesOrderRoot) {
@@ -307,6 +317,10 @@ export class SalesOrderService {
       this.objectSalesHistory = [];
    }
 
+   removeOtherAmt() {
+      this.objectOtherAmt = [];
+   }
+
    removeSummary() {
       this.objectSummary = null;
    }
@@ -319,6 +333,7 @@ export class SalesOrderService {
    resetVariables() {
       this.removeHeader();
       this.removeLine();
+      this.removeOtherAmt();
       this.removeSummary();
       this.removeDraftObject();
    }

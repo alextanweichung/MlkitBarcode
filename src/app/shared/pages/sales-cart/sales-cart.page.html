@@ -10,11 +10,12 @@
             </ion-row>
             <ion-row>
                <ion-col>
-                  <!-- <div class="ion-text-wrap">{{rowData.description}}</div> -->                  
+                  <!-- <div class="ion-text-wrap">{{rowData.description}}</div> -->
                   <div><ion-textarea [value]="rowData.description" [rows]="1" autoGrow readonly></ion-textarea></div>
                </ion-col>
             </ion-row>
-            <ng-container *ngIf="(isQuotation || isSalesOrder) && showLatestPrice && getLatestSalesHistoryByItemId(rowData.itemId)">
+            <ng-container
+               *ngIf="(isQuotation || isSalesOrder) && showLatestPrice && getLatestSalesHistoryByItemId(rowData.itemId)">
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto font-smaller">
                      L/P:
@@ -124,6 +125,72 @@
    </ion-item-sliding>
 </ion-list>
 
+<ng-container *ngIf="showOtherAmount || (objectOtherAmount && objectOtherAmount.length > 0)">
+
+   <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+      <ion-label>Other Amount</ion-label>
+      <ion-button size="small" (click)="addOtherAmount()"><ion-icon name="add-outline" slot="icon-only"></ion-icon></ion-button>
+   </ion-list-header>
+
+   <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-item-sliding #sliding *ngFor="let rowData of objectOtherAmount; let rowIndex = index">
+         <ion-item class="ion-no-padding no-ripple" (click)="showOtherAmtModal(rowIndex)">
+            <ion-grid class="ion-no-padding p-2">
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">{{rowData.amountCode}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div>{{rowData.amountDescription}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="rowData.remark" placeholder="Enter remark" [autoGrow]="true" readonly></ion-textarea>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Amt. Expr.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Cur. Sub.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">Amt.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">Cum. Amt.</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div>{{rowData.amountExpression}}</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div>{{rowData.currentSubtotal|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-align-right" [ngClass]="{'color-danger': rowData.totalAmount < 0 }"><span *ngIf="rowData.totalAmount < 0">{{'('}}</span>{{Math.abs(rowData.totalAmount) | number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}<span *ngIf="rowData.totalAmount < 0">{{')'}}</span></div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div>{{rowData.cumulativeAmount|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+                  </ion-col>
+               </ion-row>
+            </ion-grid>
+         </ion-item>
+         <ion-item-options>
+            <ion-item-option color="danger" (click)="sliding.close(); removeOtherAmtConfirmation(rowData, rowIndex)">
+               Delete
+            </ion-item-option>
+         </ion-item-options>
+      </ion-item-sliding>
+   </ion-list>
+
+</ng-container>
+
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" (ionModalDidDismiss)="onModalHide()">
    <ng-template>
       <ion-header>
@@ -166,7 +233,7 @@
                   <ion-label>
                      <div>Disc. Code</div>
                   </ion-label>
-                  <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']">
+                  <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.discountGroupCode" (ionChange)="onDiscCodeChanged(selectedItem, $event)" [disabled]="restrictTrxFields['discountGroupCode']"> 
                      <ion-select-option *ngFor="let s of discountGroupMasterList" [value]="s.code">{{s.code}}</ion-select-option>
                   </ion-select>
                </ion-item>
@@ -184,11 +251,17 @@
                   <ion-input *ngIf="!objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmtExTax|number:'1.2-2'}}" [disabled]="true"></ion-input>
                </ion-item>
                <ng-container *ngIf="configSalesActivateTradingMargin">
-                  <ion-item>
+                  <ion-item *ngIf="!configTradingActivateMarginExpr">
                      <ion-label>
                         <div>Trade Margin Pct.</div>
                      </ion-label>
                      <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.tradingMarginPct|number:'1.0-2'}}%" [disabled]="true"></ion-input>
+                  </ion-item>
+                  <ion-item *ngIf="configTradingActivateMarginExpr">
+                     <ion-label>
+                        <div>Trade Margin Expr.</div>
+                     </ion-label>
+                     <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.tradingMarginExpression}}" [disabled]="true"></ion-input>
                   </ion-item>
                   <ion-item>
                      <ion-label>
@@ -230,7 +303,7 @@
                         <ng-container *ngFor="let number of [1,2,3,4,5,6,7,8,9,10]">
                            <ng-container *ngIf="getPromoInfo(selectedItem.promoEventId).priority === number; then icon1 else icon2"></ng-container>
                            <ng-template #icon1><ion-icon name="star" class="icon-smaller"></ion-icon></ng-template>
-                           <ng-template #icon2><ion-icon name="star-outline" class="icon-smaller"></ion-icon></ng-template>                           
+                           <ng-template #icon2><ion-icon name="star-outline" class="icon-smaller"></ion-icon></ng-template>
                         </ng-container>
                      </ion-col>
                   </ion-row>
@@ -399,3 +472,78 @@
       </ion-content>
    </ng-template>
 </ion-popover>
+
+<!-- #region other amount modal -->
+
+<ion-modal [isOpen]="otherAmtModal" (didDismiss)="otherAmtModal = false" (ionModalDidDismiss)="onOtherAmtModalHide()">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>Other Amt.</ion-title>
+            <ion-buttons slot="start">
+               <ion-button (click)="applyOtherAmt()">Done</ion-button>
+            </ion-buttons>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content *ngIf="selectedOtherAmt">
+         <div class="p-2">
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <ion-item>
+                  <ion-label>
+                     <div>Code</div>
+                  </ion-label>
+                  <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedOtherAmt.amountCode" (ionChange)="onOtherAmtCodeChanged(selectedOtherAmt, $event)">
+                     <ion-select-option *ngFor="let s of otherAmtMasterList" [value]="s.code">{{s.code}}</ion-select-option>
+                  </ion-select>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Description</div>
+                  </ion-label>
+                  <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedOtherAmt.amountCode|codeMapping:otherAmtMasterList}}" readonly></ion-input>
+                  <ion-icon name="information-circle-outline" (click)="showExtraInfoPopover($event)" *ngIf="showExtraInfo(selectedOtherAmt)"></ion-icon>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Amt. Expr.</div>
+                  </ion-label>
+                  <ion-input #amtExp slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" (ionBlur)="onAmountExpressionBlur(selectedOtherAmt, amtExp)" [(ngModel)]="selectedOtherAmt.amountExpression"></ion-input>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Current SubTotal</div>
+                  </ion-label>
+                  <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedOtherAmt.currentSubtotal|number:(objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}" readonly [disabled]="true"></ion-input>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Amount</div>
+                  </ion-label>
+                  <div class="font-align-right" [ngClass]="{'color-danger': selectedOtherAmt.totalAmount < 0 }"><span *ngIf="selectedOtherAmt.totalAmount < 0">{{'('}}</span>{{Math.abs(selectedOtherAmt.totalAmount) | number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}<span *ngIf="selectedOtherAmt.totalAmount < 0">{{')'}}</span></div>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Cumulative Amount</div>
+                  </ion-label>
+                  <div class="font-align-right">{{selectedOtherAmt.cumulativeAmount|number: (objectHeader?.isHomeCurrency ? precisionSales.localFormat : precisionSales.foreignFormat)}}</div>
+               </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Remark</div>
+                  </ion-label>
+                  <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="selectedOtherAmt.remark" placeholder="Enter remark" [autoGrow]="true"></ion-textarea>
+               </ion-item>
+            </ion-list>
+         </div>
+      </ion-content>
+   </ng-template>
+</ion-modal>
+<ion-popover #extraInfoPopover [isOpen]="isExtraInfoPopoverOpen" (didDismiss)="isExtraInfoPopoverOpen = false">
+   <ng-template>
+      <ion-content>
+         <div class="font-size-small">{{retrieveExtraInfo(selectedOtherAmt)}}</div>
+      </ion-content>
+   </ng-template>
+</ion-popover>
+
+<!-- #endregion -->

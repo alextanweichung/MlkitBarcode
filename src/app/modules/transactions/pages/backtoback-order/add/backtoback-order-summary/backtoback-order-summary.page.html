@@ -186,6 +186,58 @@
         </ion-grid>
       </ion-item>
     </ion-list>
+    <div *ngIf="objectService.objectSummary.otherAmount && objectService.objectSummary.otherAmount?.length > 0">
+       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+          <ion-label>Other Amount</ion-label>
+       </ion-list-header>
+       <ion-item class="ion-no-padding no-ripple" *ngFor="let rowData of objectService.objectSummary.otherAmount">
+          <ion-grid class="ion-no-padding p-2">
+             <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <div class="font-bold">{{rowData.amountCode}}</div>
+                </ion-col>
+             </ion-row>
+             <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <div>{{rowData.amountDescription}}</div>
+                </ion-col>
+             </ion-row>
+             <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" [(ngModel)]="rowData.remark" placeholder="Enter remark" [autoGrow]="true" readonly></ion-textarea>
+                </ion-col>
+             </ion-row>
+             <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <div class="font-bold">Amt. Expr.</div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <div class="font-bold">Cur. Sub.</div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                   <div class="font-bold">Amt.</div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                   <div class="font-bold">Cum. Amt.</div>
+                </ion-col>
+             </ion-row>
+             <ion-row>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <div>{{rowData.amountExpression}}</div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto">
+                   <div>{{rowData.currentSubtotal|number: (objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                   <div class="font-align-right" [ngClass]="{'color-danger': rowData.totalAmount < 0 }"><span *ngIf="rowData.totalAmount < 0">{{'('}}</span>{{Math.abs(rowData.totalAmount) | number: (objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}<span *ngIf="rowData.totalAmount < 0">{{')'}}</span></div>
+                </ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                   <div>{{rowData.cumulativeAmount|number: (objectService.objectHeader?objectService.precisionSales.localFormat:objectService.precisionSales.foreignFormat)}}</div>
+                </ion-col>
+             </ion-row>
+          </ion-grid>
+       </ion-item>
+     </div>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

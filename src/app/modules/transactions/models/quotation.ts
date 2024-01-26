@@ -1,5 +1,6 @@
 import { ApprovalHistory } from "src/app/shared/models/approval-history"
 import { TransactionDetail } from "src/app/shared/models/transaction-detail"
+import { OtherAmount } from "./sales-order"
 
 export interface QuotationList {
    quotationId: number
@@ -13,6 +14,7 @@ export interface QuotationList {
    qty: number
    deactivated: boolean
    createdById: number
+   otherAmountCount?: number
 }
 
 export interface QuotationRoot {
@@ -21,6 +23,7 @@ export interface QuotationRoot {
    barcodeTag?: any
    otp?: any
    approvalHistory?: ApprovalHistory[]
+   otherAmount?: OtherAmount[]
 }
 
 export interface QuotationHeader {

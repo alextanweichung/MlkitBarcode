@@ -12,6 +12,7 @@ export interface LoginUser {
    companyCode: string
    loginUserGroupType: string
    locationId: number[]
+   defaultLocationId: number
 }
 
 export interface LoginRequest {
