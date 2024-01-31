@@ -8,6 +8,9 @@
       <ion-buttons slot="start">
          <ion-button (click)="cancelInsert()"><ion-icon slot="start" name="chevron-back-outline"></ion-icon></ion-button>
       </ion-buttons>
+      <ion-buttons slot="primary" *ngIf="objectForm.controls.truckArrangementId?.value">
+         <ion-button (click)="refreshTruckArrangment()"><ion-icon slot="start" name="refresh-outline"></ion-icon></ion-button>
+      </ion-buttons>
    </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" [hidden]="scanActive">
@@ -15,7 +18,7 @@
       <form class="form-default" [formGroup]="objectForm">
          <ng-container *ngIf="objectForm.controls.cartonTruckLoadingId.value === 0">
             <ion-list class="list-custom" lines="none">
-              <app-search-dropdown title="Truck Arrangement" [searchDropdownList]="pendingListSearch" [selectedId]="objectForm.controls.truckArrangementId?.value" (onActionComplete)="onTruckArrangmentSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onTAScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onTADoneScanning($event)"></app-search-dropdown>
+              <app-search-dropdown #tasdd title="Truck Arrangement" [searchDropdownList]="pendingListSearch" [selectedId]="objectForm.controls.truckArrangementId?.value" (onActionComplete)="onTruckArrangmentSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onTAScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onTADoneScanning($event)"></app-search-dropdown>
             </ion-list>
          </ng-container>
          <ng-container *ngIf="objectForm.controls.truckArrangementId?.value">

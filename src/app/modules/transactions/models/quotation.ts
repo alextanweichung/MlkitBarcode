@@ -90,6 +90,7 @@ export interface QuotationHeader {
    modifiedAt?: Date
    deactivated: boolean
    shipName?: string
+   uuId: string
 
    // local use
    priceSegmentCode: string

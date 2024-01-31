@@ -29,6 +29,7 @@ export interface SalesOrderRoot {
    approvalHistory?: ApprovalHistory[]
    isWorkFlowDone?: boolean
    otherAmount?: OtherAmount[]
+   orderCyle?: OrderLifeCycle[]
 }
 
 export interface SalesOrderHeader {
@@ -105,6 +106,7 @@ export interface SalesOrderHeader {
    modifiedAt?: Date
    deactivated: boolean
    shipName?: string
+   uuId: string
 
    // local use
    priceSegmentCode: string
@@ -121,4 +123,12 @@ export interface OtherAmount {
    cumulativeAmount: number
    sequence: number
    remark: string
+}
+
+export interface OrderLifeCycle {
+   orderLifeCycle: string
+   description: string
+   createdById: string
+   createdBy: string
+   createdAt: string
 }

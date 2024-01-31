@@ -86,7 +86,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.moduleControl = obj;
          let config = this.moduleControl.find(x => x.ctrlName === "SOSelectionEnforceSameOrigin");
          if (config != undefined) {
-            if (config.ctrlValue.toUpperCase() == "Y") {
+            if (config.ctrlValue.toUpperCase() === "Y") {
                this.configSOSelectionEnforceSameOrigin = true;
             } else {
                this.configSOSelectionEnforceSameOrigin = false;
@@ -94,7 +94,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          }
          let config2 = this.moduleControl.find(x => x.ctrlName === "SOSelectionEnforceSameDestination");
          if (config2 != undefined) {
-            if (config2.ctrlValue.toUpperCase() == "Y") {
+            if (config2.ctrlValue.toUpperCase() === "Y") {
                this.configSOSelectionEnforceSameDestination = true;
             } else {
                this.configSOSelectionEnforceSameDestination = false;
@@ -121,9 +121,17 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                return;
             }
             this.selectedDocs.unshift(doc);
-            if (this.selectedDocs && this.selectedDocs.length === 1) {
+            if (this.selectedDocs && this.selectedDocs.length > 0) {
                this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
                this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
+               this.objectForm.patchValue({
+                  locationId: this.selectedDocs[0].locationId,
+                  customerId: this.selectedDocs[0].customerId,
+                  toLocationId: this.selectedDocs[0].toLocationId,
+               })
+               this.selectedLocationId = this.selectedDocs[0].locationId;
+               this.selectedCustomerId = this.selectedDocs[0].customerId;
+               this.selectedToLocationId = this.selectedDocs[0].toLocationId;
             }
             // this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
             this.uniqueDoc = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.salesOrderNum))];
@@ -143,13 +151,13 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       if (defaultLocation) {
          this.objectForm.patchValue({ locationId: defaultLocation });
       } else {
-         let findWh = this.fLocationMasterList.find(x => x.attribute1 == 'W');
+         let findWh = this.fLocationMasterList.find(x => x.attribute1 === 'W');
          if (findWh) {
             this.objectForm.patchValue({ locationId: findWh.id });
          }
       }
       if (this.configService.loginUser.defaultLocationId) {
-         let findLocation = this.objectService.locationMasterList.find(x => x.id == this.configService.loginUser.defaultLocationId);
+         let findLocation = this.objectService.locationMasterList.find(x => x.id === this.configService.loginUser.defaultLocationId);
          if (findLocation) {
             this.objectForm.patchValue({ locationId: findLocation.id });
          }
@@ -216,9 +224,18 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.objectForm.patchValue({ copyFrom: "S" });
                   // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.selectedDocs.unshift(doc);
-                  if (this.selectedDocs && this.selectedDocs.length === 1) {
+                  if (this.selectedDocs && this.selectedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
                      this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
+                     this.objectForm.patchValue({
+                        locationId: this.selectedDocs[0].locationId,
+                        customerId: this.selectedDocs[0].customerId,
+                        toLocationId: this.selectedDocs[0].toLocationId,
+                        copyFrom: "S"
+                     })
+                     this.selectedLocationId = this.selectedDocs[0].locationId;
+                     this.selectedCustomerId = this.selectedDocs[0].customerId;
+                     this.selectedToLocationId = this.selectedDocs[0].toLocationId;
                   }
                   this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
                   this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
@@ -266,9 +283,18 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.objectForm.patchValue({ copyFrom: "B" });
                   // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.selectedDocs.unshift(doc);
-                  if (this.selectedDocs && this.selectedDocs.length === 1) {
+                  if (this.selectedDocs && this.selectedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
                      this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
+                     this.objectForm.patchValue({
+                        locationId: this.selectedDocs[0].locationId,
+                        customerId: this.selectedDocs[0].customerId,
+                        toLocationId: this.selectedDocs[0].toLocationId,
+                        copyFrom: "B"
+                     })
+                     this.selectedLocationId = this.selectedDocs[0].locationId;
+                     this.selectedCustomerId = this.selectedDocs[0].customerId;
+                     this.selectedToLocationId = this.selectedDocs[0].toLocationId;
                   }
                   this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
                   this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
@@ -439,7 +465,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.selectedCustomerId = event ? event.id : null;
          this.objectForm.patchValue({ customerId: this.selectedCustomerId });
          if (this.selectedCustomerId) {
-            var lookupValue = this.objectService.customerMasterList?.find(e => e.id == this.selectedCustomerId);
+            var lookupValue = this.objectService.customerMasterList?.find(e => e.id === this.selectedCustomerId);
             if (lookupValue != undefined) {
                this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
                if (lookupValue.attributeArray1.length > 0) {
@@ -453,11 +479,11 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.selectedToLocationId = null;
                }
             }
-            if (lookupValue.attribute5 == "T") {
+            if (lookupValue.attribute5 === "T") {
                this.objectForm.controls.toLocationId.clearValidators();
                this.objectForm.controls.toLocationId.updateValueAndValidity();
             }
-            if (lookupValue.attributeArray1.length == 1) {
+            if (lookupValue.attributeArray1.length === 1) {
                this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
                if (bindToLocationId) {
                   this.selectedToLocationId = this.selectedCustomerLocationList[0].id;
@@ -465,7 +491,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             }
 
             //Auto map object type code
-            if (lookupValue.attribute5 == "T" || lookupValue.attribute5 == "F" || lookupValue.attribute5 == "B") {
+            if (lookupValue.attribute5 === "T" || lookupValue.attribute5 === "F" || lookupValue.attribute5 === "B") {
                this.objectForm.patchValue({ typeCode: "S" });
                this.objectForm.controls["typeCode"].disable();
             } else {

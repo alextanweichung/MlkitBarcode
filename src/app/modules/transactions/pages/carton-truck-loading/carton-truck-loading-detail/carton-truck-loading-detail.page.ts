@@ -118,5 +118,9 @@ export class CartonTruckLoadingDetailPage implements OnInit, ViewWillEnter {
          return [];
       }
    }
+
+   previousStep() {
+      this.objectService.resetVariables();
+   }
    
 }

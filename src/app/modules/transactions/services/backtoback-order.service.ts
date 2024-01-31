@@ -58,6 +58,8 @@ export class BackToBackOrderService {
    remarkMasterList: MasterListDetails[] = [];
 
    salesTypeList: MasterListDetails[] = [];
+   docStatusList: MasterListDetails[] = [];
+   orderLifeCycleMasterList: MasterListDetails[] = [];
 
    customers: Customer[] = [];
 
@@ -122,6 +124,8 @@ export class BackToBackOrderService {
    async loadStaticLovList() {
       let fullMasterList = await this.getStaticLovList();
       this.salesTypeList = fullMasterList.filter(x => x.objectName === "SalesType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.docStatusList = fullMasterList.filter(x => x.objectName === "SalesOrderStatus" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.orderLifeCycleMasterList = fullMasterList.filter(x => x.objectName === "OrderLifeCycle" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
    }
 
    async loadCustomer() {

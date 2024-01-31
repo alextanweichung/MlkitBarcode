@@ -112,6 +112,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       this.objectService.getSOHeader(salesOrderNums).subscribe(response => {
          if (response.status === 200) {
             let doc = response.body[0] as SalesOrderHeaderForWD;
+            console.log("🚀 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ doc:", doc)
             if (doc === undefined) {
                this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
                return;
@@ -126,9 +127,17 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                return;
             }
             this.seletcedDocs.unshift(doc);
-            if (this.seletcedDocs && this.seletcedDocs.length === 1) {
+            if (this.seletcedDocs && this.seletcedDocs.length > 0) {
                this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
                this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+               this.objectForm.patchValue({
+                  locationId: this.seletcedDocs[0].locationId,
+                  customerId: this.seletcedDocs[0].customerId,
+                  toLocationId: this.seletcedDocs[0].toLocationId
+               })
+               this.selectedLocationId = this.seletcedDocs[0].locationId;
+               this.selectedCustomerId = this.seletcedDocs[0].customerId;
+               this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
             }
             // this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
             this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
@@ -221,9 +230,18 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.objectForm.patchValue({ copyFrom: "S" });
                   // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.seletcedDocs.unshift(doc);
-                  if (this.seletcedDocs && this.seletcedDocs.length === 1) {
+                  if (this.seletcedDocs && this.seletcedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
                      this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+                     this.objectForm.patchValue({
+                        locationId: this.seletcedDocs[0].locationId,
+                        customerId: this.seletcedDocs[0].customerId,
+                        toLocationId: this.seletcedDocs[0].toLocationId,
+                        copyFrom: "S"
+                     })
+                     this.selectedLocationId = this.seletcedDocs[0].locationId;
+                     this.selectedCustomerId = this.seletcedDocs[0].customerId;
+                     this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
                   }
                   this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
                   this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
@@ -271,9 +289,18 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.objectForm.patchValue({ copyFrom: "B" });
                   // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
                   this.seletcedDocs.unshift(doc);
-                  if (this.seletcedDocs && this.seletcedDocs.length === 1) {
+                  if (this.seletcedDocs && this.seletcedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
                      this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+                     this.objectForm.patchValue({
+                        locationId: this.seletcedDocs[0].locationId,
+                        customerId: this.seletcedDocs[0].customerId,
+                        toLocationId: this.seletcedDocs[0].toLocationId,
+                        copyFrom: "B"
+                     })
+                     this.selectedLocationId = this.seletcedDocs[0].locationId;
+                     this.selectedCustomerId = this.seletcedDocs[0].customerId;
+                     this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
                   }
                   this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
                   this.objectService.multiPickingObject.outstandingPickList.forEach(r => {

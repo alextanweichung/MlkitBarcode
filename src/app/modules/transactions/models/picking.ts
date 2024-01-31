@@ -40,6 +40,7 @@ export interface MultiPickingHeader {
    toLocationId: number
    businessModelType: string
    isWithSo: boolean
+   copyFrom: string
    sourceType: string
    remark: any
    totalCarton: number

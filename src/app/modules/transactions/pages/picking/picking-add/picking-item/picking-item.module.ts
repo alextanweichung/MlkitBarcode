@@ -11,6 +11,7 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
    imports: [
@@ -21,7 +22,8 @@ import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id
       BarcodeScanInputPageModule,
       ItemAddListFlatPageModule,
       NgCircleProgressModule,
-      OfflineItemIdMappingModule
+      OfflineItemIdMappingModule,
+      SumModule
    ],
    declarations: [PickingItemPage]
 })

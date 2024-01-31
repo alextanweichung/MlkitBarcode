@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
+import { OrderLifeCycle } from 'src/app/modules/transactions/models/sales-order';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -25,6 +26,7 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
    objectId: number
    processType: string;
    selectedSegment: string;
+   salesOrderLifeCycleList: OrderLifeCycle[] = [];
 
    isShowDisabledLine: boolean = false;
 
@@ -65,6 +67,7 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
             let object = response;
             object.header = this.commonService.convertObjectAllDateType(object.header);
+            this.salesOrderLifeCycleList = object.orderCyle;
             this.loadWorkflow(object.header.backToBackOrderId);
             await this.objectService.setHeader(object.header);
             await this.objectService.setLine(object.details);
@@ -306,5 +309,17 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
 
    /* #endregion */
 
+   /* #region order life cycle */
+
+   lifeCycleModal: boolean = false;
+   showFullOrderLifeCycle() {
+      this.lifeCycleModal = true;
+   }
+
+   hideOrderLifeCycleModal() {
+      this.lifeCycleModal = false;
+   }
+
+   /* #endregion */
 
 }

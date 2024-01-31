@@ -8,6 +8,7 @@ import { RpCheckQohPageRoutingModule } from './rp-check-qoh-routing.module';
 
 import { RpCheckQohPage } from './rp-check-qoh.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
     FormsModule,
     IonicModule,
     RpCheckQohPageRoutingModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    BarcodeScanInputPageModule
   ],
   declarations: [RpCheckQohPage]
 })

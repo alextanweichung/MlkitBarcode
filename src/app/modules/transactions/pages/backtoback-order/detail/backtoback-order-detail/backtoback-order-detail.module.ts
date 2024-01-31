@@ -11,18 +11,20 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    BacktobackOrderDetailPageRoutingModule,
-    IdMappingModule,
-    SumModule,
-    OfflineItemIdMappingModule,
-    OfflineItemIdDescMappingModule
-  ],
-  declarations: [BacktobackOrderDetailPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      BacktobackOrderDetailPageRoutingModule,
+      IdMappingModule,
+      SumModule,
+      OfflineItemIdMappingModule,
+      OfflineItemIdDescMappingModule,
+      CodeMappingModule
+   ],
+   declarations: [BacktobackOrderDetailPage]
 })
-export class BacktobackOrderDetailPageModule {}
+export class BacktobackOrderDetailPageModule { }

@@ -34,7 +34,7 @@
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
                <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event, true)"></app-search-dropdown>
                <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
-               <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
+               <app-search-dropdown *ngIf="objectForm.controls.businessModelType.value !== 'T' && objectForm.controls.businessModelType.value !== null" title="Destination Location" optionLabel="description" [masterDropdownList]="selectedCustomerLocationList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
                <ion-item>
                   <ion-label class="font-bold" position="stacked">Remark</ion-label>
                   <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>

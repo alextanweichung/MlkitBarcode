@@ -9,6 +9,9 @@ import { InventoryLevelService } from '../../services/inventory-level.service';
 import { InventoryLevelRoot, InventoryLevelVariationRoot, ItemPriceBySegment } from '../../models/inventory-level';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 @Component({
    selector: 'app-inventory-level-retail',
@@ -24,6 +27,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
 
    itemCode: string = "";
    selectedViewOptions: string = "item";
+   selectedItem: TransactionDetail;
 
    object: InventoryLevelRoot;
    variationObject: InventoryLevelVariationRoot;
@@ -90,6 +94,9 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
       if (event) {
          this.itemCode = event.code;
          this.validateItemCode();
+      } else {
+         this.itemCode = null;
+         this.validateItemCode();
       }
    }
 
@@ -108,6 +115,12 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
                this.itemInfo = null;
                this.toastService.presentToast("", "Invalid Item Code", "top", "danger", 1000);
             }
+         } else {
+            this.itemCode = null;
+            this.itemInfo = null;
+            this.object = null;
+            this.variationObject = null;
+            this.prices = [];
          }
       } catch (e) {
          console.error(e);
@@ -347,5 +360,48 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
    hidePriceDialog() {
       this.priceModal = false;
    }
+
+   /* #region  barcode scanner */
+
+   scanActive: boolean = false;
+   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
+   onCameraStatusChanged(event) {
+      this.scanActive = event;
+      if (this.scanActive) {
+         document.body.style.background = "transparent";
+      }
+   }
+
+   async onDoneScanning(barcode: string) {
+      if (barcode) {
+         await this.barcodescaninput.validateBarcode(barcode);
+      }
+   }
+
+   stopScanner() {
+      BarcodeScanner.stopScan();
+      // this.scanActive = false;
+      this.onCameraStatusChanged(false);
+   }
+   
+   async onItemAdd(event: TransactionDetail[]) {
+      console.log("🚀 ~ InventoryLevelRetailPage ~ onItemAdd ~ event:", JSON.stringify(event))
+      if (event && event.length > 0) {
+         this.itemCode = event[0].itemCode;
+         this.selectedItem = event[0];
+         if (this.selectedItem.variationTypeCode === "1" || this.selectedItem.variationTypeCode === "2") {
+            this.selectedViewOptions = "variation";
+         }
+         await this.validateItemCode();
+         await this.barcodescaninput.setFocus();
+      } else {
+         this.itemCode = null;
+         this.selectedItem = null;
+         this.validateItemCode();
+         await this.barcodescaninput.setFocus();
+      }
+   }
+
+   /* #endregion */
 
 }

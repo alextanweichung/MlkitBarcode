@@ -13,19 +13,21 @@ import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-inpu
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    PackingItemPageRoutingModule,
-    BarcodeScanInputPageModule,
-    ItemAddListFlatPageModule,
-    NgCircleProgressModule,
-    SearchDropdownPageModule,
-    OfflineItemIdMappingModule
-  ],
-  declarations: [PackingItemPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      PackingItemPageRoutingModule,
+      BarcodeScanInputPageModule,
+      ItemAddListFlatPageModule,
+      NgCircleProgressModule,
+      SearchDropdownPageModule,
+      OfflineItemIdMappingModule,
+      SumModule
+   ],
+   declarations: [PackingItemPage]
 })
-export class PackingItemPageModule {}
+export class PackingItemPageModule { }

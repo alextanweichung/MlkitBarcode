@@ -493,14 +493,15 @@
                      <div>Code</div>
                   </ion-label>
                   <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedOtherAmt.amountCode" (ionChange)="onOtherAmtCodeChanged(selectedOtherAmt, $event)">
-                     <ion-select-option *ngFor="let s of otherAmtMasterList" [value]="s.code">{{s.code}}</ion-select-option>
+                     <ion-select-option *ngFor="let s of otherAmtMasterList" [value]="s.code">{{s.code}} - {{s.description}}</ion-select-option>
                   </ion-select>
                </ion-item>
                <ion-item>
                   <ion-label>
                      <div>Description</div>
                   </ion-label>
-                  <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedOtherAmt.amountCode|codeMapping:otherAmtMasterList}}" readonly></ion-input>
+                  <ion-textarea slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedOtherAmt.amountCode|codeMapping:otherAmtMasterList}}" placeholder="Select Other Amt." [autoGrow]="true" readonly="true"></ion-textarea>
+                  <!-- <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedOtherAmt.amountCode|codeMapping:otherAmtMasterList}}" readonly></ion-input> -->
                   <ion-icon name="information-circle-outline" (click)="showExtraInfoPopover($event)" *ngIf="showExtraInfo(selectedOtherAmt)"></ion-icon>
                </ion-item>
                <ion-item>

@@ -222,6 +222,15 @@
                      <div>{{objectService.objectHeader.createdBy}} {{objectService.objectHeader.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
                   </ion-col>
                </ion-row>
+               <ion-row (click)="showFullOrderLifeCycle()">
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Transaction Stage</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">{{objectService.objectHeader.orderLifeCycle|codeMapping:objectService.orderLifeCycleMasterList}}</div>
+                     <ion-icon style="position:relative; top:0.1rem" name="alert-circle-outline"></ion-icon>
+                  </ion-col>
+               </ion-row>
             </ion-grid>
          </ion-item>
       </ion-list>
@@ -544,8 +553,7 @@
       </ion-header>
       <ion-content>
          <div class="p-2">
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center"
-               *ngIf="approvalHistory && approvalHistory?.length === 0">
+            <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="approvalHistory && approvalHistory?.length === 0">
                <ion-label>Approval History Not Available.</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -581,6 +589,45 @@
                         </ion-col>
                         <ion-col class="ion-flex ion-margin-auto justify-content-end">
                            <div>{{h.reason}}</div>
+                        </ion-col>
+                     </ion-row>
+                  </ion-grid>
+               </ion-item>
+            </ion-list>
+         </div>
+      </ion-content>
+   </ng-template>
+</ion-modal>
+
+<ion-modal [isOpen]="lifeCycleModal" (didDismiss)="lifeCycleModal = false">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>Order Life Cycle</ion-title>
+            <ion-buttons slot="start">
+               <ion-button (click)="hideOrderLifeCycleModal()">Done</ion-button>
+            </ion-buttons>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content>
+         <div class="p-2">
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <ion-item class="ion-no-padding no-ripple" *ngFor="let rowData of salesOrderLifeCycleList">
+                  <ion-grid class="ion-no-padding py-2 pl-2">
+                     <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                           <div class="font-bold">Date</div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div>{{rowData.createdAt|date:'dd/MM/yyyy hh:mm:ss a'}}</div>
+                        </ion-col>
+                     </ion-row>
+                     <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                           <div class="font-bold">Event</div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <div>{{rowData.description}}</div>
                         </ion-col>
                      </ion-row>
                   </ion-grid>

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [hidden]="scanActive">
    <ion-toolbar>
       <ion-title>
          <div class="ion-text-wrap">
@@ -26,11 +26,17 @@
       </ion-content>
    </ng-template>
 </ion-popover>
-<ion-content fullscreen>
+<ion-content fullscreen [hidden]="scanActive">
    <div class="p-2">
+
+      <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [showVariationModalSelection]="false"></app-barcode-scan-input>
+      <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+         <ion-label>OR</ion-label>
+      </ion-list-header>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <app-search-dropdown title="Item" optionValue="code" [searchDropdownList]="itemSearchDropdownList" (onActionComplete)="onItemChanged($event)"></app-search-dropdown>
+         <app-search-dropdown title="Item" optionValue="code" [searchDropdownList]="itemSearchDropdownList" [selectedCode]="itemCode" (onActionComplete)="onItemChanged($event)"></app-search-dropdown>
       </ion-list>
+
       <ion-segment *ngIf="itemInfo && (itemInfo?.variationTypeCode === '1' || itemInfo?.variationTypeCode === '2')" [(ngModel)]="selectedViewOptions" (ionChange)="advancedFilter()">
          <ion-segment-button value="item">
             <ion-label>Item</ion-label>
@@ -114,8 +120,9 @@
                         {{row.itemVariationXDescription}}
                      </td>
                      <td class="p-1 font-half-size ion-text-right" *ngFor="let rowColumn of row.variationDetails">
-                        <div [ngClass]="{'color-danger': ((rowColumn.qty - rowColumn.openQty) < 0), 'color-warning': ((rowColumn.qty - rowColumn.openQty) == 0) }">
-                           {{(rowColumn.qty - rowColumn.openQty) | number: '1.0-0'}}</div>
+                        <div [ngClass]="{'color-danger': (rowColumn.qty < 0), 'color-warning': (rowColumn.qty == 0), 
+                        'background-yellow': (selectedItem && (selectedItem.variationTypeCode === '1' && row.itemVariationXId === selectedItem.itemVariationXId && rowColumn.itemVariationYId === null) || (selectedItem.variationTypeCode === '2' && row.itemVariationXId === selectedItem.itemVariationXId && rowColumn.itemVariationYId === selectedItem.itemVariationYId)) }">
+                           {{rowColumn.qty | number: '1.0-0'}}</div>
                      </td>
                   </tr>
                </table>
@@ -136,7 +143,7 @@
       </ion-header>
       <ion-content>
          <div class="p-2">
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="prices.length === 0">
+            <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="prices && prices.length === 0">
                <ion-label>Price Not Available.</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -192,3 +199,10 @@
       </ion-content>
    </ng-template>
 </ion-modal>
+
+<ion-row class="scanner-buttons" [hidden]="!scanActive">
+  <ion-col class="ion-no-padding">
+    <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
+  </ion-col>
+</ion-row>
+<div class="scan-box" [hidden]="!scanActive"></div>

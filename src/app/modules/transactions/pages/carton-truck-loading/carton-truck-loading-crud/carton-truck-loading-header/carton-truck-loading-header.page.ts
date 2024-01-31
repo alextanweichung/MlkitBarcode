@@ -10,6 +10,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -47,8 +48,9 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
       }
    }
 
-   ionViewDidEnter(): void {
-
+   @ViewChild("tasdd", { static: false }) tasdd: SearchDropdownPage;
+   ionViewDidEnter(): void {      
+      this.tasdd.setScanInputFocus();
    }
 
    ngOnInit() {
@@ -425,6 +427,7 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
             header: this.objectService.objectHeader,
             details: this.objectService.objectDetail
          }
+         console.log("🚀 ~ CartonTruckLoadingHeaderPage ~ insertObject ~ trxDto:", trxDto)
          if (trxDto.details.length !== this.objectService.objectTA?.details.length) {
             this.toastService.presentToast("Insert Failed", "Carton Truck Loading Line doesn't not match with Truck Arrangement Line", "top", "warning", 1000);
             return;
@@ -544,6 +547,66 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
       } catch (e) {
          console.error(e);
       }
+   }
+
+   refreshTruckArrangment() {
+      if (this.objectForm.controls.truckArrangementId.value) {
+         this.onTruckArrangementRefreshed(this.objectForm.controls.truckArrangementId.value);
+      } else {
+         this.toastService.presentToast("", "Please select Truck Arrangement", "top", "warning", 1000);
+      }
+   }
+
+   onTruckArrangementRefreshed(traId: number) {
+      this.objectService.getPendingObjectById(traId).subscribe({
+         next: (response) => {
+            let refreshed = response
+            if (refreshed) {
+               let selectedPendingObject = refreshed;
+               this.objectService.setTA(selectedPendingObject);
+               this.objectForm.patchValue({
+                  vehicleId: refreshed?.header?.vehicleId,
+                  driverId: refreshed?.header?.driverId,
+                  transportAgentId1: refreshed?.header?.transportAgentId1,
+                  transportAgentId2: refreshed?.header?.transportAgentId2,
+                  truckArrangementId: refreshed?.header?.truckArrangementId,
+                  truckArrangementNum: refreshed?.header?.truckArrangementNum
+               })
+               this.checkAndRefreshTALine(refreshed);
+               this.toastService.presentToast("", "Track Arrangment refrehsed", "top", "success", 1000);
+            }
+         }
+      })
+   }
+
+   async checkAndRefreshTALine(refreshed: TruckArrangementRootForCTL) {
+      this.objectService.objectTA.cartonBarcode = JSON.parse(JSON.stringify(refreshed.cartonBarcode)); // replace carton barcode
+      this.objectService.objectDetail = this.objectService.objectDetail.filter(r => refreshed.details.flatMap(rr => rr.trxNum).includes(r.trxNum));
+      let newlyAddedLine = refreshed.details.filter(r => !this.objectService.objectDetail.flatMap(rr => rr.trxNum).includes(r.trxNum));      
+      let objectDetail = [];
+      for await (const r of newlyAddedLine) {
+         let data: CartonTruckLoadingDetail = {
+            cartonInfo: r.cartonInfo,
+            cartonBarcode: [],
+            typeCode: r.typeCode,
+            trxId: r.trxId,
+            trxNum: r.trxNum,
+            trxType: r.trxType,
+            customerName: r.customerName,
+            totalCarton: r.totalCarton,
+            qty: r.qty,
+            remark: r.remark,
+            transportId: r.transportId,
+            cartonTruckLoadingLineId: 0,
+            cartonTruckLoadingId: this.objectForm.controls.cartonTruckLoadingId.value,
+            truckArrangementLineId: r.truckArrangementLineId,
+            sequence: (this.objectService.objectDetail.length??0) + (objectDetail.length ?? 0)
+         };
+         objectDetail.push(data);
+      }
+      this.objectService.objectDetail = [...this.objectService.objectDetail, ...objectDetail]
+      
+      // this.selectedTruckArrangement = this.selectedTruckArrangement.details.filter(r => refreshed.details.flatMap(rr => rr.trxId).includes(r.trxId) && refreshed.details.flatMap(rr => rr.trxType))
    }
 
 }

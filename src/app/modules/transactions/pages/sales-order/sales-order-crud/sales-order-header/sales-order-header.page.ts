@@ -9,6 +9,7 @@ import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-sales-order-header',
@@ -95,7 +96,8 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
             totalCarton: [null],
             isAutoPromotion: [true],
             shipName: [null],
-            priceSegmentCode: [null]
+            priceSegmentCode: [null],
+            uuid: [uuidv4()]
          });
          this.setDefaultValue();
       } catch (e) {

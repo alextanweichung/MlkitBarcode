@@ -803,7 +803,9 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                cssClass: "success",
                handler: async (data) => {
                   item.qtyPicked = Number(data.inputQty);
-                  this.updatePickingQty(item);
+                  if (this.objectService.header.isWithSo) {
+                     this.updatePickingQty(item);
+                  }
                },
             },
             {

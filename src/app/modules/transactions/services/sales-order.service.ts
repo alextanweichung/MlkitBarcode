@@ -62,8 +62,13 @@ export class SalesOrderService {
    currencyMasterList: MasterListDetails[] = [];
    salesAgentMasterList: MasterListDetails[] = [];
    uomMasterList: MasterListDetails[] = [];
-   otherAmtMasterList: MasterListDetails[] =[];
+   otherAmtMasterList: MasterListDetails[] = [];
    remarkMasterList: MasterListDetails[] = [];
+
+   salesTypeList: MasterListDetails[] = [];
+   docStatusList: MasterListDetails[] = [];
+   orderLifeCycleMasterList: MasterListDetails[] = [];
+   itemGroupingTypeMasterList: MasterListDetails[] = [];
 
    customers: Customer[] = [];
 
@@ -86,6 +91,7 @@ export class SalesOrderService {
          await this.loadingService.showLoading();
          await this.loadCustomer();
          await this.loadMasterList();
+         await this.loadStaticLovList();
          await this.loadModuleControl();
          await this.loadPromotion();
          await this.loadingService.dismissLoading();
@@ -121,6 +127,14 @@ export class SalesOrderService {
          }
       })
       await this.bindSalesAgentList();
+   }
+
+   async loadStaticLovList() {
+      let response = await this.getStaticLovList();
+      this.salesTypeList = response.filter(x => x.objectName === "SalesType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.docStatusList = response.filter(x => x.objectName === "SalesOrderStatus" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.orderLifeCycleMasterList = response.filter(x => x.objectName === "OrderLifeCycle" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemGroupingTypeMasterList = response.filter(x => x.objectName === "ItemGroupingType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
    }
 
    async loadCustomer() {
@@ -223,7 +237,7 @@ export class SalesOrderService {
             }
 
             let moqCtrl = this.moduleControl.find(x => x.ctrlName === "OrderingActivateMOQControl");
-            if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() == 'Y') {
+            if (moqCtrl && moqCtrl.ctrlValue.toUpperCase() === 'Y') {
                this.orderingActivateMOQControl = true;
             } else {
                this.orderingActivateMOQControl = false;
@@ -253,7 +267,7 @@ export class SalesOrderService {
                if (this.precisionSales.foreignMin === null) this.precisionSales.foreignMin = 2;
                if (this.precisionSales.foreignMax === null) this.precisionSales.foreignMax = 2;
                if (this.precisionSales.foreignFormat === null) this.precisionSales.foreignFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
-   
+
                this.precisionSalesUnitPrice = precision.find(x => x.precisionCode === "SALESUNITPRICE");
                if (this.precisionSalesUnitPrice.localMin === null) this.precisionSalesUnitPrice.localMin = 2;
                if (this.precisionSalesUnitPrice.localMax === null) this.precisionSalesUnitPrice.localMax = 2;
@@ -261,7 +275,7 @@ export class SalesOrderService {
                if (this.precisionSalesUnitPrice.foreignMin === null) this.precisionSalesUnitPrice.foreignMin = 2;
                if (this.precisionSalesUnitPrice.foreignMax === null) this.precisionSalesUnitPrice.foreignMax = 2;
                if (this.precisionSalesUnitPrice.foreignFormat === null) this.precisionSalesUnitPrice.foreignFormat = `1.${this.precisionSalesUnitPrice.localMin}-${this.precisionSalesUnitPrice.localMax}`;
-   
+
                this.precisionTax = precision.find(x => x.precisionCode === "TAX");
                if (this.precisionTax.localMin === null) this.precisionTax.localMin = 2;
                if (this.precisionTax.localMax === null) this.precisionTax.localMax = 2;
@@ -353,7 +367,7 @@ export class SalesOrderService {
    }
 
    getStaticLovList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/staticLov", { context: background_load() });
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/staticLov", { context: background_load() }).toPromise();
    }
 
    getCustomerList() {

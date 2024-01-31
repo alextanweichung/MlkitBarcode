@@ -81,11 +81,11 @@ export class SearchDropdownPage implements OnInit, OnChanges {
    }
 
    ngOnInit() {
-      if (!this.inputReadOnly) {
-         setTimeout(() => {
-            this.scanInput.nativeElement.focus();            
-         }, 10);
-      }
+      // if (!this.inputReadOnly) {
+      //    setTimeout(() => {
+      //       this.scanInput.nativeElement.focus();
+      //    }, 10);
+      // }
    }
 
    manuallyTrigger() {
@@ -97,6 +97,14 @@ export class SearchDropdownPage implements OnInit, OnChanges {
       if (this.optionValue === "code") {
          if (this.selectedCode !== null) {
             this.selected = this.searchDropdownList?.find(r => r.code === this.selectedCode);
+         }
+      }
+   }
+
+   setScanInputFocus() {
+      if (!this.inputReadOnly) {
+         if (this.scanInput && this.scanInput.nativeElement) {
+            this.scanInput.nativeElement.focus();
          }
       }
    }

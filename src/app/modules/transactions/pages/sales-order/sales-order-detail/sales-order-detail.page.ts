@@ -5,7 +5,7 @@ import { SalesOrderService } from 'src/app/modules/transactions/services/sales-o
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
-import { OtherAmount, SalesOrderRoot } from '../../../models/sales-order';
+import { OrderLifeCycle, OtherAmount, SalesOrderRoot } from '../../../models/sales-order';
 import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
@@ -33,6 +33,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
    workflowDone: boolean = false;
    otherAmount: OtherAmount[] = [];
    approvalHistory: ApprovalHistory[] = [];
+   salesOrderLifeCycleList: OrderLifeCycle[] = [];
 
    isDraft: boolean = false;
    draftTransactionId: number;
@@ -92,6 +93,7 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
             this.workflowDone = object.isWorkFlowDone;
             this.otherAmount = object.otherAmount;
             this.approvalHistory = object.approvalHistory;
+            this.salesOrderLifeCycleList = object.orderCyle;
             await this.loadWorkflow(object.header.salesOrderId);
             await this.objectService.setHeader(object.header);
             await this.objectService.setLine(object.details);
@@ -562,5 +564,18 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
    previousStep() {
       this.objectService.resetVariables();
    }
+
+   /* #region order life cycle */
+
+   lifeCycleModal: boolean = false;
+   showFullOrderLifeCycle() {
+      this.lifeCycleModal = true;
+   }
+
+   hideOrderLifeCycleModal() {
+      this.lifeCycleModal = false;
+   }
+
+   /* #endregion */
 
 }

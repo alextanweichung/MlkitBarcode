@@ -11,18 +11,20 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    SalesOrderDetailPageRoutingModule,
-    SumModule,
-    IdMappingModule,
-    OfflineItemIdMappingModule,
-    OfflineItemIdDescMappingModule
-  ],
-  declarations: [SalesOrderDetailPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      SalesOrderDetailPageRoutingModule,
+      SumModule,
+      IdMappingModule,
+      OfflineItemIdMappingModule,
+      OfflineItemIdDescMappingModule,
+      CodeMappingModule
+   ],
+   declarations: [SalesOrderDetailPage]
 })
-export class SalesOrderDetailPageModule {}
+export class SalesOrderDetailPageModule { }
