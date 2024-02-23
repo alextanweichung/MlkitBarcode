@@ -113,7 +113,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             this.mobilePickPackAutoFocusQtyUponScan = false;
          }
          let multiPackActivateAllLineScanning = this.moduleControl.find(x => x.ctrlName === "MultiPackActivateAllLineScanning")
-         console.log("🚀 ~ PackingItemPage ~ loadModuleControl ~ multiPackActivateAllLineScanning:", JSON.stringify(multiPackActivateAllLineScanning));
          if (multiPackActivateAllLineScanning && multiPackActivateAllLineScanning.ctrlValue.toUpperCase() === "Y") {
             this.configMultiPackActivateAllLineScanning = true;
          } else {
@@ -1113,7 +1112,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    validateNewItemConversion(itemList: TransactionDetail) {
       if (itemList.newItemId && itemList.newItemEffectiveDate && this.commonService.convertUtcDate(itemList.newItemEffectiveDate) <= this.objectService.header.trxDate) {
          let newItemCode = this.configService.item_Masters.find(r => r.id === itemList.newItemId);
-         console.log("🚀 ~ PackingItemPage ~ validateNewItemConversion ~ newItemCode:", newItemCode)
          if (newItemCode) {
             this.toastService.presentToast("Converted Code Detected", `Item ${itemList.itemCode} has been converted to ${newItemCode.code} effective from ${format(itemList.newItemEffectiveDate, "dd/MM/yyyy")}`, "top", "warning", 1000);
             if (this.systemWideBlockConvertedCode) {

@@ -33,6 +33,12 @@ export interface Dashboard {
   exchangeApprovalCount: TransactionProcessingCount
   recallDepositApprovalCount: TransactionProcessingCount
 
+  inventoryProcessingReviewCount: TransactionProcessingCount
+  inventoryProcessingApprovalCount: TransactionProcessingCount
+
+  inventoryAdjustmentReqReviewCount: TransactionProcessingCount
+  inventoryAdjustmentReqApprovalCount: TransactionProcessingCount
+
   quotationList: QuotationList[]
   salesOrderList: SalesOrderList[]
 }

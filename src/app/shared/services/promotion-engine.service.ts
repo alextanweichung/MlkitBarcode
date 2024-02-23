@@ -152,7 +152,7 @@ export class PromotionEngineService {
                   actualBillLine.eligiblePromoId = event.promoEventId;
                }
             })
-         }    
+         }
          //Continue with remaining promotion calculation only when scanned item is in itemList, & passing the eligible amount checking
          if ((affectedSalesBillLine.length > 0 && eligibleAmtCheck) || (eventItemType != "S" && itemRuleTypeCheck == "Q" && eligibleAmtCheck)) {
             //Check promoRuleType is Quantity or Amount: For Quantity, start 2nd loop. For Amount, no need loop.
@@ -217,6 +217,7 @@ export class PromotionEngineService {
                                  }
                               }
                            }
+                           break;
                         //Bundle By Multi Tiers
                         case '02':
                            // if(debugFlag){
@@ -321,6 +322,149 @@ export class PromotionEngineService {
                            //     })                  
                            //   }
                            // }
+                           break;
+                        //Bulk Discount (Mixed Item)
+                        case '03':
+                           if (debugFlag) {
+                              console.log("[Special Promo Event]: Bulk Discount (Mixed Item)");
+                           }
+                           let specialEventLineImpactArrayMixed: PromotionLine[] = event.line.filter(x => x.impactCode != "L00");
+                           //Sorting of promotion line impact by rowSequence (Desc)
+                           specialEventLineImpactArrayMixed.sort((a, b) => (a.rowSequence < b.rowSequence ? 1 : -1));
+                           let itemQtySum = affectedSalesBillLine.reduce((sum, current) => sum + current.qtyRequest, 0);
+                           //Browse through affected sales item list, check if the total qty sum match with promo event qty by sequence    
+                           for (let bulkLineImpact of specialEventLineImpactArrayMixed) {
+                              let impactQty = bulkLineImpact.rowSequence;
+                              let impactType = bulkLineImpact.impactCode;
+                              let impactValue = bulkLineImpact.impactDiscExpr;
+                              if (itemQtySum >= impactQty) {
+                                 if (debugFlag) {
+                                    console.log("Total qty for affected item match with the promo event qty " + impactQty + ". Continue to apply discount.");
+                                 }
+                                 affectedSalesBillLine.forEach(line => {
+                                    let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
+                                    switch (impactType) {
+                                       //Set Total Disc Amount
+                                       case "L03":
+                                          impactedLine = this.replacePromoDiscAmt(impactedLine, this.commonService.roundToPrecision(impactValue * line.qtyRequest, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                          break;
+                                       //Set Total Disc%
+                                       case "L04":
+                                          impactedLine = this.replacePromoDiscPct(impactedLine, impactValue, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                          break;
+                                       //Add Total Disc Amount
+                                       case "L07":
+                                          impactedLine = this.addPromoDiscAmt(impactedLine, this.commonService.roundToPrecision(impactValue * line.qtyRequest, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                          break;
+                                       //Add Total Disc%
+                                       case "L08":
+                                          impactedLine = this.addPromoDiscPct(impactedLine, impactValue, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                          break;
+                                    }
+                                 });
+                                 break;
+                              }
+                           }
+                           break;
+                        //Exact Carton Qty Discount
+                        case '04':
+                           if (debugFlag) {
+                              console.log("[Special Promo Event]: Exact Carton Qty Discount");
+                           }
+                           let specialEventLineImpactArrayCarton: PromotionLine[] = event.line.filter(x => x.impactCode != "L00");
+                           //Sorting of promotion line impact by rowSequence (Desc)
+                           specialEventLineImpactArrayCarton.sort((a, b) => (a.rowSequence < b.rowSequence ? 1 : -1));
+                           //Browse through sales item list, for the first occurance check whether there is any matching quantity      
+                           for (let bulkIndex = 0; bulkIndex <= affectedSalesBillLine.length - 1; bulkIndex++) {
+                              if (bulkIndex > 0) {
+                                 let previousDataSubset = affectedSalesBillLine.filter((x, index) => index < bulkIndex);
+                                 let findOccurance = previousDataSubset.find(x => x.itemId == affectedSalesBillLine[bulkIndex].itemId);
+                                 if (findOccurance) {
+                                    if (debugFlag) {
+                                       console.log("Occurance found for item " + affectedSalesBillLine[bulkIndex].itemCode + ". Continue to next item.");
+                                    }
+                                    continue;
+                                 }
+                              }
+                              let itemQtySum = affectedSalesBillLine.filter(x => x.itemId == affectedSalesBillLine[bulkIndex].itemId).reduce((sum, current) => sum + current.qtyRequest, 0);
+                              for (let bulkLineImpact of specialEventLineImpactArrayCarton) {
+                                 let impactQty = bulkLineImpact.rowSequence;
+                                 let impactType = bulkLineImpact.impactCode;
+                                 let impactValue = bulkLineImpact.impactDiscExpr;
+                                 let modRemainder: number = itemQtySum % impactQty;
+                                 if (modRemainder == 0 && itemQtySum >= impactQty) {
+                                    if (debugFlag) {
+                                       console.log("Total qty for item " + affectedSalesBillLine[bulkIndex].itemCode + " match with the promo event qty " + impactQty + ". Continue to apply discount.");
+                                    }
+                                    let toImpactLines = affectedSalesBillLine.filter(x => x.itemId == affectedSalesBillLine[bulkIndex].itemId);
+                                    toImpactLines.forEach(line => {
+                                       let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
+                                       switch (impactType) {
+                                          //Set Total Disc Amount
+                                          case "L03":
+                                             impactedLine = this.replacePromoDiscAmt(impactedLine, this.commonService.roundToPrecision(impactValue * line.qtyRequest, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                             break;
+                                          //Set Total Disc%
+                                          case "L04":
+                                             impactedLine = this.replacePromoDiscPct(impactedLine, impactValue, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                             break;
+                                          //Add Total Disc Amount
+                                          case "L07":
+                                             impactedLine = this.addPromoDiscAmt(impactedLine, this.commonService.roundToPrecision(impactValue * line.qtyRequest, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                             break;
+                                          //Add Total Disc%
+                                          case "L08":
+                                             impactedLine = this.addPromoDiscPct(impactedLine, impactValue, event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                                             break;
+                                       }
+                                    });
+                                    break;
+                                 } else if (itemQtySum >= impactQty) {
+                                    if (debugFlag) {
+                                       console.log("Total qty for item " + affectedSalesBillLine[bulkIndex].itemCode + " exceeded the promo event qty " + impactQty + ". Continue to apply discount.");
+                                    }
+                                    let numberOfEntitlement: number = (itemQtySum - modRemainder) / impactQty;
+                                    let totalEntitlementQty: number = numberOfEntitlement * impactQty;
+                                    let remainingQty: number = totalEntitlementQty;
+                                    let toImpactLines = affectedSalesBillLine.filter(x => x.itemId == affectedSalesBillLine[bulkIndex].itemId);
+                                    for (let line of toImpactLines) {
+                                       if (remainingQty == 0) {
+                                          break;
+                                       }
+                                       let impactedLine: TransactionDetail = salesBillLine.find(originalLine => originalLine.uuid == line.uuid);
+                                       let impactQty: number;
+                                       if (line.qtyRequest <= remainingQty) {
+                                          impactQty = line.qtyRequest;
+                                          remainingQty -= line.qtyRequest;
+                                       } else if (line.qtyRequest > remainingQty) {
+                                          impactQty = remainingQty;
+                                          remainingQty = 0;
+                                       } else {
+                                          break;
+                                       }
+                                       switch (impactType) {
+                                          //Set Total Disc Amount
+                                          case "L03":
+                                             impactedLine = this.replacePromoDiscAmt(impactedLine, this.commonService.roundToPrecision(impactValue * impactQty, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, impactQty);
+                                             break;
+                                          //Set Total Disc%
+                                          case "L04":
+                                             impactedLine = this.replacePromoDiscAmt(impactedLine, this.commonService.roundToPrecision(line.unitPrice * impactQty * impactValue / 100, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, impactQty);
+                                             break;
+                                          //Add Total Disc Amount
+                                          case "L07":
+                                             impactedLine = this.addPromoDiscAmt(impactedLine, this.commonService.roundToPrecision(impactValue * impactQty, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, impactQty);
+                                             break;
+                                          //Add Total Disc%
+                                          case "L08":
+                                             impactedLine = this.addPromoDiscAmt(impactedLine, this.commonService.roundToPrecision(line.discountedUnitPrice * impactQty * impactValue / 100, roundingPrecision), event, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, impactQty);
+                                             break;
+                                       }
+                                    }
+                                    break;
+                                 }
+                              }
+                           }
                            break;
                      }
                      break;

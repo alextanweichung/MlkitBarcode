@@ -78,7 +78,6 @@ export class PurchaseOrderDetailPage implements OnInit {
    loadMasterList() {
       try {
          this.objectService.getMasterList().subscribe(response => {
-            console.log("🚀 ~ PurchaseOrderDetailPage ~ this.objectService.getMasterList ~ response:", response)
             this.locationMasterList = response.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
             this.vendorMasterList = response.filter(x => x.objectName == "Vendor").flatMap(src => src.details).filter(y => y.deactivated == 0);
             this.itemVariationXMasterList = response.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);

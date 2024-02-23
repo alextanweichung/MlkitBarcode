@@ -34,11 +34,15 @@ export class ManagementPage implements OnInit {
   showNonTradePurchaseOrderApproval: boolean = false;
   showSalesOrderPricingApproval: boolean = false;
   showBackToBackOrderPricingApproval: boolean = false;
+  showBranchReceivingApproval: boolean = false;
+  showBranchReceivingReview: boolean = false;
   showRefundApproval: boolean = false;
   showExchangeApproval: boolean = false;
   showRecallDepositApproval: boolean = false;
-  showBranchReceivingApproval: boolean = false;
-  showBranchReceivingReview: boolean = false;
+  showInventoryProcessingReview: boolean = false;
+  showInventoryProcessingApproval: boolean = false;
+  showInventoryAdjReqReview: boolean = false;
+  showInventoryAdjReqApproval: boolean = false;
   showOtpConfig: boolean = false;
 
   constructor(
@@ -74,6 +78,12 @@ export class ManagementPage implements OnInit {
           this.showRefundApproval = pageItems.findIndex(r => r.title === approvalAppCode.refundAP) > -1;
           this.showExchangeApproval = pageItems.findIndex(r => r.title === approvalAppCode.exchangeAP) > -1;
           this.showRecallDepositApproval = pageItems.findIndex(r => r.title === approvalAppCode.recallDepositAP) > -1;
+
+          this.showInventoryProcessingReview = pageItems.findIndex(r => r.title === approvalAppCode.inventoryProcessingRV) > -1;
+          this.showInventoryProcessingApproval = pageItems.findIndex(r => r.title === approvalAppCode.inventoryProcessingAP) > -1;
+
+          this.showInventoryAdjReqReview = pageItems.findIndex(r => r.title === approvalAppCode.inventoryAdjReqRV) > -1;
+          this.showInventoryAdjReqApproval = pageItems.findIndex(r => r.title === approvalAppCode.inventoryAdjReqAP) > -1;
           
           this.showOtpConfig = pageItems.findIndex(r => r.title === approvalAppCode.otpConfig) > -1;
         }

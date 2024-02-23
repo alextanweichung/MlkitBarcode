@@ -51,11 +51,15 @@ export const approvalAppCode = {
    nonTradePRAP: "MANTPRAP",
    nonTradePORV: "MANTPORV",
    nonTradePOAP: "MANTPOAP",
+   branchReceivingRV: "MABRRV",
+   branchReceivingAP: "MABRAP",
    refundAP: "MAMRAP",
    exchangeAP: "MAMERP",
    recallDepositAP: "MAMRDAP",
-   branchReceivingRV: "MABRRV",
-   branchReceivingAP: "MABRAP",
+   inventoryProcessingRV: "MAIPRV",
+   inventoryProcessingAP: "MAIPAP",
+   inventoryAdjReqRV: "MAIARRV",
+   inventoryAdjReqAP: "MAIARAP",
    otpConfig: "MAMAOTP",
 }
 

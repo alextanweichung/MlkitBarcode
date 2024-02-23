@@ -112,7 +112,6 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       this.objectService.getSOHeader(salesOrderNums).subscribe(response => {
          if (response.status === 200) {
             let doc = response.body[0] as SalesOrderHeaderForWD;
-            console.log("🚀 ~ PickingHeaderPage ~ this.objectService.getSOHeader ~ doc:", doc)
             if (doc === undefined) {
                this.toastService.presentToast("", "Sales Order not found.", "top", "warning", 1000);
                return;

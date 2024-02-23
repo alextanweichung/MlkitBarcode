@@ -116,6 +116,16 @@ const routes: Routes = [
       path: 'managements/b2bopricing-approvals',
       loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then(m => m.B2bopricingApprovalsPageModule)
    },
+   //management-branch-receiving
+   {
+      path: 'managements/branch-receiving-reviews',
+      loadChildren: () => import('./modules/managements/pages/branch-receiving-reviews/branch-receiving-reviews.module').then(m => m.BranchReceivingReviewsPageModule)
+   },
+   {
+      path: 'managements/branch-receiving-approvals',
+      loadChildren: () => import('./modules/managements/pages/branch-receiving-approvals/branch-receiving-approvals.module').then(m => m.BranchReceivingApprovalsPageModule)
+   },
+   // refund, exchange, recall depo
    {
       path: 'managements/refund-approvals',
       loadChildren: () => import('./modules/managements/pages/refund-approvals/refund-approvals.module').then(m => m.RefundApprovalsPageModule)
@@ -128,14 +138,23 @@ const routes: Routes = [
       path: 'managements/recall-deposit-approvals',
       loadChildren: () => import('./modules/managements/pages/recall-deposit-approvals/recall-deposit-approvals.module').then(m => m.RecallDepositApprovalsPageModule)
    },
-   //management-branch-receiving
+   // management-inventory-processing
    {
-      path: 'managements/branch-receiving-reviews',
-      loadChildren: () => import('./modules/managements/pages/branch-receiving-reviews/branch-receiving-reviews.module').then(m => m.BranchReceivingReviewsPageModule)
+      path: 'managements/inventory-processing-reviews',
+      loadChildren: () => import('./modules/managements/pages/inventory-processing-reviews/inventory-processing-reviews.module').then(m => m.InventoryProcessingReviewsPageModule)
    },
    {
-      path: 'managements/branch-receiving-approvals',
-      loadChildren: () => import('./modules/managements/pages/branch-receiving-approvals/branch-receiving-approvals.module').then(m => m.BranchReceivingApprovalsPageModule)
+      path: 'managements/inventory-processing-approvals',
+      loadChildren: () => import('./modules/managements/pages/inventory-processing-approvals/inventory-processing-approvals.module').then(m => m.InventoryProcessingApprovalsPageModule)
+   },
+   // management-inventory-adj-req
+   {
+      path: 'managements/inventory-adj-req-reviews',
+      loadChildren: () => import('./modules/managements/pages/inventory-adj-req-reviews/inventory-adj-req-reviews.module').then(m => m.InventoryAdjReqReviewsPageModule)
+   },
+   {
+      path: 'managements/inventory-adj-req-approvals',
+      loadChildren: () => import('./modules/managements/pages/inventory-adj-req-approvals/inventory-adj-req-approvals.module').then(m => m.InventoryAdjReqApprovalsPageModule)
    },
    // management-otp-configuration
    {
@@ -319,7 +338,7 @@ const routes: Routes = [
       path: 'transactions/bin-count',
       loadChildren: () => import('./modules/transactions/pages/bin-count/bin-count.module').then(m => m.BinCountPageModule)
    },
-   //transactions-do-acknowledgement
+   // transactions-do-acknowledgement
    {
       path: 'transactions/do-acknowledgement',
       loadChildren: () => import('./modules/transactions/pages/do-acknowledgement/do-acknowledgement.module').then(m => m.DoAcknowledgementPageModule)
@@ -327,6 +346,16 @@ const routes: Routes = [
    {
       path: 'transactions/carton-truck-loading',
       loadChildren: () => import('./modules/transactions/pages/carton-truck-loading/carton-truck-loading.module').then(m => m.CartonTruckLoadingPageModule)
+   },
+   // transactions-inventory-count-processing-detail
+   {
+      path: 'transactions/inventory-count-processing/inventory-count-processing-detail',
+      loadChildren: () => import('./modules/transactions/pages/inventory-count-processing/inventory-count-processing-detail/inventory-count-processing-detail.module').then(m => m.InventoryCountProcessingDetailPageModule)
+   },
+   // transactions-inventory-adj-req-detail
+   {
+      path: 'transactions/inventory-adj-req/inventory-adj-req-detail',
+      loadChildren: () => import('./modules/transactions/pages/inventory-adj-req/inventory-adj-req-detail/inventory-adj-req-detail.module').then(m => m.InventoryAdjReqDetailPageModule)
    },
 
 
@@ -347,10 +376,9 @@ const routes: Routes = [
       loadChildren: () => import('./modules/reports/pages/reports/rp-so-listing/rp-so-listing.module').then(m => m.RpSoListingPageModule)
    },
    {
-     path: 'reports/rp-bo-listing',
-     loadChildren: () => import('./modules/report/pages/reports/rp-bo-listing/rp-bo-listing.module').then( m => m.RpBoListingPageModule)
+      path: 'reports/rp-bo-listing',
+      loadChildren: () => import('./modules/report/pages/reports/rp-bo-listing/rp-bo-listing.module').then(m => m.RpBoListingPageModule)
    },
- 
    {
       path: 'reports/rp-sales-customer',
       loadChildren: () => import('./modules/reports/pages/reports/rp-sales-customer/rp-sales-customer.module').then(m => m.RpSalesCustomerPageModule)
@@ -457,6 +485,8 @@ const routes: Routes = [
       path: 'sales-cart',
       loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
    },
+
+
 
 ];
 @NgModule({

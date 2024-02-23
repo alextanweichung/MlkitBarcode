@@ -31,10 +31,10 @@
               <span class="ion-text-wrap badge-green px-1"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="object.country || object.currency">
             <ion-col class="ion-flex ion-margin-auto">
-              <span class="ion-text-wrap badge-purple px-1 mx-1"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
-              <span class="ion-text-wrap badge-purple px-1"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
+              <span class="ion-text-wrap badge-purple px-1 mx-1" *ngIf="object.country"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
+              <span class="ion-text-wrap badge-purple px-1" *ngIf="object.currency"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -70,10 +70,10 @@
               <span class="ion-text-wrap badge-green px-1"><ion-icon name="person-outline"></ion-icon> {{object.counterPart}}</span>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="object.country || object.currency">
             <ion-col class="ion-flex ion-margin-auto">
-              <span class="ion-text-wrap badge-purple px-1 mx-1"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
-              <span class="ion-text-wrap badge-purple px-1"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
+              <span class="ion-text-wrap badge-purple px-1 mx-1" *ngIf="object.country"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
+              <span class="ion-text-wrap badge-purple px-1" *ngIf="object.currency"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
             </ion-col>
           </ion-row>
         </ion-grid>

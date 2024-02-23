@@ -53,6 +53,12 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
    showExchangeApproval: boolean = false;
    showRecallDepositApproval: boolean = false;
 
+   showInventoryProcessingReview: boolean = false;
+   showInventoryProcessingApproval: boolean = false;
+
+   showInventoryAdjReqReview: boolean = false;
+   showInventoryAdjReqApproval: boolean = false;
+
    showQuotation: boolean = false;
    showSalesOrder: boolean = false;
 
@@ -125,6 +131,12 @@ export class DashboardPage implements OnInit, ViewWillEnter, ViewDidEnter {
                this.showRefundApproval = mPageItems.findIndex(r => r.title === approvalAppCode.refundAP) > -1;
                this.showExchangeApproval = mPageItems.findIndex(r => r.title === approvalAppCode.exchangeAP) > -1;
                this.showRecallDepositApproval = mPageItems.findIndex(r => r.title === approvalAppCode.recallDepositAP) > -1;
+
+               this.showInventoryProcessingReview = mPageItems.findIndex(r => r.title === approvalAppCode.inventoryProcessingRV) > -1;
+               this.showInventoryProcessingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.inventoryProcessingAP) > -1;
+
+               this.showInventoryAdjReqReview = mPageItems.findIndex(r => r.title === approvalAppCode.inventoryAdjReqRV) > -1;
+               this.showInventoryAdjReqApproval = mPageItems.findIndex(r => r.title === approvalAppCode.inventoryAdjReqAP) > -1;
 
                this.showSalesOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.salesOrderPricingAP) > -1;
                this.showBackToBackOrderPricingApproval = mPageItems.findIndex(r => r.title === approvalAppCode.b2bOrderPricingAP) > -1;

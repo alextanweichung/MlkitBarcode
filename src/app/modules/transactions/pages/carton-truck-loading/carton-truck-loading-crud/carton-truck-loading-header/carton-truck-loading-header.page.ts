@@ -147,7 +147,6 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
                      this.objectService.setHeader(this.objectForm.value);
                      setTimeout(() => {
                         this.generalscan.setFocus();
-                        console.log("🚀 ~ CartonTruckLoadingHeaderPage ~ setTimeout ~ this.generalscan:", this.generalscan)
                      }, 10);
                   }
                },
@@ -427,7 +426,6 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
             header: this.objectService.objectHeader,
             details: this.objectService.objectDetail
          }
-         console.log("🚀 ~ CartonTruckLoadingHeaderPage ~ insertObject ~ trxDto:", trxDto)
          if (trxDto.details.length !== this.objectService.objectTA?.details.length) {
             this.toastService.presentToast("Insert Failed", "Carton Truck Loading Line doesn't not match with Truck Arrangement Line", "top", "warning", 1000);
             return;

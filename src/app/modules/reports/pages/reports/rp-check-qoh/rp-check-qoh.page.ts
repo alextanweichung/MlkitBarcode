@@ -60,7 +60,6 @@ export class RpCheckQohPage implements OnInit {
             }
             this.objectService.getCheckQoh(searchText, this.loginUser.loginUserType, this.loginUser.salesAgentId).subscribe(async response => {
                this.objects = response;
-               console.log("🚀 ~ RpCheckQohPage ~ this.objectService.getCheckQoh ~ this.objects:", this.objects)
                await this.massageData();
                await this.loadingService.dismissLoading();
                this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 300, true);

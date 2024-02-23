@@ -31,6 +31,7 @@ export interface StockCountRoot {
   header: StockCountHeader
   details: StockCountDetail[]
   barcodeTag?: BarcodeTag[]
+  isWorkFlowDone?: boolean
 }
 
 export interface StockCountHeader {

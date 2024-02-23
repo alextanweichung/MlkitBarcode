@@ -102,7 +102,6 @@ export class QuotationService {
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.otherAmtMasterList = this.fullMasterList.filter(x => x.objectName === "OtherAmount").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.remarkMasterList = this.fullMasterList.filter(x => x.objectName === "Remark").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      console.log("🚀 ~ QuotationService ~ loadMasterList ~ this.remarkMasterList:", this.remarkMasterList)
       this.custSubscription = this.authService.customerMasterList$.subscribe(obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {

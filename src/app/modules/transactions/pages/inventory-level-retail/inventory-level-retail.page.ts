@@ -91,11 +91,13 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
    }
    
    onItemChanged(event) {
+      console.log("🚀 ~ InventoryLevelRetailPage ~ onItemChanged ~ this.selectedItem:", this.selectedItem)
       if (event) {
          this.itemCode = event.code;
          this.validateItemCode();
       } else {
          this.itemCode = null;
+         this.selectedItem = null;
          this.validateItemCode();
       }
    }
@@ -104,6 +106,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
       try {
          if (this.itemCode && this.itemCode.length > 0) {
             let lookUpItem = this.itemList.find(e => e.itemCode.toUpperCase() == this.itemCode.toUpperCase());
+            console.log("🚀 ~ InventoryLevelRetailPage ~ validateItemCode ~ lookUpItem:", lookUpItem)
             if (lookUpItem) {
                this.itemInfo = lookUpItem;
                if (this.itemInfo.variationTypeCode === "0") {
@@ -134,11 +137,13 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
             return;
          }
          let lookUpItem = this.itemList.find(e => e.itemCode.toUpperCase() == this.itemCode.toUpperCase());
+         console.log("🚀 ~ InventoryLevelRetailPage ~ search ~ lookUpItem:", lookUpItem)
          if (lookUpItem) {
             this.itemInfo = lookUpItem;
             this.hideEmpty = false;
             this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId).subscribe(async response => {
                this.object = response;
+               console.log("🚀 ~ InventoryLevelRetailPage ~ this.objectService.getInventoryLevelByItem ~ this.object:", this.object)
                await this.computeLocationList();
             }, error => {
                console.log(error);
@@ -146,6 +151,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
             if (lookUpItem.variationTypeCode !== "0") {
                this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId).subscribe(async response => {
                   this.variationObject = response;
+                  console.log("🚀 ~ InventoryLevelRetailPage ~ this.objectService.getInventoryLevelByVariation ~ this.variationObject:", this.variationObject)
                   await this.computeLocationList();
                   await this.computeVariationXY();
                }, error => {
@@ -223,6 +229,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
          if (this.selectedViewOptions === "item") {
             this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.object = response;
+               console.log("🚀 ~ InventoryLevelRetailPage ~ this.objectService.getInventoryLevelByItem ~ this.object:", this.object)
                if (this.selectedLocation !== "all") {
                   this.object.itemInfo = this.object.itemInfo.filter(r => r.locationCode === this.selectedLocation);
                }
@@ -237,6 +244,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
          else {
             this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.variationObject = response;
+               console.log("🚀 ~ InventoryLevelRetailPage ~ this.objectService.getInventoryLevelByVariation ~ this.variationObject:", this.variationObject)
                // location filter
                if (this.selectedLocation !== "all") {
                   this.variationObject.itemInfo = this.variationObject.itemInfo.filter(r => r.locationCode === this.selectedLocation);
@@ -247,13 +255,13 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
                   let temp = this.variationObject.itemInfo;
                   for (let index = 0; index < this.variationObject.itemInfo.length; index++) {
                      let total = 0;
-                     this.variationObject[index].variation.variationDetails.forEach(rr => {
+                     this.variationObject.itemInfo[index].variation.variationDetails.forEach(rr => {
                         rr.variationDetails.forEach(rrr => {
                            total += rrr.qty
                         })
                      })
                      if (total === 0) {
-                        locationIds.push(this.variationObject[index].locationId);
+                        locationIds.push(this.variationObject.itemInfo[index].locationId);
                      }
                   }
                   locationIds.forEach(r => {
@@ -385,7 +393,6 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
    }
    
    async onItemAdd(event: TransactionDetail[]) {
-      console.log("🚀 ~ InventoryLevelRetailPage ~ onItemAdd ~ event:", JSON.stringify(event))
       if (event && event.length > 0) {
          this.itemCode = event[0].itemCode;
          this.selectedItem = event[0];

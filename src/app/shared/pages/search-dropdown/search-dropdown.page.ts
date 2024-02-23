@@ -53,7 +53,6 @@ export class SearchDropdownPage implements OnInit, OnChanges {
       }
 
       if (changes.selectedId || changes.selectedCode) {
-         console.log("🚀 ~ SearchDropdownPage ~ ngOnChanges ~ changes.selectedId:", changes.selectedId)
          if (this.optionValue === "id") {
             if (this.selectedId !== null) {
                this.selected = this.searchDropdownList?.find(r => r.id === this.selectedId);

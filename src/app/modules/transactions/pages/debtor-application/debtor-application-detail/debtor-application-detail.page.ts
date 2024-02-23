@@ -229,7 +229,6 @@ export class DebtorApplicationDetailPage implements OnInit {
 
    toggleObject() {
       this.objectService.toggleObject(this.object.header.customerPreId).subscribe(response => {
-         console.log("🚀 ~ DebtorApplicationDetailPage ~ this.objectService.toggleObject ~ response:", response)
          if (response.status === 200) {
             this.loadObject();
             this.toastService.presentToast("", "Update Complete", "top", "success", 1000);

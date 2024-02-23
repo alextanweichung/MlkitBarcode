@@ -121,7 +121,7 @@
                      </td>
                      <td class="p-1 font-half-size ion-text-right" *ngFor="let rowColumn of row.variationDetails">
                         <div [ngClass]="{'color-danger': (rowColumn.qty < 0), 'color-warning': (rowColumn.qty == 0), 
-                        'background-yellow': (selectedItem && (selectedItem.variationTypeCode === '1' && row.itemVariationXId === selectedItem.itemVariationXId && rowColumn.itemVariationYId === null) || (selectedItem.variationTypeCode === '2' && row.itemVariationXId === selectedItem.itemVariationXId && rowColumn.itemVariationYId === selectedItem.itemVariationYId)) }">
+                        'background-yellow': (selectedItem && ((selectedItem.variationTypeCode === '1' && row.itemVariationXId === selectedItem.itemVariationXId && rowColumn.itemVariationYId === null) || (selectedItem.variationTypeCode === '2' && row.itemVariationXId === selectedItem.itemVariationXId && rowColumn.itemVariationYId === selectedItem.itemVariationYId))) }">
                            {{rowColumn.qty | number: '1.0-0'}}</div>
                      </td>
                   </tr>

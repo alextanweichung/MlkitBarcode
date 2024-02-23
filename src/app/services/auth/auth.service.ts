@@ -166,7 +166,6 @@ export class AuthService {
    }
 
    async buildMasterList(skipRetrieve?: boolean) {
-      console.log("🚀 ~ AuthService ~ buildMasterList ~ buildMasterList:")
       if (!skipRetrieve) {
          try {
             this.getMasterList().subscribe(async response => {
@@ -177,7 +176,6 @@ export class AuthService {
                console.error(error);
             });
          } catch (error) {
-            console.log("🚀 ~ AuthService ~ buildMasterList ~ error:", JSON.stringify(error))
             console.error(error);
          } finally {
          }
@@ -212,7 +210,6 @@ export class AuthService {
          this.moduleControlConfig = response;
          this.setModuleControl(this.moduleControlConfig);
          let getCustomerList = this.moduleControlConfig.find(x => x.ctrlName === "SystemWideGetCustomerUponLogin");
-         console.log("🚀 ~ AuthService ~ this.getModuleControl ~ getCustomerList:", JSON.stringify(getCustomerList))
          if (getCustomerList && getCustomerList.ctrlValue.toUpperCase() === "Y") {
             this.systemWideGetCustomerUponLogin = true;
             this.buildMasterList(skipRetrieve);
@@ -264,7 +261,6 @@ export class AuthService {
    }
 
    getModuleControl() {
-      console.log("🚀 ~ AuthService ~ getModuleControl ~ getModuleControl:")
       return this.http.get<ModuleControl[]>(this.configService.selected_sys_param.apiUrl + "account/frontEndModuleControl").pipe(
          map((response: any) =>
             response.map((item: any) => item)

@@ -182,7 +182,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                size: this.itemListLoadSize
             }
             this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
-               let rrr = response;
+               let rrr = response.filter(r => this.configService.item_Masters?.flatMap(rr => rr.id).includes(r.itemId));
                if (rrr && rrr.length > 0) {
                   for await (const r of rrr) {
                      if (r.itemPricing !== null) {
@@ -364,7 +364,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       item.oriUnitPrice = item.unitPrice;
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
-      console.log("🚀 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ this.objectHeader:", this.objectHeader)
       if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B" || this.objectHeader.businessModelType === "F") {
          if (this.configSalesActivateTradingMargin || this.configTradingActivateMarginExpr) {
             if (this.configSalesActivateTradingMargin && !this.configTradingActivateMarginExpr && item.tradingMarginPct) {
@@ -378,7 +377,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             item.tradingMarginPct = null;
             item.tradingMarginExpression = null;
          }
-         console.log("🚀 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ item:", item)
       }
 
       if (this.configOrderingActivateMOQControl) {

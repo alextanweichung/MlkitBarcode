@@ -112,7 +112,6 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
    async onCustomerConfirmation(event) {
       if (event) {
          var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
-         console.log("🚀 ~ QuotationHeaderPage ~ onCustomerConfirmation ~ lookupValue:", lookupValue)
          if (lookupValue) {
             if (lookupValue.attribute14 && this.objectForm.controls.customerId.value && this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
                if (lookupValue.attribute14 !== this.objectForm.controls.priceSegmentCode.value) {
@@ -186,7 +185,6 @@ export class QuotationHeaderPage implements OnInit, ViewWillEnter {
       try {
          if (event) {
             var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
-            console.log("🚀 ~ QuotationHeaderPage ~ onCustomerSelected ~ lookupValue:", lookupValue)
             if (lookupValue != undefined) {
                this.objectForm.patchValue({ customerId: lookupValue.id });
                if (this.customersd) {
