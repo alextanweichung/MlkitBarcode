@@ -38,6 +38,16 @@
                <ion-input formControlName="depositBy" readonly></ion-input>
             </ion-item>
             <ion-item>
+               <ion-label position="stacked">Sales Date</ion-label>
+               <ion-input readonly type="text" (click)="toggleSalesDate()" [value]="salesDate"></ion-input>
+            </ion-item>
+            <ion-datetime #sDate class="animate__animated animate__fadeIn" *ngIf="sales_date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onSalesDateSelect($event)" [value]="sales_date_value.toISOString()" [preferWheel]="true">
+               <ion-buttons slot="buttons">
+                  <ion-button color="danger" (click)="sDate.cancel(); sales_date_active=false">Cancel</ion-button>
+                  <ion-button color="primary" (click)="sDate.confirm()">Done</ion-button>
+               </ion-buttons>
+            </ion-datetime>
+            <ion-item>
                <ion-label position="stacked">Bank In Date</ion-label>
                <ion-input readonly type="text" (click)="toggleDate()" [value]="date"></ion-input>
             </ion-item>
@@ -59,8 +69,7 @@
             </ion-datetime>
             <ion-item>
                <ion-label position="stacked">Bank In Amount</ion-label>
-               <ion-input #amtInput formControlName="depositAmount" inputmode="numeric" type="number"
-                  enterkeyhint="next" placeholder="Enter Amount"></ion-input>
+               <ion-input #amtInput formControlName="depositAmount" inputmode="numeric" type="number" enterkeyhint="next" placeholder="Enter Amount"></ion-input>
             </ion-item>
             <app-search-dropdown title="Bank Name" [masterDropdownList]="objectService.paymentMethodMasterList" [selectedId]="objectForm?.controls?.paymentMethodId?.value" (onActionComplete)="onPaymentMethodSelected($event)"></app-search-dropdown>
             <app-search-dropdown title="Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm?.controls?.locationId?.value" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>

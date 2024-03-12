@@ -182,7 +182,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                size: this.itemListLoadSize
             }
             this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
-               let rrr = response.filter(r => this.configService.item_Masters?.flatMap(rr => rr.id).includes(r.itemId));
+               let rrr = response; //.filter(r => this.configService.item_Masters?.flatMap(rr => rr.id).includes(r.itemId));
                if (rrr && rrr.length > 0) {
                   for await (const r of rrr) {
                      if (r.itemPricing !== null) {
@@ -218,9 +218,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
 
    availableSalesHistory: SalesItemInfoRoot[] = [];
    loadSalesHistory(newSearch: boolean) {
-      if (newSearch) {
-         this.availableSalesHistory = []
-      }
+      this.availableSalesHistory = [];
       let requestObject: SalesItemRequest = {
          itemId: this.availableItem.flatMap(r => r.itemId),
          search: null,
@@ -269,7 +267,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             },
             canDismiss: true
          })
-         modal.present();
+         await modal.present();
       } else {
          this.toastService.presentToast("", "Sales History not found", "top", "warning", 1000);
       }

@@ -6,7 +6,7 @@
       </div>
     </ion-title>
     <ion-buttons slot="start">
-      <ion-back-button text="" defaultHref="/transactions/stock-count" routerDirection="back"></ion-back-button>
+      <ion-back-button text="" defaultHref="/transactions/stock-count" (click)="previousStep()"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="primary">
       <ion-button (click)="edit()">

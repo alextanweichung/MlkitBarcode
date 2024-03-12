@@ -92,7 +92,6 @@ export class InventoryAdjReqDetailPage implements OnInit {
    loadDetail() {
       try {
          this.objectService.getObject(this.objectId).subscribe(response => {
-            console.log("🚀 ~ InventoryAdjReqDetailPage ~ this.objectService.getObject ~ response:", response)
             this.object = response;
             this.loadWorkflow(this.object.header.inventoryAdjustmentReqId);
          }, error => {

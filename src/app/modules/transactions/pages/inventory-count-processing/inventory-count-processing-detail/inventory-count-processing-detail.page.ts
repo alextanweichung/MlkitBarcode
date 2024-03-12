@@ -79,7 +79,6 @@ export class InventoryCountProcessingDetailPage implements OnInit {
    loadDetail() {
       try {
          this.objectService.getObject(this.objectId).subscribe(response => {
-            console.log("🚀 ~ InventoryCountProcessingDetailPage ~ this.objectService.getObject ~ response:", response)
             this.object = response;
             this.loadWorkflow(this.object.header.inventoryCountProcessingId);
          }, error => {

@@ -34,6 +34,16 @@
                <ion-input formControlName="posCashDepositNum" placeholder="Leave blank for auto assign"></ion-input>
             </ion-item>
             <ion-item>
+               <ion-label position="stacked">Sales Date</ion-label>
+               <ion-input readonly type="text" (click)="toggleSalesDate()" [value]="salesDate"></ion-input>
+            </ion-item>
+            <ion-datetime #sDate class="animate__animated animate__fadeIn" *ngIf="sales_date_active" color="primary" locale="en-EN" size="cover" showDefaultButtons="false" presentation="date" (ionChange)="onSalesDateSelect($event)" [value]="sales_date_value.toISOString()" [preferWheel]="true">
+               <ion-buttons slot="buttons">
+                  <ion-button color="danger" (click)="sDate.cancel(); sales_date_active=false">Cancel</ion-button>
+                  <ion-button color="primary" (click)="sDate.confirm()">Done</ion-button>
+               </ion-buttons>
+            </ion-datetime>
+            <ion-item>
                <ion-label position="stacked">Bank in Date</ion-label>
                <ion-input readonly type="text" (click)="toggleDate()" [value]="date"></ion-input>
             </ion-item>
@@ -94,8 +104,7 @@
    <ion-grid class="ion-no-padding">
       <ion-row>
          <ion-col>
-            <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()"
-               [disabled]="!objectForm.valid">
+            <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid">
                Save
             </ion-button>
          </ion-col>

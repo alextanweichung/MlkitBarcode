@@ -326,7 +326,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      objectId: object.header.inventoryCountId
                   }
                }
-               this.objectService.resetVariables();
+               await this.objectService.resetVariables();
                await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
             }
@@ -357,7 +357,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      objectId: this.objectService.objectHeader.inventoryCountId
                   }
                }
-               this.objectService.resetVariables();
+               await this.objectService.resetVariables();
                await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
             }

@@ -8,6 +8,7 @@ export interface CashDeposit {
    paymentMethodId: number
    locationId?: number
    customerId?: number
+   trxDate?: Date
    createdBy?: string
    createdById?: number
    createdAt?: Date

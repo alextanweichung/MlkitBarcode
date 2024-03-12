@@ -30,6 +30,7 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
    ) {
       this.newObjectForm();
    }
+   
    ionViewWillEnter(): void {
       if (this.objectService.objectHeader !== null && this.objectService.objectHeader?.inventoryCountId > 0) {
          this.bindExistingValue();
@@ -165,7 +166,7 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
                      objectId: this.objectService.objectHeader?.inventoryCountId
                   }
                }
-               this.objectService.resetVariables();
+               await this.objectService.resetVariables();
                this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
             } else {
                this.navController.navigateRoot("/transactions/stock-count");

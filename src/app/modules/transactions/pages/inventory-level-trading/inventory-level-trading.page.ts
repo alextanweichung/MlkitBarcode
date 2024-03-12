@@ -223,7 +223,6 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
          if (this.selectedViewOptions === "item") {
             this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.object = response;
-               console.log("🚀 ~ InventoryLevelTradingPage ~ this.objectService.getInventoryLevelByItem ~ this.object:", this.object)
                if (this.selectedLocation !== "all") {
                   this.object.itemInfo = this.object.itemInfo.filter(r => r.locationCode === this.selectedLocation);
                }
@@ -238,7 +237,6 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
          else {
             this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.variationObject = response;
-               console.log("🚀 ~ InventoryLevelTradingPage ~ this.objectService.getInventoryLevelByVariation ~ this.variationObject:", this.variationObject)
                // location filter
                if (this.selectedLocation !== "all") {
                   this.variationObject.itemInfo = this.variationObject.itemInfo.filter(r => r.locationCode === this.selectedLocation);

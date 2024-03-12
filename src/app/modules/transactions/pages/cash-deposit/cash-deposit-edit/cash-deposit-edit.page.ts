@@ -9,7 +9,6 @@ import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { CashDeposit } from '../../../models/cash-deposit';
@@ -68,6 +67,7 @@ export class CashDepositEditPage implements OnInit {
          paymentMethodId: [null, [Validators.required]],
          locationId: [null],
          customerId: [null],
+         trxDate: [null],
          sequence: [0]
       })
    }
@@ -121,6 +121,8 @@ export class CashDepositEditPage implements OnInit {
          this.objectService.getObject(this.objectId).subscribe(response => {
             this.object = response;
             this.objectForm.patchValue(this.object);
+            this.sales_date_value = this.commonService.convertUtcDate(this.object.trxDate);
+            this.salesDate = format(this.sales_date_value, "MMM d, yyyy");
             this.date_value = this.commonService.convertDateFormat(this.object.depositDateTime);
             this.date = format(this.date_value, 'MMM d, yyyy');
             this.time_value = this.commonService.convertUtcDate(this.object.depositDateTime);
@@ -166,16 +168,20 @@ export class CashDepositEditPage implements OnInit {
 
    /* #region  date part */
 
+   sales_date_active: boolean = false;
    date_active: boolean = false;
    time_active: boolean = false;
 
+   salesDate: any;
    date: any;
    time: any;
+   sales_date_value: Date;
    date_value: Date;
    time_value: Date;
 
    // Toggle date
    toggleDate() {
+      this.sales_date_active = false;
       this.date_active = this.date_active ? false : true;
       this.time_active = false;
    }
@@ -191,6 +197,7 @@ export class CashDepositEditPage implements OnInit {
 
    // Toggle time
    toggleTime() {
+      this.sales_date_active = false;
       this.time_active = this.time_active ? false : true;
       this.date_active = false;
    }
@@ -204,8 +211,26 @@ export class CashDepositEditPage implements OnInit {
       this.bindDateTimeToForm();
    }
 
+   toggleSalesDate() {
+      this.sales_date_active = this.sales_date_active ? false : true;
+      this.time_active = false;
+      this.date_active = false;
+   }
+
+   // On date select
+   onSalesDateSelect(event: any) {
+      let date = new Date(event.detail.value);
+      this.sales_date_value = this.commonService.convertUtcDate(date);
+      this.salesDate = format(date, 'MMM d, yyyy');
+      this.sales_date_active = false;
+      this.bindDateTimeToForm();
+   }
+
    bindDateTimeToForm() {
-      this.objectForm.patchValue({ depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()) })
+      this.objectForm.patchValue({
+         depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()),
+         trxDate: format(new Date(this.sales_date_value), 'yyyy-MM-dd') + "T00:00:00.000Z"
+      })
    }
 
    /* #endregion */
@@ -516,22 +541,22 @@ export class CashDepositEditPage implements OnInit {
       }
    }
 
-	/* #endregion */
+   /* #endregion */
 
-	sendForDebug() {
-		let jsonObjectString = JSON.stringify(this.objectForm.value);
-		let debugObject: JsonDebug = {
-			jsonDebugId: 0,
-			jsonData: jsonObjectString
-		};
-		this.objectService.sendDebug(debugObject).subscribe(response => {
-			if (response.status == 200) {
-				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
-			}
-		}, error => {
-			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
-			console.log(error);
-		});
-	}
+   sendForDebug() {
+      let jsonObjectString = JSON.stringify(this.objectForm.value);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status == 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
+   }
 
 }

@@ -48,6 +48,8 @@ export class CashDepositAddPage implements OnInit {
       private loadingService: LoadingService,
       private plt: Platform
    ) {
+      this.sales_date_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
+      this.salesDate = format(this.commonService.getTodayDate(), "MMM d, yyyy");
       this.date_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
       this.date = format(this.commonService.getTodayDate(), 'MMM d, yyyy');
       this.time_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
@@ -72,6 +74,7 @@ export class CashDepositAddPage implements OnInit {
          paymentMethodId: [null, [Validators.required]],
          locationId: [null],
          customerId: [null],
+         trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
          sequence: [0]
       })
    }
@@ -116,16 +119,20 @@ export class CashDepositAddPage implements OnInit {
 
    /* #region  date part */
 
+   sales_date_active: boolean = false;
    date_active: boolean = false;
    time_active: boolean = false;
 
+   salesDate: any;
    date: any;
    time: any;
+   sales_date_value: Date;
    date_value: Date;
    time_value: Date;
 
    // Toggle date
    toggleDate() {
+      this.sales_date_active = false;
       this.date_active = this.date_active ? false : true;
       this.time_active = false;
    }
@@ -141,6 +148,7 @@ export class CashDepositAddPage implements OnInit {
 
    // Toggle time
    toggleTime() {
+      this.sales_date_active = false;
       this.time_active = this.time_active ? false : true;
       this.date_active = false;
    }
@@ -154,8 +162,26 @@ export class CashDepositAddPage implements OnInit {
       this.bindDateTimeToForm();
    }
 
+   toggleSalesDate() {
+      this.sales_date_active = this.sales_date_active ? false : true;
+      this.time_active = false;
+      this.date_active = false;
+   }
+
+   // On date select
+   onSalesDateSelect(event: any) {
+      let date = new Date(event.detail.value);
+      this.sales_date_value = this.commonService.convertUtcDate(date);
+      this.salesDate = format(date, 'MMM d, yyyy');
+      this.sales_date_active = false;
+      this.bindDateTimeToForm();
+   }
+
    bindDateTimeToForm() {
-      this.objectForm.patchValue({ depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()) })
+      this.objectForm.patchValue({
+         depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()),
+         trxDate: format(new Date(this.sales_date_value), 'yyyy-MM-dd') + "T00:00:00.000Z"
+      })
    }
 
    /* #endregion */

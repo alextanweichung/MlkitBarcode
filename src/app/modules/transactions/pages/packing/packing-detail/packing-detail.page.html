@@ -264,9 +264,6 @@
                         <ion-col class="ion-flex ion-margin-auto">
                            <div class="font-bold">Barcode</div>
                         </ion-col>
-                        <ion-col class="ion-flex ion-margin-auto">
-                           <div class="font-bold">Item Code</div>
-                        </ion-col>
                         <ion-col size="1" class="ion-flex ion-margin-auto justify-content-end">
                            <div class="font-bold">Qty</div>
                         </ion-col>
@@ -276,13 +273,23 @@
                            <div>{{rowIndex2+1}}</div>
                         </ion-col>
                         <ion-col class="ion-flex ion-margin-auto">
-                           <div>{{rowData2.itemBarcode}}</div>
-                        </ion-col>
-                        <ion-col class="ion-flex ion-margin-auto">
-                           <div>{{rowData2.itemCode}}</div>
-                           <div *ngIf="rowData2.assemblyItemId" class="ml-1">
-                              <span class="badge-purple ion-text-wrap ion-flex my-auto px-1">{{lookupItemInfo(rowData2.assemblyItemId, "CODE")}}</span>
-                           </div>
+                           <ion-grid class="ion-no-padding">
+                              <ion-row>
+                                 <ion-col class="ion-flex ion-margin-auto">
+                                    <div>{{rowData2.itemBarcode}}</div>
+                                 </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                 <ion-col class="ion-flex ion-margin-auto">
+                                    <div>{{rowData2.itemCode}}</div>
+                                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData2.itemVariationXDescription">{{rowData2.itemVariationXDescription}}</span>
+                                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData2.itemVariationYDescription">{{rowData2.itemVariationYDescription}}</span>
+                                    <div *ngIf="rowData2.assemblyItemId" class="ml-1">
+                                       <span class="badge-purple ion-text-wrap ion-flex my-auto px-1">{{lookupItemInfo(rowData2.assemblyItemId, "CODE")}}</span>
+                                    </div>
+                                 </ion-col>
+                              </ion-row>
+                           </ion-grid>
                         </ion-col>
                         <ion-col size="1" class="ion-flex ion-margin-auto justify-content-end">
                            <div class="ion-flex">{{rowData2.qtyPacked|number:'1.0'}}</div>

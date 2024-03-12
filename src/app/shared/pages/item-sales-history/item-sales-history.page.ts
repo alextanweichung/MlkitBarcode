@@ -17,6 +17,7 @@ export class ItemSalesHistoryPage implements OnInit {
    }
 
    hidePriceHistoryModal() {
+      this.selectedHistory = [];
       return this.modalController.dismiss();
    }
 
