@@ -146,50 +146,51 @@
          </ion-list>
       </ng-container>
 
-      <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full"><ion-item button detail="false" class="ion-no-padding no-ripple">
-         <ion-grid class="ion-no-padding py-2 pl-2">
-            <ion-row *ngIf="getCartonItems().length > 0">
-               <ion-col class="ion-flex ion-margin-auto">
-                  <div class="font-bold">Total</div>
-               </ion-col>
-               <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">{{getCartonItems()|sum:"qtyPacked"}}</div>
-               </ion-col>
-            </ion-row>
-            <ion-row>
-               <ion-col class="ion-flex ion-margin-auto">
-                  <div class="font-bold">Barcode</div>
-               </ion-col>
-               <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
-                  <div class="font-bold">Qty</div>
-               </ion-col>
-            </ion-row>
-         </ion-grid>
-      </ion-item>
-      <ion-item-sliding #slidingItem *ngFor="let o of getCartonItems(); let i = index">
-         <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="editCartonLine(o);" *ngIf="i >= 0">
+      <ion-list class="list-custom animate__animated animate__fadeIn mt-2" lines="full">
+         <ion-item button detail="false" class="ion-no-padding no-ripple">
             <ion-grid class="ion-no-padding py-2 pl-2">
-               <ion-row>
-                  <ion-col class="ion-flex ion-margin-auto">{{o.itemBarcode}}</ion-col>
-                  <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">{{o.qtyPacked}}</ion-col>
+               <ion-row *ngIf="getCartonItems().length > 0">
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Total</div>
+                  </ion-col>
+                  <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">{{getCartonItems()|sum:"qtyPacked"}}</div>
+                  </ion-col>
                </ion-row>
                <ion-row>
-                  <ion-col class="ion-flex ion-margin-auto">{{o.itemCode}}
-                     <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="o.itemVariationXDescription">{{o.itemVariationXDescription}}</span>
-                     <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="o.itemVariationYDescription">{{o.itemVariationYDescription}}</span>
-                     <div *ngIf="o.assemblyItemId" class="ml-1 my-auto">
-                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1">{{lookupItemInfo(o.assemblyItemId, "CODE")}}</span>
-                     </div>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Barcode</div>
+                  </ion-col>
+                  <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">Qty</div>
                   </ion-col>
                </ion-row>
             </ion-grid>
          </ion-item>
-         <ion-item-options>
-            <ion-item-option color="danger" (click)="slidingItem.close(); deleteCartonLine(i, o);">
-               <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
-            </ion-item-option>
-         </ion-item-options>
-      </ion-item-sliding>
+         <ion-item-sliding #slidingItem *ngFor="let o of getCartonItems(); let i = index">
+            <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="editCartonLine(o);" *ngIf="i >= 0">
+               <ion-grid class="ion-no-padding py-2 pl-2">
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">{{o.itemBarcode}}</ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">{{o.qtyPacked}}</ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">{{o.itemCode}}
+                        <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="o.itemVariationXDescription">{{o.itemVariationXDescription}}</span>
+                        <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="o.itemVariationYDescription">{{o.itemVariationYDescription}}</span>
+                        <div *ngIf="o.assemblyItemId" class="ml-1 my-auto">
+                           <span class="badge-purple ion-text-wrap ion-flex my-auto px-1">{{lookupItemInfo(o.assemblyItemId, "CODE")}}</span>
+                        </div>
+                     </ion-col>
+                  </ion-row>
+               </ion-grid>
+            </ion-item>
+            <ion-item-options>
+               <ion-item-option color="danger" (click)="slidingItem.close(); deleteCartonLine(i, o);">
+                  <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
+               </ion-item-option>
+            </ion-item-options>
+         </ion-item-sliding>
       </ion-list>
 
    </div>

@@ -124,7 +124,8 @@
                         <ion-row class="mt-1">
                            <ion-col size="1" class="ion-flex ion-margin-auto">
                               <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">
-                                 {{rowIndex+1}}</div>
+                                 {{rowIndex+1}}
+                              </div>
                            </ion-col>
                            <ion-col size="5" class="ion-flex ion-margin-auto">
                               <ion-icon name="ellipse" [class]="rowData.qtyRequest === (rowData.qtyCurrent+(rowData.qtyPacked??0))?'color-success':'color-danger'"></ion-icon>

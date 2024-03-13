@@ -72,7 +72,7 @@
          </ion-list>
       </ng-container>
 
-      <ng-container *ngIf="showPicking || showPacking || showInterTransfer || showTransferConfirmation || showTruckLoading || showCartonTruckLoading || showDoAck || showPalletAssembly || showTransferBin || showBinCount">
+      <ng-container *ngIf="showPicking || showPacking || showInboundScan || showInterTransfer || showTransferConfirmation || showTruckLoading || showCartonTruckLoading || showDoAck || showPalletAssembly || showTransferBin || showBinCount">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>[WD] Warehouse</ion-label>
          </ion-list-header>
@@ -87,6 +87,12 @@
                <ion-icon name="cube-outline" slot="start"></ion-icon>
                <ion-label>
                   <h3>Multi Packing</h3>
+               </ion-label>
+            </ion-item>
+            <ion-item button routerLink="inbound-scan" *ngIf="showInboundScan">
+               <ion-icon name="barcode-outline" slot="start"></ion-icon>
+               <ion-label>
+                  <h3>Multi Inbound</h3>
                </ion-label>
             </ion-item>
             <ion-item button routerLink="inter-transfer" *ngIf="showInterTransfer">

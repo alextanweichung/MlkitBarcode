@@ -2,79 +2,88 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { InboundScanService } from '../../services/inbound-scan.service';
-import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, ViewDidEnter, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { FilterPage } from '../filter/filter.page';
 import { format } from 'date-fns';
-import { InboundScanList } from '../../models/inbound-scan';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { MultiInboundListObject } from '../../models/inbound-scan';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
    selector: 'app-inbound-scan',
    templateUrl: './inbound-scan.page.html',
    styleUrls: ['./inbound-scan.page.scss'],
 })
-export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter {
+export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, ViewDidLeave {
 
-   objects: InboundScanList[] = [];
-
-   startDate: Date;
-   endDate: Date;
+   objects: MultiInboundListObject[] = [];
 
    uniqueGrouping: Date[] = [];
 
+	currentPage: number = 1;
+	itemsPerPage: number = 12;
+
    constructor(
-      private authService: AuthService,
       private objectService: InboundScanService,
+      private authService: AuthService,
       private commonService: CommonService,
+      private toastService: ToastService,
+      private loadingService: LoadingService,
       private modalController: ModalController,
       private actionSheetController: ActionSheetController,
-      private navController: NavController,
-      private toastService: ToastService
+      private navController: NavController
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-      try {
-         if (!this.startDate) {
-            this.startDate = this.commonService.getFirstDayOfTodayMonth();
-         }
-         if (!this.endDate) {
-            this.endDate = this.commonService.getTodayDate();
-         }
-         await this.objectService.loadRequiredMaster();
-         await this.loadObjects();
-      } catch (e) {
-         console.error(e);
+      if (this.objectService.filterStartDate === null || this.objectService.filterStartDate === undefined) {
+         this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
       }
+      if (this.objectService.filterEndDate === null || this.objectService.filterEndDate === undefined) {
+         this.objectService.filterEndDate = this.commonService.getTodayDate();
+      }
+      this.itemSearchText = null;
+   }
+
+   async ionViewDidEnter(): Promise<void> {
+      await this.objectService.loadRequiredMaster();
+      await this.loadObjects();
+   }
+
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {
    }
 
    ngOnDestroy(): void {
-      this.objectService.stopListening();
    }
 
    /* #region  crud */
 
-   loadObjects() {
+   async loadObjects() {
       try {
-         this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
+         this.objects = [];
+         await this.loadingService.showLoading();
+         this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
+            console.log("🚀 ~ InboundScanPage ~ this.objectService.getObjectList ~ response:", response)
             this.objects = response;
-            let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-            this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-            await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+				this.resetFilteredObj();
+            await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
-         }, error => {
+         }, async error => {
+            await this.loadingService.dismissLoading();
             console.error(error);
          })
       } catch (e) {
+         await this.loadingService.dismissLoading();
          console.error(e);
+      } finally {         
+         await this.loadingService.dismissLoading();
       }
-   }
-
-   getObjects(date: Date) {
-      return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate()).sort((a, c) => { return a.inboundScanId < c.inboundScanId ? 1 : -1 });
    }
 
    /* #endregion */
@@ -86,7 +95,7 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter {
          if (this.objectService.hasWarehouseAgent()) {
             this.navController.navigateForward("/transactions/inbound-scan/inbound-scan-header");
          } else {
-            this.toastService.presentToast("", "Warehouse Agent not set.", "top", "danger", 1000);
+            this.toastService.presentToast("", "Warehouse Agent not set", "top", "warning", 1000);
          }
       } catch (e) {
          console.error(e);
@@ -126,16 +135,16 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter {
          const modal = await this.modalController.create({
             component: FilterPage,
             componentProps: {
-               startDate: this.startDate,
-               endDate: this.endDate
+               startDate: this.objectService.filterStartDate,
+               endDate: this.objectService.filterEndDate
             },
             canDismiss: true
          })
          await modal.present();
          let { data } = await modal.onWillDismiss();
          if (data && data !== undefined) {
-            this.startDate = new Date(data.startDate);
-            this.endDate = new Date(data.endDate);
+            this.objectService.filterStartDate = new Date(data.startDate);
+            this.objectService.filterEndDate = new Date(data.endDate);
             this.loadObjects();
          }
       } catch (e) {
@@ -155,5 +164,49 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter {
          console.error(e);
       }
    }
+
+	highlight(event) {
+		event.getInputElement().then(r => {
+			r.select();
+		})
+	}
+
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
+	itemSearchText: string;
+	filteredObj: MultiInboundListObject[] = [];
+	search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
+               r.multiInboundNum.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerCode.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerName.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.warehouseAgentName.toUpperCase().includes(searchText.toUpperCase())
+            )));            
+				this.currentPage = 1;
+			} else {
+				this.resetFilteredObj();
+				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+      this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+	}
 
 }

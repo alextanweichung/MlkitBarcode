@@ -41,6 +41,7 @@ export interface CustomToken {
    nbf: number,
    exp: number,
    iat: number
+   lid: string
 }
 
 export interface ResetPassword {

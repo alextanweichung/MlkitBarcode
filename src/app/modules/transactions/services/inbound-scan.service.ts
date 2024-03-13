@@ -3,11 +3,13 @@ import { Injectable } from "@angular/core";
 import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
-import { InboundScanDocRoot, InboundScanList, InboundScanRoot } from "../models/inbound-scan";
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { LoadingService } from "src/app/services/loading/loading.service";
 import { Subscription } from "rxjs";
+import { InboundHeaderForWD, MultiInbound, MultiInboundListObject, MultiInboundObject, MultiInboundRoot } from "../models/inbound-scan";
+import { ModuleControl } from "src/app/shared/models/module-control";
+import { JsonDebug } from "src/app/shared/models/jsonDebug";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -19,6 +21,9 @@ const httpObserveHeader = {
 })
 export class InboundScanService {
 
+   filterStartDate: Date;
+   filterEndDate: Date;
+   
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
@@ -35,33 +40,43 @@ export class InboundScanService {
 
    /* #region store as one set data for each picking */
 
-   object: InboundScanRoot;
-   setObject(object: InboundScanRoot) {
+   header: MultiInbound;
+   setHeader(header: MultiInbound) {
+      this.header = header;
+   }
+   
+   object: MultiInboundRoot;
+   setObject(object: MultiInboundRoot) {
       this.object = object;
    }
 
-   doc: InboundScanDocRoot;
-   setDoc(doc: InboundScanDocRoot) {
-      this.doc = doc;
+   multiInboundObject: MultiInboundObject = { outstandingInboundList: [], inboundCarton: [] };
+   setMultiInboundObject(object: MultiInboundObject) {
+      this.multiInboundObject = object;
+   }
+
+   removeHeader() {
+      this.header = null;
    }
 
    removeObject() {
       this.object = null;
    }
 
-   removeDoc() {
-      this.doc = null;
+   removeMultiInboundObject() {
+      this.multiInboundObject = { outstandingInboundList: [], inboundCarton: [] };
    }
 
    resetVariables() {
+      this.removeHeader();
+      this.removeMultiInboundObject();
       this.removeObject();
-      this.removeDoc();
    }
 
    /* #endregion */
 
    hasWarehouseAgent(): boolean {
-      let warehouseAgentId = JSON.parse(localStorage.getItem('loginUser'))?.warehouseAgentId;
+      let warehouseAgentId = JSON.parse(localStorage.getItem("loginUser"))?.warehouseAgentId;
       if (warehouseAgentId === undefined || warehouseAgentId === null || warehouseAgentId === 0) {
          return false;
       }
@@ -73,6 +88,7 @@ export class InboundScanService {
          await this.loadingService.showLoading();
          await this.loadMasterList();
          await this.loadStaticLov();
+         await this.loadModuleControl();
          await this.loadingService.dismissLoading();
       } catch (error) {
          await this.loadingService.dismissLoading();
@@ -89,14 +105,27 @@ export class InboundScanService {
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
+   customerLocationMasterList: MasterListDetails[] = [];
+   allowedLocation: Number[] = [];
+   fLocationMasterList: MasterListDetails[] = [];
    warehouseAgentMasterList: MasterListDetails[] = [];
+   reasonMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
-      this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
+      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUom").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.fLocationMasterList = this.locationMasterList;
+      if (this.object && this.object.header && this.object.header.businessModelType === "T") {
+         this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === "W");
+      } else if (this.object && this.object.header && this.object.header.businessModelType != "T") {
+         this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 !== "B");
+      }
+      this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -105,41 +134,123 @@ export class InboundScanService {
             await this.authService.rebuildCustomerList();
          }
       })
+      this.authService.currentUserToken$.subscribe(codedToken => {
+         console.log("🚀 ~ InboundScanService ~ loadMasterList ~ codedToken:", codedToken)
+         if (codedToken) {
+            let locationString = codedToken.lid;
+            if (locationString && locationString.length > 0) {
+               this.allowedLocation = locationString.split(",").map(Number);
+               console.log("🚀 ~ InboundScanService ~ loadMasterList ~ this.allowedLocation:", this.allowedLocation)
+               if (this.allowedLocation.length > 0) {
+                  this.allowedLocation = [...this.allowedLocation, ...this.fLocationMasterList.filter(x => this.allowedLocation.includes(parseInt(x.attribute15))).map(y => y.id)];
+                  this.fLocationMasterList = this.fLocationMasterList.filter(x => this.allowedLocation.includes(x.id));
+                  console.log("🚀 ~ InboundScanService ~ loadMasterList ~ this.fLocationMasterList:", this.fLocationMasterList)
+                  if (this.customerFilteringByUserLocation) {
+                     this.customerMasterList = this.customerMasterList.filter(x => this.allowedLocation.includes(parseInt(x.attribute6)));
+                  }
+               }
+            }
+         }
+      })
    }
 
    fullStaticLovList: MasterList[] = [];
    salesTypeMasterList: MasterListDetails[] = [];
    sourceTypeMasterList: MasterListDetails[] = [];
+   multiInboundGroupTypeMasterList: MasterListDetails[] = [];
+   multiInboundCopyFromMasterList: MasterListDetails[] = [];
    async loadStaticLov() {
       this.fullStaticLovList = await this.getStaticLov();
-      this.salesTypeMasterList = this.fullMasterList.filter(x => x.objectName === "SalesType").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.sourceTypeMasterList = this.fullMasterList.filter(x => x.objectName === "SourceType").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.salesTypeMasterList = this.fullStaticLovList.filter(x => x.objectName === "SalesType").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.sourceTypeMasterList = this.fullStaticLovList.filter(x => x.objectName === "SourceType").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.multiInboundGroupTypeMasterList = this.fullStaticLovList.filter(x => x.objectName === "MultiInboundGroupType").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.multiInboundCopyFromMasterList = this.fullStaticLovList.filter(x => x.objectName === "MultiInboundCopyFrom").flatMap(src => src.details).filter(y => y.deactivated === 0);
+   }
+
+   moduleControl: ModuleControl[];
+   configMultiInboundToWHOnly: boolean = true;
+   customerFilteringByUserLocation: boolean = false;
+   systemWideBlockConvertedCode: boolean;
+   allowDocumentWithEmptyLine: string = "N";
+   inbountQtyControl: string = "N";
+   multiInboundActivateHeaderReason: boolean = false;
+   loadModuleControl() {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+         this.moduleControl = obj;
+         let config = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
+         if (config != undefined) {
+            this.allowDocumentWithEmptyLine = config.ctrlValue.toUpperCase();
+         }
+         let inboundLocationControl = this.moduleControl.find(x => x.ctrlName === "MultiInboundToWHOnly")
+         if (inboundLocationControl && inboundLocationControl.ctrlValue.toUpperCase() === "Y") {
+            this.configMultiInboundToWHOnly = true;
+         } else {
+            this.configMultiInboundToWHOnly = false;
+         }
+         let custFiltering = this.moduleControl.find(x => x.ctrlName === "CustomerFilteringByUserLocation");
+         if (custFiltering && custFiltering.ctrlValue.toUpperCase() === "Y") {
+            this.customerFilteringByUserLocation = true;
+         } else {
+            this.customerFilteringByUserLocation = false;
+         }
+         let blockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")
+         if (blockConvertedCode) {
+            this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
+         } else {
+            this.systemWideBlockConvertedCode = false;
+         }
+         let inboundControl = this.moduleControl.find(x => x.ctrlName === "InboundScanQtyControl");
+         if (inboundControl != undefined) {
+            this.inbountQtyControl = inboundControl.ctrlValue;
+         }
+         let activateHeaderReason = this.moduleControl.find(x => x.ctrlName === "MultiInboundActivateHeaderReason");
+         if (activateHeaderReason && activateHeaderReason.ctrlValue.toUpperCase() === "Y") {
+            this.multiInboundActivateHeaderReason = true;
+         } else {
+            this.multiInboundActivateHeaderReason = false;
+         }   
+      })
    }
 
    getMasterList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/masterList").toPromise();
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/masterList").toPromise();
    }
 
    getStaticLov() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/staticLov").toPromise();
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/staticLov").toPromise();
    }
 
-   getObjectListByDate(startDate: string, endDate: string) {
-      return this.http.get<InboundScanList[]>(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/listing/" + startDate + "/" + endDate);
+   getObjectList(dateStart: string, dateEnd: string) {
+      return this.http.get<MultiInboundListObject[]>(this.configService.selected_sys_param.apiUrl + `MobileMultiInbound/listing/${dateStart}/${dateEnd}`);
    }
 
    getObjectById(objectId: number) {
-      return this.http.get<InboundScanRoot>(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/" + objectId);
+      return this.http.get<MultiInboundRoot>(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/" + objectId);
    }
 
-   getDoc(search: string) {
-      return this.http.get<InboundScanDocRoot[]>(this.configService.selected_sys_param.apiUrl + `MobileInboundScan/fromIT/${search}`);
+   getDoc(docNums: string[], orderType: string) {
+      if (orderType === "I") {
+         return this.http.post<InboundHeaderForWD[]>(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/getITHeader", docNums, httpObserveHeader);
+      } else {
+         return this.http.post<InboundHeaderForWD[]>(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/getSRHeader", docNums, httpObserveHeader);
+      }
    }
 
+   insertObject(object: MultiInboundRoot) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound", object, httpObserveHeader);
+   }
+
+   updateObject(object: MultiInboundRoot) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound", object, httpObserveHeader);
+   }
+
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/jsonDebug", debugObject, httpObserveHeader);
+   }
 
    // for web testing 
    validateBarcode(barcode: string) {
-      return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileInboundScan/itemByBarcode/" + barcode);
+      return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileMultiInbound/itemByBarcode/" + barcode);
    }
 
 }

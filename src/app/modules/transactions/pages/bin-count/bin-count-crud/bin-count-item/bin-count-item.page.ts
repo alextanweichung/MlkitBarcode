@@ -50,6 +50,7 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          } else {
             await this.loadBinCountBatchCriteria();
             if (this.objectService.objectDetail && this.objectService.objectDetail.length === 0) {
+               console.log("🚀 ~ BinCountItemPage ~ ionViewDidEnter ~ this.objectService.objectDetail:", this.objectService.objectDetail)
                await this.addNewObjectDetail(1);
             } else {
                await this.transformFlatDetail();

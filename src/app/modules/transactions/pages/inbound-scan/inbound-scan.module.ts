@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { InboundScanPageRoutingModule } from './inbound-scan-routing.module';
 
 import { InboundScanPage } from './inbound-scan.page';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    InboundScanPageRoutingModule
-  ],
-  declarations: [InboundScanPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      InboundScanPageRoutingModule,
+      NgxPaginationModule
+   ],
+   declarations: [InboundScanPage]
 })
-export class InboundScanPageModule {}
+export class InboundScanPageModule { }

@@ -8,3 +8,19 @@ input[type=text]:focus {
    border: none;
    outline: none;
 }
+
+.block {
+   width: 100%;
+   height: 300px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+ion-modal.image-modal {
+   --height: auto;
+}
+
+ion-select::part(icon) {
+   display: none !important;
+}
