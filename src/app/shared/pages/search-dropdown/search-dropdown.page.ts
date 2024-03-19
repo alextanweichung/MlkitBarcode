@@ -36,7 +36,9 @@ export class SearchDropdownPage implements OnInit, OnChanges {
    ) { }
 
    async ngOnChanges(changes: SimpleChanges): Promise<void> {
-      this.selected = null;
+      if (!changes.disabled) {
+         this.selected = null;
+      }
 
       if (changes.masterDropdownList) {
          await this.bindFromMasterList();

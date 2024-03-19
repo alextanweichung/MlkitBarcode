@@ -67,6 +67,7 @@ export class ConfigService {
                // apiUrl: "https://pp.rcb.com/api/",
                // apiUrl: "https://test.fiffy-erp.com/api/",
                // apiUrl: "https://idcp-noseintl.com/api/",
+               // apiUrl: "https:bmm-sys.com:1000/api/",
                imgUrl: null,
                lastDownloadAt: null
             })

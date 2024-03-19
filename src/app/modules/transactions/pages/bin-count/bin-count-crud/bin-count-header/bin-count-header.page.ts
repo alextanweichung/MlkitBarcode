@@ -29,7 +29,29 @@ export class BinCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
       this.newObjectForm();
    }
 
+   ionViewWillEnter(): void {
+      console.log("🚀 ~ BinCountHeaderPage ~ ionViewWillEnter ~ this.objectService.objectHeader:", this.objectService.objectHeader)
+      if (this.objectService.objectHeader !== null && this.objectService.objectHeader?.binCountId > 0) {
+         this.objectForm.patchValue(this.objectService.objectHeader);
+         this.dateValue = format(this.objectService.objectHeader.trxDate, "yyyy-MM-dd") + "T08:00:00.000Z";
+         this.setFormattedDateString();
+         if (this.objectService.objectHeader?.binCountId > 0) {
+            this.onLocationSelected({ id: this.objectService.objectHeader.locationId });
+         }
+      }
+      this.setFormattedDateString();
+   }
+
+   ionViewDidEnter(): void {
+
+   }
+
+   ngOnInit() {
+
+   }
+
    newObjectForm() {
+      console.log("🚀 ~ BinCountHeaderPage ~ newObjectForm ~ this.objectForm = this.formBuilder.group:")
       this.objectForm = this.formBuilder.group({
          binCountId: [0],
          binCountNum: [null],
@@ -47,29 +69,11 @@ export class BinCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
       })
    }
 
-   ionViewWillEnter(): void {
-      if (this.objectService.objectHeader !== null && this.objectService.objectHeader?.binCountId > 0) {
-         this.objectForm.patchValue(this.objectService.objectHeader);
-         this.dateValue = format(this.objectService.objectHeader.trxDate, "yyyy-MM-dd") + "T08:00:00.000Z";
-         this.setFormattedDateString();
-         if (this.objectService.objectHeader?.binCountId !== 0) {
-            this.onLocationSelected({ id: this.objectService.objectHeader.locationId });
-         }
-      }
-      this.setFormattedDateString();
-   }
-
-   ionViewDidEnter(): void {
-
-   }
-
-   ngOnInit() {
-   }
-
    binCountBatchlist: BinCountBatchList[] = [];
    binCountBatchDdl: SearchDropdownList[] = [];
    @ViewChild("binCountBatchSdd", { static: false }) binCountBatchSdd: SearchDropdownPage;
    async onLocationSelected(event: SearchDropdownList) {
+      console.log("🚀 ~ BinCountHeaderPage ~ onLocationSelected ~ event:", event)
       try {
          if (event) {
             if (this.objectService.objectHeader?.binCountId === null || this.objectService.objectHeader?.binCountId === undefined) {

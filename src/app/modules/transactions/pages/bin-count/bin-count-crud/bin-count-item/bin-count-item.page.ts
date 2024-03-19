@@ -49,8 +49,8 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.navController.navigateBack("/transactions/bin-count/bin-count-header");
          } else {
             await this.loadBinCountBatchCriteria();
-            if (this.objectService.objectDetail && this.objectService.objectDetail.length === 0) {
-               console.log("🚀 ~ BinCountItemPage ~ ionViewDidEnter ~ this.objectService.objectDetail:", this.objectService.objectDetail)
+            console.log("🚀 ~ BinCountItemPage ~ ionViewDidEnter ~ this.objectService.flatDetail:", this.objectService.flatDetail)
+            if (this.objectService.flatDetail && this.objectService.flatDetail.length === 0) {
                await this.addNewObjectDetail(1);
             } else {
                await this.transformFlatDetail();
@@ -99,6 +99,7 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                binCode: null,
                detail: []
             });
+            console.log("🚀 ~ BinCountItemPage ~ addNewObjectDetail ~ maxSequence:", maxSequence)
             this.showModal((maxSequence === null || maxSequence === undefined) ? 0 : maxSequence + 1);
          } else {
             this.objectService.flatDetail.push({
@@ -115,16 +116,18 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    transformFlatDetail() {
-      this.objectService.flatDetail = [];
-      let uniqueSequence = [...new Set(this.objectService.objectDetail.filter(r => !(r.sequence === null || r.sequence === undefined)).flatMap(r => r.sequence))];
-      uniqueSequence.forEach(r => {
-         this.objectService.flatDetail.push({
-            id: uuidv4(),
-            sequence: r,
-            binCode: this.objectService.objectDetail.find(rr => rr.sequence === r)?.binCode,
-            detail: JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(rr => rr.sequence === r)))
+      if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+         this.objectService.flatDetail = [];
+         let uniqueSequence = [...new Set(this.objectService.objectDetail.filter(r => !(r.sequence === null || r.sequence === undefined)).flatMap(r => r.sequence))];
+         uniqueSequence.forEach(r => {
+            this.objectService.flatDetail.push({
+               id: uuidv4(),
+               sequence: r,
+               binCode: this.objectService.objectDetail.find(rr => rr.sequence === r)?.binCode,
+               detail: JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(rr => rr.sequence === r)))
+            })
          })
-      })
+      }
    }
 
    binCountBatchCriteria: InventoryCountBatchCriteria;
@@ -319,6 +322,32 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       BarcodeScanner.stopScan();
       // this.scanActive = false;
       this.onCameraStatusChanged(false);
+   }
+
+   onBinScanCompleted(event: string) { // bin code
+      try {
+         let found = this.objectService.binSearchList.find(r => r.code.toUpperCase() === event.toUpperCase());
+         if (found) {
+            this.onBinCodeChanged({ id: found.id });
+         } else {
+            this.toastService.presentToast("", "Invalid Bin Code", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onBinDoneScanning(event) { // bin code
+      try {
+         let found = this.objectService.binSearchList.find(r => r.code.toUpperCase() === event.toUpperCase());
+         if (found) {
+            this.onBinCodeChanged({ id: found.id });
+         } else {
+            this.toastService.presentToast("", "Invalid Bin Code", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
    }
 
    /* #endregion */

@@ -110,7 +110,8 @@
    </ion-col>
 </ion-row>
 <div class="scan-box" [hidden]="!scanActive"></div>
-<ion-modal [isOpen]="detailModal" (didDismiss)="detailModal = false">
+
+<ion-modal [isOpen]="detailModal" (didDismiss)="detailModal = false" [hidden]="scanActive">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -126,7 +127,7 @@
       <ion-content>
          <div class="p-2" *ngIf="!(selectedSequence === null || selectedSequence === undefined)">
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">  
-               <app-search-dropdown title="From Bin" [searchDropdownList]="objectService.binSearchList" [selectedCode]="selectedFlat.binCode" optionValue="code" (onActionComplete)="onBinCodeChanged($event)"></app-search-dropdown>
+               <app-search-dropdown title="From Bin" [searchDropdownList]="objectService.binSearchList" [selectedCode]="selectedFlat.binCode" optionValue="code" (onActionComplete)="onBinCodeChanged($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onBinScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onBinDoneScanning($event)"></app-search-dropdown>
             </ion-list>
             <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                <ion-label>Item</ion-label>
