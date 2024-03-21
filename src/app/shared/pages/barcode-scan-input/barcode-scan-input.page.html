@@ -69,8 +69,7 @@
                <ion-label>{{availableVariationsByItemId[0].itemCode}} - {{availableVariationsByItemId[0].description}}</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item detail="false" class="ion-no-padding no-ripple"
-                  *ngFor="let item of availableVariationsByItemId">
+               <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableVariationsByItemId">
                   <ion-checkbox class="ml-2" slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
                   <ion-grid class="ion-no-padding py-2 pl-2">
                      <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">

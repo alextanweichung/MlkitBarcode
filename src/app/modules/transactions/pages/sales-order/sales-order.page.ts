@@ -28,8 +28,8 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
 
    uniqueGrouping: Date[] = [];
 
-	currentPage: number = 1;
-	itemsPerPage: number = 12;
+   currentPage: number = 1;
+   itemsPerPage: number = 12;
 
    constructor(
       private authService: AuthService,
@@ -45,7 +45,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    ) {
       this.objectDiffer = this.differs.find(this.objects).create();
    }
-   
+
    ngDoCheck(): void {
       const objectChanges = this.objectDiffer.diff(this.objects);
       if (objectChanges) {
@@ -119,7 +119,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
          await this.loadingService.showLoading();
          this.objectService.getDraftObjects().subscribe(async response => {
             this.draftObjects = response;
-            for await (let rowData of this.draftObjects) {               
+            for await (let rowData of this.draftObjects) {
                let objRoot: SalesOrderRoot = JSON.parse(rowData.jsonData);
                objRoot.header = this.commonService.convertObjectAllDateType(objRoot.header);
                let obj: SalesOrderList = {
@@ -168,6 +168,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    async addObject() {
       try {
          // if (this.objectService.hasSalesAgent()) {
+         this.objectService.resetVariables();
          this.navController.navigateForward("/transactions/sales-order/sales-order-header");
          // } else {
          //   this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);
@@ -307,51 +308,51 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
       }
    }
 
-	highlight(event) {
-		event.getInputElement().then(r => {
-			r.select();
-		})
-	}
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
 
-	async onKeyDown(event, searchText) {
-		if (event.keyCode === 13) {
-			await this.search(searchText, true);
-		}
-	}
+   async onKeyDown(event, searchText) {
+      if (event.keyCode === 13) {
+         await this.search(searchText, true);
+      }
+   }
 
-	itemSearchText: string;
-	filteredObj: SalesOrderList[] = [];
-	search(searchText, newSearch: boolean = false) {
-		if (newSearch) {
-			this.filteredObj = [];
-		}
-		this.itemSearchText = searchText;
-		try {
-			if (searchText && searchText.trim().length > 2) {
-				if (Capacitor.getPlatform() !== "web") {
-					Keyboard.hide();
-				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
+   itemSearchText: string;
+   filteredObj: SalesOrderList[] = [];
+   search(searchText, newSearch: boolean = false) {
+      if (newSearch) {
+         this.filteredObj = [];
+      }
+      this.itemSearchText = searchText;
+      try {
+         if (searchText && searchText.trim().length > 2) {
+            if (Capacitor.getPlatform() !== "web") {
+               Keyboard.hide();
+            }
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
                r.salesOrderNum.toUpperCase().includes(searchText.toUpperCase()) ||
                r.customerCode.toUpperCase().includes(searchText.toUpperCase()) ||
                r.customerName.toUpperCase().includes(searchText.toUpperCase()) ||
                r.salesAgentName.toUpperCase().includes(searchText.toUpperCase())
-            )));            
-				this.currentPage = 1;
-			} else {
-				this.resetFilteredObj();
-				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
-			}
-		} catch (e) {
-			console.error(e);
-		}
-	}
+            )));
+            this.currentPage = 1;
+         } else {
+            this.resetFilteredObj();
+            this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
 
-	resetFilteredObj() {
+   resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
       if (!this.objectService.filterShowClosed) {
          this.filteredObj = this.filteredObj.filter(r => !r.isClosed);
       }
-	}
+   }
 
 }

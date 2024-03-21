@@ -370,65 +370,85 @@
          </ion-toolbar>
       </ion-header>
       <ion-content>
-         <ion-item button detail="false" class="no-ripple" *ngIf="selectedItem">
-            <ion-grid class="p-0">
+         <!-- <ion-item button detail="false" class="no-ripple" *ngIf="selectedItem"> -->
+            <ion-grid class="p-0" *ngIf="selectedItem">
                <ion-row>
-                  <ion-col class="ion-flex ion-margin-auto font-smaller">
+                  <ion-col class="ion-margin-auto ion-text-center">
                      <div>{{selectedItem.itemCode}}</div>
                   </ion-col>
                </ion-row>
-               <div *ngFor="let vd of selectedItem.variationDetails">
-                  <div *ngFor="let d of vd.details">
-                     <ion-row class="py-0" *ngIf="d.deactivated === false">
-                        <ion-col size="6" class="ion-flex ion-margin-auto">
-                           <ion-grid class="ion-no-padding">
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" style="font-size:x-small" *ngIf="vd.itemVariationXId">
-                                       {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
-                                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:x-small" *ngIf="d.itemVariationYId">
-                                       {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
-                                 </ion-col>
-                              </ion-row>
-                              <ion-row class="pt-1">
-                                 <ion-col class="ion-flex ion-margin-auto font-smaller" *ngIf="isSalesOrder && showAvailQty">
-                                    Qty:
-                                    <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-1">
-                                       {{d.actualQty|number:"1.0"}}</div>
-                                    <div *ngIf="salesOrderQuantityControl === '0' || salesOrderQuantityControl === '2'" class="font-bold ml-1">{{d.availableQty|number:"1.0"}}</div>
-                                 </ion-col>
-                                 <ion-col class="ion-flex ion-margin-auto" *ngIf="d?.qtyInCart > 0">
-                                    <ion-badge>
-                                       <div class="ion-flex font-smaller">[In cart:<div class="font-bold ml-1"> {{d?.qtyInCart|number:"1.0"}}</div>]</div>
-                                    </ion-badge>
-                                 </ion-col>
-                              </ion-row>
-                           </ion-grid>
-                        </ion-col>
-                        <ion-col size="6" class="ion-margin-auto p-0">
-                           <ion-grid class="ion-no-padding">
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseVariationQty(d)">
-                                       <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                                    </ion-button>
-                                 </ion-col>
-                                 <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="d.qtyRequest" (ionBlur)="isValidVariationQty(d)" placeholder="0"></ion-input>
-                                 </ion-col>
-                                 <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(d)">
-                                       <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                                    </ion-button>
-                                 </ion-col>
-                              </ion-row>
-                           </ion-grid>
-                        </ion-col>
-                     </ion-row>
+               <ng-container *ngIf="!configItemVariationShowMatrix">
+                  <div *ngFor="let vd of selectedItem.variationDetails">
+                     <div *ngFor="let d of vd.details">
+                        <ion-row class="py-0" *ngIf="d.deactivated === false">
+                           <ion-col size="6" class="ion-flex ion-margin-auto">
+                              <ion-grid class="ion-no-padding">
+                                 <ion-row>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" style="font-size:x-small" *ngIf="vd.itemVariationXId">
+                                          {{vd.itemVariationXId|idMapping:itemVariationXMasterList}}</span>
+                                       <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:x-small" *ngIf="d.itemVariationYId">
+                                          {{d.itemVariationYId|idMapping:itemVariationYMasterList}}</span>
+                                    </ion-col>
+                                 </ion-row>
+                                 <ion-row class="pt-1">
+                                    <ion-col class="ion-flex ion-margin-auto font-smaller" *ngIf="isSalesOrder && showAvailQty">
+                                       Qty:
+                                       <div *ngIf="salesOrderQuantityControl === '1'" class="font-bold ml-1">
+                                          {{d.actualQty|number:"1.0"}}</div>
+                                       <div *ngIf="salesOrderQuantityControl === '0' || salesOrderQuantityControl === '2'" class="font-bold ml-1">{{d.availableQty|number:"1.0"}}</div>
+                                    </ion-col>
+                                    <ion-col class="ion-flex ion-margin-auto" *ngIf="d?.qtyInCart > 0">
+                                       <ion-badge>
+                                          <div class="ion-flex font-smaller">[In cart:<div class="font-bold ml-1"> {{d?.qtyInCart|number:"1.0"}}</div>]</div>
+                                       </ion-badge>
+                                    </ion-col>
+                                 </ion-row>
+                              </ion-grid>
+                           </ion-col>
+                           <ion-col size="6" class="ion-margin-auto p-0">
+                              <ion-grid class="ion-no-padding">
+                                 <ion-row>
+                                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseVariationQty(d)">
+                                          <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                                       </ion-button>
+                                    </ion-col>
+                                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                                       <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="d.qtyRequest" (ionBlur)="isValidVariationQty(d)" placeholder="0"></ion-input>
+                                    </ion-col>
+                                    <ion-col class="ion-flex ion-margin-auto justify-content-center">
+                                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseVariationQty(d)">
+                                          <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                                       </ion-button>
+                                    </ion-col>
+                                 </ion-row>
+                              </ion-grid>
+                           </ion-col>
+                        </ion-row>
+                     </div>
                   </div>
-               </div>
+               </ng-container>
+               <ng-container *ngIf="configItemVariationShowMatrix">
+                  <table id="qtyMatrix">
+                     <tr>
+                        <th class="p-1 font-half-size ion-text-left">Variety</th>
+                        <th class="p-1 font-half-size" *ngFor="let rowData of selectedItem.variationY">
+                           {{rowData|idMapping:itemVariationYMasterList}}
+                        </th>
+                     </tr>
+                     <tr *ngFor="let rowData of selectedItem.variationDetails">
+                        <td class="p-1 font-half-size">
+                           {{rowData.itemVariationXId|idMapping:itemVariationXMasterList}}
+                        </td>
+                        <td class="p-1 font-half-size ion-text-right" *ngFor="let rowData2 of rowData.details">
+                           <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="rowData2.qtyRequest" (ionBlur)="isValidVariationQty(rowData2)" placeholder="0"></ion-input>
+                        </td>
+                     </tr>
+                  </table>
+               </ng-container>
             </ion-grid>
-         </ion-item>
+         <!-- </ion-item> -->
       </ion-content>
       <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color:white;">
          <ion-button class="ion-margin" expand="block" (click)="addVariationToCart()">

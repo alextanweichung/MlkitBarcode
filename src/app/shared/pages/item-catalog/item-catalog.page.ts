@@ -86,6 +86,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    configSalesTransactionShowHistory: boolean = false;
    configSalesActivateTradingMargin: boolean;
    configTradingActivateMarginExpr: boolean = false;
+   configItemVariationShowMatrix: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -145,6 +146,13 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.configTradingActivateMarginExpr = true;
          } else {
             this.configTradingActivateMarginExpr = false;
+         }
+
+         let itemVariationShowMatrix = this.moduleControl.find(x => x.ctrlName === "ItemVariationShowMatrix");
+         if (itemVariationShowMatrix && itemVariationShowMatrix.ctrlValue.toUpperCase() === "Y") {
+            this.configItemVariationShowMatrix = true;
+         } else {
+            this.configItemVariationShowMatrix = false;
          }
 
       })
@@ -347,15 +355,21 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    assignTrxItemToDataLine(item: TransactionDetail) {
       if (this.useTax) {
          if (this.isItemPriceTaxInclusive) {
-            item.unitPrice = item.itemPricing.unitPrice;
-            item.unitPriceExTax = this.commonService.computeAmtExclTax(new Decimal(item.itemPricing.unitPrice ? item.itemPricing.unitPrice : 0), item.taxPct).toNumber();
+            if (item.itemPricing) {
+               item.unitPrice = item.itemPricing.unitPrice;
+               item.unitPriceExTax = this.commonService.computeAmtExclTax(new Decimal(item.itemPricing.unitPrice ? item.itemPricing.unitPrice : 0), item.taxPct).toNumber();
+            }
          } else {
-            item.unitPrice = this.commonService.computeAmtInclTax(new Decimal(item.itemPricing.unitPrice ? item.itemPricing.unitPrice : 0), item.taxPct).toNumber();
-            item.unitPriceExTax = item.itemPricing.unitPrice;
+            if (item.itemPricing) {
+               item.unitPrice = this.commonService.computeAmtInclTax(new Decimal(item.itemPricing.unitPrice ? item.itemPricing.unitPrice : 0), item.taxPct).toNumber();
+               item.unitPriceExTax = item.itemPricing.unitPrice;
+            }
          }
       } else {
-         item.unitPrice = item.itemPricing.unitPrice;
-         item.unitPriceExTax = item.itemPricing.unitPrice;
+         if (item.itemPricing) {
+            item.unitPrice = item.itemPricing.unitPrice;
+            item.unitPriceExTax = item.itemPricing.unitPrice;
+         }
       }
       item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.objectHeader?.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
       item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.objectHeader?.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
@@ -502,6 +516,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    itemVariationYMasterList: MasterListDetails[] = [];
    showModal(data: TransactionDetail) {
       this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
+      console.log("🚀 ~ ItemCatalogPage ~ showModal ~ this.selectedItem:", this.selectedItem)
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.isModalOpen = true;

@@ -126,8 +126,8 @@
           </ion-item>
           <ion-item>
             <ion-label><p>Unit Price</p></ion-label>
-            <ion-input *ngIf="isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="onModalItemEditComplete()"></ion-input>
-            <ion-input *ngIf="!isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="numeric" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="onModalItemEditComplete()"></ion-input>
+            <ion-input *ngIf="isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPrice" (ionBlur)="onModalItemEditComplete()"></ion-input>
+            <ion-input *ngIf="!isDisplayTaxInclusive" #unitPrice slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="decimal" enterkeyhint="done" type="number" [(ngModel)]="selectedItem.unitPriceExTax" (ionBlur)="onModalItemEditComplete()"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label><p>Discount Code</p></ion-label>
