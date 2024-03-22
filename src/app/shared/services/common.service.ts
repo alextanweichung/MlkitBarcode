@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { LocalMarginConfig } from '../models/pos-download';
 import { Decimal } from 'decimal.js';
 import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
+import { InnerVariationDetail, VariationDetail } from '../models/variation-detail';
 
 @Injectable({
    providedIn: 'root'
@@ -884,5 +885,23 @@ export class CommonService {
    }
 
    /* #endregion */
+
+   buildVariationStructure(itemList: TransactionDetail[]) {
+      let result: TransactionDetail;
+      if (itemList && itemList.length > 0) {
+         result = itemList[0];
+         let vd: VariationDetail[] = [];
+         itemList.forEach(r => {
+            vd.push({
+               itemVariationXId: r.itemVariationXId,
+               details: []
+            })
+            let d: InnerVariationDetail[] = [];
+            itemList.filter(rr => rr.taxId === r.itemVariationXId).forEach(rr => {
+               
+            })
+         })
+      }
+   }
 
 }

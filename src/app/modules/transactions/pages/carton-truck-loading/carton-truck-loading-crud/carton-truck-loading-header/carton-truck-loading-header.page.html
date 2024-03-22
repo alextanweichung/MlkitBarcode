@@ -110,6 +110,7 @@
                               <div class="font-bold">Doc. Num.</div>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                              <ion-icon class="ion-flex mr-2 my-auto" name="ellipse" [class]="validateCTL(rowData)?'color-success':'color-danger'"></ion-icon>
                               <div>{{rowData.trxNum}}</div>
                            </ion-col>
                         </ion-row>

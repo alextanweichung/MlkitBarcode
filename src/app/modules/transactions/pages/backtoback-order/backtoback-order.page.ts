@@ -119,6 +119,7 @@ export class BackToBackOrderPage implements OnInit, OnDestroy, ViewWillEnter {
    async addObject() {
       try {
          if (this.objectService.hasSalesAgent()) {
+            this.objectService.resetVariables();
             this.navController.navigateForward("/transactions/backtoback-order/backtoback-order-header");
          } else {
             this.toastService.presentToast("Control Error", "Sales Agent not set", "top", "warning", 1000);

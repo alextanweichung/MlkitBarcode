@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController, IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { CurrentInboundAssignment, CurrentInboundList, InboundLineForWD, MultiInboundCarton, MultiInboundObject, MultiInboundRoot } from 'src/app/modules/transactions/models/inbound-scan';
 import { InboundScanService } from 'src/app/modules/transactions/services/inbound-scan.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -118,7 +118,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
                      if (!isBlock) {
                         await this.runInboundEngine(r, 1);
                      }
-                  }                  
+                  }
                } else {
                   if (event && event.length > 0 && event.filter(r => r.typeCode === "AS")?.length > 0) {
                      this.toastService.presentToast("Assembly Item Detected", `Item ${event.filter(r => r.typeCode === "AS").flatMap(r => r.itemCode).join(", ")} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
@@ -676,7 +676,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
       if (itemList.newItemId && itemList.newItemEffectiveDate && this.commonService.convertUtcDate(itemList.newItemEffectiveDate) <= this.objectService.header.trxDate) {
          let newItemCode = this.configService.item_Masters.find(r => r.id === itemList.newItemId);
          if (newItemCode) {
-            this.toastService.presentToast("Converted Code Detected", `Item ${itemList.itemCode} has been converted to ${newItemCode.code} effective from ${format(itemList.newItemEffectiveDate, "dd/MM/yyyy")}`, "top", "warning", 1000);
+            this.toastService.presentToast("Converted Code Detected", `Item ${itemList.itemCode} has been converted to ${newItemCode.code} effective from ${format(new Date(itemList.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1000);
             if (this.objectService.systemWideBlockConvertedCode) {
                return true;
             } else {

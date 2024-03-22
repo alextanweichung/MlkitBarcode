@@ -517,6 +517,19 @@ export class CartonTruckLoadingHeaderPage implements OnInit, ViewWillEnter, View
       return valid;
    }
 
+   validateCTL(rowData: CartonTruckLoadingDetail) {
+      let valid: boolean = true;
+      let invalidTrxList = (rowData.totalCarton && rowData.cartonBarcode.length != rowData.totalCarton && rowData.typeCode === "O" && rowData.trxType !== "Other Delivery");
+      if (invalidTrxList) {
+         // let trxTotalCartonAmount = this.selectedTruckArrangement.cartonBarcode.filter(r => r.trxNum == trx.trxNum)?.length ?? 0;
+         let trxTotalNonNullCartonAmount = this.objectService.objectTA?.cartonBarcode.filter(r => r.trxNum == rowData.trxNum && r.cartonBarcode != null)?.length ?? 0;
+         if (trxTotalNonNullCartonAmount == rowData.totalCarton) {
+            valid = false;
+         }
+      }
+      return valid;
+   }
+
    onTAScanCompleted(event: string) { // truck arrangement
       try {
          if (event) {

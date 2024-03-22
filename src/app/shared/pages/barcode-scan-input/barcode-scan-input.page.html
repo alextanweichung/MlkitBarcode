@@ -64,22 +64,42 @@
          </ion-toolbar>
       </ion-header>
       <ion-content>
-         <div class="p-2">
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="availableVariationsByItemId && availableVariationsByItemId.length > 0">
+         <div class="p-2" *ngIf="availableVariationsByItemId && availableVariationsByItemId.length > 0">
+            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                <ion-label>{{availableVariationsByItemId[0].itemCode}} - {{availableVariationsByItemId[0].description}}</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableVariationsByItemId">
-                  <ion-checkbox class="ml-2" slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
-                  <ion-grid class="ion-no-padding py-2 pl-2">
-                     <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
-                        <ion-col class="ion-flex ion-margin-auto">
-                           <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size:small" *ngIf="item.itemVariationXId"> {{item.itemVariationXCd + " | " + item.itemVariationXDesc}}</span>
-                           <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:small" *ngIf="item.itemVariationYId"> {{item.itemVariationYCd + " | " + item.itemVariationYDesc}}</span>
-                        </ion-col>
-                     </ion-row>
-                  </ion-grid>
-               </ion-item>
+               <ng-container *ngIf="!configItemVariationShowMatrix">
+                  <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableVariationsByItemId">
+                     <ion-checkbox class="ml-2" slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
+                     <ion-grid class="ion-no-padding py-2 pl-2">
+                        <ion-row *ngIf="item.variationTypeCode === '1' || item.variationTypeCode === '2'">
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" style="font-size:small" *ngIf="item.itemVariationXId"> {{item.itemVariationXCd + " | " + item.itemVariationXDesc}}</span>
+                              <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" style="font-size:small" *ngIf="item.itemVariationYId"> {{item.itemVariationYCd + " | " + item.itemVariationYDesc}}</span>
+                           </ion-col>
+                        </ion-row>
+                     </ion-grid>
+                  </ion-item>               
+               </ng-container>
+               <ng-container *ngIf="configItemVariationShowMatrix">
+                  <table id="qtyMatrix">
+                     <tr>
+                        <th class="p-1 font-half-size ion-text-left">Variety</th>
+                        <th class="p-1 font-half-size" *ngFor="let rowData of availableVariationsByItemId[0].variationY">
+                           {{rowData|idMapping:itemVariationYMasterList}}
+                        </th>
+                     </tr>
+                     <tr *ngFor="let rowData of availableVariationsByItemId[0].variationDetails">
+                        <td class="p-1 font-half-size">
+                           {{rowData.itemVariationXId|idMapping:itemVariationXMasterList}}
+                        </td>
+                        <td class="p-1 font-half-size ion-text-right" *ngFor="let rowData2 of rowData.details">
+                           <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="rowData2.qtyRequest" placeholder="0"></ion-input>
+                        </td>
+                     </tr>
+                  </table>
+               </ng-container>
             </ion-list>
          </div>
       </ion-content>

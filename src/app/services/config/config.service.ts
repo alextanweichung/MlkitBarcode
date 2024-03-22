@@ -68,6 +68,7 @@ export class ConfigService {
                // apiUrl: "https://test.fiffy-erp.com/api/",
                // apiUrl: "https://idcp-noseintl.com/api/",
                // apiUrl: "https:bmm-sys.com:1000/api/",
+               // apiUrl: "https://idcpth.mkagrp.com/api/",
                imgUrl: null,
                lastDownloadAt: null
             })

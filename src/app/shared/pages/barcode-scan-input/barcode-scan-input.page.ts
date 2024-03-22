@@ -59,6 +59,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       }, 100);
    }
 
+   configItemVariationShowMatrix: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -78,6 +79,13 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
          } else {
             this.systemWideBlockConvertedCode = false;
+         }
+
+         let itemVariationShowMatrix = this.moduleControl.find(x => x.ctrlName === "ItemVariationShowMatrix");
+         if (itemVariationShowMatrix && itemVariationShowMatrix.ctrlValue.toUpperCase() === "Y") {
+            this.configItemVariationShowMatrix = true;
+         } else {
+            this.configItemVariationShowMatrix = false;
          }
 
       }, error => {
@@ -181,7 +189,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    availableItemmmm: TransactionDetail[] = [];
    availableVariations: TransactionDetail[] = [];
    @ViewChild("itemInput", { static: false }) itemInput: ElementRef;
-   validateItem(searchValue: string) {
+   async validateItem(searchValue: string) {
       if (searchValue) {
          this.itemSearchValue = "";
          this.availableItemmmm = [];
@@ -307,6 +315,10 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
                if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
                   if (this.showVariationModalSelection) {
+                     if (this.configItemVariationShowMatrix) {
+                        var test = await this.commonService.buildVariationStructure(this.availableVariationsByItemId);
+                        console.log("🚀 ~ BarcodeScanInputPage ~ validateItem ~ test:", test)
+                     }
                      this.showVariationModal();
                   } else {
                      this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
