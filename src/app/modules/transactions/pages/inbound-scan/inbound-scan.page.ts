@@ -69,7 +69,6 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter, ViewDi
          this.objects = [];
          await this.loadingService.showLoading();
          this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
-            console.log("🚀 ~ InboundScanPage ~ this.objectService.getObjectList ~ response:", response)
             this.objects = response;
 				this.resetFilteredObj();
             await this.loadingService.dismissLoading();

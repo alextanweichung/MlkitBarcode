@@ -135,16 +135,13 @@ export class InboundScanService {
          }
       })
       this.authService.currentUserToken$.subscribe(codedToken => {
-         console.log("🚀 ~ InboundScanService ~ loadMasterList ~ codedToken:", codedToken)
          if (codedToken) {
             let locationString = codedToken.lid;
             if (locationString && locationString.length > 0) {
                this.allowedLocation = locationString.split(",").map(Number);
-               console.log("🚀 ~ InboundScanService ~ loadMasterList ~ this.allowedLocation:", this.allowedLocation)
                if (this.allowedLocation.length > 0) {
                   this.allowedLocation = [...this.allowedLocation, ...this.fLocationMasterList.filter(x => this.allowedLocation.includes(parseInt(x.attribute15))).map(y => y.id)];
                   this.fLocationMasterList = this.fLocationMasterList.filter(x => this.allowedLocation.includes(x.id));
-                  console.log("🚀 ~ InboundScanService ~ loadMasterList ~ this.fLocationMasterList:", this.fLocationMasterList)
                   if (this.customerFilteringByUserLocation) {
                      this.customerMasterList = this.customerMasterList.filter(x => this.allowedLocation.includes(parseInt(x.attribute6)));
                   }

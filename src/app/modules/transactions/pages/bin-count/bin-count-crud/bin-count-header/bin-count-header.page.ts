@@ -30,7 +30,6 @@ export class BinCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    ionViewWillEnter(): void {
-      console.log("🚀 ~ BinCountHeaderPage ~ ionViewWillEnter ~ this.objectService.objectHeader:", this.objectService.objectHeader)
       if (this.objectService.objectHeader !== null && this.objectService.objectHeader?.binCountId > 0) {
          this.objectForm.patchValue(this.objectService.objectHeader);
          this.dateValue = format(this.objectService.objectHeader.trxDate, "yyyy-MM-dd") + "T08:00:00.000Z";
@@ -51,7 +50,6 @@ export class BinCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    newObjectForm() {
-      console.log("🚀 ~ BinCountHeaderPage ~ newObjectForm ~ this.objectForm = this.formBuilder.group:")
       this.objectForm = this.formBuilder.group({
          binCountId: [0],
          binCountNum: [null],
@@ -73,7 +71,6 @@ export class BinCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
    binCountBatchDdl: SearchDropdownList[] = [];
    @ViewChild("binCountBatchSdd", { static: false }) binCountBatchSdd: SearchDropdownPage;
    async onLocationSelected(event: SearchDropdownList) {
-      console.log("🚀 ~ BinCountHeaderPage ~ onLocationSelected ~ event:", event)
       try {
          if (event) {
             if (this.objectService.objectHeader?.binCountId === null || this.objectService.objectHeader?.binCountId === undefined) {

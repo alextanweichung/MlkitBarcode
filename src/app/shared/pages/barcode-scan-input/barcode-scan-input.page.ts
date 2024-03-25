@@ -317,7 +317,6 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   if (this.showVariationModalSelection) {
                      if (this.configItemVariationShowMatrix) {
                         var test = await this.commonService.buildVariationStructure(this.availableVariationsByItemId);
-                        console.log("🚀 ~ BarcodeScanInputPage ~ validateItem ~ test:", test)
                      }
                      this.showVariationModal();
                   } else {

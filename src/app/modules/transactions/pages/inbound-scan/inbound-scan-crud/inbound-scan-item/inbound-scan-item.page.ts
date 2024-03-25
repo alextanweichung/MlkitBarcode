@@ -582,7 +582,6 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
 
    insertObject() {
       let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiInboundObject);
-      console.log("🚀 ~ InboundScanItemPage ~ insertObject ~ newObjectDto:", newObjectDto)
       if (this.objectService.allowDocumentWithEmptyLine === "N") {
          if (newObjectDto.details.length < 1) {
             this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "warning", 1000);
@@ -608,7 +607,6 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
 
    updateObject() {
       let editObjectDto = this.transformObjectToTrxDto(this.objectService.multiInboundObject);
-      console.log("🚀 ~ InboundScanItemPage ~ updateObject ~ editObjectDto:", editObjectDto)
       if (this.objectService.allowDocumentWithEmptyLine === "N") {
          if (editObjectDto.details.length < 1) {
             this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "warning", 1000);
@@ -616,10 +614,8 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
          }
       }
       this.objectService.updateObject(editObjectDto).subscribe(response => {
-         console.log("🚀 ~ InboundScanItemPage ~ this.objectService.updateObject ~ response:", response)
          if (response.status == 201) {
             let object = response.body as MultiInboundRoot;
-            console.log("🚀 ~ InboundScanItemPage ~ this.objectService.updateObject ~ object:", object)
             this.toastService.presentToast("Update Complete", "Inbound has been updated.", "top", "success", 1000);
             this.objectService.resetVariables();
             let navigationExtras: NavigationExtras = {

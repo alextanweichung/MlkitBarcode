@@ -49,7 +49,6 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.navController.navigateBack("/transactions/bin-count/bin-count-header");
          } else {
             await this.loadBinCountBatchCriteria();
-            console.log("🚀 ~ BinCountItemPage ~ ionViewDidEnter ~ this.objectService.flatDetail:", this.objectService.flatDetail)
             if (this.objectService.flatDetail && this.objectService.flatDetail.length === 0) {
                await this.addNewObjectDetail(1);
             } else {
@@ -99,7 +98,6 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                binCode: null,
                detail: []
             });
-            console.log("🚀 ~ BinCountItemPage ~ addNewObjectDetail ~ maxSequence:", maxSequence)
             this.showModal((maxSequence === null || maxSequence === undefined) ? 0 : maxSequence + 1);
          } else {
             this.objectService.flatDetail.push({

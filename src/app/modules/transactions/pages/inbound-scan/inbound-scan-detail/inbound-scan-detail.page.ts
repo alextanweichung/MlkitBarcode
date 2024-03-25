@@ -60,7 +60,6 @@ export class InboundScanDetailPage implements OnInit, ViewWillEnter, ViewDidEnte
       try {
          await this.loadingService.showLoading();
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
-            console.log("🚀 ~ InboundScanDetailPage ~ this.objectService.getObjectById ~ response:", response)
             let object = response;
             object.header = this.commonService.convertObjectAllDateType(object.header);
             await this.objectService.setObject(object);

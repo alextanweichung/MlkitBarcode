@@ -217,7 +217,6 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
                let apiResponse: InboundHeaderForWD = response.body[0];
                this.selectedDocs.unshift(apiResponse);
                this.uniqueOutstandingDocNum = [...new Set(this.selectedDocs.flatMap(r => r.inboundDocNum))];
-               console.log("🚀 ~ InboundScanHeaderPage ~ this.objectService.getDoc ~ this.selectedDocs:", this.selectedDocs)
             }
          },
          error: (error) => {
@@ -249,7 +248,6 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
       if (event) {
          this.objectForm.patchValue({ customerId: event.id });
          var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
-         console.log("🚀 ~ InboundScanHeaderPage ~ onCustomerSelected ~ lookupValue:", lookupValue)
          if (lookupValue != undefined) {
             this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
             if (lookupValue.attributeArray1.length > 0) {
@@ -258,7 +256,6 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
                this.objectService.customerLocationMasterList = [];
             }
          }
-         console.log("🚀 ~ InboundScanHeaderPage ~ onCustomerSelected ~ this.objectService.customerLocationMasterList:", this.objectService.customerLocationMasterList)
          if (!ignoreLocationUpdate) {
             if (lookupValue.attribute5 === "T") {
                //this.getSoByCustomer(event);
@@ -298,7 +295,6 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
                this.objectService.fLocationMasterList = this.objectService.fLocationMasterList.filter(x => this.objectService.allowedLocation.includes(x.id));
             }
          }
-         console.log("🚀 ~ InboundScanHeaderPage ~ onCustomerSelected ~ this.objectService.fLocationMasterList:", this.objectService.fLocationMasterList)
          if (lookupValue.attribute5 === "T") {
             if (lookupValue.attribute10) {
                this.objectForm.patchValue({ masterUDGroup1: parseInt(lookupValue.attribute10) });
