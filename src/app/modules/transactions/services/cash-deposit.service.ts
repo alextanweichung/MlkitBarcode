@@ -69,6 +69,7 @@ export class CashDepositService {
             await this.authService.rebuildCustomerList();
          }
       })
+      console.log("🚀 ~ CashDepositService ~ loadMasterList ~ this.customerMasterList:", this.customerMasterList)
       // attribute6 = locationId
    }
 
