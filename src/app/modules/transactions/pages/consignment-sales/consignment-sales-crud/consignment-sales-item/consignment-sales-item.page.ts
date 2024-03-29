@@ -164,7 +164,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       isBlock = this.validateNewItemConversion(trxLine);
       if (!isBlock) {
          this.objectService.objectDetail.forEach(r => r.sequence += 1);
-         trxLine.qtyRequest = 1;
+         trxLine.qtyRequest = (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1;
          trxLine.locationId = this.objectService.objectHeader.toLocationId;
          trxLine.sequence = 0;
          trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.objectHeader.trxDate, this.objectService.objectHeader.toLocationId);

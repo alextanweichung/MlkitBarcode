@@ -702,7 +702,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                               await this.runPickingEngine(r, Number(res));
                            })
                         } else {
-                           await this.runPickingEngine(r, Number(1));
+                           await this.runPickingEngine(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
                         }
                      }
                   })
@@ -721,7 +721,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                               await this.insertPickingLineWithoutSo(r, Number(res));
                            }) 
                         } else {
-                           await this.insertPickingLineWithoutSo(r, Number(1));
+                           await this.insertPickingLineWithoutSo(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
                         }
                      }
                   })

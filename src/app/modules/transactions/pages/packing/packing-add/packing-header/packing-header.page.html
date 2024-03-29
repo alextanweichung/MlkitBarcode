@@ -14,22 +14,30 @@
 <ion-content fullscreen [hidden]="scanActive">
    <div class="p-2">
 
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" [formGroup]="objectForm">
          <app-search-dropdown title="Warehouse Agent" optionLabel="description" [searchDropdownList]="objectService.warehouseAgentMasterList" [selectedId]="objectForm.controls.warehouseAgentId?.value" (onActionComplete)="onWarehouseAgentSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onWAScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onWADoneScanning($event)"></app-search-dropdown>
+         <ion-item class="ion-flex ion-flex-center">
+           <ion-checkbox slot="end" formControlName="isDeemedSupply"></ion-checkbox>
+           <ion-label>
+             <div class="ion-text-small font-bold">Deemed Supply?</div>
+           </ion-label>
+         </ion-item>
       </ion-list>
 
       <ng-container *ngIf="objectForm.controls.warehouseAgentId?.value">
-         <ion-segment [(ngModel)]="isWithType" (ionChange)="isWithDocChanged($event)" *ngIf="selectedDocs && selectedDocs.length === 0">
-            <ion-segment-button value="SO">
-               <ion-label>With SO</ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="B2B">
-               <ion-label>With B2B</ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="NONE">
-               <ion-label>Without Doc</ion-label>
-            </ion-segment-button>
-         </ion-segment>
+         <ng-container *ngIf="objectForm.controls.multiPackingId?.value === 0">
+            <ion-segment [(ngModel)]="isWithType" (ionChange)="isWithDocChanged($event)" *ngIf="selectedDocs && selectedDocs.length === 0">
+               <ion-segment-button value="SO">
+                  <ion-label>With SO</ion-label>
+               </ion-segment-button>
+               <ion-segment-button value="B2B">
+                  <ion-label>With B2B</ion-label>
+               </ion-segment-button>
+               <ion-segment-button value="NONE">
+                  <ion-label>Without Doc</ion-label>
+               </ion-segment-button>
+            </ion-segment>
+         </ng-container>
          <div class="mt-2" *ngIf="isWithType === 'NONE'" [formGroup]="objectForm">
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
                <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event, true)"></app-search-dropdown>

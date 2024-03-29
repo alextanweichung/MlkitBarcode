@@ -28,22 +28,22 @@
                            <ng-container *ngIf="!showImage">
                               <ng-container *ngIf="rowData.variationTypeCode === '0'">
                                  <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">
+                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">
                                        <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                                     </ion-button>
                                  </ion-col>
                                  <ion-col size="2">
-                                    <ion-input #input class="ion-text-center" type="number" [(ngModel)]="rowData.qtyRequest" placeholder="0" (ionBlur)="isValidQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)"></ion-input>
+                                    <ion-input #input class="ion-text-center" type="number" [(ngModel)]="rowData.qtyRequest" placeholder="0" (ionBlur)="isValidQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)"></ion-input>
                                  </ion-col>
                                  <ion-col size="1" class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">
+                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">
                                        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
                                     </ion-button>
                                  </ion-col>
                               </ng-container>
                               <ng-container *ngIf="rowData.variationTypeCode === '1' || rowData.variationTypeCode === '2'">
                                  <ion-col size="4" class="ion-flex ion-margin-auto justify-content-end"> 
-                                    <ion-button expand="block" size="small" style="width:100%" (click)="showModal(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">Variation</ion-button>
+                                    <ion-button expand="block" size="small" style="width:100%" (click)="showModal(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">Variation</ion-button>
                                  </ion-col>
                               </ng-container>
                            </ng-container>
@@ -119,15 +119,15 @@
                            <ng-container *ngIf="rowData.variationTypeCode === '0'">
                               <ion-row>
                                  <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">
+                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">
                                        <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                                     </ion-button>
                                  </ion-col>
                                  <ion-col>
-                                    <ion-input #input class="ion-text-center" type="number" [(ngModel)]="rowData.qtyRequest" placeholder="0" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)"></ion-input>
+                                    <ion-input #input class="ion-text-center" type="number" [(ngModel)]="rowData.qtyRequest" placeholder="0" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)"></ion-input>
                                  </ion-col>
                                  <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">
+                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">
                                        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
                                     </ion-button>
                                  </ion-col>
@@ -136,7 +136,7 @@
                            <ng-container *ngIf="rowData.variationTypeCode === '1' || rowData.variationTypeCode === '2'">
                               <ion-row>
                                  <ion-col>
-                                    <ion-button expand="block" size="small" style="width:100%" (click)="showModal(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">Variation</ion-button>
+                                    <ion-button expand="block" size="small" style="width:100%" (click)="showModal(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">Variation</ion-button>
                                  </ion-col>
                               </ion-row>
                            </ng-container>
@@ -144,7 +144,7 @@
                         <ng-container *ngIf="rowData.qtyRequest > 0">
                            <ion-row>
                               <ion-col>
-                                 <ion-button expand="block" size="small" style="width:100%;" (click)="addToCart(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null)">Add to Cart</ion-button>
+                                 <ion-button expand="block" size="small" style="width:100%;" (click)="addToCart(rowData)" [disabled]="disableIfPricingNotSet && (rowData.itemPricing === null || rowData.itemPricing === undefined)">Add to Cart</ion-button>
                               </ion-col>
                            </ion-row>
                         </ng-container>

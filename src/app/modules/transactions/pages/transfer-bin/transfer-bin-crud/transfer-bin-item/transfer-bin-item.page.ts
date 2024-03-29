@@ -111,7 +111,7 @@ export class TransferBinItemPage implements OnInit, ViewWillEnter, ViewDidEnter 
                   itemId: trxLine.itemId,
                   itemCode: trxLine.itemCode,
                   description: trxLine.description,
-                  qtyRequest: trxLine.qtyRequest??0,
+                  qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
                   deactivated: false
                }
                await this.objectService.objectDetail[this.selectedIndex].groupList.unshift(newLine);

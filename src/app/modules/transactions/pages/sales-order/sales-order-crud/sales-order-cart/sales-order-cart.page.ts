@@ -234,6 +234,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
+            this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
+            return;
+         }
          trxDto.header.salesOrderNum = null; // always default to null when insert
          if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
             this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(async response => {
@@ -277,6 +281,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
+            this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
+            return;
+         }
          this.objectService.updateObject(trxDto).subscribe(async response => {
             this.objectService.setSummary(response.body);
             this.toastService.presentToast("", "Update Complete", "top", "success", 1000);
@@ -333,7 +341,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             await alert.present();
          } else {
             this.submit_attempt = false;
-            this.toastService.presentToast("Control Error", "Please add at least 1 item to continue", "top", "danger", 1000);
+            this.toastService.presentToast("Control Error", "Please add at least 1 item to continue", "top", "warning", 1000);
          }
       } catch (e) {
          this.submit_attempt = false;
@@ -350,6 +358,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
+            this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
+            return;
+         }
          let object: DraftTransaction = {
             draftTransactionId: 0,
             draftTransactionNum: null,
@@ -390,6 +402,10 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             otherAmount: this.objectService.objectOtherAmt
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
+            this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
+            return;
+         }
          this.objectService.draftObject.jsonData = JSON.stringify(trxDto);
          this.objectService.updateDraftObject(this.objectService.draftObject).subscribe(async response => {
             let ret: DraftTransaction = response.body as DraftTransaction

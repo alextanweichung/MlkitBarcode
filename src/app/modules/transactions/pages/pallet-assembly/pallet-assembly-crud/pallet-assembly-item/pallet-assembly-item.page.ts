@@ -228,7 +228,7 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
          itemBarcode: item.itemBarcode,
          description: item.description,
          sequence: this.palletToShow.palletItemList.length ?? 0,
-         qtyRequest: 1
+         qtyRequest: (item.qtyRequest && item.qtyRequest) > 0 ? item.qtyRequest : 1
       }
       return newPalletItem;
    }

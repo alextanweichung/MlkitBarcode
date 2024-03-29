@@ -48,6 +48,32 @@
                </ion-row>
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Deemed Supply?</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <ion-icon [class]="(object.header.isDeemedSupply??false)?'color-success':'color-danger'" [name]="(object.header.isDeemedSupply??false)?'checkmark-circle-outline':'close-circle-outline'"></ion-icon>
+                  </ion-col>
+               </ion-row>
+               <ng-container *ngIf="object.header.deemedSupplyNum">
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div class="font-bold">Deemed Supply Num.</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                        <div>{{object.header.deemedSupplyNum}}</div>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div class="font-bold">Generate Date</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                        <div>{{object.header.generateDate|date:'dd/MM/yyyy'}}</div>
+                     </ion-col>
+                  </ion-row>
+               </ng-container>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
                      <div class="font-bold">Origin Location</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">

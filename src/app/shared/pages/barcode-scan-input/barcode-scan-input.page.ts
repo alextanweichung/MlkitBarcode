@@ -188,6 +188,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    itemSearchValue: string;
    availableItemmmm: TransactionDetail[] = [];
    availableVariations: TransactionDetail[] = [];
+   variationStructure: TransactionDetail;
    @ViewChild("itemInput", { static: false }) itemInput: ElementRef;
    async validateItem(searchValue: string) {
       if (searchValue) {
@@ -195,6 +196,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
          this.availableItemmmm = [];
          this.availableVariations = [];
          this.availableVariationsByItemId = [];
+         this.variationStructure = null;
          let found_item_master: LocalItemMaster[] = [];
          let found_item_barcode: LocalItemBarcode[] = [];
          if (this.configService.item_Masters && this.configService.item_Masters.length > 0) {
@@ -316,7 +318,13 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
                   if (this.showVariationModalSelection) {
                      if (this.configItemVariationShowMatrix) {
-                        var test = await this.commonService.buildVariationStructure(this.availableVariationsByItemId);
+                        var variationStructure = await this.commonService.buildVariationStructure(JSON.parse(JSON.stringify(this.availableVariationsByItemId)));
+                        if (variationStructure === null) {
+                           this.toastService.presentToast("System Error", "Please contact administrator.", "top", "danger", 1000);
+                           return;
+                        } else {
+                           this.variationStructure = variationStructure;
+                        }
                      }
                      this.showVariationModal();
                   } else {
@@ -391,13 +399,37 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    }
 
    addVariations() {
-      let found = this.availableVariationsByItemId.filter(r => r.isSelected)
-      if (found.length > 0) {
-         let found_item_master = this.configService.item_Masters.find(r => r.id === found[0]?.itemId);
-         this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
-      }
-      else {
-         this.toastService.presentToast("", "No item added", "top", "warning", 1000);
+      if (!this.configItemVariationShowMatrix) {
+         let found = this.availableVariationsByItemId.filter(r => r.isSelected)
+         if (found.length > 0) {
+            this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
+         }
+         else {
+            this.toastService.presentToast("", "No item added", "top", "warning", 1000);
+         }
+      } else {
+         if (this.variationStructure) {
+            this.variationStructure.variationDetails.forEach(x => {
+               x.details.forEach(y => {
+                  if (y.qtyRequest && y.qtyRequest > 0) {
+                     let foundIndex = this.availableVariationsByItemId.findIndex(r => r.itemVariationXId === x.itemVariationXId && r.itemVariationYId === y.itemVariationYId);
+                     if (foundIndex > -1) {
+                        this.availableVariationsByItemId[foundIndex].qtyRequest = y.qtyRequest;
+                        this.availableVariationsByItemId[foundIndex].isSelected = true;
+                     }
+                  }
+               })
+            })
+            let found = this.availableVariationsByItemId.filter(r => r.isSelected)
+            if (found.length > 0) {
+               this.onItemAdd.emit(this.availableVariationsByItemId.filter(r => r.isSelected));
+            }
+            else {
+               this.toastService.presentToast("", "No item added", "top", "warning", 1000);
+            }
+         } else {
+            this.toastService.presentToast("System Error", "Please contact adminstrator.", "top", "danger", 1000);
+         }
       }
       this.hideVariationModel();
       this.hideItemModel();
@@ -431,6 +463,12 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    focusItemSearch() {
       this.itemInput.nativeElement.focus();
+   }
+
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
    }
 
    /* #endregion */

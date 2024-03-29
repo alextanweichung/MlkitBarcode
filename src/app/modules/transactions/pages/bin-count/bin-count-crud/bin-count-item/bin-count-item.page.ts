@@ -194,7 +194,7 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                   itemBarcode: trxLine.itemBarcode,
                   itemBarcodeTagId: trxLine.itemBarcodeTagId,
                   binCode: null,
-                  qtyRequest: 1,
+                  qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
                   /* #region  */
                   itemCode: trxLine.itemCode,
                   itemDescription: trxLine.description,

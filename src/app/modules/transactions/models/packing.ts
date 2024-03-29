@@ -40,9 +40,13 @@ export interface MultiPackingHeader {
    toLocationId: number
    businessModelType: string
    isWithSo: boolean
+   copyFrom: string
    sourceType: string
    remark: any
    totalCarton: number
+   generateDate: Date
+   isDeemedSupply: boolean
+   deemedSupplyNum: string
    childId: any
    childNum: any
    sequence: number

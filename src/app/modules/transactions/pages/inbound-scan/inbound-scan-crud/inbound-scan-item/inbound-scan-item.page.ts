@@ -116,7 +116,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
                      let isBlock: boolean = false;
                      isBlock = await this.validateNewItemConversion(r);
                      if (!isBlock) {
-                        await this.runInboundEngine(r, 1);
+                        await this.runInboundEngine(r, ((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1));
                      }
                   }
                } else {
@@ -133,7 +133,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
                            let firstInboundLine = inboundCartonTag.inboundList[0];
                            firstInboundLine.qtyScanned += 1;
                         } else {
-                           let newLine = this.assignItemFoundToNewLine(r, 1);
+                           let newLine = this.assignItemFoundToNewLine(r, ((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1));
                            newLine.cartonNum = inboundCartonTag.cartonNum;
                            inboundCartonTag.inboundList.unshift(newLine);
                         }

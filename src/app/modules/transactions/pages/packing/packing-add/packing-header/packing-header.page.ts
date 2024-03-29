@@ -43,9 +43,12 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    ionViewWillEnter(): void {
       this.isMobile = Capacitor.getPlatform() !== "web";
       if (this.objectService.header && this.objectService.header.multiPackingId > 0) {
-         this.isWithType = this.objectService.header?.isWithSo ? "SO" : "NONE";
+         this.isWithType = this.objectService.header?.isWithSo ? (this.objectService.header?.copyFrom === "S" ? "SO" : "B2B") : "NONE";
          this.objectForm.patchValue(this.objectService.object.header);
-         this.loadExisitingSO(this.objectService.object.outstandingPackList.flatMap(r => r.salesOrderNum));
+         this.patchInfo();
+         if (this.objectService.header && this.objectService.header.isWithSo) {
+            this.loadExisitingSO(this.objectService.object.outstandingPackList.flatMap(r => r.salesOrderNum));
+         }
       } else {
          this.setDefaultValue();
       }
@@ -103,6 +106,33 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       })
    }
 
+   patchInfo() {
+      this.selectedCustomerId = this.objectService.header.customerId;
+
+      var lookupValue = this.objectService.customerMasterList?.find(e => e.id === this.selectedCustomerId);
+      if (lookupValue != undefined) {
+         if (lookupValue.attributeArray1.length > 0) {
+            this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
+         } else {
+            this.selectedCustomerLocationList = [];
+         }
+
+         if (lookupValue.attribute5 === "T") {
+            // handle location
+            this.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === "W");
+            if (lookupValue !== undefined) {
+               this.objectForm.patchValue({ locationId: parseFloat(lookupValue.attribute6) });
+               this.selectedLocationId = parseFloat(lookupValue.attribute6);
+            }
+         } else {
+            this.fLocationMasterList = this.objectService.locationMasterList;
+         }
+      }
+
+      this.selectedLocationId = this.objectService.header.locationId;
+      this.selectedToLocationId = this.objectService.header.toLocationId;
+   }
+
    loadExisitingSO(salesOrderNums: string[]) {
       this.objectService.getSOHeader(salesOrderNums).subscribe(response => {
          if (response.status === 200) {
@@ -147,29 +177,35 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    setDefaultValue() {
-      let defaultLocation = this.fLocationMasterList.find(item => item.isPrimary)?.id;
-      if (defaultLocation) {
-         this.objectForm.patchValue({ locationId: defaultLocation });
-      } else {
-         let findWh = this.fLocationMasterList.find(x => x.attribute1 === 'W');
-         if (findWh) {
-            this.objectForm.patchValue({ locationId: findWh.id });
+      if (!this.objectForm.controls.locationId.value) {
+         let defaultLocation = this.fLocationMasterList.find(item => item.isPrimary)?.id;
+         if (defaultLocation) {
+            this.objectForm.patchValue({ locationId: defaultLocation });
+         } else {
+            let findWh = this.fLocationMasterList.find(x => x.attribute1 === 'W');
+            if (findWh) {
+               this.objectForm.patchValue({ locationId: findWh.id });
+            }
+         }
+         if (this.configService.loginUser.defaultLocationId) {
+            let findLocation = this.objectService.locationMasterList.find(x => x.id === this.configService.loginUser.defaultLocationId);
+            if (findLocation) {
+               this.objectForm.patchValue({ locationId: findLocation.id });
+            }
          }
       }
-      if (this.configService.loginUser.defaultLocationId) {
-         let findLocation = this.objectService.locationMasterList.find(x => x.id === this.configService.loginUser.defaultLocationId);
-         if (findLocation) {
-            this.objectForm.patchValue({ locationId: findLocation.id });
+      if (!this.objectForm.controls.warehouseAgentId.value) {
+         let defaultAgent = this.objectService.warehouseAgentMasterList.find(item => item.isPrimary)?.id;
+         if (defaultAgent) {
+            this.objectForm.patchValue({ warehouseAgentId: defaultAgent });
          }
       }
-      let defaultAgent = this.objectService.warehouseAgentMasterList.find(item => item.isPrimary)?.id;
-      if (defaultAgent) {
-         this.objectForm.patchValue({ warehouseAgentId: defaultAgent });
-      }
-      let defaultCustomer = this.objectService.customerMasterList.find(r => r.isPrimary);
-      if (defaultCustomer) {
-         this.objectForm.patchValue({ customerId: defaultCustomer.id });
-         this.onCustomerSelected(defaultCustomer.id, true);
+      if (!this.objectForm.controls.customerId.value) {
+         let defaultCustomer = this.objectService.customerMasterList.find(r => r.isPrimary);
+         if (defaultCustomer) {
+            this.objectForm.patchValue({ customerId: defaultCustomer.id });
+            this.onCustomerSelected(defaultCustomer.id, true);
+         }
       }
    }
 
@@ -578,7 +614,10 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             sourceType: ["M"],
             remark: [null],
             groupType: ["S"],
-            copyFrom: [null]
+            copyFrom: [null],
+            generateDate: [null],
+            isDeemedSupply: [false],
+            deemedSupplyNum: [null]
          });
       } catch (e) {
          console.error(e);
@@ -683,7 +722,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    onInfoModalHide() {
-      
+
    }
 
    onWAScanCompleted(event: string) { // warehouse agent

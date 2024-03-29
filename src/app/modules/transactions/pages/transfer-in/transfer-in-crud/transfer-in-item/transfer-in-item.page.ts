@@ -120,7 +120,7 @@ export class TransferInItemPage implements OnInit, ViewWillEnter {
             yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
             barcode: r.itemBarcode,
             qty: 0,
-            qtyReceive: 1,
+            qtyReceive: (r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1,
             isDeleted: false
           }
           this.insertIntoLine(outputData);

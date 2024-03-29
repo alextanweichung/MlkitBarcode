@@ -839,7 +839,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                               await this.runPackingEngine(r, Number(res));
                            })
                         } else {
-                           await this.runPackingEngine(r, Number(1));
+                           await this.runPackingEngine(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
                         }
                      }
                   })
@@ -858,7 +858,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                               await this.insertPackingLineWithoutSo(r, Number(res));
                            }) 
                         } else {
-                           await this.insertPackingLineWithoutSo(r, Number(1));
+                           await this.insertPackingLineWithoutSo(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
                         }
                      }
                   })

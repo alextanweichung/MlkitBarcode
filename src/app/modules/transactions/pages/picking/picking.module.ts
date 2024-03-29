@@ -8,15 +8,17 @@ import { PickingPageRoutingModule } from './picking-routing.module';
 
 import { PickingPage } from './picking.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    PickingPageRoutingModule,
-    ListingSkeletonPageModule
-  ],
-  declarations: [PickingPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      PickingPageRoutingModule,
+      ListingSkeletonPageModule,
+      NgxPaginationModule
+   ],
+   declarations: [PickingPage]
 })
-export class PickingPageModule {}
+export class PickingPageModule { }

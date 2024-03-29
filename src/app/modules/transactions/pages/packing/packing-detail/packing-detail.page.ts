@@ -19,7 +19,6 @@ export class PackingDetailPage implements OnInit, ViewWillEnter {
    object: MultiPackingRoot;
    isMobile: boolean = true;
 
-
    constructor(
       public objectService: PackingService,
       public configService: ConfigService,

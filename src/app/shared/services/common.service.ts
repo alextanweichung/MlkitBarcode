@@ -889,19 +889,51 @@ export class CommonService {
    buildVariationStructure(itemList: TransactionDetail[]) {
       let result: TransactionDetail;
       if (itemList && itemList.length > 0) {
+         let uniqueItem = [...new Set(itemList.flatMap(r => r.itemId))];
+         console.log("🚀 ~ CommonService ~ buildVariationStructure ~ uniqueItem:", JSON.stringify(uniqueItem))
+         let uniqueX = [...new Set(itemList.flatMap(r => r.itemVariationXId))];
+         console.log("🚀 ~ CommonService ~ buildVariationStructure ~ uniqueX:", JSON.stringify(uniqueX))
+         let uniqueY = [...new Set(itemList.filter(r => r.itemVariationYId !== null).flatMap(r => r.itemVariationYId))];
+         console.log("🚀 ~ CommonService ~ buildVariationStructure ~ uniqueY:", JSON.stringify(uniqueY))
          result = itemList[0];
+
          let vd: VariationDetail[] = [];
-         itemList.forEach(r => {
-            vd.push({
-               itemVariationXId: r.itemVariationXId,
-               details: []
-            })
-            let d: InnerVariationDetail[] = [];
-            itemList.filter(rr => rr.taxId === r.itemVariationXId).forEach(rr => {
-               
+         if (uniqueItem && uniqueItem.length > 1) {
+            return null;
+         }
+
+         uniqueItem.forEach(r => {
+            uniqueX.forEach(x => {
+               let d: InnerVariationDetail[] = [];
+               if (uniqueY && uniqueY.length > 0) {
+                  uniqueY.forEach(y => {
+                     let found = itemList.find(rr => rr.itemVariationXId === x && rr.itemVariationYId === y);
+                     let ivd: InnerVariationDetail = {
+                        itemVariationYId: y,
+                        qtyRequest: null,
+                        deactivated: found !== null ? false : true
+                     }
+                     d.push(ivd);
+                  });
+               } else {
+                  let ivd: InnerVariationDetail = {
+                     itemVariationYId: null,
+                     qtyRequest: null,
+                     deactivated: false
+                  }
+                  d.push(ivd);
+               }
+               vd.push({
+                  itemVariationXId: x,
+                  details: d
+               })
             })
          })
+         result.variationDetails = vd;
+         result.variationX = [...new Set(itemList.flatMap(r => r.itemVariationXId))];
+         result.variationY = [...new Set(itemList.flatMap(r => r.itemVariationYId))];
       }
+      return result;
    }
 
 }

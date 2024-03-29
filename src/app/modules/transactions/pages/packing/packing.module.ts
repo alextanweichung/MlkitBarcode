@@ -8,15 +8,17 @@ import { PackingPageRoutingModule } from './packing-routing.module';
 
 import { PackingPage } from './packing.page';
 import { ListingSkeletonPageModule } from 'src/app/shared/pages/listing-skeleton/listing-skeleton.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    PackingPageRoutingModule,
-    ListingSkeletonPageModule
-  ],
-  declarations: [PackingPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      PackingPageRoutingModule,
+      ListingSkeletonPageModule,
+      NgxPaginationModule
+   ],
+   declarations: [PackingPage]
 })
-export class PackingPageModule {}
+export class PackingPageModule { }

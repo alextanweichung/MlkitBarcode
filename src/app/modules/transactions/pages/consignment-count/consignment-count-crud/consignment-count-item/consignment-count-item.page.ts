@@ -113,7 +113,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 					itemSku: trxLine.itemSku,
 					itemBarcodeTagId: trxLine.itemBarcodeTagId,
 					itemBarcode: trxLine.itemBarcode,
-					qtyRequest: 1,
+					qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
 					sequence: 0,
 					// for local use
 					itemCode: trxLine.itemCode,

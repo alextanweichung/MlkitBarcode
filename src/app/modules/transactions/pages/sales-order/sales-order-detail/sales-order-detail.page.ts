@@ -473,6 +473,10 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail
          }
          trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
+            this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
+            return;
+         }
          trxDto.header.salesOrderNum = null; // always default to null when insert
          if (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) {
             this.objectService.confirmDraftObject(this.objectService.draftObject.draftTransactionId, trxDto).subscribe(async response => {

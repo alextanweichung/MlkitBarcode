@@ -43,9 +43,12 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
    }
 
    async ionViewDidEnter(): Promise<void> {
-      if (this.objectService.object && this.objectService.object.header && this.objectService.object.header && this.objectService.object.header.multiInboundId > 0) {         
+      if (this.objectService.object && this.objectService.object.header && this.objectService.object.header && this.objectService.object.header.multiInboundId > 0) {
+         this.isWithDoc = this.objectService.object.header.isWithDoc ? "true" : "false";
          this.objectForm.patchValue(this.objectService.object.header);
-         await this.loadExistingDoc(this.objectService.object.outstandingInboundList.flatMap(r => r.inboundDocNum));
+         if (this.objectService.object.header.isWithDoc) {
+            await this.loadExistingDoc(this.objectService.object.outstandingInboundList.flatMap(r => r.inboundDocNum));           
+         }
       }
    }
 

@@ -164,7 +164,7 @@ export class StockReorderAddPage implements OnInit {
                   yCd: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.code,
                   yDesc: this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
                   barcode: r.itemBarcode,
-                  lineQty: 1,
+                  lineQty: (r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1,
                   isDeleted: false
                }
                this.insertIntoLine(outputData);
