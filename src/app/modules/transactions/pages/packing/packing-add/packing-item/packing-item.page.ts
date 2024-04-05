@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonPopover, ModalController, NavController, ViewDidEnter } from '@ionic/angular';
-import { format } from 'date-fns';
+import { format, sub } from 'date-fns';
 import { CurrentPackAssignment, CurrentPackList, MultiPackingCarton, MultiPackingObject, MultiPackingRoot, SalesOrderLineForWD } from 'src/app/modules/transactions/models/packing';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -30,10 +30,10 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    showCartonInfo: boolean = false;
 
    constructor(
+      public objectService: PackingService,
       private authService: AuthService,
       public configService: ConfigService,
       private commonService: CommonService,
-      public objectService: PackingService,
       private navController: NavController,
       private alertController: AlertController,
       private toastService: ToastService,
@@ -67,6 +67,8 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    pickPackAllowCopyCode: boolean = false;
    mobilePickPackAutoFocusQtyUponScan: boolean = false;
    configMultiPackActivateAllLineScanning: boolean = false;
+   packingBlockIncompletePicking: boolean = false;
+   configMPAShowAlertToBlockInvalidAction: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -118,12 +120,24 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          } else {
             this.configMultiPackActivateAllLineScanning = false;
          }
+         let blockIncompletePick = this.moduleControl.find(x => x.ctrlName === "PackingBlockIncompletePicking")
+         if (blockIncompletePick && blockIncompletePick.ctrlValue.toUpperCase() === "Y") {
+            this.packingBlockIncompletePicking = true;
+         } else {
+            this.packingBlockIncompletePicking = false;
+         }
+         let mPAShowAlertToBlockInvalidAction = this.moduleControl.find(x => x.ctrlName === "MPAShowAlertToBlockInvalidAction")
+         if (mPAShowAlertToBlockInvalidAction && mPAShowAlertToBlockInvalidAction.ctrlValue.toUpperCase() === "Y") {
+            this.configMPAShowAlertToBlockInvalidAction = true;
+         } else {
+            this.configMPAShowAlertToBlockInvalidAction = false;
+         }         
       })
    }
 
    /* #region picking engine */
 
-   runPackingEngine(itemFound: TransactionDetail, inputQty: number) {
+   async runPackingEngine(itemFound: TransactionDetail, inputQty: number) {
       if (itemFound) {
          let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.isComponentScan && x.assembly && x.assembly.length > 0);
          let findMainCodeScanned = findAssemblyItem.find(x => x.itemId === itemFound.itemId);
@@ -157,7 +171,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
                      if (!operationSuccess) {
-                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                        if (this.configMPAShowAlertToBlockInvalidAction) {
+                           await this.presentAlert("Control Validation", "", "Input quantity exceeded SO quantity.");
+                        } else {
+                           this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                        }
                      }
                   }
                   break;
@@ -174,7 +192,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
                      if (!operationSuccess) {
-                        this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                        if (this.configMPAShowAlertToBlockInvalidAction) {
+                           await this.presentAlert("Control Validation", "", "Input quantity exceeded packing quantity.");
+                        } else {
+                           this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                        }
                      }
                   }
                   break;
@@ -182,7 +204,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          } else {
             let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
             if (!operationSuccess) {
-               this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+               if (this.configMPAShowAlertToBlockInvalidAction) {
+                  await this.presentAlert("Control Validation", "", "Item is not available in the selected Sales Order.");
+               } else {
+                  this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+               }
             }
          }
       } else {
@@ -190,7 +216,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       }
    }
 
-   runAssemblyPackingEngine(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[]) {
+   async runAssemblyPackingEngine(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[]) {
       let findComponentItem: LineAssembly;
       if (findAssemblyItem) {
          let anyOperationSuccess: boolean = false;
@@ -259,7 +285,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          if (anyOperationSuccess) {
             return true;
          } else {
-            this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+            if (this.configMPAShowAlertToBlockInvalidAction) {
+               await this.presentAlert("Control Validation", "", "Input quantity exceeded packing quantity.");
+            } else {
+               this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+            }
             return false;
          }
       } else {
@@ -846,7 +876,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                } else {
                   // Not allow to add assembly item for scanning without document
                   if (event && event.length > 0 && event.filter(r => r.typeCode === "AS")?.length > 0) {
-                     this.toastService.presentToast("Assembly Item Detected", `Item ${event.filter(r => r.typeCode === "AS").flatMap(r => r.itemCode).join(", ")} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
+                     this.toastService.presentToast(" Item Detected", `Item ${event.filter(r => r.typeCode === "AS").flatMap(r => r.itemCode).join(", ")} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
                      return;
                   }
                   event.forEach(async r => {
@@ -856,7 +886,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                         if (this.mobilePickPackAutoFocusQtyUponScan) {
                            await this.cartonLineQtyInput().then(async res => {
                               await this.insertPackingLineWithoutSo(r, Number(res));
-                           }) 
+                           })
                         } else {
                            await this.insertPackingLineWithoutSo(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
                         }
@@ -940,7 +970,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                cssClass: "success",
                handler: async (data) => {
                   item.qtyPacked = Number(data.inputQty);
-               if (this.objectService.header.isWithSo) {
+                  if (this.objectService.header.isWithSo) {
                      this.updatePackingQty(item);
                   }
                },
@@ -964,7 +994,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       this.clonedQty[rowIndex] = { ...item };
    }
 
-   updatePackingQty(item: CurrentPackList) {
+   async updatePackingQty(item: CurrentPackList) {
       let rowIndex = this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum))?.packList.findIndex(x => x === item);
       let inputQty: number = item.qtyPacked - this.clonedQty[rowIndex].qtyPacked;
       if (!item.assemblyItemId) {
@@ -997,7 +1027,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList[rowIndex] = this.clonedQty[rowIndex];
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList = [...this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList];
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                     if (this.configMPAShowAlertToBlockInvalidAction) {
+                        await this.presentAlert("Control Validation", "", "Input quantity exceeded SO quantity.");
+                     } else {
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                     }
                   }
                   break;
                //Not allow pack quantity more than pick quantity
@@ -1014,12 +1048,20 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList[rowIndex] = this.clonedQty[rowIndex];
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList = [...this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList];
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                     if (this.configMPAShowAlertToBlockInvalidAction) {
+                        await this.presentAlert("Control Validation", "", "Input quantity exceeded packing quantity.");
+                     } else {
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                     }
                   }
                   break;
             }
          } else {
-            this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
+            if (this.configMPAShowAlertToBlockInvalidAction) {
+               await this.presentAlert("Control Validation", "", "Matching outstanding list not found.");
+            } else {
+               this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
+            }
          }
       } else {
          let findAssemblyItem: SalesOrderLineForWD[] = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId === item.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
@@ -1058,7 +1100,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList[rowIndex] = this.clonedQty[rowIndex];
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList = [... this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList];
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                     if (this.configMPAShowAlertToBlockInvalidAction) {
+                        await this.presentAlert("Control Validation", "", "Input quantity exceeded SO quantity.");
+                     } else {
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                     }
                   }
                   break;
                //Not allow pack quantity more than pick quantity
@@ -1078,12 +1124,20 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   } else {
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList[rowIndex] = this.clonedQty[rowIndex];
                      this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList = [... this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum)).packList];
-                     this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                     if (this.configMPAShowAlertToBlockInvalidAction) {
+                        await this.presentAlert("Control Validation", "", "Input quantity exceeded packing quantity.");
+                     } else {
+                        this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                     }
                   }
                   break;
             }
          } else {
-            this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
+            if (this.configMPAShowAlertToBlockInvalidAction) {
+               await this.presentAlert("Control Validation", "", "Matching outstanding list not found.");
+            } else {
+               this.toastService.presentToast("Data Error", "Matching outstanding list not found.", "top", "warning", 1000);
+            }
          }
       }
       delete this.clonedQty[rowIndex];
@@ -1231,6 +1285,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             } else {
                this.toastService.presentToast("Item Not Found", "", "top", "warning", 1000);
             }
+            this.barcodescaninput.setFocus();
          }
       } catch (e) {
          console.error(e);
@@ -1534,7 +1589,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       }
    }
 
-   duplicateCarton(inputNumber) {
+   async duplicateCarton(inputNumber) {
       if (inputNumber) {
          for (let i = 0; i < inputNumber; i++) {
             let packingCartonPackList = this.objectService.multiPackingObject.packingCarton.find(r => Number(r.cartonNum) === Number(this.selectedCartonNum))?.packList;
@@ -1574,7 +1629,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                      }
                   })
                   if (!allLinesDuplicated) {
-                     this.toastService.presentToast("Control Validation", "Complete duplication is not possible due to quantity control.", "top", "warning", 1000);
+                     if (this.configMPAShowAlertToBlockInvalidAction) {
+                        await this.presentAlert("Control Validation", "", "Complete duplication is not possible due to quantity control.");
+                     } else {
+                        this.toastService.presentToast("Control Validation", "Complete duplication is not possible due to quantity control.", "top", "warning", 1000);
+                     }
                      break;
                   }
                } else {
@@ -1590,6 +1649,23 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             }
          }
       }
+   }
+
+   async presentAlert(header: string, subHeader: string, message: string) {
+      const alert = await this.alertController.create({
+         cssClass: "custom-alert",
+         header: header,
+         subHeader: subHeader,
+         message: message,
+         buttons: [{
+            text: "Ok",
+            cssClass: "success",
+            handler: () => {
+               this.barcodescaninput.setFocus();
+            },
+         }]
+      });
+      await alert.present();
    }
 
 }

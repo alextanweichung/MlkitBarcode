@@ -10,7 +10,6 @@ import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/sh
 import { Capacitor } from '@capacitor/core';
 import { environment } from 'src/environments/environment';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
-import { LoginUser } from 'src/app/services/auth/login-user';
 import { format } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { DashboardService } from '../../dashboard/services/dashboard.service';

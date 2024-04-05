@@ -84,6 +84,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    moduleControl: ModuleControl[];
    configSOSelectionEnforceSameOrigin: boolean = true;
    configSOSelectionEnforceSameDestination: boolean = true;
+   packingBlockIncompletePicking: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -102,6 +103,12 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             } else {
                this.configSOSelectionEnforceSameDestination = false;
             }
+         }
+         let blockIncompletePick = this.moduleControl.find(x => x.ctrlName === "PackingBlockIncompletePicking")
+         if (blockIncompletePick && blockIncompletePick.ctrlValue.toUpperCase() === "Y") {
+            this.packingBlockIncompletePicking = true;
+         } else {
+            this.packingBlockIncompletePicking = false;
          }
       })
    }
@@ -247,6 +254,15 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   if (doc === undefined) {
                      this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
                      return;
+                  }
+                  if (doc && this.packingBlockIncompletePicking) {
+                     let osPackList = doc.line;
+                     for (let os of osPackList) {
+                        if (os.qtyPicked !== os.qtyRequest) {
+                           this.toastService.presentToast("Action Rejected", "Unable to process selected order due to incomplete picking quantity.", "top", "warning", 1000);
+                           return;
+                        }
+                     }
                   }
                   // checking for packing, refer to base system
                   if (this.selectedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedDocs[0].locationId != doc.locationId) {
@@ -699,7 +715,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    nextStep() {
       try {
          if (!this.objectForm.valid) {
-            this.toastService.presentToast("", "Something went wrong!", "top", "danger", 1000);
+            this.toastService.presentToast("Control Validation", "Please fill in info.", "top", "warning", 1000);
             return;
          }
          this.objectService.setHeader(this.objectForm.getRawValue());
