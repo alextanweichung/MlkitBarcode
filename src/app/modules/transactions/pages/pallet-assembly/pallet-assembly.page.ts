@@ -126,6 +126,7 @@ export class PalletAssemblyPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    addObject() {
+      this.objectService.resetVariables();
       this.navController.navigateRoot("/transactions/pallet-assembly/pallet-assembly-header");
    }
 
@@ -155,7 +156,7 @@ export class PalletAssemblyPage implements OnInit, ViewWillEnter, ViewDidEnter {
 				if (Capacitor.getPlatform() !== "web") {
 					Keyboard.hide();
 				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.palletAssemblyNum.toUpperCase().includes(searchText.toUpperCase()))));
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.palletAssemblyNum?.toUpperCase().includes(searchText.toUpperCase()))));
 				this.currentPage = 1;
 			} else {
 				this.resetFilteredObj();

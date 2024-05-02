@@ -58,6 +58,9 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
       try {
          if (event) {
             await this.barcodescaninput.validateBarcode(event);
+            if (this.objectService.configMobileScanItemContinuous) {
+               await this.barcodescaninput.startScanning();
+            }
          }
       } catch (e) {
          console.error(e);

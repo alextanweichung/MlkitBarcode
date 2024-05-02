@@ -333,10 +333,10 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
                Keyboard.hide();
             }
             this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
-               r.salesOrderNum.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.customerCode.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.customerName.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.salesAgentName.toUpperCase().includes(searchText.toUpperCase())
+               r.salesOrderNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerName?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.salesAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));
             this.currentPage = 1;
          } else {

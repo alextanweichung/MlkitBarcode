@@ -6,6 +6,7 @@ export interface Sys_Parameter {
    rememberMe?: boolean
    username?: string
    password?: string
+   companyName?: string
 }
 
 export interface FireStoreReturn {

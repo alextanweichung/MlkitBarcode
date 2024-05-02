@@ -890,11 +890,8 @@ export class CommonService {
       let result: TransactionDetail;
       if (itemList && itemList.length > 0) {
          let uniqueItem = [...new Set(itemList.flatMap(r => r.itemId))];
-         console.log("🚀 ~ CommonService ~ buildVariationStructure ~ uniqueItem:", JSON.stringify(uniqueItem))
          let uniqueX = [...new Set(itemList.flatMap(r => r.itemVariationXId))];
-         console.log("🚀 ~ CommonService ~ buildVariationStructure ~ uniqueX:", JSON.stringify(uniqueX))
          let uniqueY = [...new Set(itemList.filter(r => r.itemVariationYId !== null).flatMap(r => r.itemVariationYId))];
-         console.log("🚀 ~ CommonService ~ buildVariationStructure ~ uniqueY:", JSON.stringify(uniqueY))
          result = itemList[0];
 
          let vd: VariationDetail[] = [];

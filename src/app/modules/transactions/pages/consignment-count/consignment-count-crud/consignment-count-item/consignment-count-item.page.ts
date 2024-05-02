@@ -64,6 +64,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 
 	moduleControl: ModuleControl[] = [];
 	systemWideEAN13IgnoreCheckDigit: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
 	loadModuleControl() {
 		try {
 			this.authService.moduleControlConfig$.subscribe(obj => {
@@ -72,6 +73,13 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 				if (ignoreCheckdigit != undefined) {
 					this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
 				}
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
+            }
 			}, error => {
 				console.error(error);
 			})
@@ -222,6 +230,9 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 	async onDoneScanning(barcode: string) {
 		if (barcode) {
 			await this.barcodescaninput.validateBarcode(barcode);
+         if (this.configMobileScanItemContinuous) {
+            await this.barcodescaninput.startScanning();
+         }
 		}
 	}
 

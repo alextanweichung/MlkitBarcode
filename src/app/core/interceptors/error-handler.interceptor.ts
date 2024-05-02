@@ -39,8 +39,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       // static ɵcmp: i0.ɵɵComponentDeclaration<NgxSpinnerComponent, "ngx-spinner", never, { "bdColor": "bdColor"; "size": "size"; "color": "color"; "type": "type"; "fullScreen": "fullScreen"; "name": "name"; "zIndex": "zIndex"; "template": "template"; "showSpinner": "showSpinner"; "disableAnimation": "disableAnimation"; }, {}, never, ["*"]>;
       
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
+      const overrideAuthToken = request.headers.get('Authorization');
       const authReq = request.clone({
-         headers: request.headers.set('Authorization', authToken)
+         headers: request.headers.set('Authorization', overrideAuthToken ? overrideAuthToken : authToken)
       });
 
       //Display spinner after 0.3seconds

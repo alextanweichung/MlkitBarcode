@@ -70,10 +70,10 @@ export class TransferBinService {
       this.objectDetail = [];
    }
 
-   resetVariables() {
+   async resetVariables() {
       this.removeHeader();
       this.removeLines();
-      this.configService.removeFromLocalStorage(this.trxKey);
+      await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
    binList: BinList[] = [];

@@ -23,7 +23,7 @@ export class InboundScanService {
 
    filterStartDate: Date;
    filterEndDate: Date;
-   
+
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
@@ -44,7 +44,7 @@ export class InboundScanService {
    setHeader(header: MultiInbound) {
       this.header = header;
    }
-   
+
    object: MultiInboundRoot;
    setObject(object: MultiInboundRoot) {
       this.object = object;
@@ -171,6 +171,7 @@ export class InboundScanService {
    allowDocumentWithEmptyLine: string = "N";
    inbountQtyControl: string = "N";
    multiInboundActivateHeaderReason: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -205,7 +206,14 @@ export class InboundScanService {
             this.multiInboundActivateHeaderReason = true;
          } else {
             this.multiInboundActivateHeaderReason = false;
-         }   
+         }
+
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
+         }
       })
    }
 

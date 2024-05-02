@@ -44,6 +44,9 @@ export class SalesCartPage implements OnInit, OnChanges {
    @Input() showLatestPrice: boolean = false;
    @Input() isAutoPromotion: boolean = true;
    @Input() showOtherAmount: boolean = false;
+   @Input() isSalesExchange: boolean = false;
+   @Input() isGoodsLending: boolean = false;
+   @Input() isLendingReturn: boolean = false;
 
    @Input() isCalculateMargin: boolean = false;
 
@@ -113,6 +116,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    configSystemWideActivateExtraDiscount: boolean = false;
    configSalesTransactionShowHistory: boolean = false;
    configTradingActivateMarginExpr: boolean = false
+   configSystemWideActivateMultiUOM: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -245,7 +249,7 @@ export class SalesCartPage implements OnInit, OnChanges {
             this.configTradingActivateMarginExpr = true;
          } else {
             this.configTradingActivateMarginExpr = false;
-         }  
+         }
 
          let activateItemSpec = this.moduleControl.find(x => x.ctrlName === "POSOActivateItemSpecification");
          if (activateItemSpec && activateItemSpec.ctrlValue.toUpperCase() === "Y" && (this.isBackToBackOrder || this.isSalesOrder)) {
@@ -276,6 +280,13 @@ export class SalesCartPage implements OnInit, OnChanges {
             this.configSalesTransactionShowHistory = true;
          } else {
             this.configSalesTransactionShowHistory = false;
+         }
+
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
          }
       })
    }
@@ -652,6 +663,144 @@ export class SalesCartPage implements OnInit, OnChanges {
       }
    }
 
+   onUomChanged(item: TransactionDetail, event: any, ignoreGetPricing: boolean) {
+      if (!item.baseRatio) {
+         this.toastService.presentToast("Computation Error", "Base UOM ratio is undefined. Please contact system administrator.", "top", "warning", 1000);
+         return;
+      }
+      let findUom = item.uomMaster.find(x => x.itemUomId == event.detail.value);
+      item.uomRatio = findUom.ratio;
+      let checkRemainder = item.uomRatio % item.baseRatio;
+      if (checkRemainder == 0) {
+         let computeRatio = item.uomRatio / item.baseRatio;
+         item.ratioExpr = computeRatio.toString();
+      } else {
+         item.ratioExpr = item.uomRatio.toString() + "/" + item.baseRatio.toString();
+      }
+      if (!ignoreGetPricing) {
+         let newReq = this.loadItemByIdPreCheck(item, item.itemId, null);
+         if (!newReq) {
+            return;
+         } else {
+            newReq.itemUomId = item.itemUomId
+         }
+         this.transactionService.getItemLineByReqBody(true, newReq).subscribe({
+            next: (response) => {
+               if (response.status == 200) {
+                  let itemLineResponse = response.body;
+                  item.actualQty = itemLineResponse.actualQty;
+                  item.availableQty = itemLineResponse.availableQty;
+                  item = this.assignLineUnitPrice(itemLineResponse, item);
+                  if (item.qtyRequest) {
+                     this.computeAllAmount(item);
+                  }
+               }
+            },
+            error: (error) => {
+               console.error(error);
+            }
+         })
+      }
+   }
+
+   loadItemByIdPreCheck(itemTrx: TransactionDetail, itemId: number, itemBarcode: string) {
+      let newReq: any
+      //Reset barcode field, for loadItemById.
+      if (itemId) {
+         if (itemTrx.itemBarcode) {
+            itemTrx.itemBarcode = null;
+         }
+      }
+      let rowIndex = this.objectDetail.findIndex(x => x == itemTrx);
+
+      if (!this.objectHeader.trxDate) {
+         // this.trxLineArray[rowIndex] = this.newRow();
+         this.toastService.presentToast("Control Error", "Please select transaction date.", "top", "warning", 1000);
+         return;
+      }
+      if (!this.objectHeader.locationId) {
+         // this.trxLineArray[rowIndex] = this.newRow();
+         this.toastService.presentToast("Control Error", "Please select location.", "top", "warning", 1000);
+         return;
+      }
+      if (!this.objectHeader.customerId) {
+         // this.trxLineArray[rowIndex] = this.newRow();
+         this.toastService.presentToast("Control Error", "Please select customer.", "top", "warning", 1000);
+         return;
+      }
+      if (this.objectHeader.hasOwnProperty("businessModelType") && this.objectHeader.businessModelType !== "T" && this.objectHeader.businessModelType !== null) {
+         if (!(this.isSalesExchange || this.isGoodsLending || this.isLendingReturn)) {
+            if (!this.objectHeader.toLocationId) {
+               // this.trxLineArray[rowIndex] = this.newRow();
+               this.toastService.presentToast("Control Error", "Please select destination location.", "top", "warning", 1000);
+               return;
+            }
+         }
+      }
+      if (itemId) {
+         newReq =
+         {
+            itemId: itemId,
+            trxDate: format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"),
+            locationId: this.objectHeader.locationId,
+            toLocationId: 0,
+            keyId: this.objectHeader.customerId
+         }
+      }
+      if (itemBarcode) {
+         newReq =
+         {
+            itemBarcode: itemBarcode,
+            trxDate: format(new Date(this.objectHeader.trxDate), "yyyy-MM-dd"),
+            locationId: this.objectHeader.locationId,
+            toLocationId: 0,
+            keyId: this.objectHeader.customerId
+         }
+      }
+      if (!(this.isSalesExchange || this.isGoodsLending || this.isLendingReturn)) {
+         if (this.objectHeader.toLocationId) {
+            newReq.toLocationId = this.objectHeader.toLocationId
+         }
+      }
+      if (this.isSalesExchange) {
+         if (this.objectHeader.franchiseeLocationId) {
+            newReq.toLocationId = this.objectHeader.franchiseeLocationId
+         }
+      }
+      return newReq;
+   }
+
+   assignLineUnitPrice(itemLineResponse: TransactionDetail, itemTrx: TransactionDetail) {
+      if (this.useTax) {
+         if (this.objectHeader.isItemPriceTaxInclusive) {
+            itemTrx.unitPrice = itemLineResponse.itemPricing.unitPrice;
+            itemTrx.unitPriceExTax = this.commonService.computeAmtExclTax(new Decimal(itemLineResponse.itemPricing.unitPrice ? itemLineResponse.itemPricing.unitPrice : 0), itemLineResponse.taxPct).toNumber();
+         } else {
+            itemTrx.unitPrice = this.commonService.computeAmtInclTax(new Decimal(itemLineResponse.itemPricing.unitPrice ? itemLineResponse.itemPricing.unitPrice : 0), itemLineResponse.taxPct).toNumber();
+            itemTrx.unitPriceExTax = itemLineResponse.itemPricing.unitPrice;
+         }
+      } else {
+         itemTrx.unitPrice = itemLineResponse.itemPricing.unitPrice;
+         itemTrx.unitPriceExTax = itemLineResponse.itemPricing.unitPrice;
+      }
+      itemTrx.unitPrice = this.commonService.roundToPrecision(itemTrx.unitPrice, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+      itemTrx.unitPriceExTax = this.commonService.roundToPrecision(itemTrx.unitPriceExTax, this.objectHeader.isHomeCurrency ? this.precisionSales.localMax : this.precisionSales.foreignMax);
+
+      //Assign discount code
+      if (this.configUseDiscountCode) {
+         itemTrx.discountGroupCode = itemLineResponse.itemPricing.discountGroupCode;
+      }
+      if (itemLineResponse.itemPricing.discountExpression) {
+         if (itemLineResponse.itemPricing.discountExpression != "0" && itemLineResponse.itemPricing.discountExpression != "0%") {
+            itemTrx.discountExpression = itemLineResponse.itemPricing.discountExpression;
+         }
+      } else {
+         itemTrx.discountExpression = null;
+      }
+
+      return itemTrx;
+   }
+
    /* #endregion */
 
    /* #region  edit qty */
@@ -835,12 +984,12 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    cancelOtherAmt() {
-      
+
    }
 
    addOtherAmount() {
       let newOtherAmountLine = this.newOtherAmountRow();
-      this.objectOtherAmount.push(newOtherAmountLine);      
+      this.objectOtherAmount.push(newOtherAmountLine);
       this.showOtherAmtModal(this.objectOtherAmount.length - 1);
    }
 
@@ -894,7 +1043,7 @@ export class SalesCartPage implements OnInit, OnChanges {
          }
       }
    }
-   
+
    showExtraInfo(object: OtherAmount) {
       if (object.amountCode) {
          let t = this.otherAmtMasterList.find(r => r.code === object.amountCode);

@@ -153,8 +153,8 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
          multiInboundId: 0,
          itemId: itemFound.itemId,
          itemCode: itemFound.itemCode,
-         itemVariationXId: itemFound.itemVariationLineXId,
-         itemVariationYId: itemFound.itemVariationLineYId,
+         itemVariationXId: itemFound.itemVariationXId,
+         itemVariationYId: itemFound.itemVariationXId,
          itemVariationXDescription: this.objectService.itemVariationXMasterList.find(r => r.id === itemFound.itemVariationXId)?.description,
          itemVariationYDescription: this.objectService.itemVariationYMasterList.find(r => r.id === itemFound.itemVariationYId)?.description,
          itemSku: itemFound.itemSku,
@@ -209,10 +209,14 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
          if (event) {
             let itemFound = await this.validateBarcode(event);
             if (itemFound) {
-               if (this.objectService.header.isWithDoc) {
-                  await this.runInboundEngine(itemFound, 1);
-               } else {
-                  // await this.insertPackingLineWithoutSo(itemFound, 1);
+               await this.onItemAdd([itemFound]);
+               // if (this.objectService.header.isWithDoc) {
+               //    await this.runInboundEngine(itemFound, 1);
+               // } else {
+               //    // await this.insertPackingLineWithoutSo(itemFound, 1);
+               // }
+               if (this.objectService.configMobileScanItemContinuous) {
+                  await this.barcodescaninput.startScanning();
                }
             } else {
                this.toastService.presentToast("Item Not Found", "", "top", "warning", 1000);

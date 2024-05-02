@@ -156,6 +156,15 @@ const routes: Routes = [
       path: 'managements/inventory-adj-req-approvals',
       loadChildren: () => import('./modules/managements/pages/inventory-adj-req-approvals/inventory-adj-req-approvals.module').then(m => m.InventoryAdjReqApprovalsPageModule)
    },
+   // management-multi-co-pr/po-approvals
+   {
+      path: 'managements/multi-co-pr-approvals',
+      loadChildren: () => import('./modules/managements/pages/multi-co-pr-approvals/multi-co-pr-approvals.module').then(m => m.MultiCoPrApprovalsPageModule)
+   },
+   {
+      path: 'managements/multi-co-po-approvals',
+      loadChildren: () => import('./modules/managements/pages/multi-co-po-approvals/multi-co-po-approvals.module').then(m => m.MultiCoPoApprovalsPageModule)
+   },
    // management-otp-configuration
    {
       path: 'managements/otp-configuration',
@@ -357,6 +366,10 @@ const routes: Routes = [
       path: 'transactions/inventory-adj-req/inventory-adj-req-detail',
       loadChildren: () => import('./modules/transactions/pages/inventory-adj-req/inventory-adj-req-detail/inventory-adj-req-detail.module').then(m => m.InventoryAdjReqDetailPageModule)
    },
+   {
+      path: 'transactions/defect-request',
+      loadChildren: () => import('./modules/transactions/pages/defect-request/defect-request.module').then(m => m.DefectRequestPageModule)
+   },
 
 
 
@@ -377,7 +390,7 @@ const routes: Routes = [
    },
    {
       path: 'reports/rp-bo-listing',
-      loadChildren: () => import('./modules/report/pages/reports/rp-bo-listing/rp-bo-listing.module').then(m => m.RpBoListingPageModule)
+      loadChildren: () => import('./modules/reports/pages/reports/rp-bo-listing/rp-bo-listing.module').then(m => m.RpBoListingPageModule)
    },
    {
       path: 'reports/rp-sales-customer',
@@ -403,6 +416,11 @@ const routes: Routes = [
       path: 'reports/sales-analysis',
       loadChildren: () => import('./modules/reports/pages/sales-analysis/sales-analysis.module').then(m => m.SalesAnalysisPageModule)
    },
+   {
+      path: 'reports/item-sales-analysis',
+      loadChildren: () => import('./modules/reports/pages/reports/item-sales-analysis/item-sales-analysis.module').then(m => m.ItemSalesAnalysisPageModule)
+   },
+
 
 
 
@@ -436,6 +454,10 @@ const routes: Routes = [
    {
       path: 'transaction-processing',
       loadChildren: () => import('./shared/pages/transaction-processing/transaction-processing.module').then(m => m.TransactionProcessingPageModule)
+   },
+   {
+      path: 'multico-transaction-processing',
+      loadChildren: () => import('./shared/pages/multico-transaction-processing/multico-transaction-processing.module').then(m => m.MultiCoTransactionProcessingPageModule)
    },
    {
       path: 'calendar-input',

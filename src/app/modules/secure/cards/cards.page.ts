@@ -1,7 +1,7 @@
 import { AfterContentChecked, Component, OnInit, ViewChild } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -13,6 +13,8 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { format } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { DashboardService } from '../../dashboard/services/dashboard.service';
+import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
+import { LoginUser } from 'src/app/services/auth/login-user';
 
 SwiperCore.use([Pagination]);
 
@@ -21,7 +23,7 @@ SwiperCore.use([Pagination]);
    templateUrl: './cards.page.html',
    styleUrls: ['./cards.page.scss'],
 })
-export class CardsPage implements OnInit, AfterContentChecked {
+export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
 
    @ViewChild("swiper") swiper: SwiperComponent;
 
@@ -50,8 +52,17 @@ export class CardsPage implements OnInit, AfterContentChecked {
       private toastService: ToastService,
       private loadingService: LoadingService,
       private alertController: AlertController,
+      private navController: NavController
    ) {
       this.currentVersion = environment.version;
+   }
+
+   ionViewWillEnter(): void {
+      this.commonService.getCompanyProfile().subscribe(response => {
+         this.companyInfo = response;
+      }, error => {
+         console.log(error);
+      })
    }
 
    ngOnInit(): void {
@@ -68,11 +79,6 @@ export class CardsPage implements OnInit, AfterContentChecked {
             this.loginName = decodedToken.unique_name;
             this.loginEmail = decodedToken.email;
          }
-      })
-      this.commonService.getCompanyProfile().subscribe(response => {
-         this.companyInfo = response;
-      }, error => {
-         console.log(error);
       })
       this.loadMasterList();
    }
@@ -212,8 +218,35 @@ export class CardsPage implements OnInit, AfterContentChecked {
             }
          ]
       });
-
       await alert.present();
+   }
+
+   switchCompanyModal: boolean = false;
+   async switchCompany() {
+      if (this.configService.sys_parameter && this.configService.sys_parameter.length > 1) {
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            header: "Switch Company?",
+            subHeader: "You'll be signed out after choosing company.",
+            buttons: [
+               {
+                  text: "Proceed",
+                  cssClass: "success",
+                  handler: async () => {
+                     this.showSwitchCompanyModal();
+                  }
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel"
+               }
+            ]
+         });
+         await alert.present();
+      } else {
+         this.toastService.presentToast("System Error", "Please contact adminstrator.", "top", "danger", 1000);
+      }
    }
 
    async signOut() {
@@ -236,8 +269,132 @@ export class CardsPage implements OnInit, AfterContentChecked {
             }
          ]
       });
-
       await alert.present();
    }
+
+   /* #region switch company */
+
+   showSwitchCompanyModal() {
+      this.switchCompanyModal = true;
+   }
+
+   hideSwitchCompanyModal() {
+      this.switchCompanyModal = false;
+   }
+
+   getAvailableSysParameters() {
+      return this.configService.sys_parameter.filter(r => r.apiUrl !== this.configService.selected_sys_param.apiUrl).filter(r => r.rememberMe && r.username && r.password);
+   }
+
+   async chooseCompany(rowData: Sys_Parameter) {
+      await this.hideSwitchCompanyModal();
+      await this.loadingService.showLoading();
+      setTimeout(async () => {
+         await this.authService.signOut(false, true);
+         await this.configService.signOut();
+         this.configService.selected_sys_param = rowData;
+         (await this.authService.signIn({ loginUserType: null, userEmail: rowData.username, password: rowData.password })).subscribe(async response => {
+            if (Capacitor.getPlatform() !== "web") {
+               // sync item master and item barcode
+               try {
+                  // update current version to db
+                  this.commonService.saveVersion().subscribe(response => {
+
+                  }, async error => {
+                     await this.loadingService.dismissLoading();
+                     console.error(error);
+                  })
+
+                  this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+                  
+                  if (this.configService.loginUser.loginUserType === "C") {
+                     if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                        // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                        await this.loadingService.dismissLoading();
+                        await this.navController.navigateRoot("/dashboard");
+                     }
+                     else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                        // sync by location since only 1 location
+                        this.configService.selected_location = this.configService.loginUser.locationId[0];
+                        await this.loadingService.showLoading("Downloading resources", false);
+
+                        let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+                        let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                        let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
+                        await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+                        let response2 = await this.commonService.syncMarginConfig(this.configService.loginUser.locationId[0]);
+                        let marginConfig: LocalMarginConfig[] = response2;
+                        await this.configService.syncMarginConfig(marginConfig);
+
+                        await this.loadingService.dismissLoading();
+                        await this.navController.navigateRoot("/dashboard");
+                     } else {
+                        // show error if consignment user but no location set, error shown in dashboard page
+                        await this.loadingService.dismissLoading();
+                        await this.navController.navigateRoot("/dashboard");
+                     }
+                  } else if (this.configService.loginUser.loginUserType === "P") {
+                     if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                        // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                        await this.loadingService.dismissLoading();
+                        await this.navController.navigateRoot("/dashboard");
+                     }
+                     else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                        // sync by location since only 1 location
+                        this.configService.selected_location = this.configService.loginUser.locationId[0];
+                        await this.loadingService.showLoading("Downloading resources", false);
+
+                        let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+                        let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                        let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
+                        await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+                        await this.loadingService.dismissLoading();
+                        await this.navController.navigateRoot("/dashboard");
+                     } else {
+                        // show error if consignment user but no location set, error shown in dashboard page
+                        await this.loadingService.dismissLoading();
+                        await this.navController.navigateRoot("/dashboard");
+                     }
+                  } else { // for base user
+                     await this.loadingService.showLoading("Downloading resources", false);
+                     let response = await this.commonService.syncInbound();
+                     let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                     let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
+                     await this.configService.syncInboundData(itemMaster, itemBarcode);
+                     await this.loadingService.dismissLoading();
+                     await this.navController.navigateRoot("/dashboard");
+                  }
+               } catch (error) {
+                  await this.loadingService.dismissLoading();
+                  this.toastService.presentToast("", error.message, "top", "medium", 1000);
+               } finally {
+                  await this.loadingService.dismissLoading();
+               }
+            } else { // for web development
+               this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
+               if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                  // for consignment user more than 1 location, go to dashboard and let user select then only sync
+               }
+               else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                  this.configService.selected_location = this.configService.loginUser.locationId[0];
+               } else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 0) {
+                  // show error if consignment user but no location set
+                  this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+               } else {
+
+               }
+               await this.loadingService.dismissLoading();
+               await this.navController.navigateRoot("/dashboard");
+            }
+         }, async error => {
+            await this.loadingService.dismissLoading();
+            console.error(error);
+         });
+      }, 100);
+   }
+
+   /* #endregion */
 
 }

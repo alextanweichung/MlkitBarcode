@@ -50,7 +50,7 @@ export class ConfigService {
          if (Capacitor.getPlatform() === "web") {
             this.sys_parameter.push({
                Sys_ParameterId: 1,
-               // apiUrl: "https://localhost:44351/api/",
+               apiUrl: "https://localhost:44351/api/",
                // apiUrl: "https://idcp-demo.com/api/",
                // apiUrl: "https://demo.idcp-demo.com/api/",
                // apiUrl: "https://idcp-testing.motorparts.asia/api/",
@@ -66,30 +66,35 @@ export class ConfigService {
                // apiUrl: "https://pmkt-erp.com/api/",
                // apiUrl: "https://pp.rcb.com/api/",
                // apiUrl: "https://test.fiffy-erp.com/api/",
-               apiUrl: "https://fiffy-erp.com/api/",
+               // apiUrl: "https://fiffy-erp.com/api/",
                // apiUrl: "https://idcp-noseintl.com/api/",
                // apiUrl: "https:bmm-sys.com:1000/api/",
                // apiUrl: "https://idcpth.mkagrp.com/api/",
                imgUrl: null,
-               lastDownloadAt: null
+               lastDownloadAt: null,
+               username: "aychia@idcp.my",
+               password: "Dev8888",
+               rememberMe: true
             })
             // this.sys_parameter.push({
-            //   Sys_ParameterId: 2,
-            //   // apiUrl: "https://localhost:44351/api/",
-            //   // apiUrl: "https://idcp-demo.com/api/",
-            //   apiUrl: "https://idcp-testing.motorparts.asia/api/",
-            //   // apiUrl: "https://idcp.motorparts.asia/api/",
-            //   // apiUrl: "https://idcp-ararat.com:8081/api/",
-            //   imgUrl: null,
-            //   lastDownloadAt: null
+            //    Sys_ParameterId: 2,
+            //    // apiUrl: "https://localhost:44351/api/",
+            //    // apiUrl: "https://idcp-demo.com/api/",
+            //    //   apiUrl: "https://idcp-testing.motorparts.asia/api/",
+            //    apiUrl: "https://idcp.motorparts.asia/api/",
+            //    // apiUrl: "https://idcp-ararat.com:8081/api/",
+            //    imgUrl: null,
+            //    lastDownloadAt: null,
+            //    username: "admin@idcp.my",
+            //    password: "c0nnecT#7026",
+            //    rememberMe: true
             // })
-            // if (this.sys_parameter && this.sys_parameter.length === 1) {
-            this.selected_sys_param = this.sys_parameter[0];
-            // }
+            if (this.sys_parameter && this.sys_parameter.length === 1) {
+               this.selected_sys_param = this.sys_parameter[0];
+            }
          }
          else { // live
             this.sys_parameter = await this.commonQueryService.load(this.sys_parameter, "Sys_Parameter", dbConfig.idcpcore);
-            console.log(`sys_parameter: ${JSON.stringify(this.sys_parameter)}`);
             if (this.sys_parameter && this.sys_parameter.length === 1) {
                this.selected_sys_param = this.sys_parameter[0];
             } else {

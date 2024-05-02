@@ -82,11 +82,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    moduleControl: ModuleControl[] = [];
-   configOrderingActivateMOQControl: boolean;   
+   configOrderingActivateMOQControl: boolean;
    configSalesTransactionShowHistory: boolean = false;
    configSalesActivateTradingMargin: boolean;
    configTradingActivateMarginExpr: boolean = false;
    configItemVariationShowMatrix: boolean = false;
+   configSystemWideActivateMultiUOM: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -155,6 +156,13 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             this.configItemVariationShowMatrix = false;
          }
 
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
+         }
+
       })
    }
 
@@ -190,12 +198,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                size: this.itemListLoadSize
             }
             this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
-               let rrr = response; //.filter(r => this.configService.item_Masters?.flatMap(rr => rr.id).includes(r.itemId));
+               let rrr = response.filter(r => r.itemPricing); 
                if (rrr && rrr.length > 0) {
                   for await (const r of rrr) {
-                     if (r.itemPricing !== null) {
-                        await this.assignTrxItemToDataLine(r)
-                     }
+                     await this.assignTrxItemToDataLine(r);
                   }
                } else {
                   this.startIndex = this.availableItem.length;
@@ -420,6 +426,28 @@ export class ItemCatalogPage implements OnInit, OnChanges {
             }
          }
       }
+      // Handle Multi UOM
+      if (item.multiUom && item.multiUom.length > 0) {
+         let primaryUom = item.multiUom.find(x => x.isPrimary == true);
+         if (primaryUom) {
+            item.baseRatio = primaryUom.ratio;
+            item.uomRatio = primaryUom.ratio;
+         } else {
+            item.baseRatio = 1;
+            item.uomRatio = 1;
+            item.uomMaster = [];
+            item.uomMaster = JSON.parse(JSON.stringify(item.multiUom));
+         }
+         item.ratioExpr = "1";
+         item.uomMaster = [];
+         item.uomMaster = JSON.parse(JSON.stringify(item.multiUom));
+      } else {
+         item.baseRatio = 1;
+         item.uomRatio = 1;
+         item.ratioExpr = "1";
+         item.uomMaster = [];
+      }
+      item.multiUom = [];
    }
 
    calculatNetPrice(price, discountExpression) {

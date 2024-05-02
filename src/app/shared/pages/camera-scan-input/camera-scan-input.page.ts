@@ -43,8 +43,8 @@ export class CameraScanInputPage implements OnInit {
    manipulateBarcodeCheckDigit(itemBarcode: string) {
       if (itemBarcode) {
          if (this.systemWideEAN13IgnoreCheckDigit) {
-            if (itemBarcode.length == 13) {
-               itemBarcode = itemBarcode.substring(0, itemBarcode.length - 1);
+            if (itemBarcode.length === 13) {
+               itemBarcode = itemBarcode.substring(0, 12);
             }
          }
       }

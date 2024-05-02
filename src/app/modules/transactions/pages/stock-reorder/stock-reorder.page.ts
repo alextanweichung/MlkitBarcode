@@ -98,6 +98,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
    /* #region add */
 
    async addObject() {
+      this.objectService.resetVariables();
       this.navController.navigateForward("/transactions/stock-reorder/stock-reorder-add");
    }
 

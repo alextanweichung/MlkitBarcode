@@ -92,6 +92,7 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter, ViewDi
    async addObject() {
       try {
          if (this.objectService.hasWarehouseAgent()) {
+            this.objectService.resetVariables();
             this.navController.navigateForward("/transactions/inbound-scan/inbound-scan-header");
          } else {
             this.toastService.presentToast("", "Warehouse Agent not set", "top", "warning", 1000);
@@ -189,10 +190,10 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter, ViewDi
 					Keyboard.hide();
 				}
 				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
-               r.multiInboundNum.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.customerCode.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.customerName.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.warehouseAgentName.toUpperCase().includes(searchText.toUpperCase())
+               r.multiInboundNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.customerName?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.warehouseAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));            
 				this.currentPage = 1;
 			} else {

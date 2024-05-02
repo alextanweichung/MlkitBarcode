@@ -52,12 +52,20 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
 
    moduleControl: ModuleControl[] = [];
    inventoryLevelLocationList: string[] = [];
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
             this.moduleControl = obj;
             let inventoryLevelLocationList = this.moduleControl.find(x => x.ctrlName === "InventoryLevelLocationList")?.ctrlValue;
             this.inventoryLevelLocationList = inventoryLevelLocationList === "ALL" ? [] : inventoryLevelLocationList.split(",");
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
+            }
          })
       } catch (e) {
          console.error(e);
@@ -376,6 +384,9 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter {
    async onDoneScanning(barcode: string) {
       if (barcode) {
          await this.barcodescaninput.validateBarcode(barcode);
+         // if (this.configMobileScanItemContinuous) {
+         //    await this.barcodescaninput.startScanning();
+         // }
       }
    }
 

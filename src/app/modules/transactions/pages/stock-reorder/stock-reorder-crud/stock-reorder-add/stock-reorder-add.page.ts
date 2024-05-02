@@ -12,6 +12,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -69,6 +70,7 @@ export class StockReorderAddPage implements OnInit {
    allowDocumentWithEmptyLine: string = "N";
    pickingQtyControl: string = "0";
    systemWideScanningMethod: string;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -79,6 +81,13 @@ export class StockReorderAddPage implements OnInit {
          let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
          if (scanningMethod != undefined) {
             this.systemWideScanningMethod = scanningMethod.ctrlValue;
+         }
+
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
          }
       })
    }
@@ -190,7 +199,8 @@ export class StockReorderAddPage implements OnInit {
          console.error(e);
       }
    }
-
+   
+   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
    async onDoneScanning(event) {
       try {
          if (event) {
@@ -199,6 +209,9 @@ export class StockReorderAddPage implements OnInit {
                this.insertIntoLine(itemFound);
             } else {
                this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
+            }
+            if (this.configMobileScanItemContinuous) {
+               await this.barcodescaninput.startScanning();
             }
          }
       } catch (e) {

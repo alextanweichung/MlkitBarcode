@@ -47,7 +47,7 @@
                </ion-grid>
             </ion-item>
          </ng-container>
-         <ng-container *ngIf="objectService.objectHeader?.inventoryCountId === null || objectService.objectHeader?.inventoryCountId === undefined">
+         <ng-container *ngIf="objectService.objectHeader?.inventoryCountId === null || objectService.objectHeader?.inventoryCountId === undefined || objectService.objectHeader?.inventoryCountId === 0">
             <ion-item id="open-calendar-modal">
                <!-- <ion-icon icon="calendar-outline" slot="start" color="primary"></ion-icon> -->
                <ion-label position="stacked" class="font-bold">Transaction Date</ion-label>
@@ -69,9 +69,29 @@
             <app-search-dropdown #inventoryCountBatchSdd title="Inventory Count Batch" optionLabel="description" [searchDropdownList]="inventoryCountBatchDdl" [selectedId]="objectForm?.controls?.inventoryCountBatchId?.value" (onActionComplete)="onInventoryCountBatchChanged($event)" emptyMessage="This Location does not have Inventory Count Batch" [disabled]="objectService.objectHeader?.inventoryCountId && objectService.objectHeader?.inventoryCountId > 0"></app-search-dropdown>
          </ng-container>
       </ion-list>
-      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <app-search-dropdown #rackSsd title="Rack" optionLabel="description" [masterDropdownList]="objectService.rackMasterList" [selectedId]="objectForm?.controls?.rackId?.value" (onActionComplete)="onRackChanged($event)"></app-search-dropdown>
-         <app-search-dropdown #zoneSsd title="Zone" optionLabel="description" [masterDropdownList]="objectService.zoneMasterList" [selectedId]="objectForm?.controls?.zoneId?.value" (onActionComplete)="onZoneChanged($event)"></app-search-dropdown>
+      <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" [formGroup]="objectForm">
+         <ng-container *ngIf="!objectService.configInvCountFreeTextZoneRack">
+            <app-search-dropdown #rackSsd title="Rack" optionLabel="description" [masterDropdownList]="objectService.rackMasterList" [selectedId]="objectForm?.controls?.rackId?.value" (onActionComplete)="onRackChanged($event)"></app-search-dropdown>
+            <app-search-dropdown #zoneSsd title="Zone" optionLabel="description" [masterDropdownList]="objectService.zoneMasterList" [selectedId]="objectForm?.controls?.zoneId?.value" (onActionComplete)="onZoneChanged($event)"></app-search-dropdown>
+         </ng-container>
+         <ng-container *ngIf="objectService.configInvCountFreeTextZoneRack">
+            <ion-item button [detail]="false" class="no-ripple">
+               <ion-label position="stacked" class="font-bold">Zone Desc.</ion-label>
+               <ion-input formControlName="zoneDesc" placeholder="Zone Desc."></ion-input>
+            </ion-item>
+            <ion-item button [detail]="false" class="no-ripple">
+               <ion-label position="stacked" class="font-bold">Rack Desc.</ion-label>
+               <ion-input formControlName="rackDesc" placeholder="Rack Desc."></ion-input>
+            </ion-item>
+         </ng-container>
+         <ion-item button [detail]="false" class="no-ripple">
+            <ion-label position="stacked" class="font-bold">Carton Desc.</ion-label>
+            <ion-input formControlName="cartonDesc" placeholder="Carton Desc."></ion-input>
+         </ion-item>
+         <ion-item button [detail]="false" class="no-ripple">
+           <ion-label position="stacked" class="font-bold">Remark</ion-label>
+           <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
+         </ion-item>
       </ion-list>
    </div>
 </ion-content>

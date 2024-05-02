@@ -75,6 +75,7 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
          await this.loadingService.showLoading();
          this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
+            console.log("🚀 ~ PackingPage ~ this.objectService.getObjectListByDate ~ this.objects:", this.objects)
             this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
@@ -94,12 +95,13 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
    //    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
    // }
 
-   /* #endregion */
+/* #endregion */
 
    /* #region add goods packing */
 
    async addObject() {
       try {
+         this.objectService.resetVariables();
          this.navController.navigateForward("/transactions/packing/packing-header");
       } catch (e) {
          console.error(e);
@@ -261,6 +263,7 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
    itemSearchText: string;
    filteredObj: MultiPackingList[] = [];
    search(searchText, newSearch: boolean = false) {
+      console.log("🚀 ~ PackingPage ~ search ~ searchText:", searchText)
       if (newSearch) {
          this.filteredObj = [];
       }
@@ -271,10 +274,10 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
                Keyboard.hide();
             }
             this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
-               r.multiPackingNum.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.locationCode.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.locationDescription.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.warehouseAgentName.toUpperCase().includes(searchText.toUpperCase())
+               r.multiPackingNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.warehouseAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));
             this.currentPage = 1;
          } else {

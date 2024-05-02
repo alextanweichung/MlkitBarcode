@@ -69,6 +69,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    configMultiPackActivateAllLineScanning: boolean = false;
    packingBlockIncompletePicking: boolean = false;
    configMPAShowAlertToBlockInvalidAction: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -131,7 +132,14 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             this.configMPAShowAlertToBlockInvalidAction = true;
          } else {
             this.configMPAShowAlertToBlockInvalidAction = false;
-         }         
+         }
+
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
+         }
       })
    }
 
@@ -1261,11 +1269,13 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    /* #region camera scanner */
 
    scanActive: boolean = false;
-   onCameraStatusChanged(event) {
+   async onCameraStatusChanged(event) {
       try {
          this.scanActive = event;
          if (this.scanActive) {
             document.body.style.background = "transparent";
+         } else {
+            await this.barcodescaninput.setFocus();
          }
       } catch (e) {
          console.error(e);
@@ -1285,7 +1295,10 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             } else {
                this.toastService.presentToast("Item Not Found", "", "top", "warning", 1000);
             }
-            this.barcodescaninput.setFocus();
+            await this.barcodescaninput.setFocus();
+            if (this.configMobileScanItemContinuous) {
+               await this.barcodescaninput.startScanning();
+            }
          }
       } catch (e) {
          console.error(e);

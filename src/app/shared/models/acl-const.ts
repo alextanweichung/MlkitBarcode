@@ -31,7 +31,8 @@ export const trxAppCode = {
    mobileTransferBin: "MAMTB",
    mobileBinCount: "MAMBC",
    mobileDoAck: "MAMDOACK",
-   mobileCartonTruckLoading: "MAMCTL"
+   mobileCartonTruckLoading: "MAMCTL",
+   mobileDefectRequest: "MAMBC"
 }
 
 export const approvalAppCode = {
@@ -60,6 +61,8 @@ export const approvalAppCode = {
    inventoryProcessingAP: "MAIPAP",
    inventoryAdjReqRV: "MAIARRV",
    inventoryAdjReqAP: "MAIARAP",
+   multiCoPrAP: "MAMCPRAP",
+   multiCoPoAP: "MAMCPOAP",
    otpConfig: "MAMAOTP",
 }
 
@@ -76,5 +79,6 @@ export const reportAppCode = {
    mobileCheckCN: "MARPCCN",
    mobileTrxInq: "MARPTI",
    mobileSalesAnalysis: "MARPSAL",
+   mobileItemSalesAnalysis: "MARPISAL",
    mobileCustomerDetail: "MARPCD"
 }

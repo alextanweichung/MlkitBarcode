@@ -137,6 +137,10 @@ export class InboundScanDetailPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    /* #endregion */
 
+   previousStep() {
+      this.objectService.resetVariables();
+   }
+
    editObject() {
       this.navController.navigateRoot("/transactions/inbound-scan/inbound-scan-item");
    }

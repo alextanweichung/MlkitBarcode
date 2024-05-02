@@ -73,11 +73,11 @@ export class ConsignmentCountService {
       this.localObject = null;
    }
 
-   resetVariables() {
+   async resetVariables() {
       this.removeHeader();
       this.removeLines();
       this.removeLocalObject();
-      this.configService.removeFromLocalStorage(this.trxKey);
+      await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
    // locationList: ConsignmentSalesLocation[] = [];

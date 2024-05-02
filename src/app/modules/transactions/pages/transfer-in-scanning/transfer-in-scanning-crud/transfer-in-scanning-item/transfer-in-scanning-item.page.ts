@@ -51,6 +51,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
    allowDocumentWithEmptyLine: string = "N";
    pickingQtyControl: string = "0";
    systemWideScanningMethod: string;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -61,6 +62,13 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          let scanningMethod = this.moduleControl.find(x => x.ctrlName === "SystemWideScanningMethod");
          if (scanningMethod != undefined) {
             this.systemWideScanningMethod = scanningMethod.ctrlValue;
+         }
+
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
          }
       })
    }
@@ -239,6 +247,9 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
       try {
          if (event) {
             await this.barcodescaninput.validateBarcode(event);
+            if (this.configMobileScanItemContinuous) {
+               await this.barcodescaninput.startScanning();
+            }
          }
       } catch (e) {
          console.error(e);

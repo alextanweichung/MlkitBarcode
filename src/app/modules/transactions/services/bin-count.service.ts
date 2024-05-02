@@ -83,11 +83,11 @@ export class BinCountService {
       this.flatDetail = [];
    }
 
-   resetVariables() {
+   async resetVariables() {
       this.removeHeader();
       this.removeDetail();
       this.removeFlatDetail();
-      this.configService.removeFromLocalStorage(this.trxKey);
+      await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
    binList: BinList[] = [];

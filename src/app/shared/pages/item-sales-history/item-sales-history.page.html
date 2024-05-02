@@ -13,15 +13,15 @@
             <ion-item button detail="false" class="p-0">
                <ion-grid class="ion-no-padding">
                   <ion-row>
-                     <ion-col class="ion-flex ion-margin-auto"><div class="font-bold">Date</div></ion-col>
-                     <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Qty.</div></ion-col>
-                     <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">U/P.</div></ion-col>
+                     <ion-col size="3" class="ion-flex ion-margin-auto"><div class="font-bold">Date</div></ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Qty.</div></ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">U/P.</div></ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end"><div class="font-bold">Disc.</div></ion-col>
                   </ion-row>
                   <ion-row *ngFor="let rowData of selectedHistory">
-                     <ion-col class="ion-flex ion-margin-auto">{{rowData.documentDate|date:"dd/MM/yyyy"}}</ion-col>
-                     <ion-col class="ion-flex ion-margin-auto justify-content-end">{{rowData.quantity|number:"1.0"}}</ion-col>
-                     <ion-col class="ion-flex ion-margin-auto justify-content-end">{{rowData.unitPrice|number:"1.2"}}</ion-col>
+                     <ion-col size="3" class="ion-flex ion-margin-auto">{{rowData.documentDate|date:"dd/MM/yyyy"}}</ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">{{rowData.quantity|number:"1.0"}}</ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto justify-content-end">{{rowData.unitPrice|number:"1.2"}}</ion-col>
                      <ion-col class="ion-flex ion-margin-auto justify-content-end">
                         <div *ngIf="!rowData.discountExpression">{{rowData.discountGroupCode}}</div>
                         <div *ngIf="rowData.discountExpression">{{rowData.discountGroupCode}} [{{rowData.discountExpression}}]</div>

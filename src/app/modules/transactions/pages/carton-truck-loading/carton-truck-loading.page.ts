@@ -97,6 +97,7 @@ export class CartonTruckLoadingPage implements OnInit, OnDestroy, ViewWillEnter,
 
    async addObject() {
       try {
+         this.objectService.resetVariables();
          this.navController.navigateForward("/transactions/carton-truck-loading/carton-truck-loading-header");
       } catch (e) {
          console.error(e);

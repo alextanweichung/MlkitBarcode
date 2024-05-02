@@ -7,13 +7,13 @@ export interface PalletAssemblyList {
    totalPallet: number
    remark: string
    deactivated: boolean
- }
- export interface PalletAssemblyRoot {
+}
+export interface PalletAssemblyRoot {
    header: PalletAssemblyHeader
    details: PalletAssemblyDetail[]
- }
- 
- export interface PalletAssemblyHeader {
+}
+
+export interface PalletAssemblyHeader {
    palletAssemblyId: number
    palletAssemblyNum: string
    trxDate: string
@@ -38,9 +38,9 @@ export interface PalletAssemblyList {
    modifiedBy?: string
    modifiedAt?: string
    deactivated: boolean
- }
- 
- export interface PalletAssemblyDetail {
+}
+
+export interface PalletAssemblyDetail {
    headerId: number
    lineId: number
    palletCode: string
@@ -54,9 +54,9 @@ export interface PalletAssemblyList {
    binCode: string
    sequence: number
    palletItemList: PalletItemList[]
- }
- 
- export interface PalletItemList {
+}
+
+export interface PalletItemList {
    variationId: number
    headerId: number
    lineId: number
@@ -72,5 +72,4 @@ export interface PalletAssemblyList {
    masterUDGroup2?: number
    masterUDGroup3?: number
    deactivated?: boolean
- }
- 
+}

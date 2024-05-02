@@ -22,6 +22,8 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
    _configService: any;
    objectForm: FormGroup;
    isButtonVisible: boolean = true;
+   isByLocation: boolean = false;
+   customerDisabled: boolean = false;
 
    constructor(
       public objectService: InboundScanService,
@@ -86,16 +88,19 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
       let defaultLocation = this.objectService.fLocationMasterList.find(item => item.isPrimary)?.id;
       if (defaultLocation) {
          this.objectForm.patchValue({ locationId: defaultLocation });
+         this.onDestinationLocationSelected({ id: defaultLocation });
       } else {
          let findWh = this.objectService.fLocationMasterList.find(x => x.attribute1 == 'W');
          if (findWh) {
             this.objectForm.patchValue({ locationId: findWh.id });
+            this.onDestinationLocationSelected({ id: findWh.id });
          }
       }
       if (this.configService.loginUser.defaultLocationId) {
          let findLocation = this.objectService.locationMasterList.find(x => x.id == this.configService.loginUser.defaultLocationId);
          if (findLocation) {
             this.objectForm.patchValue({ locationId: findLocation.id });
+            this.onDestinationLocationSelected({ id: findLocation.id });
          }
       }
       let defaultAgent = this.objectService.warehouseAgentMasterList.find(item => item.isPrimary)?.id;
@@ -130,7 +135,7 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
       if (input && input.length > 0) {
          this.docSearchValue = null;
          if (this.selectedDocs.findIndex(r => r.inboundDocNum.toUpperCase() === input.toUpperCase()) > -1) {
-            this.toastService.presentToast("Doc already selected.", "", "top", "warning", 1000);
+            this.toastService.presentToast("", "Doc already selected.", "top", "warning", 1000);
             return;
          } else {
             if (input && input.length > 0) {
@@ -261,16 +266,18 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
          }
          if (!ignoreLocationUpdate) {
             if (lookupValue.attribute5 === "T") {
-               //this.getSoByCustomer(event);
                this.objectForm.controls.toLocationId.clearValidators();
                this.objectForm.controls.toLocationId.updateValueAndValidity();
                this.objectForm.patchValue({ locationId: parseInt(lookupValue.attribute6), toLocationId: null });
+               this.onDestinationLocationSelected({ id: parseInt(lookupValue.attribute6) });
+               this.onCustomerLocationSelected({ id: null });
             } else {
                this.objectForm.patchValue({ toLocationId: null });
+               this.onCustomerLocationSelected({ id: null });
             }
             if (lookupValue.attributeArray1.length === 1) {
                this.objectForm.patchValue({ toLocationId: this.objectService.customerLocationMasterList[0].id });
-               //this.getSoByCustomerLocation(this.objectForm.controls.customerId.value, this.objectForm.controls.toLocationId.value);
+               this.onCustomerLocationSelected({ id: this.objectService.customerLocationMasterList[0].id });
             }
          }
 
@@ -291,6 +298,7 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
             }
             if (lookupValue !== undefined) {
                this.objectForm.patchValue({ locationId: parseFloat(lookupValue.attribute6) });
+               this.onDestinationLocationSelected({ id: parseInt(lookupValue.attribute6) });
             }
          } else {
             this.objectService.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 !== "B");
@@ -360,17 +368,51 @@ export class InboundScanHeaderPage implements OnInit, ViewWillEnter, ViewDidEnte
       }
    }
 
-   onOriginLocationSelected(event: SearchDropdownList) {
+   onCustomerLocationSelected(event: SearchDropdownList) {
       if (event) {
          this.objectForm.patchValue({ toLocationId: event.id });
          let lookupValue = this.objectService.locationMasterList.find(r => r.id === this.objectForm.controls["toLocationId"].value);
          //To patch location id if selected location is mapped to location warehouse
          if (lookupValue && lookupValue.attribute15) {
-            this.objectForm.patchValue({ toLocationId: lookupValue.attribute15 });
+            this.objectForm.patchValue({ locationId: lookupValue.attribute15 });
+            this.onDestinationLocationSelected({ id: parseInt(lookupValue.attribute15) });
          }
       } else {
          this.objectForm.patchValue({ toLocationId: null });
       }
+   }
+
+   onFullToLocationSelected(event: SearchDropdownList) {
+      if (event) {
+         let findLocation = this.objectService.locationMasterList.find(x => x.id === event.id);
+         if (findLocation) {
+            if (findLocation.attribute13) {
+               this.objectForm.patchValue({ customerId: parseInt(findLocation.attribute13) });
+               // this.objectForm.controls["customerId"].disable();
+               this.customerDisabled = true;
+            } else {
+               this.objectForm.patchValue({ toLocationId: null, customerId: null });
+               // this.objectForm.controls["customerId"].enable();
+               this.customerDisabled = false;
+               this.toastService.presentToast("Selected Denied", `${findLocation.description} is not mapped to any customer.`, "top", "warning", 1000);
+            }
+            this.onCustomerSelected({ id: this.objectForm.controls.customerId.value }, true);
+            this.onCustomerLocationSelected(event);
+         }
+      } else {
+         this.objectForm.patchValue({ toLocationId: null });
+      }
+   }
+
+   swapCustomerLocation() {
+      this.isByLocation = !this.isByLocation;
+      if (this.isByLocation) {
+         this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
+      } else {
+         this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
+      }
+      // this.objectForm.controls["customerId"].enable();
+      this.customerDisabled = false;
    }
 
    onWarehouseAgentSelected(event: SearchDropdownList) {

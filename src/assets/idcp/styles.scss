@@ -146,6 +146,14 @@
    font-size: xx-small;
 }
 
+.badge-warning {
+   background: rgba(219, 30, 210, 0.1);
+   color: #f0ad4e;
+   border: 1px solid rgba(#FBC02D,.1);
+   border-radius: 3px;
+   font-size: xx-small;
+}
+
 .ion-custom-badge {
    background: var(--ion-color-primary);
    color: var(--ion-color-primary-contrast);

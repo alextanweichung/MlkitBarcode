@@ -63,6 +63,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    systemWideBlockConvertedCode: boolean;
    pickPackAllowCopyCode: boolean = false;
    mobilePickPackAutoFocusQtyUponScan: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -99,6 +100,13 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             this.mobilePickPackAutoFocusQtyUponScan = true;
          } else {
             this.mobilePickPackAutoFocusQtyUponScan = false;
+         }
+
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
          }
       })
    }
@@ -992,6 +1000,9 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                }
             } else {
                this.toastService.presentToast("Item Not Found", "", "top", "warning", 1000);
+            }
+            if (this.configMobileScanItemContinuous) {
+               await this.barcodescaninput.startScanning();
             }
          }
       } catch (e) {

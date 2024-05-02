@@ -9,6 +9,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 
 @Component({
    selector: 'app-transfer-confirmation-item',
@@ -39,6 +40,7 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
 
    moduleControl: ModuleControl[] = [];
    systemWideEAN13IgnoreCheckDigit: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
@@ -46,6 +48,13 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
             let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
             if (ignoreCheckdigit != undefined) {
                this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+            }
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
             }
          }, error => {
             console.error(error);
@@ -138,10 +147,14 @@ export class TransferConfirmationItemPage implements OnInit, ViewWillEnter {
       }
    }
 
+   @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
    async onDoneScanning(event) {
       try {
          if (event) {
             await this.validateBarcode(event);
+            if (this.configMobileScanItemContinuous) {
+               await this.barcodescaninput.startScanning();
+            }
          }
       } catch (e) {
          console.error(e);

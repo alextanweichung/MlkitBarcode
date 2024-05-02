@@ -6,6 +6,8 @@ import { MasterList } from 'src/app/shared/models/master-list';
 import { InventoryCountBatchCriteria, InventoryCountBatchList, StockCount, StockCountDetail, StockCountHeader, StockCountList, StockCountRoot } from '../models/stock-count';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -24,11 +26,36 @@ export class StockCountService {
 
    constructor(
       private http: HttpClient,
-      private configService: ConfigService
+      private configService: ConfigService,
+      private authService: AuthService
    ) { }
 
    async loadRequiredMaster() {
+      await this.loadModuleControl();
       await this.loadMasterList();
+   }
+
+   moduleControl: ModuleControl[];
+   configInvCountFreeTextZoneRack: boolean = false;
+   configInvCountActivateLineWithBin: boolean = false;
+   loadModuleControl() {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+         this.moduleControl = obj;
+
+         let invCountFreeTextZoneRack = this.moduleControl.find(x => x.ctrlName === "InvCountFreeTextZoneRack");
+         if (invCountFreeTextZoneRack && invCountFreeTextZoneRack.ctrlValue.toUpperCase() === "Y") {
+            this.configInvCountFreeTextZoneRack = true;
+         } else {
+            this.configInvCountFreeTextZoneRack = false;
+         }
+
+         let InvCountActivateLineWithBin = this.moduleControl.find(x => x.ctrlName === "InvCountActivateLineWithBin");
+         if (InvCountActivateLineWithBin && InvCountActivateLineWithBin.ctrlValue.toUpperCase() === "Y") {
+            this.configInvCountActivateLineWithBin = true;
+         } else {
+            this.configInvCountActivateLineWithBin = false;
+         }
+      })
    }
 
    fullMasterList: MasterList[] = [];
@@ -82,11 +109,13 @@ export class StockCountService {
       this.objectBarcodeTag = [];
    }
 
-   resetVariables() {
+   async resetVariables() {
       this.removeHeader();
       this.removeDetail();
       this.removeBarcodeTag();
-      this.configService.removeFromLocalStorage(this.trxKey);
+      await this.configService.removeFromLocalStorage(this.trxKey);
+      var data = await this.configService.retrieveFromLocalStorage(this.trxKey);
+      console.log("🚀 ~ StockCountService ~ resetVariables ~ data:", JSON.stringify(data))
    }
 
    getMasterList() {

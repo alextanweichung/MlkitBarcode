@@ -327,7 +327,7 @@ export class AuthService {
    }
 
    // Sign out
-   async signOut(isAddNew: boolean = false) {
+   async signOut(isAddNew: boolean = false, isSwitchCompany: boolean = false) {
       localStorage.removeItem("loginUser");
       this.currentUserSource.next(null);
       this.currentUserTokenSource.next(null);
@@ -341,8 +341,9 @@ export class AuthService {
       if (isAddNew) {
          this.navController.navigateRoot("/welcome");
       } else {
-         // Navigate to sign-in
-         this.navController.navigateRoot("/signin");
+         if (!isSwitchCompany) {
+            this.navController.navigateRoot("/signin");
+         }
       }
    }
 

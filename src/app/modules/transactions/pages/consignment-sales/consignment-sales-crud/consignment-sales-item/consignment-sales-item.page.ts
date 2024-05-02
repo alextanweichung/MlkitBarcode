@@ -75,6 +75,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    consignmentSalesBlockItemWithoutMargin: string = "0";
    consignBearingComputeGrossMargin: boolean = false;
    systemWideBlockConvertedCode: boolean;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
@@ -107,6 +108,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                this.consignBearingComputeGrossMargin = true;
             } else {
                this.consignBearingComputeGrossMargin = false;
+            }
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
             }
          })
          this.authService.precisionList$.subscribe(precision => {
@@ -286,6 +294,9 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async onDoneScanning(barcode) {
       if (barcode) {
          await this.barcodescaninput.validateBarcode(barcode);
+         if (this.configMobileScanItemContinuous) {
+            await this.barcodescaninput.startScanning();
+         }
       }
    }
 

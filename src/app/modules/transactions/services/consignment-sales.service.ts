@@ -56,10 +56,10 @@ export class ConsignmentSalesService {
       this.objectDetail = [];
    }
 
-   resetVariables() {
+   async resetVariables() {
       this.removeHeader();
       this.removeDetail();
-      this.configService.removeFromLocalStorage(this.trxKey);
+      await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
    async loadRequiredMaster() {

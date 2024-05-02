@@ -28,10 +28,10 @@ export interface Item {
    currencyId: number
    availableQty: number
    qtyRequest?: number
- }
- 
- export interface ItemImage {
-  keyId: number
-  imageSource: string
-  imageName: string
+}
+
+export interface ItemImage {
+   keyId: number
+   imageSource: string
+   imageName: string
 }

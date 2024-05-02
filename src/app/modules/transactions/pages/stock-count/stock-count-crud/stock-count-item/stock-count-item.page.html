@@ -46,6 +46,25 @@
 </ion-popover>
 <ion-content fullscreen [hidden]="scanActive">
    <div class="p-2">
+      <ng-container *ngIf="objectService.configInvCountActivateLineWithBin">
+         <ion-list class="list-custom animate__animated animate__fadeIn mb-2" lines="full">
+            <ion-item button [detail]="false" class="no-ripple">
+               <ion-label position="stacked" class="font-bold">Current Bin</ion-label>
+               <ion-grid class="ion-no-padding m-0 w-full">
+                  <ion-row>
+                     <ion-col size="10" class="ion-flex ion-margin-auto">
+                        <ion-input [(ngModel)]="binDesc" type="email"  placeholder="Bin" (ionBlur)="onBinDescBlur()"></ion-input>
+                     </ion-col>
+                     <ion-col size="2" class="ion-flex ion-margin-auto">
+                        <ion-button fill="clear" (click)="startScanning()">
+                           <i slot="icon-only" class="fas fa-camera"></i>
+                        </ion-button>
+                     </ion-col>
+                  </ion-row>
+               </ion-grid>
+            </ion-item>
+         </ion-list>
+      </ng-container>
       <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
       <pagination-controls class="ion-flex justify-content-center pagination-top" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
@@ -61,47 +80,48 @@
          </ion-item>
       </ion-list>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <ion-item-sliding #slidingItem
-            *ngFor="let line of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let i = index">
+         <ion-item-sliding #slidingItem *ngFor="let rowData of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
             <ion-item button detail="false" class="no-ripple ion-no-padding">
                <ion-grid class="ion-no-padding pt-2 pl-2">
                   <ion-row>
                      <ion-col size="1" class="ion-flex ion-margin-auto">
-                        <div>{{i+1+((currentPage-1)*itemsPerPage)}}</div>
+                        <div>{{rowIndex+1+((currentPage-1)*itemsPerPage)}}</div>
                      </ion-col>
                      <ion-col class="ion-flex ion-margin-auto">
                         <ion-grid class="ion-no-padding">
                            <ion-row>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <div class="font-bold">{{line.itemBarcode}}</div>
+                                 <div class="font-bold">{{rowData.itemBarcode}}</div>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="objectService.configInvCountActivateLineWithBin && rowData.binDesc">
+                                 <div class="ion-text-wrap font-bold">[{{rowData.binDesc}}]</div>
                               </ion-col>
                            </ion-row>
                            <ion-row>
                               <ion-col class="ion-flex ion-margin-auto">
                                  <div class="ion-flex">
-                                    {{line.itemCode}}
-                                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="line.itemVariationXId">{{line.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="line.itemVariationYId">{{line.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                                    {{rowData.itemCode}}
+                                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXId">{{rowData.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYId">{{rowData.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                                  </div>
                               </ion-col>
                            </ion-row>
                            <ion-row>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <div class="ion-text-wrap">{{line.itemDescription}}</div>
+                                 <div class="ion-text-wrap">{{rowData.itemDescription}}</div>
                               </ion-col>
                            </ion-row>
                            <ion-row>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(line, i)">
+                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData, rowIndex)">
                                     <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                                  </ion-button>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest"
-                                    (keypress)="eventHandler($event.keyCode, line)"></ion-input>
+                                 <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode, rowData)"></ion-input>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(line)">
+                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)">
                                     <ion-icon slot="icon-only" name="add-circle"></ion-icon>
                                  </ion-button>
                               </ion-col>
@@ -112,7 +132,10 @@
                </ion-grid>
             </ion-item>
             <ion-item-options>
-               <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)">
+               <ion-item-option color="success" (click)="slidingItem.close(); updateBinDesc(rowIndex)" *ngIf="objectService.configInvCountActivateLineWithBin">
+                  <ion-icon slot="top" name="create-outline"></ion-icon>Bin
+               </ion-item-option>
+               <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(rowIndex)">
                   <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
                </ion-item-option>
             </ion-item-options>

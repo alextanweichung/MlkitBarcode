@@ -29,9 +29,9 @@ export class QuotationPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidE
    uniqueGrouping: Date[] = [];
 
    constructor(
+      private objectService: QuotationService,
       private authService: AuthService,
       private commonService: CommonService,
-      private objectService: QuotationService,
       private toastService: ToastService,
       private loadingService: LoadingService,
       private modalController: ModalController,

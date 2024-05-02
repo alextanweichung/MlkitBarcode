@@ -105,8 +105,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    manipulateBarcodeCheckDigit(itemBarcode: string) {
       if (itemBarcode) {
          if (this.systemWideEAN13IgnoreCheckDigit) {
-            if (itemBarcode.length == 13) {
-               itemBarcode = itemBarcode.substring(0, itemBarcode.length - 1);
+            if (itemBarcode.length === 13) {
+               itemBarcode = itemBarcode.substring(0, 12);
             }
          }
       }
@@ -314,24 +314,29 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                this.toastService.presentToast("", "Item not found", "top", "warning", 1000);
             }
             if (found_item_master && found_item_master.length === 1) { // only 1 item found
-               this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
-               if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
-                  if (this.showVariationModalSelection) {
-                     if (this.configItemVariationShowMatrix) {
-                        var variationStructure = await this.commonService.buildVariationStructure(JSON.parse(JSON.stringify(this.availableVariationsByItemId)));
-                        if (variationStructure === null) {
-                           this.toastService.presentToast("System Error", "Please contact administrator.", "top", "danger", 1000);
-                           return;
-                        } else {
-                           this.variationStructure = variationStructure;
+               if (found_item_master[0].varCd !== "0") {
+                  this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
+                  if (this.availableVariationsByItemId && this.availableVariationsByItemId.length > 1) { // if yes, then show variation modal
+                     if (this.showVariationModalSelection) {
+                        if (this.configItemVariationShowMatrix) {
+                           var variationStructure = await this.commonService.buildVariationStructure(JSON.parse(JSON.stringify(this.availableVariationsByItemId)));
+                           if (variationStructure === null) {
+                              this.toastService.presentToast("System Error", "Please contact administrator.", "top", "danger", 1000);
+                              return;
+                           } else {
+                              this.variationStructure = variationStructure;
+                           }
                         }
+                        this.showVariationModal();
+                     } else {
+                        this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
                      }
-                     this.showVariationModal();
                   } else {
-                     this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
+                     this.showItemModal();
                   }
                } else {
-                  this.showItemModal();
+                  this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
+                  this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
                }
             } else if (found_item_master && found_item_master.length > 0 && this.availableVariations && this.availableVariations.length > 0) { // if item found, and has barcode tag
                this.showItemModal();

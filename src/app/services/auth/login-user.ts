@@ -21,7 +21,6 @@ export interface LoginRequest {
    loginUserType: string;
 }
 
-
 export interface TokenRequest {
    accessToken: string;
    refreshToken: string;

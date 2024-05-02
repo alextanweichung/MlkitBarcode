@@ -111,6 +111,7 @@ export class StockReplenishPage implements OnInit, OnDestroy, ViewWillEnter, Vie
    async addObject() {
       try {
          if (this.objectService.hasSalesAgent()) {
+            this.objectService.resetVariables();
             this.navController.navigateForward("/transactions/stock-replenish/stock-replenish-header");
          } else {
             this.toastService.presentToast("System Error", "Sales Agent not set.", "top", "danger", 1000);

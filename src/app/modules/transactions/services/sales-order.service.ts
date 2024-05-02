@@ -395,12 +395,10 @@ export class SalesOrderService {
    }
 
    insertObject(object: SalesOrderRoot) {
-      console.log("🚀 ~ SalesOrderService ~ insertObject ~ object:", object)
       return this.http.post<SalesOrderRoot>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder", object, httpObserveHeader);
    }
 
    updateObject(object: SalesOrderRoot) {
-      console.log("🚀 ~ SalesOrderService ~ updateObject ~ object:", object)
       return this.http.put<SalesOrderRoot>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder", object, httpObserveHeader);
    }
 

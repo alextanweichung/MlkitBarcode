@@ -7,6 +7,11 @@
                   <div class="font-bold">{{rowData.itemCode}}</div>
                   <div class="ml-1" *ngIf="rowData?.vendorItemCode"> | {{rowData?.vendorItemCode}}</div>
                </ion-col>
+               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="configSystemWideActivateMultiUOM && rowData.uomMaster && rowData.uomMaster.length>1">
+                  <div>
+                     <span class="badge-warning ion-text-wrap ion-flex my-auto px-1">UOM</span>
+                  </div>
+               </ion-col>
             </ion-row>
             <ion-row>
                <ion-col>
@@ -270,12 +275,29 @@
                      <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.tradingMarginAmt|number:(objectHeader?.isHomeCurrency?precisionSales.localFormat:precisionSales.foreignFormat)}}" [disabled]="true"></ion-input>
                   </ion-item>
                </ng-container>
-               <ion-item>
-                  <ion-label>
-                     <div>UOM</div>
-                  </ion-label>
-                  <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.itemUomId|idMapping:uomMasterList}}" [disabled]="true"></ion-input>
-               </ion-item>
+               <ng-container *ngIf="!configSystemWideActivateMultiUOM">
+                  <ion-item>
+                     <ion-label>
+                        <div>UOM</div>
+                     </ion-label>
+                     <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.itemUomId|idMapping:uomMasterList}}" [disabled]="true"></ion-input>
+                  </ion-item>
+               </ng-container>
+               <ng-container *ngIf="configSystemWideActivateMultiUOM">
+                  <ion-item>
+                     <ion-label>
+                        <div>UOM</div>
+                     </ion-label>
+                     <ng-container *ngIf="selectedItem.uomMaster && selectedItem.uomMaster.length>1">
+                        <ion-select interface="action-sheet" slot="end" [(ngModel)]="selectedItem.itemUomId" (ionChange)="onUomChanged(selectedItem, $event, false)" [disabled]="restrictTrxFields['itemUomId']"> 
+                           <ion-select-option *ngFor="let s of selectedItem.uomMaster" [value]="s.itemUomId">{{s.itemUomId|idMapping:uomMasterList}}</ion-select-option>
+                        </ion-select>
+                     </ng-container>
+                     <ng-container *ngIf="!selectedItem.uomMaster || (selectedItem.uomMaster && selectedItem.uomMaster.length<=1)">
+                        <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.itemUomId|idMapping:uomMasterList}}" [disabled]="true"></ion-input>
+                     </ng-container>
+                  </ion-item>
+               </ng-container>
                <ion-item>
                   <ion-label>
                      <div>Remark</div>

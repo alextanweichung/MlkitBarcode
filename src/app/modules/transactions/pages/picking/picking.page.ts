@@ -84,7 +84,7 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter {
       } catch (error) {
          console.error(error);
          await this.loadingService.dismissLoading();
-      } finally {         
+      } finally {
          await this.loadingService.dismissLoading();
       }
    }
@@ -100,6 +100,7 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter {
    async addObject() {
       try {
          // if (this.objectService.hasWarehouseAgent()) {
+         this.objectService.resetVariables();
          this.navController.navigateForward("/transactions/picking/picking-header");
          // } else {
          //   this.toastService.presentToast("", "Warehouse Agent not set.", "top", "danger", 1000);
@@ -197,10 +198,10 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter {
                Keyboard.hide();
             }
             this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
-               r.multiPickingNum.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.locationCode.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.locationDescription.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.warehouseAgentName.toUpperCase().includes(searchText.toUpperCase())
+               r.multiPickingNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.warehouseAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));
             this.currentPage = 1;
          } else {

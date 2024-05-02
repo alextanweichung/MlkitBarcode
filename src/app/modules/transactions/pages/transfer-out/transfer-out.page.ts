@@ -110,6 +110,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
    /* #region add */
 
    async addObject() {
+      this.objectService.resetVariables();
       this.navController.navigateForward("/transactions/transfer-out/transfer-out-add");
    }
 

@@ -13,6 +13,8 @@ import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
 import { TransactionInquiryObject, TransactionInquiryRequestObject } from '../models/transaction-inquiry';
 import { SalesAnalysisObject, SalesAnalysisRequestObject } from '../models/sales-analysis';
 import { ConsignmentSalesLocation } from '../../transactions/models/consignment-sales';
+import { ItemSalesAnalysis, ItemSalesAnalysisRequestObject } from '../models/item-sales-analysis';
+import { Item } from '../../transactions/models/item';
 
 @Injectable({
    providedIn: 'root'
@@ -28,6 +30,10 @@ export class ReportsService {
 
    getCustomers() {
       return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/customer");
+   }
+
+   getItems() {
+      return this.http.get<Item[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/item/itemList");
    }
 
    getDebtorOutstanding(object: DebtorOutstandingRequest) {
@@ -76,6 +82,10 @@ export class ReportsService {
 
    getSalesAnalysis(requestObject: SalesAnalysisRequestObject) {
       return this.http.post<SalesAnalysisObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/salesAnalysis", requestObject);
+   }
+
+   getItemSalesAnalysis(requestObject: ItemSalesAnalysisRequestObject) {
+      return this.http.post<ItemSalesAnalysis[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/itemSalesAnalysis", requestObject);
    }
 
    getConsignmentLocation() {

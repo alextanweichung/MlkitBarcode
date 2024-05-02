@@ -66,6 +66,7 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    moduleControl: ModuleControl[] = [];
    systemWideEAN13IgnoreCheckDigit: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
@@ -73,6 +74,13 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
             if (ignoreCheckdigit != undefined) {
                this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
+            }
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
             }
          }, error => {
             console.error(error);
@@ -313,6 +321,9 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    async onDoneScanning(event) {
       if (event) {
          await this.barcodescaninput.validateBarcode(event);
+         if (this.configMobileScanItemContinuous) {
+            await this.barcodescaninput.startScanning();
+         }
       }
    }
 

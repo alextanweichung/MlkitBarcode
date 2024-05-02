@@ -4,9 +4,11 @@ import { NavController, ActionSheetController, ModalController, ViewWillEnter, A
 import { Customer } from 'src/app/modules/transactions/models/customer';
 import { BackToBackOrderService } from 'src/app/modules/transactions/services/backtoback-order.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CreditInfo, CreditInfoDetails } from 'src/app/shared/models/credit-info';
 import { MasterListDetails, ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 
@@ -27,6 +29,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
    constructor(
       public objectService: BackToBackOrderService,
       private authService: AuthService,
+      private configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
       private navController: NavController,
@@ -154,7 +157,7 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async onCustomerConfirmation(event) {
+   async onCustomerConfirmation(event: SearchDropdownList) {
       if (event) {
          var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
          if (lookupValue) {
@@ -226,10 +229,11 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
    selectedCustomerLocationList: MasterListDetails[] = [];
    availableAddress: ShippingInfo[] = [];
    creditInfo: CreditInfo = { creditLimit: null, creditTerms: null, isCheckCreditLimit: null, isCheckCreditTerm: null, utilizedLimit: null, pendingOrderAmount: null, outstandingAmount: null, availableLimit: null, overdueAmount: null, pending: [], outstanding: [], overdue: [] };
-   async onCustomerSelected(event: any, ignoreCurrencyRate?: boolean) {
+   async onCustomerSelected(event: SearchDropdownList, ignoreCurrencyRate?: boolean) {
       try {
          if (event) {
             var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
+            var lookupValue2 = this.objectService.customers?.find(r => r.customerId === event.id);
             if (lookupValue != undefined) {
                this.objectForm.patchValue({ customerId: lookupValue.id });
                if (this.customersd) {
@@ -284,6 +288,11 @@ export class BacktobackOrderHeaderPage implements OnInit, ViewWillEnter {
             }
             if (this.objectService.salesActivatePromotionEngine) {
                // this.loadPromotion(this.objectForm.controls.customerId.value);
+            }
+            if (lookupValue2) { // check here if the customer is universal, if yes, then assign to login's salesAgentId
+               if (lookupValue2.isUniversal) {
+                  this.objectForm.patchValue({ salesAgentId: this.configService.loginUser.salesAgentId });
+               }
             }
          } else {
             this.objectForm.patchValue({ customerId: null });

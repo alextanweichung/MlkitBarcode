@@ -8,7 +8,7 @@
    <div class="p-2 ion-flex ion-flex-center">
       <div class="logo-container">
          <ion-img src="../../../../assets/idcp/logo-idcp.svg" style="width: 50%" class="animate__animated animate__fadeInDown ion-flex ion-margin-auto" alt="iDCP Logo"></ion-img>
-         <p *ngIf="configService.selected_sys_param">{{mapCompanyName(configService.selected_sys_param.apiUrl)}}</p>
+         <p *ngIf="configService.selected_sys_param">{{configService.selected_sys_param.companyName}}</p>
          <p class="mt-2 font-size-small">Login to your account</p>
       </div>
       <ion-list class="item-card-list" lines="none">
@@ -16,13 +16,12 @@
             <ion-item *ngIf="configService.sys_parameter && configService.sys_parameter.length > 1">
                <ion-label color="tertiary" position="stacked">Company</ion-label>
                <ion-select interface="action-sheet" placeholder="Company" formControlName="apiUrl" (ionChange)="setSelectedParam()">
-                  <ion-select-option *ngFor="let s of configService.sys_parameter" [value]="s.apiUrl">{{mapCompanyName(s.apiUrl)}}</ion-select-option>
+                  <ion-select-option *ngFor="let s of configService.sys_parameter" [value]="s.apiUrl">{{s.companyName}}</ion-select-option>
                </ion-select>
             </ion-item>
             <ion-item>
                <ion-label color="tertiary" position="stacked">Email</ion-label>
-               <ion-input formControlName="userEmail" type="email" autocomplete="off"
-                  placeholder="Your email address"></ion-input>
+               <ion-input formControlName="userEmail" type="email" autocomplete="off" placeholder="Your email address"></ion-input>
             </ion-item>
             <ion-item>
                <ion-label color="tertiary" position="stacked">Password</ion-label>

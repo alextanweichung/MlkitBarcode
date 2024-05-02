@@ -29,6 +29,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    currentPage: number = 1;
    itemsPerPage: number = 12;
 
+   binDesc: string = "";
+
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
    constructor(
@@ -65,6 +67,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    moduleControl: ModuleControl[] = [];
    systemWideEAN13IgnoreCheckDigit: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
@@ -72,6 +75,13 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
             if (ignoreCheckdigit != undefined) {
                this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
+            }
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
             }
          }, error => {
             console.error(error);
@@ -131,11 +141,41 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                }
                break;
          }
-
-         if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
+         let rowIndex = this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku);
+         if (rowIndex === 0 && !this.objectService.configInvCountActivateLineWithBin) { // already in and first one
             this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+         } else if (rowIndex === 0 && this.objectService.configInvCountActivateLineWithBin) { // already in and first one + same binDesc
+            if (this.objectService.objectDetail[rowIndex].binDesc === this.binDesc) {
+               this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+               let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            } else {
+               let newLine: StockCountDetail = {
+                  inventoryCountLineId: 0,
+                  inventoryCountId: this.objectService.objectHeader.inventoryCountId,
+                  locationId: this.objectService.objectHeader.locationId,
+                  itemId: trxLine.itemId,
+                  itemVariationXId: trxLine.itemVariationXId,
+                  itemVariationYId: trxLine.itemVariationYId,
+                  itemSku: trxLine.itemSku,
+                  itemBarcodeTagId: trxLine.itemBarcodeTagId,
+                  itemBarcode: trxLine.itemBarcode,
+                  qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
+                  binDesc: this.binDesc,
+                  sequence: 0,
+                  // for local use
+                  itemCode: trxLine.itemCode,
+                  itemDescription: trxLine.description,
+                  // testing performance
+                  guid: uuidv4()
+               }
+               this.objectService.objectDetail.forEach(r => { r.sequence += 1 });
+               await this.objectService.objectDetail.unshift(newLine);
+               let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            }
          } else {
             let newLine: StockCountDetail = {
                inventoryCountLineId: 0,
@@ -148,6 +188,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                itemBarcodeTagId: trxLine.itemBarcodeTagId,
                itemBarcode: trxLine.itemBarcode,
                qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
+               binDesc: this.binDesc,
                sequence: 0,
                // for local use
                itemCode: trxLine.itemCode,
@@ -245,6 +286,55 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
+   onBinDescBlur() {
+      this.barcodescaninput.setFocus();
+   }
+
+   async updateBinDesc(rowIndex) {
+      if (this.objectService.objectDetail[rowIndex]) {
+         try {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               backdropDismiss: false,
+               header: "Update Bin Desc.",
+               inputs: [
+                  {
+                     name: "binDesc",
+                     type: "text",
+                     placeholder: "Enter Bin Desc.",
+                     value: this.objectService.objectDetail[rowIndex].binDesc,
+                  }
+               ],
+               buttons: [
+                  {
+                     text: "OK",
+                     role: "confirm",
+                     cssClass: "success",
+                     handler: async (data) => {
+                        this.objectService.objectDetail[rowIndex].binDesc = data.binDesc;
+                     },
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel"
+                  },
+               ],
+            });
+            await alert.present().then(() => {
+               const firstInput: any = document.querySelector("ion-alert input");
+               setTimeout(() => {
+                  firstInput.focus();
+               }, 1000);
+               return;
+            });
+         } catch (e) {
+            console.error(e);
+         }
+      } else {
+         this.toastService.presentToast("System Error", "Something went wrong, please contact adminstrator.", "top", "danger", 1000);
+      }
+   }
+
    /* #endregion */
 
    /* #region  camera scanner */
@@ -260,6 +350,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    async onDoneScanning(event) {
       if (event) {
          await this.barcodescaninput.validateBarcode(event);
+         if (this.configMobileScanItemContinuous) {
+            await this.barcodescaninput.startScanning();
+         }
       }
    }
 
@@ -393,26 +486,75 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
-	/* #endregion */
+   /* #endregion */
 
-	sendForDebug() {
-		let trxDto: StockCountRoot = {
-			header: this.objectService.objectHeader,
-			details: this.objectService.objectDetail
-		}
-		let jsonObjectString = JSON.stringify(trxDto);
-		let debugObject: JsonDebug = {
-			jsonDebugId: 0,
-			jsonData: jsonObjectString
-		};
-		this.objectService.sendDebug(debugObject).subscribe(response => {
-			if (response.status == 200) {
-				this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
-			}
-		}, error => {
-			this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
-			console.log(error);
-		});
-	}
+   sendForDebug() {
+      let trxDto: StockCountRoot = {
+         header: this.objectService.objectHeader,
+         details: this.objectService.objectDetail
+      }
+      let jsonObjectString = JSON.stringify(trxDto);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status == 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
+   }
+
+   /* #region bin desc camera scanning */
+   
+   async startScanning() {
+      const allowed = await this.checkPermission();
+      if (allowed) {
+         // this.scanActive = true;
+         this.onCameraStatusChanged(true);
+         const result = await BarcodeScanner.startScan();
+         if (result.hasContent) {
+            let value = result.content;
+            // this.scanActive = false;
+            await this.onCameraStatusChanged(false);
+            this.binDesc = value;
+         }
+      }
+   }
+   
+   async checkPermission() {
+      return new Promise(async (resolve) => {
+         const status = await BarcodeScanner.checkPermission({ force: true });
+         if (status.granted) {
+            resolve(true);
+         } else if (status.denied) {
+            const alert = await this.alertController.create({
+               header: "No permission",
+               message: "Please allow camera access in your setting",
+               buttons: [
+                  {
+                     text: "Open Settings",
+                     handler: () => {
+                        BarcodeScanner.openAppSettings();
+                        resolve(false);
+                     },
+                  },
+                  {
+                     text: "No",
+                     role: "cancel",
+                  },
+               ],
+            });
+            await alert.present();
+         } else {
+            resolve(false);
+         }
+      });
+   }
+
+   /* #endregion */
 
 }

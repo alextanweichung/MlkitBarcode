@@ -88,6 +88,7 @@ export class InterTransferPage implements OnInit, ViewWillEnter {
 
   async addObject() {
     try {
+      this.objectService.resetVariables();
       this.navController.navigateForward("/transactions/inter-transfer/inter-transfer-header");
     } catch (e) {
       console.error(e);

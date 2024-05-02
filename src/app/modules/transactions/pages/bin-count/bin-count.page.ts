@@ -93,7 +93,6 @@ export class BinCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
       this.navController.navigateForward("/transactions/bin-count/bin-count-detail", navigationExtras);
    }
 
-   // Select action
    async selectAction() {
       try {
          const actionSheet = await this.actionSheetController.create({
@@ -120,6 +119,7 @@ export class BinCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    addObject() {
+      this.objectService.resetVariables();
       this.navController.navigateForward("/transactions/bin-count/bin-count-header");
    }
 
@@ -163,7 +163,7 @@ export class BinCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
             if (Capacitor.getPlatform() !== "web") {
                Keyboard.hide();
             }
-            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.binCountNum.toUpperCase().includes(searchText.toUpperCase()))));
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.binCountNum?.toUpperCase().includes(searchText.toUpperCase()))));
             this.currentPage = 1;
          } else {
             this.resetFilteredObj();

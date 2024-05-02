@@ -73,40 +73,36 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async loadCompanyNames() {
       if (this.configService.sys_parameter && this.configService.sys_parameter.length > 0) {
-         this.configService.sys_parameter.forEach(async r => this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl)))
-         // for await (const r of this.configService.sys_parameter) {
-         //    this.companyNames.set(r.apiUrl, await this.commonService.getCompanyProfileByUrl(r.apiUrl));
-         // }
+         this.configService.sys_parameter.forEach(async r => {
+            let companyName = await this.commonService.getCompanyProfileByUrl(r.apiUrl);
+            r.companyName = companyName;
+         })
       }
    }
 
-   companyNames: Map<string, string> = new Map([]);
    ngOnInit() {
       if (Capacitor.getPlatform() === "web") {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         this.signin_form.get("userEmail").setValue("aychia@idcp.my");
+         // this.signin_form.get("userEmail").setValue("kh@idcp.my");
          // this.signin_form.get("userEmail").setValue("john@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
          // this.signin_form.get("userEmail").setValue("hwsales2@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");         
-         this.signin_form.get("userEmail").setValue("admin@idcp.my");
+         // this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("cwyew@idcp.my");
          // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
          // this.signin_form.get("userEmail").setValue("defneysup@idcp.my");
          // this.signin_form.get("password").setValue("Bmm@168spv01");
-         // this.signin_form.get("password").setValue("Dev8888");
+         this.signin_form.get("password").setValue("Dev8888");
          // this.signin_form.get("password").setValue("i@Dmin7026");
-         this.signin_form.get("password").setValue("c0nnecT#7026");
+         // this.signin_form.get("password").setValue("c0nnecT#7026");
          // this.signin_form.get("password").setValue("Testing1234");
          // this.signin_form.get("password").setValue("String1234");
       } else {
          this.setSelectedParam();
       }
-   }
-
-   mapCompanyName(apiUrl: string) {
-      return this.companyNames.get(apiUrl);
    }
 
    forgetPassword(event) {
@@ -125,20 +121,13 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.signin_form.get("password").setValue(null);
          }
       }
-      if (Capacitor.getPlatform() === "web") {
-         // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
-         // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
-         // this.signin_form.get("password").setValue("String1234");
-         this.signin_form.get("userEmail").setValue("admin@idcp.my");
-         this.signin_form.get("password").setValue("i@Dmin7026");
-      }
    }
 
    async deleteAlert() {
       if (this.configService.selected_sys_param) {
          try {
             const alert = await this.alertController.create({
-               header: `Delete ${this.mapCompanyName(this.configService.selected_sys_param.apiUrl)}?`,
+               header: `Delete ${this.configService.selected_sys_param.companyName}?`,
                message: "This action cannot be undone.",
                buttons: [
                   {

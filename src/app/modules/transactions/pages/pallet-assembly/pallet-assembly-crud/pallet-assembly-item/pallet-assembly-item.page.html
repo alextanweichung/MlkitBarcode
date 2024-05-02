@@ -117,7 +117,7 @@
             </ion-item>
          </ion-list>
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <ion-item-sliding #slidingItem *ngFor="let item of palletToShow.palletItemList; let rowIndex = index" (click)="qtyRequest.setFocus()">
+            <ion-item-sliding #slidingItem *ngFor="let rowData of palletToShow.palletItemList; let rowIndex = index" (click)="qtyRequest.setFocus()">
                <ion-item button detail="false" class="ion-no-padding no-ripple">
                   <ion-grid class="ion-no-padding py-2 pl-2">
                      <ion-row>
@@ -128,24 +128,26 @@
                            <ion-grid class="ion-no-padding">
                               <ion-row>
                                  <ion-col class="ion-flex my-auto">
-                                    <div>{{item.itemBarcode}}</div>
+                                    <div>{{rowData.itemBarcode}}</div>
                                  </ion-col>
                               </ion-row>
                               <ion-row>
                                  <ion-col class="ion-flex my-auto">
-                                    <div>{{item.itemCode}}</div>
+                                    <div>{{rowData.itemCode}}</div>
+                                    <!-- <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXDescription">{{rowData.itemVariationXDescription}}</span>
+                                    <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYDescription">{{rowData.itemVariationYDescription}}</span> -->
                                  </ion-col>
                               </ion-row>
                               <ion-row>
                                  <ion-col class="ion-flex my-auto">
-                                    <div>{{item.description}}</div>
+                                    <div>{{rowData.description}}</div>
                                  </ion-col>
                               </ion-row>
                            </ion-grid>
                         </ion-col>
                         <ion-col size="2" class="ion-flex my-auto">
-                           <ion-input #qtyRequest inputmode="decimal" [min]="0" placeholder="0" [(ngModel)]="item.qtyRequest" (keypress)="eventHandler($event.keyCode, item)"></ion-input>
-                           <!-- <div>{{item.qtyRequest|number:"1.0"}}</div> -->
+                           <ion-input #qtyRequest inputmode="decimal" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode, rowData)"></ion-input>
+                           <!-- <div>{{rowData.qtyRequest|number:"1.0"}}</div> -->
                         </ion-col>
                      </ion-row>
                   </ion-grid>

@@ -104,6 +104,7 @@ export class TransferBinPage implements OnInit, ViewWillEnter, ViewDidEnter {
 	}
 
 	addObject() {
+      this.objectService.resetVariables();
 		this.navController.navigateRoot("/transactions/transfer-bin/transfer-bin-header");
 	}
 

@@ -52,6 +52,7 @@ export interface Customer {
    isPrimary: boolean
    isItemPriceTaxInclusive: boolean
    isDisplayTaxInclusive: boolean
+   isUniversal: boolean
    sequence: number
    createdById: number
    createdBy: string
@@ -60,5 +61,4 @@ export interface Customer {
    modifiedBy: string
    modifiedAt: string
    deactivated: boolean
- }
- 
+}

@@ -24,6 +24,7 @@ export interface TransactionDetail {
    qtyCommit?: number
    tempQtyCommit?: number
    qtyReceive?: number
+   qtyInventory?: number
    unitPrice?: number
    unitPriceExTax?: number
    discountGroupCode?: string
@@ -158,6 +159,12 @@ export interface TransactionDetail {
    qtyToShip?: number
    standardPackingInfo?: string
 
+   uomMaster?: ItemMultiUomBase[];
+   multiUom?: ItemMultiUomBase[];
+   baseRatio?: number;
+   uomRatio?: number;
+   ratioExpr?: string;
+
    // testing performance
    guid?: string
 }
@@ -200,4 +207,16 @@ export interface ItemGroupInfo {
    seasonId: number
    categoryId: number
    deptId: number
+}
+
+export interface ItemMultiUomBase {
+   itemUomId: number
+   ratio: number
+   isPrimary: boolean
+}
+
+export interface ItemMultiUom extends ItemMultiUomBase {
+   itemMultiUomId: number
+   itemId: number
+   itemBarcode: string
 }

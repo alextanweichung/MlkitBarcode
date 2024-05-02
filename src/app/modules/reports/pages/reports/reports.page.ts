@@ -27,6 +27,7 @@ export class ReportsPage implements OnInit {
    showCheckCreditNote: boolean = false;
    showTransactionInquiry: boolean = false;
    showSalesAnalysis: boolean = false;
+   showItemSalesAnalysis: boolean = false;
    showCustomerDetail: boolean = false;
 
    constructor(
@@ -52,6 +53,7 @@ export class ReportsPage implements OnInit {
                this.showCheckCreditNote = pageItems.findIndex(r => r.title === reportAppCode.mobileCheckCN) > -1;
                this.showTransactionInquiry = pageItems.findIndex(r => r.title === reportAppCode.mobileTrxInq) > -1;
                this.showSalesAnalysis = pageItems.findIndex(r => r.title === reportAppCode.mobileSalesAnalysis) > -1;
+               this.showItemSalesAnalysis = pageItems.findIndex(r => r.title === reportAppCode.mobileItemSalesAnalysis) > -1;
                this.showCustomerDetail = pageItems.findIndex(r => r.title === reportAppCode.mobileCustomerDetail) > -1;
             }
          })

@@ -9,15 +9,15 @@ import { TransactionProcessingPageRoutingModule } from './transaction-processing
 import { TransactionProcessingPage } from './transaction-processing.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    TransactionProcessingPageRoutingModule
-  ],
-  exports: [
-    TransactionProcessingPage
-  ],
-  declarations: [TransactionProcessingPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      TransactionProcessingPageRoutingModule
+   ],
+   exports: [
+      TransactionProcessingPage
+   ],
+   declarations: [TransactionProcessingPage]
 })
-export class TransactionProcessingPageModule {}
+export class TransactionProcessingPageModule { }

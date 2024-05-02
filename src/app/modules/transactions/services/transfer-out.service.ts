@@ -6,6 +6,8 @@ import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { TransferOutRoot, TransferOutLine, TransferOutList } from "../models/transfer-out";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
+import { ModuleControl } from "src/app/shared/models/module-control";
+import { AuthService } from "src/app/services/auth/auth.service";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -32,12 +34,13 @@ export class TransferOutService {
 
    constructor(
       private http: HttpClient,
+      private authService: AuthService,
       private configService: ConfigService
    ) { }
 
    async loadRequiredMaster() {
       await this.loadMasterList();
-      // await this.loadConsignmentLocation();
+      await this.loadModuleControl();
    }
 
    async loadMasterList() {
@@ -49,10 +52,21 @@ export class TransferOutService {
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
    }
 
-   // locationList: ConsignmentSalesLocation[] = [];
-   // async loadConsignmentLocation() {
-   //   this.locationList = await this.getConsignmentLocation();
-   // }
+   
+
+   moduleControl: ModuleControl[] = [];
+   configMobileScanItemContinuous: boolean = false;
+   loadModuleControl() {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+         this.moduleControl = obj;
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
+         }
+      })
+   }
 
    /* #region  for insert */
 

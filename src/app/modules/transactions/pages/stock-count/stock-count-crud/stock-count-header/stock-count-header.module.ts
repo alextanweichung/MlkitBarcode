@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
@@ -12,15 +12,16 @@ import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/s
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    StockCountHeaderPageRoutingModule,
-    CalendarInputPageModule,
-    SearchDropdownPageModule,
-    IdMappingModule
-  ],
-  declarations: [StockCountHeaderPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      StockCountHeaderPageRoutingModule,
+      CalendarInputPageModule,
+      SearchDropdownPageModule,
+      IdMappingModule,
+      ReactiveFormsModule
+   ],
+   declarations: [StockCountHeaderPage]
 })
-export class StockCountHeaderPageModule {}
+export class StockCountHeaderPageModule { }

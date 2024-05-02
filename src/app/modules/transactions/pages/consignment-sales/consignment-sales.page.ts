@@ -56,7 +56,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    async ionViewDidEnter(): Promise<void> {
       // check incomplete trx here
       let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
-      if (data !== null) {
+      if (data) {
          if (data?.header?.toLocationId === this.configService?.selected_location) {
             this.promptIncompleteTrxAlert();
          } else {
@@ -194,6 +194,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    }
 
    async addObject() {
+      this.objectService.resetVariables();
       this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-header");
    }
 
