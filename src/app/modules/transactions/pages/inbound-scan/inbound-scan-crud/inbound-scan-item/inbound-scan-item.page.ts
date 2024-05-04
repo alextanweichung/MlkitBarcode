@@ -154,7 +154,7 @@ export class InboundScanItemPage implements OnInit, ViewDidEnter {
          itemId: itemFound.itemId,
          itemCode: itemFound.itemCode,
          itemVariationXId: itemFound.itemVariationXId,
-         itemVariationYId: itemFound.itemVariationXId,
+         itemVariationYId: itemFound.itemVariationYId,
          itemVariationXDescription: this.objectService.itemVariationXMasterList.find(r => r.id === itemFound.itemVariationXId)?.description,
          itemVariationYDescription: this.objectService.itemVariationYMasterList.find(r => r.id === itemFound.itemVariationYId)?.description,
          itemSku: itemFound.itemSku,
