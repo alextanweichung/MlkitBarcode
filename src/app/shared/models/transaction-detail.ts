@@ -13,6 +13,7 @@ export interface TransactionDetail {
    description?: string
    extendedDescription?: string
    shortDescription?: string
+   itemVariationId?: number
    itemUomId?: number
    itemUomCode?: string
    currencyRate?: number
@@ -210,6 +211,7 @@ export interface ItemGroupInfo {
 }
 
 export interface ItemMultiUomBase {
+   itemId: number
    itemUomId: number
    ratio: number
    isPrimary: boolean

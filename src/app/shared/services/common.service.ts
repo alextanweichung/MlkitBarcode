@@ -9,7 +9,7 @@ import { TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { AnnouncementFile } from 'src/app/modules/dashboard/models/dashboard';
 import { environment } from 'src/environments/environment';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup, UntypedFormGroup } from '@angular/forms';
 import { MasterListDetails } from '../models/master-list-details';
 import { MasterList } from '../models/master-list';
 import { format } from 'date-fns';
@@ -931,6 +931,28 @@ export class CommonService {
          result.variationY = [...new Set(itemList.flatMap(r => r.itemVariationYId))];
       }
       return result;
+   }
+
+   //lookUpCurrency
+   lookUpCurrency(objectForm: FormGroup<any>, currencyMasterList: any) {
+      var lookupValue = currencyMasterList?.find(e => e.id == objectForm.get("currencyId").value);
+      if (lookupValue != undefined) {
+         if (lookupValue.historyInfo && lookupValue.historyInfo.length > 0) {
+            lookupValue.historyInfo.sort(function (a, b) {
+               return new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime();
+            });
+            let currency = lookupValue.historyInfo.find(x => {
+               return new Date(objectForm.get("trxDate").value).getTime() >= new Date(x.effectiveDate).getTime()
+            })
+            if (currency) {
+               objectForm.patchValue({ currencyRate: currency.rate })
+            } else {
+               objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) })
+            }
+         } else {
+            objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) })
+         }
+      }
    }
 
 }

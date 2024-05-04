@@ -39,7 +39,7 @@
                   </ion-row>
                   <ion-row>
                      <ion-col class="ion-flex ion-margin-auto">{{rowData.locationCode}} - {{rowData.locationDesc}}</ion-col>
-                     <ion-col class="ion-flex ion-margin-auto justify-content-end">{{rowData.toLocationCode}} - {{rowData.toLocationDesc}}</ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="rowData.toLocationCode">{{rowData.toLocationCode}} - {{rowData.toLocationDesc}}</ion-col>
                   </ion-row>
                </ion-grid>
             </ion-item>

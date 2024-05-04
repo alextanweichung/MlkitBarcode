@@ -1,5 +1,4 @@
 import { HttpClient } from "@angular/common/http";
-import { format } from "date-fns";
 import { Subscription } from "rxjs";
 import { map } from "rxjs/operators";
 import { background_load } from "src/app/core/interceptors/error-handler.interceptor";
@@ -7,22 +6,20 @@ import { AuthService } from "src/app/services/auth/auth.service";
 import { ConfigService } from "src/app/services/config/config.service";
 import { LoadingService } from "src/app/services/loading/loading.service";
 import { CreditInfo } from "src/app/shared/models/credit-info";
-import { ItemList } from "src/app/shared/models/item-list";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ModuleControl } from "src/app/shared/models/module-control";
 import { PrecisionList } from "src/app/shared/models/precision-list";
-import { SalesItemInfoRoot } from "src/app/shared/models/sales-item-info";
 import { SearchDropdownList } from "src/app/shared/models/search-dropdown-list";
-import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { BulkConfirmReverse } from "src/app/shared/models/transaction-processing";
 import { WorkFlowState } from "src/app/shared/models/workflow";
 import { Customer } from "../models/customer";
-import { QuotationHeader, QuotationRoot } from "../models/quotation";
-import { OtherAmount } from "../models/sales-order";
-import { DefectRequestList } from "../models/defect-request";
+import { DefectRequestList, DefectRequestRoot } from "../models/defect-request";
 import { Injectable } from "@angular/core";
+import { TransactionDetail } from "src/app/shared/models/transaction-detail";
+import { SalesItemRequest } from "src/app/shared/models/sales-item-request";
+import { CopyFromSIHeader, CopyFromSILine } from "src/app/shared/models/copy-from-si";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -38,7 +35,14 @@ export class DefectRequestService {
    filterEndDate: Date;
    
    fullMasterList: MasterList[] = [];
+   locationMasterList: MasterListDetails[] = [];
+   fLocationMasterList: MasterListDetails[] = [];
+   currencyMasterList: MasterListDetails[] = [];
+   countryMasterList: MasterListDetails[] = [];
    customerMasterList: MasterListDetails[] = [];
+   itemUomMasterList: MasterListDetails[] = [];
+   itemVariationXMasterList: MasterListDetails[] = [];
+   itemVariationYMasterList: MasterListDetails[] = [];
 
    customers: Customer[] = [];
 
@@ -74,6 +78,14 @@ export class DefectRequestService {
    custSubscription: Subscription;
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.fLocationMasterList = this.locationMasterList.filter(x => x.attribute1 === "W" || x.attribute1 === "O");
+      this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -105,6 +117,9 @@ export class DefectRequestService {
 
    moduleControl: ModuleControl[];
    allowDocumentWithEmptyLine: string = "N";
+   configSystemWideBlockConvertedCode: boolean = false;
+   configSystemWideActivateMultiUOM: boolean = false;
+   configItemVariationShowMatrix: boolean = false;
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -116,6 +131,27 @@ export class DefectRequestService {
             let allowDocumentWithEmptyLine = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
             if (allowDocumentWithEmptyLine != undefined) {
                this.allowDocumentWithEmptyLine = allowDocumentWithEmptyLine.ctrlValue.toUpperCase();
+            }
+
+            let systemWideBlockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")?.ctrlValue;
+            if (systemWideBlockConvertedCode && systemWideBlockConvertedCode.toUpperCase() === "Y") {
+               this.configSystemWideBlockConvertedCode = true;
+            } else {
+               this.configSystemWideBlockConvertedCode = false;
+            }
+
+            let systemWideActivateMultiUOM = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+            if (systemWideActivateMultiUOM && systemWideActivateMultiUOM.toUpperCase() === "Y") {
+               this.configSystemWideActivateMultiUOM = true;
+            } else {
+               this.configSystemWideActivateMultiUOM = false;
+            }
+
+            let itemVariationShowMatrix = this.moduleControl.find(x => x.ctrlName === "ItemVariationShowMatrix");
+            if (itemVariationShowMatrix && itemVariationShowMatrix.ctrlValue.toUpperCase() === "Y") {
+               this.configItemVariationShowMatrix = true;
+            } else {
+               this.configItemVariationShowMatrix = false;
             }
          })
          this.authService.precisionList$.subscribe(precision => {
@@ -150,49 +186,17 @@ export class DefectRequestService {
 
    /* #region  for insert */
 
-   objectHeader: QuotationHeader;
-   objectOtherAmt: OtherAmount[] = [];
-   objectDetail: TransactionDetail[] = [];
-   objectSalesHistory: SalesItemInfoRoot[] = [];
-   async setHeader(objectHeader: QuotationHeader) {
-      this.objectHeader = objectHeader;
+   object: DefectRequestRoot;
+   async setObject(object: DefectRequestRoot) {
+      this.object = object;
    }
 
-   setLine(objectDetail: TransactionDetail[]) {
-      this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
-   }
-
-   setOtherAmt(otherAmt: OtherAmount[]) {
-      this.objectOtherAmt = JSON.parse(JSON.stringify(otherAmt));
-   }
-
-   objectSummary: QuotationRoot
-   setSummary(objectSummary: QuotationRoot) {
-      this.objectSummary = objectSummary;
-   }
-
-   removeHeader() {
-      this.objectHeader = null;
-   }
-
-   removeLine() {
-      this.objectDetail = [];
-      this.objectSalesHistory = [];
-   }
-
-   removeOtherAmt() {
-      this.objectOtherAmt = [];
-   }
-
-   removeSummary() {
-      this.objectSummary = null;
+   removeObject() {
+      this.object = null;
    }
 
    resetVariables() {
-      this.removeHeader();
-      this.removeLine();
-      this.removeOtherAmt();
-      this.removeSummary();
+      this.removeObject();
    }
 
    hasSalesAgent(): boolean {
@@ -221,8 +225,18 @@ export class DefectRequestService {
       return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest/customer", { context: background_load() }).toPromise();
    }
 
-   getFullItemList() {
-      return this.http.get<ItemList[]>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest/item/itemList", { context: background_load() });
+   getSIListByCustomerId(customerId: number) {
+      return this.http.get<CopyFromSIHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileDefectRequest/fromSI/customer/${customerId}`);
+   }
+
+   getSIDetail(salesInvoiceId: number) {
+      let re = /\,/gi;
+      let reqParam = salesInvoiceId.toString().replace(re, "&id=");
+      return this.http.get<CopyFromSILine[]>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest/fromSI/line/SILine?id=" + reqParam);
+   }
+
+   getFullItemList(requestObject: SalesItemRequest) {
+      return this.http.post<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest/item/itemList", requestObject);
    }
 
    getObjectListByDate(dateStart: string, dateEnd: string) {
@@ -230,15 +244,15 @@ export class DefectRequestService {
    }
 
    getObjectById(objectId: number) {
-      return this.http.get<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest/" + objectId);
+      return this.http.get<DefectRequestRoot>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest/" + objectId);
    }
 
-   insertObject(object: QuotationRoot) {
-      return this.http.post<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest", object, httpObserveHeader);
+   insertObject(object: DefectRequestRoot) {
+      return this.http.post<DefectRequestRoot>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest", object, httpObserveHeader);
    }
 
-   updateObject(object: QuotationRoot) {
-      return this.http.put<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest", object, httpObserveHeader);
+   updateObject(object: DefectRequestRoot) {
+      return this.http.put<DefectRequestRoot>(this.configService.selected_sys_param.apiUrl + "MobileDefectRequest", object, httpObserveHeader);
    }
 
    toggleObject(objectId: number) {

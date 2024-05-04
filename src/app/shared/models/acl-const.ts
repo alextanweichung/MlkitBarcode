@@ -32,7 +32,7 @@ export const trxAppCode = {
    mobileBinCount: "MAMBC",
    mobileDoAck: "MAMDOACK",
    mobileCartonTruckLoading: "MAMCTL",
-   mobileDefectRequest: "MAMBC"
+   mobileDefectRequest: "MAMDR"
 }
 
 export const approvalAppCode = {
