@@ -209,7 +209,15 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
             if (Capacitor.getPlatform() !== "web") {
                Keyboard.hide();
             }
-            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.inventoryCountNum?.toUpperCase().includes(searchText.toUpperCase()))));
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
+               r.inventoryCountNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.zoneCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.zoneDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.rackCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.rackDescription?.toUpperCase().includes(searchText.toUpperCase())
+            )));
             this.currentPage = 1;
          } else {
             this.resetFilteredObj();

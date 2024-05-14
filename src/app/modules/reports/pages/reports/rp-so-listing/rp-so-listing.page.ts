@@ -11,6 +11,8 @@ import { format, parseISO } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { DatePipe } from '@angular/common';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 @Component({
    selector: 'app-rp-so-listing',
@@ -26,11 +28,14 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
    isOverdueOnly: boolean = false;
    dateRangeSearchDropdownList: SearchDropdownList[] = [];
 
+   configSOListDisplayDOAcknowledgement: boolean = false;
+
    data: any;
    columns: any;
 
    constructor(
       private objectService: ReportsService,
+      private authService: AuthService,
       private commonService: CommonService,
       private alertController: AlertController,
       private toastService: ToastService,
@@ -39,7 +44,7 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
    ) { }
 
    ionViewWillEnter(): void {
-
+      this.loadModuleControl();
    }
 
    ngOnInit() {
@@ -85,6 +90,24 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       }, error => {
          console.log(error);
       })
+   }
+
+   moduleControl: ModuleControl[];
+   loadModuleControl() {
+      try {
+         this.authService.moduleControlConfig$.subscribe(obj => {
+            this.moduleControl = obj;
+
+            let soListDisplayDOAcknowledgement = this.moduleControl.find(x => x.ctrlName === "SOListDisplayDOAcknowledgement")?.ctrlValue;
+            if (soListDisplayDOAcknowledgement && soListDisplayDOAcknowledgement.toUpperCase() === "Y") {
+               this.configSOListDisplayDOAcknowledgement = true;
+            } else {
+               this.configSOListDisplayDOAcknowledgement = false;
+            }
+         })
+      } catch (e) {
+         console.error(e);
+      }
    }
 
    async loadObjects() {
@@ -181,12 +204,15 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       this.printObj = [];
       this.childType = type;
       try {
-         this.printObj = objs.split(';');
-         if (this.printObj && this.printObj.length === 1) {
-            await this.presentAlertViewPdf(Number(this.printObj[0].split('|')[1]), this.printObj[0].split('|')[0], type);
-         } else {
-            this.showPrintChildDialog();
-         }
+         if (objs && objs.length > 0) {
+            this.printObj = objs.split(";");
+            console.log("🚀 ~ RpSoListingPage ~ showDialogOrDownload ~ this.printObj:", this.printObj)
+            if (this.printObj && this.printObj.length === 1) {
+               await this.presentAlertViewPdf(Number(this.printObj[0].split('|')[1]), this.printObj[0].split('|')[0], type);
+            } else {
+               this.showPrintChildDialog();
+            }
+         } 
       } catch (e) {
          console.error(e);
       }
@@ -198,6 +224,24 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
 
    hidePrintChildDialog() {
       this.printChildDialog = false;
+   }
+
+   checkDoLength(obj: string) {
+      if (obj && obj.length > 0) {
+         return obj.split(";").length === 1;
+      }
+      return false;
+   }
+
+   getDOAckStatus(obj: string) {
+      if (obj && obj.length > 0) {
+         let dos = obj?.split(";");
+         if (dos && dos.length === 1) {
+            let r = dos[0].split("|");
+            return r[2] === "1";
+         }
+      }
+      return false;
    }
 
    async presentAlertViewPdf(objectId: any, objectName: string, type: string) {

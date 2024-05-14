@@ -179,7 +179,7 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
                await alert.present();
             } else {
                // this.toastService.presentToast("Invalid Quantity", "Total requested quantity [" + Number(data.qtyRequest + totalQtyRequestOfSameItemInCart) + "] is lower than minimum order quantity [" + data.minOrderQty + "]", "top", "warning", 1000);
-               this.toastService.presentToast("Invalid Quantity", "Some item does not meet minimum order quantity.", "top", "warning", 1000);
+               this.toastService.presentToast("Invalid Quantity", `${this.objectService.objectDetail.find(r => r.minOrderQty).itemCode} does not meet minimum order quantity.`, "top", "warning", 1000);
             }
          } else {
             this.submit_attempt = false;

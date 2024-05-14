@@ -65,7 +65,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
          } else {
             await this.computeUnitPrice(trxLine);
          }
-         this.objectService.objectDetail.unshift(trxLine);
+         await this.objectService.objectDetail.push(trxLine);
          await this.computeAllAmount(this.objectService.objectDetail[0]);
          if (this.objectService.salesActivatePromotionEngine && this.objectService.objectHeader.isAutoPromotion && (this.objectService.objectHeader.businessModelType === "T" || this.objectService.objectHeader.businessModelType === "B")) {
             await this.promotionEngineService.runPromotionEngine(this.objectService.objectDetail.filter(x => x.qtyRequest > 0), this.objectService.promotionMaster, this.objectService.systemWideActivateTaxControl, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.objectHeader.isHomeCurrency ? this.objectService.precisionSales.localMax : this.objectService.precisionSales.foreignMax, this.objectService.discountGroupMasterList, false, this.objectService.salesActivateTradingMargin)
@@ -85,7 +85,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
             }
             this.objectService.objectSalesHistory = [...this.objectService.objectSalesHistory, event];
          }
-      } catch (e) {
+   } catch (e) {
          console.error(e);
       }
    }

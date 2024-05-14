@@ -51,7 +51,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       if (request.context.get(BACKGROUND_LOAD)) {
          finished = true;
       }
-      
+   
       setTimeout(() => {
          if (!finished) {
             // this.loadingService.showLoading('Loading');
