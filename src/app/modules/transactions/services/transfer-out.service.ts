@@ -50,9 +50,7 @@ export class TransferOutService {
       this.fullLocationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
-   }
-
-   
+   }  
 
    moduleControl: ModuleControl[] = [];
    configMobileScanItemContinuous: boolean = false;

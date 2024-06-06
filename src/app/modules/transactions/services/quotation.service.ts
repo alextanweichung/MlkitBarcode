@@ -24,6 +24,8 @@ import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
 import { OtherAmount } from '../models/sales-order';
+import { VariationRatio } from 'src/app/shared/models/variation-ratio';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -55,6 +57,7 @@ export class QuotationService {
    uomMasterList: MasterListDetails[] = [];
    otherAmtMasterList: MasterListDetails[] =[];
    remarkMasterList: MasterListDetails[] = [];
+   variationRatioList: VariationRatio[] = [];
 
    customers: Customer[] = [];
 
@@ -62,6 +65,7 @@ export class QuotationService {
       private http: HttpClient,
       private authService: AuthService,
       private configService: ConfigService,
+      private commonService: CommonService,
       private loadingService: LoadingService
    ) { }
 
@@ -102,6 +106,8 @@ export class QuotationService {
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.otherAmtMasterList = this.fullMasterList.filter(x => x.objectName === "OtherAmount").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.remarkMasterList = this.fullMasterList.filter(x => x.objectName === "Remark").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      let ratioMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationRatio").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.variationRatioList = this.commonService.transformVariationRatioList(ratioMasterList);
       this.custSubscription = this.authService.customerMasterList$.subscribe(obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {

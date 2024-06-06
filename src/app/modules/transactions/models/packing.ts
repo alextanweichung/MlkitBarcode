@@ -158,4 +158,6 @@ export interface SalesOrderLineForWD {
    reasonId?: number
    isComponentScan?: boolean
    assembly?: LineAssembly[]
+   isPrimaryUom?: boolean
+   itemUomId?: number   
 }

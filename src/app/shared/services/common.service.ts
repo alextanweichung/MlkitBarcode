@@ -17,6 +17,7 @@ import { LocalMarginConfig } from '../models/pos-download';
 import { Decimal } from 'decimal.js';
 import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
 import { InnerVariationDetail, VariationDetail } from '../models/variation-detail';
+import { VariationRatio } from '../models/variation-ratio';
 
 @Injectable({
    providedIn: 'root'
@@ -952,6 +953,30 @@ export class CommonService {
          } else {
             objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) })
          }
+      }
+   }
+
+   transformVariationRatioList(ratioMasterList: MasterListDetails[]) {
+      if (ratioMasterList.length > 0) {
+         let uniqueRatio = ratioMasterList.map(x => x.attribute3);
+         uniqueRatio = [...new Set(uniqueRatio)];
+         let finalRatio: VariationRatio[] = [];
+         uniqueRatio.forEach(ratio => {
+            let ratioSet = ratioMasterList.filter(x => x.attribute3 == ratio);
+            if (ratioSet.length > 0) {
+               let selectedData = ratioSet.map(x => ({ itemVariationYId: parseInt(x.attribute1), ratio: parseInt(x.attribute2) }))
+               let newRatio = {
+                  itemVariationRatioCode: ratioSet[0].code,
+                  itemVariationId: ratioSet[0].id,
+                  qtyPerSet: selectedData.reduce((sum, current) => sum + current.ratio, 0),
+                  line: selectedData
+               }
+               finalRatio.push(newRatio)
+            }
+         })
+         return finalRatio;
+      } else {
+         return [];
       }
    }
 

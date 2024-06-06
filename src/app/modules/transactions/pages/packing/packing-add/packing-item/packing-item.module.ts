@@ -14,6 +14,7 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 
 @NgModule({
    imports: [
@@ -25,6 +26,7 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
       ItemAddListFlatPageModule,
       NgCircleProgressModule,
       SearchDropdownPageModule,
+      IdMappingModule,
       OfflineItemIdMappingModule,
       SumModule
    ],

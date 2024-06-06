@@ -117,6 +117,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    configSalesTransactionShowHistory: boolean = false;
    configTradingActivateMarginExpr: boolean = false
    configSystemWideActivateMultiUOM: boolean = false;
+   configItemVariationShowMatrix: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -288,6 +289,13 @@ export class SalesCartPage implements OnInit, OnChanges {
          } else {
             this.configSystemWideActivateMultiUOM = false;
          }
+
+         let itemVariationShowMatrix = this.moduleControl.find(x => x.ctrlName === "ItemVariationShowMatrix");
+         if (itemVariationShowMatrix && itemVariationShowMatrix.ctrlValue.toUpperCase() === "Y") {
+            this.configItemVariationShowMatrix = true;
+         } else {
+            this.configItemVariationShowMatrix = false;
+         }
       })
    }
 
@@ -437,9 +445,14 @@ export class SalesCartPage implements OnInit, OnChanges {
    /* #region calculation */
 
    checkQtyInput(trxLine: TransactionDetail) {
+      console.log("🚀 ~ SalesCartPage ~ checkQtyInput ~ checkQtyInput:")
+      let qtyInCart = 0;
+      if (trxLine.variationTypeCode === "0") {
+         qtyInCart += this.objectDetail.filter(r => r.uuid !== trxLine.uuid).filter(r => r.itemId === trxLine.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+      }
       if (this.configSalesOrderQuantityControl === "1") {
-         if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.actualQty) {
-            this.toastService.presentToast("Invalid Min Order Quantity", "Requested quantity [" + trxLine.qtyRequest + "] exceeded actual quantity [" + trxLine.actualQty + "]", "top", "warning", 1000);
+         if (trxLine.qtyRequest && (trxLine.qtyRequest + qtyInCart) > trxLine.actualQty) {
+            this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + (trxLine.qtyRequest + qtyInCart) + "] exceeded actual quantity [" + trxLine.actualQty + "]", "top", "warning", 1000);
             setTimeout(() => {
                trxLine.qtyRequest = null;
                if (this.isSalesOrder) {
@@ -447,10 +460,11 @@ export class SalesCartPage implements OnInit, OnChanges {
                }
                this.computeAllAmount(trxLine);
             }, 1);
+            return;
          }
       } else if (this.configSalesOrderQuantityControl === "2") {
-         if (trxLine.qtyRequest && trxLine.qtyRequest > trxLine.availableQty) {
-            this.toastService.presentToast("Invalid Min Order Quantity", "Requested quantity [" + trxLine.qtyRequest + "] exceeded available quantity [" + trxLine.availableQty + "]", "top", "warning", 1000);
+         if (trxLine.qtyRequest && (trxLine.qtyRequest + qtyInCart) > trxLine.availableQty) {
+            this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + (trxLine.qtyRequest + qtyInCart) + "] exceeded available quantity [" + trxLine.availableQty + "]", "top", "warning", 1000);
             setTimeout(() => {
                trxLine.qtyRequest = null;
                if (this.isSalesOrder) {
@@ -458,13 +472,14 @@ export class SalesCartPage implements OnInit, OnChanges {
                }
                this.computeAllAmount(trxLine);
             }, 1);
+            return;
          }
       }
       if (this.configOrderingActivateCasePackQtyControl) {
          if (trxLine.qtyRequest && trxLine.casePackQty) {
             let checkRemainder = trxLine.qtyRequest % trxLine.casePackQty;
             if (checkRemainder != 0) {
-               this.toastService.presentToast("Invalid Case Pack Quantity", "Requested quantity [" + trxLine.qtyRequest + "] does not matach with case pack quantity [" + trxLine.casePackQty + "]", "top", "warning", 1000);
+               this.toastService.presentToast("Invalid Case Pack Quantity", "Requested quantity [" + (trxLine.qtyRequest + qtyInCart) + "] does not matach with case pack quantity [" + trxLine.casePackQty + "]", "top", "warning", 1000);
                if (!this.isCasePackQtyControlWarningOnly) {
                   setTimeout(() => {
                      trxLine.qtyRequest = null;
@@ -474,6 +489,7 @@ export class SalesCartPage implements OnInit, OnChanges {
                      this.computeAllAmount(trxLine);
                   }, 1);
                }
+               return;
             }
          }
       }
@@ -482,10 +498,13 @@ export class SalesCartPage implements OnInit, OnChanges {
          if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B") {
             let totalQtySum = this.objectDetail.reduce((sum, current) => sum + current.qtyRequest, 0);
             if (trxLine.minOrderQty && totalQtySum >= trxLine.minOrderQty) {
+               if (this.isSalesOrder) {
+                  trxLine.qtyToShip = trxLine.qtyRequest;
+               }
                return;
             }
             if (trxLine.qtyRequest && trxLine.minOrderQty && trxLine.qtyRequest < trxLine.minOrderQty) {
-               this.toastService.presentToast("Invalid Quantity", "ReqRequested quantity [" + trxLine.qtyRequest + "] is lower than minimum order quantity [" + trxLine.minOrderQty + "]", "top", "warning", 1000);
+               this.toastService.presentToast("Invalid Quantity", "Requested quantity [" + (trxLine.qtyRequest + qtyInCart) + "] is lower than minimum order quantity [" + trxLine.minOrderQty + "]", "top", "warning", 1000);
                setTimeout(() => {
                   trxLine.qtyRequest = null;
                   if (this.isSalesOrder) {
@@ -498,6 +517,24 @@ export class SalesCartPage implements OnInit, OnChanges {
       }
       if (this.isSalesOrder) {
          trxLine.qtyToShip = trxLine.qtyRequest;
+      }
+   }
+
+   isValidVariationQty(data: InnerVariationDetail) {
+      let qtyInCart = 0;
+      qtyInCart += this.objectDetail.filter(r => r.variationTypeCode !== "0").flatMap(r => r.variationDetails).flatMap(r => r.details).filter(r => r.itemSku === data.itemSku).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+      if (data.qtyRequest) {
+         if (this.isSalesOrder && this.configSalesOrderQuantityControl === "1") {
+            if (((data.qtyRequest ?? 0) + qtyInCart) > data.actualQty) {
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest }] exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+               data.qtyRequest = null;
+            }
+         } else if (this.isSalesOrder && this.configSalesOrderQuantityControl === "2") {
+            if (((data.qtyRequest ?? 0) + qtyInCart) > data.availableQty) {
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest }] exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+               data.qtyRequest = null;
+            }
+         }
       }
    }
 
@@ -805,7 +842,7 @@ export class SalesCartPage implements OnInit, OnChanges {
 
    /* #region  edit qty */
 
-   computeQty() {
+   async computeQty() {
       try {
          if (this.selectedItem.variationTypeCode === "0") {
             this.computeAllAmount(this.selectedItem);
@@ -824,6 +861,7 @@ export class SalesCartPage implements OnInit, OnChanges {
             }
             this.selectedItem.qtyRequest = totalQty;
             this.selectedItem.qtyToShip = this.selectedItem.qtyRequest;
+            // await this.checkQtyInput(this.selectedItem);
             this.computeAllAmount(this.selectedItem);
          }
       } catch (e) {
@@ -832,9 +870,29 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    increaseVariationQty(data: InnerVariationDetail) {
+      let qtyInCart = 0;
+      qtyInCart += this.objectDetail.filter(r => r.variationTypeCode !== "0").flatMap(r => r.variationDetails).flatMap(r => r.details).filter(r => r.itemSku === data.itemSku).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
       try {
-         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-         this.computeQty();
+         if (data.qtyRequest) {
+            if (this.isSalesOrder && this.configSalesOrderQuantityControl === "1") {
+               if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.actualQty) {
+                  data.qtyRequest = null;
+                  this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+               } else {
+                  data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+               }
+            } else if (this.isSalesOrder && this.configSalesOrderQuantityControl === "2") {
+               if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.availableQty) {
+                  data.qtyRequest = null;
+                  this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+               } else {
+                  data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+               }
+            } else {
+               data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+            }
+            this.computeQty();
+         }
       } catch (e) {
          console.error(e);
       }

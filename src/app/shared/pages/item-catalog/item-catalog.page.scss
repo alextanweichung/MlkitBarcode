@@ -8,3 +8,24 @@ input[type=text]:focus {
    border: none;
    outline: none;
 }
+
+.matrixtable {
+   border-collapse: unset;
+
+   th {
+      border: 0.1rem solid;
+      &.custom-header {
+         background: #8ecafc;
+      }
+   }
+   
+   td {
+      border: 0.1rem solid;
+   }
+}
+
+ion-input {
+   &.customSuffix[type=number]:after {
+      content: " Set";
+   }
+}

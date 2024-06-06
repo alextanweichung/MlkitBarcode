@@ -45,8 +45,12 @@ export interface LocalItemBarcode {
    yDesc: any
    ySeq: any
    barcode: string
+   itemUomId: number
    sku: string
    qty: number
+   transitQty?: number
+   isOther?: string
+   itemUomDesc?: string
 }
 
 export interface LocalMarginConfig {

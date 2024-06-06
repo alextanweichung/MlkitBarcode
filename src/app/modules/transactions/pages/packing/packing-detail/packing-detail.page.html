@@ -309,6 +309,7 @@
                               <ion-row>
                                  <ion-col class="ion-flex ion-margin-auto">
                                     <div>{{rowData2.itemCode}}</div>
+                                    <span class="badge-warning ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData2.itemUomId && configSystemWideActivateMultiUOM && objectService.itemUomMasterList">{{rowData2.itemUomId|idMapping:objectService.itemUomMasterList}}</span>
                                     <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData2.itemVariationXDescription">{{rowData2.itemVariationXDescription}}</span>
                                     <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData2.itemVariationYDescription">{{rowData2.itemVariationYDescription}}</span>
                                     <div *ngIf="rowData2.assemblyItemId" class="ml-1">

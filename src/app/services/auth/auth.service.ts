@@ -199,6 +199,7 @@ export class AuthService {
 
    buildRestrictColumnsObject() {
       this.getRestrictedColumn().subscribe(response => {
+         console.log("🚀 ~ AuthService ~ this.getRestrictedColumn ~ response:", response)
          this.restrictedColumn = response;
          this.setRestrictedColumn(this.restrictedColumn);
       });

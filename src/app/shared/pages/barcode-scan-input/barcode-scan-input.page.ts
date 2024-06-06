@@ -21,6 +21,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    @Input() showVariationModalSelection: boolean = true; // wms no variation
    @Input() itemVariationXMasterList: MasterListDetails[] = [];
    @Input() itemVariationYMasterList: MasterListDetails[] = [];
+   @Input() itemUomMasterList: MasterListDetails[] = [];
 
    moduleControl: ModuleControl[];
    systemWideEAN13IgnoreCheckDigit: boolean = false;
@@ -59,6 +60,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       }, 100);
    }
 
+   configSystemWideActivateMultiUOM: boolean = false;
    configItemVariationShowMatrix: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
@@ -86,6 +88,13 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             this.configItemVariationShowMatrix = true;
          } else {
             this.configItemVariationShowMatrix = false;
+         }
+
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
          }
 
       }, error => {
@@ -156,7 +165,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   itemBarcode: found_barcode.barcode,
                   itemBrandId: found_item_master.brandId,
                   itemGroupId: found_item_master.groupId,
-                  itemUomId: found_item_master.uomId,
+                  itemUomId: found_barcode.itemUomId,
+                  itemUomDesc: found_barcode.itemUomDesc,
                   itemCategoryId: found_item_master.catId,
                   itemDepartmentId: found_item_master.deptId,
                   itemBarcodeTagId: found_barcode.id,
@@ -210,46 +220,93 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                }
             }
             if (found_item_master && found_item_master.length > 0) {
-               found_item_barcode = this.configService.item_Barcodes.filter(r => found_item_master.flatMap(rr => rr.id).includes(r.itemId));
-               found_item_master.forEach(r => {
+               found_item_barcode = this.configService.item_Barcodes.filter(r => r.isOther === "N" && found_item_master.flatMap(rr => rr.id).includes(r.itemId));
+               for await (const r of found_item_master){
                   if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
-                     let t = found_item_barcode.find(rr => rr.itemId === r.id);
-                     if (t) {
-                        let outputData: TransactionDetail = {
-                           itemId: r.id,
-                           itemCode: r.code,
-                           description: r.itemDesc,
-                           typeCode: r.typeCode,
-                           variationTypeCode: r.varCd,
-                           discountGroupCode: r.discCd,
-                           discountExpression: (r.discPct ?? "0") + "%",
-                           taxId: r.taxId,
-                           taxCode: r.taxCd,
-                           taxPct: r.taxPct,
-                           qtyRequest: null,
-                           itemPricing: {
+                     if (r.varCd === "0") {
+                        let barcodes = found_item_barcode.filter(rr => rr.itemId === r.id);
+                        if (!this.configSystemWideActivateMultiUOM) {
+                           barcodes = barcodes.filter(rr => rr.itemUomId === r.uomId);
+                        }
+                        if (barcodes && barcodes.length > 0) {
+                           for await (const barcode of barcodes) {
+                              if (this.availableItemmmm.findIndex(rr => rr.itemSku === barcode.sku) < 0) {
+                                 let outputData: TransactionDetail = {
+                                    itemId: r.id,
+                                    itemCode: r.code,
+                                    description: r.itemDesc,
+                                    typeCode: r.typeCode,
+                                    variationTypeCode: r.varCd,
+                                    discountGroupCode: r.discCd,
+                                    discountExpression: (r.discPct ?? "0") + "%",
+                                    taxId: r.taxId,
+                                    taxCode: r.taxCd,
+                                    taxPct: r.taxPct,
+                                    qtyRequest: null,
+                                    itemPricing: {
+                                       itemId: r.id,
+                                       unitPrice: r.price,
+                                       discountGroupCode: r.discCd,
+                                       discountExpression: (r.discPct ?? "0") + "%",
+                                       discountPercent: r.discPct ?? 0,
+                                       discountGroupId: null,
+                                       unitPriceMin: null,
+                                       currencyId: null
+                                    },
+                                    itemSku: r.varCd === "0" ? barcode.sku : null,
+                                    itemBarcode: r.varCd === "0" ? barcode.barcode : null,
+                                    itemBrandId: r.brandId,
+                                    itemGroupId: r.groupId,
+                                    itemUomId: barcode.itemUomId,
+                                    itemUomDesc: barcode.itemUomDesc,
+                                    itemCategoryId: r.catId,
+                                    itemDepartmentId: r.deptId,
+                                    itemBarcodeTagId: r.varCd === "0" ? barcode.id : null
+                                 }
+                                 this.availableItemmmm.push(outputData);
+                              }
+                           }
+                        }
+                     } else {
+                        let barcode = found_item_barcode.find(rr => rr.itemId === r.id);
+                        if (barcode) {
+                           let outputData: TransactionDetail = {
                               itemId: r.id,
-                              unitPrice: r.price,
+                              itemCode: r.code,
+                              description: r.itemDesc,
+                              typeCode: r.typeCode,
+                              variationTypeCode: r.varCd,
                               discountGroupCode: r.discCd,
                               discountExpression: (r.discPct ?? "0") + "%",
-                              discountPercent: r.discPct ?? 0,
-                              discountGroupId: null,
-                              unitPriceMin: null,
-                              currencyId: null
-                           },
-                           itemSku: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.sku : null,
-                           itemBarcode: r.varCd === "0" ? found_item_barcode.find(rr => rr.itemId === r.id)?.barcode : null,
-                           itemBrandId: r.brandId,
-                           itemGroupId: r.groupId,
-                           itemUomId: r.uomId,
-                           itemCategoryId: r.catId,
-                           itemDepartmentId: r.deptId,
-                           itemBarcodeTagId: r.varCd === "0" ? t.id : null
+                              taxId: r.taxId,
+                              taxCode: r.taxCd,
+                              taxPct: r.taxPct,
+                              qtyRequest: null,
+                              itemPricing: {
+                                 itemId: r.id,
+                                 unitPrice: r.price,
+                                 discountGroupCode: r.discCd,
+                                 discountExpression: (r.discPct ?? "0") + "%",
+                                 discountPercent: r.discPct ?? 0,
+                                 discountGroupId: null,
+                                 unitPriceMin: null,
+                                 currencyId: null
+                              },
+                              itemSku: r.varCd === "0" ? barcode.sku : null,
+                              itemBarcode: r.varCd === "0" ? barcode.barcode : null,
+                              itemBrandId: r.brandId,
+                              itemGroupId: r.groupId,
+                              itemUomId: barcode.itemUomId,
+                              itemUomDesc: barcode.itemUomDesc,
+                              itemCategoryId: r.catId,
+                              itemDepartmentId: r.deptId,
+                              itemBarcodeTagId: r.varCd === "0" ? barcode.id : null
+                           }
+                           this.availableItemmmm.push(outputData);
                         }
-                        this.availableItemmmm.push(outputData);
                      }
                   }
-               })
+               }
             }
             if (found_item_barcode && found_item_barcode.length > 0) {
                found_item_barcode.sort((a, b) => {
@@ -300,7 +357,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                         itemBarcode: r.barcode,
                         itemBrandId: found_item_master.find(rr => rr.id === r.itemId)?.brandId,
                         itemGroupId: found_item_master.find(rr => rr.id === r.itemId)?.groupId,
-                        itemUomId: found_item_master.find(rr => rr.id === r.itemId)?.uomId,
+                        itemUomId: r.itemUomId,
+                        itemUomDesc: r.itemUomDesc,
                         itemCategoryId: found_item_master.find(rr => rr.id === r.itemId)?.catId,
                         itemDepartmentId: found_item_master.find(rr => rr.id === r.itemId)?.deptId,
                         itemBarcodeTagId: r.id,
@@ -332,11 +390,15 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                         this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
                      }
                   } else {
-                     this.showItemModal();
+                     this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
                   }
                } else {
-                  this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
-                  this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
+                  if ((this.availableVariations && this.availableVariations.length === 1) || !this.configSystemWideActivateMultiUOM) { // variation 0 and no uom
+                     this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
+                     this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
+                  } else { // let user select item by uom
+                     this.showItemModal();
+                  }
                }
             } else if (found_item_master && found_item_master.length > 0 && this.availableVariations && this.availableVariations.length > 0) { // if item found, and has barcode tag
                this.showItemModal();
@@ -352,7 +414,10 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    /* #region modal for user to select item (if more than 1 item found when they search) */
 
    itemModalOpen: boolean = false;
-   showItemModal() {
+   async showItemModal() {
+      if (this.availableItemmmm && this.availableItemmmm.length > 0) {
+         await this.availableItemmmm.sort((a, c) => { return a.itemCode > c.itemCode ? 1 : -1 });
+      }
       this.itemModalOpen = true;
    }
 
@@ -362,7 +427,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    }
 
    availableVariationsByItemId: TransactionDetail[] = [];
-   showVariations(item: TransactionDetail) {
+   async showVariations(item: TransactionDetail) {
       this.availableVariationsByItemId = [];
       if (item.variationTypeCode === "0") {
          if (item) {
@@ -375,8 +440,82 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       }
       else {
          if (this.showVariationModalSelection) {
-            this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === item.itemId);
-            this.showVariationModal();
+            let found_item_master = this.configService.item_Masters.filter(r => r.id === item.itemId);
+            let found_item_barcode = this.configService.item_Barcodes.filter(r => r.itemId === item.itemId);
+            if (found_item_master) {
+               if (found_item_barcode && found_item_barcode.length > 0) {
+                  found_item_barcode.sort((a, b) => {
+                     if (a.xSeq === b.xSeq) {
+                        if (a.ySeq < b.ySeq) {
+                           return -1;
+                        } else if (a.ySeq > b.ySeq) {
+                           return 1;
+                        }
+                        return 0;
+                     } else if (a.xSeq < b.xSeq) {
+                        return -1;
+                     } else {
+                        return 1;
+                     }
+                  })
+                  found_item_barcode.forEach(async r => {
+                     if (this.availableVariations.findIndex(rr => rr.itemSku === r.sku) < 0) {
+                        let outputData: TransactionDetail = {
+                           itemId: r.itemId,
+                           itemCode: found_item_master.find(rr => rr.id === r.itemId)?.code,
+                           description: found_item_master.find(rr => rr.id === r.itemId)?.itemDesc,
+                           typeCode: found_item_master.find(rr => rr.id === r.itemId)?.typeCode,
+                           variationTypeCode: found_item_master.find(rr => rr.id === r.itemId)?.varCd,
+                           discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
+                           discountExpression: (found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? "0") + "%",
+                           taxId: found_item_master.find(rr => rr.id === r.itemId)?.taxId,
+                           taxCode: found_item_master.find(rr => rr.id === r.itemId)?.taxCd,
+                           taxPct: found_item_master.find(rr => rr.id === r.itemId)?.taxPct,
+                           qtyRequest: null,
+                           itemPricing: {
+                              itemId: found_item_master.find(rr => rr.id === r.itemId)?.id,
+                              unitPrice: found_item_master.find(rr => rr.id === r.itemId)?.price,
+                              discountGroupCode: found_item_master.find(rr => rr.id === r.itemId)?.discCd,
+                              discountExpression: (found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? "0") + "%",
+                              discountPercent: found_item_master.find(rr => rr.id === r.itemId)?.discPct ?? 0,
+                              discountGroupId: null,
+                              unitPriceMin: null,
+                              currencyId: null
+                           },
+                           itemVariationXId: r.xId,
+                           itemVariationXCd: r.xCd,
+                           itemVariationXDesc: r.xDesc,
+                           itemVariationYId: r.yId,
+                           itemVariationYCd: r.yCd,
+                           itemVariationYDesc: r.yDesc,
+                           itemSku: r.sku,
+                           itemBarcode: r.barcode,
+                           itemBrandId: found_item_master.find(rr => rr.id === r.itemId)?.brandId,
+                           itemGroupId: found_item_master.find(rr => rr.id === r.itemId)?.groupId,
+                           itemUomId: r.itemUomId,
+                           itemUomDesc: r.itemUomDesc,
+                           itemCategoryId: found_item_master.find(rr => rr.id === r.itemId)?.catId,
+                           itemDepartmentId: found_item_master.find(rr => rr.id === r.itemId)?.deptId,
+                           itemBarcodeTagId: r.id,
+                           newItemId: found_item_master.find(rr => rr.id === r.itemId)?.newId,
+                           newItemEffectiveDate: found_item_master.find(rr => rr.id === r.itemId)?.newDate
+                        }
+                        this.availableVariations.push(outputData);
+                     }
+                  })
+               }
+               this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === item.itemId);
+               var variationStructure = await this.commonService.buildVariationStructure(JSON.parse(JSON.stringify(this.availableVariationsByItemId)));
+               if (variationStructure === null) {
+                  this.toastService.presentToast("System Error", "Please contact administrator.", "top", "danger", 1000);
+                  return;
+               } else {
+                  this.variationStructure = variationStructure;
+               }
+               this.showVariationModal();
+            } else {
+               this.toastService.presentToast("Something went wrong", "Please contact adminstrator.", "top", "danger", 1000);
+            }
          } else {
             if (item) {
                let found = this.configService.item_Masters.find(r => r.id === item.itemId);

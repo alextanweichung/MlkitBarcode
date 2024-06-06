@@ -46,7 +46,7 @@
 </ion-popover>
 <ion-content fullscreen>
    <div class="px-2">
-    <app-item-catalog [keyId]="objectService.objectHeader?.customerId" [locationId]="objectService.objectHeader?.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader?.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [showStandardPackingInfo]="objectService.showStandardPackingInfo" [isBackToBackOrder]="true" [showAvailQty]="objectService.showQuantity" [itemInCart]="objectService.objectDetail"></app-item-catalog>
+    <app-item-catalog [keyId]="objectService.objectHeader?.customerId" [locationId]="objectService.objectHeader?.locationId" [fullMasterList]="objectService.fullMasterList" [useTax]="objectService.systemWideActivateTaxControl" [objectHeader]="objectService.objectHeader" [precisionSales]="objectService.precisionSales" [precisionSalesUnitPrice]="objectService.precisionSalesUnitPrice" [isItemPriceTaxInclusive]="objectService.objectHeader?.isItemPriceTaxInclusive" (onItemAdded)="onItemAdded($event)" [showImage]="showImage" [showStandardPackingInfo]="objectService.showStandardPackingInfo" [isBackToBackOrder]="true" [showAvailQty]="objectService.showQuantity" [itemInCart]="objectService.objectDetail" [variationRatioList]="objectService.variationRatioList"></app-item-catalog>
   </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

@@ -1,4 +1,3 @@
-import { SalesItemInfoRoot } from "./sales-item-info"
 import { VariationDetail } from "./variation-detail"
 
 export interface TransactionDetail {
@@ -16,6 +15,7 @@ export interface TransactionDetail {
    itemVariationId?: number
    itemUomId?: number
    itemUomCode?: string
+   itemUomDesc?: string
    currencyRate?: number
    /* #region for mobile only */
    qtyInCart?: number
@@ -215,10 +215,16 @@ export interface ItemMultiUomBase {
    itemUomId: number
    ratio: number
    isPrimary: boolean
+   itemSku?: string
 }
 
 export interface ItemMultiUom extends ItemMultiUomBase {
    itemMultiUomId: number
    itemId: number
    itemBarcode: string
+}
+
+export interface ItemListMultiUom{
+   itemId: number
+   multiUom: ItemMultiUomBase[]
 }

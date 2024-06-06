@@ -233,7 +233,13 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (this.objectService.orderingPriceApprovalIgnoreACL) {
+            this.checkPricingApprovalLines(trxDto, trxDto.details);
+         } else {
+            if (this.originalRestrictTrxFields.unitPrice || this.originalRestrictTrxFields.unitPriceExTax || this.originalRestrictTrxFields.discountExpression || this.originalRestrictTrxFields.discountGroupCode) {
+               this.checkPricingApprovalLines(trxDto, trxDto.details);
+            }
+         }
          if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
             this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
             return;
@@ -280,7 +286,13 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (this.objectService.orderingPriceApprovalIgnoreACL) {
+            this.checkPricingApprovalLines(trxDto, trxDto.details);
+         } else {
+            if (this.originalRestrictTrxFields.unitPrice || this.originalRestrictTrxFields.unitPriceExTax || this.originalRestrictTrxFields.discountExpression || this.originalRestrictTrxFields.discountGroupCode) {
+               this.checkPricingApprovalLines(trxDto, trxDto.details);
+            }
+         }
          if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
             this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
             return;
@@ -357,7 +369,13 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (this.objectService.orderingPriceApprovalIgnoreACL) {
+            this.checkPricingApprovalLines(trxDto, trxDto.details);
+         } else {
+            if (this.originalRestrictTrxFields.unitPrice || this.originalRestrictTrxFields.unitPriceExTax || this.originalRestrictTrxFields.discountExpression || this.originalRestrictTrxFields.discountGroupCode) {
+               this.checkPricingApprovalLines(trxDto, trxDto.details);
+            }
+         }
          if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
             this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
             return;
@@ -401,7 +419,13 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (this.objectService.orderingPriceApprovalIgnoreACL) {
+            this.checkPricingApprovalLines(trxDto, trxDto.details);
+         } else {
+            if (this.originalRestrictTrxFields.unitPrice || this.originalRestrictTrxFields.unitPriceExTax || this.originalRestrictTrxFields.discountExpression || this.originalRestrictTrxFields.discountGroupCode) {
+               this.checkPricingApprovalLines(trxDto, trxDto.details);
+            }
+         }
          if (trxDto.details.filter(r => r.unitPrice === null || r.unitPrice === undefined)?.length > 0) {
             this.toastService.presentToast("Control Error", "Please enter valid price for each line.", "top", "warning", 1000);
             return;
@@ -437,7 +461,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          trxDto.header.isPricingApproval = false;
       } else {
          let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
-         filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length === 0);
+         filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length <= 1);
          if (filteredData.length > 0) {
             filteredData.forEach(x => { x.isPricingApproval = true });
             trxDto.header.isPricingApproval = true;

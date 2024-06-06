@@ -43,6 +43,7 @@
                      <ion-row>
                         <ion-col class="ion-flex ion-margin-auto">
                            <div>{{item.itemCode}} - {{item.description}}</div>
+                           <span class="badge-warning ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemUomId && configSystemWideActivateMultiUOM && itemUomMasterList">{{item.itemUomId|idMapping:itemUomMasterList}}</span>
                         </ion-col>
                      </ion-row>
                   </ion-grid>
@@ -53,7 +54,7 @@
    </ng-template>
 </ion-modal>
 
-<ion-modal #variationModal [isOpen]="variationModalOpen" (didDismiss)="variationModalOpen = false; setFocus()">
+<ion-modal #variationModal [isOpen]="variationModalOpen" (didDismiss)="variationModalOpen = false; setFocus()" style="background-color: white;">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -68,7 +69,17 @@
             <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                <ion-label>{{availableVariationsByItemId[0].itemCode}} - {{availableVariationsByItemId[0].description}}</ion-label>
             </ion-list-header>
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+
+            <!-- <ng-container *ngIf="configItemVariationShowMatrix && variationStructure">
+                  <tr>
+                     <th class="p-1 font-half-size ion-text-left sticky">Variety</th>
+                     <th class="p-1 font-half-size sticky" *ngFor="let rowData of variationStructure.variationY">
+                        {{rowData|idMapping:itemVariationYMasterList}}
+                     </th>
+                  </tr>
+            </ng-container> -->
+            
+            <ion-list class="list-custom animate__animated animate__fadeIn custom-border" lines="full">
                <ng-container *ngIf="!configItemVariationShowMatrix">
                   <ion-item detail="false" class="ion-no-padding no-ripple" *ngFor="let item of availableVariationsByItemId">
                      <ion-checkbox class="ml-2" slot="start" [(ngModel)]="item.isSelected"></ion-checkbox>
@@ -83,22 +94,24 @@
                   </ion-item>               
                </ng-container>
                <ng-container *ngIf="configItemVariationShowMatrix && variationStructure">
-                  <table id="qtyMatrix">
-                     <tr>
-                        <th class="p-1 font-half-size ion-text-left">Variety</th>
-                        <th class="p-1 font-half-size" *ngFor="let rowData of variationStructure.variationY">
-                           {{rowData|idMapping:itemVariationYMasterList}}
-                        </th>
-                     </tr>
-                     <tr *ngFor="let rowData of variationStructure.variationDetails">
-                        <td class="p-1 font-half-size">
-                           {{rowData.itemVariationXId|idMapping:itemVariationXMasterList}}
-                        </td>
-                        <td class="p-1 font-half-size ion-text-right" *ngFor="let rowData2 of rowData.details">
-                           <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="rowData2.qtyRequest" placeholder="0" (ionFocus)="highlight(input)" [disabled]="rowData2.deactivated"></ion-input>
-                        </td>
-                     </tr>
-                  </table>
+                  <div class="table-container">
+                     <table id="qtyMatrix">
+                        <tr>
+                           <th class="p-1 font-half-size ion-text-left sticky-top">Variety</th>
+                           <th class="p-1 font-half-size sticky-top" *ngFor="let rowData of variationStructure.variationY">
+                              {{rowData|idMapping:itemVariationYMasterList}}
+                           </th>
+                        </tr>
+                        <tr *ngFor="let rowData of variationStructure.variationDetails">
+                           <td class="p-1 font-half-size sticky-left">
+                              {{rowData.itemVariationXId|idMapping:itemVariationXMasterList}}
+                           </td>
+                           <td class="p-1 font-half-size ion-text-right" *ngFor="let rowData2 of rowData.details">
+                              <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="rowData2.qtyRequest" placeholder="0" (ionFocus)="highlight(input)" [disabled]="rowData2.deactivated"></ion-input>
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
                </ng-container>
             </ion-list>
          </div>

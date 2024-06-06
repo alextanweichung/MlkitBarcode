@@ -14,12 +14,13 @@ import { LineAssembly, TransactionDetail } from '../../models/transaction-detail
 import { InnerVariationDetail } from '../../models/variation-detail';
 import { CommonService } from '../../services/common.service';
 import { SearchItemService } from '../../services/search-item.service';
-import { InfiniteScrollCustomEvent, IonSearchbar, ModalController } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonPopover, IonSearchbar, ModalController } from '@ionic/angular';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { SalesItemRequest } from '../../models/sales-item-request';
 import Decimal from 'decimal.js';
 import { SalesHistoryInfo, SalesItemInfoRoot } from '../../models/sales-item-info';
 import { ItemSalesHistoryPage } from '../item-sales-history/item-sales-history.page';
+import { VariationRatio } from '../../models/variation-ratio';
 
 @Component({
    selector: 'app-item-catalog',
@@ -46,6 +47,8 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    @Input() isSalesOrder: boolean = false;
    @Input() isBackToBackOrder: boolean = false;
    @Input() disableIfPricingNotSet: boolean = true;
+   @Input() variationRatioList: VariationRatio[] = [];
+   filteredVariationRatioList: VariationRatio[] = [];
 
    brandMasterList: MasterListDetails[] = [];
    groupMasterList: MasterListDetails[] = [];
@@ -198,7 +201,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                size: this.itemListLoadSize
             }
             this.searchItemService.getItemInfoByKeywordfortest(requestObject).subscribe(async response => {
-               let rrr = response.filter(r => r.itemPricing); 
+               let rrr = response.filter(r => r.itemPricing);
                if (rrr && rrr.length > 0) {
                   for await (const r of rrr) {
                      await this.assignTrxItemToDataLine(r);
@@ -359,6 +362,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    /* #region  unit price, tax, discount */
 
    assignTrxItemToDataLine(item: TransactionDetail) {
+      console.log("🚀 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ item:", item)
       if (this.useTax) {
          if (this.isItemPriceTaxInclusive) {
             if (item.itemPricing) {
@@ -479,29 +483,39 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    isValidQty(data: TransactionDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
-         if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
-            data.qtyRequest = null;
-            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
-         }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
-         if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
-            data.qtyRequest = null;
-            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+      let qtyInCart = 0;
+      if (data.variationTypeCode === "0") {
+         qtyInCart += this.itemInCart.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+      }
+      if (data.qtyRequest) {
+         if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
+            if (((data.qtyRequest ?? 0) + qtyInCart) > data.actualQty) {
+               data.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+            }
+         } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
+            if (((data.qtyRequest ?? 0) + qtyInCart) > data.availableQty) {
+               data.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+            }
          }
       }
    }
 
    increaseQty(data: TransactionDetail) {
+      let qtyInCart = 0;
+      if (data.variationTypeCode === "0") {
+         qtyInCart += this.itemInCart.filter(r => r.itemId === data.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+      }
       if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
-         if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
+         if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.actualQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
          } else {
             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
          }
       } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
-         if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
+         if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.availableQty) {
             data.qtyRequest = null;
             this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
          } else {
@@ -546,6 +560,12 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      if (this.selectedItem.itemVariationId) {
+         this.filteredVariationRatioList = this.variationRatioList.filter(r => r.itemVariationId === this.selectedItem.itemVariationId)
+      } else {
+         this.filteredVariationRatioList = this.variationRatioList;
+      }
+      console.log("🚀 ~ ItemCatalogPage ~ showModal ~ this.filteredVariationRatioList:", this.filteredVariationRatioList)
       this.isModalOpen = true;
    }
 
@@ -558,36 +578,44 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    }
 
    isValidVariationQty(data: InnerVariationDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
-         if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
-            data.qtyRequest = null;
-            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
-         }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
-         if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
-            data.qtyRequest = null;
-            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+      let qtyInCart = 0;
+      qtyInCart += this.itemInCart.filter(r => r.variationTypeCode !== "0").flatMap(r => r.variationDetails).flatMap(r => r.details).filter(r => r.itemSku === data.itemSku).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+      if (data.qtyRequest) {
+         if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
+            if (((data.qtyRequest ?? 0) + qtyInCart) > data.actualQty) {
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest}] exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+               data.qtyRequest = null;
+            }
+         } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
+            if (((data.qtyRequest ?? 0) + qtyInCart) > data.availableQty) {
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest}] exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+               data.qtyRequest = null;
+            }
          }
       }
    }
 
    increaseVariationQty(data: InnerVariationDetail) {
-      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
-         if (((data.qtyRequest ?? 0) + 1) > data.actualQty) {
-            data.qtyRequest = null;
-            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+      let qtyInCart = 0;
+      qtyInCart += this.itemInCart.filter(r => r.variationTypeCode !== "0").flatMap(r => r.variationDetails).flatMap(r => r.details).filter(r => r.itemSku === data.itemSku).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
+      if (data.qtyRequest) {
+         if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
+            if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.actualQty) {
+               data.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+            } else {
+               data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+            }
+         } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
+            if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.availableQty) {
+               data.qtyRequest = null;
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+            } else {
+               data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+            }
          } else {
             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
          }
-      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
-         if (((data.qtyRequest ?? 0) + 1) > data.availableQty) {
-            data.qtyRequest = null;
-            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
-         } else {
-            data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-         }
-      } else {
-         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
    }
 
@@ -612,6 +640,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                      y.qtyInCart = (y.qtyInCart ?? 0) + this.selectedItem.variationDetails.flatMap(xx => xx.details).filter(yy => yy.qtyRequest && yy.qtyRequest > 0 && yy.itemSku === y.itemSku).flatMap(yy => yy.qtyRequest).reduce((a, c) => a + c, 0);
                   })
                })
+
                setTimeout(() => {
                   this.onItemAdded.emit(JSON.parse(JSON.stringify(this.selectedItem)));
                   if (this.configSalesTransactionShowHistory && (this.isQuotation || this.isSalesOrder)) {
@@ -701,5 +730,44 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    async setFocus() {
       await this.searchbar.setFocus();
    }
+
+   /* #region pop over variation ratio quick input */
+
+   @ViewChild("popover") popover: IonPopover;
+   isPopoverOpen: boolean = false;
+   selectedX: InnerVariationDetail[] = [];
+   selectedRatio: VariationRatio;
+   presentPopover(event, xData: InnerVariationDetail[]) {
+      this.popover.event = event;
+      this.selectedX = xData;
+      this.xRatio = null;
+      this.isPopoverOpen = true;
+   }
+
+   xRatio: number;
+   popoverDismiss(event) {
+      
+   }
+
+   onRatioKeyDown(event) {
+      if (event.keyCode === 13) {
+         this.applyQtyByRatio();
+      }
+   }
+
+   applyQtyByRatio() {
+      this.selectedX.forEach(async x => {
+         let findRatio = this.selectedRatio.line.find(r => x.itemVariationYId == r.itemVariationYId);
+         if (findRatio) {
+            x.qtyRequest = findRatio.ratio * this.xRatio;
+            await this.isValidVariationQty(x);
+         }
+      })
+      this.selectedX = [];
+      this.xRatio = null;
+      this.isPopoverOpen = false;
+   }
+
+   /* #endregion */
 
 }

@@ -132,7 +132,7 @@
             <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                <ion-label>Item</ion-label>
             </ion-list-header>
-            <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>            
+            <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [itemUomMasterList]="objectService.itemUomMasterList"></app-barcode-scan-input>            
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
                <ion-item button detail="false" class="ion-no-padding no-ripple">
                   <ion-grid class="ion-no-padding py-2 pl-2">

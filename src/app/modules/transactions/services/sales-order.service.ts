@@ -26,6 +26,8 @@ import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SalesItemInfoRoot } from 'src/app/shared/models/sales-item-info';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
+import { VariationRatio } from 'src/app/shared/models/variation-ratio';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -64,6 +66,7 @@ export class SalesOrderService {
    uomMasterList: MasterListDetails[] = [];
    otherAmtMasterList: MasterListDetails[] = [];
    remarkMasterList: MasterListDetails[] = [];
+   variationRatioList: VariationRatio[] = [];
 
    salesTypeList: MasterListDetails[] = [];
    docStatusList: MasterListDetails[] = [];
@@ -75,6 +78,7 @@ export class SalesOrderService {
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
+      private commonService: CommonService,
       private authService: AuthService,
       private loadingService: LoadingService
    ) { }
@@ -118,6 +122,8 @@ export class SalesOrderService {
       this.uomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.otherAmtMasterList = this.fullMasterList.filter(x => x.objectName === "OtherAmount").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.remarkMasterList = this.fullMasterList.filter(x => x.objectName === "Remark").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      let ratioMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationRatio").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.variationRatioList = this.commonService.transformVariationRatioList(ratioMasterList);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -187,6 +193,7 @@ export class SalesOrderService {
    orderingActivateMOQControl: boolean = false;
    salesActivateTradingMargin: boolean = false;
    configSalesTransactionShowHistory: boolean = false;
+   orderingPriceApprovalIgnoreACL: boolean = false;
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -255,6 +262,11 @@ export class SalesOrderService {
                this.configSalesTransactionShowHistory = true;
             } else {
                this.configSalesTransactionShowHistory = false;
+            }
+
+            let priceApproval = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalIgnoreACL");
+            if (priceApproval && priceApproval.ctrlValue.toUpperCase() == 'Y') {
+               this.orderingPriceApprovalIgnoreACL = true;
             }
 
          })

@@ -84,6 +84,7 @@ export class ConsignmentSalesService {
    salesAgentMasterList: MasterListDetails[] = [];
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
+   itemUomMasterList: MasterListDetails[] = [];
    currencyMasterList: MasterListDetails[] = [];
    discountGroupMasterList: MasterListDetails[] = [];
    async loadMasterList() {
@@ -94,6 +95,7 @@ export class ConsignmentSalesService {
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUom").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName === "DiscountGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {

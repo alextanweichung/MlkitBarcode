@@ -11,6 +11,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -24,6 +25,8 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    warehouseAgentId: number
    isMobile: boolean = true;
    isButtonVisible: boolean = true;
+   isByLocation: boolean = false;
+   customerDisabled: boolean = false;
 
    constructor(
       public objectService: PackingService,
@@ -85,6 +88,8 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    configSOSelectionEnforceSameOrigin: boolean = true;
    configSOSelectionEnforceSameDestination: boolean = true;
    packingBlockIncompletePicking: boolean = false;
+   configSystemWideActivateMultiUOM: boolean = false;
+   configMultiPackAutoTransformLooseUom: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -110,6 +115,19 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          } else {
             this.packingBlockIncompletePicking = false;
          }
+
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
+         }
+         let transformUom = this.moduleControl.find(x => x.ctrlName === "MultiPackAutoTransformLooseUom")?.ctrlValue;
+         if (transformUom && transformUom.toUpperCase() === "Y") {
+            this.configMultiPackAutoTransformLooseUom = true;
+         } else {
+            this.configMultiPackAutoTransformLooseUom = false;
+         }
       })
    }
 
@@ -126,13 +144,13 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
          if (lookupValue.attribute5 === "T") {
             // handle location
-            this.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === "W");
+            this.objectService.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === "W");
             if (lookupValue !== undefined) {
                this.objectForm.patchValue({ locationId: parseFloat(lookupValue.attribute6) });
                this.selectedLocationId = parseFloat(lookupValue.attribute6);
             }
          } else {
-            this.fLocationMasterList = this.objectService.locationMasterList;
+            this.objectService.fLocationMasterList = this.objectService.locationMasterList;
          }
       }
 
@@ -160,7 +178,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             this.selectedDocs.unshift(doc);
             if (this.selectedDocs && this.selectedDocs.length > 0) {
                this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
-               this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
+               this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
                this.objectForm.patchValue({
                   locationId: this.selectedDocs[0].locationId,
                   customerId: this.selectedDocs[0].customerId,
@@ -185,11 +203,11 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    setDefaultValue() {
       if (!this.objectForm.controls.locationId.value) {
-         let defaultLocation = this.fLocationMasterList.find(item => item.isPrimary)?.id;
+         let defaultLocation = this.objectService.fLocationMasterList.find(item => item.isPrimary)?.id;
          if (defaultLocation) {
             this.objectForm.patchValue({ locationId: defaultLocation });
          } else {
-            let findWh = this.fLocationMasterList.find(x => x.attribute1 === 'W');
+            let findWh = this.objectService.fLocationMasterList.find(x => x.attribute1 === 'W');
             if (findWh) {
                this.objectForm.patchValue({ locationId: findWh.id });
             }
@@ -278,7 +296,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.selectedDocs.unshift(doc);
                   if (this.selectedDocs && this.selectedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
-                     this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
+                     this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
                      this.objectForm.patchValue({
                         locationId: this.selectedDocs[0].locationId,
                         customerId: this.selectedDocs[0].customerId,
@@ -337,7 +355,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.selectedDocs.unshift(doc);
                   if (this.selectedDocs && this.selectedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
-                     this.onDestinationChanged({ id: this.selectedDocs[0].toLocationId });
+                     this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
                      this.objectForm.patchValue({
                         locationId: this.selectedDocs[0].locationId,
                         customerId: this.selectedDocs[0].customerId,
@@ -511,7 +529,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    selectedCustomerId: number;
    selectedCustomerLocationList: MasterListDetails[] = [];
-   fLocationMasterList: MasterListDetails[] = [];
+   // fLocationMasterList: MasterListDetails[] = [];
    onCustomerSelected(event, bindToLocationId: boolean) {
       try {
          this.selectedCustomerId = event ? event.id : null;
@@ -553,13 +571,13 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
             if (lookupValue.attribute5 === "T") {
                // handle location
-               this.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === "W");
+               this.objectService.fLocationMasterList = this.objectService.locationMasterList.filter(r => r.attribute1 === "W");
                if (lookupValue !== undefined) {
                   this.objectForm.patchValue({ locationId: parseFloat(lookupValue.attribute6) });
                   this.selectedLocationId = parseFloat(lookupValue.attribute6);
                }
             } else {
-               this.fLocationMasterList = this.objectService.locationMasterList;
+               this.objectService.fLocationMasterList = this.objectService.locationMasterList;
             }
          }
       } catch (e) {
@@ -568,7 +586,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    selectedToLocationId: number;
-   onDestinationChanged(event) {
+   onCustomerLocationSelected(event) {
       if (event) {
          this.selectedToLocationId = event.id;
          this.objectForm.patchValue({ toLocationId: this.selectedToLocationId });
@@ -577,6 +595,40 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.objectForm.patchValue({ toLocationId: this.selectedToLocationId });
       }
    }
+
+   onFullToLocationSelected(event: SearchDropdownList) {
+      if (event) {
+         let findLocation = this.objectService.locationMasterList.find(x => x.id === event.id);
+         if (findLocation) {
+            if (findLocation.attribute13) {
+               this.objectForm.patchValue({ customerId: parseInt(findLocation.attribute13) });
+               // this.objectForm.controls["customerId"].disable();
+               this.customerDisabled = true;
+            } else {
+               this.objectForm.patchValue({ toLocationId: null, customerId: null });
+               // this.objectForm.controls["customerId"].enable();
+               this.customerDisabled = false;
+               this.toastService.presentToast("Selected Denied", `${findLocation.description} is not mapped to any customer.`, "top", "warning", 1000);
+            }
+            this.onCustomerSelected({ id: this.objectForm.controls.customerId.value }, true);
+            this.onCustomerLocationSelected(event);
+         }
+      } else {
+         this.objectForm.patchValue({ toLocationId: null });
+      }
+   }
+
+   swapCustomerLocation() {
+      this.isByLocation = !this.isByLocation;
+      if (this.isByLocation) {
+         this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
+      } else {
+         this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
+      }
+      // this.objectForm.controls["customerId"].enable();
+      this.customerDisabled = false;
+   }
+
 
    @ViewChild("segment", { static: false }) segment: IonSegment;
    isWithType: string = "SO";

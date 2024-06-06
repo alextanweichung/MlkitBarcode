@@ -63,7 +63,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       this.loadModuleControl();
-      this.loadRestrictColumms();
+      await this.loadRestrictColumms();
       await this.barcodescaninput.setFocus();
    }
 
@@ -82,14 +82,14 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
             this.moduleControl = obj;
             let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
             if (SystemWideActivateTaxControl != undefined) {
-               this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() == "Y" ? true : false;
+               this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() === "Y" ? true : false;
             }
             let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
             if (ignoreCheckdigit != undefined) {
-               this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() == "Y" ? true : false;
+               this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
             }
             let activateMargin = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesActivateMarginCalculation");
-            if (activateMargin && activateMargin.ctrlValue.toUpperCase() == 'Y') {
+            if (activateMargin && activateMargin.ctrlValue.toUpperCase() === 'Y') {
                this.consignmentSalesActivateMarginCalculation = true;
             }
             let consignmentBlockNoMarginItem = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesBlockItemWithoutMargin");
@@ -104,7 +104,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
             }
 
             let computationMethod = this.moduleControl.find(x => x.ctrlName === "ConsignBearingComputeGrossMargin");
-            if (computationMethod && computationMethod.ctrlValue.toUpperCase() == 'Y') {
+            if (computationMethod && computationMethod.ctrlValue.toUpperCase() === 'Y') {
                this.consignBearingComputeGrossMargin = true;
             } else {
                this.consignBearingComputeGrossMargin = false;
@@ -118,8 +118,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
             }
          })
          this.authService.precisionList$.subscribe(precision => {
-            this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-            this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+            this.precisionSales = precision.find(x => x.precisionCode === "SALES");
+            this.precisionTax = precision.find(x => x.precisionCode === "TAX");
             this.maxPrecision = this.precisionSales.localMax;
             this.maxPrecisionTax = this.precisionTax.localMax;
          })
@@ -133,11 +133,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       try {
          let restrictedTrx = {};
          this.authService.restrictedColumn$.subscribe(obj => {
-            let trxDataColumns = obj.filter(x => x.moduleName == "SM" && x.objectName == "ConsignmentSalesLine").map(y => y.fieldName);
+            console.log("🚀 ~ ConsignmentSalesItemPage ~ loadRestrictColumms ~ obj:", obj)
+            let trxDataColumns = obj.filter(x => x.moduleName === "SM" && x.objectName === "ConsignmentSalesLine").map(y => y.fieldName);
             trxDataColumns.forEach(element => {
                restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
             });
             this.restrictTrxFields = restrictedTrx;
+            console.log("🚀 ~ ConsignmentSalesItemPage ~ loadRestrictColumms ~ this.restrictTrxFields:", this.restrictTrxFields)
          })
       } catch (e) {
          console.error(e);
@@ -369,7 +371,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       try {
          let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
          if (discPct) {
-            if (discPct == "0") {
+            if (discPct === "0") {
                trxLine.discountExpression = null;
             } else {
                trxLine.discountExpression = discPct + "%";
@@ -633,7 +635,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       };
 
       this.objectService.sendDebug(debugObject).subscribe(response => {
-         if (response.status == 200) {
+         if (response.status === 200) {
             this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
          }
       }, error => {

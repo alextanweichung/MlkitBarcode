@@ -11,7 +11,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { LineAssembly, TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { ItemListMultiUom, LineAssembly, TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -70,6 +70,8 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    packingBlockIncompletePicking: boolean = false;
    configMPAShowAlertToBlockInvalidAction: boolean = false;
    configMobileScanItemContinuous: boolean = false;
+   configSystemWideActivateMultiUOM: boolean = false;
+   configMultiPackAutoTransformLooseUom: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -140,6 +142,34 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          } else {
             this.configMobileScanItemContinuous = false;
          }
+
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
+         }
+         let transformUom = this.moduleControl.find(x => x.ctrlName === "MultiPackAutoTransformLooseUom")?.ctrlValue;
+         if (transformUom && transformUom.toUpperCase() === "Y") {
+            this.configMultiPackAutoTransformLooseUom = true;
+         } else {
+            this.configMultiPackAutoTransformLooseUom = false;
+         }
+         if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+            this.loadItemListMultiUom();
+         }
+      })
+   }
+
+   itemListMultiUom: ItemListMultiUom[] = [];
+   loadItemListMultiUom() {
+      this.objectService.getItemListMultiUom().subscribe({
+         next: (response) => {
+            this.itemListMultiUom = response;            
+         },
+         error: (error) => {
+            console.error(error);
+         }
       })
    }
 
@@ -177,18 +207,24 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
-                     let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
-                     if (!operationSuccess) {
-                        if (this.configMPAShowAlertToBlockInvalidAction) {
-                           await this.presentAlert("Control Validation", "", "Input quantity exceeded SO quantity.");
-                        } else {
-                           this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                     let reinsertLine: boolean = false;
+                     if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+                        reinsertLine = this.transformItemScannedUom(itemFound, inputQty);
+                     }
+                     if (!reinsertLine) {
+                        let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
+                        if (!operationSuccess) {
+                           if (this.configMPAShowAlertToBlockInvalidAction) {
+                              await this.presentAlert("Control Validation", "", "Input quantity exceeded SO quantity.");
+                           } else {
+                              this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                           }
                         }
                      }
                   }
                   break;
                //Not allow pack quantity more than pick quantity
-               case "1":
+               case "2":
                   if (osTotalAvailableQtyPicked >= inputQty) {
                      this.insertPackingLine(itemFound, inputQty, outstandingLines, "2");
                      let totalQtyCurrent = this.objectService.multiPackingObject.outstandingPackList.reduce((sum, current) => sum + current.qtyCurrent, 0);
@@ -198,29 +234,85 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
-                     let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
-                     if (!operationSuccess) {
-                        if (this.configMPAShowAlertToBlockInvalidAction) {
-                           await this.presentAlert("Control Validation", "", "Input quantity exceeded packing quantity.");
-                        } else {
-                           this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                     let reinsertLine: boolean = false;
+                     if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+                        reinsertLine = this.transformItemScannedUom(itemFound, inputQty);
+                     }
+                     if (!reinsertLine) {
+                        let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
+                        if (!operationSuccess) {
+                           if (this.configMPAShowAlertToBlockInvalidAction) {
+                              await this.presentAlert("Control Validation", "", "Input quantity exceeded packing quantity.");
+                           } else {
+                              this.toastService.presentToast("Control Validation", "Input quantity exceeded packing quantity.", "top", "warning", 1000);
+                           }
                         }
                      }
                   }
                   break;
             }
          } else {
-            let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
-            if (!operationSuccess) {
-               if (this.configMPAShowAlertToBlockInvalidAction) {
-                  await this.presentAlert("Control Validation", "", "Item is not available in the selected Sales Order.");
-               } else {
-                  this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+            let reinsertLine: boolean = false;
+            if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+               reinsertLine = this.transformItemScannedUom(itemFound, inputQty);
+            }
+            if (!reinsertLine) {
+               let operationSuccess = this.runAssemblyPackingEngine(itemFound, inputQty, findAssemblyItem);
+               if (!operationSuccess) {
+                  if (this.configMPAShowAlertToBlockInvalidAction) {
+                     await this.presentAlert("Control Validation", "", "Item is not available in the selected Sales Order.");
+                  } else {
+                     this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+                  }
                }
             }
          }
       } else {
          this.toastService.presentToast("Control Validation", "Invalid Item Barcode", "top", "warning", 1000);
+      }
+   }
+   
+   transformItemScannedUom(itemFound: TransactionDetail, inputQty: number) {
+      //Check whether item has multi UOM
+      let findItem = this.itemListMultiUom.find(x => x.itemId == itemFound.itemId);
+      if (findItem) {
+         //Look for scanned item UOM ratio
+         let currentItemUom = findItem.multiUom.find(x => x.itemUomId == itemFound.itemUomId);
+         if (currentItemUom) {
+            //Filter for scanned item other UOM ratio which is lower than current
+            let otherItemUom = findItem.multiUom.filter(x => x.itemUomId != itemFound.itemUomId && x.ratio < currentItemUom.ratio);
+            otherItemUom.sort((a, b) => (a.ratio > b.ratio) ? 1 : -1);
+            if (otherItemUom.length > 0) {
+               let findOsLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId == itemFound.itemId);
+               if (findOsLines.length > 0) {
+                  for (let uom of otherItemUom) {
+                     let transformQty = inputQty * currentItemUom.ratio / uom.ratio;
+                     if (Number.isInteger(transformQty)) {
+                        //To futher enhance this part
+                        //Checking on multiple lines and consolidate the qty
+                        let findOsLinesWithQty = findOsLines.filter(x => (x.qtyRequest - x.qtyPacked - x.qtyCurrent) >= transformQty);
+                        if (findOsLinesWithQty.length > 0) {
+                           itemFound.itemBarcode = currentItemUom.itemSku;
+                           itemFound.itemSku = uom.itemSku;
+                           itemFound.itemUomId = uom.itemUomId;
+                           this.runPackingEngine(itemFound, transformQty);
+                           return true;
+                        }
+                     } else {
+                        return false;
+                     }
+                  }
+               } else {
+                  return false;
+               }
+            } else {
+               return false;
+            }
+         } else {
+            return false;
+         }
+      } else {
+         return false;
       }
    }
 
@@ -1615,7 +1707,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   let componentList: CurrentPackList[] = duplicatedList.filter(x => x.assemblyItemId);
                   nonComponentList.forEach(line => {
                      line.multiPackingLineId = 0;
-                     line.multiPackingId = 0;
+                     line.multiPackingId = this.objectService.object.header.multiPackingId;
                      line.cartonNum = this.objectService.multiPackingObject.packingCarton[0].cartonNum;
                      let checking = this.checkPackingRules(line.itemSku, line.qtyPacked);
                      if (checking) {
@@ -1629,7 +1721,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                   })
                   componentList.forEach(line => {
                      line.multiPackingLineId = 0;
-                     line.multiPackingId = 0;
+                     line.multiPackingId = this.objectService.header.multiPackingId;
                      line.cartonNum = this.objectService.multiPackingObject.packingCarton[0].cartonNum;
                      let checking = this.checkAssemblyPackingRules(line.assemblyItemId, line.itemId, line.qtyPacked);
                      if (checking) {
@@ -1652,7 +1744,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                } else {
                   duplicatedList.forEach(line => {
                      line.multiPackingLineId = 0;
-                     line.multiPackingId = 0;
+                     line.multiPackingId = this.objectService.header.multiPackingId;
                      line.cartonNum = this.objectService.multiPackingObject.packingCarton[0].cartonNum;
                   })
                   this.objectService.multiPackingObject.packingCarton[0].packList = [...duplicatedList];

@@ -7,6 +7,8 @@ import { MultiPackingCarton, MultiPackingRoot } from '../../../models/packing';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { Capacitor } from '@capacitor/core';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
    selector: 'app-packing-detail',
@@ -21,6 +23,7 @@ export class PackingDetailPage implements OnInit, ViewWillEnter {
 
    constructor(
       public objectService: PackingService,
+      private authService: AuthService,
       public configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
@@ -37,6 +40,7 @@ export class PackingDetailPage implements OnInit, ViewWillEnter {
    }
 
    ionViewWillEnter(): void {
+      this.loadModuleControl();
       this.isMobile = Capacitor.getPlatform() !== "web";
       if (!this.objectId) {
          this.navController.navigateBack('/transactions/packing')
@@ -47,6 +51,21 @@ export class PackingDetailPage implements OnInit, ViewWillEnter {
 
    ngOnInit() {
 
+   }
+
+   moduleControl: ModuleControl[] = [];
+   configSystemWideActivateMultiUOM: boolean = false;
+   loadModuleControl() {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+         this.moduleControl = obj;
+
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
+         }
+      })
    }
 
    uniqueSalesOrder: string[] = [];

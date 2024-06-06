@@ -93,8 +93,10 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    loadModuleControl() {
       try {
          this.authService.precisionList$.subscribe(precision => {
-            this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-            this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+            if (precision) {
+               this.precisionSales = precision.find(x => x.precisionCode == "SALES");
+               this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+            }
          })
       } catch (e) {
          console.error(e);

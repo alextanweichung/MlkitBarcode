@@ -16,7 +16,6 @@ import { SalesItemRequest } from 'src/app/shared/models/sales-item-request';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { ItemSalesHistoryPage } from 'src/app/shared/pages/item-sales-history/item-sales-history.page';
-import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { GeneralTransactionService } from 'src/app/shared/services/general-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
@@ -297,7 +296,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
          trxDto.header.isPricingApproval = false;
       } else {
          let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
-         filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length === 0);
+         filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length <= 1);
          if (filteredData.length > 0) {
             filteredData.forEach(x => { x.isPricingApproval = true });
             trxDto.header.isPricingApproval = true;

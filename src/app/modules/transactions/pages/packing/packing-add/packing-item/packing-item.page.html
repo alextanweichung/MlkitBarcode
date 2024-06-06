@@ -58,7 +58,7 @@
 </ion-popover>
 <ion-content fullscreen [hidden]="scanActive">
    <div class="p-2">
-      <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
+      <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [itemUomMasterList]="objectService.itemUomMasterList"></app-barcode-scan-input>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.header.isWithSo && showItemList">
          <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let i of objectService.getUniqueItem()" (click)="showImageModal(i)">
             <circle-progress slot="start" [percent]="objectService.getProgressByItemCode(i)"></circle-progress>
@@ -176,6 +176,7 @@
                   </ion-row>
                   <ion-row>
                      <ion-col class="ion-flex ion-margin-auto">{{o.itemCode}}
+                        <span class="badge-warning ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="o.itemUomId && configSystemWideActivateMultiUOM && objectService.itemUomMasterList">{{o.itemUomId|idMapping:objectService.itemUomMasterList}}</span>
                         <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="o.itemVariationXDescription">{{o.itemVariationXDescription}}</span>
                         <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="o.itemVariationYDescription">{{o.itemVariationYDescription}}</span>
                         <div *ngIf="o.assemblyItemId" class="ml-1 my-auto">
