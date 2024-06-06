@@ -94,22 +94,26 @@
                   </ion-item>               
                </ng-container>
                <ng-container *ngIf="configItemVariationShowMatrix && variationStructure">
-                  <div class="table-container">
+                  <div class="table-container" style="scroll-behavior: smooth;">
                      <table id="qtyMatrix">
-                        <tr>
-                           <th class="p-1 font-half-size ion-text-left sticky-top">Variety</th>
-                           <th class="p-1 font-half-size sticky-top" *ngFor="let rowData of variationStructure.variationY">
-                              {{rowData|idMapping:itemVariationYMasterList}}
-                           </th>
-                        </tr>
-                        <tr *ngFor="let rowData of variationStructure.variationDetails">
-                           <td class="p-1 font-half-size sticky-left">
-                              {{rowData.itemVariationXId|idMapping:itemVariationXMasterList}}
-                           </td>
-                           <td class="p-1 font-half-size ion-text-right" *ngFor="let rowData2 of rowData.details">
-                              <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="rowData2.qtyRequest" placeholder="0" (ionFocus)="highlight(input)" [disabled]="rowData2.deactivated"></ion-input>
-                           </td>
-                        </tr>
+                        <thead>
+                           <tr>
+                              <th class="p-1 font-half-size ion-text-left sticky-top"></th>
+                              <th class="p-1 font-half-size sticky-top" *ngFor="let rowData of variationStructure.variationY">
+                                 {{rowData|idMapping:itemVariationYMasterList}}
+                              </th>
+                           </tr>
+                        </thead>
+                        <tbody style="margin-top: 2.5rem;">
+                           <tr *ngFor="let rowData of variationStructure.variationDetails">
+                              <td class="p-1 font-half-size sticky-left">
+                                 {{rowData.itemVariationXId|idMapping:itemVariationXMasterList}}
+                              </td>
+                              <td class="p-1 font-half-size ion-text-right" *ngFor="let rowData2 of rowData.details">
+                                 <ion-input #input class="ion-text-center" type="number" [min]="0" [(ngModel)]="rowData2.qtyRequest" placeholder="0" (ionFocus)="highlight(input)" [disabled]="rowData2.deactivated"></ion-input>
+                              </td>
+                           </tr>
+                        </tbody>
                      </table>
                   </div>
                </ng-container>

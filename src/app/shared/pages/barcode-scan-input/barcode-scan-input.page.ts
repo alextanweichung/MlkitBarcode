@@ -221,7 +221,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             }
             if (found_item_master && found_item_master.length > 0) {
                found_item_barcode = this.configService.item_Barcodes.filter(r => r.isOther === "N" && found_item_master.flatMap(rr => rr.id).includes(r.itemId));
-               for await (const r of found_item_master){
+               for await (const r of found_item_master) {
                   if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
                      if (r.varCd === "0") {
                         let barcodes = found_item_barcode.filter(rr => rr.itemId === r.id);
@@ -672,5 +672,5 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    }
 
    /* #endregion */
-
+   
 }
