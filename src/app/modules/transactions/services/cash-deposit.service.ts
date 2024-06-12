@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { CashDeposit } from '../models/cash-deposit';
 import { Customer } from '../models/customer';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
+import { CashDepositHeader, CashDepositRoot } from '../models/cash-deposit';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -78,7 +78,7 @@ export class CashDepositService {
    }
 
    getObjects() {
-      return this.http.get<CashDeposit[]>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit");
+      return this.http.get<CashDepositHeader[]>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit");
    }
 
    insertObject(object) {
@@ -90,7 +90,7 @@ export class CashDepositService {
    }
 
    getObject(objectId: number) {
-      return this.http.get<CashDeposit>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/" + objectId);
+      return this.http.get<CashDepositRoot>(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/" + objectId);
    }
 
    deleteObject(objectId: number) {
@@ -119,6 +119,10 @@ export class CashDepositService {
 
    downloadFile(fileId: number) {
       return this.http.get(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/imageFile/" + fileId, { responseType: 'blob' });
+   }
+
+   deleteFile(fileId: number) {
+      return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobilePosCashDeposit/imageFile/" + fileId, httpObserveHeader);
    }
 
    sendDebug(debugObject: JsonDebug) {

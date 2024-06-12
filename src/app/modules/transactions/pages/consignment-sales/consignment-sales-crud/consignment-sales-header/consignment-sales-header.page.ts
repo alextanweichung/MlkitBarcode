@@ -1,6 +1,5 @@
-import { Component, DoCheck, IterableDiffers, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, IonDatetime, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
@@ -66,6 +65,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          businessModelType: [null],
          isBearPromo: [null],
          marginMode: [null],
+         uuid: [null]
       })
       if (this.configService.selected_location) {
          let findLocation = this.objectService.locationMasterList.find(r => r.id === this.configService.selected_location);

@@ -94,34 +94,34 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
   //   }
   // }
 
-  async onLocationSelected(event) {
-    if (event) {
-      const alert = await this.alertController.create({
-        cssClass: "custom-alert",
-        header: "Are you sure to proceed?",
-        subHeader: "Changing Location will remove inserted lines",
-        buttons: [
-          {
-            text: "Confirm",
-            cssClass: "success",
-            handler: async () => {      
-              this.objectForm.patchValue({ locationId: event.id });
-              this.objectService.removeLines();
-            }
-          },
-          {
-            text: "Cancel",
-            role: "cancel",
-            cssClass: "cancel",
-            handler: async () => {
+   async onLocationSelected(event) {
+      if (event && this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            header: "Are you sure to proceed?",
+            subHeader: "Changing Location will remove inserted lines",
+            buttons: [
+               {
+                  text: "Confirm",
+                  cssClass: "success",
+                  handler: async () => {
+                     this.objectForm.patchValue({ locationId: event.id });
+                     this.objectService.removeLines();
+                  }
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel",
+                  handler: async () => {
 
-            }
-          }
-        ]
-      });
-      await alert.present();
-    }
-  }
+                  }
+               }
+            ]
+         });
+         await alert.present();
+      }
+   }
 
   /* #region steps */
 

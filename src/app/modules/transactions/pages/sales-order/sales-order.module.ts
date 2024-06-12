@@ -16,7 +16,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
       FormsModule,
       IonicModule,
       SalesOrderPageRoutingModule,
-      ListingSkeletonPageModule,      
+      ListingSkeletonPageModule,
       NgxPaginationModule
    ],
    declarations: [SalesOrderPage]

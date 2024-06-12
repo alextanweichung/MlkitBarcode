@@ -12,10 +12,9 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { CashDeposit } from '../../../models/cash-deposit';
 import { CashDepositService } from '../../../services/cash-deposit.service';
-import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { CashDepositHeader } from '../../../models/cash-deposit';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -51,9 +50,9 @@ export class CashDepositAddPage implements OnInit {
       this.sales_date_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
       this.salesDate = format(this.commonService.getTodayDate(), "MMM d, yyyy");
       this.date_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
-      this.date = format(this.commonService.getTodayDate(), 'MMM d, yyyy');
+      this.date = format(this.commonService.getTodayDate(), "MMM d, yyyy");
       this.time_value = this.commonService.convertUtcDate(this.commonService.getTodayDate());
-      this.time = format(this.commonService.getTodayDate(), 'hh:mm a');
+      this.time = format(this.commonService.getTodayDate(), "hh:mm a");
       this.newObjectForm();
    }
 
@@ -66,7 +65,7 @@ export class CashDepositAddPage implements OnInit {
       this.objectForm = this.formBuilder.group({
          posCashDepositId: 0,
          posCashDepositNum: [null],
-         depositBy: [JSON.parse(localStorage.getItem('loginUser'))?.userName],
+         depositBy: [JSON.parse(localStorage.getItem("loginUser"))?.userName],
          depositAmount: [0, [Validators.required]],
          depositDateTime: [new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()), [Validators.required]],
          depositFileId: [null],
@@ -141,7 +140,7 @@ export class CashDepositAddPage implements OnInit {
    onDateSelect(event: any) {
       let date = new Date(event.detail.value);
       this.date_value = this.commonService.convertUtcDate(date);
-      this.date = format(date, 'MMM d, yyyy');
+      this.date = format(date, "MMM d, yyyy");
       this.date_active = false;
       this.bindDateTimeToForm();
    }
@@ -157,7 +156,7 @@ export class CashDepositAddPage implements OnInit {
    onTimeSelect(event: any) {
       let time = new Date(event.detail.value);
       this.time_value = this.commonService.convertUtcDate(time);
-      this.time = format(time, 'hh:mm a');
+      this.time = format(time, "hh:mm a");
       this.time_active = false;
       this.bindDateTimeToForm();
    }
@@ -172,7 +171,7 @@ export class CashDepositAddPage implements OnInit {
    onSalesDateSelect(event: any) {
       let date = new Date(event.detail.value);
       this.sales_date_value = this.commonService.convertUtcDate(date);
-      this.salesDate = format(date, 'MMM d, yyyy');
+      this.salesDate = format(date, "MMM d, yyyy");
       this.sales_date_active = false;
       this.bindDateTimeToForm();
    }
@@ -180,7 +179,7 @@ export class CashDepositAddPage implements OnInit {
    bindDateTimeToForm() {
       this.objectForm.patchValue({
          depositDateTime: new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate(), this.time_value.getHours(), this.time_value.getMinutes(), this.time_value.getSeconds()),
-         trxDate: format(new Date(this.sales_date_value), 'yyyy-MM-dd') + "T00:00:00.000Z"
+         trxDate: format(new Date(this.sales_date_value), "yyyy-MM-dd") + "T00:00:00.000Z"
       })
    }
 
@@ -196,7 +195,7 @@ export class CashDepositAddPage implements OnInit {
             quality: 50,
             allowEditing: false,
             resultType: CameraResultType.Uri,
-            source: CameraSource.Prompt // Camera, Photos or Prompt!
+            source: CameraSource.Prompt, // Camera, Photos or Prompt!
          });
 
          if (image) {
@@ -212,7 +211,7 @@ export class CashDepositAddPage implements OnInit {
       try {
          const base64Data = await this.readAsBase64(photo);
 
-         const fileName = new Date().getTime() + '.jpeg';
+         const fileName = new Date().getTime() + ".jpeg";
          const savedFile = await Filesystem.writeFile({
             path: `${IMAGE_DIR}/${fileName}`,
             data: base64Data,
@@ -277,7 +276,7 @@ export class CashDepositAddPage implements OnInit {
                   path: filePath,
                   data: `data:image/jpeg;base64,${readFile.data}`
                });
-               this.toastService.presentToast('File size too large', '', 'top', 'danger', 1500);
+               this.toastService.presentToast("File size too large", "", "top", "danger", 1500);
             } else {
                this.images.push({
                   name: f.name,
@@ -297,7 +296,7 @@ export class CashDepositAddPage implements OnInit {
    // https://ionicframework.com/docs/angular/your-first-app/3-saving-photos
    private async readAsBase64(photo: Photo) {
       try {
-         if (this.plt.is('hybrid')) {
+         if (this.plt.is("hybrid")) {
             const file = await Filesystem.readFile({
                path: photo.path
             });
@@ -331,7 +330,7 @@ export class CashDepositAddPage implements OnInit {
          const response = await fetch(file.data);
          const blob = await response.blob();
          const formData = new FormData();
-         formData.append('file', blob, file.name);
+         formData.append("file", blob, file.name);
          this.objectService.uploadFile(objectId, fileId, formData).subscribe(response => {
 
          }, error => {
@@ -378,24 +377,24 @@ export class CashDepositAddPage implements OnInit {
    async cancelInsert() {
       try {
          const actionSheet = await this.actionSheetController.create({
-            header: 'Are you sure to cancel?',
-            subHeader: 'Changes made will be discard.',
-            cssClass: 'custom-action-sheet',
+            header: "Are you sure to cancel?",
+            subHeader: "Changes made will be discard.",
+            cssClass: "custom-action-sheet",
             buttons: [
                {
-                  text: 'Yes',
-                  role: 'confirm',
+                  text: "Yes",
+                  role: "confirm",
                },
                {
-                  text: 'No',
-                  role: 'cancel',
+                  text: "No",
+                  role: "cancel",
                }]
          });
          await actionSheet.present();
          const { role } = await actionSheet.onWillDismiss();
-         if (role === 'confirm') {
+         if (role === "confirm") {
             this.removeDir();
-            this.navController.navigateBack('/transactions/cash-deposit');
+            this.navController.navigateBack("/transactions/cash-deposit");
          }
       } catch (e) {
          console.error(e);
@@ -406,26 +405,26 @@ export class CashDepositAddPage implements OnInit {
       try {
          if (this.objectForm.valid) {
             const alert = await this.alertController.create({
-               header: 'Are you sure to proceed?',
+               header: "Are you sure to proceed?",
                buttons: [
                   {
-                     text: 'OK',
-                     cssClass: 'success',
-                     role: 'confirm',
+                     text: "OK",
+                     cssClass: "success",
+                     role: "confirm",
                      handler: async () => {
                         await this.insertObject();
                      },
                   },
                   {
-                     text: 'Cancel',
-                     cssClass: 'cancel',
-                     role: 'cancel'
+                     text: "Cancel",
+                     cssClass: "cancel",
+                     role: "cancel"
                   },
                ],
             });
             await alert.present();
          } else {
-            this.toastService.presentToast('Error', 'Please fill required fields.', 'top', 'danger', 2000);
+            this.toastService.presentToast("Error", "Please fill required fields.", "top", "danger", 2000);
          }
       } catch (e) {
          console.error(e);
@@ -436,11 +435,14 @@ export class CashDepositAddPage implements OnInit {
       try {
          let response = await this.objectService.insertObject(this.objectForm.value);
          if (response.status === 201) {
-            let ret = response.body as CashDeposit;
-            await this.startUpload(this.images[0], ret.posCashDepositId, ret.depositFileId ?? 0);
-            this.toastService.presentToast('Insert Complete', '', 'top', 'success', 1000);
+            console.log("🚀 ~ CashDepositAddPage ~ insertObject ~ response:", JSON.stringify(response))
+            let ret = response.body as CashDepositHeader;
+            for await (const image of this.images) {
+               await this.startUpload(image, ret.posCashDepositId, 0);
+            }
+            this.toastService.presentToast("Insert Complete", "", "top", "success", 1000);
             await this.removeDir();
-            this.navController.navigateRoot('transactions/cash-deposit');
+            this.navController.navigateRoot("transactions/cash-deposit");
          }
       } catch (e) {
          console.error(e);

@@ -76,15 +76,23 @@
             </ion-item>
          </ion-list>
       </form>
-      <div *ngIf="imageUrl && images?.length === 0">
+      <div *ngIf="onlineFiles && onlineFiles.length > 0">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-            <ion-label>Attachment</ion-label>
+            <ion-label>Attachments</ion-label>
          </ion-list-header>
-         <img [src]="imageUrl">
+         <ion-item *ngFor="let file of onlineFiles">
+            <ion-thumbnail slot="start">
+               <img [src]="file.imageUrl">
+            </ion-thumbnail>
+            <ion-label class="ion-text-wrap"> {{ file.filesName }} </ion-label>
+            <ion-button slot="end" fill="clear" (click)="presentDeleteOnlineImageAlert(file)">
+               <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-button>
+         </ion-item>
       </div>
 
       <div class="mt-2">
-         <ion-button fill="clear" expand="full" color="dark" (click)="presentAlert()" *ngIf="images.length === 0">
+         <ion-button fill="clear" expand="full" color="dark" (click)="presentAlert()">
             <ion-icon slot="start" name="camera"></ion-icon>
             Select Image
          </ion-button>

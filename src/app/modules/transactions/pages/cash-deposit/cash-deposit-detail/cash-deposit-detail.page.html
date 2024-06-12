@@ -1,7 +1,7 @@
 <ion-header>
    <ion-toolbar>
       <ion-title>
-         <div class="ion-text-wrap">{{object?.posCashDepositNum}}</div>
+         <div class="ion-text-wrap">{{object?.header?.posCashDepositNum}}</div>
       </ion-title>
       <ion-buttons slot="start">
          <ion-back-button text="" defaultHref="/transactions/cash-deposit"></ion-back-button>
@@ -24,7 +24,7 @@
                      <div class="font-bold">Doc. Num.</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.posCashDepositNum}}</div>
+                     <div>{{object?.header?.posCashDepositNum}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -32,7 +32,7 @@
                      <div class="font-bold">Sales Date</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.trxDate|date:'dd/MM/yyyy'}}</div>
+                     <div>{{object?.header?.trxDate|date:'dd/MM/yyyy'}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -40,7 +40,7 @@
                      <div class="font-bold">Doc. Date</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.depositDateTime|date:'dd/MM/yyyy'}}</div>
+                     <div>{{object?.header?.depositDateTime|date:'dd/MM/yyyy'}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -48,7 +48,7 @@
                      <div class="font-bold">Doc. Time</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.depositDateTime|date:'hh:mm a'}}</div>
+                     <div>{{object?.header?.depositDateTime|date:'hh:mm a'}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -56,7 +56,7 @@
                      <div class="font-bold">Bank In Amount</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.depositAmount|number:'1.2'}}</div>
+                     <div>{{object?.header?.depositAmount|number:'1.2'}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -64,7 +64,7 @@
                      <div class="font-bold">Bank In Slip Num.</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.depositSlipNum}}</div>
+                     <div>{{object?.header?.depositSlipNum}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -72,7 +72,7 @@
                      <div class="font-bold">Bank Name</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}</div>
+                     <div>{{object?.header?.paymentMethodId|idMapping:objectService.paymentMethodMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -80,7 +80,7 @@
                      <div class="font-bold">Location</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.locationId|idMapping:objectService.locationMasterList}}</div>
+                     <div>{{object?.header?.locationId|idMapping:objectService.locationMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -88,7 +88,7 @@
                      <div class="font-bold">Customer</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.customerId|idMapping:objectService.customerMasterList}}</div>
+                     <div>{{object?.header?.customerId|idMapping:objectService.customerMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -96,17 +96,17 @@
                      <div class="font-bold">Created By</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.createdBy}} {{object.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+                     <div>{{object?.header?.createdBy}} {{object?.header?.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
                   </ion-col>
                </ion-row>
             </ion-grid>
          </ion-item>
       </ion-list>
-      <div *ngIf="imageUrl">
+      <div *ngIf="imageUrls && imageUrls.length > 0">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-            <ion-label>Details</ion-label>
+            <ion-label>Attachments</ion-label>
          </ion-list-header>
-         <img [src]="imageUrl">
+         <img [src]="imageUrl" *ngFor="let imageUrl of imageUrls">
       </div>
    </div>
 </ion-content>

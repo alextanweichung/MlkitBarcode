@@ -186,29 +186,36 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
       }
    }
 
+   isCountingTimer: boolean = true;
    async nextStep() {
-      const alert = await this.alertController.create({
-         header: "Are you sure to proceed?",
-         cssClass: "custom-action-sheet",
-         buttons: [
-            {
-               text: "Yes",
-               role: "confirm",
-               cssClass: "success",
-               handler: async () => {
-                  this.saveObject();
+      if (this.isCountingTimer) {
+         this.isCountingTimer = false;
+         const alert = await this.alertController.create({
+            header: "Are you sure to proceed?",
+            cssClass: "custom-action-sheet",
+            buttons: [
+               {
+                  text: "Yes",
+                  role: "confirm",
+                  cssClass: "success",
+                  handler: async () => {
+                     await this.saveObject();
+                  },
                },
-            },
-            {
-               text: "Cancel",
-               role: "cancel",
-               handler: () => {
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  handler: () => {
 
-               }
-            },
-         ],
-      });
-      await alert.present();
+                  }
+               },
+            ],
+         });
+         await alert.present();
+      }
+      setTimeout(() => {
+         this.isCountingTimer = true;
+      }, 1000);
    }
 
    saveObject() {

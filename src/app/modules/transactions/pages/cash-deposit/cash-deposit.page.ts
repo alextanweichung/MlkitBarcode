@@ -2,10 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { CashDeposit } from '../../models/cash-deposit';
 import { CashDepositService } from '../../services/cash-deposit.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { CashDepositHeader } from '../../models/cash-deposit';
 
 @Component({
    selector: 'app-cash-deposit',
@@ -14,9 +16,10 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 })
 export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
 
-   objects: CashDeposit[] = [];
+   objects: CashDepositHeader[] = [];
 
-   uniqueGrouping: Date[] = [];
+   currentPage: number = 1;
+   itemsPerPage: number = 12;
 
    constructor(
       private authService: AuthService,
@@ -44,9 +47,7 @@ export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
       try {
          this.objectService.getObjects().subscribe(async response => {
             this.objects = response;
-            let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.depositDateTime))))];
-            this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-            await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+            this.resetFilteredObj();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, error => {
             console.error(error);
@@ -54,10 +55,6 @@ export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
       } catch (e) {
          console.error(e);
       }
-   }
-
-   getObjects(date: Date) {
-      return this.objects.filter(r => new Date(r.depositDateTime).getMonth() === date.getMonth() && new Date(r.depositDateTime).getFullYear() === date.getFullYear() && new Date(r.depositDateTime).getDate() === date.getDate());
    }
 
    /* #region  add object */
@@ -101,6 +98,47 @@ export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
          }
       }
       this.navController.navigateForward("/transactions/cash-deposit/cash-deposit-detail", navigationExtras);
+   }
+
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
+
+   async onKeyDown(event, searchText) {
+      if (event.keyCode === 13) {
+         await this.search(searchText, true);
+      }
+   }
+
+   itemSearchText: string;
+   filteredObj: CashDepositHeader[] = [];
+   search(searchText, newSearch: boolean = false) {
+      if (newSearch) {
+         this.filteredObj = [];
+      }
+      this.itemSearchText = searchText;
+      try {
+         if (searchText && searchText.trim().length > 2) {
+            if (Capacitor.getPlatform() !== "web") {
+               Keyboard.hide();
+            }
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
+               r.posCashDepositNum?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+            this.currentPage = 1;
+         } else {
+            this.resetFilteredObj();
+            this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   resetFilteredObj() {
+      this.filteredObj = JSON.parse(JSON.stringify(this.objects));
    }
 
 }
