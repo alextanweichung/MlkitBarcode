@@ -43,7 +43,6 @@ export class CashDepositDetailPage implements OnInit {
    loadDetail() {
       try {
          this.objectService.getObject(this.objectId).subscribe(async response => {
-            console.log("🚀 ~ CashDepositDetailPage ~ this.objectService.getObject ~ response:", response)
             this.object = response;
             if (this.object && this.object.depositFile && this.object.depositFile.length > 0) {
                await this.loadAttachment(this.object.depositFile.flatMap(r => r.filesId));

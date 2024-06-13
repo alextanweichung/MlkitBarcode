@@ -303,7 +303,6 @@ export class DefectRequestItemPage implements OnInit {
 
    async nextStep() {
       try {
-         console.log("🚀 ~ DefectRequestItemPage ~ nextStep ~ this.objectService.object:", this.objectService.object);
          this.navController.navigateForward("/transactions/defect-request/defect-request-cart");
       } catch (e) {
          console.error(e);

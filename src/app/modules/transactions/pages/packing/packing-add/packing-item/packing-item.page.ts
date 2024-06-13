@@ -165,7 +165,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    loadItemListMultiUom() {
       this.objectService.getItemListMultiUom().subscribe({
          next: (response) => {
-            this.itemListMultiUom = response;            
+            this.itemListMultiUom = response;
          },
          error: (error) => {
             console.error(error);
@@ -271,7 +271,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          this.toastService.presentToast("Control Validation", "Invalid Item Barcode", "top", "warning", 1000);
       }
    }
-   
+
    transformItemScannedUom(itemFound: TransactionDetail, inputQty: number) {
       //Check whether item has multi UOM
       let findItem = this.itemListMultiUom.find(x => x.itemId == itemFound.itemId);
@@ -315,6 +315,50 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          return false;
       }
    }
+   
+   transformAssemblyItemScannedUom(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[], outstandingLines: SalesOrderLineForWD[]) {
+      //Check whether item has multi UOM
+      let findItem = this.itemListMultiUom.find(x => x.itemId == itemFound.itemId);
+      if (findItem) {
+         //Look for scanned item UOM ratio
+         let currentItemUom = findItem.multiUom.find(x => x.itemUomId == itemFound.itemUomId);
+         if (currentItemUom) {
+            //Filter for scanned item other UOM ratio which is lower than current
+            let otherItemUom = findItem.multiUom.filter(x => x.itemUomId != itemFound.itemUomId && x.ratio < currentItemUom.ratio);
+            otherItemUom.sort((a, b) => (a.ratio > b.ratio) ? 1 : -1);
+            if (otherItemUom.length > 0) {
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
+               if (outstandingLines.length > 0) {
+                  for (let uom of otherItemUom) {
+                     let transformQty = inputQty * currentItemUom.ratio / uom.ratio;
+                     if (Number.isInteger(transformQty)) {
+                        //To futher enhance this part
+                        //Checking on multiple lines and consolidate the qty
+                        let findOsLinesWithQty = assemblyOutstandingLines.filter(x => (x.qtyRequest - x.qtyPacked - x.qtyCurrent) >= transformQty);
+                        if (findOsLinesWithQty.length > 0) {
+                           itemFound.itemBarcode = currentItemUom.itemSku;
+                           itemFound.itemSku = uom.itemSku;
+                           itemFound.itemUomId = uom.itemUomId;
+                           this.runAssemblyPackingEngine(itemFound, transformQty, findAssemblyItem);
+                           return true;
+                        }
+                     } else {
+                        return false;
+                     }
+                  }
+               } else {
+                  return false;
+               }
+            } else {
+               return false;
+            }
+         } else {
+            return false;
+         }
+      } else {
+         return false;
+      }
+   }
 
    async runAssemblyPackingEngine(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[]) {
       let findComponentItem: LineAssembly;
@@ -326,7 +370,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             if (findComponentItem) {
                let mainItemFound = this.objectService.multiPackingObject.outstandingPackList.find(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
                let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId === itemFound.itemId);
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId === itemFound.itemId && y.itemUomId == itemFound.itemUomId);
                if (outstandingLines.length > 0) {
                   let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
                   let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
@@ -352,7 +396,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                               this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                            }
                         } else {
-                           componentOperationSuccess = false;
+                           if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+                              componentOperationSuccess = this.transformAssemblyItemScannedUom(itemFound, inputQty, findAssemblyItem, outstandingLines);
+                           } else {
+                              componentOperationSuccess = false;
+                           }
                         }
                         break;
                      //Not allow pack quantity more than pick quantity
@@ -367,7 +415,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                               this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                            }
                         } else {
-                           componentOperationSuccess = false;
+                           if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+                              componentOperationSuccess = this.transformAssemblyItemScannedUom(itemFound, inputQty, findAssemblyItem, outstandingLines);
+                           } else {
+                              componentOperationSuccess = false;
+                           }
                         }
                         break;
                   }

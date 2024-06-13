@@ -36,7 +36,6 @@ export class DefectRequestCartPage implements OnInit {
    selectedIndex: number;
    showEditModal(rowData: DefectRequestDetail, rowIndex: number) {
       this.selectedItem = JSON.parse(JSON.stringify(rowData)) as DefectRequestDetail;
-      console.log("🚀 ~ DefectRequestCartPage ~ showEditModal ~ this.selectedItem:", this.selectedItem)
       this.selectedIndex = rowIndex;
       this.isModalOpen = true;
    }
@@ -299,7 +298,6 @@ export class DefectRequestCartPage implements OnInit {
    async updateObject() {
       try {
          await this.loadingService.showLoading();
-         console.log("🚀 ~ DefectRequestCartPage ~ this.objectService.updateObject ~ this.objectService.object:", this.objectService.object)
          this.objectService.updateObject(this.objectService.object).subscribe({
             next: (response) => {
                if (response.status === 204) {

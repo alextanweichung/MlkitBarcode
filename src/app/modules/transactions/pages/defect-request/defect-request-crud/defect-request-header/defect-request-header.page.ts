@@ -168,7 +168,6 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
                this.objectForm.patchValue({ toLocationId: this.selectedCustomerLocationList[0].id });
             }
             //Auto map object type code
-            console.log("🚀 ~ DefectRequestHeaderPage ~ onCustomerSelected ~ lookupValue.attribute5:", lookupValue.attribute5)
             if (lookupValue.attribute5 === "T" || lookupValue.attribute5 === "F" || lookupValue.attribute5 === "B") {
                this.objectForm.patchValue({ typeCode: "S" });
                this.objectForm.controls["typeCode"].disable();
@@ -343,7 +342,6 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
       this.objectForm.patchValue({ workFlowTransactionId: this.copyFromSIHeaderList.find(r => r.isSelected)?.workFlowTransactionId });
       this.objectService.setObject({ header: this.objectForm.getRawValue(), details: this.objectService.object?.details ?? [] });
       await this.transformCopyFromSI(this.copyFromSILineList);
-      console.log("🚀 ~ DefectRequestHeaderPage ~ proceedWithSI ~ this.objectService.object:", this.objectService.object);
       setTimeout(() => {
          this.navController.navigateForward("/transactions/defect-request/defect-request-item");         
       }, 50);

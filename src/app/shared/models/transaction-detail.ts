@@ -188,6 +188,9 @@ export interface LineAssembly {
    qtyPacked?: number
    qtyCurrent?: number
    qtyPossible?: number
+   itemBarcode?: string
+   itemSku?: string
+   itemUomId?: number
 }
 
 export interface ItemPricing {
@@ -224,7 +227,7 @@ export interface ItemMultiUom extends ItemMultiUomBase {
    itemBarcode: string
 }
 
-export interface ItemListMultiUom{
+export interface ItemListMultiUom {
    itemId: number
    multiUom: ItemMultiUomBase[]
 }

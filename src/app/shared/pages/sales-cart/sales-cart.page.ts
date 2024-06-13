@@ -445,7 +445,6 @@ export class SalesCartPage implements OnInit, OnChanges {
    /* #region calculation */
 
    checkQtyInput(trxLine: TransactionDetail) {
-      console.log("🚀 ~ SalesCartPage ~ checkQtyInput ~ checkQtyInput:")
       let qtyInCart = 0;
       if (trxLine.variationTypeCode === "0") {
          qtyInCart += this.objectDetail.filter(r => r.uuid !== trxLine.uuid).filter(r => r.itemId === trxLine.itemId).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);

@@ -58,7 +58,6 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    async ionViewDidEnter(): Promise<void> {
       // check incomplete trx here
       let data = await this.configService.retrieveFromLocalStorage(this.objectService.trxKey);
-      console.log("🚀 ~ StockCountPage ~ ionViewDidEnter ~ data:", JSON.stringify(data))
       if (data) {
          this.promptIncompleteTrxAlert();
       }

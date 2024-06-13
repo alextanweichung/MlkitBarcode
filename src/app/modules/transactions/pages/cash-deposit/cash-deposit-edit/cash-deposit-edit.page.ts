@@ -195,11 +195,8 @@ export class CashDepositEditPage implements OnInit {
 
    // On date select
    async onDateSelect(event: any) {
-      console.log("🚀 ~ CashDepositEditPage ~ onDateSelect ~ event:", JSON.stringify(event))
       let date = new Date(event.detail.value);
-      console.log("🚀 ~ CashDepositEditPage ~ onDateSelect ~ date:", JSON.stringify(date))
       this.date_value = await this.commonService.convertUtcDate(date);
-      console.log("🚀 ~ CashDepositEditPage ~ onDateSelect ~ this.date_value:", this.date_value)
       this.date = format(date, "MMM d, yyyy");
       this.date_active = false;
       this.bindDateTimeToForm();
@@ -215,7 +212,6 @@ export class CashDepositEditPage implements OnInit {
    // On time select
    onTimeSelect(event: any) {
       let time = new Date(event.detail.value);
-      console.log("🚀 ~ CashDepositEditPage ~ onTimeSelect ~ time:", time)
       this.time_value = this.commonService.convertUtcDate(time);
       this.time = format(time, "hh:mm a");
       this.time_active = false;
@@ -239,10 +235,9 @@ export class CashDepositEditPage implements OnInit {
 
    bindDateTimeToForm() {
       this.objectForm.patchValue({
-         depositDateTime: format(new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate()), "yyyy-MM-dd") + `T${this.time_value.getUTCHours()}:${this.time_value.getMinutes()}:00.000Z`,
-         trxDate: format(new Date(this.sales_date_value), "yyyy-MM-dd") + "T00:00:00.000Z"
+         depositDateTime: format(new Date(this.date_value.getFullYear(), this.date_value.getMonth(), this.date_value.getDate()), "yyyy-MM-dd") + `T${("0" + this.time_value.getUTCHours()).slice(-2)}:${("0" + this.time_value.getMinutes()).slice(-2)}:00`,
+         trxDate: format(new Date(this.sales_date_value), "yyyy-MM-dd") + "T00:00:00"
       })
-      console.log("🚀 ~ CashDepositEditPage ~ bindDateTimeToForm ~ this.objectForm:", JSON.stringify(this.objectForm.value))
    }
 
    /* #endregion */
@@ -395,7 +390,6 @@ export class CashDepositEditPage implements OnInit {
    });
 
    async startUpload(file: LocalFile, objectId: number, fileId: number) {
-      console.log("🚀 ~ CashDepositEditPage ~ startUpload ~ file:", JSON.stringify(file))
       try {
          const response = await fetch(file.data);
          const blob = await response.blob();

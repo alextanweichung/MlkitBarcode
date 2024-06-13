@@ -362,7 +362,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    /* #region  unit price, tax, discount */
 
    assignTrxItemToDataLine(item: TransactionDetail) {
-      console.log("🚀 ~ ItemCatalogPage ~ assignTrxItemToDataLine ~ item:", item)
       if (this.useTax) {
          if (this.isItemPriceTaxInclusive) {
             if (item.itemPricing) {
@@ -565,7 +564,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       } else {
          this.filteredVariationRatioList = this.variationRatioList;
       }
-      console.log("🚀 ~ ItemCatalogPage ~ showModal ~ this.filteredVariationRatioList:", this.filteredVariationRatioList)
       this.isModalOpen = true;
    }
 

@@ -133,13 +133,11 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       try {
          let restrictedTrx = {};
          this.authService.restrictedColumn$.subscribe(obj => {
-            console.log("🚀 ~ ConsignmentSalesItemPage ~ loadRestrictColumms ~ obj:", obj)
             let trxDataColumns = obj.filter(x => x.moduleName === "SM" && x.objectName === "ConsignmentSalesLine").map(y => y.fieldName);
             trxDataColumns.forEach(element => {
                restrictedTrx[this.commonService.toFirstCharLowerCase(element)] = true;
             });
             this.restrictTrxFields = restrictedTrx;
-            console.log("🚀 ~ ConsignmentSalesItemPage ~ loadRestrictColumms ~ this.restrictTrxFields:", this.restrictTrxFields)
          })
       } catch (e) {
          console.error(e);

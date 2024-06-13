@@ -435,7 +435,6 @@ export class CashDepositAddPage implements OnInit {
       try {
          let response = await this.objectService.insertObject(this.objectForm.value);
          if (response.status === 201) {
-            console.log("🚀 ~ CashDepositAddPage ~ insertObject ~ response:", JSON.stringify(response))
             let ret = response.body as CashDepositHeader;
             for await (const image of this.images) {
                await this.startUpload(image, ret.posCashDepositId, 0);

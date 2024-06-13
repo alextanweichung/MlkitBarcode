@@ -206,7 +206,6 @@ export class RpSoListingPage implements OnInit, ViewWillEnter {
       try {
          if (objs && objs.length > 0) {
             this.printObj = objs.split(";");
-            console.log("🚀 ~ RpSoListingPage ~ showDialogOrDownload ~ this.printObj:", this.printObj)
             if (this.printObj && this.printObj.length === 1) {
                await this.presentAlertViewPdf(Number(this.printObj[0].split('|')[1]), this.printObj[0].split('|')[0], type);
             } else {

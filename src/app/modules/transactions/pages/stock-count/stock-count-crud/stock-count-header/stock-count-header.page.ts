@@ -41,7 +41,6 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
    async ionViewDidEnter(): Promise<void> {
       if (!this.objectForm.controls.locationId.value && this.configService.selected_location) {
          this.objectForm.patchValue({ locationId: this.configService.selected_location });
-         console.log("🚀 ~ StockCountHeaderPage ~ ionViewDidEnter ~ this.objectForm:", JSON.stringify(this.objectForm.value))
          await this.onLocationSelected({ id: this.configService.selected_location });
          this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
          this.setFormattedDateString();
@@ -80,7 +79,6 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
    bindExistingValue() {
       // bind display
       this.objectForm.patchValue(this.objectService.objectHeader);
-      console.log("🚀 ~ StockCountHeaderPage ~ ionViewDidEnter ~ this.objectForm:", JSON.stringify(this.objectForm.value))
       this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
       this.setFormattedDateString();
       if (this.objectService.objectHeader) {
@@ -93,7 +91,6 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
    inventoryCountBatchDdl: SearchDropdownList[] = [];
    @ViewChild("inventoryCountBatchSdd", { static: false }) inventoryCountBatchSdd: SearchDropdownPage;
    onLocationSelected(event: SearchDropdownList) {
-      console.log("🚀 ~ StockCountHeaderPage ~ onLocationSelected ~ event:", event)
       try {
          this.objectForm.patchValue({ locationId: null });
          if (this.objectService.objectHeader?.inventoryCountId === null || this.objectService.objectHeader?.inventoryCountId === undefined) {
@@ -104,11 +101,9 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
             this.inventoryCountBatchDdl = [];
             this.objectService.getInventoryCountBatchByLocationId(this.objectForm.controls.locationId.value).subscribe(response => {
                this.fullInventoryCountBatchList = response;
-               console.log("🚀 ~ StockCountHeaderPage ~ this.objectService.getInventoryCountBatchByLocationId ~ this.inventoryCountBatchList:", JSON.stringify(this.inventoryCountBatchList))
                this.inventoryCountBatchList = this.fullInventoryCountBatchList.filter(r => !r.isCompleted);
                if (this.objectService.objectHeader?.inventoryCountId && this.objectService.objectHeader?.inventoryCountId > 0) {
                   this.objectService.objectHeader.inventoryCountBatchNum = this.fullInventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.objectService.objectHeader.inventoryCountBatchId)?.inventoryCountBatchNum;
-                  console.log("🚀 ~ StockCountHeaderPage ~ this.objectService.getInventoryCountBatchByLocationId ~ this.objectService.objectHeader:", JSON.stringify(this.objectService.objectHeader))
                   this.objectService.objectHeader.inventoryCountBatchDescription = this.fullInventoryCountBatchList?.find(r => r.inventoryCountBatchId === this.objectService.objectHeader.inventoryCountBatchId)?.description;
                }
                if (this.inventoryCountBatchList.length > 0) {
@@ -121,7 +116,6 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
                      })
                   })
                   this.inventoryCountBatchDdl = JSON.parse(JSON.stringify(temp));
-                  console.log("🚀 ~ StockCountHeaderPage ~ this.objectService.getInventoryCountBatchByLocationId ~ this.inventoryCountBatchDdl:", JSON.stringify(this.inventoryCountBatchDdl))
                }
             }, error => {
                console.error(error);

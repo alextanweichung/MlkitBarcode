@@ -75,7 +75,6 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
          await this.loadingService.showLoading();
          this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
-            console.log("🚀 ~ PackingPage ~ this.objectService.getObjectListByDate ~ this.objects:", this.objects)
             this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
@@ -263,7 +262,6 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
    itemSearchText: string;
    filteredObj: MultiPackingList[] = [];
    search(searchText, newSearch: boolean = false) {
-      console.log("🚀 ~ PackingPage ~ search ~ searchText:", searchText)
       if (newSearch) {
          this.filteredObj = [];
       }
