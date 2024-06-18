@@ -165,6 +165,14 @@ const routes: Routes = [
       path: 'managements/multi-co-po-approvals',
       loadChildren: () => import('./modules/managements/pages/multi-co-po-approvals/multi-co-po-approvals.module').then(m => m.MultiCoPoApprovalsPageModule)
    },
+   {
+      path: 'managements/multi-co-pa-approvals',
+      loadChildren: () => import('./modules/managements/pages/multi-co-pa-approvals/multi-co-pa-approvals.module').then(m => m.MultiCoPaApprovalsPageModule)
+   },
+   {
+      path: 'managements/multi-co-pa-reviews',
+      loadChildren: () => import('./modules/managements/pages/multi-co-pa-reviews/multi-co-pa-reviews.module').then(m => m.MultiCoPaReviewsPageModule)
+   },
    // management-otp-configuration
    {
       path: 'managements/otp-configuration',
@@ -507,6 +515,15 @@ const routes: Routes = [
       path: 'sales-cart',
       loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
    },
+  {
+    path: 'multi-co-pa-reviews',
+    loadChildren: () => import('./modules/managements/pages/multi-co-pa-reviews/multi-co-pa-reviews.module').then( m => m.MultiCoPaReviewsPageModule)
+  },
+  {
+    path: 'multi-co-pa-approvals',
+    loadChildren: () => import('./modules/managements/pages/multi-co-pa-approvals/multi-co-pa-approvals.module').then( m => m.MultiCoPaApprovalsPageModule)
+  },
+
 
 
 

@@ -36,6 +36,8 @@ export class ManagementPage implements OnInit {
    showInventoryAdjReqApproval: boolean = false;
    showMultiCoPrApproval: boolean = false;
    showMultiCoPoApproval: boolean = false;
+   showMultiCoPaApproval: boolean = false;
+   showMultiCoPaReview: boolean = false;
    showOtpConfig: boolean = false;
 
    constructor(
@@ -80,6 +82,9 @@ export class ManagementPage implements OnInit {
 
                this.showMultiCoPrApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPrAP) > -1;
                this.showMultiCoPoApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPoAP) > -1;
+
+               this.showMultiCoPaApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPaAP) > -1;
+               this.showMultiCoPaReview = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPaRV) > -1;
 
                this.showOtpConfig = pageItems.findIndex(r => r.title === approvalAppCode.otpConfig) > -1;
             }

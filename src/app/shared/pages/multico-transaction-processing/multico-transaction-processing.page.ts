@@ -17,7 +17,7 @@ import { CommonService } from '../../services/common.service';
 export class MultiCoTransactionProcessingPage implements OnInit {
 
    @Input() trxEndPoint: string;
-
+   @Input() limitCol: boolean = false;
    constructor(
       private objectService: MultiCoTransactionProcessingService,
       private commonService: CommonService,

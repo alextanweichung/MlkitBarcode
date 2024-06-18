@@ -63,6 +63,8 @@ export const approvalAppCode = {
    inventoryAdjReqAP: "MAIARAP",
    multiCoPrAP: "MAMCPRAP",
    multiCoPoAP: "MAMCPOAP",
+   multiCoPaAP: "MAMCPAAP",
+   multiCoPaRV: "MAMCPARV",
    otpConfig: "MAMAOTP",
 }
 
