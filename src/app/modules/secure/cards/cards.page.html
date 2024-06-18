@@ -52,7 +52,7 @@
                   Sync now
                </ion-button>
             </ion-item>
-            <ion-item detail="false" *ngIf="configService.loginUser.loginUserType === 'C' && configService.loginUser && configService.loginUser.locationId.length > 0" (click)="showLocationModal()">
+            <ion-item detail="false" *ngIf="configService.loginUser && configService.loginUser.locationId.length > 0" (click)="showLocationModal()">
                <ion-label>
                   <h3>Switch Location</h3>
                   <p class="font-size-smallest">Selected: {{configService.selected_location|idMapping:dashboardService.locationMasterList}}</p>
@@ -113,7 +113,7 @@
       </ion-header>
       <ion-content>
          <div class="p-2">
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="configService.loginUser.locationId && configService.loginUser.locationId.length === 0">
+            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                <ion-label>Location not set</ion-label>
             </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">

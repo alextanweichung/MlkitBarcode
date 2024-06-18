@@ -10,6 +10,8 @@ import { FilterPage } from '../filter/filter.page';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
    selector: 'app-consignment-sales',
@@ -20,10 +22,9 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
    objects: ConsignmentSalesList[] = [];
 
-   startDate: Date;
-   endDate: Date;
-
    uniqueGrouping: Date[] = [];
+	currentPage: number = 1;
+	itemsPerPage: number = 12;
 
    constructor(
       private objectService: ConsignmentSalesService,
@@ -39,12 +40,14 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
+		this.objects = [];
+		this.filteredObj = [];
       try {
-         if (!this.startDate) {
-            this.startDate = this.commonService.getFirstDayOfTodayMonth();
+         if (!this.objectService.filterStartDate) {
+            this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
          }
-         if (!this.endDate) {
-            this.endDate = this.commonService.getTodayDate();
+         if (!this.objectService.filterEndDate) {
+            this.objectService.filterEndDate = this.commonService.getTodayDate();
          }
          await this.objectService.loadRequiredMaster();
          await this.loadObjects();
@@ -108,11 +111,9 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    async loadObjects() {
       try {
          await this.loadingService.showLoading();
-         this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
+         this.objectService.getObjectListByDate(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
-            let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-            this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-            await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
+				this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
@@ -125,10 +126,6 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
       } finally {
          await this.loadingService.dismissLoading();
       }
-   }
-
-   getObjects(date: Date) {
-      return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
    }
 
    goToDetail(objectId: number) {
@@ -147,16 +144,16 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
          const modal = await this.modalController.create({
             component: FilterPage,
             componentProps: {
-               startDate: this.startDate,
-               endDate: this.endDate
+               startDate: this.objectService.filterStartDate,
+               endDate: this.objectService.filterEndDate
             },
             canDismiss: true
          })
          await modal.present();
          let { data } = await modal.onWillDismiss();
          if (data && data !== undefined) {
-            this.startDate = new Date(data.startDate);
-            this.endDate = new Date(data.endDate);
+            this.objectService.filterStartDate = new Date(data.startDate);
+            this.objectService.filterEndDate = new Date(data.endDate);
             this.loadObjects();
          }
       } catch (e) {
@@ -166,7 +163,47 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
    /* #region add */
 
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
+	itemSearchText: string;
+	filteredObj: ConsignmentSalesList[] = [];
+	search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.consignmentSalesNum?.toUpperCase().includes(searchText.toUpperCase()))));
+				this.currentPage = 1;
+			} else {
+				this.resetFilteredObj();
+				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+	}
+
+	highlight(event) {
+		event.getInputElement().then(r => {
+			r.select();
+		})
+	}
+
    // Select action
+
    async selectAction() {
       try {
          const actionSheet = await this.actionSheetController.create({

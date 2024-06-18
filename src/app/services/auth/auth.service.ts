@@ -173,10 +173,10 @@ export class AuthService {
                this.customerMasterList = masterList.filter(x => x.objectName === "Customer").flatMap(src => src.details);
                this.setCustomerMasterList(this.customerMasterList);
             }, async error => {
-               console.error(error);
+               console.error(JSON.stringify(error));
             });
          } catch (error) {
-            console.error(error);
+            console.error(JSON.stringify(error));
          } finally {
          }
       }
@@ -193,7 +193,7 @@ export class AuthService {
          this.model = this.model.sort((a, b) => Number(a.tabindex) - Number(b.tabindex));
          this.setMenuHierarchy(this.model);
       }, error => {
-         console.log(error);
+         console.error(JSON.stringify(error));
       });
    }
 

@@ -94,8 +94,8 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       try {
          this.authService.precisionList$.subscribe(precision => {
             if (precision) {
-               this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-               this.precisionTax = precision.find(x => x.precisionCode == "TAX");
+               this.precisionSales = precision.find(x => x.precisionCode === "SALES");
+               this.precisionTax = precision.find(x => x.precisionCode === "TAX");
             }
          })
       } catch (e) {
@@ -148,13 +148,13 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    maxDate = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
    @ViewChild("datetime") datetime: IonDatetime
    setFormattedDateString() {
-      this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+      this.formattedDateString = format(parseISO(format(new Date(this.dateValue), "yyyy-MM-dd") + `T00:00:00.000Z`), "MMM d, yyyy");
    }
 
    onTrxDateSelected(value: any) {
-      this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+      this.dateValue = format(new Date(value), "yyyy-MM-dd") + "T08:00:00.000Z";
       this.setFormattedDateString();
-      this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+      this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), "yyyy-MM-dd") + `T00:00:00.000Z`) });
    }
 
    dateDismiss() {
@@ -195,10 +195,10 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    onCurrencySelected(event) {
       try {
          if (event) {
-            var lookupValue = this.objectService.currencyMasterList?.find(e => e.id == event);
+            var lookupValue = this.objectService.currencyMasterList?.find(e => e.id === event);
             if (lookupValue != undefined) {
                this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
-               if (lookupValue.attribute2 == "Y") {
+               if (lookupValue.attribute2 === "Y") {
                   this.objectForm.patchValue({ isHomeCurrency: true });
                   this.objectForm.patchValue({ maxPrecision: this.precisionSales.localMax });
                   this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.localMax });
@@ -231,7 +231,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
                   this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
                   let findLocation = this.objectService.locationMasterList.find(r => r.id === event.id);
                   this.objectForm.patchValue({
-                     isBearPromo: findLocation.attribute6 == '1' ? true : false,
+                     isBearPromo: findLocation.attribute6 === "1" ? true : false,
                      marginMode: findLocation.attribute8
                   })
                },

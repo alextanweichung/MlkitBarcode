@@ -181,11 +181,11 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
             let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
             await this.configService.syncInboundData(itemMaster, itemBarcode);
 
-            if (this.configService.loginUser.loginUserType === "C") {
+            // if (this.configService.loginUser.loginUserType === "C") {
                let response2 = await this.commonService.syncMarginConfig(this.configService.selected_location);
                let marginConfig: LocalMarginConfig[] = response2;
                await this.configService.syncMarginConfig(marginConfig);
-            }
+            // }
             await this.loadingService.dismissLoading();
          } catch (e) {
             await this.loadingService.dismissLoading();

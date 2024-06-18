@@ -47,7 +47,7 @@ export class CommonService {
       try {
          return this.http.get(apiUrl + "account/companyInfo").toPromise().then(r => { return r["name"] });
       } catch (e) {
-         console.error(e);
+         console.error(JSON.stringify(e));
       }
    }
 
