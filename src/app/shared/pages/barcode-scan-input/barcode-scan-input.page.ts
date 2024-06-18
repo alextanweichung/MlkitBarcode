@@ -225,7 +225,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                   if (this.availableItemmmm.findIndex(rr => rr.itemCode === r.code) < 0) {
                      if (r.varCd === "0") {
                         let barcodes = found_item_barcode.filter(rr => rr.itemId === r.id);
-                        if (!this.configSystemWideActivateMultiUOM) {
+                        if (!(this.configSystemWideActivateMultiUOM && this.itemUomMasterList && this.itemUomMasterList.length > 0)) {
                            barcodes = barcodes.filter(rr => rr.itemUomId === r.uomId);
                         }
                         if (barcodes && barcodes.length > 0) {
@@ -393,7 +393,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
                      this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
                   }
                } else {
-                  if ((this.availableVariations && this.availableVariations.length === 1) || !this.configSystemWideActivateMultiUOM) { // variation 0 and no uom
+                  if ((this.availableVariations && this.availableVariations.length === 1) || !(this.configSystemWideActivateMultiUOM && this.itemUomMasterList && this.itemUomMasterList.length > 0)) { // variation 0 and no uom
                      this.availableVariationsByItemId = this.availableVariations.filter(r => r.itemId === found_item_master[0].id); // check if that one item has variation or not
                      this.onItemAdd.emit([this.availableVariationsByItemId[0]]);
                   } else { // let user select item by uom

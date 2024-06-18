@@ -231,8 +231,12 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    }
 
    async addObject() {
-      this.objectService.resetVariables();
-      this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-header");
+      if (!this.configService.selected_location) {
+         this.toastService.presentToast("Control Error", "Please select a location first at setting tab.", "top", "warning", 2000);
+      } else {
+         this.objectService.resetVariables();
+         this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-header");
+      }
    }
 
    /* #endregion */

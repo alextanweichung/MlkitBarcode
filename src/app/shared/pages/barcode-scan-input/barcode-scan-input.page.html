@@ -43,7 +43,7 @@
                      <ion-row>
                         <ion-col class="ion-flex ion-margin-auto">
                            <div>{{item.itemCode}} - {{item.description}}</div>
-                           <span class="badge-warning ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemUomId && configSystemWideActivateMultiUOM && itemUomMasterList">{{item.itemUomId|idMapping:itemUomMasterList}}</span>
+                           <span class="badge-warning ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="item.itemUomId && configSystemWideActivateMultiUOM && (itemUomMasterList && itemUomMasterList.length > 0)">{{item.itemUomId|idMapping:itemUomMasterList}}</span>
                         </ion-col>
                      </ion-row>
                   </ion-grid>
