@@ -15,6 +15,7 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { CashDepositService } from '../../../services/cash-deposit.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { CashDepositHeader } from '../../../models/cash-deposit';
+import { v4 as uuidv4 } from 'uuid';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -74,6 +75,7 @@ export class CashDepositAddPage implements OnInit {
          locationId: [null],
          customerId: [null],
          trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
+         uuid: [uuidv4()],
          sequence: [0]
       })
    }
@@ -401,9 +403,11 @@ export class CashDepositAddPage implements OnInit {
       }
    }
 
+   submitAttempt: boolean = false;
    async nextStep() {
       try {
          if (this.objectForm.valid) {
+            this.submitAttempt = true;
             const alert = await this.alertController.create({
                header: "Are you sure to proceed?",
                buttons: [
@@ -418,32 +422,49 @@ export class CashDepositAddPage implements OnInit {
                   {
                      text: "Cancel",
                      cssClass: "cancel",
-                     role: "cancel"
+                     role: "cancel",
+                     handler: () => {
+                        this.submitAttempt = false;
+                     }
                   },
                ],
             });
             await alert.present();
          } else {
+            this.submitAttempt = false;
             this.toastService.presentToast("Error", "Please fill required fields.", "top", "danger", 2000);
          }
       } catch (e) {
+         this.submitAttempt = false;
          console.error(e);
+      } finally {
+         this.submitAttempt = false;
       }
    }
 
+   isCountingTimer: boolean = true;
    async insertObject() {
       try {
-         let response = await this.objectService.insertObject(this.objectForm.value);
-         if (response.status === 201) {
-            let ret = response.body as CashDepositHeader;
-            for await (const image of this.images) {
-               await this.startUpload(image, ret.posCashDepositId, 0);
+         if (this.isCountingTimer) {
+            this.isCountingTimer = false;
+            await this.loadingService.showLoading();
+            let response = await this.objectService.insertObject(this.objectForm.value);
+            if (response.status === 201) {
+               let ret = response.body as CashDepositHeader;
+               for await (const image of this.images) {
+                  await this.startUpload(image, ret.posCashDepositId, 0);
+               }
+               await this.loadingService.dismissLoading();
+               this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
+               await this.removeDir();
+               this.navController.navigateRoot("transactions/cash-deposit");
             }
-            this.toastService.presentToast("Insert Complete", "", "top", "success", 1000);
-            await this.removeDir();
-            this.navController.navigateRoot("transactions/cash-deposit");
          }
+         setTimeout(() => {
+            this.isCountingTimer = true;
+         }, 1000);
       } catch (e) {
+         await this.loadingService.dismissLoading();
          console.error(e);
       }
    }

@@ -27,6 +27,7 @@ export interface CashDepositHeader {
    modifiedAt: Date
    deactivated: boolean
    revision: number
+   uuid: string
 }
 
 export interface CashDepositFile {

@@ -68,7 +68,8 @@ export class CashDepositEditPage implements OnInit {
          locationId: [null],
          customerId: [null],
          trxDate: [null],
-         sequence: [0]
+         sequence: [0],
+         uuid: [null]
       })
    }
 

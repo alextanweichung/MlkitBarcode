@@ -101,7 +101,7 @@
    <ion-grid class="ion-no-padding">
       <ion-row>
          <ion-col>
-            <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid">
+            <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid && submitAttempt">
                Save
             </ion-button>
          </ion-col>

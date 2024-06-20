@@ -31,6 +31,7 @@
                </ion-grid>
             </ion-item>
          </ion-list>
+			<pagination-controls class="ion-flex justify-content-center pagination-top" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
       </ng-container>
    </div>
    <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">
