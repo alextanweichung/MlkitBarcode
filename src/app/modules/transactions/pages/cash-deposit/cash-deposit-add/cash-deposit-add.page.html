@@ -81,16 +81,16 @@
          </ion-list>
       </form>
       <div class="mt-2">
-         <ion-button fill="clear" expand="full" color="dark" (click)="selectImage()">
+         <ion-button fill="clear" expand="full" color="dark" (click)="imageAction()">
             <ion-icon slot="start" name="camera"></ion-icon>
-            Select Image
+            Upload Image
          </ion-button>
          <ion-item *ngFor="let file of images; let i = index">
             <ion-thumbnail slot="start">
                <ion-img [src]="file.data"></ion-img>
             </ion-thumbnail>
             <ion-label class="ion-text-wrap"> {{ file.name }} </ion-label>
-            <ion-button slot="end" fill="clear" (click)="deleteImage(file)">
+            <ion-button slot="end" fill="clear" (click)="deleteAction(file)">
                <ion-icon slot="icon-only" name="trash"></ion-icon>
             </ion-button>
          </ion-item>
