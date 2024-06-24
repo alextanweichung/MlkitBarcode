@@ -118,7 +118,7 @@
                                  </ion-button>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode, rowData)"></ion-input>
+                                 <ion-input #qtyInput class="ion-text-center" type="number" inputmode="numeric" pattern="[0-9]*" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode, rowData)" (ionBlur)="onQtyBlur(rowData)"></ion-input>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto">
                                  <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)">
