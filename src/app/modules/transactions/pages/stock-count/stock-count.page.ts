@@ -28,7 +28,7 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    itemsPerPage: number = 12;
 
    constructor(
-      private objectService: StockCountService,
+      public objectService: StockCountService,
       private authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,

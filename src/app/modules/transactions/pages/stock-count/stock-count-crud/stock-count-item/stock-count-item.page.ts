@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
+import { AlertController, IonInput, IonPopover, NavController, ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -44,7 +44,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ) { }
 
    ionViewWillEnter(): void {
-
+      
    }
 
    ionViewDidEnter(): void {
@@ -239,6 +239,10 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             Keyboard.hide();
          }
       }
+   }
+
+   onQtyBlur(line: StockCountDetail) {
+      line.qtyRequest = Math.floor(line.qtyRequest);
    }
 
    async increaseQty(line: StockCountDetail) {

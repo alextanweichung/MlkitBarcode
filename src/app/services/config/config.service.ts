@@ -72,6 +72,7 @@ export class ConfigService {
                // apiUrl: "https://idcpth.mkagrp.com/api/",
                // apiUrl: "https://vn.mkagrp.com.vn/api/",
                // apiUrl: "https://mh.mkagrp.com.vn/api/",
+               // apiUrl: "https://pos.mkagrp.com/api/",
                imgUrl: null,
                lastDownloadAt: null,
                username: "aychia@idcp.my",

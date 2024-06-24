@@ -38,6 +38,7 @@ export class StockCountService {
    moduleControl: ModuleControl[];
    configInvCountFreeTextZoneRack: boolean = false;
    configInvCountActivateLineWithBin: boolean = false;
+   configHeaderShowBinDesc: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -54,6 +55,13 @@ export class StockCountService {
             this.configInvCountActivateLineWithBin = true;
          } else {
             this.configInvCountActivateLineWithBin = false;
+         }
+
+         let InvCountHeaderShowBinDesc = this.moduleControl.find(x => x.ctrlName === "InvCountListingShowBinDesc");
+         if (InvCountHeaderShowBinDesc && InvCountHeaderShowBinDesc.ctrlValue.toUpperCase() === "Y") {
+            this.configHeaderShowBinDesc = true;
+         } else {
+            this.configHeaderShowBinDesc = false;
          }
       })
    }
