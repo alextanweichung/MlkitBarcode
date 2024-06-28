@@ -2,26 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
-import { CommonService } from 'src/app/shared/services/common.service';
-import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
-import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
-import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { TransactionProcessingDoc } from 'src/app/shared/models/transaction-processing';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { TransactionProcessingService } from 'src/app/shared/services/transaction-processing.service';
 
 @Component({
-   selector: 'app-sales-order-pending-review',
-   templateUrl: './sales-order-reviews.page.html',
-   styleUrls: ['./sales-order-reviews.page.scss'],
-   providers: [TransactionProcessingService, { provide: "apiObject", useValue: "mobileSalesOrderReview" }]
+  selector: 'app-payment-arrangement-approvals',
+  templateUrl: './payment-arrangement-approvals.page.html',
+  styleUrls: ['./payment-arrangement-approvals.page.scss'],
+  providers: [TransactionProcessingService, { provide: "apiObject", useValue: "mobilePaymentArrangementApprove" }]
 })
-export class SalesOrderReviewsPage implements OnInit, ViewWillEnter {
+export class PaymentArrangementApprovalsPage implements OnInit, ViewWillEnter {
 
    pendingObjects: TransactionProcessingDoc[] = [];
    completedObjects: TransactionProcessingDoc[] = [];
 
    startDate: Date;
    endDate: Date;
-
    constructor(
       private objectService: TransactionProcessingService,
       private authService: AuthService,

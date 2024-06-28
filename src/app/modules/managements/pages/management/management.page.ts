@@ -34,6 +34,10 @@ export class ManagementPage implements OnInit {
    showInventoryProcessingApproval: boolean = false;
    showInventoryAdjReqReview: boolean = false;
    showInventoryAdjReqApproval: boolean = false;
+   
+   showPaymentArrangementReview: boolean = false;
+   showPaymentArrangementApproval: boolean = false;
+   
    showMultiCoPrApproval: boolean = false;
    showMultiCoPoApproval: boolean = false;
    showMultiCoPaApproval: boolean = false;
@@ -79,6 +83,9 @@ export class ManagementPage implements OnInit {
 
                this.showInventoryAdjReqReview = pageItems.findIndex(r => r.title === approvalAppCode.inventoryAdjReqRV) > -1;
                this.showInventoryAdjReqApproval = pageItems.findIndex(r => r.title === approvalAppCode.inventoryAdjReqAP) > -1;
+
+               this.showPaymentArrangementReview = pageItems.findIndex(r => r.title === approvalAppCode.paymentArrangementRV) > -1;
+               this.showPaymentArrangementApproval = pageItems.findIndex(r => r.title === approvalAppCode.paymentArrangementAP) > -1;
 
                this.showMultiCoPrApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPrAP) > -1;
                this.showMultiCoPoApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPoAP) > -1;

@@ -50,7 +50,7 @@ export class ConfigService {
          if (Capacitor.getPlatform() === "web") {
             this.sys_parameter.push({
                Sys_ParameterId: 1,
-               // apiUrl: "https://localhost:44351/api/",
+               apiUrl: "https://localhost:44351/api/",
                // apiUrl: "https://idcp-demo.com/api/",
                // apiUrl: "https://demo.idcp-demo.com/api/",
                // apiUrl: "https://idcp-testing.motorparts.asia/api/",
@@ -68,11 +68,11 @@ export class ConfigService {
                // apiUrl: "https://test.fiffy-erp.com/api/",
                // apiUrl: "https://fiffy-erp.com/api/",
                // apiUrl: "https://idcp-noseintl.com/api/",
-               // apiUrl: "https:bmm-sys.com:1000/api/",
+               // apiUrl: "https://bmm-sys.com:1000/api/",
                // apiUrl: "https://idcpth.mkagrp.com/api/",
                // apiUrl: "https://vn.mkagrp.com.vn/api/",
                // apiUrl: "https://mh.mkagrp.com.vn/api/",
-               apiUrl: "https://pos.mkagrp.com/api/",
+               // apiUrl: "https://pos.mkagrp.com/api/",
                imgUrl: null,
                lastDownloadAt: null,
                username: "aychia@idcp.my",

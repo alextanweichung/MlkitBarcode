@@ -122,7 +122,6 @@ export class StockCountService {
       this.removeDetail();
       this.removeBarcodeTag();
       await this.configService.removeFromLocalStorage(this.trxKey);
-      var data = await this.configService.retrieveFromLocalStorage(this.trxKey);
    }
 
    getMasterList() {

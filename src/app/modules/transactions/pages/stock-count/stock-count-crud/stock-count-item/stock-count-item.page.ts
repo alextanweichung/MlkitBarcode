@@ -35,7 +35,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    constructor(
       public objectService: StockCountService,
-      private authService: AuthService,
+      public authService: AuthService,
       private configService: ConfigService,
       private toastService: ToastService,
       private loadingService: LoadingService,
@@ -525,6 +525,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             // this.scanActive = false;
             await this.onCameraStatusChanged(false);
             this.binDesc = value;
+            this.barcodescaninput.setFocus();
          }
       }
    }

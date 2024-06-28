@@ -1765,7 +1765,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                      if (checking) {
                         this.objectService.multiPackingObject.packingCarton[0].packList.push(line);
                         let outstandingLines = this.objectService.multiPackingObject.outstandingPackList.filter(x => x.itemSku == line.itemSku);
-                        let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == line.itemSku);
+                        let packListLines = this.objectService.multiPackingObject.packingCarton.flatMap(x => x.packList).filter(x => x.itemSku == line.itemSku && x.assemblyItemId);
                         this.computePackingAssignment(line.qtyPacked, outstandingLines, packListLines);
                      } else {
                         allLinesDuplicated = false;
