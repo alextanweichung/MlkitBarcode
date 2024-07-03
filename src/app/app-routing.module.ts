@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
    {
       path: '',
       redirectTo: 'welcome', // TODO: Set this to ''
-      pathMatch: 'full'
+      pathMatch: 'full',
    },
    {
       path: '',
@@ -26,10 +27,7 @@ const routes: Routes = [
       path: 'forget-password',
       loadChildren: () => import('./modules/public/forget-password/forget-password.module').then(m => m.ForgetPasswordPageModule)
    },
-
-
-
-
+   
 
    // dashboard  
    {
@@ -173,6 +171,15 @@ const routes: Routes = [
       path: 'managements/multi-co-pa-reviews',
       loadChildren: () => import('./modules/managements/pages/multi-co-pa-reviews/multi-co-pa-reviews.module').then(m => m.MultiCoPaReviewsPageModule)
    },
+   {
+     path: 'managements/payment-arrangement-reviews',
+     loadChildren: () => import('./modules/managements/pages/payment-arrangement-reviews/payment-arrangement-reviews.module').then( m => m.PaymentArrangementReviewsPageModule)
+   },
+   {
+     path: 'managements/payment-arrangement-approvals',
+     loadChildren: () => import('./modules/managements/pages/payment-arrangement-approvals/payment-arrangement-approvals.module').then( m => m.PaymentArrangementApprovalsPageModule)
+   },
+ 
    // management-otp-configuration
    {
       path: 'managements/otp-configuration',
@@ -378,6 +385,10 @@ const routes: Routes = [
       path: 'transactions/defect-request',
       loadChildren: () => import('./modules/transactions/pages/defect-request/defect-request.module').then(m => m.DefectRequestPageModule)
    },
+   {
+     path: 'transactions/payment-arrangement/payment-arrangement-detail',
+     loadChildren: () => import('./modules/transactions/pages/payment-arrangement/payment-arrangement-detail/payment-arrangement-detail.module').then( m => m.PaymentArrangementDetailPageModule)
+   },
 
 
 
@@ -515,16 +526,6 @@ const routes: Routes = [
       path: 'sales-cart',
       loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
    },
-  {
-    path: 'multi-co-pa-reviews',
-    loadChildren: () => import('./modules/managements/pages/multi-co-pa-reviews/multi-co-pa-reviews.module').then( m => m.MultiCoPaReviewsPageModule)
-  },
-  {
-    path: 'multi-co-pa-approvals',
-    loadChildren: () => import('./modules/managements/pages/multi-co-pa-approvals/multi-co-pa-approvals.module').then( m => m.MultiCoPaApprovalsPageModule)
-  },
-
-
 
 
 ];

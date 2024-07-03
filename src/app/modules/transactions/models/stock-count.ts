@@ -13,6 +13,7 @@ export interface StockCount {
    zoneDescription?: string
    rackCode?: string
    rackDescription?: string
+   binDesc?: string
    deactivated: boolean
    createdById: number
 }

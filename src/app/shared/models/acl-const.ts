@@ -61,6 +61,10 @@ export const approvalAppCode = {
    inventoryProcessingAP: "MAIPAP",
    inventoryAdjReqRV: "MAIARRV",
    inventoryAdjReqAP: "MAIARAP",
+
+   paymentArrangementRV: "MAMPARV",
+   paymentArrangementAP: "MAMPAAP",
+   
    multiCoPrAP: "MAMCPRAP",
    multiCoPoAP: "MAMCPOAP",
    multiCoPaAP: "MAMCPAAP",

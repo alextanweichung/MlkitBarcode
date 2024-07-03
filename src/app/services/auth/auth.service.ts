@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import jwt_decode, { JwtPayload } from "jwt-decode";
@@ -13,6 +13,8 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { RestrictedColumn } from 'src/app/shared/models/restricted-column';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { Keyboard } from '@capacitor/keyboard';
+import { Capacitor } from '@capacitor/core';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -33,6 +35,8 @@ export class AuthService {
    masterDefinedGroup: MasterList[];
    model: MenuItem[];
    precisionList: PrecisionList[];
+
+   hideFooter: boolean = false;
 
    configExtracted: boolean;
    systemWideGetCustomerUponLogin: boolean = false;
@@ -74,12 +78,27 @@ export class AuthService {
       private http: HttpClient,
       private configService: ConfigService,
       private navController: NavController,
+      private ngZone: NgZone
    ) {
-      // if (!this.isTokenExpired()) {
-      //    this.buildAllObjects(true);
+      if (Capacitor.getPlatform() === "web") {
+         
+      } else {
+         Keyboard.addListener("keyboardWillShow", () => {
+            this.ngZone.run(() => {
+               this.hideFooter = true;
+            })
+         })
+         Keyboard.addListener("keyboardWillHide", () => {
+            this.ngZone.run(() => {
+               this.hideFooter = false;
+            })
+         })
+      }
+      
+      if (!this.isTokenExpired()) {
+         this.buildAllObjects(true);
          this.customerMasterListSubject.next(null);
-         // this.itemListSubject.next(null);
-      // }
+      }
    }
 
    // Sign in

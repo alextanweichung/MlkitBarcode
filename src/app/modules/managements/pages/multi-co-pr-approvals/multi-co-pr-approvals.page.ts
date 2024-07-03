@@ -5,7 +5,7 @@ import { MultiCoTransactionProcessingService } from 'src/app/shared/services/mul
    selector: 'app-multi-co-pr-approvals',
    templateUrl: './multi-co-pr-approvals.page.html',
    styleUrls: ['./multi-co-pr-approvals.page.scss'],
-   providers: [MultiCoTransactionProcessingService, { provide: 'apiObject', useValue: 'multiCoPrApproval' }]
+   providers: [MultiCoTransactionProcessingService, { provide: 'apiObject', useValue: 'mobileMultiCoPrApproval' }]
 })
 export class MultiCoPrApprovalsPage implements OnInit {
 

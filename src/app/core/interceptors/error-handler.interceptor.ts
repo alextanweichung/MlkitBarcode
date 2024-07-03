@@ -8,11 +8,8 @@ import {
    HttpContext
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { LoadingService } from 'src/app/services/loading/loading.service';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);
 
@@ -24,11 +21,9 @@ export function background_load() {
 export class ErrorHandlerInterceptor implements HttpInterceptor {
 
    constructor(
-      private router: Router,
-      private toastService: ToastService,
-      private loadingService: LoadingService,
-      private spinner: NgxSpinnerService
+      private toastService: ToastService
    ) { }
+
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
       if (request.headers.get('skip')) {
          const authReq = request.clone({
@@ -54,8 +49,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    
       setTimeout(() => {
          if (!finished) {
-            // this.loadingService.showLoading('Loading');
-            // this.spinner.show('sp1');
+            
          }
       }, 800);
 
@@ -75,33 +69,23 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
 
                      } else {                        
                         this.toastService.presentToast('Bad request error', error.status + ':' + error.statusText, 'top', 'danger', 2000);
-                        // this.messageService.add({ severity: 'error', summary: 'Bad request error', detail: error.status + ':' + error.statusText });
                      }
                      break;
                   case 401:
-                     if (error.error.description) {
-                        this.toastService.presentToast('Unauthorised', error.error.description, 'top', 'danger', 2000);
-                        // this.messageService.add({ severity: 'error', summary: 'Unauthorised', detail: error.error.description });
+                     if (error?.error?.description) {
+                        this.toastService.presentToast('Unauthorised', error?.error?.description, 'top', 'danger', 2000);
                      } else {
                         this.toastService.presentToast('Unauthorised', error.status + ':' + error.statusText, 'top', 'danger', 2000);
-                        // this.messageService.add({ severity: 'error', summary: 'Unauthorised', detail: error.status + ':' + error.statusText });
                      }
                      break;
                   case 404:
-                     //this.router.navigateByUrl('/not-found');
                      this.toastService.presentToast('No result', 'Resources not found.', 'top', 'danger', 2000);
-                     // this.messageService.add({ severity: 'custom', summary: 'No result', detail: "Resources not found." });
                      break;
                   case 500:
-                     //const navigationExtras: NavigationExtras = {state: {error: error.error}}
-                     //this.router.navigateByUrl('/error', navigationExtras);
-                     this.toastService.presentToast('Error', error.error.message, 'top', 'danger', 2000);
-                     // this.messageService.add({ severity: 'error', summary: 'Internal server error 500', detail: error.error.message });
+                     this.toastService.presentToast('Error', error?.error?.message, 'top', 'danger', 2000);
                      break;
                   default:
                      this.toastService.presentToast('Error', 'Something went wrong', 'top', 'danger', 2000);
-                     // this.messageService.add({ severity: 'error', summary: 'Something went wrong' });
-                     console.log(JSON.stringify(error));
                      break;
                }
             }
@@ -110,8 +94,6 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          //Clear spinner
          finalize(() => {
             finished = true;
-            // this.loadingService.dismissLoading();
-            // this.spinner.hide('sp1');
          })
       );
    }

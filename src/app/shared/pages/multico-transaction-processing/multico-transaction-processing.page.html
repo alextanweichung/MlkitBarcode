@@ -29,7 +29,7 @@
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto justify-content-end font-bold">
                                  <div *ngIf="!limitCol" class="mr-2">{{rowData2.currency}}</div>
-                                 <div *ngIf="!limitCol">{{rowData2.amount|number:"1.2-2"}}</div>
+                                 <div *ngIf="limitCol">{{rowData2.amount|number:"1.2-2"}}</div>
                                  <div *ngIf="limitCol">{{rowData2.docNum}}</div>
                               </ion-col>
                            </ion-row>
@@ -45,6 +45,11 @@
                               <ion-col class="ion-flex ion-margin-auto">
                                  <span class="badge-warning ion-text-wrap ion-flex my-auto mr-2" style="font-size: smaller; padding: 0 0.2rem;" *ngIf="rowData2.counterPartCode">{{rowData2.counterPartCode}}</span>
                                  <div>{{rowData2.counterPart}}</div>
+                              </ion-col>
+                           </ion-row>
+                           <ion-row *ngIf="rowData2.typeDetail">
+                              <ion-col class="ion-flex ion-margin-auto">
+                                 <span class="ion-text-wrap badge-warning px-1" *ngIf="rowData2.typeDetail"><ion-icon name="alert-circle-outline"></ion-icon> {{rowData2.typeDetail}}</span>
                               </ion-col>
                            </ion-row>
                         </ion-grid>

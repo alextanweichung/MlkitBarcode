@@ -34,6 +34,9 @@
                 <ion-col class="ion-flex ion-margin-auto">{{object.description}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end">{{object.locationCode}}</ion-col>
               </ion-row>
+              <ion-row *ngIf="objectService.configHeaderShowBinDesc">
+                <ion-col class="ion-flex ion-margin-auto" *ngIf="object.binDesc">{{object.binDesc}}</ion-col>
+              </ion-row>
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto" *ngIf="object.zoneCode">{{object.zoneCode}} - {{object.zoneDescription}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="object.rackCode">{{object.rackCode}} - {{object.rackDescription}}</ion-col>
