@@ -57,7 +57,8 @@ export class StockReorderAddPage implements OnInit {
          salesOrderId: [null],
          salesOrderNum: [null],
          remark: [null],
-         workFlowTransactionId: [null]
+         workFlowTransactionId: [null],
+         uuid: [null]
       })
    }
 

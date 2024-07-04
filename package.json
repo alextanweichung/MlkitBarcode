@@ -57,6 +57,7 @@
       "ng-circle-progress": "^1.7.1",
       "ng2-charts": "^3.1.2",
       "ngx-pagination": "^6.0.3",
+      "ngx-pinch-zoom": "^2.6.2",
       "ngx-spinner": "^16.0.2",
       "onesignal-cordova-plugin": "^3.3.0",
       "primeicons": "^1.0.0",

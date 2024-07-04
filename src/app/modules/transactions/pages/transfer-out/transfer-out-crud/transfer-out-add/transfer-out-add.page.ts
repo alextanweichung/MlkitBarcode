@@ -69,7 +69,8 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
          totalCarton: [null],
          remark: [null],
          workFlowTransactionId: [null],
-         grnNum: [null]
+         grnNum: [null],
+         uuid: [null]
       })
    }
 

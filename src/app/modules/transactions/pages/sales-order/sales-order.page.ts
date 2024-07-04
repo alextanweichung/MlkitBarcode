@@ -74,14 +74,15 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    }
 
    async ionViewDidLeave(): Promise<void> {
-      await this.objectService.stopListening();
+      
    }
 
    ngOnInit() {
 
    }
 
-   async ngOnDestroy(): Promise<void> {
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
    }
 
    /* #region  crud */

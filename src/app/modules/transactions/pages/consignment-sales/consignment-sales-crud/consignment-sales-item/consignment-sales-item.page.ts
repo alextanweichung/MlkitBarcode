@@ -14,6 +14,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
@@ -365,15 +366,23 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
-   async onDiscCodeChanged(trxLine: TransactionDetail, event: any) {
+   async onDiscCodeChanged(trxLine: TransactionDetail, event: SearchDropdownList) {
       try {
-         let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.detail.value).attribute1
-         if (discPct) {
-            if (discPct === "0") {
-               trxLine.discountExpression = null;
-            } else {
-               trxLine.discountExpression = discPct + "%";
+         if (event) {
+            let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.code)?.attribute1
+            if (discPct) {
+               trxLine.discountGroupCode = event.code;
+               if (discPct === "0") {
+                  trxLine.discountExpression = null;
+               } else {
+                  trxLine.discountExpression = discPct + "%";
+               }
+               trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.objectHeader.trxDate, this.objectService.objectHeader.toLocationId);
+               await this.computeAllAmount(trxLine);
             }
+         } else {
+            trxLine.discountGroupCode = null;
+            trxLine.discountExpression = null;
             trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.objectHeader.trxDate, this.objectService.objectHeader.toLocationId);
             await this.computeAllAmount(trxLine);
          }

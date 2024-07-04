@@ -13,19 +13,21 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
 import { CameraScanInputPageModule } from 'src/app/shared/pages/camera-scan-input/camera-scan-input.module';
 import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-input-offline/item-code-input-offline.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ConsignmentSalesItemPageRoutingModule,
-    BarcodeScanInputPageModule,
-    ItemAddListFlatPageModule,
-    IdMappingModule,
-    ItemCodeInputOfflinePageModule,
-    SumModule
-  ],
-  declarations: [ConsignmentSalesItemPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      ConsignmentSalesItemPageRoutingModule,
+      BarcodeScanInputPageModule,
+      ItemAddListFlatPageModule,
+      IdMappingModule,
+      ItemCodeInputOfflinePageModule,
+      SumModule,
+      SearchDropdownPageModule
+   ],
+   declarations: [ConsignmentSalesItemPage]
 })
-export class ConsignmentSalesItemPageModule {}
+export class ConsignmentSalesItemPageModule { }

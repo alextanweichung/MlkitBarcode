@@ -16,6 +16,7 @@ import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { v4 as uuidv4 } from 'uuid';
+import { StockCountDetailPage } from '../../stock-count-detail/stock-count-detail.page';
 
 @Component({
    selector: 'app-stock-count-item',
@@ -226,7 +227,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
          }
          if (line.qtyRequest === 0) {
-            await this.deleteLine(index);
+            await this.deleteLine(line);
          }
       } catch (e) {
          console.error(e);
@@ -251,9 +252,10 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
-   async deleteLine(index) {
+   async deleteLine(rowData: StockCountDetail) {
       try {
-         if (this.objectService.objectDetail[index]) {
+         let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+         if (index > -1) {
             const alert = await this.alertController.create({
                cssClass: "custom-alert",
                header: "Delete this item?",
@@ -294,8 +296,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       this.barcodescaninput.setFocus();
    }
 
-   async updateBinDesc(rowIndex) {
-      if (this.objectService.objectDetail[rowIndex]) {
+   async updateBinDesc(rowData: StockCountDetail) {
+      let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+      if (index > -1) {
          try {
             const alert = await this.alertController.create({
                cssClass: "custom-alert",
@@ -306,7 +309,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      name: "binDesc",
                      type: "text",
                      placeholder: "Enter Bin Desc.",
-                     value: this.objectService.objectDetail[rowIndex].binDesc,
+                     value: this.objectService.objectDetail[index].binDesc,
                   }
                ],
                buttons: [
@@ -315,7 +318,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      role: "confirm",
                      cssClass: "success",
                      handler: async (data) => {
-                        this.objectService.objectDetail[rowIndex].binDesc = data.binDesc;
+                        this.objectService.objectDetail[index].binDesc = data.binDesc;
                      },
                   },
                   {

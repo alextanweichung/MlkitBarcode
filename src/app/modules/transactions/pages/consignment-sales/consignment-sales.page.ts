@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController, ViewDidEnter, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -18,13 +18,13 @@ import { Keyboard } from '@capacitor/keyboard';
    templateUrl: './consignment-sales.page.html',
    styleUrls: ['./consignment-sales.page.scss'],
 })
-export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter {
+export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, ViewDidLeave {
 
    objects: ConsignmentSalesList[] = [];
 
    uniqueGrouping: Date[] = [];
-	currentPage: number = 1;
-	itemsPerPage: number = 12;
+   currentPage: number = 1;
+   itemsPerPage: number = 12;
 
    constructor(
       private objectService: ConsignmentSalesService,
@@ -40,8 +40,8 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-		this.objects = [];
-		this.filteredObj = [];
+      this.objects = [];
+      this.filteredObj = [];
       try {
          if (!this.objectService.filterStartDate) {
             this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
@@ -66,6 +66,10 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
          }
       }
+   }
+
+   ionViewDidLeave(): void {
+      this.objectService.stopListening();
    }
 
    async ngOnInit() {
@@ -113,7 +117,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
          await this.loadingService.showLoading();
          this.objectService.getObjectListByDate(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
-				this.resetFilteredObj();
+            this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
@@ -163,44 +167,44 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
    /* #region add */
 
-	async onKeyDown(event, searchText) {
-		if (event.keyCode === 13) {
-			await this.search(searchText, true);
-		}
-	}
+   async onKeyDown(event, searchText) {
+      if (event.keyCode === 13) {
+         await this.search(searchText, true);
+      }
+   }
 
-	itemSearchText: string;
-	filteredObj: ConsignmentSalesList[] = [];
-	search(searchText, newSearch: boolean = false) {
-		if (newSearch) {
-			this.filteredObj = [];
-		}
-		this.itemSearchText = searchText;
-		try {
-			if (searchText && searchText.trim().length > 2) {
-				if (Capacitor.getPlatform() !== "web") {
-					Keyboard.hide();
-				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.consignmentSalesNum?.toUpperCase().includes(searchText.toUpperCase()))));
-				this.currentPage = 1;
-			} else {
-				this.resetFilteredObj();
-				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
-			}
-		} catch (e) {
-			console.error(e);
-		}
-	}
+   itemSearchText: string;
+   filteredObj: ConsignmentSalesList[] = [];
+   search(searchText, newSearch: boolean = false) {
+      if (newSearch) {
+         this.filteredObj = [];
+      }
+      this.itemSearchText = searchText;
+      try {
+         if (searchText && searchText.trim().length > 2) {
+            if (Capacitor.getPlatform() !== "web") {
+               Keyboard.hide();
+            }
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.consignmentSalesNum?.toUpperCase().includes(searchText.toUpperCase()))));
+            this.currentPage = 1;
+         } else {
+            this.resetFilteredObj();
+            this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
 
-	resetFilteredObj() {
-		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
-	}
+   resetFilteredObj() {
+      this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+   }
 
-	highlight(event) {
-		event.getInputElement().then(r => {
-			r.select();
-		})
-	}
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
 
    // Select action
 

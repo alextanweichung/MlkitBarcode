@@ -28,9 +28,15 @@
                                  <span class="badge-green ion-text-wrap ion-flex my-auto" style="font-size: small; padding: 0 0.2rem;">{{rowData2.trxDate|date:"dd/MM/yy"}}</span>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto justify-content-end font-bold">
-                                 <div *ngIf="!limitCol" class="mr-2">{{rowData2.currency}}</div>
-                                 <div *ngIf="limitCol">{{rowData2.amount|number:"1.2-2"}}</div>
                                  <div *ngIf="limitCol">{{rowData2.docNum}}</div>
+                              </ion-col>
+                           </ion-row>
+                           <ion-row *ngIf="rowData2.currency || rowData2.amount">
+                              <ion-col class="ion-flex ion-margin-auto">
+                                 <div *ngIf="!limitCol" class="mr-2">{{rowData2.currency}}</div>
+                              </ion-col>
+                              <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                 <div *ngIf="limitCol">{{rowData2.amount|number:"1.2-2"}}</div>
                               </ion-col>
                            </ion-row>
                            <ion-row *ngIf="!limitCol">

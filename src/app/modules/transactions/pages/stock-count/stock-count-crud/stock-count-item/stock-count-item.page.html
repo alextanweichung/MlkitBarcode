@@ -132,10 +132,10 @@
                </ion-grid>
             </ion-item>
             <ion-item-options>
-               <ion-item-option color="success" (click)="slidingItem.close(); updateBinDesc(rowIndex)" *ngIf="objectService.configInvCountActivateLineWithBin">
+               <ion-item-option color="success" (click)="slidingItem.close(); updateBinDesc(rowData)" *ngIf="objectService.configInvCountActivateLineWithBin">
                   <ion-icon slot="top" name="create-outline"></ion-icon>Bin
                </ion-item-option>
-               <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(rowIndex)">
+               <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(rowData)">
                   <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
                </ion-item-option>
             </ion-item-options>

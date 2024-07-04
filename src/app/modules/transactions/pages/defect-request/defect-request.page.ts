@@ -38,6 +38,10 @@ export class DefectRequestPage implements OnInit, ViewWillEnter, ViewDidEnter, V
    ) {
    }
 
+   ngOnDestroy(): void {
+      this.objectService.stopListening();
+   }
+
    async ionViewWillEnter(): Promise<void> {
       try {
          if (!this.objectService.filterStartDate) {
@@ -58,7 +62,7 @@ export class DefectRequestPage implements OnInit, ViewWillEnter, ViewDidEnter, V
       
    }
 
-   ionViewDidLeave(): void {
+   async ionViewDidLeave(): Promise<void> {
       
    }
 

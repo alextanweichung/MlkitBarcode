@@ -7,7 +7,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
-import { LineAssembly, TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { ItemListMultiUom, LineAssembly, TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { CurrentPickList, MultiPickingCarton, MultiPickingObject, MultiPickingRoot, PickingLineVariation, SalesOrderLineForWD } from 'src/app/modules/transactions/models/picking';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
@@ -64,6 +64,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    pickPackAllowCopyCode: boolean = false;
    mobilePickPackAutoFocusQtyUponScan: boolean = false;
    configMobileScanItemContinuous: boolean = false;
+   configSystemWideActivateMultiUOM: boolean = false;
+   configMultiPackAutoTransformLooseUom: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -108,6 +110,34 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          } else {
             this.configMobileScanItemContinuous = false;
          }
+
+         let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;
+         if (activateMultiUom && activateMultiUom.toUpperCase() === "Y") {
+            this.configSystemWideActivateMultiUOM = true;
+         } else {
+            this.configSystemWideActivateMultiUOM = false;
+         }
+         let transformUom = this.moduleControl.find(x => x.ctrlName === "MultiPackAutoTransformLooseUom")?.ctrlValue;
+         if (transformUom && transformUom.toUpperCase() === "Y") {
+            this.configMultiPackAutoTransformLooseUom = true;
+         } else {
+            this.configMultiPackAutoTransformLooseUom = false;
+         }
+         if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+            this.loadItemListMultiUom();
+         }
+      })
+   }
+
+   itemListMultiUom: ItemListMultiUom[] = [];
+   loadItemListMultiUom() {
+      this.objectService.getItemListMultiUom().subscribe({
+         next: (response) => {
+            this.itemListMultiUom = response;
+         },
+         error: (error) => {
+            console.error(error);
+         }
       })
    }
 
@@ -143,21 +173,121 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                         this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                      }
                   } else {
-                     let operationSuccess = this.runAssemblyPickingEngine(itemFound, inputQty, findAssemblyItem);
-                     if (!operationSuccess) {
-                        this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                     let reinsertLine: boolean = false;
+                     if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+                        reinsertLine = this.transformItemScannedUom(itemFound, inputQty);
+                     }
+                     if (!reinsertLine) {
+                        let operationSuccess = this.runAssemblyPickingEngine(itemFound, inputQty, findAssemblyItem);
+                        if (!operationSuccess) {
+                           this.toastService.presentToast("Control Validation", "Input quantity exceeded SO quantity.", "top", "warning", 1000);
+                        }
                      }
                   }
                   break;
             }
          } else {
-            let operationSuccess = this.runAssemblyPickingEngine(itemFound, inputQty, findAssemblyItem);
-            if (!operationSuccess) {
-               this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+            let reinsertLine: boolean = false;
+            if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+               reinsertLine = this.transformItemScannedUom(itemFound, inputQty);
+            }
+            if (!reinsertLine) {
+               let operationSuccess = this.runAssemblyPickingEngine(itemFound, inputQty, findAssemblyItem);
+               if (!operationSuccess) {
+                  this.toastService.presentToast("Control Validation", "Item is not available in the selected Sales Order.", "top", "warning", 1000);
+               }
             }
          }
       } else {
          this.toastService.presentToast("Control Validation", "Invalid Item Barcode", "top", "warning", 1000);
+      }
+   }
+
+   transformItemScannedUom(itemFound: TransactionDetail, inputQty: number) {
+      //Check whether item has multi UOM
+      let findItem = this.itemListMultiUom.find(x => x.itemId == itemFound.itemId);
+      if (findItem) {
+         //Look for scanned item UOM ratio
+         let currentItemUom = findItem.multiUom.find(x => x.itemUomId == itemFound.itemUomId);
+         if (currentItemUom) {
+            //Filter for scanned item other UOM ratio which is lower than current
+            let otherItemUom = findItem.multiUom.filter(x => x.itemUomId != itemFound.itemUomId && x.ratio < currentItemUom.ratio);
+            otherItemUom.sort((a, b) => (a.ratio > b.ratio) ? 1 : -1);
+            if (otherItemUom.length > 0) {
+               let findOsLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == itemFound.itemId);
+               if (findOsLines.length > 0) {
+                  for (let uom of otherItemUom) {
+                     let transformQty = inputQty * currentItemUom.ratio / uom.ratio;
+                     if (Number.isInteger(transformQty)) {
+                        //To futher enhance this part
+                        //Checking on multiple lines and consolidate the qty
+                        let findOsLinesWithQty = findOsLines.filter(x => (x.qtyRequest - x.qtyPicked - x.qtyCurrent) >= transformQty);
+                        if (findOsLinesWithQty.length > 0) {
+                           itemFound.itemBarcode = currentItemUom.itemSku;
+                           itemFound.itemSku = uom.itemSku;
+                           itemFound.itemUomId = uom.itemUomId;
+                           this.runPickingEngine(itemFound, transformQty);
+                           return true;
+                        }
+                     } else {
+                        return false;
+                     }
+                  }
+               } else {
+                  return false;
+               }
+            } else {
+               return false;
+            }
+         } else {
+            return false;
+         }
+      } else {
+         return false;
+      }
+   }
+
+   transformAssemblyItemScannedUom(itemFound: TransactionDetail, inputQty: number, findAssemblyItem: SalesOrderLineForWD[], outstandingLines: SalesOrderLineForWD[]) {
+      //Check whether item has multi UOM
+      let findItem = this.itemListMultiUom.find(x => x.itemId == itemFound.itemId);
+      if (findItem) {
+         //Look for scanned item UOM ratio
+         let currentItemUom = findItem.multiUom.find(x => x.itemUomId == itemFound.itemUomId);
+         if (currentItemUom) {
+            //Filter for scanned item other UOM ratio which is lower than current
+            let otherItemUom = findItem.multiUom.filter(x => x.itemUomId != itemFound.itemUomId && x.ratio < currentItemUom.ratio);
+            otherItemUom.sort((a, b) => (a.ratio > b.ratio) ? 1 : -1);
+            if (otherItemUom.length > 0) {
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId);
+               if (outstandingLines.length > 0) {
+                  for (let uom of otherItemUom) {
+                     let transformQty = inputQty * currentItemUom.ratio / uom.ratio;
+                     if (Number.isInteger(transformQty)) {
+                        //To futher enhance this part
+                        //Checking on multiple lines and consolidate the qty
+                        let findOsLinesWithQty = assemblyOutstandingLines.filter(x => (x.qtyRequest - x.qtyPicked - x.qtyCurrent) >= transformQty);
+                        if (findOsLinesWithQty.length > 0) {
+                           itemFound.itemBarcode = currentItemUom.itemSku;
+                           itemFound.itemSku = uom.itemSku;
+                           itemFound.itemUomId = uom.itemUomId;
+                           this.runAssemblyPickingEngine(itemFound, transformQty, findAssemblyItem);
+                           return true;
+                        }
+                     } else {
+                        return false;
+                     }
+                  }
+               } else {
+                  return false;
+               }
+            } else {
+               return false;
+            }
+         } else {
+            return false;
+         }
+      } else {
+         return false;
       }
    }
 
@@ -170,8 +300,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             findComponentItem = item.assembly.find(x => x.itemComponentId === itemFound.itemId);
             if (findComponentItem) {
                let mainItemFound = this.objectService.multiPickingObject.outstandingPickList.find(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-               let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);
-               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId === itemFound.itemId);
+               let outstandingLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId === findComponentItem.assemblyItemId && x.isComponentScan && x.assembly && x.assembly.length > 0);               
+               let assemblyOutstandingLines = outstandingLines.flatMap(x => x.assembly).filter(y => y.itemComponentId == itemFound.itemId && y.itemUomId == itemFound.itemUomId);
                if (outstandingLines.length > 0) {
                   let osTotalQtyRequest = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyRequest ?? 0), 0);
                   let osTotalQtyPicked = assemblyOutstandingLines.reduce((sum, current) => sum + (current.qtyPicked ?? 0), 0);
@@ -195,7 +325,11 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                               this.toastService.presentToast("Complete Notification", "Scanning for selected SO is completed.", "top", "success", 1000);
                            }
                         } else {
-                           componentOperationSuccess = false;
+                           if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
+                              componentOperationSuccess = this.transformAssemblyItemScannedUom(itemFound, inputQty, findAssemblyItem, outstandingLines);
+                           } else {
+                              componentOperationSuccess = false;
+                           }
                         }
                         break;
                   }
@@ -727,7 +861,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                         if (this.mobilePickPackAutoFocusQtyUponScan) {
                            await this.cartonLineQtyInput().then(async res => {
                               await this.insertPickingLineWithoutSo(r, Number(res));
-                           }) 
+                           })
                         } else {
                            await this.insertPickingLineWithoutSo(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
                         }
@@ -778,7 +912,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          await alert.present().then(() => {
             const firstInput: any = document.querySelector("ion-alert input");
             setTimeout(() => {
-               firstInput.focus();               
+               firstInput.focus();
             }, 1000);
             return;
          });

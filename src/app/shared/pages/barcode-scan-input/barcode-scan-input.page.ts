@@ -62,6 +62,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    configSystemWideActivateMultiUOM: boolean = false;
    configItemVariationShowMatrix: boolean = false;
+   configItemVariationMatrixShowCodeDesc: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -88,6 +89,13 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             this.configItemVariationShowMatrix = true;
          } else {
             this.configItemVariationShowMatrix = false;
+         }
+
+         let itemVariationMatrixShowCodeDesc = this.moduleControl.find(x => x.ctrlName === "ItemVariationMatrixShowCodeDesc");
+         if (itemVariationMatrixShowCodeDesc && itemVariationMatrixShowCodeDesc.ctrlValue.toUpperCase() === "Y") {
+            this.configItemVariationMatrixShowCodeDesc = true
+         } else {
+            this.configItemVariationMatrixShowCodeDesc = false;
          }
 
          let activateMultiUom = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateMultiUOM")?.ctrlValue;

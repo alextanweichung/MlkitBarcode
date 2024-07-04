@@ -7,7 +7,7 @@ import { MultiPickingHeader, MultiPickingList, MultiPickingObject, MultiPickingR
 import { background_load } from 'src/app/core/interceptors/error-handler.interceptor';
 import { ItemImage } from '../models/item';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
-import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { ItemListMultiUom, TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
@@ -351,7 +351,10 @@ export class PickingService {
    //   return this.http.post(this.configService.selected_sys_param.apiUrl + "MobilePicking", object, httpObserveHeader);
    // }
 
-
+   getItemListMultiUom() {
+      return this.http.get<ItemListMultiUom[]>(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/item/itemListMultiUom", { context: background_load() });
+   }
+   
    // for web testing 
    validateBarcode(barcode: string) {
       return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileMultiPicking/itemByBarcode/" + barcode);

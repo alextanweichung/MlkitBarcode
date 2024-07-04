@@ -8,6 +8,7 @@ import { ItemCatalogPageRoutingModule } from './item-catalog-routing.module';
 
 import { ItemCatalogPage } from './item-catalog.page';
 import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
+import { PinchZoomModule } from 'ngx-pinch-zoom';
 
 @NgModule({
    imports: [
@@ -15,7 +16,8 @@ import { IdMappingModule } from '../../pipes/id-mapping/id-mapping.module';
       FormsModule,
       IonicModule,
       ItemCatalogPageRoutingModule,
-      IdMappingModule
+      IdMappingModule,
+      PinchZoomModule
    ],
    exports: [
       ItemCatalogPage

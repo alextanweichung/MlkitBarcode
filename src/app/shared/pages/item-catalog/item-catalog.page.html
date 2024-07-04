@@ -16,8 +16,11 @@
                                        {{rowData?.itemPricing?.discountGroupCode}} [{{rowData?.itemPricing?.discountExpression}}]
                                     </div>
                                  </ion-badge>
-                                 <ion-img style="height:120px" [src]="matchImage(rowData.itemId)"></ion-img>
-                                 </ion-col>
+                                 <div class="image-container" (click)="showZoomedImage(rowData.itemId)">
+                                    <!-- <ion-img style="height:120px" [src]="matchImage(rowData.itemId)"></ion-img> -->
+                                     <img [src]="matchImage(rowData.itemId)" alt="" class="image">
+                                 </div>
+                              </ion-col>
                            </ion-row>
                         </ng-container>
                         <ion-row>
@@ -172,6 +175,14 @@
 <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)" threshold="30%">
    <ion-infinite-scroll-content></ion-infinite-scroll-content>
 </ion-infinite-scroll>
+
+<!-- Zoomed image overlay -->
+<div *ngIf="showZoom && selectedImageSrc" class="zoomed-image">
+   <span class="close-btn" (click)="hideZoomedImage()">&times;</span>
+   <pinch-zoom>      
+      <img [src]="selectedImageSrc" alt="Zoomed Image" class="zoomed-img">
+   </pinch-zoom>
+</div>
 
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
    <ng-template>

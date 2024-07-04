@@ -22,6 +22,8 @@ const httpObserveHeader = {
 })
 export class PackingService {
 
+   trxKey: string = "multiPacking";
+
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
