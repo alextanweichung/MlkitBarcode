@@ -6,7 +6,6 @@
       </ion-buttons>
       <ion-buttons slot="primary">
          <ion-button (click)="showPopover($event)"><ion-icon slot="icon-only" name="menu-outline"></ion-icon></ion-button>
-         <!-- <ion-button (click)="showExtraInfo()"><ion-icon slot="start" name="menu-outline"></ion-icon></ion-button> -->
       </ion-buttons>
    </ion-toolbar>
 </ion-header>
@@ -17,14 +16,16 @@
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
             <ion-item (click)="popover.dismiss(); showExtraInfo()">
                <i slot="end" class="fas fa-truck-fast"></i>
-               <!-- <ion-icon slot="end" name="airplane-outline"></ion-icon> -->
                <ion-label>
                   <div>Shipping Info</div>
                </ion-label>
             </ion-item>
+            <ion-item (click)="popover.dismiss(); showTrxAttr()">
+               <ion-label>
+                  <div>Trx. Attr.</div>
+               </ion-label>
+            </ion-item>
             <ion-item (click)="popover.dismiss();">
-               <!-- <i slot="end" class="fas fa-dollar-sign"></i> -->
-               <!-- <ion-icon slot="end" name="airplane-outline"></ion-icon> -->
                <ion-label>
                   <div>Show Other Amt.</div>
                </ion-label>
@@ -264,6 +265,28 @@
                   <ion-label position="stacked">Attention</ion-label>
                   <ion-input [(ngModel)]="objectService.objectHeader.attention" placeholder="Enter Attention"></ion-input>
                </ion-item>
+            </ion-list>
+         </div>
+      </ion-content>
+   </ng-template>
+</ion-modal>
+
+<ion-modal [isOpen]="trxAttrModal" (didDismiss)="trxAttrModal = false">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>Trx. Attr.</ion-title>
+            <ion-buttons slot="start">
+               <ion-button (click)="hideExtraInfo()">Done</ion-button>
+            </ion-buttons>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content>
+         <div class="p-2">
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <app-search-dropdown #udoption1 title="{{'salesOrderUDOption1' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [searchDropdownList]="objectService.udOption1List" (onActionComplete)="onUdOption1Changed($event)"></app-search-dropdown>
+               <app-search-dropdown #udoption2 title="{{'salesOrderUDOption2' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [searchDropdownList]="objectService.udOption2List" (onActionComplete)="onUdOption2Changed($event)"></app-search-dropdown>
+               <app-search-dropdown #udoption3 title="{{'salesOrderUDOption3' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [searchDropdownList]="objectService.udOption3List" (onActionComplete)="onUdOption3Changed($event)"></app-search-dropdown>
             </ion-list>
          </div>
       </ion-content>

@@ -12,6 +12,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
 import { SalesCartPageModule } from 'src/app/shared/pages/sales-cart/sales-cart.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { UserDefinedCaptionModule } from 'src/app/shared/pipes/user-defined-caption/user-defined-caption.module';
 
 @NgModule({
    imports: [
@@ -23,7 +25,9 @@ import { SalesCartPageModule } from 'src/app/shared/pages/sales-cart/sales-cart.
       SumModule,
       OfflineItemIdMappingModule,
       OfflineItemIdDescMappingModule,
-      SalesCartPageModule
+      SalesCartPageModule,
+      SearchDropdownPageModule,
+      UserDefinedCaptionModule
    ],
    declarations: [SalesOrderCartPage]
 })

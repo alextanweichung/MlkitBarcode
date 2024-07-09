@@ -167,6 +167,31 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
 
    /* #endregion */
 
+   /* #region transaction attributes */
+
+   trxAttrModal: boolean = false;
+   showTrxAttr() {
+      this.trxAttrModal = true;
+   }
+
+   hideTrxAttr() {
+      this.trxAttrModal = false;
+   }
+
+   onUdOption1Changed(event: SearchDropdownList) {
+
+   }
+
+   onUdOption2Changed(event: SearchDropdownList) {
+      
+   }
+
+   onUdOption3Changed(event: SearchDropdownList) {
+      
+   }
+
+   /* #endregion */
+
    /* #region  step */
 
    previousStep() {
@@ -455,7 +480,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
    /* #endregion */
 
    /* #region  misc */
-   
+
    checkPricingApprovalLines(trxDto: SalesOrderRoot, trxLineArray: TransactionDetail[]) {
       if (trxDto.header.businessModelType === "R" || trxDto.header.businessModelType === "C") {
          trxDto.header.isPricingApproval = false;

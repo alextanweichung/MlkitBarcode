@@ -68,6 +68,11 @@ export class SalesOrderService {
    remarkMasterList: MasterListDetails[] = [];
    variationRatioList: VariationRatio[] = [];
 
+   userDefinedList: MasterList[] = [];
+   udOption1List: MasterListDetails[] = [];
+   udOption2List: MasterListDetails[] = [];
+   udOption3List: MasterListDetails[] = [];
+
    salesTypeList: MasterListDetails[] = [];
    docStatusList: MasterListDetails[] = [];
    orderLifeCycleMasterList: MasterListDetails[] = [];
@@ -95,6 +100,7 @@ export class SalesOrderService {
          await this.loadingService.showLoading();
          await this.loadCustomer();
          await this.loadMasterList();
+         await this.loadUserDefinedList();
          await this.loadStaticLovList();
          await this.loadModuleControl();
          await this.loadPromotion();
@@ -133,6 +139,19 @@ export class SalesOrderService {
          }
       })
       await this.bindSalesAgentList();
+   }
+
+   loadUserDefinedList() {
+      this.getUserDefinedList().subscribe(response => {
+         this.userDefinedList = response.flatMap(src => src);
+         console.log("🚀 ~ SalesOrderService ~ this.getUserDefinedList ~ this.userDefinedList:", this.userDefinedList)
+         this.udOption1List = response.filter(x => x.objectName.toUpperCase() === "SALESORDERUDOPTION1" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+         console.log("🚀 ~ SalesOrderService ~ this.getUserDefinedList ~ this.udOption1List:", this.udOption1List)
+         this.udOption2List = response.filter(x => x.objectName.toUpperCase() === "SALESORDERUDOPTION2" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.udOption3List = response.filter(x => x.objectName.toUpperCase() === "SALESORDERUDOPTION3" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+      }, error => {
+         console.log(error);
+      })
    }
 
    async loadStaticLovList() {
@@ -265,7 +284,7 @@ export class SalesOrderService {
             }
 
             let priceApproval = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalIgnoreACL");
-            if (priceApproval && priceApproval.ctrlValue.toUpperCase() == 'Y') {
+            if (priceApproval && priceApproval.ctrlValue.toUpperCase() === 'Y') {
                this.orderingPriceApprovalIgnoreACL = true;
             }
 
@@ -376,6 +395,14 @@ export class SalesOrderService {
 
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/masterlist", { context: background_load() }).toPromise();
+   }
+
+   getUserDefinedList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileSalesOrder/udlist").pipe(
+         map((response: any) =>
+            response.map((item: any) => item)
+         )
+      );
    }
 
    getStaticLovList() {
