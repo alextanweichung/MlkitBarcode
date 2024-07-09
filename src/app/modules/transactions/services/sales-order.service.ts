@@ -144,9 +144,7 @@ export class SalesOrderService {
    loadUserDefinedList() {
       this.getUserDefinedList().subscribe(response => {
          this.userDefinedList = response.flatMap(src => src);
-         console.log("🚀 ~ SalesOrderService ~ this.getUserDefinedList ~ this.userDefinedList:", this.userDefinedList)
          this.udOption1List = response.filter(x => x.objectName.toUpperCase() === "SALESORDERUDOPTION1" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
-         console.log("🚀 ~ SalesOrderService ~ this.getUserDefinedList ~ this.udOption1List:", this.udOption1List)
          this.udOption2List = response.filter(x => x.objectName.toUpperCase() === "SALESORDERUDOPTION2" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
          this.udOption3List = response.filter(x => x.objectName.toUpperCase() === "SALESORDERUDOPTION3" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
       }, error => {

@@ -277,16 +277,16 @@
          <ion-toolbar>
             <ion-title>Trx. Attr.</ion-title>
             <ion-buttons slot="start">
-               <ion-button (click)="hideExtraInfo()">Done</ion-button>
+               <ion-button (click)="hideTrxAttr()">Done</ion-button>
             </ion-buttons>
          </ion-toolbar>
       </ion-header>
       <ion-content>
          <div class="p-2">
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <app-search-dropdown #udoption1 title="{{'salesOrderUDOption1' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [searchDropdownList]="objectService.udOption1List" (onActionComplete)="onUdOption1Changed($event)"></app-search-dropdown>
-               <app-search-dropdown #udoption2 title="{{'salesOrderUDOption2' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [searchDropdownList]="objectService.udOption2List" (onActionComplete)="onUdOption2Changed($event)"></app-search-dropdown>
-               <app-search-dropdown #udoption3 title="{{'salesOrderUDOption3' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [searchDropdownList]="objectService.udOption3List" (onActionComplete)="onUdOption3Changed($event)"></app-search-dropdown>
+               <app-search-dropdown #udoption1 title="{{'salesOrderUDOption1' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [selectedId]="objectService.objectHeader.salesOrderUDOption1" [searchDropdownList]="objectService.udOption1List" (onActionComplete)="onUdOption1Changed($event)"></app-search-dropdown>
+               <app-search-dropdown #udoption2 title="{{'salesOrderUDOption2' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [selectedId]="objectService.objectHeader.salesOrderUDOption2" [searchDropdownList]="objectService.udOption2List" (onActionComplete)="onUdOption2Changed($event)"></app-search-dropdown>
+               <app-search-dropdown #udoption3 title="{{'salesOrderUDOption3' | userDefinedCaption:objectService.userDefinedList}}" optionLabel="description" [selectedId]="objectService.objectHeader.salesOrderUDOption3" [searchDropdownList]="objectService.udOption3List" (onActionComplete)="onUdOption3Changed($event)"></app-search-dropdown>
             </ion-list>
          </div>
       </ion-content>

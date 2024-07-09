@@ -14,6 +14,7 @@ import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { SalesItemRequest } from 'src/app/shared/models/sales-item-request';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
+import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { GeneralTransactionService } from 'src/app/shared/services/general-transaction.service';
 import { PromotionEngineService } from 'src/app/shared/services/promotion-engine.service';
@@ -178,16 +179,34 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       this.trxAttrModal = false;
    }
 
+   @ViewChild("udoption1", { static: false }) udoption1: SearchDropdownPage;
    onUdOption1Changed(event: SearchDropdownList) {
-
+      if (event) {
+         this.objectService.objectHeader.salesOrderUDOption1 = event.id;
+      } else {
+         this.objectService.objectHeader.salesOrderUDOption1 = null;
+      }
+      this.udoption1.manuallyTrigger();
    }
 
+   @ViewChild("udoption2", { static: false }) udoption2: SearchDropdownPage;
    onUdOption2Changed(event: SearchDropdownList) {
-      
+      if (event) {
+         this.objectService.objectHeader.salesOrderUDOption2 = event.id;
+      } else {
+         this.objectService.objectHeader.salesOrderUDOption2 = null;
+      }
+      this.udoption2.manuallyTrigger();
    }
 
+   @ViewChild("udoption3", { static: false }) udoption3: SearchDropdownPage;
    onUdOption3Changed(event: SearchDropdownList) {
-      
+      if (event) {
+         this.objectService.objectHeader.salesOrderUDOption3 = event.id;
+      } else {
+         this.objectService.objectHeader.salesOrderUDOption3 = null;
+      }      
+      this.udoption3.manuallyTrigger();
    }
 
    /* #endregion */

@@ -217,9 +217,9 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                await this.loadingService.dismissLoading();
                this.toastService.presentToast("Search Complete", `${this.availableItem.length} item(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
             })
-            // if (Capacitor.getPlatform() !== "web") {
+            if (Capacitor.getPlatform() !== "web") {
                await this.loadImages(this.itemSearchText); // todo : to handle load image based on availableItem
-            // }
+            }
          } else {
             await this.loadingService.dismissLoading()
             this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
