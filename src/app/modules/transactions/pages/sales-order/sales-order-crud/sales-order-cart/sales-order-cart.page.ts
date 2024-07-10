@@ -205,7 +205,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
          this.objectService.objectHeader.salesOrderUDOption3 = event.id;
       } else {
          this.objectService.objectHeader.salesOrderUDOption3 = null;
-      }      
+      }
       this.udoption3.manuallyTrigger();
    }
 
@@ -225,8 +225,8 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       try {
          this.submit_attempt = true;
          if (this.objectService.objectDetail.length > 0) {
-            await this.validateMinOrderQty();
-            if (this.objectService.objectDetail.filter(r => r.minOrderQtyError).length === 0) {
+            await this.validateMinOrderQty();            
+            if (await this.validateMinOrderAmt() && this.objectService.objectDetail.filter(r => r.minOrderQtyError).length === 0) {
                const alert = await this.alertController.create({
                   header: "Are you sure to proceed?",
                   subHeader: (this.objectService.draftObject && this.objectService.draftObject.draftTransactionId > 0) ? "This will delete Draft & Generate SO" : "",
@@ -577,6 +577,27 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             })
          }
       }
+   }
+
+   validateMinOrderAmt() {
+      return new Promise((resolve, reject) => {
+         if (this.objectService.soMinOrderAmount !== 0) {
+            let totalAmt = this.objectService.objectDetail.reduce((sum, current) => sum + current.subTotalExTax, 0);
+            if (!this.objectService.objectHeader.isHomeCurrency) {
+               totalAmt = totalAmt * this.objectService.objectHeader.currencyRate;
+            }
+            totalAmt = this.commonService.decimalJsRoundTwo(totalAmt);
+            console.log("🚀 ~ SalesOrderCartPage ~ ret ~ totalAmt:", totalAmt)
+            if (totalAmt < this.objectService.soMinOrderAmount) {
+               this.toastService.presentToast("Control Validation", `Min ordering amount is ${this.objectService.soMinOrderAmount}. Please add more items.`, "top", "warning", 1000);
+               reject(false);
+            } else {
+               resolve(true);
+            }
+         } else {
+            resolve(true);
+         }
+      })
    }
 
    /* #endregion */

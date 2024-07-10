@@ -389,6 +389,21 @@ export class CommonService {
       }
    }
 
+   decimalJsRoundTwo(inputNumber: number) {
+      let amount: Decimal = new Decimal(inputNumber ? inputNumber : 0);
+      return amount.toDecimalPlaces(2).toNumber();
+   }
+
+   decimalJsRoundInt(inputNumber: number) {
+      let amount: Decimal = new Decimal(inputNumber ? inputNumber : 0);
+      return amount.toDecimalPlaces(0).toNumber();
+   }
+
+   decimalJsRoundPrecision(inputNumber: number, precision: number) {
+      let amount: Decimal = new Decimal(inputNumber ? inputNumber : 0);
+      return amount.toDecimalPlaces(precision).toNumber();
+   }
+
    computeDiscTaxAmount(trxLine: any, useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number) {
       try {
          let totalDiscAmt: Decimal = new Decimal(0);

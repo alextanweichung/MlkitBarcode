@@ -211,6 +211,7 @@ export class SalesOrderService {
    salesActivateTradingMargin: boolean = false;
    configSalesTransactionShowHistory: boolean = false;
    orderingPriceApprovalIgnoreACL: boolean = false;
+   soMinOrderAmount: number = 0;
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -284,6 +285,11 @@ export class SalesOrderService {
             let priceApproval = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalIgnoreACL");
             if (priceApproval && priceApproval.ctrlValue.toUpperCase() === 'Y') {
                this.orderingPriceApprovalIgnoreACL = true;
+            }
+
+            let minOrderAmt = this.moduleControl.find(x => x.ctrlName === "SOMinOrderAmount");
+            if (minOrderAmt && minOrderAmt.ctrlValue !== "0") {
+              this.soMinOrderAmount = parseFloat(minOrderAmt.ctrlValue);
             }
 
          })
