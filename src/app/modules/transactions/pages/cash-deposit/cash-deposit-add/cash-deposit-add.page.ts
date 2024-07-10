@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource, GalleryPhoto, GalleryPhotos, Photo } from '@capacitor/camera';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileInfo } from '@capacitor/filesystem/dist/esm/definitions';
 import { ActionSheetController, AlertController, IonPopover, NavController, Platform } from '@ionic/angular';
@@ -191,25 +191,79 @@ export class CashDepositAddPage implements OnInit {
 
    images: LocalFile[] = [];
 
-   async selectImage() {
+   // Select Image action
+   async imageAction() {
       try {
-         const image = await Camera.getPhoto({
-            quality: 50,
-            allowEditing: false,
-            resultType: CameraResultType.Uri,
-            source: CameraSource.Prompt, // Camera, Photos or Prompt!
+         const actionSheet = await this.actionSheetController.create({
+            header: "Choose an action",
+            cssClass: "custom-action-sheet",
+            buttons: [
+               {
+                  text: "Select Multiple Images",
+                  icon: "image-outline",
+                  handler: async () => {
+                     await this.selectImage(1);
+                  }
+               },
+               {
+                  text: "Snap Picture",
+                  icon: "camera-outline",
+                  handler: async () => {
+                     await this.selectImage(2);
+                  }
+               },
+               {
+                  text: "Cancel",
+                  icon: "close",
+                  role: "cancel"
+               }]
          });
-
-         if (image) {
-            this.saveImage(image);
-         }
+         await actionSheet.present();
       } catch (e) {
          console.error(e);
       }
    }
 
+   async selectImage(type: number) {
+      if(type == 1) {
+         try {
+            const images: GalleryPhotos = await Camera.pickImages({
+               quality: 50,
+            });
+
+            if (images && images.photos.length> 0) {
+               for await (let image of images.photos) {
+                  await this.saveImage(image);
+               }
+
+               // Reload the file list
+               // Improve by only loading for the new image and unshifting array!
+               await this.loadFiles();
+            }
+         } catch (e) {
+            console.error(e);
+         }
+      }
+      if(type == 2){
+         const image = await Camera.getPhoto({
+            quality: 50,
+            allowEditing: false,
+            resultType: CameraResultType.Uri,
+            source: CameraSource.Camera, // Camera, Photos or Prompt!
+         });
+
+         if (image) {
+            await this.saveImage(image);
+
+            // Reload the file list
+            // Improve by only loading for the new image and unshifting array!
+            await this.loadFiles();
+         }
+      }
+   }
+
    // Create a new file from a capture image
-   async saveImage(photo: Photo) {
+   async saveImage(photo: Photo | GalleryPhoto) {
       try {
          const base64Data = await this.readAsBase64(photo);
 
@@ -220,10 +274,6 @@ export class CashDepositAddPage implements OnInit {
             directory: Directory.Data,
             recursive: true
          });
-
-         // Reload the file list
-         // Improve by only loading for the new image and unshifting array!
-         this.loadFiles();
       } catch (e) {
          console.error(e);
       }
@@ -296,7 +346,7 @@ export class CashDepositAddPage implements OnInit {
    }
 
    // https://ionicframework.com/docs/angular/your-first-app/3-saving-photos
-   private async readAsBase64(photo: Photo) {
+   private async readAsBase64(photo: Photo | GalleryPhoto) {
       try {
          if (this.plt.is("hybrid")) {
             const file = await Filesystem.readFile({
@@ -339,6 +389,31 @@ export class CashDepositAddPage implements OnInit {
             console.log(error);
          })
          // this.uploadData(formData, objectId, fileId);
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async deleteAction(file: LocalFile) {
+      try {
+         const actionSheet = await this.actionSheetController.create({
+            header: "Choose an action",
+            cssClass: "custom-action-sheet",
+            buttons: [
+               {
+                  text: "Confirm",
+                  icon: "checkmark",
+                  handler: async () => {
+                     await this.deleteImage(file);
+                  }
+               },
+               {
+                  text: "Cancel",
+                  icon: "close",
+                  role: "cancel"
+               }]
+         });
+         await actionSheet.present();
       } catch (e) {
          console.error(e);
       }
