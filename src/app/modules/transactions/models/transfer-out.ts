@@ -18,9 +18,11 @@ export interface TransferOutRoot {
    createdBy?: string
    createById?: number
    createdAt?: Date
- }
- 
- export interface TransferOutLine {
+   handleBy?: string
+   totalBag?: number
+}
+
+export interface TransferOutLine {
    id: number
    uuid: string
    transferOutId: number
@@ -46,10 +48,10 @@ export interface TransferOutRoot {
 
    // for local use
    qtyRequest?: number
-   unitPriceExTax?: number   
- }
- 
- export interface TransferOutList {
+   unitPriceExTax?: number
+}
+
+export interface TransferOutList {
    transferOutId: number
    transferOutNum: string
    trxDate: string
@@ -60,5 +62,4 @@ export interface TransferOutRoot {
    toLocationDesc: string
    isCompleted: boolean
    deactivated: boolean
- }
- 
+}

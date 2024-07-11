@@ -34,15 +34,23 @@
             <app-search-dropdown title="To Location" [masterDropdownList]="objectService.fullLocationMasterList" [selectedId]="objectForm.controls.toLocationId?.value" (onActionComplete)="onToLocationChanged($event)" [disabled]="objectService.objectHeader?.transferOutId > 0"></app-search-dropdown>
             <ion-item>
                <ion-label position="stacked" class="font-bold">Remark</ion-label>
-               <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Remark" formControlName="remark"></ion-textarea>
+               <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="next" placeholder="Remark" formControlName="remark"></ion-textarea>
             </ion-item>
             <ion-item>
                <ion-label position="stacked" class="font-bold">Total Carton</ion-label>
-               <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Enter Total Carton" formControlName="totalCarton"></ion-input>
+               <ion-input inputmode="numeric" type="number" enterkeyhint="next" placeholder="Total Carton" formControlName="totalCarton"></ion-input>
             </ion-item>
             <ion-item>
                <ion-label position="stacked" class="font-bold">GRN Num.</ion-label>
-               <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter GRN Num" formControlName="grnNum"></ion-input>
+               <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="GRN Num" formControlName="grnNum"></ion-input>
+            </ion-item>
+            <ion-item>
+               <ion-label position="stacked" class="font-bold">Handle By</ion-label>
+               <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Handle By" formControlName="handleBy"></ion-input>
+            </ion-item>
+            <ion-item>
+               <ion-label position="stacked" class="font-bold">Total Bag</ion-label>
+               <ion-input inputmode="numeric" type="text" enterkeyhint="next" placeholder="Total Bag" formControlName="totalBag"></ion-input>
             </ion-item>
          </ion-list>
       </form>
@@ -50,7 +58,7 @@
    </div>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="authService.hideFooter">
    <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
       Next
    </ion-button>

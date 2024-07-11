@@ -24,7 +24,7 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
 
    constructor(
       public objectService: TransferOutService,
-      private authService: AuthService,
+      public authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
@@ -70,7 +70,9 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
          remark: [null],
          workFlowTransactionId: [null],
          grnNum: [null],
-         uuid: [null]
+         uuid: [null],
+         handleBy: [null],
+         totalBag: [null]
       })
    }
 

@@ -4,6 +4,7 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
 import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -24,6 +25,7 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
 
    constructor(
       public objectService: TransferOutService,
+      public authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
