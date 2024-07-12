@@ -40,6 +40,7 @@ export const approvalAppCode = {
    quotationAP: "MAQUAP",
    salesOrderRV: "MASORV",
    salesOrderAP: "MASOAP",
+   maxQtyAP: "MAMXQAP",
    purchaseReqRV: "MAPRRV",
    purchaseReqAP: "MAPRAP",
    purchaseOrderRV: "MAPORV",

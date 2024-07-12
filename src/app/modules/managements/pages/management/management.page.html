@@ -26,7 +26,7 @@
          </ion-list>
       </ng-container>
 
-      <ng-container *ngIf="showSalesOrderReview || showSalesOrderApproval">
+      <ng-container *ngIf="showSalesOrderReview || showSalesOrderApproval || showMxqApproval">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>Sales Order</ion-label>
          </ion-list-header>
@@ -41,6 +41,12 @@
                <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
                <ion-label>
                   <h3>Approvals</h3>
+               </ion-label>
+            </ion-item>
+            <ion-item button routerLink="somxq-approvals" *ngIf="showMxqApproval">
+               <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+               <ion-label>
+                  <h3>Max Qty Approvals</h3>
                </ion-label>
             </ion-item>
          </ion-list>

@@ -61,6 +61,10 @@ const routes: Routes = [
       path: 'managements/sales-order-approvals',
       loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
    },
+   {
+      path: 'managements/somxq-approvals',
+      loadChildren: () => import('./modules/managements/pages/somxq-approval/somxq-approval.module').then(m => m.SomxqApprovalPageModule)
+   },
    // management-b2bo
    {
       path: 'managements/b2bo-reviews',
