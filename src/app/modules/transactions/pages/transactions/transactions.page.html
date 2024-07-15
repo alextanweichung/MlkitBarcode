@@ -78,11 +78,19 @@
          </ion-list>
       </ng-container>
 
-      <ng-container *ngIf="showPicking || showPacking || showInboundScan || showInterTransfer || showTransferConfirmation || showTruckLoading || showCartonTruckLoading || showDoAck || showPalletAssembly || showTransferBin || showBinCount">
+      <ng-container *ngIf="showLocationApplication || showPicking || showPacking || showInboundScan || showInterTransfer || showTransferConfirmation || showTruckLoading || showCartonTruckLoading || showDoAck || showPalletAssembly || showTransferBin || showBinCount">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>[WD] Warehouse</ion-label>
          </ion-list-header>
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <ion-item button routerLink="location-application" *ngIf="showLocationApplication">
+                  <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                  <ion-label>
+                     <h3>Location Application</h3>
+                  </ion-label>
+               </ion-item>
+            </ion-list>
             <ion-item button routerLink="picking" *ngIf="showPicking">
                <ion-icon name="people-circle-outline" slot="start"></ion-icon>
                <ion-label>
