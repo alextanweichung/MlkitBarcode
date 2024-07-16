@@ -3,13 +3,18 @@ import { LineAssembly } from "src/app/shared/models/transaction-detail"
 export interface MultiPackingList {
    multiPackingId: number
    multiPackingNum: string
-   trxDate: string
+   trxDate: Date
    locationCode: string
    locationDescription: string
    warehouseAgentId: number
    warehouseAgentName: string
    deactivated: boolean
    createdById: number
+
+   // local use
+   isTrxLocal: boolean
+   guid: string
+   lastUpdated: Date
 }
 
 export interface MultiPackingRoot {
@@ -57,6 +62,11 @@ export interface MultiPackingHeader {
    modifiedBy: any
    modifiedAt: any
    deactivated: boolean
+
+   // local use
+   isTrxLocal: boolean
+   guid: string
+   lastUpdated: Date
 }
 
 export interface MultiPackingCarton {

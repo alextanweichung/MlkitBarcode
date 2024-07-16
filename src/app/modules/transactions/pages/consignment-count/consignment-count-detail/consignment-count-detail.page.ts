@@ -65,7 +65,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 			await this.loadingService.showLoading();
 			this.objectService.getObjectById(this.objectId).subscribe(async response => {
 				let object = response;
-				object.header = this.commonService.convertObjectAllDateType(object.header);
+				// object.header = this.commonService.convertObjectAllDateType(object.header);
 				object.details.forEach(r => {
 					let found = object.barcodeTag.find(rr => rr.itemSku === r.itemSku);
 					if (found) {

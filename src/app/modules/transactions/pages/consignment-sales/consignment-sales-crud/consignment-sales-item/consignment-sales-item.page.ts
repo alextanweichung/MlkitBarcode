@@ -541,11 +541,14 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                }
                this.objectService.resetVariables();
                this.navController.navigateRoot("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
+            } else {
+               this.sendForDebug();
             }
          }, error => {
             console.error(error);
          });
       } catch (e) {
+         this.sendForDebug();
          console.error(e);
       }
    }
@@ -566,11 +569,14 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                }
                this.objectService.resetVariables();
                this.navController.navigateRoot("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
+            } else {
+               this.sendForDebug();
             }
          }, error => {
             console.error(error);
          });
       } catch (e) {
+         this.sendForDebug();
          console.error(e);
       }
    }

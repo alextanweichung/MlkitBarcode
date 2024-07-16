@@ -17,6 +17,8 @@ import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/ba
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { v4 as uuidv4 } from 'uuid';
 import { StockCountDetailPage } from '../../stock-count-detail/stock-count-detail.page';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 @Component({
    selector: 'app-stock-count-item',
@@ -31,6 +33,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    itemsPerPage: number = 12;
 
    binDesc: string = "";
+   fLocationZoneDetail: MasterListDetails[] = [];
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -45,7 +48,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ) { }
 
    ionViewWillEnter(): void {
-      
+      if (this.objectService.locationZoneDetailMasterList && this.objectService.locationZoneDetailMasterList.length > 0) {
+         this.fLocationZoneDetail = this.objectService.locationZoneDetailMasterList.filter(r => Number(r.attribute1) === this.objectService.objectHeader.locationId);
+      }
    }
 
    ionViewDidEnter(): void {
@@ -63,33 +68,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    ngOnInit() {
-      this.loadModuleControl();
-   }
 
-   moduleControl: ModuleControl[] = [];
-   systemWideEAN13IgnoreCheckDigit: boolean = false;
-   configMobileScanItemContinuous: boolean = false;
-   loadModuleControl() {
-      try {
-         this.authService.moduleControlConfig$.subscribe(obj => {
-            this.moduleControl = obj;
-            let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
-            if (ignoreCheckdigit != undefined) {
-               this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
-            }
-
-            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
-            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
-               this.configMobileScanItemContinuous = true;
-            } else {
-               this.configMobileScanItemContinuous = false;
-            }
-         }, error => {
-            console.error(error);
-         })
-      } catch (e) {
-         console.error(e);
-      }
    }
 
    inventoryCountBatchCriteria: InventoryCountBatchCriteria;
@@ -357,7 +336,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    async onDoneScanning(event) {
       if (event) {
          await this.barcodescaninput.validateBarcode(event);
-         if (this.configMobileScanItemContinuous) {
+         if (this.objectService.configMobileScanItemContinuous) {
             await this.barcodescaninput.startScanning();
          }
       }
@@ -516,7 +495,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    /* #region bin desc camera scanning */
-   
+
    async startScanning() {
       const allowed = await this.checkPermission();
       if (allowed) {
@@ -532,7 +511,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          }
       }
    }
-   
+
    async checkPermission() {
       return new Promise(async (resolve) => {
          const status = await BarcodeScanner.checkPermission({ force: true });
@@ -561,6 +540,53 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             resolve(false);
          }
       });
+   }
+
+   /* #endregion */
+
+   /* #region bin scan dropdown */
+
+   onBinSelected(event: SearchDropdownList) {
+      if (event) {
+         let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.code.toUpperCase());
+         if (found) {
+            this.binDesc = found.code;
+         } else {
+            this.binDesc = null;
+         }
+      } else {
+         this.binDesc = null;
+      }
+   }
+
+   onBinScanCompleted(event: string) { // truck arrangement
+      try {
+         if (event) {
+            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found) {
+               this.onBinSelected({ id: found.id, code: found.code });
+            } else {
+               this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
+            }
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onBinDoneScanning(event) { // truck arrangement
+      try {
+         if (event) {
+            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found) {
+               this.onBinSelected({ id: found.id, code: found.code });
+            } else {
+               this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
+            }
+         }
+      } catch (e) {
+         console.error(e);
+      }
    }
 
    /* #endregion */

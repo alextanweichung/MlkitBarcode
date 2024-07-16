@@ -11,18 +11,20 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { SearchDropdownPageModule } from "../../../../../../shared/pages/search-dropdown/search-dropdown.module";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    StockCountItemPageRoutingModule,
-    IdMappingModule,
-    BarcodeScanInputPageModule,
-    SumModule,
-    NgxPaginationModule
-  ],
-  declarations: [StockCountItemPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      StockCountItemPageRoutingModule,
+      IdMappingModule,
+      BarcodeScanInputPageModule,
+      SumModule,
+      NgxPaginationModule,
+      SearchDropdownPageModule
+   ],
+   declarations: [StockCountItemPage]
 })
-export class StockCountItemPageModule {}
+export class StockCountItemPageModule { }

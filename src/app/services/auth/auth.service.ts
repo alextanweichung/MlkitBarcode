@@ -84,11 +84,13 @@ export class AuthService {
          
       } else {
          Keyboard.addListener("keyboardWillShow", () => {
+            console.log("keyboardWillShow");
             this.ngZone.run(() => {
                this.hideFooter = true;
             })
          })
          Keyboard.addListener("keyboardWillHide", () => {
+            console.log("keyboardWillHide");
             this.ngZone.run(() => {
                this.hideFooter = false;
             })

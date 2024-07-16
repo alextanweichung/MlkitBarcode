@@ -39,6 +39,8 @@ export class StockCountService {
    configInvCountFreeTextZoneRack: boolean = false;
    configInvCountActivateLineWithBin: boolean = false;
    configHeaderShowBinDesc: boolean = false;
+   configMobileScanItemContinuous: boolean = false;
+   configInvCountBinFromLocation: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -63,6 +65,20 @@ export class StockCountService {
          } else {
             this.configHeaderShowBinDesc = false;
          }
+
+         let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+         if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileScanItemContinuous = true;
+         } else {
+            this.configMobileScanItemContinuous = false;
+         }
+
+         let invCountBinFromLocation = this.moduleControl.find(x => x.ctrlName === "InvCountBinFromLocation");
+         if (invCountBinFromLocation && invCountBinFromLocation.ctrlValue.toUpperCase() === "Y") {
+            this.configInvCountBinFromLocation = true;
+         } else {
+            this.configInvCountBinFromLocation = false;
+         }
       })
    }
 
@@ -76,6 +92,7 @@ export class StockCountService {
    itemBrandMasterList: MasterListDetails[] = [];
    itemGroupMasterList: MasterListDetails[] = [];
    itemCategoryMasterList: MasterListDetails[] = [];
+   locationZoneDetailMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -88,6 +105,7 @@ export class StockCountService {
       this.itemCategoryMasterList = this.fullMasterList.filter(x => x.objectName === "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.rackMasterList = this.fullMasterList.filter(x => x.objectName === "Rack").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.zoneMasterList = this.fullMasterList.filter(x => x.objectName === "Zone").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.locationZoneDetailMasterList = this.fullMasterList.filter(x => x.objectName === "LocationBin").flatMap(src => src.details).filter(y => y.deactivated === 0);      
    }
 
    objectHeader: StockCountHeader = null;

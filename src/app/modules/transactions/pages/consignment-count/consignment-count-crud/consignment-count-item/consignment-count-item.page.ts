@@ -34,8 +34,8 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 
 	constructor(
 		public objectService: ConsignmentCountService,
+		public authService: AuthService,
 		private configService: ConfigService,
-		private authService: AuthService,
 		private toastService: ToastService,
 		private loadingService: LoadingService,
 		private alertController: AlertController,

@@ -4,7 +4,7 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { SalesOrderHeaderForWD, SalesOrderLineForWD } from 'src/app/modules/transactions/models/packing';
+import { MultiPackingRoot, SalesOrderHeaderForWD, SalesOrderLineForWD } from 'src/app/modules/transactions/models/packing';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -45,9 +45,10 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
 
    ionViewWillEnter(): void {
       this.isMobile = Capacitor.getPlatform() !== "web";
-      if (this.objectService.header && this.objectService.header.multiPackingId > 0) {
+      if (this.objectService.header && (this.objectService.header.multiPackingId > 0 || (this.objectService.header.isTrxLocal && this.objectService.header.guid))) {
          this.isWithType = this.objectService.header?.isWithSo ? (this.objectService.header?.copyFrom === "S" ? "SO" : "B2B") : "NONE";
          this.objectForm.patchValue(this.objectService.object.header);
+         console.log("🚀 ~ PackingHeaderPage ~ ionViewWillEnter ~ this.objectForm:", JSON.stringify(this.objectForm.value))
          this.patchInfo();
          if (this.objectService.header && this.objectService.header.isWithSo) {
             this.loadExisitingSO(this.objectService.object.outstandingPackList.flatMap(r => r.salesOrderNum));
@@ -400,13 +401,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   role: "confirm",
                   cssClass: "danger",
                   handler: async () => {
-                     // this.selectedDocs = this.selectedDocs.filter(r => r.salesOrderNum !== salesOrderNum);
-                     // this.objectService.multiPackingObject.outstandingPackList = this.objectService.multiPackingObject.outstandingPackList.filter(r => r.salesOrderNum != salesOrderNum);
-                     // this.uniqueSo = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.salesOrderNum))];
-                     // this.uniqueItemCode = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.itemCode))];
-                     // if (this.selectedDocs && this.selectedDocs.length === 0) {
-                     //   this.setDefaultValue();
-                     // }
+                     
                   },
                },
                {
@@ -764,7 +759,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       }
    }
 
-   nextStep() {
+   async nextStep() {
       try {
          if (!this.objectForm.valid) {
             this.toastService.presentToast("Control Validation", "Please fill in info.", "top", "warning", 1000);

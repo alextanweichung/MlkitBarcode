@@ -3,18 +3,21 @@ import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonPopover, ModalController, NavController, ViewDidEnter } from '@ionic/angular';
-import { format, sub } from 'date-fns';
+import { format } from 'date-fns';
 import { CurrentPackAssignment, CurrentPackList, MultiPackingCarton, MultiPackingObject, MultiPackingRoot, SalesOrderLineForWD } from 'src/app/modules/transactions/models/packing';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
+import { LocalTransaction } from 'src/app/shared/models/pos-download';
 import { ItemListMultiUom, LineAssembly, TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-packing-item',
@@ -31,12 +34,13 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
 
    constructor(
       public objectService: PackingService,
-      private authService: AuthService,
+      public authService: AuthService,
       public configService: ConfigService,
       private commonService: CommonService,
       private navController: NavController,
       private alertController: AlertController,
       private toastService: ToastService,
+      private loadingService: LoadingService,
       private modalController: ModalController
    ) { }
 
@@ -978,33 +982,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       }
    }
 
-   /* #region for web testing */
-
-   itemSearchValue: string;
-   handleKeyDown(event) {
-      if (event.keyCode === 13) {
-         if (this.objectService.multiPackingObject.packingCarton.length === 0) {
-            this.toastService.presentToast("Control Validation", "Please create carton before adding items.", "top", "warning", 1000);
-         } else {
-            this.objectService.validateBarcode(this.itemSearchValue).subscribe(async response => {
-               this.itemSearchValue = null;
-               if (response) {
-                  if (this.objectService.header.isWithSo) {
-                     await this.runPackingEngine(response, Number(1));
-                  } else {
-                     await this.insertPackingLineWithoutSo(response, Number(1));
-                  }
-               }
-            }, error => {
-               console.error(error);
-            })
-         }
-         event.preventDefault();
-      }
-   }
-
-   /* #endregion */
-
    async onItemAdd(event: TransactionDetail[]) {
       try {
          if (this.objectService.multiPackingObject.packingCarton.length === 0) {
@@ -1455,12 +1432,16 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       this.onCameraStatusChanged(false);
    }
 
-   /* #endregion */
+   /* #endregion */   
 
-   async saveButtonClicked() {
+   async saveButtonClicked(saveLocal: boolean) {
       switch (this.packingMatchPickingQty) {
          case "0":
-            this.nextStep();
+            if (saveLocal) {
+               this.nextStepLocal();
+            } else {
+               this.nextStep();
+            }
             break;
          case "1":
             let check1 = this.checkPackingPickingQty();
@@ -1490,16 +1471,23 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                });
                await alert.present();
             } else {
-               this.nextStep();
+               if (saveLocal) {
+                  this.nextStepLocal();   
+               } else {
+                  this.nextStep();
+               }
             }
             break;
          case "2":
             let check2 = this.checkPackingPickingQty();
             if (!check2) {
                this.toastService.presentToast("Validation Failed", "Packing quantity does not match with picking quantity. Please rectify to save the transaction.", "top", "warning", 2000);
-
             } else {
-               this.nextStep();
+               if (saveLocal) {
+                  this.nextStepLocal();
+               } else {
+                  this.nextStep();
+               }
             }
             break;
       }
@@ -1514,6 +1502,37 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       })
       return qtyMatched;
    }
+
+	async nextStepLocal() {
+		try {
+			const alert = await this.alertController.create({
+				cssClass: "custom-alert",
+				header: "Are you sure to proceed?",
+				buttons: [
+					{
+						text: "Confirm",
+						cssClass: "success",
+						handler: async () => {
+							await this.insertObjectLocal();
+						}
+					},
+					{
+						text: "Cancel",
+						role: "cancel",
+						cssClass: "cancel",
+						handler: async () => {
+                     
+						}
+					}
+				]
+			});
+			await alert.present();
+		} catch (e) {
+			console.error(e);
+		} finally {
+         
+		}
+	}
 
    async nextStep() {
       try {
@@ -1545,7 +1564,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       }
    }
 
-   insertObject() {
+   async insertObject() {
       try {
          let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPackingObject);
          let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPackingObject)
@@ -1559,16 +1578,22 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                return;
             }
          }
-         this.objectService.insertObject(newObjectDto).subscribe(response => {
+			await this.loadingService.showLoading();
+         this.objectService.insertObject(newObjectDto).subscribe(async response => {
             if (response.status === 201) {
                let object = response.body as MultiPackingRoot;
                this.toastService.presentToast("Insert Complete", "New packing has been created.", "top", "success", 1000);
-               this.objectService.resetVariables();
+               console.log("🚀 ~ PackingItemPage ~ this.objectService.insertObject ~ this.objectService.localObject:", JSON.stringify(this.objectService.localObject))
+					if (this.objectService.localObject) {
+						await this.configService.deleteLocalTransaction("MultiPacking", this.objectService.localObject);
+					}
                let navigationExtras: NavigationExtras = {
                   queryParams: {
                      objectId: object.header.multiPackingId
                   }
                }
+					await this.objectService.resetVariables();
+					await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/packing/packing-detail", navigationExtras);
             }
          }, error => {
@@ -1579,7 +1604,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       }
    }
 
-   updateObject() {
+   async updateObject() {
       try {
          let updateObjectDto = this.transformObjectToTrxDto(this.objectService.multiPackingObject);
          let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPackingObject)
@@ -1593,21 +1618,75 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                return;
             }
          }
-         this.objectService.updateObject(updateObjectDto).subscribe(response => {
+			await this.loadingService.showLoading();
+         this.objectService.updateObject(updateObjectDto).subscribe(async response => {
             if (response.status === 201) {
                let object = response.body as MultiPackingRoot;
                this.toastService.presentToast("Update Complete", "Packing has been updated.", "top", "success", 1000);
-               this.objectService.resetVariables();
+					if (this.objectService.localObject) {
+						await this.configService.deleteLocalTransaction("MultiPacking", this.objectService.localObject);
+					}
                let navigationExtras: NavigationExtras = {
                   queryParams: {
                      objectId: object.header.multiPackingId
                   }
                }
+					await this.objectService.resetVariables();
+					await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/packing/packing-detail", navigationExtras);
             }
          }, error => {
             console.error(error);
          });
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async insertObjectLocal() {
+      try {
+         let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPackingObject);
+         let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPackingObject)
+         if (!checkFullComponentScan) {
+            this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);
+            return;
+         }
+         if (this.allowDocumentWithEmptyLine === "N") {
+            if (newObjectDto.details.length < 1) {
+               this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "danger", 1000);
+               return;
+            }
+         }
+			let localTrx: LocalTransaction;
+			if (newObjectDto.header.isTrxLocal) {
+				localTrx = {
+					id: newObjectDto.header.guid,
+					apiUrl: this.configService.selected_sys_param.apiUrl,
+					trxType: "MultiPacking",
+					lastUpdated: new Date(),
+					jsonData: JSON.stringify(newObjectDto)
+				}
+				await this.configService.updateLocalTransaction(localTrx);
+			} else {
+				localTrx = {
+					id: uuidv4(),
+					apiUrl: this.configService.selected_sys_param.apiUrl,
+					trxType: "MultiPacking",
+					lastUpdated: new Date(),
+					jsonData: JSON.stringify(newObjectDto)
+				}
+				await this.configService.insertLocalTransaction(localTrx);
+			}
+         this.toastService.presentToast("Insert Complete", "New packing has been created.", "top", "success", 1000);
+			await this.objectService.resetVariables();
+			let navigationExtras: NavigationExtras = {
+				queryParams: {
+					objectId: 0,
+					isLocal: true,
+					guid: localTrx.id
+				}
+			}
+			this.navController.navigateRoot("/transactions/packing/packing-detail", navigationExtras);
       } catch (e) {
          console.error(e);
       }

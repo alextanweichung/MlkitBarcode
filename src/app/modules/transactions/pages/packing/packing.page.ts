@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MultiPackingList } from '../../models/packing';
+import { MultiPackingList, MultiPackingRoot } from '../../models/packing';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -13,6 +13,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Network } from '@capacitor/network';
 
 @Component({
    selector: 'app-packing',
@@ -46,6 +47,8 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
+		this.objects = [];
+		this.filteredObj = [];
       try {
          if (!this.startDate) {
             this.startDate = this.commonService.getFirstDayOfTodayMonth();
@@ -54,7 +57,7 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
             this.endDate = this.commonService.getTodayDate();
          }
          await this.objectService.loadRequiredMaster();
-         await this.loadObjects();
+         await this.loadLocalObjects();
       } catch (e) {
          console.error(e);
       }
@@ -74,8 +77,10 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
       try {
          await this.loadingService.showLoading();
          this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
-            this.objects = response;
-            this.resetFilteredObj();
+            console.log("🚀 ~ PackingPage ~ this.objectService.getObjectListByDate ~ response:", response)
+				let objects = response.filter(r => !this.objects.flatMap(rr => rr.multiPackingId).includes(r.multiPackingId))
+				this.objects = [...this.objects, ...objects];
+				await this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
@@ -90,11 +95,7 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
       }
    }
 
-   // getObjects(date: Date) {
-   //    return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-   // }
-
-/* #endregion */
+   /* #endregion */
 
    /* #region add goods packing */
 
@@ -227,18 +228,60 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
          if (data && data !== undefined) {
             this.startDate = new Date(data.startDate);
             this.endDate = new Date(data.endDate);
-            this.loadObjects();
+				await this.loadLocalObjects();
          }
       } catch (e) {
          console.error(e);
       }
    }
 
-   goToDetail(objectId: number) {
+	async loadLocalObjects() {
+		try {
+			let localObject = await this.configService.getLocalTransaction("MultiPacking");
+			console.log("🚀 ~ PackingPage ~ loadLocalObjects ~ localObject:", localObject)
+			let d: MultiPackingList[] = [];
+         if (localObject && localObject.length > 0) {
+            localObject.forEach(r => {
+               let dd: MultiPackingRoot = JSON.parse(r.jsonData);
+               dd.header.isTrxLocal = true;
+               dd.header.guid = r.id;
+               dd.header.lastUpdated = r.lastUpdated;
+               d.push({
+                  multiPackingId: dd.header.multiPackingId,
+                  multiPackingNum: dd.header.multiPackingNum,
+                  trxDate: dd.header.trxDate,
+                  locationCode: this.objectService.locationMasterList.find(rr => rr.id === dd.header.locationId)?.code,
+                  locationDescription: this.objectService.locationMasterList.find(rr => rr.id === dd.header.locationId)?.description,
+                  warehouseAgentId: dd.header.warehouseAgentId,
+                  warehouseAgentName: this.objectService.locationMasterList.find(rr => rr.id === dd.header.warehouseAgentId)?.description,
+                  deactivated: dd.header.deactivated,
+                  createdById: dd.header.createdById,
+
+                  isTrxLocal: dd.header.isTrxLocal,
+                  guid: dd.header.guid,
+                  lastUpdated: dd.header.lastUpdated
+               });
+            })
+            this.objects = [...this.objects, ...d];
+         }
+			await this.resetFilteredObj();
+			if ((await Network.getStatus()).connected) {
+				await this.loadObjects();
+			}
+		} catch (error) {
+			console.error(error);
+		} finally {
+
+		}
+	}
+
+	goToDetail(objectId: number, isLocal: boolean = false, guid: string = null) {
       try {
          let navigationExtras: NavigationExtras = {
             queryParams: {
-               objectId: objectId
+               objectId: objectId,
+               isLocal: isLocal,
+               guid: guid
             }
          }
          this.navController.navigateForward("/transactions/packing/packing-detail", navigationExtras);
@@ -277,7 +320,14 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
                r.locationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.warehouseAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));
-            this.currentPage = 1;
+				this.filteredObj.sort((x, y) => {
+					if (x.isTrxLocal === y.isTrxLocal) {
+						return x.trxDate < y.trxDate ? 0 : 1;
+					} else {
+						return (x.isTrxLocal === y.isTrxLocal) ? 0 : x.isTrxLocal ? -1 : 1;
+					}
+				});
+				this.currentPage = 1;
          } else {
             this.resetFilteredObj();
             this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
@@ -289,6 +339,7 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
 
    resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      console.log("🚀 ~ PackingPage ~ resetFilteredObj ~ this.filteredObj:", this.filteredObj)
    }
 
 }

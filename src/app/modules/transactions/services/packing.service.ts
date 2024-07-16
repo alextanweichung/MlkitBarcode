@@ -11,6 +11,7 @@ import { background_load } from "src/app/core/interceptors/error-handler.interce
 import { AuthService } from "src/app/services/auth/auth.service";
 import { LoadingService } from "src/app/services/loading/loading.service";
 import { Subscription } from "rxjs";
+import { LocalTransaction } from "src/app/shared/models/pos-download";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -43,6 +44,7 @@ export class PackingService {
    header: MultiPackingHeader;
    object: MultiPackingRoot;
    setHeader(header: MultiPackingHeader) {
+      console.log("🚀 ~ setHeader ~ header:", JSON.stringify(header))
       this.header = header;
    }
 
@@ -51,8 +53,13 @@ export class PackingService {
       this.multiPackingObject = object;
    }
 
-   setPackingSummary(object: MultiPackingRoot) {
+   setPackingObject(object: MultiPackingRoot) {
       this.object = object;
+   }
+
+   localObject: LocalTransaction;
+   setLocalObject(localObject: LocalTransaction) {
+      this.localObject = localObject;
    }
 
    removeHeader() {
@@ -67,10 +74,16 @@ export class PackingService {
       this.object = null;
    }
 
-   resetVariables() {
+   removeLocalObject() {
+      this.localObject = null;
+   }
+
+   async resetVariables() {
       this.removeHeader();
       this.removeMultiPackingObject();
       this.removePackingSummary();
+      this.removeLocalObject();
+      await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
    /* #endregion */

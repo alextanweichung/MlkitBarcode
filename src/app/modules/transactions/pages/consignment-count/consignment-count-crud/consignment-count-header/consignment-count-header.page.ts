@@ -10,89 +10,89 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
-  selector: 'app-consignment-count-header',
-  templateUrl: './consignment-count-header.page.html',
-  styleUrls: ['./consignment-count-header.page.scss'],
+   selector: 'app-consignment-count-header',
+   templateUrl: './consignment-count-header.page.html',
+   styleUrls: ['./consignment-count-header.page.scss'],
 })
 export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
-  objectForm: FormGroup;
-  objectRoot: ConsignmentCountRoot;
+   objectForm: FormGroup;
+   objectRoot: ConsignmentCountRoot;
 
-  constructor(
-    public objectService: ConsignmentCountService,
-    private configService: ConfigService,
-    private commonService: CommonService,
-    private toastService: ToastService,
-    private navController: NavController,
-    private alertController: AlertController,
-    private actionSheetController: ActionSheetController,
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-  ) {
-    this.newObjectForm();
-  }
+   constructor(
+      public objectService: ConsignmentCountService,
+      private configService: ConfigService,
+      private commonService: CommonService,
+      private toastService: ToastService,
+      private navController: NavController,
+      private alertController: AlertController,
+      private actionSheetController: ActionSheetController,
+      private formBuilder: FormBuilder,
+      private route: ActivatedRoute,
+   ) {
+      this.newObjectForm();
+   }
 
-  newObjectForm() {
-    this.objectForm = this.formBuilder.group({
-      consignmentCountId: [0],
-      consignmentCountNum: [null],
-      description: [null],
-      trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-      trxDateTime: [null],
-      locationId: [this.configService.selected_location ?? 0, [Validators.required]],
-      consignmentCountUDField1: [null],
-      consignmentCountUDField2: [null],
-      consignmentCountUDField3: [null],
-      consignmentCountUDOption1: [null],
-      consignmentCountUDOption2: [null],
-      consignmentCountUDOption3: [null],
-      remark: [null],
-      printCount: [null],
-      rack: [null],
-      zone: [null],
-      sourceType: ["M"],
-      isLocal: [null],
-      guid: [null],
-      lastUpdated: [null]
-    });
-  }
+   newObjectForm() {
+      this.objectForm = this.formBuilder.group({
+         consignmentCountId: [0],
+         consignmentCountNum: [null],
+         description: [null],
+         trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
+         trxDateTime: [null],
+         locationId: [this.configService.selected_location ?? 0, [Validators.required]],
+         consignmentCountUDField1: [null],
+         consignmentCountUDField2: [null],
+         consignmentCountUDField3: [null],
+         consignmentCountUDOption1: [null],
+         consignmentCountUDOption2: [null],
+         consignmentCountUDOption3: [null],
+         remark: [null],
+         printCount: [null],
+         rack: [null],
+         zone: [null],
+         sourceType: ["M"],
+         isLocal: [null],
+         guid: [null],
+         lastUpdated: [null]
+      });
+   }
 
-  async ionViewWillEnter(): Promise<void> {
-    await this.setFormattedDateString();
-    // await this.bindLocationList();
-    if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
-
-    } else {
-      await this.objectForm.patchValue(this.objectService.objectHeader);
-      this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
+   async ionViewWillEnter(): Promise<void> {
       await this.setFormattedDateString();
-    }
-  }
+      // await this.bindLocationList();
+      if (this.objectService.objectHeader === null || this.objectService.objectHeader === undefined) {
 
-  ionViewDidEnter(): void {
-    
-  }
+      } else {
+         await this.objectForm.patchValue(this.objectService.objectHeader);
+         this.dateValue = format(new Date(this.objectService.objectHeader.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
+         await this.setFormattedDateString();
+      }
+   }
 
-  ngOnInit() {
+   ionViewDidEnter(): void {
 
-  }
+   }
 
-  // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-  // bindLocationList() {
-  //   this.consignmentLocationSearchDropdownList = [];
-  //   try {
-  //     this.objectService.locationMasterList.forEach(r => {
-  //       this.consignmentLocationSearchDropdownList.push({
-  //         id: r.id,
-  //         code: r.code,
-  //         description: r.description
-  //       })
-  //     })
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
+   ngOnInit() {
+
+   }
+
+   // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
+   // bindLocationList() {
+   //   this.consignmentLocationSearchDropdownList = [];
+   //   try {
+   //     this.objectService.locationMasterList.forEach(r => {
+   //       this.consignmentLocationSearchDropdownList.push({
+   //         id: r.id,
+   //         code: r.code,
+   //         description: r.description
+   //       })
+   //     })
+   //   } catch (e) {
+   //     console.error(e);
+   //   }
+   // }
 
    async onLocationSelected(event) {
       if (event && this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
@@ -123,87 +123,87 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
       }
    }
 
-  /* #region steps */
+   /* #region steps */
 
-  async cancelInsert() {
-    const actionSheet = await this.actionSheetController.create({
-      header: "Are you sure to cancel?",
-      subHeader: "Changes made will be discard.",
-      cssClass: "custom-action-sheet",
-      buttons: [
-        {
-          text: "Yes",
-          role: "confirm",
-        },
-        {
-          text: "No",
-          role: "cancel",
-        }]
-    });
-    await actionSheet.present();
+   async cancelInsert() {
+      const actionSheet = await this.actionSheetController.create({
+         header: "Are you sure to cancel?",
+         subHeader: "Changes made will be discard.",
+         cssClass: "custom-action-sheet",
+         buttons: [
+            {
+               text: "Yes",
+               role: "confirm",
+            },
+            {
+               text: "No",
+               role: "cancel",
+            }]
+      });
+      await actionSheet.present();
 
-    const { role } = await actionSheet.onWillDismiss();
+      const { role } = await actionSheet.onWillDismiss();
 
-    if (role === "confirm") {
-      if (this.objectService?.objectHeader?.isLocal) {
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            objectId: 0,
-            isLocal: true,
-            guid: this.objectService.objectHeader.guid
-          }
-        }
-        this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
-      }      
-      else if (this.objectService.objectHeader && this.objectService.objectHeader?.consignmentCountId > 0) {
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            objectId: this.objectService.objectHeader.consignmentCountId
-          }
-        }
-        this.objectService.resetVariables();
-        this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+      if (role === "confirm") {
+         if (this.objectService?.objectHeader?.isLocal) {
+            let navigationExtras: NavigationExtras = {
+               queryParams: {
+                  objectId: 0,
+                  isLocal: true,
+                  guid: this.objectService.objectHeader.guid
+               }
+            }
+            this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+         }
+         else if (this.objectService.objectHeader && this.objectService.objectHeader?.consignmentCountId > 0) {
+            let navigationExtras: NavigationExtras = {
+               queryParams: {
+                  objectId: this.objectService.objectHeader.consignmentCountId
+               }
+            }
+            this.objectService.resetVariables();
+            this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+         }
+         else {
+            this.objectService.resetVariables();
+            this.navController.navigateRoot("/transactions/consignment-count");
+         }
       }
-      else {
-        this.objectService.resetVariables();
-        this.navController.navigateRoot("/transactions/consignment-count");
-      }
-    }
-  }
+   }
 
-  async nextStep() {
-    this.objectService.setHeader(this.objectForm.getRawValue());
-    let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-    this.navController.navigateForward("/transactions/consignment-count/consignment-count-item");
-  }
+   async nextStep() {
+      this.objectService.setHeader(this.objectForm.getRawValue());
+      let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      this.navController.navigateForward("/transactions/consignment-count/consignment-count-item");
+   }
 
-  /* #endregion */
+   /* #endregion */
 
-  /* #region calendar handle here */
+   /* #region calendar handle here */
 
-  formattedDateString: string = "";
-  dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
-  maxDate = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
-  @ViewChild("datetime") datetime: IonDatetime
-  setFormattedDateString() {
-    this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
-  }
-  
-  onTrxDateSelected(value: any) {
-    this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
-    this.setFormattedDateString();
-    this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
-  }
+   formattedDateString: string = "";
+   dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+   maxDate = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+   @ViewChild("datetime") datetime: IonDatetime
+   setFormattedDateString() {
+      this.formattedDateString = format(parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+   }
 
-  dateDismiss() {
-    this.datetime.cancel(true);
-  }
+   onTrxDateSelected(value: any) {
+      this.dateValue = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+      this.setFormattedDateString();
+      this.objectForm.patchValue({ trxDate: parseISO(format(new Date(this.dateValue), 'yyyy-MM-dd') + `T00:00:00.000Z`) });
+   }
 
-  dateSelect() {
-    this.datetime.confirm(true);
-  }
+   dateDismiss() {
+      this.datetime.cancel(true);
+   }
 
-  /* #endregion */
+   dateSelect() {
+      this.datetime.confirm(true);
+   }
+
+   /* #endregion */
 
 }

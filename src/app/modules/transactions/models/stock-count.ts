@@ -58,6 +58,7 @@ export interface StockCountHeader {
    cartonDesc: string
    zoneDesc: string
    rackDesc: string
+   sourceType: string
    sequence: number
    createdById?: number
    createdBy?: string

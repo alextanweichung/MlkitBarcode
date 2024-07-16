@@ -105,8 +105,7 @@
     
   </div>
 </ion-content>
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
-  
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive || authService.hideFooter">  
   <ion-grid class="ion-no-padding">
     <ion-row>
       <ion-col>

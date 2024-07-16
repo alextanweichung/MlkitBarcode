@@ -46,7 +46,7 @@
 </ion-popover>
 <ion-content fullscreen [hidden]="scanActive">
    <div class="p-2">
-      <ng-container *ngIf="objectService.configInvCountActivateLineWithBin">
+      <ng-container *ngIf="objectService.configInvCountActivateLineWithBin && !objectService.configInvCountBinFromLocation">
          <ion-list class="list-custom animate__animated animate__fadeIn mb-2" lines="full">
             <ion-item button [detail]="false" class="no-ripple">
                <ion-label position="stacked" class="font-bold">Current Bin</ion-label>
@@ -63,6 +63,11 @@
                   </ion-row>
                </ion-grid>
             </ion-item>
+         </ion-list>
+      </ng-container>
+      <ng-container *ngIf="objectService.configInvCountActivateLineWithBin">
+         <ion-list class="list-custom animate__animated animate__fadeIn mb-2" lines="full">
+            <app-search-dropdown title="Current Bin" [masterDropdownList]="fLocationZoneDetail" optionValue="code" [selectedCode]="binDesc" (onActionComplete)="onBinSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onBinScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onBinDoneScanning($event)"></app-search-dropdown>
          </ion-list>
       </ng-container>
       <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [itemUomMasterList]="objectService.itemUomMasterList"></app-barcode-scan-input>

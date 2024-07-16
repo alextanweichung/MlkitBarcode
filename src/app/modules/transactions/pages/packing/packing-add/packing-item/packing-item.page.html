@@ -197,10 +197,23 @@
    </div>
 </ion-content>
 
-<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive">
-   <ion-button class="ion-margin" expand="block" size="default" (click)="saveButtonClicked()">
-      Save
-   </ion-button>
+<ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive || authService.hideFooter">
+   <ion-grid class="ion-no-padding">
+      <ion-row>
+         <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" color="warning" (click)="saveButtonClicked(true)">
+               Save Local
+               <ion-icon slot="end" name="cloud-offline-outline"></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" color="success" (click)="saveButtonClicked(false)">
+               Save Online
+               <ion-icon slot="end" name="cloud-done-outline"></ion-icon>
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </ion-grid>
 </ion-footer>
 
 <ion-row class="scanner-buttons" [hidden]="!scanActive">

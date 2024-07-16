@@ -165,6 +165,7 @@ export class CommonService {
    convertObjectAllDateType(inputObject: any) {
       try {
          if (inputObject.hasOwnProperty("trxDate")) {
+            console.log("🚀 ~ CommonService ~ convertObjectAllDateType ~ inputObject.hasOwnProperty():", JSON.stringify(inputObject.hasOwnProperty("trxDate")))
             if (inputObject.trxDate != null) {
                inputObject.trxDate = this.convertUtcDate(inputObject.trxDate);
             }
