@@ -374,6 +374,9 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
                      case "PRICINGAPPROVAL":
                         workflowApiObject = "MobilePricingApprove";
                         break;
+                     case "MAXQTYAPPROVAL":
+                        workflowApiObject = "MobileMaxQtyApprove";
+                        break;
                      default:
                         this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
                         return;
@@ -389,6 +392,9 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
                         break;
                      case "PRICINGAPPROVAL":
                         workflowApiObject = "MobilePricingApprove";
+                        break;
+                     case "MAXQTYAPPROVAL":
+                        workflowApiObject = "MobileMaxQtyApprove";
                         break;
                      default:
                         this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);

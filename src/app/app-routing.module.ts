@@ -61,6 +61,10 @@ const routes: Routes = [
       path: 'managements/sales-order-approvals',
       loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
    },
+   {
+      path: 'managements/somxq-approvals',
+      loadChildren: () => import('./modules/managements/pages/somxq-approval/somxq-approval.module').then(m => m.SomxqApprovalPageModule)
+   },
    // management-b2bo
    {
       path: 'managements/b2bo-reviews',
@@ -302,6 +306,10 @@ const routes: Routes = [
       loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then(m => m.DebtorApplicationPageModule)
    },
    {
+      path: 'transactions/location-application',
+      loadChildren: () => import('./modules/transactions/pages/location-application/location-application.module').then(m => m.LocationApplicationPageModule)
+   },
+   {
       path: 'transactions/stock-replenish',
       loadChildren: () => import('./modules/transactions/pages/stock-replenish/stock-replenish.module').then(m => m.StockReplenishPageModule)
    },
@@ -526,7 +534,6 @@ const routes: Routes = [
       path: 'sales-cart',
       loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
    },
-
 
 ];
 @NgModule({

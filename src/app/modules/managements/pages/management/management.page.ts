@@ -13,6 +13,7 @@ export class ManagementPage implements OnInit {
    showQuotationApproval: boolean = false;
    showSalesOrderReview: boolean = false;
    showSalesOrderApproval: boolean = false;
+   showMxqApproval: boolean = false;
    showBackToBackOrderReview: boolean = false;
    showBackToBackOrderApproval: boolean = false;
    showPurchaseReqReview: boolean = false;
@@ -57,6 +58,7 @@ export class ManagementPage implements OnInit {
                this.showQuotationApproval = pageItems.findIndex(r => r.title === approvalAppCode.quotationAP) > -1;
                this.showSalesOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderRV) > -1;
                this.showSalesOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.salesOrderAP) > -1;
+               this.showMxqApproval = pageItems.findIndex(r => r.title === approvalAppCode.maxQtyAP) > -1;
                this.showBackToBackOrderReview = pageItems.findIndex(r => r.title === approvalAppCode.b2bOrderRV) > -1;
                this.showBackToBackOrderApproval = pageItems.findIndex(r => r.title === approvalAppCode.b2bOrderAP) > -1;
                this.showPurchaseReqReview = pageItems.findIndex(r => r.title === approvalAppCode.purchaseReqRV) > -1;

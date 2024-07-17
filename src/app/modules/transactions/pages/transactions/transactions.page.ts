@@ -22,6 +22,7 @@ export class TransactionsPage implements OnInit {
    showTruckLoading: boolean = false;
    showInterTransfer: boolean = false;
    showTransferConfirmation: boolean = false;
+   showLocationApplication: boolean = false;
    showDebtorApplication: boolean = false;
    showStockReplenish: boolean = false;
    showConsignmentCount: boolean = false;
@@ -60,6 +61,7 @@ export class TransactionsPage implements OnInit {
                this.showInterTransfer = pageItems.findIndex(r => r.title === trxAppCode.mobileInterTransfer) > -1;
                this.showTransferConfirmation = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferConfirmation) > -1;
                this.showDebtorApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileDebtorApp) > -1;
+               this.showLocationApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileLocationApp) > -1;
                // this.showStockReplenish = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReplenish) > -1;
                this.showConsignmentCount = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignmentCount) > -1;
                this.showInboundScan = pageItems.findIndex(r => r.title === trxAppCode.mobileInboundScan) > -1;
