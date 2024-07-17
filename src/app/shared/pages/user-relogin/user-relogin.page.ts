@@ -75,9 +75,10 @@ export class UserReloginPage implements OnInit {
                   this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                } else {
                   this.show2FaDialog = false;
-                  setTimeout(async () => {
-                     await this.modalController.dismiss();
-                  }, 500);
+                  // setTimeout(async () => {
+                  //    let ret = await this.modalController.getTop();
+                  //    console.log("🚀 ~ UserReloginPage ~ setTimeout ~ ret:", ret)
+                  // }, 100);
                   this.toastService.presentToast("Logged in successfully", "", "top", "success", 2000);
                }
             } else {
@@ -112,8 +113,14 @@ export class UserReloginPage implements OnInit {
       }
    }
 
-   on2FaDialogHide() {
+   async on2FaDialogHide() {
+      console.log("🚀 ~ UserReloginPage ~ on2FaDialogHide ~ on2FaDialogHide:")
       this.loginResponse = null;
+      try {
+         await this.modalController.dismiss(null, null, "userReloginModal");
+      } catch (error) {
+         console.error(error);
+      }
    }
 
    isDisplayQrImage() {

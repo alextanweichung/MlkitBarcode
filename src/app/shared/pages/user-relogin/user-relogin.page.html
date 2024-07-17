@@ -56,7 +56,7 @@
       </ng-container>
    </div>
 </ion-content>
-<ion-modal id="userReloginModal2FA" [isOpen]="show2FaDialog" (didDismiss)="show2FaDialog = false">
+<ion-modal id="userReloginModal2FA" [isOpen]="show2FaDialog" (didDismiss)="on2FaDialogHide()">
    <ng-template>
       <ion-header>
          <ion-toolbar>
