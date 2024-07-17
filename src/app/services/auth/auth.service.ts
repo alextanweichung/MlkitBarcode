@@ -117,7 +117,7 @@ export class AuthService {
                this.setDebugMode(loginUser.token);
                this.isLoggedIn = true;
                this.checkAdminRights(loginUser.token);
-               this.updatePlayerId(loginUser);
+               // this.updatePlayerId(loginUser);
             } else {
                return response;
             }
@@ -125,15 +125,15 @@ export class AuthService {
       )
    }
 
-   updatePlayerId(loginUser: LoginUser) {
-      let user = this.getDecodedToken(loginUser.token);
-      if (loginUser.playerId !== localStorage.getItem("player_Id")) {
-         this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
-         }, error => {
-            console.log(error);
-         });
-      }
-   }
+   // updatePlayerId(loginUser: LoginUser) {
+   //    let user = this.getDecodedToken(loginUser.token);
+   //    if (loginUser.playerId !== localStorage.getItem("player_Id")) {
+   //       this.http.put(this.configService.selected_sys_param.apiUrl + "MobileDownload/playerId/" + Number(user.nameid) + "/" + localStorage.getItem("player_Id"), httpObserveHeader).subscribe(response => {
+   //       }, error => {
+   //          console.log(error);
+   //       });
+   //    }
+   // }
 
    refreshToken(tokenRequest: TokenRequest) {
       // return this.http.post(this.configService.selected_sys_param.apiUrl + "account/refreshToken?testmode=ShortLifeToken,ShortLifeRefreshToken", tokenRequest).pipe(

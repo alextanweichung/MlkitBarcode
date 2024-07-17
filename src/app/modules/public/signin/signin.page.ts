@@ -175,11 +175,9 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          this.submit_attempt = true;
          await this.loadingService.showLoading();
          if (Capacitor.getPlatform() !== "web") {
-            OneSignal.getDeviceState(function (stateChanges) {
-               localStorage.setItem("player_Id", stateChanges.userId);
-            });
+            // localStorage.setItem("player_Id", await OneSignal.User.getOnesignalId())
          } else {
-            localStorage.setItem("player_Id", "6ce7134e-5a4b-426f-b89b-54de14e05eba");
+            // localStorage.setItem("player_Id", "6ce7134e-5a4b-426f-b89b-54de14e05eba");
          }
          // If email or password empty
          if (this.signin_form.value.email == "" || this.signin_form.value.password == "") {
@@ -214,6 +212,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                         this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                      } else {
 
+                        await OneSignal.User.addEmail(this.configService.loginUser.userEmail);
                         this.show2FaDialog = false;
 
                         // sync item master and item barcode
