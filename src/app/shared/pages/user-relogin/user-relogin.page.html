@@ -3,15 +3,15 @@
       <ion-title>
          <div class="ion-text-wrap">{{title}}</div>
       </ion-title>
-      <ion-buttons slot="start">
-         <ion-button (click)="closeRef()">Done</ion-button>
+      <ion-buttons slot="primary">
+         <ion-button (click)="closeRef()">X</ion-button>
       </ion-buttons>
    </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-   <div>
+   <div class="p-2">
       <ng-container *ngIf="displayMode === 0">
          
          <ion-list class="item-card-list" lines="none">
@@ -21,16 +21,16 @@
             </ion-item>
             <ion-item>
                <ion-label color="tertiary" position="stacked">Password</ion-label>
-               <ion-input [(ngModel)]="loginModel.password" type="password" placeholder="Your password"></ion-input>
+               <ion-input #inputPassword [(ngModel)]="loginModel.password" type="password" placeholder="Your password"></ion-input>
             </ion-item>
          </ion-list>
 
-         <ion-button class="ion-margin-top px-3" type="submit" expand="block" color="primary" (click)="login()">
+         <ion-button class="mt-2" type="submit" expand="block" color="primary" (click)="login()">
             LOGIN
          </ion-button>
 
          <div class="flex flex-column">
-            <div class="mt-2" *ngIf="loginError.length > 0">
+            <div class="mt-2" *ngIf="loginError?.length > 0">
                <ion-badge color="danger">{{loginError}}</ion-badge>
                <!-- <p-tag styleClass="mr-2" icon="pi pi-lock" severity="danger">{{loginError}} </p-tag> -->
             </div>
@@ -56,28 +56,31 @@
       </ng-container>
    </div>
 </ion-content>
-<!-- <p-dialog [(visible)]="show2FaDialog" [style]="{width: '400px'}" header="2FA Required" [modal]="false" styleClass="p-fluid" (onHide)="on2FaDialogHide()" appendTo="body">
-   <ng-template pTemplate="content">
-       <div *ngIf="isDisplayQrImage()">
-           <div class="font-bold flex justify-content-center">Please download Microsoft/Google Authenticator, scan the QR Code (Or input manual code) to register for 2FA:</div>
-           <div class="flex justify-content-center">
+<ion-modal id="userReloginModal2FA" [isOpen]="show2FaDialog" (didDismiss)="show2FaDialog = false">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>2FA Required</ion-title>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content>
+         <div *ngIf="isDisplayQrImage()">
+            <div class="font-bold flex justify-content-center">Please download Microsoft/Google Authenticator, scan the QR Code (Or input manual code) to register for 2FA:</div>
+            <div class="flex justify-content-center">
                <img [src]="get2FAQrImage()"/>
-           </div>
-           <div class="flex justify-content-center align-items-center mb-3" *ngIf="get2FAManualKey()">{{ get2FAManualKey() }}<i class="ml-2 pi pi-copy cursor-pointer" pTooltip="Copy to clipboard" (click)="copyToClipboard(get2FAManualKey())"></i></div>
-       </div>
-       <div class="mt-3">
-           <p-divider align="center" [style]="{'z-index': '0'}">
-               <div class="flex justify-content-center col-12 p-0">
-                   <span class="badge-purple font-bold px-2 py-1">Please Input OTP From Authenticator</span>
-               </div>
-           </p-divider>
-           <code-input #codeInput2Fa [isCodeHidden]="false" initialFocusField=0
-           [codeLength]="6"
-           (codeCompleted)="onCodeCompleted($event)">
-           </code-input>
-           <p-divider align="center" [style]="{'z-index': '0'}">
-           </p-divider>
-       </div>
+            </div>
+            <div class="flex justify-content-center align-items-center mb-3" *ngIf="get2FAManualKey()">{{ get2FAManualKey() }}<i class="ml-2 pi pi-copy cursor-pointer" pTooltip="Copy to clipboard" (click)="copyToClipboard(get2FAManualKey())"></i></div>
+         </div>
+         <div class="mt-3">
+             <!-- <p-divider align="center" [style]="{'z-index': '0'}"> -->
+                 <div class="flex justify-content-center col-12 p-0">
+                     <span class="badge-purple font-bold px-2 py-1">Please Input OTP From Authenticator</span>
+                 </div>
+             <!-- </p-divider> -->
+             <code-input #codeInput2Fa [isCodeHidden]="false" [initialFocusField]="0" [codeLength]="6" (codeCompleted)="onCodeCompleted($event)">
+             </code-input>
+             <!-- <p-divider align="center" [style]="{'z-index': '0'}"></p-divider> -->
+         </div>
+      </ion-content>
    </ng-template>
-</p-dialog> -->
-<!-- <p-toast key="codeDialog" position="bottom-center" [style]="{'white-space': 'pre-line'}"></p-toast> -->
+</ion-modal>

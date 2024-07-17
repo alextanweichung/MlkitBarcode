@@ -87,7 +87,6 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                         } else {
                            errorPrompt = "Error 401";
                         }
-                        console.log("🚀 ~ ErrorHandlerInterceptor ~ intercept ~ errorCode:", errorCode)
                         switch (errorCode) {
                            case "TokenExpired":
                               this.promptUserRelogin(errorPrompt);
@@ -143,18 +142,17 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    }
 
    async promptUserRelogin(errorPrompt: string) {
-      let existingModal = await this.modalController.getTop();
+      // console.log("🚀 ~ ErrorHandlerInterceptor ~ promptUserRelogin ~ (await this.modalController.getTop()):", (await this.modalController.getTop())?.id)
       if (this.activatedRoute.snapshot["_routerState"].url == "/login") {
          this.toastService.presentToast("Token Expired", errorPrompt, "top", "danger", 2000);
-         if (existingModal && existingModal.id === "userReloginModal") {
+         if ((await this.modalController.getTop()) && (await this.modalController.getTop()).id.includes("userReloginModal")) {
             this.modalController.dismiss();
          }
       } else {
          const loginUser: LoginUser = JSON.parse(localStorage.getItem("loginUser"));
-         console.log("🚀 ~ ErrorHandlerInterceptor ~ promptUserRelogin ~ loginUser:", loginUser)
          if (loginUser) {
             if (loginUser.tokenExpiredBehavior === "1" || loginUser.tokenExpiredBehavior === "2") {
-               if (existingModal === undefined || existingModal === null || (existingModal && existingModal.id !== "userReloginModal")) {
+               if (!(await this.modalController.getTop()) || ((await this.modalController.getTop()) && !(await this.modalController.getTop()).id.includes("userReloginModal"))) {
                   const modal = await this.modalController.create({
                      id: "userReloginModal",
                      component: UserReloginPage,
@@ -163,7 +161,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                         title: "Login Expired. Please re-login.",
                         loginUser: loginUser
                      },
-                     backdropDismiss: false
+                     backdropDismiss: false,
+                     animated: false
                   });
 
                   await modal.present();

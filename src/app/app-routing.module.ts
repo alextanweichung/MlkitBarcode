@@ -27,7 +27,7 @@ const routes: Routes = [
       path: 'forget-password',
       loadChildren: () => import('./modules/public/forget-password/forget-password.module').then(m => m.ForgetPasswordPageModule)
    },
-   
+
 
    // dashboard  
    {
@@ -176,14 +176,14 @@ const routes: Routes = [
       loadChildren: () => import('./modules/managements/pages/multi-co-pa-reviews/multi-co-pa-reviews.module').then(m => m.MultiCoPaReviewsPageModule)
    },
    {
-     path: 'managements/payment-arrangement-reviews',
-     loadChildren: () => import('./modules/managements/pages/payment-arrangement-reviews/payment-arrangement-reviews.module').then( m => m.PaymentArrangementReviewsPageModule)
+      path: 'managements/payment-arrangement-reviews',
+      loadChildren: () => import('./modules/managements/pages/payment-arrangement-reviews/payment-arrangement-reviews.module').then(m => m.PaymentArrangementReviewsPageModule)
    },
    {
-     path: 'managements/payment-arrangement-approvals',
-     loadChildren: () => import('./modules/managements/pages/payment-arrangement-approvals/payment-arrangement-approvals.module').then( m => m.PaymentArrangementApprovalsPageModule)
+      path: 'managements/payment-arrangement-approvals',
+      loadChildren: () => import('./modules/managements/pages/payment-arrangement-approvals/payment-arrangement-approvals.module').then(m => m.PaymentArrangementApprovalsPageModule)
    },
- 
+
    // management-otp-configuration
    {
       path: 'managements/otp-configuration',
@@ -394,8 +394,8 @@ const routes: Routes = [
       loadChildren: () => import('./modules/transactions/pages/defect-request/defect-request.module').then(m => m.DefectRequestPageModule)
    },
    {
-     path: 'transactions/payment-arrangement/payment-arrangement-detail',
-     loadChildren: () => import('./modules/transactions/pages/payment-arrangement/payment-arrangement-detail/payment-arrangement-detail.module').then( m => m.PaymentArrangementDetailPageModule)
+      path: 'transactions/payment-arrangement/payment-arrangement-detail',
+      loadChildren: () => import('./modules/transactions/pages/payment-arrangement/payment-arrangement-detail/payment-arrangement-detail.module').then(m => m.PaymentArrangementDetailPageModule)
    },
 
 
@@ -533,6 +533,10 @@ const routes: Routes = [
    {
       path: 'sales-cart',
       loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
+   },
+   {
+      path: 'user-relogin',
+      loadChildren: () => import('./shared/pages/user-relogin/user-relogin.module').then(m => m.UserReloginPageModule)
    },
 
 

@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { UserReloginPageRoutingModule } from './user-relogin-routing.module';
 
 import { UserReloginPage } from './user-relogin.page';
+import { CodeInputModule } from 'angular-code-input';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    UserReloginPageRoutingModule
-  ],
-  declarations: [UserReloginPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      UserReloginPageRoutingModule,
+      CodeInputModule
+   ],
+   declarations: [UserReloginPage]
 })
-export class UserReloginPageModule {}
+export class UserReloginPageModule { }

@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
 import { Network } from '@capacitor/network';
+import { CodeInputComponent } from 'angular-code-input';
 
 @Component({
    selector: 'app-signin',
@@ -21,6 +22,8 @@ import { Network } from '@capacitor/network';
 })
 export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
+   loginModel: LoginRequest = { userEmail: "", password: "", loginUserType: "B" };
+
    current_year: number = new Date().getFullYear();
    currentVersion: string;
 
@@ -28,6 +31,10 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    submit_attempt: boolean = false;
 
    rememberMe: boolean = false;
+
+   show2FaDialog: boolean = false;
+   loginResponse: LoginUser;
+   @ViewChild("codeInput2Fa") codeInput !: CodeInputComponent;
 
    constructor(
       private authService: AuthService,
@@ -162,9 +169,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    // Sign in
-   async signIn() {
+   async signIn(append2Fa?: boolean, twoFactorAuthCode?: string) {
       try {
-         // todo : check if delay
          this.configService.selected_sys_param = this.configService.sys_parameter.find(r => r.apiUrl === this.signin_form.controls.apiUrl.value);
          this.submit_attempt = true;
          await this.loadingService.showLoading();
@@ -181,9 +187,17 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Control Error", "Please input email and password", "top", "warning", 1000);
          } else {
-            let loginModel: LoginRequest = this.signin_form.value;
-            (await this.authService.signIn(loginModel)).subscribe(async response => {
+            this.loginModel = this.signin_form.value;
+            if (append2Fa) {
+               this.loginModel.twoFactorType = "authenticator";
+               this.loginModel.twoFactorAuthCode = twoFactorAuthCode;
+            }
+            localStorage.removeItem("loginUser");
+            (await this.authService.signIn(this.loginModel)).subscribe(async response => {
+               this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
                if (Capacitor.getPlatform() !== "web") {
+
+                  /* #region update local db data */
                   this.configService.selected_sys_param.rememberMe = this.rememberMe;
                   if (this.rememberMe) {
                      this.configService.selected_sys_param.username = this.signin_form.controls.userEmail.value;
@@ -193,110 +207,173 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      this.configService.selected_sys_param.password = "";
                   }
                   await this.configService.update_Sys_Parameter(this.configService.selected_sys_param);
+                  /* #endregion */
 
-                  // sync item master and item barcode
-                  try {
-                     // update current version to db
-                     this.commonService.saveVersion().subscribe(response => {
+                  if (this.configService.loginUser) {
+                     if (this.configService.loginUser.loginUserGroupType === "API") {
+                        this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
+                     } else {
 
-                     }, async error => {
-                        await this.loadingService.dismissLoading();
-                        console.error(error);
-                     })
+                        // sync item master and item barcode
+                        try {
+                           // update current version to db
+                           this.commonService.saveVersion().subscribe(response => {
 
-                     this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-                     if (this.configService.loginUser.loginUserType === "C") {
-                        if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
-                           // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                           }, async error => {
+                              await this.loadingService.dismissLoading();
+                              console.error(error);
+                           })
+
+                           if (this.configService.loginUser.loginUserType === "C") {
+                              if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                                 // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                                 await this.loadingService.dismissLoading();
+                                 await this.navController.navigateRoot("/dashboard");
+                              }
+                              else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                                 // sync by location since only 1 location
+                                 this.configService.selected_location = this.configService.loginUser.locationId[0];
+                                 await this.loadingService.showLoading("Downloading resources", false);
+
+                                 let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+                                 let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                                 let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
+                                 await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+                                 let response2 = await this.commonService.syncMarginConfig(this.configService.loginUser.locationId[0]);
+                                 let marginConfig: LocalMarginConfig[] = response2;
+                                 await this.configService.syncMarginConfig(marginConfig);
+
+                                 await this.loadingService.dismissLoading();
+                                 await this.navController.navigateRoot("/dashboard");
+                              } else {
+                                 // show error if consignment user but no location set, error shown in dashboard page
+                                 await this.loadingService.dismissLoading();
+                                 await this.navController.navigateRoot("/dashboard");
+                              }
+                           } else if (this.configService.loginUser.loginUserType === "P") {
+                              if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                                 // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                                 await this.loadingService.dismissLoading();
+                                 await this.navController.navigateRoot("/dashboard");
+                              }
+                              else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                                 // sync by location since only 1 location
+                                 this.configService.selected_location = this.configService.loginUser.locationId[0];
+                                 await this.loadingService.showLoading("Downloading resources", false);
+
+                                 let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
+                                 let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                                 let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
+                                 await this.configService.syncInboundData(itemMaster, itemBarcode);
+
+                                 await this.loadingService.dismissLoading();
+                                 await this.navController.navigateRoot("/dashboard");
+                              } else {
+                                 // show error if consignment user but no location set, error shown in dashboard page
+                                 await this.loadingService.dismissLoading();
+                                 await this.navController.navigateRoot("/dashboard");
+                              }
+                           } else { // for base user
+                              await this.loadingService.showLoading("Downloading resources", false);
+                              let response = await this.commonService.syncInbound();
+                              let itemMaster: LocalItemMaster[] = response["itemMaster"];
+                              let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
+                              await this.configService.syncInboundData(itemMaster, itemBarcode);
+                              await this.loadingService.dismissLoading();
+                              await this.navController.navigateRoot("/dashboard");
+                           }
+                        } catch (error) {
+                           this.submit_attempt = false;
                            await this.loadingService.dismissLoading();
-                           await this.navController.navigateRoot("/dashboard");
+                           this.toastService.presentToast("", error.message, "top", "medium", 1000);
+                        } finally {
+                           this.submit_attempt = false;
+                           await this.loadingService.dismissLoading();
                         }
-                        else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
-                           // sync by location since only 1 location
-                           this.configService.selected_location = this.configService.loginUser.locationId[0];
-                           await this.loadingService.showLoading("Downloading resources", false);
-
-                           let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-                           let itemMaster: LocalItemMaster[] = response["itemMaster"];
-                           let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
-                           await this.configService.syncInboundData(itemMaster, itemBarcode);
-
-                           let response2 = await this.commonService.syncMarginConfig(this.configService.loginUser.locationId[0]);
-                           let marginConfig: LocalMarginConfig[] = response2;
-                           await this.configService.syncMarginConfig(marginConfig);
-
-                           await this.loadingService.dismissLoading();
-                           await this.navController.navigateRoot("/dashboard");
-                        } else {
-                           // show error if consignment user but no location set, error shown in dashboard page
-                           await this.loadingService.dismissLoading();
-                           await this.navController.navigateRoot("/dashboard");
-                        }
-                     } else if (this.configService.loginUser.loginUserType === "P") {
-                        if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
-                           // for consignment user more than 1 location, go to dashboard and let user select then only sync
-                           await this.loadingService.dismissLoading();
-                           await this.navController.navigateRoot("/dashboard");
-                        }
-                        else if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
-                           // sync by location since only 1 location
-                           this.configService.selected_location = this.configService.loginUser.locationId[0];
-                           await this.loadingService.showLoading("Downloading resources", false);
-
-                           let response = await this.commonService.syncInboundConsignment(this.configService.loginUser.locationId[0], format(this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), "yyyy-MM-dd"));
-                           let itemMaster: LocalItemMaster[] = response["itemMaster"];
-                           let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
-                           await this.configService.syncInboundData(itemMaster, itemBarcode);
-
-                           await this.loadingService.dismissLoading();
-                           await this.navController.navigateRoot("/dashboard");
-                        } else {
-                           // show error if consignment user but no location set, error shown in dashboard page
-                           await this.loadingService.dismissLoading();
-                           await this.navController.navigateRoot("/dashboard");
-                        }
-                     } else { // for base user
-                        await this.loadingService.showLoading("Downloading resources", false);
-                        let response = await this.commonService.syncInbound();
-                        let itemMaster: LocalItemMaster[] = response["itemMaster"];
-                        let itemBarcode: LocalItemBarcode[] = response["itemBarcode"];
-                        await this.configService.syncInboundData(itemMaster, itemBarcode);
-                        await this.loadingService.dismissLoading();
-                        await this.navController.navigateRoot("/dashboard");
                      }
-                  } catch (error) {
-                     this.submit_attempt = false;
-                     await this.loadingService.dismissLoading();
-                     this.toastService.presentToast("", error.message, "top", "medium", 1000);
-                  } finally {
-                     this.submit_attempt = false;
-                     await this.loadingService.dismissLoading();
-                  }
-               } else { // for web development
-                  this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-                  if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
-                     // for consignment user more than 1 location, go to dashboard and let user select then only sync
-                  }
-                  else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
-                     this.configService.selected_location = this.configService.loginUser.locationId[0];
-                  } else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 0) {
-                     // show error if consignment user but no location set
-                     this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
                   } else {
-
+                     this.loginResponse = response;
+                     if (this.loginResponse.status === "2FA") {
+                        this.show2FaDialog = true;
+                     } else if (this.loginResponse.status === "IAC") {
+                        this.toastService.presentToast("System Notification", "Invalid Authentication Code.", "top", "danger", 2000);
+                        this.codeInput.focusOnField(5);
+                        this.loginModel.twoFactorType = null;
+                        this.loginModel.twoFactorAuthCode = null;
+                     }
+                     else {
+                        this.loginModel.twoFactorType = null;
+                        this.loginModel.twoFactorAuthCode = null;
+                     }
                   }
-                  this.submit_attempt = false;
-                  await this.loadingService.dismissLoading();
-                  await this.navController.navigateRoot("/dashboard");
+               } else {
+                  // for web development
+                  if (this.configService.loginUser) {
+                     if (this.configService.loginUser.loginUserGroupType === "API") {
+                        this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
+                     } else {
+                        if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                           // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                        }
+                        else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                           this.configService.selected_location = this.configService.loginUser.locationId[0];
+                        } else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 0) {
+                           // show error if consignment user but no location set
+                           this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+                        } else {
+
+                        } 
+                        
+                        this.show2FaDialog = false;
+
+                        setTimeout(async () => {
+
+                           if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
+                              // for consignment user more than 1 location, go to dashboard and let user select then only sync
+                           }
+                           else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 1) {
+                              this.configService.selected_location = this.configService.loginUser.locationId[0];
+                           } else if (this.configService.loginUser.loginUserType === "C" && this.configService.loginUser.locationId && this.configService.loginUser.locationId.length === 0) {
+                              // show error if consignment user but no location set
+                              this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
+                           } else {
+   
+                           }
+                           this.submit_attempt = false;
+                           await this.loadingService.dismissLoading();
+                           await this.navController.navigateRoot("/dashboard");
+                           
+                        }, 50);
+                     }
+                  } else {
+                     this.loginResponse = response;
+                     if (this.loginResponse.status === "2FA") {
+                        this.show2FaDialog = true;
+                     } else if (this.loginResponse.status === "IAC") {
+                        this.toastService.presentToast("System Notification", "Invalid Authentication Code.", "top", "danger", 2000);
+                        this.codeInput.focusOnField(5);
+                        this.loginModel.twoFactorType = null;
+                        this.loginModel.twoFactorAuthCode = null;
+                     }
+                     else {
+                        this.loginModel.twoFactorType = null;
+                        this.loginModel.twoFactorAuthCode = null;  
+                     }
+                  }
                }
             }, async error => {
                this.submit_attempt = false;
+               this.loginModel.twoFactorType = null;
+               this.loginModel.twoFactorAuthCode = null;  
                await this.loadingService.dismissLoading();
                console.error(error);
             });
          }
       } catch (error) {
          await this.loadingService.dismissLoading();
+         this.loginModel.twoFactorType = null;
+         this.loginModel.twoFactorAuthCode = null;  
          console.error(error);
       } finally {
          await this.loadingService.dismissLoading();
@@ -336,6 +413,64 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          ]
       });
       await alert.present();
+   }
+
+   /* #endregion */
+
+   /* #region 2fa */
+
+   on2FaDialogHide() {
+      this.loginResponse = null;
+   }
+
+   isDisplayQrImage() {
+      if (this.loginResponse) {
+         let findAuthenticator = this.loginResponse.options.find(x => x.type === "authenticator");
+         if (findAuthenticator) {
+            if (findAuthenticator.setupInfo && findAuthenticator.setupInfo.qrCodeSetupImageUrl) {
+               return true;
+            } else {
+               return false;
+            }
+         } else {
+            return false;
+         }
+      } else {
+         return false;
+      }
+   }
+
+   get2FAQrImage() {
+      let findAuthenticator = this.loginResponse.options.find(x => x.type == 'authenticator');
+      if (findAuthenticator) {
+         if (findAuthenticator.setupInfo && findAuthenticator.setupInfo.qrCodeSetupImageUrl) {
+            return findAuthenticator.setupInfo.qrCodeSetupImageUrl;
+         } else {
+            return null;
+         }
+      }
+   }
+
+   get2FAManualKey() {
+      let findAuthenticator = this.loginResponse.options.find(x => x.type == 'authenticator');
+      if (findAuthenticator) {
+         if (findAuthenticator.setupInfo && findAuthenticator.setupInfo.manualEntryKey) {
+            return findAuthenticator.setupInfo.manualEntryKey;
+         } else {
+            return null;
+         }
+      }
+   }
+
+   copyToClipboard(manualKey: string) {
+      navigator.clipboard.writeText(manualKey)
+         .then(() => {
+            this.toastService.presentToast("Copied to clipboard.", "", "top", "success", 1000);
+         }).catch(e => console.log(e));
+   }
+
+   onCodeCompleted(event: any) {
+      this.signIn(true, event);
    }
 
    /* #endregion */

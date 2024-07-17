@@ -105,10 +105,10 @@ export class AuthService {
 
    // Sign in
    async signIn(loginModel: LoginRequest) {
-      return this.http.post(this.configService.selected_sys_param.apiUrl + "account/login?testmode=ShortLifeToken", loginModel).pipe(
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "account/login?testmode=ShortLifeToken,ShortLifeRefreshToken", loginModel).pipe(
          map((response: LoginUser) => {
             const loginUser = response;
-            if (loginUser.token !== null) {
+            if (!(loginUser.token === null || loginUser.token === undefined)) {
                localStorage.setItem("loginUser", JSON.stringify(loginUser));
                this.currentUserSource.next(loginUser);
                this.setCurrentUserToken(loginUser.token);
@@ -135,7 +135,7 @@ export class AuthService {
    }
 
    refreshToken(tokenRequest: TokenRequest) {
-      return this.http.post(this.configService.selected_sys_param.apiUrl + "account/refreshToken", tokenRequest).pipe(
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "account/refreshToken?testmode=ShortLifeToken,ShortLifeRefreshToken", tokenRequest).pipe(
          map((response: LoginUser) => {
             const loginUser = response;
             if (loginUser.token != null) {

@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { IonInput, ModalController } from '@ionic/angular';
 import { CodeInputComponent } from 'angular-code-input';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginRequest, LoginUser } from 'src/app/services/auth/login-user';
@@ -21,7 +21,7 @@ export class UserReloginPage implements OnInit {
    loginResponse: LoginUser;
    loginUser: LoginUser;
    currentLoginUser: LoginUser;
-   @ViewChild("inputPassword") inputPasswordElement: ElementRef;
+   @ViewChild("inputPassword") inputPasswordElement: IonInput;
    @ViewChild("codeInput2Fa") codeInput !: CodeInputComponent;
 
    constructor(
@@ -31,40 +31,36 @@ export class UserReloginPage implements OnInit {
    ) { }
 
    ngOnInit() {
-      this.currentLoginUser = this.loginUser
-      console.log("🚀 ~ UserReloginPage ~ ngOnInit ~ this.currentLoginUser:", this.currentLoginUser)
+      this.currentLoginUser = this.loginUser;
       const token = {
          accessToken: this.currentLoginUser?.token,
          refreshToken: this.currentLoginUser?.refreshToken
       }
+      console.log("🚀 ~ UserReloginPage ~ ngOnInit ~ token:", token)
       this.loginModel.userEmail = this.currentLoginUser.userEmail;
       this.tokenExpiredBehavior = this.currentLoginUser.tokenExpiredBehavior;
-      console.log("🚀 ~ UserReloginPage ~ ngOnInit ~ this.tokenExpiredBehavior:", this.tokenExpiredBehavior)
       if (this.tokenExpiredBehavior === "2") {
          this.accountService.refreshToken(token).subscribe(response => {
             this.accountService.buildAllObjects();
             this.displayMode = 1;
-            console.log("🚀 ~ UserReloginPage ~ this.accountService.refreshToken ~ this.displayMode:", this.displayMode)
          }, error => {
             console.log(error);
             this.displayMode = 0;
-            console.log("🚀 ~ UserReloginPage ~ this.accountService.refreshToken ~ this.displayMode:", this.displayMode)
             setTimeout(() => {
-               this.inputPasswordElement.nativeElement.focus();
+               this.inputPasswordElement.setFocus();
             }, 100);
          });
       } else {
          this.displayMode = 0;
-         console.log("🚀 ~ UserReloginPage ~ ngOnInit ~ this.displayMode:", this.displayMode)
          setTimeout(() => {
-            this.inputPasswordElement.nativeElement.focus();
+            this.inputPasswordElement.setFocus();
          }, 100);
       }
    }
 
    async login(append2Fa?: boolean, twoFactorAuthCode?: string) {
       this.inputRequired = "";
-      if (this.loginModel.userEmail == "" || this.loginModel.password == "") {
+      if (this.loginModel.userEmail === "" || this.loginModel.password === "") {
          this.inputRequired = "Please login with your email & password"
       } else {
          if (append2Fa) {
@@ -72,20 +68,23 @@ export class UserReloginPage implements OnInit {
             this.loginModel.twoFactorAuthCode = twoFactorAuthCode;
          }
          localStorage.removeItem("loginUser");
-         (await this.accountService.signIn(this.loginModel)).subscribe(response => {
+         (await this.accountService.signIn(this.loginModel)).subscribe(async response => {
             const loginUser: LoginUser = JSON.parse(localStorage.getItem("loginUser"));
             if (loginUser) {
-               if (loginUser.loginUserGroupType == "API") {
+               if (loginUser.loginUserGroupType === "API") {
                   this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                } else {
-                  this.toastService.presentToast("Logged in successfully", "", "top", "danger", 2000);
-                  this.modalController.dismiss();
+                  this.show2FaDialog = false;
+                  setTimeout(async () => {
+                     await this.modalController.dismiss();
+                  }, 500);
+                  this.toastService.presentToast("Logged in successfully", "", "top", "success", 2000);
                }
             } else {
                this.loginResponse = response;
-               if (this.loginResponse.status == "2FA") {
+               if (this.loginResponse.status === "2FA") {
                   this.show2FaDialog = true;
-               } else if (this.loginResponse.status == "IAC") {
+               } else if (this.loginResponse.status === "IAC") {
                   this.toastService.presentToast("System Notification", "Invalid Authentication Code.", "top", "danger", 2000);
                   this.codeInput.focusOnField(5);
                   this.loginModel.twoFactorType = null;
@@ -96,7 +95,7 @@ export class UserReloginPage implements OnInit {
                   this.loginModel.twoFactorAuthCode = null;
                }
             }
-            //upon successful login, route to main page   
+            //upon successful login, route to main page
          }, error => {
             console.log(error);
             this.loginError = error.error;
@@ -119,7 +118,7 @@ export class UserReloginPage implements OnInit {
 
    isDisplayQrImage() {
       if (this.loginResponse) {
-         let findAuthenticator = this.loginResponse.options.find(x => x.type == "authenticator");
+         let findAuthenticator = this.loginResponse.options.find(x => x.type === "authenticator");
          if (findAuthenticator) {
             if (findAuthenticator.setupInfo && findAuthenticator.setupInfo.qrCodeSetupImageUrl) {
                return true;
@@ -135,7 +134,7 @@ export class UserReloginPage implements OnInit {
    }
 
    get2FAQrImage() {
-      let findAuthenticator = this.loginResponse.options.find(x => x.type == "authenticator");
+      let findAuthenticator = this.loginResponse.options.find(x => x.type === "authenticator");
       if (findAuthenticator) {
          if (findAuthenticator.setupInfo && findAuthenticator.setupInfo.qrCodeSetupImageUrl) {
             return findAuthenticator.setupInfo.qrCodeSetupImageUrl;
@@ -146,7 +145,7 @@ export class UserReloginPage implements OnInit {
    }
 
    get2FAManualKey() {
-      let findAuthenticator = this.loginResponse.options.find(x => x.type == "authenticator");
+      let findAuthenticator = this.loginResponse.options.find(x => x.type === "authenticator");
       if (findAuthenticator) {
          if (findAuthenticator.setupInfo && findAuthenticator.setupInfo.manualEntryKey) {
             return findAuthenticator.setupInfo.manualEntryKey;
@@ -168,7 +167,6 @@ export class UserReloginPage implements OnInit {
    }
 
    closeRef() {
-      console.log("🚀 ~ UserReloginPage ~ closeRef ~ this.modalController:", this.modalController)
       this.modalController.dismiss();
    }
 

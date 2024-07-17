@@ -7,15 +7,17 @@ import { IonicModule } from '@ionic/angular';
 import { SigninPageRoutingModule } from './signin-routing.module';
 
 import { SigninPage } from './signin.page';
+import { CodeInputModule } from 'angular-code-input';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    SigninPageRoutingModule,
-    ReactiveFormsModule
-  ],
-  declarations: [SigninPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      SigninPageRoutingModule,
+      ReactiveFormsModule,
+      CodeInputModule
+   ],
+   declarations: [SigninPage]
 })
-export class SigninPageModule {}
+export class SigninPageModule { }
