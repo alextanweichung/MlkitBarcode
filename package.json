@@ -60,7 +60,7 @@
       "ngx-pagination": "^6.0.3",
       "ngx-pinch-zoom": "^2.6.2",
       "ngx-spinner": "^16.0.2",
-      "onesignal-cordova-plugin": "^3.3.2",
+      "onesignal-cordova-plugin": "^5.2.3",
       "primeicons": "^1.0.0",
       "rxjs": "~6.6.0",
       "sharp": "^0.31.0",
