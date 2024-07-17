@@ -33,6 +33,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    itemsPerPage: number = 12;
 
    binDesc: string = "";
+   selectedBin: SearchDropdownList;
    fLocationZoneDetail: MasterListDetails[] = [];
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
@@ -86,8 +87,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    onItemAdd(event: TransactionDetail[]) {
       if (event && event.length > 0) {
-         event.forEach(r => {
-            this.addItemToLine(r);
+         event.forEach(async r => {
+            await this.addItemToLine(r);
          })
          try {
             this.barcodescaninput.setFocus();
@@ -143,7 +144,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                   itemBarcodeTagId: trxLine.itemBarcodeTagId,
                   itemBarcode: trxLine.itemBarcode,
                   qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
-                  binDesc: this.binDesc,
+                  binDesc: (this.objectService.configInvCountActivateLineWithBin && !this.objectService.configInvCountBinFromLocation) ? this.binDesc : null,
+                  binId: (this.objectService.configInvCountActivateLineWithBin && this.objectService.configInvCountBinFromLocation) ? this.selectedBin?.id : null,
                   sequence: 0,
                   // for local use
                   itemCode: trxLine.itemCode,
@@ -168,7 +170,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                itemBarcodeTagId: trxLine.itemBarcodeTagId,
                itemBarcode: trxLine.itemBarcode,
                qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
-               binDesc: this.binDesc,
+               binDesc: (this.objectService.configInvCountActivateLineWithBin && !this.objectService.configInvCountBinFromLocation) ? this.binDesc : null,
+               binId: (this.objectService.configInvCountActivateLineWithBin && this.objectService.configInvCountBinFromLocation) ? this.selectedBin?.id : null,
                sequence: 0,
                // for local use
                itemCode: trxLine.itemCode,
@@ -321,6 +324,65 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
+   updateBinModal: boolean = false;
+   selectedStockCountDetail: StockCountDetail;
+   updateBinId(rowData: StockCountDetail) {
+      let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+      if (index > -1) {
+         this.selectedStockCountDetail = this.objectService.objectDetail[index];
+      } else {
+         this.selectedStockCountDetail = null;
+      }
+   }
+
+   hideUpdateBinModal() {
+      this.selectedStockCountDetail = null;
+      this.updateBinModal = false;
+   }
+
+   onUpdateBinSelected(event: SearchDropdownList) {
+      if (event) {
+         let found = this.fLocationZoneDetail.find(r => r.id === event.id);
+         if (found && this.selectedStockCountDetail) {
+            this.selectedStockCountDetail.binId = event.id;
+         } else {
+            this.selectedStockCountDetail.binId = null;
+         }
+      } else {
+         this.selectedStockCountDetail.binId = null;
+      }
+   }
+
+   onUpdateBinScanCompleted(event: string) {
+      try {
+         if (event) {
+            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found && this.selectedStockCountDetail) {
+               this.selectedStockCountDetail.binId = found.id
+            } else {
+               this.selectedStockCountDetail.binId = null;
+            }
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   onUpdateBinDoneScanning(event: string) {
+      try {
+         if (event) {
+            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            if (found && this.selectedStockCountDetail) {
+               this.selectedStockCountDetail.binId = found.id;
+            } else {
+               this.selectedStockCountDetail.binId = null;
+            }
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+   
    /* #endregion */
 
    /* #region  camera scanner */
@@ -548,14 +610,14 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    onBinSelected(event: SearchDropdownList) {
       if (event) {
-         let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.code.toUpperCase());
+         let found = this.fLocationZoneDetail.find(r => r.id === event.id);
          if (found) {
-            this.binDesc = found.code;
+            this.selectedBin = event;
          } else {
-            this.binDesc = null;
+            this.selectedBin = null;
          }
       } else {
-         this.binDesc = null;
+         this.selectedBin = null;
       }
    }
 

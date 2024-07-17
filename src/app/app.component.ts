@@ -8,7 +8,6 @@ import { ConfigService } from './services/config/config.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { NotificationsService } from './shared/services/notifications.service';
 import OneSignal from 'onesignal-cordova-plugin';
-import { App, AppState } from '@capacitor/app';
 
 @Component({
    selector: 'app-root',
@@ -52,16 +51,6 @@ export class AppComponent {
             // Set StatusBar style (dark / light)
             await StatusBar.setStyle({ style: Style.Dark });
             await BarcodeScanner.checkPermission({ force: true });
-
-            // App.addListener("appStateChange", (state: AppState) => {
-            //    if (state.isActive) {
-
-            //    } else {
-            //       this.ngZone.run(() => {
-            //          this.handleAppDestroy();
-            //       })
-            //    }
-            // })
          }
 
          // ...
@@ -88,16 +77,18 @@ export class AppComponent {
 
 function OneSignalInit() {
    // Uncomment to set OneSignal device logging to VERBOSE  
-   // OneSignal.setLogLevel(6, 0);
-
+   OneSignal.setLogLevel(6, 0);
+   
    // NOTE: Update the setAppId value below with your OneSignal AppId.
-   OneSignal.setAppId("18607f67-a6dc-44cb-ac02-91770a58a695");
+   OneSignal.setAppId("7f373743-31c5-49d7-b2ba-bffb45ab191e");
+
    OneSignal.setNotificationOpenedHandler(function (jsonData) {
       console.log("notificationOpenedCallback: " + JSON.stringify(jsonData));
    });
 
    // Prompts the user for notification permissions.
    //    * Since this shows a generic native prompt, we recommend instead using an In-App Message to prompt for notification permission (See step 7) to better communicate to your users what notifications they will get.
+   
    OneSignal.promptForPushNotificationsWithUserResponse(function (accepted) {
       console.log("User accepted notifications: " + accepted);
    });

@@ -83,6 +83,7 @@ export interface StockCountDetail {
    qtyApproved?: number
    qtyCommit?: number
    binDesc: string
+   binId: number
    sequence: number
    createdById?: number
    createdBy?: string

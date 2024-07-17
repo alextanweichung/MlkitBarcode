@@ -214,6 +214,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                         this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                      } else {
 
+                        this.show2FaDialog = false;
+
                         // sync item master and item barcode
                         try {
                            // update current version to db
