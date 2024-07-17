@@ -13,12 +13,18 @@ export interface LoginUser {
    loginUserGroupType: string
    locationId: number[]
    defaultLocationId: number
+   
+   status: string;    // SCS: Success, 2FA: Required 2 Factor, IAC: Invalid Authenticator Code
+   tokenExpiredBehavior: string;
+   options: AuthenticatorOption[]
 }
 
 export interface LoginRequest {
    userEmail: string;
    password: string;
    loginUserType: string;
+   twoFactorType?: string;
+   twoFactorAuthCode?: string;
 }
 
 export interface TokenRequest {
@@ -48,4 +54,14 @@ export interface ResetPassword {
    confirmPassword: string;
    userEmail: string;
    token: string;
+}
+
+export interface AuthenticatorOption {
+   type: string;
+   setupInfo: AuthenticatorSetupInfo
+}
+
+export interface AuthenticatorSetupInfo {
+   manualEntryKey: string;
+   qrCodeSetupImageUrl: string;
 }

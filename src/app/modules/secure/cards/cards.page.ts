@@ -1,7 +1,7 @@
 import { AfterContentChecked, Component, OnInit, ViewChild } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
-import { AlertController, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -15,6 +15,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { DashboardService } from '../../dashboard/services/dashboard.service';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { LoginUser } from 'src/app/services/auth/login-user';
+import { UserReloginPage } from 'src/app/shared/pages/user-relogin/user-relogin.page';
 
 SwiperCore.use([Pagination]);
 
@@ -52,6 +53,7 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
       private toastService: ToastService,
       private loadingService: LoadingService,
       private alertController: AlertController,
+      private modalController: ModalController,
       private navController: NavController
    ) {
       this.currentVersion = environment.version;
@@ -250,6 +252,21 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
    }
 
    async signOut() {
+      // const loginUser: LoginUser = JSON.parse(localStorage.getItem("loginUser"));
+      // const modal = await this.modalController.create({
+      //    component: UserReloginPage,
+      //    cssClass: "ion-custom-modal",
+      //    componentProps:{
+      //       title: "Login Expired. Please re-login.",
+      //       loginUser: loginUser
+      //    },
+      //    backdropDismiss: false
+      // });
+
+      // await modal.present();
+      // let { data } = await modal.onWillDismiss();
+      // console.log("🚀 ~ CardsPage ~ signOut ~ data:", data)
+
       const alert = await this.alertController.create({
          cssClass: "custom-alert",
          header: "Sign-out?",

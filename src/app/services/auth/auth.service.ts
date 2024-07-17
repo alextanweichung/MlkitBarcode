@@ -105,7 +105,7 @@ export class AuthService {
 
    // Sign in
    async signIn(loginModel: LoginRequest) {
-      return this.http.post(this.configService.selected_sys_param.apiUrl + "account/login", loginModel).pipe(
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "account/login?testmode=ShortLifeToken", loginModel).pipe(
          map((response: LoginUser) => {
             const loginUser = response;
             if (loginUser.token !== null) {
@@ -117,6 +117,8 @@ export class AuthService {
                this.isLoggedIn = true;
                this.checkAdminRights(loginUser.token);
                this.updatePlayerId(loginUser);
+            } else {
+               return response;
             }
          })
       )

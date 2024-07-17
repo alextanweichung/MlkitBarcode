@@ -10,6 +10,10 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ModalController, NavController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { LoginUser } from 'src/app/services/auth/login-user';
+import { UserReloginPage } from 'src/app/shared/pages/user-relogin/user-relogin.page';
 
 const BACKGROUND_LOAD = new HttpContextToken<boolean>(() => false);
 
@@ -21,7 +25,10 @@ export function background_load() {
 export class ErrorHandlerInterceptor implements HttpInterceptor {
 
    constructor(
-      private toastService: ToastService
+      private toastService: ToastService,
+      private navController: NavController,
+      private modalController: ModalController,
+      private activatedRoute: ActivatedRoute
    ) { }
 
    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -32,7 +39,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          return next.handle(authReq);
       }
       // static ɵcmp: i0.ɵɵComponentDeclaration<NgxSpinnerComponent, "ngx-spinner", never, { "bdColor": "bdColor"; "size": "size"; "color": "color"; "type": "type"; "fullScreen": "fullScreen"; "name": "name"; "zIndex": "zIndex"; "template": "template"; "showSpinner": "showSpinner"; "disableAnimation": "disableAnimation"; }, {}, never, ["*"]>;
-      
+
       const authToken = 'Bearer ' + JSON.parse(localStorage.getItem('loginUser'))?.token
       const overrideAuthToken = request.headers.get('Authorization');
       const authReq = request.clone({
@@ -46,10 +53,10 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       if (request.context.get(BACKGROUND_LOAD)) {
          finished = true;
       }
-   
+
       setTimeout(() => {
          if (!finished) {
-            
+
          }
       }, 800);
 
@@ -67,25 +74,62 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                         }
                         throw modalStateErrors.flat();
 
-                     } else {                        
-                        this.toastService.presentToast('Bad request error', error.status + ':' + error.statusText, 'top', 'danger', 2000);
+                     } else {
+                        this.toastService.presentToast("Bad request error", error.status + ':' + error.statusText, "top", "danger", 2000);
                      }
                      break;
                   case 401:
-                     if (error?.error?.description) {
-                        this.toastService.presentToast('Unauthorised', error?.error?.description, 'top', 'danger', 2000);
+                     if (error.error && error.error.code) {
+                        let errorCode = error.error.code;
+                        let errorPrompt: string;
+                        if (error.error.description) {
+                           errorPrompt = error.error.description;
+                        } else {
+                           errorPrompt = "Error 401";
+                        }
+                        console.log("🚀 ~ ErrorHandlerInterceptor ~ intercept ~ errorCode:", errorCode)
+                        switch (errorCode) {
+                           case "TokenExpired":
+                              this.promptUserRelogin(errorPrompt);
+                              break;
+                           case "RefreshTokenExpired":
+                              this.promptUserRelogin(errorPrompt);
+                              break;
+                           case "TokenRevoked":
+                              this.toastService.presentToast("Token Revoked", errorPrompt, "top", "danger", 2000);
+                              localStorage.removeItem("loginUser");
+                              this.navController.navigateRoot("/login");
+                              break;
+                           case "InvalidToken":
+                              this.toastService.presentToast("Invalid Token", errorPrompt, "top", "danger", 2000);
+                              break;
+                           default:
+                              this.toastService.presentToast("Unauthorised", errorPrompt, "top", "danger", 2000);
+                              break;
+                        }
                      } else {
-                        this.toastService.presentToast('Unauthorised', error.status + ':' + error.statusText, 'top', 'danger', 2000);
+                        if (error.error) {
+                           this.toastService.presentToast("Unauthorised", error.error, "top", "danger", 2000);
+                        } else {
+                           this.toastService.presentToast("Unauthorised", "Error 401", "top", "danger", 2000);
+                        }
                      }
                      break;
                   case 404:
-                     this.toastService.presentToast('No result', 'Resources not found.', 'top', 'danger', 2000);
+                     this.toastService.presentToast("No result", "Resources not found.", "top", "danger", 2000);
+                     break;
+                  case 405:
+                     this.toastService.presentToast("Method Not Allowed", "API function not implemented.", "top", "danger", 2000);
                      break;
                   case 500:
-                     this.toastService.presentToast('Error', error?.error?.message, 'top', 'danger', 2000);
+                     this.toastService.presentToast("Internal server error 500", error.error.message, "top", "danger", 2000);
+                     break;
+                  case 503:
+                     this.toastService.presentToast("System Validation", error.error.message, "top", "danger", 2000);
                      break;
                   default:
-                     this.toastService.presentToast('Error', 'Something went wrong', 'top', 'danger', 2000);
+                     this.toastService.presentToast("Something went wrong", "", "top", "danger", 2000);
+                     console.log(error);
                      break;
                }
             }
@@ -97,4 +141,40 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
          })
       );
    }
+
+   async promptUserRelogin(errorPrompt: string) {
+      let existingModal = await this.modalController.getTop();
+      if (this.activatedRoute.snapshot["_routerState"].url == "/login") {
+         this.toastService.presentToast("Token Expired", errorPrompt, "top", "danger", 2000);
+         if (existingModal && existingModal.id === "userReloginModal") {
+            this.modalController.dismiss();
+         }
+      } else {
+         const loginUser: LoginUser = JSON.parse(localStorage.getItem("loginUser"));
+         console.log("🚀 ~ ErrorHandlerInterceptor ~ promptUserRelogin ~ loginUser:", loginUser)
+         if (loginUser) {
+            if (loginUser.tokenExpiredBehavior === "1" || loginUser.tokenExpiredBehavior === "2") {
+               if (existingModal === undefined || existingModal === null || (existingModal && existingModal.id !== "userReloginModal")) {
+                  const modal = await this.modalController.create({
+                     id: "userReloginModal",
+                     component: UserReloginPage,
+                     cssClass: "ion-custom-modal",
+                     componentProps: {
+                        title: "Login Expired. Please re-login.",
+                        loginUser: loginUser
+                     },
+                     backdropDismiss: false
+                  });
+
+                  await modal.present();
+               }
+            } else {
+               this.toastService.presentToast("Token Expired", errorPrompt, "top", "danger", 2000);
+            }
+         } else {
+            this.toastService.presentToast("Unauthorised", errorPrompt, "top", "danger", 2000);
+         }
+      }
+   }
+
 }

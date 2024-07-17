@@ -535,6 +535,7 @@ const routes: Routes = [
       loadChildren: () => import('./shared/pages/sales-cart/sales-cart.module').then(m => m.SalesCartPageModule)
    },
 
+
 ];
 @NgModule({
    imports: [

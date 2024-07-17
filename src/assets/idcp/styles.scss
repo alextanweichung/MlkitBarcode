@@ -775,6 +775,11 @@ ion-modal.ion-modal-calendar {
    }
 }
 
+ion-modal.ion-custom-modal {
+   --height: 50vh;
+   padding: 0 10px;
+}
+
 .scan-box {
    border: 2px solid #fff;
    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5);
