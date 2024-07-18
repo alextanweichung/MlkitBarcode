@@ -4,9 +4,13 @@ export interface ConsignmentSalesList {
   consignmentSalesId: number
   consignmentSalesNum: string
   trxDate: Date
+  customerCode: string
   customerName: string
   locationDesc: string
+  toLocationCode: string
   toLocationDesc: string
+  grandTotal: number
+  qtyRequest: number
   deactivated: boolean
   isEntryCompleted: boolean
 }

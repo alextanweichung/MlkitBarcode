@@ -129,7 +129,7 @@
          </ion-item>
       </ion-list>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <ion-item button detail="false" class="ion-no-padding no-ripple"            *ngFor="let rowData of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
+         <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let rowData of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
             <ion-grid class="ion-no-padding py-2 pl-2">
                <ion-row>
                   <ion-col size="1" class="ion-flex ion-margin-auto">
@@ -141,17 +141,18 @@
                            <ion-col class="ion-flex ion-margin-auto">
                               <div class="font-bold">{{rowData.itemBarcode}}</div>
                            </ion-col>
-                           <ion-col class="ion-flex ion-margin-auto justify-content-end"                              *ngIf="objectService.configInvCountActivateLineWithBin && rowData.binDesc">
-                              <div class="ion-text-wrap font-bold">[{{rowData.binDesc}}]</div>
+                           <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="objectService.configInvCountActivateLineWithBin">
+                              <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && !objectService.configInvCountBinFromLocation && rowData.binDesc">[{{rowData.binDesc}}]</div>
+                              <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation && rowData.binId">[{{rowData.binId|idMapping:objectService.locationZoneDetailMasterList}}]</div>
                            </ion-col>
                         </ion-row>
                         <ion-row>
                            <ion-col class="ion-flex ion-margin-auto">
                               <div class="ion-flex">
                                  {{rowData.itemCode}}
-                                 <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1"                                    *ngIf="rowData.itemVariationXDescription">
+                                 <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXDescription">
                                     {{rowData.itemVariationXDescription}}</span>
-                                 <span class="badge-purple ion-text-wrap ion-flex my-auto px-1"                                    *ngIf="rowData.itemVariationYDescription">
+                                 <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYDescription">
                                     {{rowData.itemVariationYDescription}}</span>
                               </div>
                            </ion-col>

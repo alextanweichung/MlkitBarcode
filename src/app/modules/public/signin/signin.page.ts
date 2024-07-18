@@ -211,7 +211,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      if (this.configService.loginUser.loginUserGroupType === "API") {
                         this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                      } else {
-
+                        
                         await OneSignal.User.addEmail(this.configService.loginUser.userEmail);
                         this.show2FaDialog = false;
 

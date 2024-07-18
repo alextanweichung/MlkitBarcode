@@ -5,6 +5,7 @@ import { ActionSheetController, IonDatetime, NavController, ViewDidEnter, ViewWi
 import { format, parseISO } from 'date-fns';
 import { InventoryCountBatchList, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
@@ -21,6 +22,7 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
 
    constructor(
       public objectService: StockCountService,
+      public authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,
       private actionSheetController: ActionSheetController,

@@ -49,7 +49,23 @@
          </ion-text>
       </div>
    </div>
-</ion-content>
+</ion-content><ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+   <ng-template>
+      <ion-content class="p-2">
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button detail="false" (click)="popover.dismiss(); addNewActivation();">
+               <ion-icon name="add-circle-outline" slot="end"></ion-icon>
+               <ion-label>
+                  <div>Activate Company</div>
+               </ion-label>
+            </ion-item>
+            <ion-item *ngIf="configService.sys_parameter.length > 1" button detail="false" (click)="popover.dismiss(); deleteAlert();">
+               <ion-icon slot="end" name="trash-outline"></ion-icon>Delete
+            </ion-item>
+         </ion-list>
+      </ion-content>
+   </ng-template>
+</ion-popover>
 <ion-modal id="userReloginModal2FA" [isOpen]="show2FaDialog" [style]="{top: '25vh'}" (didDismiss)="on2FaDialogHide()" backdropDismiss="false" showBackdrop="true">
    <ng-template>
       <ion-header>

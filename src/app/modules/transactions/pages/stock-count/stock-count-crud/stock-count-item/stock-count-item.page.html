@@ -99,8 +99,8 @@
                                  <div class="font-bold">{{rowData.itemBarcode}}</div>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="objectService.configInvCountActivateLineWithBin">
-                                 <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && !objectService.configInvCountBinFromLocation">[{{rowData.binDesc}}]</div>
-                                 <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation">[{{rowData.binId|idMapping:fLocationZoneDetail}}]</div>
+                                 <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && !objectService.configInvCountBinFromLocation && rowData.binDesc">[{{rowData.binDesc}}]</div>
+                                 <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation && rowData.binId">[{{rowData.binId|idMapping:fLocationZoneDetail}}]</div>
                               </ion-col>
                            </ion-row>
                            <ion-row>
@@ -181,5 +181,16 @@
             </ion-list>
          </div>
       </ion-content>
+      <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+         <ion-grid class="ion-no-padding">
+            <ion-row>
+               <ion-col>
+                  <ion-button class="ion-margin" expand="block" size="default" (click)="hideUpdateBinModal()">
+                     Save
+                  </ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-grid>
+      </ion-footer>
    </ng-template>
 </ion-modal>

@@ -181,11 +181,22 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
       }
       this.itemSearchText = searchText;
       try {
-         if (searchText && searchText.trim().length > 2) {
+         if (searchText.length === 0) {
+            this.resetFilteredObj();
+         }
+         else if (searchText && searchText.trim().length > 2) {
             if (Capacitor.getPlatform() !== "web") {
                Keyboard.hide();
             }
-            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.consignmentSalesNum?.toUpperCase().includes(searchText.toUpperCase()))));
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
+               r.consignmentSalesNum?.toUpperCase().includes(searchText.toUpperCase())
+               || r.customerCode?.toUpperCase().includes(searchText.toUpperCase())
+               || r.customerName?.toUpperCase().includes(searchText.toUpperCase())
+               || r.toLocationCode?.toUpperCase().includes(searchText.toUpperCase())
+               || r.toLocationDesc?.toUpperCase().includes(searchText.toUpperCase())
+               || r.qtyRequest.toString().includes(searchText.toUpperCase())
+               || r.grandTotal.toString().includes(searchText.toUpperCase())
+            )));
             this.currentPage = 1;
          } else {
             this.resetFilteredObj();

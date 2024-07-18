@@ -330,8 +330,10 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
       if (index > -1) {
          this.selectedStockCountDetail = this.objectService.objectDetail[index];
+         this.updateBinModal = true;
       } else {
          this.selectedStockCountDetail = null;
+         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
       }
    }
 
