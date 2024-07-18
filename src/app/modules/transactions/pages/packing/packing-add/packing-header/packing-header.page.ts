@@ -48,7 +48,6 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       if (this.objectService.header && (this.objectService.header.multiPackingId > 0 || (this.objectService.header.isTrxLocal && this.objectService.header.guid))) {
          this.isWithType = this.objectService.header?.isWithSo ? (this.objectService.header?.copyFrom === "S" ? "SO" : "B2B") : "NONE";
          this.objectForm.patchValue(this.objectService.object.header);
-         console.log("🚀 ~ PackingHeaderPage ~ ionViewWillEnter ~ this.objectForm:", JSON.stringify(this.objectForm.value))
          this.patchInfo();
          if (this.objectService.header && this.objectService.header.isWithSo) {
             this.loadExisitingSO(this.objectService.object.outstandingPackList.flatMap(r => r.salesOrderNum));

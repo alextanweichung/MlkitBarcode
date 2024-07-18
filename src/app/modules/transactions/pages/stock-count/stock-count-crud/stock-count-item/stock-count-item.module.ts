@@ -12,6 +12,7 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
 import { NgxPaginationModule } from 'ngx-pagination';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { SearchDropdownPageModule } from "../../../../../../shared/pages/search-dropdown/search-dropdown.module";
+import { BinMappingModule } from 'src/app/shared/pipes/bin-mapping/bin-mapping.module';
 
 @NgModule({
    imports: [
@@ -20,6 +21,7 @@ import { SearchDropdownPageModule } from "../../../../../../shared/pages/search-
       IonicModule,
       StockCountItemPageRoutingModule,
       IdMappingModule,
+      BinMappingModule,
       BarcodeScanInputPageModule,
       SumModule,
       NgxPaginationModule,

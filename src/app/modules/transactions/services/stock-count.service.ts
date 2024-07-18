@@ -8,6 +8,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { BinList } from '../models/transfer-bin';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -92,7 +93,6 @@ export class StockCountService {
    itemBrandMasterList: MasterListDetails[] = [];
    itemGroupMasterList: MasterListDetails[] = [];
    itemCategoryMasterList: MasterListDetails[] = [];
-   locationZoneDetailMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -105,7 +105,6 @@ export class StockCountService {
       this.itemCategoryMasterList = this.fullMasterList.filter(x => x.objectName === "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.rackMasterList = this.fullMasterList.filter(x => x.objectName === "Rack").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.zoneMasterList = this.fullMasterList.filter(x => x.objectName === "Zone").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.locationZoneDetailMasterList = this.fullMasterList.filter(x => x.objectName === "LocationBin").flatMap(src => src.details).filter(y => y.deactivated === 0);      
    }
 
    objectHeader: StockCountHeader = null;
@@ -176,6 +175,10 @@ export class StockCountService {
 
    updateInventoryCount(inventoryCountRoot: StockCountRoot) {
       return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileInventoryCount", inventoryCountRoot, httpObserveHeader);
+   }
+
+   getBinListByLocationId(locationId: number) {
+      return this.http.get<BinList[]>(this.configService.selected_sys_param.apiUrl + `MobileInventoryCount/binList/${locationId}`);
    }
 
    sendDebug(debugObject: JsonDebug) {

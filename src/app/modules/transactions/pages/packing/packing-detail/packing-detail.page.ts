@@ -105,7 +105,6 @@ export class PackingDetailPage implements OnInit, ViewWillEnter {
 			object.header.guid = localObject.id;
 			object.header.lastUpdated = localObject.lastUpdated;
          // object.header = this.commonService.convertObjectAllDateType(object.header);
-         console.log("🚀 ~ PackingDetailPage ~ loadLocalObject ~ object.header:", JSON.stringify(object.header))
 			if (this.isLocal) {
 				await this.objectService.setLocalObject(JSON.parse(JSON.stringify(localObject)));
 			}

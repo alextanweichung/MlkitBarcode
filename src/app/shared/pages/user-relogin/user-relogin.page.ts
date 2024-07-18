@@ -36,7 +36,6 @@ export class UserReloginPage implements OnInit {
          accessToken: this.currentLoginUser?.token,
          refreshToken: this.currentLoginUser?.refreshToken
       }
-      console.log("🚀 ~ UserReloginPage ~ ngOnInit ~ token:", token)
       this.loginModel.userEmail = this.currentLoginUser.userEmail;
       this.tokenExpiredBehavior = this.currentLoginUser.tokenExpiredBehavior;
       if (this.tokenExpiredBehavior === "2") {
@@ -77,7 +76,6 @@ export class UserReloginPage implements OnInit {
                   this.show2FaDialog = false;
                   // setTimeout(async () => {
                   //    let ret = await this.modalController.getTop();
-                  //    console.log("🚀 ~ UserReloginPage ~ setTimeout ~ ret:", ret)
                   // }, 100);
                   this.toastService.presentToast("Logged in successfully", "", "top", "success", 2000);
                }
@@ -114,7 +112,6 @@ export class UserReloginPage implements OnInit {
    }
 
    async on2FaDialogHide() {
-      console.log("🚀 ~ UserReloginPage ~ on2FaDialogHide ~ on2FaDialogHide:")
       this.loginResponse = null;
       try {
          await this.modalController.dismiss(null, null, "userReloginModal");

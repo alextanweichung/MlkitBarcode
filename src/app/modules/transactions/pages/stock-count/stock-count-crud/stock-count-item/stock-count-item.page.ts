@@ -3,7 +3,7 @@ import { NavigationExtras } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
-import { AlertController, IonInput, IonPopover, NavController, ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { StockCountDetail, InventoryCountBatchCriteria, StockCountRoot } from 'src/app/modules/transactions/models/stock-count';
 import { StockCountService } from 'src/app/modules/transactions/services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -11,14 +11,12 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
-import { ModuleControl } from 'src/app/shared/models/module-control';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-input.service';
 import { v4 as uuidv4 } from 'uuid';
-import { StockCountDetailPage } from '../../stock-count-detail/stock-count-detail.page';
-import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { BinList } from 'src/app/modules/transactions/models/transfer-bin';
 
 @Component({
    selector: 'app-stock-count-item',
@@ -34,7 +32,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    binDesc: string = "";
    selectedBin: SearchDropdownList;
-   fLocationZoneDetail: MasterListDetails[] = [];
+   binList: BinList[] = [];
+   binListDropDown: SearchDropdownList[] = [];
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -49,8 +48,18 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ) { }
 
    ionViewWillEnter(): void {
-      if (this.objectService.locationZoneDetailMasterList && this.objectService.locationZoneDetailMasterList.length > 0) {
-         this.fLocationZoneDetail = this.objectService.locationZoneDetailMasterList.filter(r => Number(r.attribute1) === this.objectService.objectHeader.locationId);
+      if (this.objectService.objectHeader && this.objectService.objectHeader.locationId) {
+         this.objectService.getBinListByLocationId(this.objectService.objectHeader.locationId).subscribe({
+            next: async (response) => {
+               this.binList = response;
+               for await (let rowData of this.binList) {
+                  this.binListDropDown.push({ id: rowData.binId, code: rowData.binCode, description: rowData.binCode });                  
+               }
+            },
+            error: (error) => {
+               console.log(error);
+            }
+         })
       }
    }
 
@@ -344,7 +353,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    onUpdateBinSelected(event: SearchDropdownList) {
       if (event) {
-         let found = this.fLocationZoneDetail.find(r => r.id === event.id);
+         let found = this.binList.find(r => r.binId === event.id);
          if (found && this.selectedStockCountDetail) {
             this.selectedStockCountDetail.binId = event.id;
          } else {
@@ -358,9 +367,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    onUpdateBinScanCompleted(event: string) {
       try {
          if (event) {
-            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            let found = this.binList.find(r => r.binCode.toUpperCase() === event.toUpperCase());
             if (found && this.selectedStockCountDetail) {
-               this.selectedStockCountDetail.binId = found.id
+               this.selectedStockCountDetail.binId = found.binId
             } else {
                this.selectedStockCountDetail.binId = null;
             }
@@ -373,9 +382,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    onUpdateBinDoneScanning(event: string) {
       try {
          if (event) {
-            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            let found = this.binList.find(r => r.binCode.toUpperCase() === event.toUpperCase());
             if (found && this.selectedStockCountDetail) {
-               this.selectedStockCountDetail.binId = found.id;
+               this.selectedStockCountDetail.binId = found.binId;
             } else {
                this.selectedStockCountDetail.binId = null;
             }
@@ -612,7 +621,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    onBinSelected(event: SearchDropdownList) {
       if (event) {
-         let found = this.fLocationZoneDetail.find(r => r.id === event.id);
+         let found = this.binList.find(r => r.binId === event.id);
          if (found) {
             this.selectedBin = event;
          } else {
@@ -626,9 +635,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    onBinScanCompleted(event: string) { // truck arrangement
       try {
          if (event) {
-            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            let found = this.binList.find(r => r.binCode.toUpperCase() === event.toUpperCase());
             if (found) {
-               this.onBinSelected({ id: found.id, code: found.code });
+               this.onBinSelected({ id: found.binId, code: found.binCode });
             } else {
                this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
             }
@@ -641,9 +650,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    onBinDoneScanning(event) { // truck arrangement
       try {
          if (event) {
-            let found = this.fLocationZoneDetail.find(r => r.code.toUpperCase() === event.toUpperCase());
+            let found = this.binList.find(r => r.binCode.toUpperCase() === event.toUpperCase());
             if (found) {
-               this.onBinSelected({ id: found.id, code: found.code });
+               this.onBinSelected({ id: found.binId, code: found.binCode });
             } else {
                this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
             }

@@ -67,7 +67,7 @@
       </ng-container>
       <ng-container *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation">
          <ion-list class="list-custom animate__animated animate__fadeIn mb-2" lines="full">
-            <app-search-dropdown title="Current Bin" [masterDropdownList]="fLocationZoneDetail" [selectedId]="selectedBin?.id" (onActionComplete)="onBinSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onBinScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onBinDoneScanning($event)"></app-search-dropdown>
+            <app-search-dropdown title="Current Bin" [searchDropdownList]="binListDropDown" [optionLabel]="'code'" [selectedId]="selectedBin?.id" (onActionComplete)="onBinSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onBinScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onBinDoneScanning($event)"></app-search-dropdown>
          </ion-list>
       </ng-container>
       <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [itemUomMasterList]="objectService.itemUomMasterList"></app-barcode-scan-input>
@@ -100,7 +100,7 @@
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="objectService.configInvCountActivateLineWithBin">
                                  <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && !objectService.configInvCountBinFromLocation && rowData.binDesc">[{{rowData.binDesc}}]</div>
-                                 <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation && rowData.binId">[{{rowData.binId|idMapping:fLocationZoneDetail}}]</div>
+                                 <div class="ion-text-wrap font-bold" *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation && rowData.binId">[{{rowData.binId|binMapping:binList}}]</div>
                               </ion-col>
                            </ion-row>
                            <ion-row>
@@ -177,7 +177,7 @@
       <ion-content *ngIf="selectedStockCountDetail">
          <div class="p-2">
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <app-search-dropdown title="Update To" [masterDropdownList]="fLocationZoneDetail" [selectedId]="selectedStockCountDetail.binId" (onActionComplete)="onUpdateBinSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onUpdateBinScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onUpdateBinDoneScanning($event)"></app-search-dropdown>
+               <app-search-dropdown title="Update To" [searchDropdownList]="binListDropDown" [optionLabel]="'code'" [selectedId]="selectedStockCountDetail.binId" (onActionComplete)="onUpdateBinSelected($event)" [showCamera]="true" [inputReadOnly]="false" [clearSearchValue]="true" (onScanCompleted)="onUpdateBinScanCompleted($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onUpdateBinDoneScanning($event)"></app-search-dropdown>
             </ion-list>
          </div>
       </ion-content>

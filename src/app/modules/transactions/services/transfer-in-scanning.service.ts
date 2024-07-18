@@ -109,7 +109,6 @@ export class TransferInScanningService {
    }
 
    undoObject(objectId: number) {
-      console.log("🚀 ~ TransferInScanningService ~ undoObject ~ objectId:", objectId)
       return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileTransferInScanning/undoDocument/${objectId}`, null, httpObserveHeader)
    }
 

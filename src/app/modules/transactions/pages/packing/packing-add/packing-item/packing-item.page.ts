@@ -1583,7 +1583,6 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
             if (response.status === 201) {
                let object = response.body as MultiPackingRoot;
                this.toastService.presentToast("Insert Complete", "New packing has been created.", "top", "success", 1000);
-               console.log("🚀 ~ PackingItemPage ~ this.objectService.insertObject ~ this.objectService.localObject:", JSON.stringify(this.objectService.localObject))
 					if (this.objectService.localObject) {
 						await this.configService.deleteLocalTransaction("MultiPacking", this.objectService.localObject);
 					}

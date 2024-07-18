@@ -54,9 +54,9 @@ export interface TransferBinList {
    deactivated: boolean
 }
 
-
 // bin list
 export interface BinList {
+   binId: number
    binCode: string
    typeCode: string
 }

@@ -84,7 +84,6 @@ export class PaymentArrangementDetailPage implements OnInit, ViewWillEnter, View
             next: async (response) => {
                this.object = response;
                this.uniqueCurrencyId = this.object.details.map(x => x.currencyId).filter((value, index, self) => self.indexOf(value) === index);
-               console.log("🚀 ~ PaymentArrangementDetailPage ~ next: ~ this.uniqueCurrencyId:", this.uniqueCurrencyId)
                await this.loadWorkflow(this.object.header.paymentArrangementId);
             },
             error: (error) => {

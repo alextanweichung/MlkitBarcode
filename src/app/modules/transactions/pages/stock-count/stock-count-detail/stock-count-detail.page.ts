@@ -5,6 +5,7 @@ import { StockCountService } from '../../../services/stock-count.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { v4 as uuidv4 } from 'uuid';
+import { BinList } from '../../../models/transfer-bin';
 
 @Component({
    selector: 'app-stock-count-detail',
@@ -16,6 +17,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
    objectId: number;
    currentPage: number = 1;
    itemsPerPage: number = 12;
+   binList: BinList[] = [];
 
    constructor(
       public objectService: StockCountService,
@@ -26,10 +28,10 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
    ) { }
 
    ionViewWillEnter(): void {
-      this.route.queryParams.subscribe(params => {
+      this.route.queryParams.subscribe(async params => {
          this.objectId = params["objectId"];
          if (this.objectId) {
-            this.loadObject();
+            await this.loadObject();
          }
       })
    }
@@ -43,6 +45,16 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
          await this.loadingService.showLoading();
          this.objectService.getInventoryCount(this.objectId).subscribe(async response => {
             let object = response;
+            if (object && object.header.locationId) {
+               this.objectService.getBinListByLocationId(object.header.locationId).subscribe({
+                  next: (response) => {
+                     this.binList = response;
+                  },
+                  error: (error) => {
+                     console.log(error);
+                  }
+               })
+            }
             object.header = this.commonService.convertObjectAllDateType(object.header);
             object.details.forEach(r => {
                let found = object.barcodeTag.find(rr => rr.itemSku === r.itemSku);

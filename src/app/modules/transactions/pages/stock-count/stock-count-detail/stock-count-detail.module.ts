@@ -10,17 +10,19 @@ import { StockCountDetailPage } from './stock-count-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { BinMappingModule } from 'src/app/shared/pipes/bin-mapping/bin-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    StockCountDetailPageRoutingModule,
-    IdMappingModule,
-    SumModule,
-    NgxPaginationModule
-  ],
-  declarations: [StockCountDetailPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      StockCountDetailPageRoutingModule,
+      IdMappingModule,
+      BinMappingModule,
+      SumModule,
+      NgxPaginationModule
+   ],
+   declarations: [StockCountDetailPage]
 })
-export class StockCountDetailPageModule {}
+export class StockCountDetailPageModule { }

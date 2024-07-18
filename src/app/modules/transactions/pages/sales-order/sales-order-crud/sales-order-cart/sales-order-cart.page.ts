@@ -587,7 +587,6 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
                totalAmt = totalAmt * this.objectService.objectHeader.currencyRate;
             }
             totalAmt = this.commonService.decimalJsRoundTwo(totalAmt);
-            console.log("🚀 ~ SalesOrderCartPage ~ ret ~ totalAmt:", totalAmt)
             if (totalAmt < this.objectService.soMinOrderAmount) {
                this.toastService.presentToast("Control Validation", `Min ordering amount is ${this.objectService.soMinOrderAmount}. Please add more items.`, "top", "warning", 1000);
                reject(false);

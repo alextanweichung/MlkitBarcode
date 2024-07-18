@@ -77,7 +77,6 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
       try {
          await this.loadingService.showLoading();
          this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
-            console.log("🚀 ~ PackingPage ~ this.objectService.getObjectListByDate ~ response:", response)
 				let objects = response.filter(r => !this.objects.flatMap(rr => rr.multiPackingId).includes(r.multiPackingId))
 				this.objects = [...this.objects, ...objects];
 				await this.resetFilteredObj();
@@ -238,7 +237,6 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
 	async loadLocalObjects() {
 		try {
 			let localObject = await this.configService.getLocalTransaction("MultiPacking");
-			console.log("🚀 ~ PackingPage ~ loadLocalObjects ~ localObject:", localObject)
 			let d: MultiPackingList[] = [];
          if (localObject && localObject.length > 0) {
             localObject.forEach(r => {
@@ -339,7 +337,6 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
 
    resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
-      console.log("🚀 ~ PackingPage ~ resetFilteredObj ~ this.filteredObj:", this.filteredObj)
    }
 
 }

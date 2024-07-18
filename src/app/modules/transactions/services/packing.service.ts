@@ -44,7 +44,6 @@ export class PackingService {
    header: MultiPackingHeader;
    object: MultiPackingRoot;
    setHeader(header: MultiPackingHeader) {
-      console.log("🚀 ~ setHeader ~ header:", JSON.stringify(header))
       this.header = header;
    }
 

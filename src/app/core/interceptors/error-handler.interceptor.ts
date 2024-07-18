@@ -142,7 +142,6 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    }
 
    async promptUserRelogin(errorPrompt: string) {
-      // console.log("🚀 ~ ErrorHandlerInterceptor ~ promptUserRelogin ~ (await this.modalController.getTop()):", (await this.modalController.getTop())?.id)
       if (this.activatedRoute.snapshot["_routerState"].url == "/login") {
          this.toastService.presentToast("Token Expired", errorPrompt, "top", "danger", 2000);
          if ((await this.modalController.getTop()) && (await this.modalController.getTop()).id.includes("userReloginModal")) {

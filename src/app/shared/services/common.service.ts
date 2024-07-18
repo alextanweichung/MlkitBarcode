@@ -165,7 +165,6 @@ export class CommonService {
    convertObjectAllDateType(inputObject: any) {
       try {
          if (inputObject.hasOwnProperty("trxDate")) {
-            console.log("🚀 ~ CommonService ~ convertObjectAllDateType ~ inputObject.hasOwnProperty():", JSON.stringify(inputObject.hasOwnProperty("trxDate")))
             if (inputObject.trxDate != null) {
                inputObject.trxDate = this.convertUtcDate(inputObject.trxDate);
             }
@@ -714,7 +713,6 @@ export class CommonService {
                await this.opener.open(this.file.externalApplicationStorageDirectory + filename + object.filesType, "application/pdf");
                await this.loadingService.dismissLoading();
             }).catch(async (error) => {
-               console.log(`this.file.writeFile ${JSON.stringify(error)}`);
                await this.loadingService.dismissLoading();
             })
          } else if (Capacitor.getPlatform() === "ios") {

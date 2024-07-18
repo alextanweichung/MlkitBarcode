@@ -265,7 +265,6 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
 
       // await modal.present();
       // let { data } = await modal.onWillDismiss();
-      // console.log("🚀 ~ CardsPage ~ signOut ~ data:", data)
 
       const alert = await this.alertController.create({
          cssClass: "custom-alert",
