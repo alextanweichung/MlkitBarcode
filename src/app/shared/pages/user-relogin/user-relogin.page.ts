@@ -73,10 +73,15 @@ export class UserReloginPage implements OnInit {
                if (loginUser.loginUserGroupType === "API") {
                   this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                } else {
-                  this.show2FaDialog = false;
-                  // setTimeout(async () => {
-                  //    let ret = await this.modalController.getTop();
-                  // }, 100);
+                  if (this.show2FaDialog) {
+                     this.show2FaDialog = false;
+                  } else {
+                     try {
+                        await this.modalController.dismiss(null, null, "userReloginModal");
+                     } catch (error) {
+                        console.error(error);
+                     }
+                  }
                   this.toastService.presentToast("Logged in successfully", "", "top", "success", 2000);
                }
             } else {
