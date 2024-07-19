@@ -551,15 +551,24 @@ export class CommonService {
       switch (objectHeader.marginMode) {
          case "G":
             trxLine.marginAmt = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).mul(new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0)).mul(new Decimal(trxLine.marginPct ? trxLine.marginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+            if (!trxLine.marginPct && trxLine.marginExpression) {
+               trxLine.marginAmt = this.computeConsignmentMarginExpr(new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).mul(new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0)), trxLine.marginExpression);
+            }
             break;
          case "N":
             trxLine.marginAmt = new Decimal(trxLine.subTotal ? trxLine.subTotal : 0).mul(new Decimal(trxLine.marginPct ? trxLine.marginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+            if (!trxLine.marginPct && trxLine.marginExpression) {
+               trxLine.marginAmt = this.computeConsignmentMarginExpr(new Decimal(trxLine.subTotal ? trxLine.subTotal : 0), trxLine.marginExpression);
+            }
             break;
          case "A":
             let afterBearingAmt = new Decimal(trxLine.discountAmt ? trxLine.discountAmt : 0).mul(new Decimal(100 - bearPct)).div(100).toDecimalPlaces(2);
             trxLine.bearPct = bearPct;
             trxLine.bearAmt = beforeBearingAmt.toNumber();
             trxLine.marginAmt = (new Decimal(trxLine.subTotal ? trxLine.subTotal : 0).add(afterBearingAmt)).mul(new Decimal(trxLine.marginPct ? trxLine.marginPct : 0).div(100)).toDecimalPlaces(2).toNumber();
+            if (!trxLine.marginPct && trxLine.marginExpression) {
+               trxLine.marginAmt = this.computeConsignmentMarginExpr((new Decimal(trxLine.subTotal ? trxLine.subTotal : 0).add(afterBearingAmt)), trxLine.marginExpression);
+            }
             break;
          case null:
             trxLine.bearAmt = 0;
@@ -572,6 +581,9 @@ export class CommonService {
             trxLine.bearAmt = beforeBearingAmt.toNumber();
             if (bearPromoUseGross && trxLine.bearAmt) {
                trxLine.marginAmt = new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).mul(new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0)).mul(new Decimal(trxLine.marginPct ? trxLine.marginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
+               if (!trxLine.marginPct && trxLine.marginExpression) {
+                  trxLine.marginAmt = this.computeConsignmentMarginExpr(new Decimal(trxLine.unitPrice ? trxLine.unitPrice : 0).mul(new Decimal(trxLine.qtyRequest ? trxLine.qtyRequest : 0)), trxLine.marginExpression);
+               }
             }
             break;
          case false:
@@ -588,80 +600,32 @@ export class CommonService {
             trxLine.shortOverBearAmt = (new Decimal(trxLine.subTotal ? trxLine.subTotal : 0).sub(new Decimal(trxLine.marginAmt ? trxLine.marginAmt : 0))).mul(new Decimal(trxLine.shortOverBearPct ? trxLine.shortOverBearPct : 0).div(100)).toDecimalPlaces(2).toNumber();
          }
          if (objectHeader.hasOwnProperty("isBearShortOver") && objectHeader.isBearShortOver == true && trxLine.hasOwnProperty("isShortOver") && trxLine.hasOwnProperty("shortOverBearAmt") && trxLine.isShortOver && trxLine.shortOverBearAmt) {
-            trxLine.invoiceAmt = new Decimal(trxLine.invoiceAmt ? trxLine.invoiceAmt : 0).sub(new Decimal(trxLine.shortOverBearAmt ? trxLine.shortOverBearAmt : 0)).toDecimalPlaces(2).toNumber();
+            trxLine.invoiceAmt = trxLine.shortOverBearAmt;
          }
       }
       return trxLine;
    }
 
-   // computeMarginAmtByConsignmentConfigFlat(trxLine: GeneralCsEstimation, headerObject: any, bearPromoUseGross: boolean) {
-   //    //To read bearPct from trxLine
-   //    let bearPct: number = 0;
-   //    let promoBearPct: number = 0;
-   //    if (trxLine.normalBearPct) {
-   //       bearPct = trxLine.normalBearPct;
-   //    }
-   //    if (trxLine.promoBearPct) {
-   //       promoBearPct = trxLine.promoBearPct;
-   //    }
-   //    let beforeBearingAmt = new Decimal(trxLine.normalDiscountAmt ? trxLine.normalDiscountAmt : 0).mul(new Decimal(bearPct ? bearPct : 0)).div(100).toDecimalPlaces(2);
-   //    let promoBeforeBearingAmt = new Decimal(trxLine.promoDiscountAmt ? trxLine.promoDiscountAmt : 0).mul(new Decimal(bearPct ? bearPct : 0)).div(100).toDecimalPlaces(2);
-   //    switch (headerObject.marginMode) {
-   //       case 'G':
-   //          trxLine.normalMarginAmt = new Decimal(trxLine.normalUnitPrice ? trxLine.normalUnitPrice : 0).mul(new Decimal(trxLine.normalQtyRequest ? trxLine.normalQtyRequest : 0)).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
-   //          trxLine.promoMarginAmt = new Decimal(trxLine.promoUnitPrice ? trxLine.promoUnitPrice : 0).mul(new Decimal(trxLine.promoQtyRequest ? trxLine.promoQtyRequest : 0)).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
-   //          break;
-   //       case 'N':
-   //          trxLine.normalMarginAmt = new Decimal(trxLine.normalSubTotal ? trxLine.normalSubTotal : 0).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
-   //          trxLine.promoMarginAmt = new Decimal(trxLine.promoSubTotal ? trxLine.promoSubTotal : 0).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
-   //          break;
-   //       case 'A':
-   //          let afterBearingAmt = new Decimal(trxLine.normalDiscountAmt ? trxLine.normalDiscountAmt : 0).mul(new Decimal(100 - bearPct)).div(100).toDecimalPlaces(2);
-   //          let promoAfterBearingAmt = new Decimal(trxLine.promoDiscountAmt ? trxLine.promoDiscountAmt : 0).mul(new Decimal(100 - promoBearPct)).div(100).toDecimalPlaces(2);
-
-   //          trxLine.normalBearPct = bearPct;
-   //          trxLine.normalBearAmt = beforeBearingAmt.toNumber();
-   //          trxLine.normalMarginAmt = (new Decimal(trxLine.normalSubTotal ? trxLine.normalSubTotal : 0).add(afterBearingAmt ? afterBearingAmt : 0)).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0).div(100)).toDecimalPlaces(2).toNumber();
-
-   //          trxLine.promoBearPct = promoBearPct;
-   //          trxLine.promoBearAmt = promoBeforeBearingAmt.toNumber();
-   //          trxLine.promoMarginAmt = (new Decimal(trxLine.promoSubTotal ? trxLine.promoSubTotal : 0).add(promoAfterBearingAmt ? promoAfterBearingAmt : 0)).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0).div(100)).toDecimalPlaces(2).toNumber();
-   //          break;
-   //       case null:
-   //          trxLine.normalBearAmt = 0;
-   //          trxLine.normalMarginAmt = 0;
-   //          trxLine.promoBearAmt = 0;
-   //          trxLine.promoMarginAmt = 0;
-   //          break;
-   //    }
-   //    switch (headerObject.isBearPromo) {
-   //       case true:
-   //          trxLine.normalBearPct = bearPct;
-   //          trxLine.normalBearAmt = beforeBearingAmt.toNumber();
-   //          trxLine.promoBearPct = promoBearPct;
-   //          trxLine.promoBearAmt = promoBeforeBearingAmt.toNumber();
-   //          if (bearPromoUseGross) {
-   //             if (trxLine.normalBearAmt) {
-   //                trxLine.normalMarginAmt = new Decimal(trxLine.normalUnitPrice ? trxLine.normalUnitPrice : 0).mul(new Decimal(trxLine.normalQtyRequest ? trxLine.normalQtyRequest : 0)).mul(new Decimal(trxLine.normalMarginPct ? trxLine.normalMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
-   //             }
-   //             if (trxLine.promoBearAmt) {
-   //                trxLine.promoMarginAmt = new Decimal(trxLine.promoUnitPrice ? trxLine.promoUnitPrice : 0).mul(new Decimal(trxLine.promoQtyRequest ? trxLine.promoQtyRequest : 0)).mul(new Decimal(trxLine.promoMarginPct ? trxLine.promoMarginPct : 0)).div(100).toDecimalPlaces(2).toNumber();
-   //             }
-
-   //          }
-   //          break;
-   //       case false:
-   //          trxLine.normalBearPct = 0;
-   //          trxLine.normalBearAmt = 0;
-   //          trxLine.promoBearPct = 0;
-   //          trxLine.promoBearAmt = 0;
-   //          break;
-   //    }
-   //    trxLine.totalMarginAmt = new Decimal(trxLine.normalMarginAmt ? trxLine.normalMarginAmt : 0).add(trxLine.promoMarginAmt ? trxLine.promoMarginAmt : 0).toDecimalPlaces(2).toNumber();
-   //    trxLine.totalBearAmt = new Decimal(trxLine.normalBearAmt ? trxLine.normalBearAmt : 0).add(trxLine.promoBearAmt ? trxLine.promoBearAmt : 0).toDecimalPlaces(2).toNumber();
-   //    trxLine.invoiceAmt = new Decimal(trxLine.lineSubTotal ? trxLine.lineSubTotal : 0).sub(new Decimal(trxLine.totalMarginAmt ? trxLine.totalMarginAmt : 0)).add(new Decimal(trxLine.totalBearAmt ? trxLine.totalBearAmt : 0)).toDecimalPlaces(2).toNumber();
-   //    return trxLine;
-   // }
+   computeConsignmentMarginExpr(amountDecimal: Decimal, marginExpression: string) {
+      let totalMarginAmt: Decimal = new Decimal(0);
+      //To split the expression with multi level discount, for eg. (10%/5%/3%)
+      if (marginExpression != "" && marginExpression != null) {
+         let splittedDisc = marginExpression.split(/[+/]/g);
+         splittedDisc.forEach(x => {
+            let xDecimal: Decimal = new Decimal(parseFloat(x) ? parseFloat(x) : 0);
+            if (x.includes("%")) {
+               let currentMarginPct: Decimal = xDecimal.div(100);
+               let currentMargincAmt: Decimal = amountDecimal.mul(currentMarginPct);
+               totalMarginAmt = totalMarginAmt.add(currentMargincAmt);
+               amountDecimal = amountDecimal.sub(currentMargincAmt);
+            } else {
+               totalMarginAmt = totalMarginAmt.add(xDecimal);
+               amountDecimal = amountDecimal.sub(xDecimal);
+            }
+         })
+      }
+      return totalMarginAmt.toDecimalPlaces(2).toNumber();
+   }
 
    reversePromoImpact(receiptLine: TransactionDetail) {
       try {
@@ -692,6 +656,7 @@ export class CommonService {
             if (allMatch && allMatch.length > 0) {
                item.marginPct = allMatch[0].mPct;
                item.bearPct = allMatch[0].bPct;
+               item.marginExpression = allMatch[0].mExpr;
             }
          }
          return item;
@@ -889,7 +854,7 @@ export class CommonService {
       if (line.amountExpression) {
          let expressionValue: Decimal
          let expressionDecimal: Decimal = new Decimal(parseFloat(line.amountExpression) ? parseFloat(line.amountExpression) : 0);
-         if (line.amountExpression.includes('%')) {
+         if (line.amountExpression.includes("%")) {
             expressionValue = expressionDecimal.div(100);
             line.totalAmount = new Decimal(line.currentSubtotal ? line.currentSubtotal : 0).mul(expressionValue).toNumber();
          } else {

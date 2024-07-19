@@ -40,6 +40,7 @@ export interface ShippingInfo {
    email: string
    fax: string
    areaId: number
+   stateId: number
 }
 
 export interface HistoryInfo {

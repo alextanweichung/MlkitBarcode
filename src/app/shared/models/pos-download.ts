@@ -63,6 +63,7 @@ export interface LocalMarginConfig {
    hLevel: number
    mPct: number
    bPct: number
+   mExpr: string
 }
 
 export interface LocalTransaction {

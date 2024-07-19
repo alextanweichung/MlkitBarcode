@@ -262,6 +262,12 @@
                   </ion-select>
                </ion-item>
                <ion-item>
+                  <ion-label position="stacked">State</ion-label>
+                  <ion-select interface="action-sheet" [(ngModel)]="objectService.objectHeader.shipStateId" placeholder="Select State">
+                     <ion-select-option *ngFor="let a of objectService.stateMasterList" [value]="a.id">{{a.description}}</ion-select-option>
+                  </ion-select>
+               </ion-item>
+               <ion-item>
                   <ion-label position="stacked">Attention</ion-label>
                   <ion-input [(ngModel)]="objectService.objectHeader.attention" placeholder="Enter Attention"></ion-input>
                </ion-item>

@@ -118,15 +118,8 @@ export class BacktobackOrderCartPage implements OnInit, ViewWillEnter {
             this.objectService.objectHeader.shipEmail = this.selectedAddress.email;
             this.objectService.objectHeader.shipFax = this.selectedAddress.fax;
             this.objectService.objectHeader.shipAreaId = this.selectedAddress.areaId;
+            this.objectService.objectHeader.shipStateId = this.selectedAddress.stateId;
             this.objectService.objectHeader.attention = this.selectedAddress.attention;
-         } else {
-            this.objectService.objectHeader.shipAddress = null;
-            this.objectService.objectHeader.shipPostCode = null;
-            this.objectService.objectHeader.shipPhone = null;
-            this.objectService.objectHeader.shipEmail = null;
-            this.objectService.objectHeader.shipFax = null;
-            this.objectService.objectHeader.shipAreaId = null;
-            this.objectService.objectHeader.attention = null;
          }
       } catch (e) {
          console.error(e);

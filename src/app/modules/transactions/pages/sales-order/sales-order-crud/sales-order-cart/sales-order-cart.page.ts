@@ -159,6 +159,7 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
             this.objectService.objectHeader.shipEmail = this.selectedAddress.email;
             this.objectService.objectHeader.shipFax = this.selectedAddress.fax;
             this.objectService.objectHeader.shipAreaId = this.selectedAddress.areaId;
+            this.objectService.objectHeader.shipStateId = this.selectedAddress.stateId;
             this.objectService.objectHeader.attention = this.selectedAddress.attention;
          }
       } catch (e) {

@@ -98,7 +98,7 @@ export class AuthService {
       }
       
       if (!this.isTokenExpired()) {
-         if (this.configService.selected_sys_param) {
+         if (this.configService.selected_sys_param && this.configService.loginUser) {
             this.buildAllObjects(true);
          }
          this.customerMasterListSubject.next(null);

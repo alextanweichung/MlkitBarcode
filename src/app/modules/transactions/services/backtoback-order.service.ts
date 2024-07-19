@@ -51,6 +51,7 @@ export class BackToBackOrderService {
    shipMethodMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
    areaMasterList: MasterListDetails[] = [];
+   stateMasterList: MasterListDetails[] = [];
    currencyMasterList: MasterListDetails[] = [];
    salesAgentMasterList: MasterListDetails[] = [];
    termPeriodMasterList: MasterListDetails[] = [];
@@ -108,6 +109,7 @@ export class BackToBackOrderService {
       this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName === "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details);
       this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.stateMasterList = this.fullMasterList.filter(x => x.objectName === "State").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
