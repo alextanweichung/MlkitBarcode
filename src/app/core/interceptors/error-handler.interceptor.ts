@@ -157,7 +157,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                      component: UserReloginPage,
                      cssClass: "ion-custom-modal",
                      componentProps: {
-                        title: "Login Expired. Please re-login.",
+                        title: "Login Expired",
                         loginUser: loginUser
                      },
                      backdropDismiss: false,

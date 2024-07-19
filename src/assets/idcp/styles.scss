@@ -778,8 +778,8 @@ ion-modal.ion-modal-calendar {
 ion-modal.ion-custom-modal {
    --height: 50vh;
    padding: 0 10px;
-   
-   div[role="dialog"] {
+   display: flex;
+   &::part(content) {
       border-radius: 12px;
    }
 }
