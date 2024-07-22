@@ -63,7 +63,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      this.loadModuleControl();
+      await this.loadModuleControl();
       await this.loadRestrictColumms();
       await this.barcodescaninput.setFocus();
    }
@@ -77,6 +77,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    consignBearingComputeGrossMargin: boolean = false;
    systemWideBlockConvertedCode: boolean;
    configMobileScanItemContinuous: boolean = false;
+   configConsignmentActivateMarginExpr: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
@@ -116,6 +117,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                this.configMobileScanItemContinuous = true;
             } else {
                this.configMobileScanItemContinuous = false;
+            }
+
+            let useConsMarginExpr = this.moduleControl.find(x => x.ctrlName === "ConsignmentActivateMarginExpr");
+            if (useConsMarginExpr && useConsMarginExpr.ctrlValue.toUpperCase() == 'Y') {
+               this.configConsignmentActivateMarginExpr = true;
+            } else {
+               this.configConsignmentActivateMarginExpr = false;
             }
          })
          this.authService.precisionList$.subscribe(precision => {
@@ -217,6 +225,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       }
       item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
       item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
+      
       item.oriUnitPrice = item.unitPrice;
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
@@ -224,9 +233,14 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       item.guid = uuidv4()
 
       if (this.consignmentSalesActivateMarginCalculation) {
-         if (item.marginPct) {
+         if (!this.configConsignmentActivateMarginExpr && item.marginPct) {
+            item.marginExpression = null;
             this.objectService.objectDetail.unshift(item);
             await this.computeAllAmount(this.objectService.objectDetail[0]);
+         } else if (this.configConsignmentActivateMarginExpr && item.marginExpression) {
+            item.marginPct = null;
+            this.objectService.objectDetail.unshift(item);
+            await this.computeAllAmount(this.objectService.objectDetail[0]);            
          }
          else {
             if (this.consignmentSalesBlockItemWithoutMargin !== "0") {

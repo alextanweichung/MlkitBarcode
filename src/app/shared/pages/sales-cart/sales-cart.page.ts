@@ -929,6 +929,7 @@ export class SalesCartPage implements OnInit, OnChanges {
 
    onPricingApprovalSwitch(event: any) {
       if (event.detail.checked) {
+         console.log("🚀 ~ SalesCartPage ~ onPricingApprovalSwitch ~ this.orderingPriceApprovalEnabledFields:", this.orderingPriceApprovalEnabledFields)
          switch (this.orderingPriceApprovalEnabledFields) {
             case "0":
                if (this.restrictTrxFields.unitPrice) {

@@ -7,6 +7,7 @@ import { ConsignmentCountRoot } from 'src/app/modules/transactions/models/consig
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
@@ -78,48 +79,43 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
 
    }
 
-   // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-   // bindLocationList() {
-   //   this.consignmentLocationSearchDropdownList = [];
-   //   try {
-   //     this.objectService.locationMasterList.forEach(r => {
-   //       this.consignmentLocationSearchDropdownList.push({
-   //         id: r.id,
-   //         code: r.code,
-   //         description: r.description
-   //       })
-   //     })
-   //   } catch (e) {
-   //     console.error(e);
-   //   }
-   // }
-
-   async onLocationSelected(event) {
-      if (event && this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
-         const alert = await this.alertController.create({
-            cssClass: "custom-alert",
-            header: "Are you sure to proceed?",
-            subHeader: "Changing Location will remove inserted lines",
-            buttons: [
-               {
-                  text: "Confirm",
-                  cssClass: "success",
-                  handler: async () => {
-                     this.objectForm.patchValue({ locationId: event.id });
-                     this.objectService.removeLines();
-                  }
-               },
-               {
-                  text: "Cancel",
-                  role: "cancel",
-                  cssClass: "cancel",
-                  handler: async () => {
-
-                  }
-               }
-            ]
-         });
-         await alert.present();
+   async onLocationSelected(event: SearchDropdownList) {
+      if (event) {
+         let found = this.objectService.locationMasterList.find(r => r.id === event.id);
+         if (found) {
+            if (this.objectService.objectDetail && this.objectService.objectDetail.length > 0) {
+               const alert = await this.alertController.create({
+                  cssClass: "custom-alert",
+                  header: "Are you sure to proceed?",
+                  subHeader: "Changing Location will remove inserted lines",
+                  buttons: [
+                     {
+                        text: "Confirm",
+                        cssClass: "success",
+                        handler: async () => {
+                           this.objectForm.patchValue({ locationId: found.id });
+                           this.objectService.removeLines();
+                        }
+                     },
+                     {
+                        text: "Cancel",
+                        role: "cancel",
+                        cssClass: "cancel",
+                        handler: async () => {
+   
+                        }
+                     }
+                  ]
+               });
+               await alert.present();
+            } else {
+               this.objectForm.patchValue({ locationId: found.id });
+            }
+         } else {
+            this.toastService.presentToast("System Error", "Location not found", "top", "danger", 2000);
+         }
+      } else {
+         this.objectForm.patchValue({ locationId: null });
       }
    }
 
@@ -153,7 +149,7 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
                   guid: this.objectService.objectHeader.guid
                }
             }
-            this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+            this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
          }
          else if (this.objectService.objectHeader && this.objectService.objectHeader?.consignmentCountId > 0) {
             let navigationExtras: NavigationExtras = {

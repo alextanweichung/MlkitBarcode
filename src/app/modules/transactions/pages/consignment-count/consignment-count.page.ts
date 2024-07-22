@@ -112,6 +112,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 		try {
 			await this.loadingService.showLoading();
 			this.objectService.getObjects(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
+				console.log("🚀 ~ ConsignmentCountPage ~ this.objectService.getObjects ~ response:", response)
 				let objects = response.filter(r => !this.objects.flatMap(rr => rr.consignmentCountId).includes(r.consignmentCountId))
 				this.objects = [...this.objects, ...objects];
 				await this.resetFilteredObj();

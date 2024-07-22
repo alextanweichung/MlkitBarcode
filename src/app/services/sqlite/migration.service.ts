@@ -12,7 +12,7 @@ export const create_item_master_table: string = `CREATE TABLE IF NOT EXISTS ITEM
 
 export const create_item_barcode_table: string = `CREATE TABLE IF NOT EXISTS ITEM_BARCODE (id INTEGER, itemId INTEGER, xId INTEGER, xCd VARCHAR(20), xDesc VARCHAR(255), xSeq INTEGER, yId INTEGER, yCd VARCHAR(20), yDesc VARCHAR(255), ySeq INTEGER, barcode VARCHAR(255), itemUomId INTEGER, sku VARCHAR(255), qty DECIMAL(6,0), transitQty DECIMAL(6,0), isOther VARCHAR(20), itemUomDesc VARCHAR(255)); `;
 
-export const create_margin_config_table: string = `CREATE TABLE IF NOT EXISTS MARGIN_CONFIG (id INTEGER, trxDate DATE, locId INTEGER, type VARCHAR(20), typeId INTEGER, discCode VARCHAR(20), hLevel INTEGER, mPct DECIMAL(6,0), bPct DECIMAL(6,0));`;
+export const create_margin_config_table: string = `CREATE TABLE IF NOT EXISTS MARGIN_CONFIG (id INTEGER, trxDate DATE, locId INTEGER, type VARCHAR(20), typeId INTEGER, discCode VARCHAR(20), hLevel INTEGER, mPct DECIMAL(6,0), bPct DECIMAL(6,0), mExpr VARCHAR(255));`;
 
 export const create_local_transaction_table: string = `CREATE TABLE IF NOT EXISTS LOCAL_TRANSACTION (id GUID PRIMARY KEY, apiUrl VARCHAR(255), trxType VARCHAR(100), lastUpdated DATE, jsonData TEXT)`
 

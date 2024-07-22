@@ -69,15 +69,6 @@
             <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
                <ion-label>{{availableVariationsByItemId[0].itemCode}} - {{availableVariationsByItemId[0].description}}</ion-label>
             </ion-list-header>
-
-            <!-- <ng-container *ngIf="configItemVariationShowMatrix && variationStructure">
-                  <tr>
-                     <th class="p-1 font-half-size ion-text-left sticky">Variety</th>
-                     <th class="p-1 font-half-size sticky" *ngFor="let rowData of variationStructure.variationY">
-                        {{rowData|idMapping:itemVariationYMasterList}}
-                     </th>
-                  </tr>
-            </ng-container> -->
             
             <ion-list class="list-custom animate__animated animate__fadeIn custom-border" lines="full">
                <ng-container *ngIf="!configItemVariationShowMatrix">
@@ -101,7 +92,7 @@
                               <th class="p-1 font-half-size ion-text-left sticky-top"></th>
                               <th class="p-1 font-half-size sticky-top" *ngFor="let rowData of variationStructure.variationY">
                                  <div class="ion-flex">
-                                    <ion-badge *ngIf="configItemVariationMatrixShowCodeDesc">{{rowData|idToCodeMapping:itemVariationYMasterList}}</ion-badge>
+                                    <ion-badge *ngIf="configItemVariationMatrixShowCodeDesc && rowData">{{rowData|idToCodeMapping:itemVariationYMasterList}}</ion-badge>
                                     <div class="ml-1 my-auto">{{rowData|idMapping:itemVariationYMasterList}}</div>
                                  </div>
                               </th>

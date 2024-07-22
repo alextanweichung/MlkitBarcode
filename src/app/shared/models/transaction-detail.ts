@@ -116,6 +116,7 @@ export interface TransactionDetail {
 
    /* #region for consignment sales */
    marginPct?: number
+   marginExpression?: string
    marginAmt?: number
    bearPct?: number
    bearAmt?: number
