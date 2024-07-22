@@ -56,8 +56,8 @@ export class QuotationPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidE
 
    }
 
-   ionViewDidLeave(): void {
-      
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {

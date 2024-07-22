@@ -1,6 +1,6 @@
 import { Component, DoCheck, IterableDiffers, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ViewWillEnter, ViewDidEnter, ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
+import { ViewWillEnter, ViewDidEnter, ActionSheetController, AlertController, ModalController, NavController, ViewDidLeave } from '@ionic/angular';
 import { format } from 'date-fns';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -15,7 +15,7 @@ import { SalesOrderList } from '../../models/sales-order';
    templateUrl: './stock-replenish.page.html',
    styleUrls: ['./stock-replenish.page.scss'],
 })
-export class StockReplenishPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, DoCheck {
+export class StockReplenishPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidEnter, DoCheck, ViewDidLeave {
 
    private objectDiffer: any;
    objects: SalesOrderList[] = [];
@@ -61,8 +61,12 @@ export class StockReplenishPage implements OnInit, OnDestroy, ViewWillEnter, Vie
       await this.objectService.loadRequiredMaster();
    }
 
-   ionViewDidEnter(): void {
-      this.loadObjects();
+   async ionViewDidEnter(): Promise<void> {
+      await this.loadObjects();
+   }
+
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {

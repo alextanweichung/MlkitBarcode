@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { FilterPage } from '../filter/filter.page';
-import { ViewWillEnter, ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
+import { ViewWillEnter, ActionSheetController, AlertController, ModalController, NavController, ViewDidLeave } from '@ionic/angular';
 import { format } from 'date-fns';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
@@ -16,7 +16,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
    templateUrl: './backtoback-order.page.html',
    styleUrls: ['./backtoback-order.page.scss'],
 })
-export class BackToBackOrderPage implements OnInit, OnDestroy, ViewWillEnter {
+export class BackToBackOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLeave {
 
    objects: BackToBackOrderList[] = [];
 
@@ -51,6 +51,10 @@ export class BackToBackOrderPage implements OnInit, OnDestroy, ViewWillEnter {
       // reload all masterlist whenever user enter listing
       await this.objectService.loadRequiredMaster();
       await this.loadObjects();
+   }
+
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {

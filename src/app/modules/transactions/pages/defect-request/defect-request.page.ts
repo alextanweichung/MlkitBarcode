@@ -63,7 +63,7 @@ export class DefectRequestPage implements OnInit, ViewWillEnter, ViewDidEnter, V
    }
 
    async ionViewDidLeave(): Promise<void> {
-      
+      await this.objectService.stopListening();
    }
 
    async loadObjects() {

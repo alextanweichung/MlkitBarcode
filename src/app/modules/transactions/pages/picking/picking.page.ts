@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from '../../../../shared/services/common.service';
 import { PickingService } from '../../services/picking.service';
@@ -18,7 +18,7 @@ import { Keyboard } from '@capacitor/keyboard';
    templateUrl: './picking.page.html',
    styleUrls: ['./picking.page.scss'],
 })
-export class PickingPage implements OnInit, OnDestroy, ViewWillEnter {
+export class PickingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLeave {
 
    objects: MultiPickingList[] = [];
 
@@ -57,6 +57,10 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter {
       } catch (e) {
          console.error(e);
       }
+   }
+
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {

@@ -53,7 +53,7 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter, ViewDi
    }
 
    async ionViewDidLeave(): Promise<void> {
-      
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {

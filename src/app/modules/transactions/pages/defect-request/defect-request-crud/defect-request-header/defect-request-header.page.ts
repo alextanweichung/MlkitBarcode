@@ -77,7 +77,8 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
          salesAgentId: [null],
          parentObject: [null],
          createdBy: [null],
-         modifiedBy: [null]
+         modifiedBy: [null],
+         reasonId: [null]
       });
    }
 
@@ -230,6 +231,19 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
          this.objectForm.patchValue({ locationId: parseInt(lookupValue.attribute15) });
       } else {
          this.objectForm.patchValue({ locationId: null });
+      }
+   }
+
+   onReasonSelected(event: SearchDropdownList) {
+      if (event) {
+         let found = this.objectService.reasonMasterList.find(r => r.id === event.id);
+         if (found) {
+            this.objectForm.patchValue({ reasonId: found.id });
+         } else {
+            this.toastService.presentToast("System Error", "Reason not found", "top", "danger", 1000);
+         }
+      } else {
+         this.objectForm.patchValue({ reasonId: null });
       }
    }
 

@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { PackingService } from '../../services/packing.service';
-import { ActionSheetController, AlertController, IonSearchbar, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonSearchbar, ModalController, NavController, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { format } from 'date-fns';
 import { FilterPage } from '../filter/filter.page';
@@ -20,7 +20,7 @@ import { Network } from '@capacitor/network';
    templateUrl: './packing.page.html',
    styleUrls: ['./packing.page.scss'],
 })
-export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
+export class PackingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLeave {
 
    objects: MultiPackingList[] = [];
 
@@ -61,6 +61,10 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter {
       } catch (e) {
          console.error(e);
       }
+   }
+
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {

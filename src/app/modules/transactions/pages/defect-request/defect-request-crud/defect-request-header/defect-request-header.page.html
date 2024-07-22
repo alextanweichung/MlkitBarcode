@@ -34,10 +34,10 @@
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="none" [formGroup]="objectForm">
          <app-search-dropdown #locationsd title="Location" [masterDropdownList]="objectService.fLocationMasterList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationSelected($event)"></app-search-dropdown>
          <app-search-dropdown #customersd title="Customer" [searchDropdownList]="objectService.customerSearchDropdownList" [selectedId]="objectForm.controls.customerId.value" (onActionComplete)="onCustomerSelected($event)"></app-search-dropdown>
-         <ng-container
-            *ngIf="objectForm.controls.businessModelType.value !== 'T' && objectForm.controls.businessModelType.value !== null">
+         <ng-container *ngIf="objectForm.controls.businessModelType.value !== 'T' && objectForm.controls.businessModelType.value !== null">
             <app-search-dropdown #locationsd title="Origin Location" [masterDropdownList]="selectedCustomerLocationList" [selectedId]="objectForm.controls.toLocationId.value" (onActionComplete)="onCustomerLocationSelected($event)"></app-search-dropdown>
          </ng-container>
+         <app-search-dropdown #locationsd title="Reason" [masterDropdownList]="objectService.reasonMasterList" [selectedId]="objectForm.controls.reasonId.value" (onActionComplete)="onReasonSelected($event)"></app-search-dropdown>
          <ion-item>
             <ion-label class="font-bold" position="stacked">Remark</ion-label>
             <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>

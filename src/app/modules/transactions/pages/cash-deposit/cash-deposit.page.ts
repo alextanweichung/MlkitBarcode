@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { ActionSheetController, NavController, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, NavController, ViewDidLeave, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CashDepositService } from '../../services/cash-deposit.service';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -14,7 +14,7 @@ import { CashDepositHeader } from '../../models/cash-deposit';
    templateUrl: './cash-deposit.page.html',
    styleUrls: ['./cash-deposit.page.scss'],
 })
-export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
+export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLeave {
 
    objects: CashDepositHeader[] = [];
 
@@ -33,6 +33,10 @@ export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter {
    async ionViewWillEnter(): Promise<void> {
       await this.objectService.loadRequiredMaster();
       await this.loadObjects();
+   }
+
+   async ionViewDidLeave(): Promise<void> {
+      await this.objectService.stopListening();
    }
 
    ngOnInit() {
