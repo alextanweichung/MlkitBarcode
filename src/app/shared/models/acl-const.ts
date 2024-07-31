@@ -20,6 +20,7 @@ export const trxAppCode = {
    mobileInterTransfer: "MATRIT",
    mobileTransferConfirmation: "MATRTC",
    mobileDebtorApp: "MATRDA",
+   mobileCreditorApp: "MATRCA",
    mobileLocationApp: "MATRLA",
    mobileStockReplenish: "MATRSP",
    mobileConsignmentCount: "MATRCC",

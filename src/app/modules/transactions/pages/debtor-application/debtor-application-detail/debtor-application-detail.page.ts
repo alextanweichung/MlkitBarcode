@@ -41,7 +41,7 @@ export class DebtorApplicationDetailPage implements OnInit {
 
    ngOnInit() {
       if (!this.objectId) {
-         this.navController.navigateBack("/transactions/sales-order")
+         this.navController.navigateBack("/transactions")
       } else {
          this.loadObject();
       }

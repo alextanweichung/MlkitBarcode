@@ -198,7 +198,7 @@
          </ion-list>
       </ng-container>
 
-      <ng-container *ngIf="showDebtorApplication">
+      <ng-container *ngIf="showDebtorApplication || showCreditorApplication">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>[FA] Finance</ion-label>
          </ion-list-header>
@@ -207,6 +207,12 @@
                <ion-icon name="person-add-outline" slot="start"></ion-icon>
                <ion-label>
                   <h3>Debtor Application</h3>
+               </ion-label>
+            </ion-item>
+            <ion-item button routerLink="creditor-application" *ngIf="showCreditorApplication">
+               <ion-icon name="person-add-outline" slot="start"></ion-icon>
+               <ion-label>
+                  <h3>Creditor Application</h3>
                </ion-label>
             </ion-item>
          </ion-list>
