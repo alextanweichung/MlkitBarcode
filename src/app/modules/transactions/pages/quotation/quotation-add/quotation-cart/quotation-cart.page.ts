@@ -228,7 +228,13 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (this.objectService.orderingPriceApprovalIgnoreACL) {
+            this.checkPricingApprovalLines(trxDto, trxDto.details);
+         } else {
+            if (this.originalRestrictTrxFields.unitPrice || this.originalRestrictTrxFields.unitPriceExTax || this.originalRestrictTrxFields.discountExpression || this.originalRestrictTrxFields.discountGroupCode) {
+               this.checkPricingApprovalLines(trxDto, trxDto.details);
+            }
+         }
          this.objectService.insertObject(trxDto).subscribe(async response => {
             let object = response.body;
             await this.objectService.setSummary(object);
@@ -258,7 +264,13 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         trxDto = this.checkPricingApprovalLines(trxDto, trxDto.details);
+         if (this.objectService.orderingPriceApprovalIgnoreACL) {
+            this.checkPricingApprovalLines(trxDto, trxDto.details);
+         } else {
+            if (this.originalRestrictTrxFields.unitPrice || this.originalRestrictTrxFields.unitPriceExTax || this.originalRestrictTrxFields.discountExpression || this.originalRestrictTrxFields.discountGroupCode) {
+               this.checkPricingApprovalLines(trxDto, trxDto.details);
+            }
+         }
          this.objectService.updateObject(trxDto).subscribe(async response => {
             let object = response.body;
             await this.objectService.setSummary(object);
@@ -289,6 +301,7 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
          trxDto.header.isPricingApproval = false;
       } else {
          let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
+         console.log("🚀 ~ QuotationCartPage ~ checkPricingApprovalLines ~ filteredData:", filteredData)
          filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length <= 1);
          if (filteredData.length > 0) {
             filteredData.forEach(x => { x.isPricingApproval = true });

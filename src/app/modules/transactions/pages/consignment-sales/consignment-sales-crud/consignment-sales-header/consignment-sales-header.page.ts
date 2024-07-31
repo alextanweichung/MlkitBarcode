@@ -102,22 +102,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          console.error(e);
       }
    }
-
-   // locationSearchDropdownList: SearchDropdownList[] = [];
-   // bindLocationList() {
-   //   try {
-   //     this.objectService.locationMasterList.forEach(r => {
-   //       this.locationSearchDropdownList.push({
-   //         id: r.id,
-   //         code: r.code,
-   //         description: r.description
-   //       })
-   //     })
-   //   } catch (e) {
-   //     console.error(e);
-   //   }
-   // }
-
+   
    customerSearchDropdownList: SearchDropdownList[] = [];
    salesAgentSearchDropdownList: SearchDropdownList[] = [];
    bindMasterList() {
@@ -226,7 +211,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
                handler: async () => {
                   let customerId = Number(this.objectService.locationMasterList.find(r => r.id === event.id)?.attribute13);
                   if (customerId) {
-                     this.onCustomerChanged(customerId)
+                     this.onCustomerChanged(customerId);
                   }
                   this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
                   let findLocation = this.objectService.locationMasterList.find(r => r.id === event.id);
@@ -280,21 +265,8 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    async nextStep() {
       try {
          if (this.objectForm.valid) {
-            // this.objectService.getExistingObject(format(new Date(this.objectForm.controls.trxDate.value), "yyyy-MM-dd"), this.objectForm.controls.toLocationId.value).subscribe(response => {
-            //   if (response) {
-            //     let navigationExtras: NavigationExtras = {
-            //       queryParams: {
-            //         objectId: response.header.consignmentSalesId
-            //       }
-            //     }
-            //     this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item", navigationExtras);
-            //   } else {
             this.objectService.setHeader(this.objectForm.getRawValue());
             this.navController.navigateForward("/transactions/consignment-sales/consignment-sales-item");
-            //   }
-            // }, error => {
-            //   console.error(error);
-            // })
          }
       } catch (e) {
          console.error(e);

@@ -3,10 +3,10 @@ import { Injectable } from "@angular/core";
 import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
-import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
-import { TransferInScanningRoot, TransferInScanningLine, TransferInScanningList } from "../models/transfer-in-scanning";
+import { TransferInScanningRoot, TransferInScanningList } from "../models/transfer-in-scanning";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
+import { v4 as uuidv4 } from 'uuid';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -21,8 +21,6 @@ export class TransferInScanningService {
 
    filterStartDate: Date;
    filterEndDate: Date;
-
-   // selectedConsignmentLocation: ConsignmentSalesLocation = null;
 
    fullMasterList: MasterList[] = [];
    interTransferTypeList: MasterListDetails[] = [];
@@ -39,7 +37,6 @@ export class TransferInScanningService {
 
    async loadRequiredMaster() {
       await this.loadMasterList();
-      // await this.loadConsignmentLocation();
    }
 
    async loadMasterList() {
@@ -49,17 +46,16 @@ export class TransferInScanningService {
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
    }
-
-   // locationList: ConsignmentSalesLocation[] = [];
-   // async loadConsignmentLocation() {
-   //   this.locationList = await this.getConsignmentLocation();
-   // }
-
+   
    /* #region  for insert */
 
    object: TransferInScanningRoot;
+   objectUuid: string = null;
    setObject(object: TransferInScanningRoot) {
       this.object = object;
+      if (!this.objectUuid) {
+         this.objectUuid = uuidv4();
+      }
    }
 
    removeObject() {
@@ -67,6 +63,7 @@ export class TransferInScanningService {
    }
 
    resetVariables() {
+      this.objectUuid = null;
       this.removeObject();
    }
 
@@ -75,10 +72,6 @@ export class TransferInScanningService {
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferInScanning/masterlist").toPromise();
    }
-
-   // getConsignmentLocation() {
-   //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferInScanning/consignmentLocation").toPromise();
-   // }
 
    getStaticLovList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferInScanning/staticLov");

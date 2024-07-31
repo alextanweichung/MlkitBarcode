@@ -238,6 +238,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
          trxLine.oriUnitPriceExTax = trxLine.unitPriceExTax;
          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
          trxLine.oriDiscountExpression = trxLine.discountExpression;
+         console.log("🚀 ~ SalesOrderItemPage ~ assignTrxItemToDataLine ~ trxLine:", trxLine)
 
          // update qtyToShip
          trxLine.qtyToShip = trxLine.qtyRequest;

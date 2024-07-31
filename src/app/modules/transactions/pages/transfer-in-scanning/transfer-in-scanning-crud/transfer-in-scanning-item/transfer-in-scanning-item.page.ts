@@ -25,7 +25,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
 
    constructor(
       public objectService: TransferInScanningService,
-      private authService: AuthService,
+      public authService: AuthService,
       private commonService: CommonService,
       private configService: ConfigService,
       private toastService: ToastService,
@@ -438,7 +438,8 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          workFlowTransactionId: this.objectService.object.workFlowTransactionId,
          interTransferQty: null,
          line: this.objectService.object.line.filter(r => r.uuid !== null),
-         transferAdjustment: null
+         transferAdjustment: null,
+         uuid: this.objectService.objectUuid
       }
 
       this.objectService.insertObject(insertObject).subscribe(response => {

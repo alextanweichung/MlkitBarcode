@@ -20,9 +20,10 @@ export interface TransferInScanningRoot {
    workFlowTransactionId: number
    line: TransferInScanningLine[]
    transferAdjustment: TransferAdjustmentRoot
- }
- 
- export interface TransferInScanningLine {
+   uuid: string
+}
+
+export interface TransferInScanningLine {
    id: number
    uuid: any
    transferInScanningId: number
@@ -53,34 +54,34 @@ export interface TransferInScanningRoot {
    // for local use
    qtyRequest?: number
    unitPriceExTax?: number
- }
+}
 
- export interface TransferAdjustmentRoot {
-  transferAdjustmentId: number
-  transferAdjustmentNum: string
-  isCompleted: boolean
-  line: TransferAdjustmentLine[]
+export interface TransferAdjustmentRoot {
+   transferAdjustmentId: number
+   transferAdjustmentNum: string
+   isCompleted: boolean
+   line: TransferAdjustmentLine[]
 }
 
 export interface TransferAdjustmentLine {
-  transferAdjustmentId: number
-  transferAdjustmentLineId: number
-  transferAdjustmentVariationId: number
-  sequence: number
-  itemId: number
-  itemCode: string
-  itemSku: string
-  itemDesc: string
-  xId: any
-  xCd: any
-  xDesc: any
-  yId: any
-  yCd: any
-  yDesc: any
-  qty: number
+   transferAdjustmentId: number
+   transferAdjustmentLineId: number
+   transferAdjustmentVariationId: number
+   sequence: number
+   itemId: number
+   itemCode: string
+   itemSku: string
+   itemDesc: string
+   xId: any
+   xCd: any
+   xDesc: any
+   yId: any
+   yCd: any
+   yDesc: any
+   qty: number
 }
 
- export interface TransferInScanningList {
+export interface TransferInScanningList {
    transferInScanningId: number
    transferInScanningNum: string
    trxDate: string
@@ -89,4 +90,4 @@ export interface TransferAdjustmentLine {
    locationDesc: string
    deactivated: boolean
    isCompleted: boolean
- }
+}

@@ -19,6 +19,9 @@ export interface MasterListDetails {
    attribute13: string;
    attribute14: string;
    attribute15: string;
+   attribute16: string;
+   attribute17: string;
+   attribute18: string;
    attributeArray1: number[];
    shippingInfo?: ShippingInfo[]
    parentId?: number;

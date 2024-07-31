@@ -61,6 +61,7 @@ export class SalesOrderHeaderPage implements OnInit, ViewWillEnter {
             shipEmail: [null, [Validators.email]],
             shipFax: [null],
             shipAreaId: [null],
+            shipStateId: [null],
             shipMethodId: [null],
             attention: [null],
             termPeriodId: [null],

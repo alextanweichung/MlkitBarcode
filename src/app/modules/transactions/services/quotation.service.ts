@@ -151,6 +151,7 @@ export class QuotationService {
    isCasePackQtyControlWarningOnly: boolean = false;
    consignBearingComputeGrossMargin: boolean = false;
    configSalesTransactionShowHistory: boolean = false;
+   orderingPriceApprovalIgnoreACL: boolean = false;
 
    precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
    precisionSalesUnitPrice: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
@@ -228,6 +229,11 @@ export class QuotationService {
                this.configSalesTransactionShowHistory = true;
             } else {
                this.configSalesTransactionShowHistory = false;
+            }
+
+            let priceApproval = this.moduleControl.find(x => x.ctrlName === "OrderingPriceApprovalIgnoreACL");
+            if (priceApproval && priceApproval.ctrlValue.toUpperCase() === 'Y') {
+               this.orderingPriceApprovalIgnoreACL = true;
             }
 
          })
@@ -357,10 +363,12 @@ export class QuotationService {
    }
 
    insertObject(object: QuotationRoot) {
+      console.log("🚀 ~ QuotationService ~ insertObject ~ object:", object)
       return this.http.post<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
    }
 
    updateObject(object: QuotationRoot) {
+      console.log("🚀 ~ QuotationService ~ updateObject ~ object:", object)
       return this.http.put<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
    }
 
