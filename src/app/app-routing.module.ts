@@ -306,6 +306,10 @@ const routes: Routes = [
       loadChildren: () => import('./modules/transactions/pages/debtor-application/debtor-application.module').then(m => m.DebtorApplicationPageModule)
    },
    {
+      path: 'transactions/creditor-application',
+      loadChildren: () => import('./modules/transactions/pages/creditor-application/creditor-application.module').then(m => m.CreditorApplicationPageModule)
+   },
+   {
       path: 'transactions/location-application',
       loadChildren: () => import('./modules/transactions/pages/location-application/location-application.module').then(m => m.LocationApplicationPageModule)
    },
@@ -538,6 +542,11 @@ const routes: Routes = [
       path: 'user-relogin',
       loadChildren: () => import('./shared/pages/user-relogin/user-relogin.module').then(m => m.UserReloginPageModule)
    },
+  {
+    path: 'creditor-application',
+    loadChildren: () => import('./modules/transactions/pages/creditor-application/creditor-application.module').then( m => m.CreditorApplicationPageModule)
+  },
+
 
 
 ];
