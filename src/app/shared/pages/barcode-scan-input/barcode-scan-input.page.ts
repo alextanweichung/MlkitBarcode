@@ -423,6 +423,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    itemModalOpen: boolean = false;
    async showItemModal() {
+      console.log("🚀 ~ BarcodeScanInputPage ~ showItemModal ~ this.availableItemmmm:", JSON.stringify(this.availableItemmmm.flatMap(r => { r.itemCode, r.itemUomCode })))
       if (this.availableItemmmm && this.availableItemmmm.length > 0) {
          await this.availableItemmmm.sort((a, c) => { return a.itemCode > c.itemCode ? 1 : -1 });
       }

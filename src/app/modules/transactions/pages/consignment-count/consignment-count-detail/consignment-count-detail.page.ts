@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConsignmentCountService } from '../../../services/consignment-count.service';
-import { ConsignmentCountRoot } from '../../../models/consignment-count';
+import { ConsignmentCountDetail, ConsignmentCountRoot } from '../../../models/consignment-count';
 import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -9,6 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { Network } from '@capacitor/network';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
 	selector: 'app-consignment-count-detail',
@@ -78,6 +80,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 				})
 				await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
 				await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
+            await this.resetFilteredObj();
 				await this.loadingService.dismissLoading();
 			}, async error => {
 				await this.loadingService.dismissLoading();
@@ -112,6 +115,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 			}
 			await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
 			await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
+         await this.resetFilteredObj();
 			await this.loadingService.dismissLoading();
 		} catch (e) {
 			await this.loadingService.dismissLoading();
@@ -189,5 +193,51 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 			console.error(e);
 		}
 	}
+
+   /* #region line search bar */
+
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
+
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
+	itemSearchText: string;
+	filteredObj: ConsignmentCountDetail[] = [];
+	search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
+               r.itemCode?.toUpperCase().includes(searchText.toUpperCase())
+               || r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+				this.currentPage = 1;
+			} else {
+				this.resetFilteredObj();
+				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+		this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
+	}
+
+   /* #endregion */
 
 }
