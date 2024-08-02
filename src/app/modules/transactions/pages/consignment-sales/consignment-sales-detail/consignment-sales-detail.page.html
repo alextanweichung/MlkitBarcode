@@ -82,7 +82,20 @@
               <div class="font-bold">Location</div>
             </ion-col>
             <ion-col class="ion-margin-auto justify-content-end">
-              <div>{{objectService.objectHeader.toLocationId|idMapping:objectService.locationMasterList}}</div>
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                    <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                      <div class="ion-flex">
+                        <ion-badge class="cs-custom-badge" color="tertiary">{{objectService.objectHeader.toLocationId|idToCodeMapping:objectService.locationMasterList}}</ion-badge>
+                      </div>
+                    </ion-col>
+                </ion-row>
+                <ion-row>
+                    <ion-col class="ion-margin-auto justify-content-end">
+                        <div>{{objectService.objectHeader.toLocationId|idMapping:objectService.locationMasterList}}</div>
+                    </ion-col>
+                </ion-row>
+              </ion-grid>
             </ion-col>
           </ion-row>
           <ion-row>

@@ -33,14 +33,29 @@
                         <div class="font-bold justify-content-end">{{rowData.trxDate|date:"dd/MM/yyyy"}}</div>
                      </ion-col>
                   </ion-row>
-                  <ion-row class="my-1">
+                  <!-- <ion-row class="my-1">
                      <ion-col class="ion-flex ion-margin-auto justify-content-between">
                         <div class="ion-flex"><ion-badge class="cs-custom-badge mr-1">{{rowData.customerCode}}</ion-badge><span class="ion-margin-auto">{{rowData.customerName}}</span></div>
                      </ion-col>
                   </ion-row>
                   <ion-row class="my-1">
-                     <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div class="ion-flex"><ion-badge class="cs-custom-badge mr-1">{{rowData.toLocationCode}}</ion-badge></div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end">
                         <div class="ion-flex"><ion-badge class="cs-custom-badge mr-1">{{rowData.toLocationCode}}</ion-badge><span class="ion-margin-auto">{{rowData.toLocationDesc}}</span></div>
+                     </ion-col>
+                  </ion-row> -->
+                  <ion-row class="my-1">
+                     <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                        <div class="ion-flex"><ion-badge class="cs-custom-badge mr-1">{{rowData.customerCode}}</ion-badge></div>
+                        <div class="ion-flex justify-content-end"><ion-badge class="cs-custom-badge mr-1">{{rowData.toLocationCode}}</ion-badge></div>
+                     </ion-col>
+                  </ion-row>
+                  <ion-row class="my-1">
+                     <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                        <div class="ion-flex">{{rowData.customerName}}</div>
+                        <div class="ion-flexjustify-content-end">{{rowData.toLocationDesc}}</div>
                      </ion-col>
                   </ion-row>
                   <ion-row class="my-1">
