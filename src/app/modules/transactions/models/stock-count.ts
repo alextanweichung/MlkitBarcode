@@ -16,6 +16,11 @@ export interface StockCount {
    binDesc?: string
    deactivated: boolean
    createdById: number
+
+   // local use
+   isTrxLocal: boolean
+   guid: string
+   lastUpdated: Date
 }
 
 export interface StockCountList {
@@ -67,6 +72,11 @@ export interface StockCountHeader {
    modifiedBy?: string
    modifiedAt?: Date
    deactivated?: boolean
+
+   // local use
+   isLocal: boolean
+   guid: string
+   lastUpdated: Date
 }
 
 export interface StockCountDetail {

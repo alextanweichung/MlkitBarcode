@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { Network } from '@capacitor/network';
+import { TransactionCode } from '../../models/transaction-type-constant';
 
 @Component({
 	selector: 'app-consignment-count',
@@ -132,7 +133,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 
 	async loadLocalObjects() {
 		try {
-			let localObject = await this.configService.getLocalTransaction("ConsignmentCount");
+			let localObject = await this.configService.getLocalTransaction(TransactionCode.consignmentCountTrx);
 			let d: ConsignmentCountHeader[] = [];
          if (localObject && localObject.length > 0) {
             localObject.forEach(r => {

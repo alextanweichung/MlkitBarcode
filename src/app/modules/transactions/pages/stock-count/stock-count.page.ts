@@ -5,13 +5,15 @@ import { format } from 'date-fns';
 import { FilterPage } from 'src/app/modules/transactions/pages/filter/filter.page';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
-import { StockCount } from '../../models/stock-count';
+import { StockCount, StockCountRoot } from '../../models/stock-count';
 import { StockCountService } from '../../services/stock-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+import { TransactionCode } from '../../models/transaction-type-constant';
+import { Network } from '@capacitor/network';
 
 @Component({
    selector: 'app-stock-count',
@@ -23,7 +25,7 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    @ViewChild("searchbar", { static: false }) searchbar: IonSearchbar;
 
    objects: StockCount[] = [];
-   uniqueGrouping: Date[] = [];
+   // uniqueGrouping: Date[] = [];
    currentPage: number = 1;
    itemsPerPage: number = 12;
 
@@ -41,18 +43,24 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.objectService.loadRequiredMaster();
-      try {
-         if (!this.objectService.filterStartDate) {
-            this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
+      this.objects = [];
+      this.filteredObj = [];
+      if ((await Network.getStatus()).connected) {
+         try {
+            await this.objectService.loadRequiredMaster();
+         } catch (error) {
+            console.error(error);
+            this.toastService.presentToast("", "Not connected to internet", "top", "warning", 1000);
          }
-         if (!this.objectService.filterEndDate) {
-            this.objectService.filterEndDate = this.commonService.getTodayDate();
-         }
-         this.loadObjects();
-      } catch (e) {
-         console.error(e);
       }
+      if (!this.objectService.filterStartDate) {
+         this.objectService.filterStartDate = this.commonService.getFirstDayOfTodayMonth();
+      }
+      if (!this.objectService.filterEndDate) {
+         this.objectService.filterEndDate = this.commonService.getTodayDate();
+      }
+		this.searchbar.value = null;
+      await this.loadLocalObjects();
    }
 
    async ionViewDidEnter(): Promise<void> {
@@ -105,7 +113,8 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
       try {
          await this.loadingService.showLoading();
          this.objectService.getInventoryCountByDate(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
-            this.objects = response;
+            let objects = response.filter(r => !this.objects.flatMap(rr => rr.inventoryCountId).includes(r.inventoryCountId))
+            this.objects = [...this.objects, ...objects];
             this.resetFilteredObj();
             // let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
             // this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
@@ -124,14 +133,58 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
+   async loadLocalObjects() {
+      try {
+         let localObject = await this.configService.getLocalTransaction(TransactionCode.inventoryCountTrx);
+         let d: StockCount[] = [];
+         if (localObject && localObject.length > 0) {
+            localObject.forEach(r => {
+               let dd: StockCountRoot = JSON.parse(r.jsonData);
+               dd.header.isLocal = true;
+               dd.header.guid = r.id;
+               dd.header.lastUpdated = r.lastUpdated;
+               d.push({
+                  inventoryCountId: dd.header.inventoryCountId,
+                  inventoryCountNum: dd.header.inventoryCountNum,
+                  trxDate: dd.header.trxDate.toString(),
+                  locationCode: this.objectService.locationMasterList.find(r=> r.id == dd.header.locationId)?.code,
+                  locationDescription: this.objectService.locationMasterList.find(r => r.id == dd.header.locationId)?.description,
+                  description: dd.header.description,
+                  inventoryCountBatchNum: dd.header.inventoryCountBatchNum,
+                  inventoryCountBatchDescription: dd.header.inventoryCountBatchDescription,
+                  zoneCode: this.objectService.zoneMasterList.find(r => r.id == dd.header.zoneId)?.code,
+                  zoneDescription: this.objectService.zoneMasterList.find(r => r.id == dd.header.zoneId)?.description,
+                  rackCode: this.objectService.zoneMasterList.find(r => r.id == dd.header.rackId)?.code,
+                  rackDescription: this.objectService.zoneMasterList.find(r => r.id == dd.header.rackId)?.description,
+                  deactivated: dd.header.deactivated,
+                  createdById: dd.header.createdById,
+                  isTrxLocal: dd.header.isLocal,
+                  guid: dd.header.guid,
+                  lastUpdated: dd.header.lastUpdated
+               });
+            })
+            this.objects = [...this.objects, ...d];
+         }
+         await this.resetFilteredObj();
+         if ((await Network.getStatus()).connected) {
+            await this.loadObjects();
+         }
+      } catch (error) {
+         console.error(error);
+      } finally {
+      }
+   }
+
    getObjects(date: Date) {
       return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
    }
 
-   goToDetail(objectId: number) {
+   goToDetail(objectId: number, isLocal: boolean = false, guid: string = null) {
       let navigationExtras: NavigationExtras = {
          queryParams: {
-            objectId: objectId
+            objectId: objectId,
+            isLocal: isLocal,
+            guid: guid
          }
       }
       this.navController.navigateForward("/transactions/stock-count/stock-count-detail", navigationExtras);
@@ -181,6 +234,7 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
          await modal.present();
          let { data } = await modal.onWillDismiss();
          if (data && data !== undefined) {
+            this.objects = [];
             this.objectService.filterStartDate = new Date(data.startDate);
             this.objectService.filterEndDate = new Date(data.endDate);
             this.loadObjects();

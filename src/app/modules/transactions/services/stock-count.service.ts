@@ -9,6 +9,8 @@ import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { BinList } from '../models/transfer-bin';
+import { LocalTransaction } from 'src/app/shared/models/pos-download';
+import { TransactionCode } from '../models/transaction-type-constant';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -23,7 +25,7 @@ export class StockCountService {
    filterStartDate: Date;
    filterEndDate: Date;
 
-   trxKey: string = "inventoryCount";
+   trxKey: string = TransactionCode.inventoryCountTrx;
 
    constructor(
       private http: HttpClient,
@@ -117,6 +119,12 @@ export class StockCountService {
       this.objectDetail = objectDetail;
    }
 
+   localObject: LocalTransaction;
+   setLocalObject(localObject: LocalTransaction) {
+      console.log("🚀 ~ StockCountService ~ setLocalObject ~ localObject:", JSON.stringify(localObject))
+      this.localObject = localObject;
+   }
+
    objectBarcodeTag: BarcodeTag[] = [];
    setBarcodeTag(objectBarcodeTag: BarcodeTag[]) {
       this.objectBarcodeTag = objectBarcodeTag;
@@ -130,6 +138,10 @@ export class StockCountService {
       this.objectDetail = [];
    }
 
+   removeLocalObject() {
+      this.localObject = null;
+   }
+
    removeBarcodeTag() {
       this.objectBarcodeTag = [];
    }
@@ -138,6 +150,7 @@ export class StockCountService {
       this.removeHeader();
       this.removeDetail();
       this.removeBarcodeTag();
+      this.removeLocalObject();
       await this.configService.removeFromLocalStorage(this.trxKey);
    }
 

@@ -17,6 +17,8 @@ import { BarcodeScanInputService } from 'src/app/shared/services/barcode-scan-in
 import { v4 as uuidv4 } from 'uuid';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { BinList } from 'src/app/modules/transactions/models/transfer-bin';
+import { LocalTransaction } from 'src/app/shared/models/pos-download';
+import { TransactionCode } from 'src/app/modules/transactions/models/transaction-type-constant';
 
 @Component({
    selector: 'app-stock-count-item',
@@ -464,6 +466,39 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
+   async nextStepLocal() {
+      try {
+         this.submit_attempt = true;
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            header: "Are you sure to proceed?",
+            buttons: [
+               {
+                  text: "Confirm",
+                  cssClass: "success",
+                  handler: async () => {
+                     await this.insertObjectLocal();
+                  }
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel",
+                  handler: async () => {
+                     this.submit_attempt = false;
+                  }
+               }
+            ]
+         });
+         await alert.present();
+      } catch (e) {
+         this.submit_attempt = false;
+         console.error(e);
+      } finally {
+         this.submit_attempt = false;
+      }
+   }
+
    async insertObject() {
       try {
          await this.loadingService.showLoading();
@@ -471,12 +506,14 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             if (response.status === 201) {
                this.submit_attempt = false;
                let object = response.body as StockCountRoot;
-               this.objectService.resetVariables();
                this.toastService.presentToast("", "Stock Count added", "top", "success", 1000);
                let navigationExtras: NavigationExtras = {
                   queryParams: {
                      objectId: object.header.inventoryCountId
                   }
+               }
+               if (this.objectService.localObject) {
+                  await this.configService.deleteLocalTransaction(TransactionCode.inventoryCountTrx, this.objectService.localObject);
                }
                await this.objectService.resetVariables();
                await this.loadingService.dismissLoading();
@@ -497,6 +534,56 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
+   async insertObjectLocal() {
+      try {
+         await this.loadingService.showLoading();
+         let object: StockCountRoot = {
+            header: this.objectService.objectHeader,
+            details: this.objectService.objectDetail
+         }
+         let localTrx: LocalTransaction;
+         if (this.objectService.objectHeader.isLocal) {
+            localTrx = {
+               id: this.objectService.objectHeader.guid,
+               apiUrl: this.configService.selected_sys_param.apiUrl,
+               trxType: TransactionCode.inventoryCountTrx,
+               lastUpdated: new Date(),
+               jsonData: JSON.stringify(object)
+            }
+            await this.configService.updateLocalTransaction(localTrx);
+         } else {
+            localTrx = {
+               id: uuidv4(),
+               apiUrl: this.configService.selected_sys_param.apiUrl,
+               trxType: TransactionCode.inventoryCountTrx,
+               lastUpdated: new Date(),
+               jsonData: JSON.stringify(object)
+            }
+            await this.configService.insertLocalTransaction(localTrx);
+         }
+         this.submit_attempt = false;
+         await this.objectService.resetVariables();
+         await this.loadingService.dismissLoading();
+         let navigationExtras: NavigationExtras = {
+            queryParams: {
+               objectId: 0,
+               isLocal: true,
+               guid: localTrx.id
+            }
+         }
+         this.navController.navigateForward("/transactions/stock-count/stock-count-detail", navigationExtras);
+      } catch (error) {
+         this.submit_attempt = false;
+         await this.loadingService.dismissLoading();
+         this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+         console.error(error);
+      } finally {
+         this.submit_attempt = false;
+         await this.loadingService.dismissLoading();
+      }
+   }
+
+
    async updateObject() {
       try {
          await this.loadingService.showLoading();
@@ -508,6 +595,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                   queryParams: {
                      objectId: this.objectService.objectHeader.inventoryCountId
                   }
+               }
+               if (this.objectService.localObject) {
+                  await this.configService.deleteLocalTransaction(TransactionCode.inventoryCountTrx, this.objectService.localObject);
                }
                await this.objectService.resetVariables();
                await this.loadingService.dismissLoading();

@@ -11,6 +11,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { Network } from '@capacitor/network';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+import { TransactionCode } from '../../../models/transaction-type-constant';
 
 @Component({
 	selector: 'app-consignment-count-detail',
@@ -97,7 +98,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 	async loadLocalObject() {
 		try {
 			await this.loadingService.showLoading();
-			let localObject = await this.configService.getLocalTransactionById("ConsignmentCount", this.guid);
+			let localObject = await this.configService.getLocalTransactionById(TransactionCode.consignmentCountTrx, this.guid);
 			let object = JSON.parse(localObject.jsonData) as ConsignmentCountRoot;
 			object.header.isLocal = true;
 			object.header.guid = localObject.id;
@@ -166,7 +167,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 							cssClass: "danger",
 							handler: async () => {
 								if (this.objectService.localObject) {
-									await this.configService.deleteLocalTransaction("ConsignmentCount", this.objectService.localObject);
+									await this.configService.deleteLocalTransaction(TransactionCode.consignmentCountTrx, this.objectService.localObject);
 									this.toastService.presentToast("", "Consignment Count deleted", "top", "success", 1000);
 									await this.objectService.resetVariables();
 									this.navController.navigateRoot("transactions/consignment-count");

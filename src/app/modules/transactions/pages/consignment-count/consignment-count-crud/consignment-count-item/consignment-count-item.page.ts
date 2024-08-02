@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentCountDetail, ConsignmentCountRoot } from 'src/app/modules/transactions/models/consignment-count';
+import { TransactionCode } from 'src/app/modules/transactions/models/transaction-type-constant';
 import { ConsignmentCountService } from 'src/app/modules/transactions/services/consignment-count.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -320,124 +321,124 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       }
    }
 
-   async insertObjectLocal() {
-      try {
-         await this.loadingService.showLoading();
-         let object: ConsignmentCountRoot = {
-            header: this.objectService.objectHeader,
-            details: this.objectService.objectDetail
-         }
-         let localTrx: LocalTransaction;
-         if (this.objectService.objectHeader.isLocal) {
-            localTrx = {
-               id: this.objectService.objectHeader.guid,
-               apiUrl: this.configService.selected_sys_param.apiUrl,
-               trxType: "ConsignmentCount",
-               lastUpdated: new Date(),
-               jsonData: JSON.stringify(object)
-            }
-            await this.configService.updateLocalTransaction(localTrx);
-         } else {
-            localTrx = {
-               id: uuidv4(),
-               apiUrl: this.configService.selected_sys_param.apiUrl,
-               trxType: "ConsignmentCount",
-               lastUpdated: new Date(),
-               jsonData: JSON.stringify(object)
-            }
-            await this.configService.insertLocalTransaction(localTrx);
-         }
-         this.submit_attempt = false;
-         await this.objectService.resetVariables();
-         await this.loadingService.dismissLoading();
-         let navigationExtras: NavigationExtras = {
-            queryParams: {
-               objectId: 0,
-               isLocal: true,
-               guid: localTrx.id
-            }
-         }
-         this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
-      } catch (error) {
-         this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
-         this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
-         console.error(error);
-      } finally {
-         this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
-      }
-   }
+	async insertObjectLocal() {
+		try {
+			await this.loadingService.showLoading();
+			let object: ConsignmentCountRoot = {
+				header: this.objectService.objectHeader,
+				details: this.objectService.objectDetail
+			}
+			let localTrx: LocalTransaction;
+			if (this.objectService.objectHeader.isLocal) {
+				localTrx = {
+					id: this.objectService.objectHeader.guid,
+					apiUrl: this.configService.selected_sys_param.apiUrl,
+					trxType: TransactionCode.consignmentCountTrx,
+					lastUpdated: new Date(),
+					jsonData: JSON.stringify(object)
+				}
+				await this.configService.updateLocalTransaction(localTrx);
+			} else {
+				localTrx = {
+					id: uuidv4(),
+					apiUrl: this.configService.selected_sys_param.apiUrl,
+					trxType: TransactionCode.consignmentCountTrx,
+					lastUpdated: new Date(),
+					jsonData: JSON.stringify(object)
+				}
+				await this.configService.insertLocalTransaction(localTrx);
+			}
+			this.submit_attempt = false;
+			await this.objectService.resetVariables();
+			await this.loadingService.dismissLoading();
+			let navigationExtras: NavigationExtras = {
+				queryParams: {
+					objectId: 0,
+					isLocal: true,
+					guid: localTrx.id
+				}
+			}
+			this.navController.navigateForward("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+		} catch (error) {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+			this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+			console.error(error);
+		} finally {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+		}
+	}
 
-   async insertObject() {
-      try {
-         await this.loadingService.showLoading();
-         this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
-            if (response.status === 201) {
-               this.submit_attempt = false;
-               let object = response.body as ConsignmentCountRoot;
-               this.toastService.presentToast("", "Consignment Count added", "top", "success", 1000);
-               let navigationExtras: NavigationExtras = {
-                  queryParams: {
-                     objectId: object.header.consignmentCountId
-                  }
-               }
-               if (this.objectService.localObject) {
-                  await this.configService.deleteLocalTransaction("ConsignmentCount", this.objectService.localObject);
-               }
-               await this.objectService.resetVariables();
-               await this.loadingService.dismissLoading();
-               this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
-            }
-         }, async error => {
-            this.submit_attempt = false;
-            await this.loadingService.dismissLoading();
-            console.error(error);
-         })
-      } catch (e) {
-         this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
-         console.error(e);
-      } finally {
-         this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
-      }
-   }
+	async insertObject() {
+		try {
+			await this.loadingService.showLoading();
+			this.objectService.insertObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
+				if (response.status === 201) {
+					this.submit_attempt = false;
+					let object = response.body as ConsignmentCountRoot;
+					this.toastService.presentToast("", "Consignment Count added", "top", "success", 1000);
+					let navigationExtras: NavigationExtras = {
+						queryParams: {
+							objectId: object.header.consignmentCountId
+						}
+					}
+					if (this.objectService.localObject) {
+						await this.configService.deleteLocalTransaction(TransactionCode.consignmentCountTrx, this.objectService.localObject);
+					}
+					await this.objectService.resetVariables();
+					await this.loadingService.dismissLoading();
+					this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+				}
+			}, async error => {
+				this.submit_attempt = false;
+				await this.loadingService.dismissLoading();
+				console.error(error);
+			})
+		} catch (e) {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+			console.error(e);
+		} finally {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+		}
+	}
 
-   async updateObject() {
-      try {
-         await this.loadingService.showLoading();
-         this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
-            if (response.status === 201) {
-               this.submit_attempt = false;
-               let object = response.body as ConsignmentCountRoot;
-               this.toastService.presentToast("", "Consignment Count updated", "top", "success", 1000);
-               let navigationExtras: NavigationExtras = {
-                  queryParams: {
-                     objectId: object.header.consignmentCountId
-                  }
-               }
-               if (this.objectService.localObject) {
-                  await this.configService.deleteLocalTransaction("ConsignmentCount", this.objectService.localObject);
-               }
-               await this.objectService.resetVariables();
-               await this.loadingService.dismissLoading();
-               this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
-            }
-         }, async error => {
-            this.submit_attempt = false;
-            await this.loadingService.dismissLoading();
-            console.error(error);
-         })
-      } catch (e) {
-         this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
-         console.error(e);
-      } finally {
-         this.submit_attempt = false;
-         await this.loadingService.dismissLoading();
-      }
-   }
+	async updateObject() {
+		try {
+			await this.loadingService.showLoading();
+			this.objectService.updateObject({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
+				if (response.status === 201) {
+					this.submit_attempt = false;
+					let object = response.body as ConsignmentCountRoot;
+					this.toastService.presentToast("", "Consignment Count updated", "top", "success", 1000);
+					let navigationExtras: NavigationExtras = {
+						queryParams: {
+							objectId: object.header.consignmentCountId
+						}
+					}
+					if (this.objectService.localObject) {
+						await this.configService.deleteLocalTransaction(TransactionCode.consignmentCountTrx, this.objectService.localObject);
+					}
+					await this.objectService.resetVariables();
+					await this.loadingService.dismissLoading();
+					this.navController.navigateRoot("/transactions/consignment-count/consignment-count-detail", navigationExtras);
+				}
+			}, async error => {
+				this.submit_attempt = false;
+				await this.loadingService.dismissLoading();
+				console.error(error);
+			})
+		} catch (e) {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+			console.error(e);
+		} finally {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+		}
+	}
 
    /* #endregion */
 

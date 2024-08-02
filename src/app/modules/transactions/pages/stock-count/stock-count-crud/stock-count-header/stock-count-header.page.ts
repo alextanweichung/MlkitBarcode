@@ -175,15 +175,26 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
          const { role } = await actionSheet.onWillDismiss();
 
          if (role === "confirm") {
-            await this.objectService.resetVariables();
-            if (this.objectService.objectHeader?.inventoryCountId && this.objectService.objectHeader?.inventoryCountId > 0) {
+            if (this.objectService?.objectHeader?.isLocal) {
+               let navigationExtras: NavigationExtras = {
+                  queryParams: {
+                     objectId: 0,
+                     isLocal: true,
+                     guid: this.objectService.objectHeader.guid
+                  }
+               }
+               this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
+            }
+            else if (this.objectService.objectHeader?.inventoryCountId && this.objectService.objectHeader?.inventoryCountId > 0) {
                let navigationExtras: NavigationExtras = {
                   queryParams: {
                      objectId: this.objectService.objectHeader?.inventoryCountId
                   }
                }
+               await this.objectService.resetVariables();
                this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
             } else {
+               await this.objectService.resetVariables();
                this.navController.navigateRoot("/transactions/stock-count");
             }
          }
@@ -192,8 +203,10 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
       }
    }
 
-   nextStep() {
+   async nextStep() {
       this.objectService.setHeader(this.objectForm.getRawValue());
+      let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       this.navController.navigateForward("/transactions/stock-count/stock-count-crud/stock-count-item");
    }
 

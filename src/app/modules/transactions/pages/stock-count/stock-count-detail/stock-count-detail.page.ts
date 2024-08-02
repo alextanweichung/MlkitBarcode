@@ -1,11 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonPopover, NavController, ViewWillEnter } from '@ionic/angular';
 import { StockCountService } from '../../../services/stock-count.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 import { BinList } from '../../../models/transfer-bin';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { Network } from '@capacitor/network';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { StockCountRoot } from '../../../models/stock-count';
+import { TransactionCode } from '../../../models/transaction-type-constant';
 
 @Component({
    selector: 'app-stock-count-detail',
@@ -15,6 +20,8 @@ import { BinList } from '../../../models/transfer-bin';
 export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
    objectId: number;
+   isLocal: boolean = false;
+	guid: string = null;
    currentPage: number = 1;
    itemsPerPage: number = 12;
    binList: BinList[] = [];
@@ -22,16 +29,33 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
    constructor(
       public objectService: StockCountService,
       private commonService: CommonService,
+		private toastService: ToastService,
       private loadingService: LoadingService,
+		private configService: ConfigService,
       private navController: NavController,
+      private alertController: AlertController,
       private route: ActivatedRoute,
    ) { }
 
-   ionViewWillEnter(): void {
+   async ionViewWillEnter(): Promise<void> {
+      if ((await Network.getStatus()).connected) {
+         await this.objectService.loadRequiredMaster();
+      }
       this.route.queryParams.subscribe(async params => {
-         this.objectId = params["objectId"];
-         if (this.objectId) {
-            await this.loadObject();
+         this.isLocal = params["isLocal"];
+         this.guid = params["guid"];
+         if (this.isLocal) {
+            if (this.guid) {
+               await this.loadLocalObject();
+            } else {
+               this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+            }
+         } 
+         else {
+            this.objectId = params["objectId"];
+            if (this.objectId) {
+               await this.loadObject();
+            }
          }
       })
    }
@@ -81,6 +105,36 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
       }
    }
 
+   async loadLocalObject() {
+      try {
+         await this.loadingService.showLoading();
+         let localObject = await this.configService.getLocalTransactionById(TransactionCode.inventoryCountTrx, this.guid);
+         let object = JSON.parse(localObject.jsonData) as StockCountRoot;
+         object.header.isLocal = true;
+         object.header.guid = localObject.id;
+         object.header.lastUpdated = localObject.lastUpdated;
+         object.details.forEach(r => {
+            if (r.itemVariationXId) {
+               r.itemVariationXDescription = this.objectService.itemVariationXMasterList.find(rr => rr.id === r.itemVariationXId)?.description;
+            }
+            if (r.itemVariationYId) {
+               r.itemVariationYDescription = this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description;
+            }
+         })
+         if (this.isLocal) {
+            await this.objectService.setLocalObject(JSON.parse(JSON.stringify(localObject)));
+         }
+         await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
+         await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
+         await this.loadingService.dismissLoading();
+      } catch (e) {
+         await this.loadingService.dismissLoading();
+         console.error(e);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
+   }
+
    edit() {
       this.navController.navigateRoot("/transactions/stock-count/stock-count-crud/stock-count-header");
    }
@@ -91,6 +145,63 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
    previousStep() {
       this.objectService.resetVariables();
+      this.navController.navigateBack("/transactions/stock-count");
+   }
+
+   /* #region more action popover */
+
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
+
+   async deleteLocal() {
+      try {
+         if (this.objectService.objectHeader.isLocal) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               header: "Delete this Stock Count?",
+               message: "This action cannot be undone.",
+               buttons: [
+                  {
+                     text: "Delete",
+                     cssClass: "danger",
+                     handler: async () => {
+                        if (this.objectService.localObject) {
+                           await this.configService.deleteLocalTransaction(TransactionCode.inventoryCountTrx, this.objectService.localObject);
+                           this.toastService.presentToast("", "Stock Count deleted", "top", "success", 1000);
+                           await this.objectService.resetVariables();
+                           this.navController.navigateRoot("transactions/stock-count");
+                        } else {
+                           this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+                        }
+                     }
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel",
+                     cssClass: "cancel",
+                     handler: async () => {
+
+                     }
+                  }
+               ]
+            });
+            await alert.present();
+         } else {
+            this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
    }
 
 }

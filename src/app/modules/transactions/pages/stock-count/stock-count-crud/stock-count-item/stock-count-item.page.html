@@ -153,9 +153,24 @@
    </div>
 </ion-content>
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive || authService.hideFooter">
-   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
-      Save
-   </ion-button>
+   <ion-grid class="ion-no-padding">
+      <ion-row>
+         <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" color="warning"
+               (click)="submit_attempt = true; nextStepLocal()" [disabled]="submit_attempt">
+               Save Local
+               <ion-icon slot="end" name="cloud-offline-outline"></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-button class="ion-margin" expand="block" size="default" color="success"
+               (click)="submit_attempt = true; nextStep()" [disabled]="submit_attempt">
+               Save Online
+               <ion-icon slot="end" name="cloud-done-outline"></ion-icon>
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </ion-grid>
 </ion-footer>
 <ion-row class="scanner-buttons" [hidden]="!scanActive">
    <ion-col class="ion-no-padding">
