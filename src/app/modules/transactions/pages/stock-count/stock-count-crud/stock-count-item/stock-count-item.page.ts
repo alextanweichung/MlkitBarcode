@@ -729,7 +729,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             if (found) {
                this.onBinSelected({ id: found.binId, code: found.binCode });
             } else {
-               this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
+               this.toastService.presentToast("", "Invalid Bin", "top", "warning", 1000);
             }
          }
       } catch (e) {
@@ -744,7 +744,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             if (found) {
                this.onBinSelected({ id: found.binId, code: found.binCode });
             } else {
-               this.toastService.presentToast("", "Invalid Truck Arrangment", "top", "warning", 1000);
+               this.toastService.presentToast("", "Invalid Bin", "top", "warning", 1000);
             }
          }
       } catch (e) {

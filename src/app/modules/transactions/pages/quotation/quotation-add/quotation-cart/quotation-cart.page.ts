@@ -228,6 +228,8 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
+         console.log("🚀 ~ QuotationCartPage ~ insertObject ~ this.objectService.orderingPriceApprovalIgnoreACL:", this.objectService.orderingPriceApprovalIgnoreACL)
+         console.log("🚀 ~ QuotationCartPage ~ insertObject ~ this.originalRestrictTrxFields:", this.originalRestrictTrxFields)
          if (this.objectService.orderingPriceApprovalIgnoreACL) {
             this.checkPricingApprovalLines(trxDto, trxDto.details);
          } else {
@@ -300,13 +302,14 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
       if (trxDto.header.businessModelType === "R" || trxDto.header.businessModelType === "C") {
          trxDto.header.isPricingApproval = false;
       } else {
+         trxLineArray.forEach(x => { x.isPricingApproval = false }); // cast all to false first, then only check again
          let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
-         console.log("🚀 ~ QuotationCartPage ~ checkPricingApprovalLines ~ filteredData:", filteredData)
-         filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length <= 1);
+         filteredData = filteredData.filter(x => !x.isPromoImpactApplied);
          if (filteredData.length > 0) {
             filteredData.forEach(x => { x.isPricingApproval = true });
             trxDto.header.isPricingApproval = true;
          } else {
+            trxLineArray.forEach(x => { x.isPricingApproval = false });
             trxDto.header.isPricingApproval = false;
          }
       }

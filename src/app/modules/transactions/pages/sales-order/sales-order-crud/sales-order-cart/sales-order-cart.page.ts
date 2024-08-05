@@ -505,12 +505,14 @@ export class SalesOrderCartPage implements OnInit, ViewWillEnter {
       if (trxDto.header.businessModelType === "R" || trxDto.header.businessModelType === "C") {
          trxDto.header.isPricingApproval = false;
       } else {
+         trxLineArray.forEach(x => { x.isPricingApproval = false }); // cast all to false first, then only check again
          let filteredData = trxLineArray.filter(x => x.unitPrice != x.oriUnitPrice || x.unitPriceExTax != x.oriUnitPriceExTax || x.discountGroupCode != x.oriDiscountGroupCode || x.discountExpression != x.oriDiscountExpression);
-         filteredData = filteredData.filter(x => !x.isPromoImpactApplied && x.uomMaster.length <= 1);
+         filteredData = filteredData.filter(x => !x.isPromoImpactApplied);
          if (filteredData.length > 0) {
             filteredData.forEach(x => { x.isPricingApproval = true });
             trxDto.header.isPricingApproval = true;
          } else {
+            trxLineArray.forEach(x => { x.isPricingApproval = false });
             trxDto.header.isPricingApproval = false;
          }
       }

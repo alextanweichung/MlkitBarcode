@@ -395,10 +395,10 @@ export class ItemCatalogPage implements OnInit, OnChanges {
       item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.objectHeader?.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
       item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.objectHeader?.isHomeCurrency ? this.precisionSalesUnitPrice.localMax : this.precisionSalesUnitPrice.foreignMax);
 
-      item.oriUnitPrice = item.unitPrice;
-      item.oriUnitPriceExTax = item.unitPriceExTax;
-      item.oriDiscountGroupCode = item.discountGroupCode;
-      item.oriDiscountExpression = item.discountExpression;
+      // item.oriUnitPrice = item.unitPrice;
+      // item.oriUnitPriceExTax = item.unitPriceExTax;
+      // item.oriDiscountGroupCode = item.discountGroupCode;
+      // item.oriDiscountExpression = item.discountExpression;
 
       if (this.objectHeader.businessModelType === "T" || this.objectHeader.businessModelType === "B" || this.objectHeader.businessModelType === "F") {
          if (this.configSalesActivateTradingMargin || this.configTradingActivateMarginExpr) {
