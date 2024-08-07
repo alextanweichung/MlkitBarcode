@@ -24,6 +24,7 @@ export class ReportsPage implements OnInit {
    showSalesAgentPerformanceAll: boolean = false;
    showSalesByDebtor: boolean = false;
    showCheckQOH: boolean = false;
+   showCheckQOHVariation: boolean = false;
    showCheckCreditNote: boolean = false;
    showTransactionInquiry: boolean = false;
    showSalesAnalysis: boolean = false;
@@ -50,6 +51,7 @@ export class ReportsPage implements OnInit {
                this.showSalesAgentPerformanceAll = pageItems.findIndex(r => r.title === reportAppCode.mobileSAPerformance) > -1;
                this.showSalesByDebtor = pageItems.findIndex(r => r.title === reportAppCode.mobileSalesByDebtor) > -1;
                this.showCheckQOH = pageItems.findIndex(r => r.title === reportAppCode.mobileCheckQOH) > -1;
+               this.showCheckQOHVariation = pageItems.findIndex(r => r.title === reportAppCode.mobileCheckQOHVariation) > -1;
                this.showCheckCreditNote = pageItems.findIndex(r => r.title === reportAppCode.mobileCheckCN) > -1;
                this.showTransactionInquiry = pageItems.findIndex(r => r.title === reportAppCode.mobileTrxInq) > -1;
                this.showSalesAnalysis = pageItems.findIndex(r => r.title === reportAppCode.mobileSalesAnalysis) > -1;

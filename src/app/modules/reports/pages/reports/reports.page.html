@@ -39,6 +39,11 @@
           <div>Check QOH</div>
         </ion-label>
       </ion-item>
+      <ion-item button (click)="goToReport('rp-check-qoh-variation')" *ngIf="showCheckQOHVariation">
+        <ion-label>
+          <div>Check QOH Variation</div>
+        </ion-label>
+      </ion-item>
       <ion-item button (click)="goToReport('rp-check-cn')" *ngIf="showCheckCreditNote">
         <ion-label>
           <div>Check Credit Note</div>

@@ -82,11 +82,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
    }
 
    ngOnInit() {
-      // if (!this.inputReadOnly) {
-      //    setTimeout(() => {
-      //       this.scanInput.nativeElement.focus();
-      //    }, 10);
-      // }
+      
    }
 
    manuallyTrigger() {

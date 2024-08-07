@@ -221,7 +221,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      if (Number.isInteger(transformQty)) {
                         //To futher enhance this part
                         //Checking on multiple lines and consolidate the qty
-                        let findOsLinesWithQty = findOsLines.filter(x => (x.qtyRequest - x.qtyPicked - x.qtyCurrent) >= transformQty);
+                        let findOsLinesWithQty = findOsLines.filter(x => ((x.qtyRequest??0) - (x.qtyPicked??0) - (x.qtyCurrent??0)) >= transformQty);
                         if (findOsLinesWithQty.length > 0) {
                            itemFound.itemBarcode = currentItemUom.itemSku;
                            itemFound.itemSku = uom.itemSku;
@@ -265,7 +265,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      if (Number.isInteger(transformQty)) {
                         //To futher enhance this part
                         //Checking on multiple lines and consolidate the qty
-                        let findOsLinesWithQty = assemblyOutstandingLines.filter(x => (x.qtyRequest - x.qtyPicked - x.qtyCurrent) >= transformQty);
+                        let findOsLinesWithQty = assemblyOutstandingLines.filter(x => ((x.qtyRequest??0) - (x.qtyPicked??0) - (x.qtyCurrent??0)) >= transformQty);
                         if (findOsLinesWithQty.length > 0) {
                            itemFound.itemBarcode = currentItemUom.itemSku;
                            itemFound.itemSku = uom.itemSku;

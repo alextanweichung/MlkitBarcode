@@ -436,6 +436,10 @@ const routes: Routes = [
       loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh/rp-check-qoh.module').then(m => m.RpCheckQohPageModule)
    },
    {
+      path: 'reports/rp-check-qoh-variation',
+      loadChildren: () => import('./modules/reports/pages/reports/rp-check-qoh-variation/rp-check-qoh-variation.module').then(m => m.RpCheckQohVariationPageModule)
+   },
+   {
       path: 'reports/rp-check-cn',
       loadChildren: () => import('./modules/reports/pages/reports/rp-check-cn/rp-check-cn.module').then(m => m.RpCheckCnPageModule)
    },
@@ -542,10 +546,10 @@ const routes: Routes = [
       path: 'user-relogin',
       loadChildren: () => import('./shared/pages/user-relogin/user-relogin.module').then(m => m.UserReloginPageModule)
    },
-  {
-    path: 'creditor-application',
-    loadChildren: () => import('./modules/transactions/pages/creditor-application/creditor-application.module').then( m => m.CreditorApplicationPageModule)
-  },
+   {
+      path: 'creditor-application',
+      loadChildren: () => import('./modules/transactions/pages/creditor-application/creditor-application.module').then(m => m.CreditorApplicationPageModule)
+   },
 
 
 

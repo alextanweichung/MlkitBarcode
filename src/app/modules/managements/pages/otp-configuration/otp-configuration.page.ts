@@ -56,14 +56,13 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
       this.setFormattedDateString();
    }
 
-   ionViewWillEnter(): void {
-
+   async ionViewWillEnter(): Promise<void> {
+      await this.loadCommonData();
    }
 
    ngOnInit() {
       this.loadUsers();
       this.loadOtps();
-      this.loadCommonData();
    }
 
    users: User[] = [];
@@ -76,6 +75,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
    }
 
    loadCommonData() {
+      this.userSearchDropDownList = [];
       this.otpConfigService.getDescendantUser().subscribe((response: User[]) => {
          this.users = response;
          this.users.forEach(r => {
@@ -127,6 +127,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
    onUserChanged(event) {
       if (event && event.id) {
          this.selectedUser = event.id;
+         this.appsSearchDropdownList = [];
          this.otpConfigService.getUserApps(event.id).subscribe((response: App[]) => {
             this.apps = response;
             this.apps.forEach(r => {
@@ -174,8 +175,10 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
          this.setFormattedDateString();
       }
    }
-
+   
+   submit_attempt: boolean = false;
    generateOtp() {
+      this.submit_attempt = true;
       if (this.selectedApp && this.selectedUser && this.selectedValidity) {
          let t = this.transformObjectToDto();
          this.otpConfigService.insertOtp(t).subscribe(async response => {
@@ -188,10 +191,12 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
          }, error => {
             console.log(error);
             this.toastService.presentToast("Error", `${error.message}`, "top", "danger", 1000);
+            this.submit_attempt = false;
          })
       }
       else {
-         this.toastService.presentToast("Error", "Please insert all fields.", "top", "danger", 1000);
+         this.toastService.presentToast("Control Error", "Please insert all fields.", "top", "warning", 1000);
+         this.submit_attempt = false;
       }
    }
 
@@ -226,6 +231,7 @@ export class OtpConfigurationPage implements OnInit, ViewWillEnter {
       this.setFormattedDateString();
       this.checkboxValue = true;
       this.remark = null;
+      this.submit_attempt = false;
    }
 
    copyMessage(val: string) {

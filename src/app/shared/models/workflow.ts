@@ -15,4 +15,5 @@ export interface WorkFlowState {
   isCompleted: boolean
   sequence: number
   interval: string
+  currentService?: string
 }

@@ -65,6 +65,23 @@ export const approvalAppCode = {
    inventoryAdjReqRV: "MAIARRV",
    inventoryAdjReqAP: "MAIARAP",
 
+   soCreditAP: "MASOCAP",
+   soCODRV: "MASOCODRV",
+   soCODAP: "MASOCODAP",
+
+   b2bCreditAP: "MAB2BCAP",
+   b2bCODRV: "MAB2BCODRV",
+   b2bCODAP: "MAB2BCODAP",
+
+   // consignTORV: "MACOTRV",
+   // consignTOAP: "MACOTAP",
+
+   // retailTORV: "MARTTRV",
+   // retailTOAP: "MARTTAP",
+
+   // defectReqRV: "MADRRV",
+   // defectReqAP: "MADRAP",
+
    paymentArrangementRV: "MAMPARV",
    paymentArrangementAP: "MAMPAAP",
    
@@ -85,6 +102,7 @@ export const reportAppCode = {
    mobileSAPerformance: "MARPSAPA",
    mobileSalesByDebtor: "MARPSBD",
    mobileCheckQOH: "MARPCQOH",
+   mobileCheckQOHVariation: "MARPCQOHV",
    mobileCheckCN: "MARPCCN",
    mobileTrxInq: "MARPTI",
    mobileSalesAnalysis: "MARPSAL",

@@ -8,13 +8,14 @@ import { SAPerformanceListing, SalesAgentAllPerformanceObject } from '../models/
 import { ReportSOListing } from '../models/rp-so-listing';
 import { SalesByCustomer, SalesByCustomerRequest } from '../models/rp-sales-customer';
 import { CreditInfo } from 'src/app/shared/models/credit-info';
-import { CheckQohRoot } from '../models/rp-check-qoh';
+import { CheckQohRoot, CheckQohVariationRequest, CheckQohVariationRoot } from '../models/rp-check-qoh';
 import { CheckCn, CheckCnRequest } from '../models/rp-check-cn';
 import { TransactionInquiryObject, TransactionInquiryRequestObject } from '../models/transaction-inquiry';
 import { SalesAnalysisObject, SalesAnalysisRequestObject } from '../models/sales-analysis';
 import { ConsignmentSalesLocation } from '../../transactions/models/consignment-sales';
 import { ItemSalesAnalysis, ItemSalesAnalysisRequestObject } from '../models/item-sales-analysis';
 import { Item } from '../../transactions/models/item';
+import { MasterList } from 'src/app/shared/models/master-list';
 
 @Injectable({
    providedIn: 'root'
@@ -24,9 +25,7 @@ export class ReportsService {
    constructor(
       private http: HttpClient,
       private configService: ConfigService
-   ) {
-
-   }
+   ) { }
 
    getCustomers() {
       return this.http.get<Customer[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/customer");
@@ -63,6 +62,10 @@ export class ReportsService {
    getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
       return this.http.get<CheckQohRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
    }
+   
+   getCheckQohVariation(loginUserType: string, request: CheckQohVariationRequest) {
+      return this.http.post<CheckQohVariationRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQohVariation/" + loginUserType, request);
+   }
 
    getCheckCn(object: CheckCnRequest) {
       return this.http.post<CheckCn[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkCn", object);
@@ -90,6 +93,10 @@ export class ReportsService {
 
    getConsignmentLocation() {
       return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/consignmentLocation");
+   }
+
+   getMasterList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/masterList");
    }
 
 }

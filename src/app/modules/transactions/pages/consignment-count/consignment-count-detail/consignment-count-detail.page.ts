@@ -110,6 +110,9 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 				if (r.itemVariationYId) {
 					r.itemVariationYDescription = this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description;
 				}
+            if (r.guid) {
+               r.guid = uuidv4();
+            }
 			})
 			if (this.isLocal) {
 				await this.objectService.setLocalObject(JSON.parse(JSON.stringify(localObject)));

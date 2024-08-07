@@ -49,12 +49,12 @@
    <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
 
     <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-      <ion-item-sliding #slidingItem *ngFor="let line of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let i = index">
+      <ion-item-sliding #slidingItem *ngFor="let line of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
         <ion-item button detail="false" class="no-ripple ion-no-padding">
           <ion-grid class="ion-no-padding pt-2 pl-2">
             <ion-row>
               <ion-col size="1" class="ion-flex ion-margin-auto">
-                <div>{{i+1+((currentPage-1)*itemsPerPage)}}</div>
+                <div>{{rowIndex+1+((currentPage-1)*itemsPerPage)}}</div>
               </ion-col>
               <ion-col class="ion-flex ion-margin-auto">
                 <ion-grid class="ion-no-padding">
@@ -79,12 +79,12 @@
                   </ion-row>
                   <ion-row>
                     <ion-col class="ion-flex ion-margin-auto">
-                      <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(line, i)">
+                      <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(line)">
                         <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                       </ion-button>
                     </ion-col>
                     <ion-col class="ion-flex ion-margin-auto">
-                      <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
+                      <ion-input #qtyInput class="ion-text-center" type="number" [min]="0" placeholder="0" [(ngModel)]="line.qtyRequest" (ionBlur)="updateQty(line)" (keypress)="eventHandler($event.keyCode, line)"></ion-input>
                     </ion-col>
                     <ion-col class="ion-flex ion-margin-auto">
                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(line)">
@@ -98,7 +98,7 @@
           </ion-grid>
         </ion-item>
         <ion-item-options>
-          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(i)">
+          <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(line)">
             <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
           </ion-item-option>
         </ion-item-options>

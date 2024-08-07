@@ -373,8 +373,8 @@ export class QuotationDetailPage implements OnInit, ViewWillEnter {
    generateSOButtonClicked() {
       if (this.objectService.objectHeader) {
          if (this.workFlowState) {
-            let isReviewComplete = this.workFlowState.find(x => x.stateType == "REVIEW")?.isCompleted == undefined ? true : this.workFlowState.find(x => x.stateType == "REVIEW")?.isCompleted
-            let isApprovalComplete = this.workFlowState.find(x => x.stateType == "APPROVAL")?.isCompleted == undefined ? true : this.workFlowState.find(x => x.stateType == "APPROVAL")?.isCompleted
+            let isReviewComplete = this.workFlowState.find(x => x.currentService == "QuotationReview")?.isCompleted == undefined ? true : this.workFlowState.find(x => x.currentService == "QuotationReview")?.isCompleted
+            let isApprovalComplete = this.workFlowState.find(x => x.currentService == "QuotationApprove")?.isCompleted == undefined ? true : this.workFlowState.find(x => x.currentService == "QuotationApprove")?.isCompleted
             let poTrxId = this.workFlowState.find(x => x.routerLink == "/sm/sales-order")?.trxId
             if (poTrxId) {
                this.toastService.presentToast("Validation", "SO is already generated", "top", "warning", 1000);

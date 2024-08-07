@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonSearchbar } from '@ionic/angular';
 import { SearchDropdownList } from '../../models/search-dropdown-list';
+import { MasterListDetails } from '../../models/master-list-details';
 
 @Component({
    selector: 'app-search-multi-dropdown',
@@ -14,7 +15,8 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
    @Input() showBoldHeader: boolean = false;
    @Input() optionLabel: string = 'description';
    @Input() showCode: boolean = false;
-   @Input() searchDropdownList: SearchDropdownList[];
+   @Input() searchDropdownList: SearchDropdownList[] = [];
+   @Input() masterDropdownList: MasterListDetails[] = [];
    @Output() onActionComplete: EventEmitter<SearchDropdownList[]> = new EventEmitter();
    tempDropdownList: SearchDropdownList[] = [];
    @Input() selectedIds: number[] = [];
@@ -25,7 +27,10 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
    constructor() { }
 
-   ngOnChanges(changes: SimpleChanges): void {
+   async ngOnChanges(changes: SimpleChanges): Promise<void> {
+      if (changes.masterDropdownList) {
+         await this.bindFromMasterList();
+      }
       if (changes.selectedIds || changes.searchDropdownList) {
          if (this.selectedIds) {
             this.selected = this.searchDropdownList.filter(r => this.selectedIds.includes(r.id));
@@ -36,6 +41,20 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
    }
 
    ngOnInit() {
+      
+   }
+
+   bindFromMasterList() {
+      this.searchDropdownList = [];
+      if (this.masterDropdownList && this.masterDropdownList.length > 0) {
+         this.masterDropdownList.forEach(r => {
+            this.searchDropdownList.push({
+               id: r.id,
+               code: r.code,
+               description: r.description
+            })
+         })
+      }
    }
 
    searchText: string = '';
@@ -75,17 +94,17 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
    itemChecked(event, object: SearchDropdownList) {
       if (event.detail.checked) {
-         if (this.selected.findIndex(r => r.id === object.id) > -1) {
+         if (this.selected?.findIndex(r => r.id === object.id) > -1) {
             // already in
          } else {
             if (this.selectAll) {
                this.selected = [...this.searchDropdownList];
             } else {
-               this.selected.push(object);
+               this.selected?.push(object);
             }
          }
       } else {
-         this.selected.splice(this.selected.findIndex(r => r.id === object.id), 1);
+         this.selected?.splice(this.selected?.findIndex(r => r.id === object.id), 1);
       }
    }
 
@@ -136,7 +155,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
 
    assignToTemp(startIndex: number, size: number) {
       if (this.searchText && this.searchText.length > 0) {
-         this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
+         this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.filter(r => r.code.toLowerCase().includes(this.searchText.toLowerCase()) || r.oldCode?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description?.toLowerCase().includes(this.searchText.toLowerCase())).slice(this.startIndex, startIndex + size)];
       } else {
          this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
       }
