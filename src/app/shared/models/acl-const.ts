@@ -73,14 +73,14 @@ export const approvalAppCode = {
    b2bCODRV: "MAB2BCODRV",
    b2bCODAP: "MAB2BCODAP",
 
-   // consignTORV: "MACOTRV",
-   // consignTOAP: "MACOTAP",
+   retailTORV: "MARTTORV",
+   retailTOAP: "MARTTOAP",
 
-   // retailTORV: "MARTTRV",
-   // retailTOAP: "MARTTAP",
+   consignTORV: "MACOTORV",
+   consignTOAP: "MACOTOAP",
 
-   // defectReqRV: "MADRRV",
-   // defectReqAP: "MADRAP",
+   defectReqRV: "MADRRV",
+   defectReqAP: "MADRAP",
 
    paymentArrangementRV: "MAMPARV",
    paymentArrangementAP: "MAMPAAP",
