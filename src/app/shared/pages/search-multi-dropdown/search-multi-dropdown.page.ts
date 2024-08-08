@@ -23,6 +23,8 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
    selected: SearchDropdownList[] = [];
    selectAll: boolean = false;
 
+   oldSelectedIds: number[] = [];
+
    @ViewChild('searchBar', { static: false }) searchBar: IonSearchbar;
 
    constructor() { }
@@ -32,10 +34,18 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
          await this.bindFromMasterList();
       }
       if (changes.selectedIds || changes.searchDropdownList) {
+         this.searchDropdownList.forEach(r => {
+            r.checked = false;
+         })
+         this.selected = null;
+         this.oldSelectedIds = [];
+
          if (this.selectedIds) {
             this.selected = this.searchDropdownList.filter(r => this.selectedIds.includes(r.id));
-         } else {
-            this.selected = null;
+            this.selected.forEach(r => {
+               r.checked = true;
+            })
+            this.oldSelectedIds = this.selectedIds;
          }
       }
    }
@@ -130,7 +140,7 @@ export class SearchMultiDropdownPage implements OnInit, OnChanges {
    // Cancel
    cancel() {
       // Dismiss modal
-      this.hideModal(null);
+      this.hideModal(this.searchDropdownList.filter(r => this.oldSelectedIds.includes(r.id)));
    }
 
    apply() {

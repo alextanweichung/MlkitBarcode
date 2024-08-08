@@ -6,7 +6,9 @@ export interface ConsignmentSalesList {
   trxDate: Date
   customerCode: string
   customerName: string
+  locationId: number
   locationDesc: string
+  toLocationId: number
   toLocationCode: string
   toLocationDesc: string
   grandTotal: number

@@ -10,6 +10,7 @@ import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -23,6 +24,7 @@ export class ConsignmentSalesService {
 
    filterStartDate: Date;
    filterEndDate: Date;
+   filterLocationId: number[] = [];
 
    trxKey: string = "ConsignmentSales";
 
@@ -95,6 +97,7 @@ export class ConsignmentSalesService {
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.locationMasterList = this.locationMasterList.filter(r => (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      this.bindLocationList();
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -109,6 +112,18 @@ export class ConsignmentSalesService {
             await this.authService.rebuildCustomerList();
          }
       })
+   }
+
+   locationSearchDropdownList: SearchDropdownList[] = [];
+   async bindLocationList() {
+      this.locationSearchDropdownList = [];
+      for await (let r of this.locationMasterList) {
+         this.locationSearchDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+         })
+      }
    }
 
    loadStaticLov() {

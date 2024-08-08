@@ -73,7 +73,10 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    }
 
    async ngOnInit() {
-
+      this.objectService.filterLocationId = [];
+      if (this.configService.selected_location) {
+         this.objectService.filterLocationId.push(this.configService.selected_location);
+      }
    }
 
    ngOnDestroy(): void {
@@ -149,7 +152,10 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
             component: FilterPage,
             componentProps: {
                startDate: this.objectService.filterStartDate,
-               endDate: this.objectService.filterEndDate
+               endDate: this.objectService.filterEndDate,
+               locationFilter: true,
+               locationList: this.objectService.locationSearchDropdownList,
+               selectedLocationId: this.objectService.filterLocationId
             },
             canDismiss: true
          })
@@ -158,6 +164,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
          if (data && data !== undefined) {
             this.objectService.filterStartDate = new Date(data.startDate);
             this.objectService.filterEndDate = new Date(data.endDate);
+            this.objectService.filterLocationId = data.locationIds;
             this.loadObjects();
          }
       } catch (e) {
@@ -209,6 +216,9 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
    resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      if (this.objectService.filterLocationId && this.objectService.filterLocationId.length > 0) {
+         this.filteredObj = this.filteredObj.filter(r => this.objectService.filterLocationId.includes(r.toLocationId));
+      }
    }
 
    highlight(event) {

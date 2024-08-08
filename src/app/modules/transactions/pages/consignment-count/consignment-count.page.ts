@@ -72,7 +72,11 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	}
 
 	ngOnInit() {
-
+      this.objectService.filterLocationId = [];
+      if (this.configService.selected_location) {
+         this.objectService.filterLocationId.push(this.configService.selected_location);
+      }
+         console.log("🚀 ~ ConsignmentCountPage ~ ngOnInit ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
 	}
 
 	async promptIncompleteTrxAlert() {
@@ -113,7 +117,6 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 		try {
 			await this.loadingService.showLoading();
 			this.objectService.getObjects(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
-				console.log("🚀 ~ ConsignmentCountPage ~ this.objectService.getObjects ~ response:", response)
 				let objects = response.filter(r => !this.objects.flatMap(rr => rr.consignmentCountId).includes(r.consignmentCountId))
 				this.objects = [...this.objects, ...objects];
 				await this.resetFilteredObj();
@@ -133,19 +136,21 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 
 	async loadLocalObjects() {
 		try {
-			let localObject = await this.configService.getLocalTransaction(TransactionCode.consignmentCountTrx);
-			let d: ConsignmentCountHeader[] = [];
-         if (localObject && localObject.length > 0) {
-            localObject.forEach(r => {
-               let dd: ConsignmentCountRoot = JSON.parse(r.jsonData);
-               dd.header.isLocal = true;
-               dd.header.guid = r.id;
-               dd.header.lastUpdated = r.lastUpdated;
-               d.push(dd.header);
-            })
-            this.objects = [...this.objects, ...d];
+         if (Capacitor.getPlatform() !== "web") {
+            let localObject = await this.configService.getLocalTransaction(TransactionCode.consignmentCountTrx);
+            let d: ConsignmentCountHeader[] = [];
+            if (localObject && localObject.length > 0) {
+               localObject.forEach(r => {
+                  let dd: ConsignmentCountRoot = JSON.parse(r.jsonData);
+                  dd.header.isLocal = true;
+                  dd.header.guid = r.id;
+                  dd.header.lastUpdated = r.lastUpdated;
+                  d.push(dd.header);
+               })
+               this.objects = [...this.objects, ...d];
+            }
+            await this.resetFilteredObj();
          }
-			await this.resetFilteredObj();
 			if ((await Network.getStatus()).connected) {
 				await this.loadObjects();
 			}
@@ -199,25 +204,29 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	}
 
 	async filter() {
-		try {
+      try {
+         console.log("🚀 ~ ConsignmentCountPage ~ filter ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
 			const modal = await this.modalController.create({
 				component: FilterPage,
 				componentProps: {
 					startDate: this.objectService.filterStartDate,
 					endDate: this.objectService.filterEndDate,
-					customerFilter: false,
-					salesAgentFilter: false,
-					useDraft: false
+               locationFilter: true,
+               locationList: this.objectService.locationSearchDropdownList,
+               selectedLocationId: this.objectService.filterLocationId
 				},
 				canDismiss: true
 			})
 			await modal.present();
 			let { data } = await modal.onWillDismiss();
+			console.log("🚀 ~ ConsignmentCountPage ~ filter ~ data:", data)
 			if (data && data !== undefined) {
 				this.objects = [];
 				this.uniqueGrouping = [];
 				this.objectService.filterStartDate = new Date(data.startDate);
 				this.objectService.filterEndDate = new Date(data.endDate);
+            this.objectService.filterLocationId = data.locationIds;
+            console.log("🚀 ~ ConsignmentCountPage ~ filter ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
 				await this.loadLocalObjects();
 			}
 		} catch (e) {
@@ -262,7 +271,12 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	}
 
 	resetFilteredObj() {
+      console.log("🚀 ~ ConsignmentCountPage ~ resetFilteredObj ~ this.objects:", this.objects)
 		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      console.log("🚀 ~ ConsignmentCountPage ~ resetFilteredObj ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
+      if (this.objectService.filterLocationId && this.objectService.filterLocationId.length > 0) {
+         this.filteredObj = this.filteredObj.filter(r => this.objectService.filterLocationId.includes(r.locationId));
+      }
 		this.filteredObj.sort((x, y) => {
 			if (x.isLocal === y.isLocal) {
 				return x.trxDate < y.trxDate ? 0 : 1;

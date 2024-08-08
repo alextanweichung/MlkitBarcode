@@ -27,6 +27,9 @@ export class FilterPage implements OnInit {
    salesAgentFilter: boolean = false;
    salesAgentList: SearchDropdownList[] = [];
 
+   locationFilter: boolean = false;
+   locationList: SearchDropdownList[] = [];
+
    useDraft: boolean = false;
    showDraftOnly: boolean = true;
 
@@ -81,6 +84,17 @@ export class FilterPage implements OnInit {
       }
    }
 
+   selectedLocationId: number[] = [];
+   onLocationSelected(event) {
+      console.log("🚀 ~ FilterPage ~ onLocationSelected ~ event:", event)
+      this.selectedLocationId = [];
+      if (event) {
+         event.forEach(r => {
+            this.selectedLocationId.push(r.id)
+         });
+      }
+   }
+
    selectedSalesAgentId: number[] = [];
    onSalesAgentSelected(event) {
       this.selectedSalesAgentId = [];
@@ -94,18 +108,14 @@ export class FilterPage implements OnInit {
    // Cancel
    cancel() {
       // Dismiss modal
-      this.modalController.dismiss();
+      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, locationIds: this.selectedLocationId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
+      
+      this.modalController.dismiss(this.filters);
    }
 
    // Apply filter
    apply() {
-      // Add filter logic here...
-      // ...
-      // if (this.customerFilter || this.salesAgentFilter) {
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
-      // } else {
-      //   this.filters = { startDate: this.startDate, endDate: this.endDate };
-      // }
+      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, locationIds: this.selectedLocationId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
 
       // Dismiss modal and apply filters
       this.modalController.dismiss(this.filters);

@@ -7,6 +7,7 @@ import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
 import { LocalTransaction } from "src/app/shared/models/pos-download";
+import { SearchDropdownList } from "src/app/shared/models/search-dropdown-list";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -20,6 +21,7 @@ export class ConsignmentCountService {
 
    filterStartDate: Date;
    filterEndDate: Date;
+   filterLocationId: number[] = [];
 
    trxKey: string = "consignmentCount";
 
@@ -44,6 +46,19 @@ export class ConsignmentCountService {
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      this.bindLocationList();
+   }
+
+   locationSearchDropdownList: SearchDropdownList[] = [];
+   async bindLocationList() {
+      this.locationSearchDropdownList = [];
+      for await (let r of this.locationMasterList) {
+         this.locationSearchDropdownList.push({
+            id: r.id,
+            code: r.code,
+            description: r.description
+         })
+      }
    }
 
    objectHeader: ConsignmentCountHeader;
