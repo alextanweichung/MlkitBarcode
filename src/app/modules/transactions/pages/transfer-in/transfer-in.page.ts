@@ -67,10 +67,15 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          this.objectService.selectedLocation = this.configService.selected_location;
          await this.loadPendingList();
       }
+      else {
+         if (this.objectService.selectedLocation) {
+            await this.loadPendingList();
+         }
+      }
    }
 
    async ionViewDidEnter(): Promise<void> {
-      
+
    }
 
    ngOnInit() {
@@ -99,6 +104,9 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
       if (event) {
          this.objectService.selectedLocation = event.id;
          this.loadPendingList();
+      } else {
+         this.objectService.selectedLocation = null;
+         this.pendingObject = [];
       }
    }
 

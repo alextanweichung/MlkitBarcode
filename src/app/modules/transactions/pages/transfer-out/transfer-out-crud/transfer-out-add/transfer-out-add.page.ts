@@ -103,22 +103,6 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       })
    }
 
-   // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-   // bindLocationList() {
-   //   this.consignmentLocationSearchDropdownList = [];
-   //   try {
-   //     this.objectService.locationList.forEach(r => {
-   //       this.consignmentLocationSearchDropdownList.push({
-   //         id: r.locationId,
-   //         code: r.locationCode,
-   //         description: r.locationDescription
-   //       })
-   //     })
-   //   } catch (e) {
-   //     console.error(e);
-   //   }
-   // }
-
    onLocationChanged(event: any) {
       if (event) {
          this.objectService.selectedLocation = event.id;
