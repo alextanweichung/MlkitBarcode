@@ -12,6 +12,8 @@ import { Keyboard } from '@capacitor/keyboard';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { Capacitor } from '@capacitor/core';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-picking-header',
@@ -24,6 +26,8 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    warehouseAgentId: number
    isMobile: boolean = true;
    isButtonVisible: boolean = true;
+   isByLocation: boolean = false;
+   customerDisabled: boolean = false;
 
    constructor(
       public objectService: PickingService,
@@ -87,6 +91,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    moduleControl: ModuleControl[];
    configSOSelectionEnforceSameOrigin: boolean = true;
    configSOSelectionEnforceSameDestination: boolean = true;
+   configSystemWideCustomerLocationSelection: string = "C";
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -105,6 +110,13 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             } else {
                this.configSOSelectionEnforceSameDestination = false;
             }
+         }
+         let systemWideCustomerLocationSelection = this.moduleControl.find(x => x.ctrlName === "SystemWideCustomerLocationSelection")?.ctrlValue;
+         if (systemWideCustomerLocationSelection) {
+            this.configSystemWideCustomerLocationSelection = systemWideCustomerLocationSelection;
+         }
+         if (this.configSystemWideCustomerLocationSelection === "L") {
+            this.swapCustomerLocation("L");
          }
       })
    }
@@ -156,7 +168,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             this.seletcedDocs.unshift(doc);
             if (this.seletcedDocs && this.seletcedDocs.length > 0) {
                this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
-               this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+               this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
                this.objectForm.patchValue({
                   locationId: this.seletcedDocs[0].locationId,
                   customerId: this.seletcedDocs[0].customerId,
@@ -266,7 +278,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.seletcedDocs.unshift(doc);
                   if (this.seletcedDocs && this.seletcedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
-                     this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+                     this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
                      this.objectForm.patchValue({
                         locationId: this.seletcedDocs[0].locationId,
                         customerId: this.seletcedDocs[0].customerId,
@@ -325,7 +337,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                   this.seletcedDocs.unshift(doc);
                   if (this.seletcedDocs && this.seletcedDocs.length > 0) {
                      this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
-                     this.onDestinationChanged({ id: this.seletcedDocs[0].toLocationId });
+                     this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
                      this.objectForm.patchValue({
                         locationId: this.seletcedDocs[0].locationId,
                         customerId: this.seletcedDocs[0].customerId,
@@ -552,7 +564,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    }
 
    selectedToLocationId: number;
-   onDestinationChanged(event) {
+   onCustomerLocationSelected(event) {
       if (event) {
          this.selectedToLocationId = event.id;
          this.objectForm.patchValue({ toLocationId: this.selectedToLocationId });
@@ -560,6 +572,44 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.selectedToLocationId = null;
          this.objectForm.patchValue({ toLocationId: this.selectedToLocationId });
       }
+   }
+
+   onFullToLocationSelected(event: SearchDropdownList) {
+      if (event) {
+         let findLocation = this.objectService.locationMasterList.find(x => x.id === event.id);
+         if (findLocation) {
+            if (findLocation.attribute13) {
+               this.objectForm.patchValue({ customerId: parseInt(findLocation.attribute13) });
+               // this.objectForm.controls["customerId"].disable();
+               this.customerDisabled = true;
+            } else {
+               this.objectForm.patchValue({ toLocationId: null, customerId: null });
+               // this.objectForm.controls["customerId"].enable();
+               this.customerDisabled = false;
+               this.toastService.presentToast("Selected Denied", `${findLocation.description} is not mapped to any customer.`, "top", "warning", 1000);
+            }
+            this.onCustomerSelected({ id: this.objectForm.controls.customerId.value }, true);
+            this.onCustomerLocationSelected(event);
+         }
+      } else {
+         this.objectForm.patchValue({ toLocationId: null });
+      }
+   }
+
+   swapCustomerLocation(type: string = null) {
+      if (type === "C") {
+         this.isByLocation = false;
+      } else if (type === "L") {
+         this.isByLocation = true;
+      } else {
+         this.isByLocation = !this.isByLocation;
+      }
+      if (this.isByLocation) {
+         this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
+      } else {
+         this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
+      }
+      this.customerDisabled = false;
    }
 
    @ViewChild("segment", { static: false }) segment: IonSegment;
@@ -614,7 +664,8 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             sourceType: ["M"],
             remark: [null],
             groupType: ["S"],
-            copyFrom: [null]
+            copyFrom: [null],
+            uuid: [uuidv4()]
          });
       } catch (e) {
          console.error(e);

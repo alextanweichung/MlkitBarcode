@@ -52,7 +52,7 @@
                   <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.toLocationId.value" (onActionComplete)="onFullToLocationSelected($event)"></app-search-dropdown>
                   <ng-container *ngIf="objectForm.controls.toLocationId.value">
                      <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="objectForm.controls.customerId.value" (onActionComplete)="onCustomerSelected($event, true)" [disabled]="customerDisabled"></app-search-dropdown>
-                  </ng-container>               
+                  </ng-container>
                </ng-container>
                <ion-item>
                   <ion-label class="font-bold" position="stacked">Remark</ion-label>

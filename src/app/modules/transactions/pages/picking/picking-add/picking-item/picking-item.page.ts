@@ -66,6 +66,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    configMobileScanItemContinuous: boolean = false;
    configSystemWideActivateMultiUOM: boolean = false;
    configMultiPackAutoTransformLooseUom: boolean = false;
+   pickPackAllowAssemblyPartialSave: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -122,6 +123,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             this.configMultiPackAutoTransformLooseUom = true;
          } else {
             this.configMultiPackAutoTransformLooseUom = false;
+         }
+         let allowPartialScan = this.moduleControl.find(x => x.ctrlName === "PickPackAllowAssemblyPartialSave")
+         if (allowPartialScan && allowPartialScan.ctrlValue.toUpperCase() === "Y" ) {
+            this.pickPackAllowAssemblyPartialSave = true;
+         } else {
+            this.pickPackAllowAssemblyPartialSave = false;
          }
          if (this.configSystemWideActivateMultiUOM && this.configMultiPackAutoTransformLooseUom) {
             this.loadItemListMultiUom();
@@ -1185,10 +1192,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    insertObject() {
       try {
          let newObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
-         let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPickingObject)
-         if (!checkFullComponentScan) {
-            this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);
-            return;
+         if (!this.pickPackAllowAssemblyPartialSave) {
+            let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPickingObject);
+            if (!checkFullComponentScan) {
+               this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);
+               return;
+            }
          }
          if (this.allowDocumentWithEmptyLine === "N") {
             if (newObjectDto.details.length < 1) {
@@ -1219,10 +1228,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    updateObject() {
       try {
          let updateObjectDto = this.transformObjectToTrxDto(this.objectService.multiPickingObject);
-         let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPickingObject)
-         if (!checkFullComponentScan) {
-            this.toastService.presentToast("Update Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);
-            return;
+         if (!this.pickPackAllowAssemblyPartialSave) {
+            let checkFullComponentScan = this.checkAssemblyFullScan(this.objectService.multiPickingObject);
+            if (!checkFullComponentScan) {
+               this.toastService.presentToast("Insert Failed", "Component items are partially scan. Not allow to save.", "top", "warning", 1000);
+               return;
+            }
          }
          if (this.allowDocumentWithEmptyLine === "N") {
             if (updateObjectDto.details.length < 1) {

@@ -219,6 +219,7 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
 
    resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
    }
 
 }

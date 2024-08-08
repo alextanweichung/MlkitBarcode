@@ -271,9 +271,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	}
 
 	resetFilteredObj() {
-      console.log("🚀 ~ ConsignmentCountPage ~ resetFilteredObj ~ this.objects:", this.objects)
 		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
-      console.log("🚀 ~ ConsignmentCountPage ~ resetFilteredObj ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
       if (this.objectService.filterLocationId && this.objectService.filterLocationId.length > 0) {
          this.filteredObj = this.filteredObj.filter(r => this.objectService.filterLocationId.includes(r.locationId));
       }

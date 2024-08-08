@@ -107,14 +107,6 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       if (event) {
          this.objectService.selectedLocation = event.id;
          this.objectForm.patchValue({ locationId: event.id });
-      } else {
-         this.objectService.selectedLocation = null;
-         this.objectForm.patchValue({ locationId: null });
-      }
-   }
-
-   onToLocationChanged(event: any) {
-      if (event) {
          let found = this.objectService.fullLocationMasterList.find(r => r.id === event.id);
          if (found) {
             if (found.attribute1 === "C"){
@@ -122,10 +114,18 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
             } else {
                this.objectForm.patchValue({ typeCode: "IL" });
             }
-         }         
+         }
+      } else {
+         this.objectService.selectedLocation = null;
+         this.objectForm.patchValue({ typeCode: "C" });
+         this.objectForm.patchValue({ locationId: null });
+      }
+   }
+
+   onToLocationChanged(event: any) {
+      if (event) {
          this.objectForm.patchValue({ toLocationId: event.id });
       } else {
-         this.objectForm.patchValue({ typeCode: "C" });
          this.objectForm.patchValue({ toLocationId: null });
       }
    }

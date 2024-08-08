@@ -6,6 +6,9 @@
             <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
          </ion-button>
       </ion-buttons>
+      <ion-buttons slot="primary" (click)="swapCustomerLocation()" *ngIf="!objectForm.controls.isWithSo.value">
+         <ion-icon slot="icon-only" name="sync-outline"></ion-icon>
+      </ion-buttons>
       <ion-buttons slot="primary">
          <app-camera-scan-input #cameraScanInput *ngIf="isButtonVisible && objectForm.controls.warehouseAgentId?.value && (isWithType === 'SO' || isWithType === 'B2B')" [scanActive]="scanActive" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)"></app-camera-scan-input>
       </ion-buttons>
@@ -32,9 +35,17 @@
          </ion-segment>
          <div class="mt-2" *ngIf="isWithType === 'NONE'" [formGroup]="objectForm">
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event, true)"></app-search-dropdown>
                <app-search-dropdown title="Origin Location" optionLabel="description" [searchDropdownList]="fLocationMasterList" [selectedId]="selectedLocationId" (onActionComplete)="onOriginChanged($event)"></app-search-dropdown>
-               <app-search-dropdown *ngIf="objectForm.controls.businessModelType.value !== 'T' && objectForm.controls.businessModelType.value !== null" title="Destination Location" optionLabel="description" [masterDropdownList]="selectedCustomerLocationList" [selectedId]="selectedToLocationId" (onActionComplete)="onDestinationChanged($event)"></app-search-dropdown>
+               <ng-container *ngIf="!isByLocation">
+                  <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="selectedCustomerId" (onActionComplete)="onCustomerSelected($event, true)" [disabled]="customerDisabled"></app-search-dropdown>
+                  <app-search-dropdown *ngIf="objectForm.controls.businessModelType.value !== 'T' && objectForm.controls.businessModelType.value !== null" title="Destination Location" optionLabel="description" [masterDropdownList]="selectedCustomerLocationList" [selectedId]="selectedToLocationId" (onActionComplete)="onCustomerLocationSelected($event)"></app-search-dropdown>
+               </ng-container>
+               <ng-container *ngIf="isByLocation">
+                  <app-search-dropdown title="Destination Location" optionLabel="description" [searchDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.toLocationId.value" (onActionComplete)="onFullToLocationSelected($event)"></app-search-dropdown>
+                  <ng-container *ngIf="objectForm.controls.toLocationId.value">
+                     <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="objectForm.controls.customerId.value" (onActionComplete)="onCustomerSelected($event, true)" [disabled]="customerDisabled"></app-search-dropdown>
+                  </ng-container>
+               </ng-container>
                <ion-item>
                   <ion-label class="font-bold" position="stacked">Remark</ion-label>
                   <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>

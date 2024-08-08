@@ -353,6 +353,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
       if (!this.objectService.filterShowClosed) {
          this.filteredObj = this.filteredObj.filter(r => !r.isClosed);
       }
+      this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
    }
 
 }

@@ -528,7 +528,7 @@ export class CommonService {
                totalMarginAmt = totalMarginAmt.add(currentMargincAmt);
                totalMarginAmtExTax = totalMarginAmtExTax.add(currentMargincAmtExTax);
                subTotal = subTotal.sub(currentMargincAmt);
-               subTotalExTax = subTotalExTax.sub(currentMargincAmt);
+               subTotalExTax = subTotalExTax.sub(currentMargincAmtExTax);
             } else {
                totalMarginAmt = totalMarginAmt.add(xDecimal);
                totalMarginAmtExTax = totalMarginAmtExTax.add(xDecimal);

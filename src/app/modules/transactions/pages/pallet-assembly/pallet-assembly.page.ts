@@ -169,6 +169,7 @@ export class PalletAssemblyPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
 	resetFilteredObj() {
 		this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
 	}
 
 	highlight(event) {

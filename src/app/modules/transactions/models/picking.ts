@@ -54,6 +54,7 @@ export interface MultiPickingHeader {
    modifiedBy: any
    modifiedAt: any
    deactivated: boolean
+   uuid: string
 }
 
 export interface MultiPickingCarton {

@@ -219,6 +219,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
       if (this.objectService.filterLocationId && this.objectService.filterLocationId.length > 0) {
          this.filteredObj = this.filteredObj.filter(r => this.objectService.filterLocationId.includes(r.toLocationId));
       }
+      this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
    }
 
    highlight(event) {

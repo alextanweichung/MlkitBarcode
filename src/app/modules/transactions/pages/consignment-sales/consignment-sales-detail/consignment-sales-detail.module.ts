@@ -9,6 +9,7 @@ import { ConsignmentSalesDetailPageRoutingModule } from './consignment-sales-det
 import { ConsignmentSalesDetailPage } from './consignment-sales-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { IdToCodeMappingModule } from 'src/app/shared/pipes/id-to-code-mapping/id-to-code-mapping.module';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IonicModule,
     ConsignmentSalesDetailPageRoutingModule,
     IdMappingModule,
+    IdToCodeMappingModule,
     SumModule
   ],
   declarations: [ConsignmentSalesDetailPage]

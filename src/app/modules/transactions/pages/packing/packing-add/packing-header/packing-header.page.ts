@@ -4,7 +4,7 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { ActionSheetController, AlertController, IonSegment, ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { MultiPackingRoot, SalesOrderHeaderForWD, SalesOrderLineForWD } from 'src/app/modules/transactions/models/packing';
+import { SalesOrderHeaderForWD, SalesOrderLineForWD } from 'src/app/modules/transactions/models/packing';
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -13,6 +13,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-packing-header',
@@ -90,6 +91,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    packingBlockIncompletePicking: boolean = false;
    configSystemWideActivateMultiUOM: boolean = false;
    configMultiPackAutoTransformLooseUom: boolean = false;
+   configSystemWideCustomerLocationSelection: string = "C";
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -127,6 +129,13 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             this.configMultiPackAutoTransformLooseUom = true;
          } else {
             this.configMultiPackAutoTransformLooseUom = false;
+         }
+         let systemWideCustomerLocationSelection = this.moduleControl.find(x => x.ctrlName === "SystemWideCustomerLocationSelection")?.ctrlValue;
+         if (systemWideCustomerLocationSelection) {
+            this.configSystemWideCustomerLocationSelection = systemWideCustomerLocationSelection;
+         }
+         if (this.configSystemWideCustomerLocationSelection === "L") {
+            this.swapCustomerLocation("L");
          }
       })
    }
@@ -612,17 +621,21 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       }
    }
 
-   swapCustomerLocation() {
-      this.isByLocation = !this.isByLocation;
+   swapCustomerLocation(type: string = null) {
+      if (type === "C") {
+         this.isByLocation = false;
+      } else if (type === "L") {
+         this.isByLocation = true;
+      } else {
+         this.isByLocation = !this.isByLocation;
+      }
       if (this.isByLocation) {
          this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
       } else {
          this.objectForm.patchValue({ customerId: null, toLocationId: null, businessModelType: null });
       }
-      // this.objectForm.controls["customerId"].enable();
       this.customerDisabled = false;
    }
-
 
    @ViewChild("segment", { static: false }) segment: IonSegment;
    isWithType: string = "SO";
@@ -679,7 +692,8 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             copyFrom: [null],
             generateDate: [null],
             isDeemedSupply: [false],
-            deemedSupplyNum: [null]
+            deemedSupplyNum: [null],
+            uuid: [uuidv4()]
          });
       } catch (e) {
          console.error(e);

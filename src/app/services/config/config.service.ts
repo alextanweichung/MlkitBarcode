@@ -74,6 +74,7 @@ export class ConfigService {
                // apiUrl: "https://mh.mkagrp.com.vn/api/",
                // apiUrl: "https://pos.mkagrp.com/api/",
                // apiUrl: "https://kbe-erp.com/api/",
+               // apiUrl: "https://idcp.solfili.com/api/",
                imgUrl: null,
                lastDownloadAt: null,
                username: "aychia@idcp.my",

@@ -62,6 +62,7 @@ export interface MultiPackingHeader {
    modifiedBy: any
    modifiedAt: any
    deactivated: boolean
+   uuid: string
 
    // local use
    isTrxLocal: boolean
