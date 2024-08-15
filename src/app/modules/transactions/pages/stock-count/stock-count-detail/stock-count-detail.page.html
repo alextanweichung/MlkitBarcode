@@ -145,11 +145,10 @@
          </ion-item>
       </ion-list>
 
-
       <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
 
       <pagination-controls class="ion-flex justify-content-center pagination-top" (pageChange)="currentPage=$event" previousLabel="" nextLabel="" [autoHide]="true" [directionLinks]="true" [maxSize]="5"></pagination-controls>
-      
+
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
          <ion-item button detail="false" class="ion-no-padding no-ripple">
             <ion-grid class="ion-no-padding py-2 pl-2">
