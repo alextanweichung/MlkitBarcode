@@ -9,8 +9,10 @@ import { BinList } from '../../../models/transfer-bin';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { Network } from '@capacitor/network';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { StockCountRoot } from '../../../models/stock-count';
+import { StockCountDetail, StockCountRoot } from '../../../models/stock-count';
 import { TransactionCode } from '../../../models/transaction-type-constant';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
    selector: 'app-stock-count-detail',
@@ -93,6 +95,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
             await this.objectService.setHeader(object.header);
             await this.objectService.setLines(object.details);
             await this.loadingService.dismissLoading();
+            await this.resetFilteredObj();
          }, async error => {
             await this.loadingService.dismissLoading();
             console.error(error);
@@ -120,6 +123,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
             if (r.itemVariationYId) {
                r.itemVariationYDescription = this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description;
             }
+            r.guid = uuidv4();
          })
          if (this.isLocal) {
             await this.objectService.setLocalObject(JSON.parse(JSON.stringify(localObject)));
@@ -127,6 +131,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
          await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
          await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
          await this.loadingService.dismissLoading();
+         await this.resetFilteredObj();
       } catch (e) {
          await this.loadingService.dismissLoading();
          console.error(e);
@@ -203,5 +208,52 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
          console.error(e);
       }
    }
+
+   /* #region line search bar */
+
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
+
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
+	itemSearchText: string;
+	filteredObj: StockCountDetail[] = [];
+	search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
+               r.itemCode?.toUpperCase().includes(searchText.toUpperCase())
+               || r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+				this.currentPage = 1;
+			} else {
+				this.resetFilteredObj();
+				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+		this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
+		console.log("🚀 ~ StockCountDetailPage ~ resetFilteredObj ~ this.filteredObj:", this.filteredObj)
+	}
+
+   /* #endregion */
 
 }

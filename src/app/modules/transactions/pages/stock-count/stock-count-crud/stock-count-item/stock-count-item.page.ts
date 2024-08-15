@@ -168,6 +168,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                await this.objectService.objectDetail.unshift(newLine);
                let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+               this.resetFilteredObj();
             }
          } else {
             let newLine: StockCountDetail = {
@@ -194,6 +195,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             await this.objectService.objectDetail.unshift(newLine);
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            this.resetFilteredObj();
          }
       } catch (e) {
          console.error(e);
@@ -208,14 +210,26 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       })
    }
 
-   async decreaseQty(line: StockCountDetail, index: number) {
+   async decreaseQty(line: StockCountDetail) {
       try {
          if (line.qtyRequest - 1 < 0) {
             line.qtyRequest = 0;
+            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+            if (findIndex > -1) {
+               this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+            } else {
+               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+            }
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
          } else {
             line.qtyRequest--;
+            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+            if (findIndex > -1) {
+               this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+            } else {
+               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+            }
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
          }
@@ -235,48 +249,67 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
-   onQtyBlur(line: StockCountDetail) {
+   async onQtyBlur(line: StockCountDetail) {
       line.qtyRequest = Math.floor(line.qtyRequest);
-   }
-
-   async increaseQty(line: StockCountDetail) {
-      line.qtyRequest += 1;
+      let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+      if (findIndex > -1) {
+         this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+      } else {
+         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+      }
       let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
       await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
-   async deleteLine(rowData: StockCountDetail) {
+   async increaseQty(line: StockCountDetail) {
+      line.qtyRequest += 1;
+      let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+      if (findIndex > -1) {
+         this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+      } else {
+         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+      }
+      let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+   }
+
+   async deleteLine(line: StockCountDetail) {
       try {
-         let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
-         if (index > -1) {
-            const alert = await this.alertController.create({
-               cssClass: "custom-alert",
-               header: "Delete this item?",
-               message: "This action cannot be undone.",
-               buttons: [
-                  {
-                     text: "Delete item",
-                     cssClass: "danger",
-                     handler: async () => {
-                        this.objectService.objectDetail.splice(index, 1);
-                        this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
-                        let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-                        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         if (findIndex > -1) {
+            if (this.objectService.objectDetail[findIndex]) {
+               const alert = await this.alertController.create({
+                  cssClass: "custom-alert",
+                  header: "Delete this item?",
+                  message: "This action cannot be undone.",
+                  buttons: [
+                     {
+                        text: "Delete item",
+                        cssClass: "danger",
+                        handler: async () => {
+                           this.objectService.objectDetail.splice(findIndex, 1);
+                           this.toastService.presentToast("", "Line deleted", "top", "success", 1000);
+                           let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                           await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+                           this.resetFilteredObj();
+                        }
+                     },
+                     {
+                        text: "Cancel",
+                        role: "cancel",
+                        cssClass: "cancel",
+                        handler: async () => {
+                           this.objectService.objectDetail[findIndex].qtyRequest = 1;
+                           let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                           await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+                        }
                      }
-                  },
-                  {
-                     text: "Cancel",
-                     role: "cancel",
-                     cssClass: "cancel",
-                     handler: async () => {
-                        this.objectService.objectDetail[index].qtyRequest = 1;
-                        let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-                        await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-                     }
-                  }
-               ]
-            });
-            await alert.present();
+                  ]
+               });
+               await alert.present();
+            } else {
+               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+            }
          } else {
             this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
          }
@@ -751,6 +784,52 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          console.error(e);
       }
    }
+
+   /* #endregion */
+
+   /* #region line search bar */
+
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
+
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+		}
+	}
+
+	itemSearchText: string;
+	filteredObj: StockCountDetail[] = [];
+	search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
+               r.itemCode?.toUpperCase().includes(searchText.toUpperCase())
+               || r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+				this.currentPage = 1;
+			} else {
+				this.resetFilteredObj();
+				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+		this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
+	}
 
    /* #endregion */
 

@@ -63,6 +63,7 @@ export interface MultiPackingHeader {
    modifiedAt: any
    deactivated: boolean
    uuid: string
+   shipMethodId?: number
 
    // local use
    isTrxLocal: boolean
@@ -138,6 +139,7 @@ export interface SalesOrderHeaderForWD {
    currencyDesc: string
    businessModelType: string
    isLoaded: boolean
+   shipMethodId: number
    line: SalesOrderLineForWD[]
 }
 

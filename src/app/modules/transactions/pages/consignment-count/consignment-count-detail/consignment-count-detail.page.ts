@@ -72,17 +72,17 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 				object.details.forEach(r => {
 					let found = object.barcodeTag.find(rr => rr.itemSku === r.itemSku);
 					if (found) {
-						r.itemCode = found.itemCode,
-							r.itemDescription = found.description,
-							r.itemVariationXDescription = found.itemVariationLineXDescription,
-							r.itemVariationYDescription = found.itemVariationLineYDescription,
-							r.guid = uuidv4()
-					}
+                  r.itemCode = found.itemCode;
+                  r.itemDescription = found.description;
+                  r.itemVariationXDescription = found.itemVariationLineXDescription;
+                  r.itemVariationYDescription = found.itemVariationLineYDescription;
+                  r.guid = uuidv4();
+               }
 				})
 				await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
 				await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
-            await this.resetFilteredObj();
 				await this.loadingService.dismissLoading();
+            await this.resetFilteredObj();
 			}, async error => {
 				await this.loadingService.dismissLoading();
 				console.error(error);
@@ -110,17 +110,15 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 				if (r.itemVariationYId) {
 					r.itemVariationYDescription = this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description;
 				}
-            if (r.guid) {
-               r.guid = uuidv4();
-            }
+            r.guid = uuidv4();
 			})
 			if (this.isLocal) {
 				await this.objectService.setLocalObject(JSON.parse(JSON.stringify(localObject)));
 			}
 			await this.objectService.setHeader(JSON.parse(JSON.stringify(object.header)));
 			await this.objectService.setLines(JSON.parse(JSON.stringify(object.details)));
-         await this.resetFilteredObj();
 			await this.loadingService.dismissLoading();
+         await this.resetFilteredObj();
 		} catch (e) {
 			await this.loadingService.dismissLoading();
 			console.error(e);
@@ -240,6 +238,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 
 	resetFilteredObj() {
 		this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
+		console.log("🚀 ~ ConsignmentCountDetailPage ~ resetFilteredObj ~ this.filteredObj:", this.filteredObj)
 	}
 
    /* #endregion */

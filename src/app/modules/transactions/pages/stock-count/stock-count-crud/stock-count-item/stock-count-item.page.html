@@ -84,8 +84,11 @@
             </ion-grid>
          </ion-item>
       </ion-list>
+      
+      <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
+
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <ion-item-sliding #slidingItem *ngFor="let rowData of objectService.objectDetail|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
+         <ion-item-sliding #slidingItem *ngFor="let rowData of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
             <ion-item button detail="false" class="no-ripple ion-no-padding">
                <ion-grid class="ion-no-padding pt-2 pl-2">
                   <ion-row>
@@ -119,7 +122,7 @@
                            </ion-row>
                            <ion-row>
                               <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData, rowIndex)">
+                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)">
                                     <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
                                  </ion-button>
                               </ion-col>

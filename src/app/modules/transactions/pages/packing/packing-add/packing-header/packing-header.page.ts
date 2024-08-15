@@ -310,11 +310,12 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
                         locationId: this.selectedDocs[0].locationId,
                         customerId: this.selectedDocs[0].customerId,
                         toLocationId: this.selectedDocs[0].toLocationId,
-                        copyFrom: "S"
+                        copyFrom: "S",
+                        shipMethodId: this.selectedDocs[0].shipMethodId
                      })
                      this.selectedLocationId = this.selectedDocs[0].locationId;
                      this.selectedCustomerId = this.selectedDocs[0].customerId;
-                     this.selectedToLocationId = this.selectedDocs[0].toLocationId;
+                     this.selectedToLocationId = this.selectedDocs[0].toLocationId;                     
                   }
                   this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
                   this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
@@ -693,6 +694,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
             generateDate: [null],
             isDeemedSupply: [false],
             deemedSupplyNum: [null],
+            shipMethodId: [null],
             uuid: [uuidv4()]
          });
       } catch (e) {
