@@ -377,6 +377,15 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
                      case "MAXQTYAPPROVAL":
                         workflowApiObject = "MobileMaxQtyApprove";
                         break;
+                     case "CREDITAPPROVAL":
+                        workflowApiObject = "MobileSoCreditApprove";
+                        break;
+                     case "CODAPPROVAL":
+                        workflowApiObject = "MobileSoCodApprove";
+                        break;
+                     case "CODREVIEW":
+                        workflowApiObject = "MobileSoCodReview";
+                        break;
                      default:
                         this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
                         return;
@@ -395,6 +404,15 @@ export class SalesOrderDetailPage implements OnInit, ViewWillEnter {
                         break;
                      case "MAXQTYAPPROVAL":
                         workflowApiObject = "MobileMaxQtyApprove";
+                        break;
+                     case "CREDITAPPROVAL":
+                        workflowApiObject = "MobileSoCreditApprove";
+                        break;
+                     case "CODAPPROVAL":
+                        workflowApiObject = "MobileSoCodApprove";
+                        break;
+                     case "CODREVIEW":
+                        workflowApiObject = "MobileSoCodReview";
                         break;
                      default:
                         this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);

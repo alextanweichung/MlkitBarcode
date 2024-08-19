@@ -267,6 +267,15 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
                      case "PRICINGAPPROVAL":
                         workflowApiObject = "MobileBackToBackOrderPricingApprove";
                         break;
+                     case "CREDITAPPROVAL":
+                        workflowApiObject = "MobileB2bCreditApprove";
+                        break;
+                     case "CODAPPROVAL":
+                        workflowApiObject = "MobileB2bCodApprove";
+                        break;
+                     case "CODREVIEW":
+                        workflowApiObject = "MobileB2bCodReview";
+                        break;
                      default:
                         this.toastService.presentToast("System Error", "Workflow not found", "top", "danger", 1000);
                         return;
@@ -282,6 +291,15 @@ export class BacktobackOrderDetailPage implements OnInit, ViewWillEnter {
                         break;
                      case "PRICINGAPPROVAL":
                         workflowApiObject = "MobileBackToBackOrderPricingApprove";
+                        break;
+                     case "CREDITAPPROVAL":
+                        workflowApiObject = "MobileB2bCreditApprove";
+                        break;
+                     case "CODAPPROVAL":
+                        workflowApiObject = "MobileB2bCodApprove";
+                        break;
+                     case "CODREVIEW":
+                        workflowApiObject = "MobileB2bCodReview";
                         break;
                      default:
                         this.toastService.presentToast("System Error", "Workflow not found", "top", "danger", 1000);

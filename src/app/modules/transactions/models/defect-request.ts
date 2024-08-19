@@ -1,6 +1,7 @@
 import { ItemMultiUomBase, LineAssembly } from "src/app/shared/models/transaction-detail"
 import { OtpLine } from "../../managements/models/otp"
 import { VariationDetail } from "src/app/shared/models/variation-detail"
+import { ApprovalHistory } from "src/app/shared/models/approval-history"
 
 export interface DefectRequestList {
    defectRequestId: number
@@ -24,6 +25,8 @@ export interface DefectRequestRoot {
    otp?: any
    attachmentFile?: any[]
    comment?: any[]
+   approvalHistory?: ApprovalHistory[]
+   isWorkFlowDone?: boolean
 }
 
 export interface DefectRequestHeader {

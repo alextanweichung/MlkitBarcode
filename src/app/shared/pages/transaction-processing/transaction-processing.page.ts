@@ -21,6 +21,7 @@ export class TransactionProcessingPage implements OnInit {
 
    @Input() selectedSegment: string = 'pending';
    @Input() showAmount: boolean = true;
+   @Input() showOriginLocation: boolean = false;
    constructor(
       private objectService: TransactionProcessingService,
       private navController: NavController,

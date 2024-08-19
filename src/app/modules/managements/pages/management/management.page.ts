@@ -35,10 +35,21 @@ export class ManagementPage implements OnInit {
    showInventoryProcessingApproval: boolean = false;
    showInventoryAdjReqReview: boolean = false;
    showInventoryAdjReqApproval: boolean = false;
-   
    showPaymentArrangementReview: boolean = false;
    showPaymentArrangementApproval: boolean = false;
-   
+   showSoCreditApproval: boolean = false;
+   showSoCodApproval: boolean = false;
+   showSoCodReview: boolean = false;
+   showB2bCreditApproval: boolean = false;
+   showB2bCodApproval: boolean = false;
+   showB2bCodReview: boolean = false;
+   showTransferOutApproval: boolean = false;
+   showTransferOutReview: boolean = false;
+   showCoTransferOutApproval: boolean = false;
+   showCoTransferOutReview: boolean = false;
+   showDefectReqApproval: boolean = false;
+   showDefectReqReview: boolean = false;
+
    showMultiCoPrApproval: boolean = false;
    showMultiCoPoApproval: boolean = false;
    showMultiCoPaApproval: boolean = false;
@@ -89,6 +100,23 @@ export class ManagementPage implements OnInit {
                this.showPaymentArrangementReview = pageItems.findIndex(r => r.title === approvalAppCode.paymentArrangementRV) > -1;
                this.showPaymentArrangementApproval = pageItems.findIndex(r => r.title === approvalAppCode.paymentArrangementAP) > -1;
 
+               this.showSoCreditApproval = pageItems.findIndex(r => r.title === approvalAppCode.soCreditAP) > -1;
+               this.showSoCodApproval = pageItems.findIndex(r => r.title === approvalAppCode.soCODAP) > -1;
+               this.showSoCodReview = pageItems.findIndex(r => r.title === approvalAppCode.soCODRV) > -1;
+
+               this.showB2bCreditApproval = pageItems.findIndex(r => r.title === approvalAppCode.b2bCreditAP) > -1;
+               this.showB2bCodApproval = pageItems.findIndex(r => r.title === approvalAppCode.b2bCODAP) > -1;
+               this.showB2bCodReview = pageItems.findIndex(r => r.title === approvalAppCode.b2bCODRV) > -1;
+
+               this.showTransferOutApproval = pageItems.findIndex(r => r.title === approvalAppCode.retailTOAP) > -1;
+               this.showTransferOutReview = pageItems.findIndex(r => r.title === approvalAppCode.retailTORV) > -1;
+
+               this.showCoTransferOutApproval = pageItems.findIndex(r => r.title === approvalAppCode.consignTOAP) > -1;
+               this.showCoTransferOutReview = pageItems.findIndex(r => r.title === approvalAppCode.consignTORV) > -1;
+
+               this.showDefectReqApproval = pageItems.findIndex(r => r.title === approvalAppCode.defectReqAP) > -1;
+               this.showDefectReqReview = pageItems.findIndex(r => r.title === approvalAppCode.defectReqRV) > -1;
+               
                this.showMultiCoPrApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPrAP) > -1;
                this.showMultiCoPoApproval = pageItems.findIndex(r => r.title === approvalAppCode.multiCoPoAP) > -1;
 
