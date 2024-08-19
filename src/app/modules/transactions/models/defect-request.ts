@@ -9,7 +9,7 @@ export interface DefectRequestList {
    customerName: string
    salesAgentName: string
    countryDesc: string
-   currenctCode: string
+   currencyCode: string
    locationCode: string
    locationDesc: string
    toLocationCode: string
@@ -66,6 +66,15 @@ export interface DefectRequestHeader {
    modifiedAt: string
    deactivated: boolean
    revision: number
+   shipAddress?: string
+   shipPostCode?: string
+   shipPhone?: string
+   shipFax?: string
+   shipEmail?: string
+   shipStateId?: number
+   shipAreaId?: number
+   shipName?:string
+   defectRequestCategoryId: number
 }
 
 export interface DefectRequestDetail {

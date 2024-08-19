@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { DefectRequestDetail, DefectRequestRoot } from 'src/app/modules/transactions/models/defect-request';
 import { DefectRequestService } from 'src/app/modules/transactions/services/defect-request.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { ShippingInfo } from 'src/app/shared/models/master-list-details';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 
 @Component({
@@ -27,6 +29,29 @@ export class DefectRequestCartPage implements OnInit {
    ) { }
 
    ngOnInit() {
+      this.loadAvailableAddresses();
+   }
+
+
+   availableAddress: ShippingInfo[] = [];
+   shippingInfo: ShippingInfo;
+   loadAvailableAddresses() {
+      try {
+         this.availableAddress = [];
+         if (this.objectService.object.header) {
+            if (this.objectService.object.header.businessModelType === "T") {
+               this.availableAddress = this.objectService.customerMasterList.filter(r => r.id === this.objectService.object.header.customerId).flatMap(r => r.shippingInfo);
+            } else {
+               this.availableAddress = this.objectService.locationMasterList.filter(r => r.id === this.objectService.object.header.toLocationId).flatMap(r => r.shippingInfo);
+            }
+         }
+         if (this.objectService.object.header.defectRequestId === 0) { // only do this when new sales-order
+            this.selectedAddress = this.availableAddress.find(r => r.isPrimary);
+            this.onAddressSelected();
+         }
+      } catch (e) {
+         console.error(e);
+      }
    }
 
    /* #region  modal to edit each item */
@@ -106,6 +131,37 @@ export class DefectRequestCartPage implements OnInit {
    async onModalHide() {
       this.selectedIndex = null;
       this.selectedItem = null;
+   }
+
+   /* #endregion */
+
+   /* #region  extra info e.g. shipping and address */
+
+   isExtraInfoModal: boolean = false;
+   showExtraInfo() {
+      this.isExtraInfoModal = true;
+   }
+
+   hideExtraInfo() {
+      this.isExtraInfoModal = false;
+   }
+
+   selectedAddress: ShippingInfo;
+   onAddressSelected() {
+      try {
+         if (this.selectedAddress) {
+            this.objectService.object.header.shipAddress = this.selectedAddress.address;
+            this.objectService.object.header.shipPostCode = this.selectedAddress.postCode;
+            this.objectService.object.header.shipPhone = this.selectedAddress.phone;
+            this.objectService.object.header.shipEmail = this.selectedAddress.email;
+            this.objectService.object.header.shipFax = this.selectedAddress.fax;
+            this.objectService.object.header.shipAreaId = this.selectedAddress.areaId;
+            this.objectService.object.header.shipStateId = this.selectedAddress.stateId;
+            this.objectService.object.header.attention = this.selectedAddress.attention;
+         }
+      } catch (e) {
+         console.error(e);
+      }
    }
 
    /* #endregion */
@@ -328,4 +384,36 @@ export class DefectRequestCartPage implements OnInit {
 
    /* #endregion */
 
+   /* #region more action popover */
+
+   isPopoverOpen: boolean = false;
+   @ViewChild("popover", { static: false }) popoverMenu: IonPopover;
+   showPopover(event) {
+      try {
+         this.popoverMenu.event = event;
+         this.isPopoverOpen = true;
+      } catch (e) {
+         console.error(e);
+      }
+   }
+   /* #endregion */
+   sendForDebug() {
+      let trxDto: DefectRequestRoot = {
+         header: this.objectService.object.header,
+         details: this.objectService.object.details
+      }
+      let jsonObjectString = JSON.stringify(trxDto);
+      let debugObject: JsonDebug = {
+         jsonDebugId: 0,
+         jsonData: jsonObjectString
+      };
+      this.objectService.sendDebug(debugObject).subscribe(response => {
+         if (response.status == 200) {
+            this.toastService.presentToast("", "Debugging successful", "top", "success", 1000);
+         }
+      }, error => {
+         this.toastService.presentToast("", "Debugging failure", "top", "warning", 1000);
+         console.log(error);
+      });
+   }
 }

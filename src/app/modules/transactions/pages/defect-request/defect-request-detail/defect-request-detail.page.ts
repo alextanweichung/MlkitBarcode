@@ -14,6 +14,7 @@ import { DefectRequestDetail } from '../../../models/defect-request';
 export class DefectRequestDetailPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    objectId: number;
+   showAdditionalInfo: boolean = false;
 
    constructor(
       public objectService: DefectRequestService,

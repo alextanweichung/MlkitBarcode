@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionSheetController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { DefectRequestService } from 'src/app/modules/transactions/services/defect-request.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -51,6 +51,14 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
          trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate())],
          typeCode: [null],
          customerId: [null],
+         shipAddress: [null, [Validators.maxLength(500)]],
+         shipPostCode: [null],
+         shipPhone: [null],
+         shipEmail: [null, [Validators.email]],
+         shipFax: [null],
+         shipName: [null],
+         shipAreaId: [null],
+         shipStateId: [null],
          attention: [null],
          locationId: [null],
          toLocationId: [null],
@@ -78,7 +86,8 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
          parentObject: [null],
          createdBy: [null],
          modifiedBy: [null],
-         reasonId: [null]
+         reasonId: [null],
+         defectRequestCategoryId: [null],
       });
    }
 
@@ -111,6 +120,7 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
          var lookupValue = this.objectService.customerMasterList?.find(e => e.id === event.id);
          if (lookupValue) {
             this.objectForm.patchValue({ customerId: lookupValue.id });
+            this.objectForm.patchValue({ shipName: lookupValue.description });
             this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
             if (lookupValue.attributeArray1.length > 0) {
                this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));
@@ -246,6 +256,20 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
          this.objectForm.patchValue({ reasonId: null });
       }
    }
+
+   onCategorySelected(event: SearchDropdownList) {
+      if (event) {
+         let found = this.objectService.defectRequestCategoryMasterList.find(r => r.id === event.id);
+         if (found) {
+            this.objectForm.patchValue({ defectRequestCategoryId: found.id });
+         } else {
+            this.toastService.presentToast("System Error", "Category not found", "top", "danger", 1000);
+         }
+      } else {
+         this.objectForm.patchValue({ defectRequestCategoryId: null });
+      }
+   }
+
 
    async copyFromSI() {
       this.copyFromSIHeaderList = [];
