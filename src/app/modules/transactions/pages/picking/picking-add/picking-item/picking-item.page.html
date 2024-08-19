@@ -81,7 +81,7 @@
                   <ion-row *ngFor="let v of objectService.getItemVariation(i)">
                      <ion-col class="ion-flex ion-margin-auto" *ngIf="v && v.variationTypeCode !== '0'">
                         <div class="ion-flex">
-                           <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="v.xDesc">{{v.xDesc}}</span>
+                           <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mr-1" *ngIf="v.xDesc">{{v.xDesc}}</span>
                            <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="v.yDesc">{{v.yDesc}}</span>
                         </div>
                      </ion-col>
@@ -168,11 +168,19 @@
 
 <ion-modal class="image-modal" [isOpen]="isImageModalOpen" [initialBreakpoint]="1" [breakpoints]="[0, 1]" (ionModalDidDismiss)="isImageModalOpen = false">
    <ng-template>
-      <div class="block">
+      <div class="block" (click)="showZoomedImage()">
          <ion-img [src]="imageUrl"></ion-img>
       </div>
    </ng-template>
 </ion-modal>
+
+<!-- Zoomed image overlay -->
+<div *ngIf="showZoom && imageUrl" class="zoomed-image">
+   <span class="close-btn" (click)="hideZoomedImage()">&times;</span>
+   <pinch-zoom>      
+      <img [src]="imageUrl" alt="Zoomed Image" class="zoomed-img">
+   </pinch-zoom>
+</div>
 
 <ion-modal [isOpen]="copyModal" (didDismiss)="copyModal = false">
    <ng-template>

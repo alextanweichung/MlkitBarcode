@@ -55,13 +55,20 @@
               <div class="font-bold"> From Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{o.locationId|idMapping:objectService.locationMasterList}}
+              {{o.locationId|idMapping:objectService.fullLocationMasterList}}
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold"> Total Carton</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              {{o.totalCarton}}
             </ion-col>
           </ion-row>
         </ion-grid>
       </ion-item>
     </ion-list>
-
       
     <ion-list-header class="ion-list-header-small ion-flex ion-text-center" *ngIf="objects && objects.length > 0">
       <ion-label>Completed Doc.</ion-label>

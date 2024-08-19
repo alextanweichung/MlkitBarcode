@@ -976,7 +976,9 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                      itemVariationXId: found_barcode.xId,
                      itemVariationYId: found_barcode.yId,
                      itemSku: found_barcode.sku,
-                     itemBarcode: found_barcode.barcode
+                     itemBarcode: found_barcode.barcode,
+                     itemUomId: found_barcode.itemUomId,
+                     itemUomDesc: found_barcode.itemUomDesc,
                   }
                   return outputData;
                } else {
@@ -1392,6 +1394,17 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
       })
    }
 
+   showZoom: boolean = false;
+   showZoomedImage() {
+      this.isImageModalOpen = false;
+      this.showZoom = true;
+   }
+
+   hideZoomedImage() {
+      this.showZoom = false;
+   }
+
+
    /* #endregion */
 
    /* #region camera scanner */
@@ -1719,6 +1732,12 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          })
       }
       this.objectService.header.totalCarton = multiPackingObject.packingCarton.length;
+      if (!this.objectService.header.businessModelType) {                              
+         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === this.objectService.header.customerId);
+         if (lookupValue) {
+            this.objectService.header.businessModelType = lookupValue.attribute5;
+         }
+      }
       let trxDto: MultiPackingRoot = {
          header: this.objectService.header,
          details: multiPackingObject.packingCarton,

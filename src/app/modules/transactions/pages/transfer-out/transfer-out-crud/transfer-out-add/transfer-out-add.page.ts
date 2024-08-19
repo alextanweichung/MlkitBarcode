@@ -9,6 +9,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { format, parseISO } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-transfer-out-add',
@@ -70,10 +71,13 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
          remark: [null],
          workFlowTransactionId: [null],
          grnNum: [null],
-         uuid: [null],
+         uuid: [uuidv4()],
          handleBy: [null],
          totalBag: [null]
       })
+      if (this.objectForm.controls.locationId.value) {
+         this.onLocationChanged({ id: this.objectForm.controls.locationId.value });
+      }
    }
 
    ngOnInit() {
@@ -109,7 +113,7 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
          this.objectForm.patchValue({ locationId: event.id });
          let found = this.objectService.fullLocationMasterList.find(r => r.id === event.id);
          if (found) {
-            if (found.attribute1 === "C"){
+            if (found.attribute1 === "C") {
                this.objectForm.patchValue({ typeCode: "C" });
             } else {
                this.objectForm.patchValue({ typeCode: "IL" });

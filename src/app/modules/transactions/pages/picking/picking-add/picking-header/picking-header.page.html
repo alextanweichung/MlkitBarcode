@@ -93,7 +93,7 @@
                               <div>{{selectedLocationId|idMapping:objectService.locationMasterList}}</div>
                            </ion-col>
                         </ion-row>
-                        <ion-row>
+                        <ion-row *ngIf="selectedToLocationId">
                            <ion-col class="ion-flex ion-margin-auto">
                               <div class="font-bold">Destination Location</div>
                            </ion-col>

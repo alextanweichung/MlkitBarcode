@@ -8,6 +8,7 @@ import { SalesOrderHeaderForWD, SalesOrderLineForWD } from 'src/app/modules/tran
 import { PackingService } from 'src/app/modules/transactions/services/packing.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -35,6 +36,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       public configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
+      private loadingService: LoadingService,
       private navController: NavController,
       private alertController: AlertController,
       private modalController: ModalController,
@@ -270,132 +272,149 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    uniqueSku: string[] = [];
    uniqueItemSkuAndCode: Map<string, string> = new Map([]);
    validateSalesOrder(input: string) {
-      if (input && input.length > 0) {
-         this.itemSearchValue = null;
-         if (this.selectedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
-            this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
-         } else {
-            this.objectService.getSOHeader([input]).subscribe(response => {
-               if (response.status === 200) {
-                  let doc = response.body[0] as SalesOrderHeaderForWD;
-                  if (doc === undefined) {
-                     this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-                     return;
-                  }
-                  if (doc && this.packingBlockIncompletePicking) {
-                     let osPackList = doc.line;
-                     for (let os of osPackList) {
-                        if (os.qtyPicked !== os.qtyRequest) {
-                           this.toastService.presentToast("Action Rejected", "Unable to process selected order due to incomplete picking quantity.", "top", "warning", 1000);
+      setTimeout(async () => {
+         try {
+            if (input && input.length > 0) {
+               this.itemSearchValue = null;
+               if (this.selectedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
+                  this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
+               } else {
+                  await this.loadingService.showLoading();
+                  this.objectService.getSOHeader([input]).subscribe(response => {
+                     if (response.status === 200) {
+                        let doc = response.body[0] as SalesOrderHeaderForWD;
+                        if (doc === undefined) {
+                           this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
                            return;
                         }
+                        if (doc && this.packingBlockIncompletePicking) {
+                           let osPackList = doc.line;
+                           for (let os of osPackList) {
+                              if (os.qtyPicked !== os.qtyRequest) {
+                                 this.toastService.presentToast("Action Rejected", "Unable to process selected order due to incomplete picking quantity.", "top", "warning", 1000);
+                                 return;
+                              }
+                           }
+                        }
+                        // checking for packing, refer to base system
+                        if (this.selectedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedDocs[0].locationId != doc.locationId) {
+                           this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
+                           return;
+                        }
+                        if (this.selectedDocs.length > 0 && this.selectedDocs[0].customerId != doc.customerId) {
+                           this.toastService.presentToast("", "Not allow to combine Doc with different customer.", "top", "warning", 1000);
+                           return;
+                        }
+                        this.objectForm.patchValue({ copyFrom: "S" });
+                        // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                        this.selectedDocs.unshift(doc);
+                        if (this.selectedDocs && this.selectedDocs.length > 0) {
+                           this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
+                           this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
+                           this.objectForm.patchValue({
+                              locationId: this.selectedDocs[0].locationId,
+                              customerId: this.selectedDocs[0].customerId,
+                              toLocationId: this.selectedDocs[0].toLocationId,
+                              copyFrom: "S",
+                              shipMethodId: this.selectedDocs[0].shipMethodId
+                           })
+                           this.selectedLocationId = this.selectedDocs[0].locationId;
+                           this.selectedCustomerId = this.selectedDocs[0].customerId;
+                           this.selectedToLocationId = this.selectedDocs[0].toLocationId;
+                        }
+                        this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+                        this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
+                           if (r.multiPackingOutstandingId === null) r.multiPackingOutstandingId = 0;
+                           r.multiPackingId = this.objectForm.controls.multiPackingId.value;
+                        })
+                        this.uniqueDoc = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.salesOrderNum))];
+                        this.uniqueItemCode = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.itemCode))];
+                        this.uniqueSku = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(rr => rr.itemSku))];
+                        this.uniqueSku.forEach(r => {
+                           this.uniqueItemSkuAndCode.set(r, this.objectService.multiPackingObject.outstandingPackList.find(rr => rr.itemSku === r).itemCode);
+                        })
                      }
-                  }
-                  // checking for packing, refer to base system
-                  if (this.selectedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedDocs[0].locationId != doc.locationId) {
-                     this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
-                     return;
-                  }
-                  if (this.selectedDocs.length > 0 && this.selectedDocs[0].customerId != doc.customerId) {
-                     this.toastService.presentToast("", "Not allow to combine Doc with different customer.", "top", "warning", 1000);
-                     return;
-                  }
-                  this.objectForm.patchValue({ copyFrom: "S" });
-                  // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
-                  this.selectedDocs.unshift(doc);
-                  if (this.selectedDocs && this.selectedDocs.length > 0) {
-                     this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
-                     this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
-                     this.objectForm.patchValue({
-                        locationId: this.selectedDocs[0].locationId,
-                        customerId: this.selectedDocs[0].customerId,
-                        toLocationId: this.selectedDocs[0].toLocationId,
-                        copyFrom: "S",
-                        shipMethodId: this.selectedDocs[0].shipMethodId
-                     })
-                     this.selectedLocationId = this.selectedDocs[0].locationId;
-                     this.selectedCustomerId = this.selectedDocs[0].customerId;
-                     this.selectedToLocationId = this.selectedDocs[0].toLocationId;                     
-                  }
-                  this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
-                  this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
-                     if (r.multiPackingOutstandingId === null) r.multiPackingOutstandingId = 0;
-                     r.multiPackingId = this.objectForm.controls.multiPackingId.value;
-                  })
-                  this.uniqueDoc = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.salesOrderNum))];
-                  this.uniqueItemCode = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.itemCode))];
-                  this.uniqueSku = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(rr => rr.itemSku))];
-                  this.uniqueSku.forEach(r => {
-                     this.uniqueItemSkuAndCode.set(r, this.objectService.multiPackingObject.outstandingPackList.find(rr => rr.itemSku === r).itemCode);
-                  })
+                  }, async error => {
+                     console.error(error);
+                  });
                }
-            }, error => {
-               console.error(error);
-            });
+            } else {
+               this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+            }
+         } catch (error) {
+            console.error(error);
+         } finally {
+            await this.loadingService.dismissLoading();
          }
-      } else {
-         this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-      }
+      }, 0);
    }
 
    validateB2B(input: string) {
-      if (input && input.length > 0) {
-         this.itemSearchValue = null;
-         if (this.selectedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
-            this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
-         } else {
-            this.objectService.getB2BHeader([input]).subscribe(response => {
-               if (response.status === 200) {
-                  let doc = response.body[0] as SalesOrderHeaderForWD;
-                  if (doc === undefined) {
-                     this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-                     return;
-                  }
-                  // checking for packing, refer to base system
-                  if (this.selectedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedDocs[0].locationId != doc.locationId) {
-                     this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
-                     return;
-                  }
-                  if (this.selectedDocs.length > 0 && this.selectedDocs[0].customerId != doc.customerId) {
-                     this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
-                     return;
-                  }
-                  this.objectForm.patchValue({ copyFrom: "B" });
-                  // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
-                  this.selectedDocs.unshift(doc);
-                  if (this.selectedDocs && this.selectedDocs.length > 0) {
-                     this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
-                     this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
-                     this.objectForm.patchValue({
-                        locationId: this.selectedDocs[0].locationId,
-                        customerId: this.selectedDocs[0].customerId,
-                        toLocationId: this.selectedDocs[0].toLocationId,
-                        copyFrom: "B"
-                     })
-                     this.selectedLocationId = this.selectedDocs[0].locationId;
-                     this.selectedCustomerId = this.selectedDocs[0].customerId;
-                     this.selectedToLocationId = this.selectedDocs[0].toLocationId;
-                  }
-                  this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
-                  this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
-                     if (r.multiPackingOutstandingId === null) r.multiPackingOutstandingId = 0;
-                     r.multiPackingId = this.objectForm.controls.multiPackingId.value;
-                  })
-                  this.uniqueDoc = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.salesOrderNum))];
-                  this.uniqueItemCode = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.itemCode))];
-                  this.uniqueSku = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(rr => rr.itemSku))];
-                  this.uniqueSku.forEach(r => {
-                     this.uniqueItemSkuAndCode.set(r, this.objectService.multiPackingObject.outstandingPackList.find(rr => rr.itemSku === r).itemCode);
-                  })
+      setTimeout(async () => {
+         try {
+            if (input && input.length > 0) {
+               this.itemSearchValue = null;
+               if (this.selectedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
+                  this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
+               } else {
+                  await this.loadingService.showLoading();
+                  this.objectService.getB2BHeader([input]).subscribe(response => {
+                     if (response.status === 200) {
+                        let doc = response.body[0] as SalesOrderHeaderForWD;
+                        if (doc === undefined) {
+                           this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+                           return;
+                        }
+                        // checking for packing, refer to base system
+                        if (this.selectedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.selectedDocs[0].locationId != doc.locationId) {
+                           this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
+                           return;
+                        }
+                        if (this.selectedDocs.length > 0 && this.selectedDocs[0].customerId != doc.customerId) {
+                           this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
+                           return;
+                        }
+                        this.objectForm.patchValue({ copyFrom: "B" });
+                        // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                        this.selectedDocs.unshift(doc);
+                        if (this.selectedDocs && this.selectedDocs.length > 0) {
+                           this.onCustomerSelected({ id: this.selectedDocs[0].customerId }, false);
+                           this.onCustomerLocationSelected({ id: this.selectedDocs[0].toLocationId });
+                           this.objectForm.patchValue({
+                              locationId: this.selectedDocs[0].locationId,
+                              customerId: this.selectedDocs[0].customerId,
+                              toLocationId: this.selectedDocs[0].toLocationId,
+                              copyFrom: "B"
+                           })
+                           this.selectedLocationId = this.selectedDocs[0].locationId;
+                           this.selectedCustomerId = this.selectedDocs[0].customerId;
+                           this.selectedToLocationId = this.selectedDocs[0].toLocationId;
+                        }
+                        this.objectService.multiPackingObject.outstandingPackList = [...this.objectService.multiPackingObject.outstandingPackList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+                        this.objectService.multiPackingObject.outstandingPackList.forEach(r => {
+                           if (r.multiPackingOutstandingId === null) r.multiPackingOutstandingId = 0;
+                           r.multiPackingId = this.objectForm.controls.multiPackingId.value;
+                        })
+                        this.uniqueDoc = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.salesOrderNum))];
+                        this.uniqueItemCode = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(r => r.itemCode))];
+                        this.uniqueSku = [...new Set(this.objectService.multiPackingObject.outstandingPackList.flatMap(rr => rr.itemSku))];
+                        this.uniqueSku.forEach(r => {
+                           this.uniqueItemSkuAndCode.set(r, this.objectService.multiPackingObject.outstandingPackList.find(rr => rr.itemSku === r).itemCode);
+                        })
+                     }
+                  }, error => {
+                     console.error(error);
+                  });
                }
-            }, error => {
-               console.error(error);
-            });
+            } else {
+               this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+            }
+         } catch (error) {
+            console.error(error);
+         } finally {
+            await this.loadingService.dismissLoading();
          }
-      } else {
-         this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-      }
-
+      }, 0);
    }
 
    async deleteSo(salesOrderNum) {
@@ -540,7 +559,7 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
          this.objectForm.patchValue({ customerId: this.selectedCustomerId });
          if (this.selectedCustomerId) {
             var lookupValue = this.objectService.customerMasterList?.find(e => e.id === this.selectedCustomerId);
-            if (lookupValue != undefined) {
+            if (lookupValue !== undefined) {
                this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
                if (lookupValue.attributeArray1.length > 0) {
                   this.selectedCustomerLocationList = this.objectService.locationMasterList.filter(value => lookupValue.attributeArray1.includes(value.id));

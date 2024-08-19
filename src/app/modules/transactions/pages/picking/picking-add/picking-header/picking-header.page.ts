@@ -14,6 +14,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { Capacitor } from '@capacitor/core';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { v4 as uuidv4 } from 'uuid';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 
 @Component({
    selector: 'app-picking-header',
@@ -35,6 +36,7 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       public configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
+      private loadingService: LoadingService,
       private navController: NavController,
       private alertController: AlertController,
       private modalController: ModalController,
@@ -251,123 +253,147 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    uniqueItemCode: string[] = [];
    uniqueSku: string[] = [];
    uniqueItemSkuAndCode: Map<string, string> = new Map([]);
-   validateSalesOrder(input: string) {
-      if (input && input.length > 0) {
-         this.itemSearchValue = null;
-         if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
-            this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
-         } else {
-            this.objectService.getSOHeader([input]).subscribe(response => {
-               if (response.status === 200) {
-                  let doc = response.body[0] as SalesOrderHeaderForWD;
-                  if (doc === undefined) {
-                     this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-                     return;
-                  }
-                  // checking for picking, refer to base system
-                  if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
-                     this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
-                     return;
-                  }
-                  if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
-                     this.toastService.presentToast("", "Not allow to combine Doc with different customer.", "top", "warning", 1000);
-                     return;
-                  }
-                  this.objectForm.patchValue({ copyFrom: "S" });
-                  // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
-                  this.seletcedDocs.unshift(doc);
-                  if (this.seletcedDocs && this.seletcedDocs.length > 0) {
-                     this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
-                     this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
-                     this.objectForm.patchValue({
-                        locationId: this.seletcedDocs[0].locationId,
-                        customerId: this.seletcedDocs[0].customerId,
-                        toLocationId: this.seletcedDocs[0].toLocationId,
-                        copyFrom: "S"
-                     })
-                     this.selectedLocationId = this.seletcedDocs[0].locationId;
-                     this.selectedCustomerId = this.seletcedDocs[0].customerId;
-                     this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
-                  }
-                  this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
-                  this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
-                     if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
-                     r.multiPickingId = this.objectForm.controls.multiPickingId.value;
-                  })
-                  this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
-                  this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
-                  this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
-                  this.uniqueSku.forEach(r => {
-                     this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
-                  })
+   async validateSalesOrder(input: string) {
+      setTimeout(async () => {
+         try {
+
+            if (input && input.length > 0) {
+               this.itemSearchValue = null;
+               if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
+                  this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
+               } else {
+
+                  await this.loadingService.showLoading("Loading", false);
+
+                  this.objectService.getSOHeader([input]).subscribe(response => {
+                     if (response.status === 200) {
+                        let doc = response.body[0] as SalesOrderHeaderForWD;
+                        if (doc === undefined) {
+                           this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+                           return;
+                        }
+                        // checking for picking, refer to base system
+                        if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
+                           this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
+                           return;
+                        }
+                        if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
+                           this.toastService.presentToast("", "Not allow to combine Doc with different customer.", "top", "warning", 1000);
+                           return;
+                        }
+                        this.objectForm.patchValue({ copyFrom: "S" });
+                        // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                        this.seletcedDocs.unshift(doc);
+                        if (this.seletcedDocs && this.seletcedDocs.length > 0) {
+                           this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
+                           this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
+                           this.objectForm.patchValue({
+                              locationId: this.seletcedDocs[0].locationId,
+                              customerId: this.seletcedDocs[0].customerId,
+                              toLocationId: this.seletcedDocs[0].toLocationId,
+                              copyFrom: "S"
+                           })
+                           this.selectedLocationId = this.seletcedDocs[0].locationId;
+                           this.selectedCustomerId = this.seletcedDocs[0].customerId;
+                           this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
+                        }
+                        this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+                        this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
+                           if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
+                           r.multiPickingId = this.objectForm.controls.multiPickingId.value;
+                        })
+                        this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
+                        this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+                        this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
+                        this.uniqueSku.forEach(r => {
+                           this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
+                        })
+                     }
+                  }, async error => {
+                     console.error(error);
+                  });
+
                }
-            }, error => {
-               console.error(error);
-            });
+            } else {
+               this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+            }
+         } catch (error) {
+            console.error(error);
+         } finally {
+            await this.loadingService.dismissLoading();
          }
-      } else {
-         this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-      }
+      }, 0);
    }
 
    validateB2B(input: string) {
-      if (input && input.length > 0) {
-         this.itemSearchValue = null;
-         if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
-            this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
-         } else {
-            this.objectService.getB2BHeader([input]).subscribe(response => {
-               if (response.status === 200) {
-                  let doc = response.body[0] as SalesOrderHeaderForWD;
-                  if (doc === undefined) {
-                     this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-                     return;
-                  }
-                  // checking for picking, refer to base system
-                  if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
-                     this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
-                     return;
-                  }
-                  if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
-                     this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
-                     return;
-                  }
-                  this.objectForm.patchValue({ copyFrom: "B" });
-                  // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
-                  this.seletcedDocs.unshift(doc);
-                  if (this.seletcedDocs && this.seletcedDocs.length > 0) {
-                     this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
-                     this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
-                     this.objectForm.patchValue({
-                        locationId: this.seletcedDocs[0].locationId,
-                        customerId: this.seletcedDocs[0].customerId,
-                        toLocationId: this.seletcedDocs[0].toLocationId,
-                        copyFrom: "B"
-                     })
-                     this.selectedLocationId = this.seletcedDocs[0].locationId;
-                     this.selectedCustomerId = this.seletcedDocs[0].customerId;
-                     this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
-                  }
-                  this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
-                  this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
-                     if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
-                     r.multiPickingId = this.objectForm.controls.multiPickingId.value;
-                  })
-                  this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
-                  this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
-                  this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
-                  this.uniqueSku.forEach(r => {
-                     this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
-                  })
-               }
-            }, error => {
-               console.error(error);
-            });
-         }
-      } else {
-         this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
-      }
+      setTimeout(async () => {
+         try {
 
+            if (input && input.length > 0) {
+               this.itemSearchValue = null;
+               if (this.seletcedDocs.findIndex(r => r.salesOrderNum.toLowerCase() === input.toLowerCase()) > -1) {
+                  this.toastService.presentToast("", "Document already selected.", "top", "warning", 1000);
+               } else {
+
+                  await this.loadingService.showLoading("Loading", false);
+
+                  this.objectService.getB2BHeader([input]).subscribe(response => {
+                     if (response.status === 200) {
+                        let doc = response.body[0] as SalesOrderHeaderForWD;
+                        if (doc === undefined) {
+                           this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+                           return;
+                        }
+                        // checking for picking, refer to base system
+                        if (this.seletcedDocs.length > 0 && this.configSOSelectionEnforceSameOrigin && this.seletcedDocs[0].locationId != doc.locationId) {
+                           this.toastService.presentToast("", "Not allow to combine Doc with different origin location.", "top", "warning", 1000);
+                           return;
+                        }
+                        if (this.seletcedDocs.length > 0 && this.seletcedDocs[0].customerId != doc.customerId) {
+                           this.toastService.presentToast("", "Not allow to combine sales order with different customer.", "top", "warning", 1000);
+                           return;
+                        }
+                        this.objectForm.patchValue({ copyFrom: "B" });
+                        // doc.line.sort((a, b) => a.itemCode.localeCompare(b.itemCode));
+                        this.seletcedDocs.unshift(doc);
+                        if (this.seletcedDocs && this.seletcedDocs.length > 0) {
+                           this.onCustomerSelected({ id: this.seletcedDocs[0].customerId }, false);
+                           this.onCustomerLocationSelected({ id: this.seletcedDocs[0].toLocationId });
+                           this.objectForm.patchValue({
+                              locationId: this.seletcedDocs[0].locationId,
+                              customerId: this.seletcedDocs[0].customerId,
+                              toLocationId: this.seletcedDocs[0].toLocationId,
+                              copyFrom: "B"
+                           })
+                           this.selectedLocationId = this.seletcedDocs[0].locationId;
+                           this.selectedCustomerId = this.seletcedDocs[0].customerId;
+                           this.selectedToLocationId = this.seletcedDocs[0].toLocationId;
+                        }
+                        this.objectService.multiPickingObject.outstandingPickList = [...this.objectService.multiPickingObject.outstandingPickList, ...(response.body as SalesOrderHeaderForWD[]).flatMap(x => x.line)];
+                        this.objectService.multiPickingObject.outstandingPickList.forEach(r => {
+                           if (r.multiPickingOutstandingId === null) r.multiPickingOutstandingId = 0;
+                           r.multiPickingId = this.objectForm.controls.multiPickingId.value;
+                        })
+                        this.uniqueDoc = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.salesOrderNum))];
+                        this.uniqueItemCode = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
+                        this.uniqueSku = [...new Set(this.objectService.multiPickingObject.outstandingPickList.flatMap(rr => rr.itemSku))];
+                        this.uniqueSku.forEach(r => {
+                           this.uniqueItemSkuAndCode.set(r, this.objectService.multiPickingObject.outstandingPickList.find(rr => rr.itemSku === r).itemCode);
+                        })
+                     }
+                  }, error => {
+                     console.error(error);
+                  });
+               }
+            } else {
+               this.toastService.presentToast("", "Doc not found.", "top", "warning", 1000);
+            }
+         } catch (error) {
+            console.error(error);
+         } finally {
+            await this.loadingService.dismissLoading();
+         }
+      }, 0);
    }
 
    async deleteSo(salesOrderNum) {

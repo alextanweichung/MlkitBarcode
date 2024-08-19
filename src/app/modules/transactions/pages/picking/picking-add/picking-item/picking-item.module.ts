@@ -12,6 +12,7 @@ import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-fl
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { PinchZoomModule } from 'ngx-pinch-zoom';
 
 @NgModule({
    imports: [
@@ -23,7 +24,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
       ItemAddListFlatPageModule,
       NgCircleProgressModule,
       OfflineItemIdMappingModule,
-      SumModule
+      SumModule,
+      PinchZoomModule
    ],
    declarations: [PickingItemPage]
 })

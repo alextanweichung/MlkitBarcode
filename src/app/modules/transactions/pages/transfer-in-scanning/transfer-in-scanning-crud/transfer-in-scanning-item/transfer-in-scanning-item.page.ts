@@ -436,6 +436,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          createdAt: null,
          remark: this.objectService.object.remark,
          workFlowTransactionId: this.objectService.object.workFlowTransactionId,
+         totalCarton: this.objectService.object.totalCarton,
          interTransferQty: null,
          line: this.objectService.object.line.filter(r => r.uuid !== null),
          transferAdjustment: null,

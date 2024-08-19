@@ -15,6 +15,7 @@ import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { PinchZoomModule } from 'ngx-pinch-zoom';
 
 @NgModule({
    imports: [
@@ -28,7 +29,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
       SearchDropdownPageModule,
       IdMappingModule,
       OfflineItemIdMappingModule,
-      SumModule
+      SumModule,
+      PinchZoomModule
    ],
    declarations: [PackingItemPage]
 })

@@ -49,7 +49,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       private alertController: AlertController,
    ) { }
 
-   ionViewWillEnter(): void {
+   async ionViewWillEnter(): Promise<void> {
       if (this.objectService.objectHeader && this.objectService.objectHeader.locationId) {
          this.objectService.getBinListByLocationId(this.objectService.objectHeader.locationId).subscribe({
             next: async (response) => {
@@ -63,6 +63,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             }
          })
       }
+      await this.resetFilteredObj();
    }
 
    ionViewDidEnter(): void {

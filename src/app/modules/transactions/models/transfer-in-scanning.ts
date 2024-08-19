@@ -18,6 +18,7 @@ export interface TransferInScanningRoot {
    createdAt: string
    remark: any
    workFlowTransactionId: number
+   totalCarton: number
    line: TransferInScanningLine[]
    transferAdjustment: TransferAdjustmentRoot
    uuid: string

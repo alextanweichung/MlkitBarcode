@@ -164,6 +164,7 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
             let osTotalQtyPicked = outstandingLines.reduce((sum, current) => sum + current.qtyPicked, 0);
             let osTotalQtyCurrent = outstandingLines.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
             let osTotalAvailableQty = osTotalQtyRequest - osTotalQtyPicked - osTotalQtyCurrent;
+            console.log("🚀 ~ PickingItemPage ~ runPickingEngine ~ this.pickingQtyControl.toUpperCase():", this.pickingQtyControl.toUpperCase())
             switch (this.pickingQtyControl.toUpperCase()) {
                //No control
                case "N":
@@ -171,6 +172,8 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                   break;
                //Not allow pick quantity more than SO quantity
                case "Y":
+                  console.log("🚀 ~ PickingItemPage ~ runPickingEngine ~ osTotalAvailableQty:", osTotalAvailableQty)
+                  console.log("🚀 ~ PickingItemPage ~ runPickingEngine ~ inputQty:", inputQty)
                   if (osTotalAvailableQty >= inputQty) {
                      this.insertPickingLine(itemFound, inputQty, outstandingLines, "Y");
                      let totalQtyCurrent = this.objectService.multiPickingObject.outstandingPickList.reduce((sum, current) => sum + (current.qtyCurrent ?? 0), 0);
@@ -211,24 +214,31 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    }
 
    transformItemScannedUom(itemFound: TransactionDetail, inputQty: number) {
+      console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ itemFound:", JSON.stringify(itemFound))
       //Check whether item has multi UOM
       let findItem = this.itemListMultiUom.find(x => x.itemId == itemFound.itemId);
+      console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ findItem:", JSON.stringify(findItem))
       if (findItem) {
          //Look for scanned item UOM ratio
          let currentItemUom = findItem.multiUom.find(x => x.itemUomId == itemFound.itemUomId);
+         console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ currentItemUom:", JSON.stringify(currentItemUom))
          if (currentItemUom) {
             //Filter for scanned item other UOM ratio which is lower than current
             let otherItemUom = findItem.multiUom.filter(x => x.itemUomId != itemFound.itemUomId && x.ratio < currentItemUom.ratio);
             otherItemUom.sort((a, b) => (a.ratio > b.ratio) ? 1 : -1);
+            console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ otherItemUom:", JSON.stringify(otherItemUom))
             if (otherItemUom.length > 0) {
                let findOsLines = this.objectService.multiPickingObject.outstandingPickList.filter(x => x.itemId == itemFound.itemId);
+               console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ findOsLines:", JSON.stringify(findOsLines))
                if (findOsLines.length > 0) {
                   for (let uom of otherItemUom) {
                      let transformQty = inputQty * currentItemUom.ratio / uom.ratio;
+                     console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ transformQty:", transformQty)
                      if (Number.isInteger(transformQty)) {
                         //To futher enhance this part
                         //Checking on multiple lines and consolidate the qty
                         let findOsLinesWithQty = findOsLines.filter(x => ((x.qtyRequest??0) - (x.qtyPicked??0) - (x.qtyCurrent??0)) >= transformQty);
+                        console.log("🚀 ~ PickingItemPage ~ transformItemScannedUom ~ findOsLinesWithQty:", JSON.stringify(findOsLinesWithQty))
                         if (findOsLinesWithQty.length > 0) {
                            itemFound.itemBarcode = currentItemUom.itemSku;
                            itemFound.itemSku = uom.itemSku;
@@ -795,7 +805,9 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      itemVariationXId: found_barcode.xId,
                      itemVariationYId: found_barcode.yId,
                      itemSku: found_barcode.sku,
-                     itemBarcode: found_barcode.barcode
+                     itemBarcode: found_barcode.barcode,
+                     itemUomId: found_barcode.itemUomId,
+                     itemUomDesc: found_barcode.itemUomDesc
                   }
                   return outputData;
                } else {
@@ -1100,17 +1112,30 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
 
    isImageModalOpen: boolean = false;
    imageUrl: string;
+   selectedItemId: number = null;
    showImageModal(itemCode: string) {
-      let itemId = this.objectService.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode).itemId;
+      this.selectedItemId = this.objectService.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode).itemId;
       this.imageUrl = null;
-      this.objectService.getItemImage(itemId).subscribe(response => {
-         if (response && response.length > 0) {
-            this.imageUrl = "data:image/png;base64, " + response[0].imageSource;
-            this.isImageModalOpen = true;
-         }
-      }, error => {
-         console.error(error);
-      })
+      if (this.selectedItemId) {
+         this.objectService.getItemImage(this.selectedItemId).subscribe(response => {
+            if (response && response.length > 0) {
+               this.imageUrl = "data:image/png;base64, " + response[0].imageSource;
+               this.isImageModalOpen = true;
+            }
+         }, error => {
+            console.error(error);
+         })
+      }
+   }
+
+   showZoom: boolean = false;
+   showZoomedImage() {
+      this.isImageModalOpen = false;
+      this.showZoom = true;
+   }
+
+   hideZoomedImage() {
+      this.showZoom = false;
    }
 
    /* #endregion */
@@ -1278,6 +1303,12 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
          })
       }
       this.objectService.header.totalCarton = multiPickingObject.pickingCarton.length;
+      if (!this.objectService.header.businessModelType) {                              
+         var lookupValue = this.objectService.customerMasterList?.find(e => e.id === this.objectService.header.customerId);
+         if (lookupValue) {
+            this.objectService.header.businessModelType = lookupValue.attribute5;
+         }
+      }
       let trxDto: MultiPickingRoot = {
          header: this.objectService.header,
          details: multiPickingObject.pickingCarton,

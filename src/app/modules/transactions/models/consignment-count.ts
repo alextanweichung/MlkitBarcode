@@ -1,5 +1,18 @@
 import { BarcodeTag } from "src/app/shared/models/item-barcode"
 
+export interface ConsignmentCountList {
+   consignmentCountId: number
+   consignmentCountNum: string
+   trxDate: Date
+   locationId: number
+   totalQty: number
+
+   // local use
+   isLocal: boolean
+   guid: string
+   lastUpdated: Date
+}
+
 export interface ConsignmentCountRoot {
   header: ConsignmentCountHeader
   details: ConsignmentCountDetail[]

@@ -399,12 +399,12 @@ export class CommonQueryService<T> {
                )
             });
 
-            if (table !== inboundDb_Tables.margin_Config) {
-               statements.push({
-                  statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
-                  values: []
-               })
-            }
+            // if (table !== inboundDb_Tables.margin_Config) {
+            //    statements.push({
+            //       statement: `CREATE UNIQUE INDEX ${table}_id_UNIQUE ON ${table} (id ASC);`,
+            //       values: []
+            //    })
+            // }
             let timestart = new Date();
             await this._databaseService.executeQuery<any>(async (db: SQLiteDBConnection) => {
                let ret: any = await db.executeSet(statements, true);

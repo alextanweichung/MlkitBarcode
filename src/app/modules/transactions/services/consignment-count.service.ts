@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
-import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountRoot } from "../models/consignment-count";
+import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountList, ConsignmentCountRoot } from "../models/consignment-count";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
@@ -110,8 +110,7 @@ export class ConsignmentCountService {
 
    // getObjects() {
    getObjects(dateStart: string, dateEnd: string) {
-      return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
-      // return this.http.get<ConsignmentCountHeader[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount`);
+      return this.http.get<ConsignmentCountList[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
    }
 
    getObjectById(objectId: number) {

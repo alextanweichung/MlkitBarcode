@@ -4,7 +4,7 @@ import { ViewWillEnter, NavController, ActionSheetController, ViewDidEnter, Aler
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentCountService } from '../../services/consignment-count.service';
-import { ConsignmentCountHeader, ConsignmentCountRoot } from '../../models/consignment-count';
+import { ConsignmentCountHeader, ConsignmentCountList, ConsignmentCountRoot } from '../../models/consignment-count';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
@@ -24,7 +24,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 
 	@ViewChild("searchbar", { static: false }) searchbar: IonSearchbar;
 
-	objects: ConsignmentCountHeader[] = [];
+	objects: ConsignmentCountList[] = [];
 	uniqueGrouping: Date[] = [];
 	currentPage: number = 1;
 	itemsPerPage: number = 12;
@@ -76,7 +76,6 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
       if (this.configService.selected_location) {
          this.objectService.filterLocationId.push(this.configService.selected_location);
       }
-         console.log("🚀 ~ ConsignmentCountPage ~ ngOnInit ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
 	}
 
 	async promptIncompleteTrxAlert() {
@@ -138,14 +137,21 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 		try {
          if (Capacitor.getPlatform() !== "web") {
             let localObject = await this.configService.getLocalTransaction(TransactionCode.consignmentCountTrx);
-            let d: ConsignmentCountHeader[] = [];
+            let d: ConsignmentCountList[] = [];
             if (localObject && localObject.length > 0) {
                localObject.forEach(r => {
                   let dd: ConsignmentCountRoot = JSON.parse(r.jsonData);
-                  dd.header.isLocal = true;
-                  dd.header.guid = r.id;
-                  dd.header.lastUpdated = r.lastUpdated;
-                  d.push(dd.header);
+                  d.push({
+                     consignmentCountId: dd.header.consignmentCountId,
+                     consignmentCountNum: dd.header.consignmentCountNum,
+                     trxDate: dd.header.trxDate,
+                     locationId: dd.header.locationId,
+                     totalQty: dd.details.reduce((a, b) => a + b.qtyRequest, 0),
+                     
+                     isLocal: true,
+                     guid: r.id,
+                     lastUpdated: r.lastUpdated
+                  })
                })
                this.objects = [...this.objects, ...d];
             }
@@ -205,7 +211,6 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 
 	async filter() {
       try {
-         console.log("🚀 ~ ConsignmentCountPage ~ filter ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
 			const modal = await this.modalController.create({
 				component: FilterPage,
 				componentProps: {
@@ -219,14 +224,12 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 			})
 			await modal.present();
 			let { data } = await modal.onWillDismiss();
-			console.log("🚀 ~ ConsignmentCountPage ~ filter ~ data:", data)
 			if (data && data !== undefined) {
 				this.objects = [];
 				this.uniqueGrouping = [];
 				this.objectService.filterStartDate = new Date(data.startDate);
 				this.objectService.filterEndDate = new Date(data.endDate);
             this.objectService.filterLocationId = data.locationIds;
-            console.log("🚀 ~ ConsignmentCountPage ~ filter ~ this.objectService.filterLocationId:", this.objectService.filterLocationId)
 				await this.loadLocalObjects();
 			}
 		} catch (e) {
@@ -241,7 +244,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	}
 
 	itemSearchText: string;
-	filteredObj: ConsignmentCountHeader[] = [];
+	filteredObj: ConsignmentCountList[] = [];
 	search(searchText, newSearch: boolean = false) {
 		if (newSearch) {
 			this.filteredObj = [];

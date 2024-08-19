@@ -83,9 +83,9 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
          this.objectService.getObjectListByDate(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
 				let objects = response.filter(r => !this.objects.flatMap(rr => rr.multiPackingId).includes(r.multiPackingId))
 				this.objects = [...this.objects, ...objects];
-				await this.resetFilteredObj();
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
+				await this.resetFilteredObj();
          }, async error => {
             console.error(error);
             await this.loadingService.dismissLoading();

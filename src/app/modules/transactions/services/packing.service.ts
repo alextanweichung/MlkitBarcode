@@ -282,22 +282,24 @@ export class PackingService {
    reasonMasterList: MasterListDetails[] = [];
    packagingMasterList: MasterListDetails[] = [];
    async loadMasterList() {
-      this.fullMasterList = await this.getMasterList();
-      this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
-      this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUom").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.fLocationMasterList = this.locationMasterList;
-      if (this.object && this.object.header.businessModelType === "T") {
-         this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === "W");
-      } else if (this.object && this.object.header.businessModelType !== "T") {
-         this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 !== "B");
-      }
-      this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      setTimeout(async () => {
+         this.fullMasterList = await this.getMasterList();
+         this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         await this.customerMasterList.sort((a, c) => { return a.code > c.code ? 1 : -1 });
+         this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUom").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.fLocationMasterList = this.locationMasterList;
+         if (this.object && this.object.header.businessModelType === "T") {
+            this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 === "W");
+         } else if (this.object && this.object.header.businessModelType !== "T") {
+            this.fLocationMasterList = this.locationMasterList.filter(r => r.attribute1 !== "B");
+         }
+         this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);        
+      }, 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {

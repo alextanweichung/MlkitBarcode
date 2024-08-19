@@ -8,15 +8,17 @@ import { StockReorderDetailPageRoutingModule } from './stock-reorder-detail-rout
 
 import { StockReorderDetailPage } from './stock-reorder-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    StockReorderDetailPageRoutingModule,
-    IdMappingModule
-  ],
-  declarations: [StockReorderDetailPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      StockReorderDetailPageRoutingModule,
+      IdMappingModule,
+      SumModule
+   ],
+   declarations: [StockReorderDetailPage]
 })
-export class StockReorderDetailPageModule {}
+export class StockReorderDetailPageModule { }
