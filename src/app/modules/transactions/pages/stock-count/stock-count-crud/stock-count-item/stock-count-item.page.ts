@@ -139,11 +139,13 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            this.resetFilteredObj();
          } else if (rowIndex === 0 && this.objectService.configInvCountActivateLineWithBin) { // already in and first one + same binDesc
             if (this.objectService.objectDetail[rowIndex].binDesc === this.binDesc) {
                this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
                let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+               this.resetFilteredObj();
             } else {
                let newLine: StockCountDetail = {
                   inventoryCountLineId: 0,

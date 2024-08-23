@@ -18,12 +18,13 @@ import { Decimal } from 'decimal.js';
 import { OtherAmount } from 'src/app/modules/transactions/models/sales-order';
 import { InnerVariationDetail, VariationDetail } from '../models/variation-detail';
 import { VariationRatio } from '../models/variation-ratio';
+import { ModuleControl } from '../models/module-control';
 
 @Injectable({
    providedIn: 'root'
 })
 export class CommonService {
-
+   
    constructor(
       private http: HttpClient,
       private configService: ConfigService,
@@ -956,6 +957,15 @@ export class CommonService {
          return finalRatio;
       } else {
          return [];
+      }
+   }
+
+   getModCtrlBoolValue(moduleControl: ModuleControl[], controlName: string) {
+      let findControl = moduleControl.find(x => x.ctrlName === controlName)
+      if (findControl && findControl.ctrlValue.toUpperCase() == "Y") {
+         return true;
+      } else {
+         return false;
       }
    }
 

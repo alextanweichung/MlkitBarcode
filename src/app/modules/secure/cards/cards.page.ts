@@ -1,7 +1,7 @@
 import { AfterContentChecked, Component, OnInit, ViewChild } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
 import SwiperCore, { SwiperOptions, Pagination } from 'swiper';
-import { AlertController, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
+import { AlertController, IonSearchbar, ModalController, NavController, ViewWillEnter } from '@ionic/angular';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -15,7 +15,6 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { DashboardService } from '../../dashboard/services/dashboard.service';
 import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
 import { LoginUser } from 'src/app/services/auth/login-user';
-import { UserReloginPage } from 'src/app/shared/pages/user-relogin/user-relogin.page';
 
 SwiperCore.use([Pagination]);
 
@@ -164,8 +163,11 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
    /* #region select location modal */
 
    selectLocationModal: boolean = false;
+   @ViewChild("searchBar") searchBar: IonSearchbar;
    showLocationModal() {
       this.selectLocationModal = true;
+      this.searchText = null;
+      this.assignToTemp();
    }
 
    hideLocationModal() {
@@ -184,9 +186,9 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
             await this.configService.syncInboundData(itemMaster, itemBarcode);
 
             // if (this.configService.loginUser.loginUserType === "C") {
-               let response2 = await this.commonService.syncMarginConfig(this.configService.selected_location);
-               let marginConfig: LocalMarginConfig[] = response2;
-               await this.configService.syncMarginConfig(marginConfig);
+            let response2 = await this.commonService.syncMarginConfig(this.configService.selected_location);
+            let marginConfig: LocalMarginConfig[] = response2;
+            await this.configService.syncMarginConfig(marginConfig);
             // }
             await this.loadingService.dismissLoading();
          } catch (e) {
@@ -252,20 +254,6 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
    }
 
    async signOut() {
-      // const loginUser: LoginUser = JSON.parse(localStorage.getItem("loginUser"));
-      // const modal = await this.modalController.create({
-      //    component: UserReloginPage,
-      //    cssClass: "ion-custom-modal",
-      //    componentProps:{
-      //       title: "Login Expired. Please re-login.",
-      //       loginUser: loginUser
-      //    },
-      //    backdropDismiss: false
-      // });
-
-      // await modal.present();
-      // let { data } = await modal.onWillDismiss();
-
       const alert = await this.alertController.create({
          cssClass: "custom-alert",
          header: "Sign-out?",
@@ -322,7 +310,7 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
                   })
 
                   this.configService.loginUser = JSON.parse(localStorage.getItem("loginUser")) as LoginUser;
-                  
+
                   if (this.configService.loginUser.loginUserType === "C") {
                      if (this.configService.loginUser.locationId && this.configService.loginUser.locationId.length > 1) {
                         // for consignment user more than 1 location, go to dashboard and let user select then only sync
@@ -413,4 +401,38 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
 
    /* #endregion */
 
+   /* #region location filter */
+
+   searchText: string = "";
+   async onKeyDown(event) {
+      if (event.keyCode === 13) {
+         await this.searchItem();
+      }
+   }
+
+   tempDropdownList: MasterListDetails[] = [];
+   searchItem() {
+      this.tempDropdownList = []
+      this.assignToTemp();
+   }
+
+   resetFilter() {
+      this.searchText = "";
+      this.tempDropdownList = [];
+      this.assignToTemp();
+   }
+
+   assignToTemp() {
+      if (this.searchText && this.searchText.length > 0) {
+         this.tempDropdownList = [...this.tempDropdownList, ...this.dashboardService.locationMasterList.filter(r => r.code?.toLowerCase().includes(this.searchText.toLowerCase()) || r.description?.toLowerCase().includes(this.searchText.toLowerCase()))];
+         if (this.tempDropdownList && this.tempDropdownList.length === 1) {
+            this.setDefaultLocation(this.tempDropdownList[0]);
+         }
+      } else {
+         this.tempDropdownList = [...this.tempDropdownList, ...this.dashboardService.locationMasterList];
+      }
+   }
+
+   /* #endregion */
+   
 }

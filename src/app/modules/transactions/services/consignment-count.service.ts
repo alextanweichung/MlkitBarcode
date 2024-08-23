@@ -4,10 +4,13 @@ import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountList, ConsignmentCountRoot } from "../models/consignment-count";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
-import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
 import { LocalTransaction } from "src/app/shared/models/pos-download";
 import { SearchDropdownList } from "src/app/shared/models/search-dropdown-list";
+import { LoadingService } from "src/app/services/loading/loading.service";
+import { CommonService } from "src/app/shared/services/common.service";
+import { AuthService } from "src/app/services/auth/auth.service";
+import { ModuleControl } from "src/app/shared/models/module-control";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -27,26 +30,55 @@ export class ConsignmentCountService {
 
    constructor(
       private http: HttpClient,
-      private configService: ConfigService
+      private authService: AuthService,
+      private configService: ConfigService,
+      private commonService: CommonService,
+      private loadingService: LoadingService
    ) { }
 
    async loadRequiredMaster() {
-      await this.loadMasterList();
+      try {
+         await this.loadingService.showLoading();
+         await this.loadModuleControl();
+         await this.loadMasterList();
+         await this.loadingService.dismissLoading();
+      } catch (error) {
+         await this.loadingService.dismissLoading();
+         console.error(error);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
    }
+
+   moduleControl: ModuleControl[];
+   loadModuleControl() {
+      try {
+         this.authService.moduleControlConfig$.subscribe(obj => {
+            this.moduleControl = obj;
+         });
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
 
    fullMasterList: MasterList[] = [];
    itemUomMasterList: MasterListDetails[] = [];
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
+   fullLocationMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName == "ItemUOM").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated == 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName == "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = this.fullMasterList.filter(x => x.objectName == "Location").flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = this.locationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
-      this.bindLocationList();
+      this.fullLocationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      if (this.commonService.getModCtrlBoolValue(this.moduleControl, "TransformCSBizModelAsRetail")) {
+         this.locationMasterList = this.fullLocationMasterList.filter(r => (r.attribute1 === "C" || r.attribute1 === "O") && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      } else {
+         this.locationMasterList = this.fullLocationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      }
    }
 
    locationSearchDropdownList: SearchDropdownList[] = [];
@@ -94,15 +126,6 @@ export class ConsignmentCountService {
       this.removeLocalObject();
       await this.configService.removeFromLocalStorage(this.trxKey);
    }
-
-   // locationList: ConsignmentSalesLocation[] = [];
-   // async loadConsignmentLocation() {
-   //   this.locationList = await this.getConsignmentLocation();
-   // }
-
-   // getConsignmentLocation() {
-   //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/consignmentLocation").toPromise();
-   // }
 
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/masterList").toPromise();

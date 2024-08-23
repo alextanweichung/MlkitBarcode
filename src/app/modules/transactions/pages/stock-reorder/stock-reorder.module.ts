@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { StockReorderPageRoutingModule } from './stock-reorder-routing.module';
 
 import { StockReorderPage } from './stock-reorder.page';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    StockReorderPageRoutingModule
-  ],
-  declarations: [StockReorderPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      StockReorderPageRoutingModule,
+      NgxPaginationModule
+   ],
+   declarations: [StockReorderPage]
 })
-export class StockReorderPageModule {}
+export class StockReorderPageModule { }

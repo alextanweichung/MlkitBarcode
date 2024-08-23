@@ -45,6 +45,7 @@ export interface TransferOutLine {
    discountExpression?: string
    discountAmt?: number
    subTotal?: number
+   containerNum: number
 
    // for local use
    qtyRequest?: number

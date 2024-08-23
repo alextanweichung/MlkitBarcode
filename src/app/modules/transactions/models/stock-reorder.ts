@@ -15,12 +15,12 @@ export interface StockReorderRoot {
    remark: any
    workFlowTransactionId: number
    line: StockReorderLine[]
- }
- 
- export interface StockReorderLine {
+}
+
+export interface StockReorderLine {
    id: number
    uuid: string
-   stockReorderId: string
+   stockReorderId: number
    sequence: number
    itemId: number
    itemCode: string
@@ -35,17 +35,16 @@ export interface StockReorderRoot {
    barcode: string
    lineQty: number
    isDeleted: boolean
- }
-
- export interface StockReorderList {
-  stockReorderId: number
-  stockReorderNum: string
-  trxDate: string
-  trxDateTime: string
-  locationCode: string
-  locationDesc: string
-  deactivated: boolean
-  isCompleted: boolean
 }
 
- 
+export interface StockReorderList {
+   stockReorderId: number
+   stockReorderNum: string
+   trxDate: string
+   trxDateTime: string
+   locationCode: string
+   locationDesc: string
+   deactivated: boolean
+   isCompleted: boolean
+}
+

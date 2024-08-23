@@ -20,18 +20,6 @@
             </ion-row>
          </ion-grid>
       </ng-container>
-      <!-- <ng-container *ngIf="selected && !selected?.oldCode">
-         <ion-grid class="ion-no-padding m-0 w-full">
-            <ion-row class="my-2">
-               <ion-col class="ion-flex ion-margin-auto">
-                  <ion-badge style="display:inline-flex" *ngIf="selected && selected?.code">
-                     <div>{{selected?.code}}</div>
-                  </ion-badge>
-                  <div class="my-auto ml-2">{{selected?.[optionLabel]}}</div>
-               </ion-col>
-            </ion-row>
-         </ion-grid>
-      </ng-container> -->
       <ion-input *ngIf="!selected" [placeholder]="'Select ' + title" [readonly]="inputReadOnly"></ion-input>
    </ion-item>
 </ng-container>

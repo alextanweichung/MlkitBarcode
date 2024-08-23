@@ -34,12 +34,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    moduleControl: ModuleControl[] = [];
    allowModifyItemInfo: boolean = true;
-   useTax: boolean = true;
-   systemWideEAN13IgnoreCheckDigit: boolean = false;
-   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-   maxPrecision: number = 2;
-   maxPrecisionTax: number = 2;
 
    inputType: string = "number";
 
@@ -63,78 +57,12 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      await this.loadModuleControl();
       await this.loadRestrictColumms();
       await this.barcodescaninput.setFocus();
    }
 
    ngOnInit() {
 
-   }
-
-   consignmentSalesActivateMarginCalculation: boolean = false;
-   consignmentSalesBlockItemWithoutMargin: string = "0";
-   consignBearingComputeGrossMargin: boolean = false;
-   systemWideBlockConvertedCode: boolean;
-   configMobileScanItemContinuous: boolean = false;
-   configConsignmentActivateMarginExpr: boolean = false;
-   loadModuleControl() {
-      try {
-         this.authService.moduleControlConfig$.subscribe(obj => {
-            this.moduleControl = obj;
-            let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
-            if (SystemWideActivateTaxControl != undefined) {
-               this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() === "Y" ? true : false;
-            }
-            let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
-            if (ignoreCheckdigit != undefined) {
-               this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
-            }
-            let activateMargin = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesActivateMarginCalculation");
-            if (activateMargin && activateMargin.ctrlValue.toUpperCase() === 'Y') {
-               this.consignmentSalesActivateMarginCalculation = true;
-            }
-            let consignmentBlockNoMarginItem = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesBlockItemWithoutMargin");
-            if (consignmentBlockNoMarginItem) {
-               this.consignmentSalesBlockItemWithoutMargin = consignmentBlockNoMarginItem.ctrlValue;
-            }
-            let blockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")
-            if (blockConvertedCode) {
-               this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
-            } else {
-               this.systemWideBlockConvertedCode = false;
-            }
-
-            let computationMethod = this.moduleControl.find(x => x.ctrlName === "ConsignBearingComputeGrossMargin");
-            if (computationMethod && computationMethod.ctrlValue.toUpperCase() === 'Y') {
-               this.consignBearingComputeGrossMargin = true;
-            } else {
-               this.consignBearingComputeGrossMargin = false;
-            }
-
-            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
-            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
-               this.configMobileScanItemContinuous = true;
-            } else {
-               this.configMobileScanItemContinuous = false;
-            }
-
-            let useConsMarginExpr = this.moduleControl.find(x => x.ctrlName === "ConsignmentActivateMarginExpr");
-            if (useConsMarginExpr && useConsMarginExpr.ctrlValue.toUpperCase() == 'Y') {
-               this.configConsignmentActivateMarginExpr = true;
-            } else {
-               this.configConsignmentActivateMarginExpr = false;
-            }
-         })
-         this.authService.precisionList$.subscribe(precision => {
-            this.precisionSales = precision.find(x => x.precisionCode === "SALES");
-            this.precisionTax = precision.find(x => x.precisionCode === "TAX");
-            this.maxPrecision = this.precisionSales.localMax;
-            this.maxPrecisionTax = this.precisionTax.localMax;
-         })
-      } catch (e) {
-         console.error(e);
-      }
    }
 
    restrictTrxFields: any = {};
@@ -171,7 +99,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async addItemToLine(trxLine: TransactionDetail) {
-      if (this.consignmentSalesActivateMarginCalculation) {
+      if (this.objectService.consignmentSalesActivateMarginCalculation) {
          if (!this.objectService.objectHeader.marginMode) {
             this.toastService.presentToast("Control Validation", "Unable to proceed. Please setup location margin mode.", "top", "warning", 1000);
             return;
@@ -197,7 +125,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
          let newItemCode = this.configService.item_Masters.find(r => r.id === trxLine.itemId);
          if (newItemCode) {
             this.toastService.presentToast("Converted Code Detected", `Item ${trxLine.itemCode} has been converted to ${newItemCode.code} effective from ${format(new Date(trxLine.newItemEffectiveDate), "dd/MM/yyyy")}`, "top", "warning", 1000);
-            if (this.systemWideBlockConvertedCode) {
+            if (this.objectService.systemWideBlockConvertedCode) {
                return true;
             } else {
                return false;
@@ -211,7 +139,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async assignTrxItemToDataLine(item: TransactionDetail) {
-      if (this.useTax) {
+      if (this.objectService.useTax) {
          if (this.objectService.objectHeader.isItemPriceTaxInclusive) {
             item.unitPrice = item.itemPricing.unitPrice;
             item.unitPriceExTax = this.commonService.computeAmtExclTax(new Decimal(item.itemPricing.unitPrice ? item.itemPricing.unitPrice : 0), item.taxPct).toNumber();
@@ -223,29 +151,29 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
          item.unitPrice = item.itemPricing.unitPrice;
          item.unitPriceExTax = item.itemPricing.unitPrice;
       }
-      item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.maxPrecision);
-      item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.maxPrecision);
-      
+      item.unitPrice = this.commonService.roundToPrecision(item.unitPrice, this.objectService.maxPrecision);
+      item.unitPriceExTax = this.commonService.roundToPrecision(item.unitPriceExTax, this.objectService.maxPrecision);
+
       item.oriUnitPrice = item.unitPrice;
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
       // testing performance
       item.guid = uuidv4()
 
-      if (this.consignmentSalesActivateMarginCalculation) {
-         if (!this.configConsignmentActivateMarginExpr && item.marginPct) {
+      if (this.objectService.consignmentSalesActivateMarginCalculation) {
+         if (!this.objectService.configConsignmentActivateMarginExpr && item.marginPct) {
             item.marginExpression = null;
             this.objectService.objectDetail.unshift(item);
             await this.computeAllAmount(this.objectService.objectDetail[0]);
-         } else if (this.configConsignmentActivateMarginExpr && item.marginExpression) {
+         } else if (this.objectService.configConsignmentActivateMarginExpr && item.marginExpression) {
             item.marginPct = null;
             this.objectService.objectDetail.unshift(item);
-            await this.computeAllAmount(this.objectService.objectDetail[0]);            
+            await this.computeAllAmount(this.objectService.objectDetail[0]);
          }
          else {
-            if (this.consignmentSalesBlockItemWithoutMargin !== "0") {
+            if (this.objectService.consignmentSalesBlockItemWithoutMargin !== "0") {
                this.toastService.presentToast("", `Margin unavailable for code ${item.itemCode}`, "top", "warning", 1000);
-               if (this.consignmentSalesBlockItemWithoutMargin === "1") {
+               if (this.objectService.consignmentSalesBlockItemWithoutMargin === "1") {
                   this.objectService.objectDetail.unshift(item);
                   await this.computeAllAmount(this.objectService.objectDetail[0]);
                }
@@ -309,7 +237,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async onDoneScanning(barcode) {
       if (barcode) {
          await this.barcodescaninput.validateBarcode(barcode);
-         if (this.configMobileScanItemContinuous) {
+         if (this.objectService.configMobileScanItemContinuous) {
             await this.barcodescaninput.startScanning();
          }
       }
@@ -342,7 +270,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async computeUnitPriceExTax(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
       try {
          trxLine.unitPrice = parseFloat(parseFloat(stringValue).toFixed(2));
-         trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.useTax, this.maxPrecision);
+         trxLine.unitPriceExTax = this.commonService.computeUnitPriceExTax(trxLine, this.objectService.useTax, this.objectService.maxPrecision);
          await this.computeDiscTaxAmount(trxLine);
          let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
          await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
@@ -354,7 +282,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async computeUnitPrice(trxLine: TransactionDetail, stringValue: string) { // special handle for iPhone, cause no decimal point
       try {
          trxLine.unitPriceExTax = parseFloat(parseFloat(stringValue).toFixed(2));
-         trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.useTax, this.maxPrecision);
+         trxLine.unitPrice = this.commonService.computeUnitPrice(trxLine, this.objectService.useTax, this.objectService.maxPrecision);
          await this.computeDiscTaxAmount(trxLine);
          let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
          await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
@@ -365,8 +293,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    async computeDiscTaxAmount(trxLine: TransactionDetail) {
       try {
-         trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.useTax, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.maxPrecision);
-         if (this.consignmentSalesActivateMarginCalculation) {
+         trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.useTax, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.maxPrecision);
+         if (this.objectService.consignmentSalesActivateMarginCalculation) {
             await this.computeMarginAmount(trxLine);
          }
       } catch (e) {
@@ -375,7 +303,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async computeMarginAmount(trxLine: TransactionDetail) {
-      trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.objectHeader, this.consignBearingComputeGrossMargin, true);
+      trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.objectHeader, this.objectService.consignBearingComputeGrossMargin, true);
       let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
       await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
@@ -413,7 +341,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
          line.qtyRequest = parseFloat(line.qtyRequest.toFixed(0));
          try {
             await this.computeDiscTaxAmount(line);
-            if (this.consignmentSalesActivateMarginCalculation) {
+            if (this.objectService.consignmentSalesActivateMarginCalculation) {
                await this.computeMarginAmount(line);
             }
             let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
@@ -504,34 +432,36 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
          this.toastService.presentToast("Unable to proceed", "Invalid Qty", "top", "warning", 1000);
       } else {
          try {
-            if (this.objectService.objectDetail.length > 0) {
-               const alert = await this.alertController.create({
-                  header: "Are you sure to proceed?",
-                  cssClass: "custom-alert",
-                  buttons: [
-                     {
-                        text: "OK",
-                        cssClass: "success",
-                        role: "confirm",
-                        handler: async () => {
-                           if (this.objectService.objectHeader?.consignmentSalesId && this.objectService.objectHeader.consignmentSalesId > 0) {
-                              await this.updateObject();
-                           } else {
-                              await this.insertObject();
-                           }
-                        },
-                     },
-                     {
-                        text: "Cancel",
-                        cssClass: "cancel",
-                        role: "cancel"
-                     },
-                  ],
-               });
-               await alert.present();
-            } else {
-               this.toastService.presentToast("Control Error", "Detail is empty", "top", "warning", 1000);
+            if (this.objectService.allowDocumentWithEmptyLine == "N") {
+               if (this.objectService.objectDetail.length < 1) {
+                  this.toastService.presentToast("Insert Failed", "System unable to insert document without item line.", "top", "warning", 1000);
+                  return;
+               }
             }
+            const alert = await this.alertController.create({
+               header: "Are you sure to proceed?",
+               cssClass: "custom-alert",
+               buttons: [
+                  {
+                     text: "OK",
+                     cssClass: "success",
+                     role: "confirm",
+                     handler: async () => {
+                        if (this.objectService.objectHeader?.consignmentSalesId && this.objectService.objectHeader.consignmentSalesId > 0) {
+                           await this.updateObject();
+                        } else {
+                           await this.insertObject();
+                        }
+                     },
+                  },
+                  {
+                     text: "Cancel",
+                     cssClass: "cancel",
+                     role: "cancel"
+                  },
+               ],
+            });
+            await alert.present();
          } catch (e) {
             console.error(e);
          }

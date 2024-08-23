@@ -126,7 +126,7 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
    }
 
    editObject() {
-      this.navController.navigateRoot("/transactions/transfer-out/transfer-out-add");
+      this.navController.navigateRoot("/transactions/transfer-out/transfer-out-header");
    }
 
    /* #region more action popover */

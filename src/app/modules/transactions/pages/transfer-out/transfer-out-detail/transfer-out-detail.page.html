@@ -150,31 +150,34 @@
         </ion-grid>
       </ion-item>
 
-      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let line of objectService.objectDetail; let i = index">
+      <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let rowData of objectService.objectDetail; let rowIndex = index">
         <ion-grid class="ion-no-padding py-2 pl-2">
           <ion-row>
             <ion-col size="1" class="ion-flex ion-margin-auto">
-              <div class="ion-text-right">{{i+1|number:'1.0'}}</div>
+              <div class="ion-text-right">{{rowIndex+1|number:'1.0'}}</div>
             </ion-col>
             <ion-col size="9">
               <ion-grid class="ion-no-padding">
                 <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
-                    <div class="font-bold">{{line.itemCode}}</div>
+                    <div class="font-bold">{{rowData.itemCode}}</div>
                     <div class="ion-flex">
-                      <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="line.xDesc"> {{line.xDesc}}</span>
-                      <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="line.yDesc"> {{line.yDesc}}</span>
+                      <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.xDesc"> {{rowData.xDesc}}</span>
+                      <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.yDesc"> {{rowData.yDesc}}</span>
                     </div>
                   </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col class="ion-flex ion-margin-auto">
-                    <div class="ion-text-wrap">{{line.itemDesc}}</div>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="rowData.containerNum">
+                     <div class="ion-text-wrap font-bold">Ctr. [{{rowData.containerNum}}]</div>
                   </ion-col>
                 </ion-row>
                 <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
-                    <div class="ion-text-wrap">{{line.barcode}}</div>
+                    <div class="ion-text-wrap">{{rowData.itemDesc}}</div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                    <div class="ion-text-wrap">{{rowData.barcode}}</div>
                   </ion-col>
                 </ion-row>
               </ion-grid>
@@ -182,7 +185,7 @@
             <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
                <div class="ion-flex my-auto">
                  <ion-badge>
-                   <div class="ion-text-right">{{line.lineQty|number:'1.0'}}</div>
+                   <div class="ion-text-right">{{rowData.lineQty|number:'1.0'}}</div>
                  </ion-badge>
                </div>
             </ion-col>
@@ -211,19 +214,19 @@
           </ion-row>
           <ion-row>
             <ion-col>
-              <div>{{line.unitPrice|number:"1.0-2"}}</div>
+              <div>{{rowData.unitPrice|number:"1.0-2"}}</div>
             </ion-col>
             <ion-col>
               <div class="ion-flex">
-                <div>{{line.discountGroupCode}}</div>
-                <div *ngIf="line.discountExpression"> [{{line.discountExpression}}]</div>
+                <div>{{rowData.discountGroupCode}}</div>
+                <div *ngIf="rowData.discountExpression"> [{{rowData.discountExpression}}]</div>
               </div>
             </ion-col>
             <ion-col class="justify-content-end">
-              <div >{{(line.discountAmt??0)|number:"1.0-2"}}</div>
+              <div >{{(rowData.discountAmt??0)|number:"1.0-2"}}</div>
             </ion-col>
             <ion-col class="justify-content-end">
-              <div >{{(line.subTotal??0)|number:"1.0-2"}}</div>
+              <div >{{(rowData.subTotal??0)|number:"1.0-2"}}</div>
             </ion-col>
           </ion-row>
         </ion-grid>

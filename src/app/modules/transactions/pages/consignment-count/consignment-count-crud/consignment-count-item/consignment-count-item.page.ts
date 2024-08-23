@@ -111,6 +111,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
             this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += 1;
             let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            this.resetFilteredObj();
          } else {
             let newLine: ConsignmentCountDetail = {
                consignmentCountLineId: 0,

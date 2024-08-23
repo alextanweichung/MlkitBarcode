@@ -97,7 +97,7 @@
    </div>
 </ion-content>
 
-<ion-modal [isOpen]="selectLocationModal" (didDismiss)="selectLocationModal = false">
+<ion-modal [isOpen]="selectLocationModal" (didPresent)="searchBar.setFocus()" (didDismiss)="selectLocationModal = false">
    <ng-template>
       <ion-header>
          <ion-toolbar>
@@ -110,14 +110,14 @@
                <ion-button (click)="hideLocationModal()">Done</ion-button>
             </ion-buttons>
          </ion-toolbar>
+         <ion-toolbar>
+            <ion-searchbar #searchBar class="p-0" enterkeyhint="search" [(ngModel)]="searchText" showCancelButton="never" animated="true" [placeholder]="'Search for Location'" (keydown)="onKeyDown($event)" (ionClear)="resetFilter();"></ion-searchbar>
+         </ion-toolbar>
       </ion-header>
       <ion-content>
          <div class="p-2">
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-               <ion-label>Location not set</ion-label>
-            </ion-list-header>
             <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item button="false" *ngFor="let rowData of dashboardService.locationMasterList" (click)="setDefaultLocation(rowData)">
+               <ion-item button="false" *ngFor="let rowData of tempDropdownList" (click)="setDefaultLocation(rowData)">
                   <div slot="start">
                      <ion-grid class="ion-no-padding">
                         <ion-row>

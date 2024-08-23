@@ -2,15 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
-import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesLocation, ConsignmentSalesRoot } from '../models/consignment-sales';
+import { ConsignmentSalesHeader, ConsignmentSalesList, ConsignmentSalesRoot } from '../models/consignment-sales';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
-import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { Subscription } from 'rxjs';
+import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { ModuleControl } from 'src/app/shared/models/module-control';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -70,6 +72,7 @@ export class ConsignmentSalesService {
    async loadRequiredMaster() {
       try {
          await this.loadingService.showLoading();
+         await this.loadModuleControl();
          await this.loadMasterList();
          await this.loadStaticLov();
          await this.loadingService.dismissLoading();
@@ -79,12 +82,91 @@ export class ConsignmentSalesService {
       } finally {
          await this.loadingService.dismissLoading();
       }
-      // await this.loadConsignmentLocation();
+   }
+
+   moduleControl: ModuleControl[];
+   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+   maxPrecision: number = 2;
+   maxPrecisionTax: number = 2;
+   useTax: boolean = true;
+   systemWideEAN13IgnoreCheckDigit: boolean = false;
+   allowDocumentWithEmptyLine: string = "N";
+   consignmentSalesActivateMarginCalculation: boolean = false;
+   consignmentSalesBlockItemWithoutMargin: string = "0";
+   consignBearingComputeGrossMargin: boolean = false;
+   systemWideBlockConvertedCode: boolean;
+   configMobileScanItemContinuous: boolean = false;
+   configConsignmentActivateMarginExpr: boolean = false;
+   loadModuleControl() {
+      try {
+         this.authService.moduleControlConfig$.subscribe(obj => {
+            this.moduleControl = obj;
+
+            let config = this.moduleControl.find(x => x.ctrlName === "AllowDocumentWithEmptyLine");
+            if (config != undefined) {
+               this.allowDocumentWithEmptyLine = config.ctrlValue.toUpperCase();
+            }
+
+            let SystemWideActivateTaxControl = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateTax");
+            if (SystemWideActivateTaxControl != undefined) {
+               this.useTax = SystemWideActivateTaxControl.ctrlValue.toUpperCase() === "Y" ? true : false;
+            }
+            let ignoreCheckdigit = this.moduleControl.find(x => x.ctrlName === "SystemWideEAN13IgnoreCheckDigit");
+            if (ignoreCheckdigit != undefined) {
+               this.systemWideEAN13IgnoreCheckDigit = ignoreCheckdigit.ctrlValue.toUpperCase() === "Y" ? true : false;
+            }
+            let activateMargin = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesActivateMarginCalculation");
+            if (activateMargin && activateMargin.ctrlValue.toUpperCase() === 'Y') {
+               this.consignmentSalesActivateMarginCalculation = true;
+            }
+            let consignmentBlockNoMarginItem = this.moduleControl.find(x => x.ctrlName === "ConsignmentSalesBlockItemWithoutMargin");
+            if (consignmentBlockNoMarginItem) {
+               this.consignmentSalesBlockItemWithoutMargin = consignmentBlockNoMarginItem.ctrlValue;
+            }
+            let blockConvertedCode = this.moduleControl.find(x => x.ctrlName === "SystemWideBlockConvertedCode")
+            if (blockConvertedCode) {
+               this.systemWideBlockConvertedCode = blockConvertedCode.ctrlValue.toUpperCase() === "Y" ? true : false;
+            } else {
+               this.systemWideBlockConvertedCode = false;
+            }
+
+            let computationMethod = this.moduleControl.find(x => x.ctrlName === "ConsignBearingComputeGrossMargin");
+            if (computationMethod && computationMethod.ctrlValue.toUpperCase() === 'Y') {
+               this.consignBearingComputeGrossMargin = true;
+            } else {
+               this.consignBearingComputeGrossMargin = false;
+            }
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
+            }
+
+            let useConsMarginExpr = this.moduleControl.find(x => x.ctrlName === "ConsignmentActivateMarginExpr");
+            if (useConsMarginExpr && useConsMarginExpr.ctrlValue.toUpperCase() == 'Y') {
+               this.configConsignmentActivateMarginExpr = true;
+            } else {
+               this.configConsignmentActivateMarginExpr = false;
+            }
+         });
+         this.authService.precisionList$.subscribe(precision => {
+            if (precision) {
+               this.precisionSales = precision.find(x => x.precisionCode === "SALES");
+               this.precisionTax = precision.find(x => x.precisionCode === "TAX");
+            }
+         })
+      } catch (e) {
+         console.error(e);
+      }
    }
 
    custSubscription: Subscription;
    fullMasterList: MasterList[] = [];
    customerMasterList: MasterListDetails[] = [];
+   fullLocationMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
    salesAgentMasterList: MasterListDetails[] = [];
    itemVariationXMasterList: MasterListDetails[] = [];
@@ -95,8 +177,12 @@ export class ConsignmentSalesService {
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
-      this.locationMasterList = this.locationMasterList.filter(r => (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      this.fullLocationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      if (this.commonService.getModCtrlBoolValue(this.moduleControl, "TransformCSBizModelAsRetail")) {
+         this.locationMasterList = this.fullLocationMasterList.filter(r => (r.attribute1 === "C" || r.attribute1 === "O") && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      } else {
+         this.locationMasterList = this.fullLocationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
+      }
       this.bindLocationList();
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);

@@ -16,7 +16,6 @@ import { CommonService } from 'src/app/shared/services/common.service';
 export class StockReorderDetailPage implements OnInit, ViewWillEnter {
 
    objectId: number;
-   object: StockReorderRoot;
 
    constructor(
       private authService: AuthService,
@@ -68,8 +67,8 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
    loadObject() {
       try {
          this.objectService.getObjectById(this.objectId).subscribe(response => {
-            this.object = response;
-            // this.loadWorkflow(this.object.header.salesOrderId);
+            let object = response as StockReorderRoot;
+            this.objectService.setObject(object);
          }, error => {
             console.error(error);
          })
@@ -100,6 +99,10 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
          ],
       });
       await alert.present();
+   }
+
+   editObject() {
+      this.navController.navigateRoot("/transactions/stock-reorder/stock-reorder-header");
    }
 
    completeObject() {

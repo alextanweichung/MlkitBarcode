@@ -13,39 +13,35 @@
 </ion-header>
 <ion-content [fullscreen]="true">
    <div class="p-2">
+		<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
       <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects||objects?.length===0">
          <ion-label>Nothing found!</ion-label>
       </ion-list-header>
       <ng-container *ngIf="objects?.length > 0">
-         <div *ngFor="let m of uniqueGrouping">
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-               <ion-label>{{m|date:'dd MMM yyyy'}}</ion-label>
-            </ion-list-header>
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="none">
-               <ion-item [button]="false" [detail]="false" class="ion-no-padding" (click)="goToDetail(object.stockReorderId)" *ngFor="let object of getObjects(m)">
-                  <ion-grid class="ion-no-padding py-2 pl-2">
-                     <ion-row>
-                        <ion-col class="ion-flex ion-margin-auto font-bold">
-                           <ion-icon class="ion-flex mr-2" name="ellipse"
-                              [class]="object.isCompleted?'color-success':'color-danger'"></ion-icon>
-                           <div class="ion-flex mr-2">{{object.stockReorderNum}}</div>
-                        </ion-col>
-                        <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge>
-                              <div class="ion-text-right">{{object.trxDate|date:'dd/MM/yyyy'}}</div>
-                           </ion-badge></ion-col>
-                     </ion-row>
-                     <ion-row>
-                        <ion-col size="auto" class="ion-flex ion-margin-auto">
-                           <ion-badge>{{object.locationCode}}</ion-badge>
-                        </ion-col>
-                        <ion-col class="ion-flex ion-margin-auto">
-                           <div class="ion-flex my-auto ml-2">{{object.locationDesc}}</div>
-                        </ion-col>
-                     </ion-row>
-                  </ion-grid>
-               </ion-item>
-            </ion-list>
-         </div>
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item [button]="false" [detail]="false" class="ion-no-padding" *ngFor="let rowData of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}" (click)="goToDetail(rowData.stockReorderId)">
+               <ion-grid class="ion-no-padding py-2 pl-2">
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto font-bold">
+                        <ion-icon class="ion-flex mr-2" name="ellipse"
+                           [class]="rowData.isCompleted?'color-success':'color-danger'"></ion-icon>
+                        <div class="ion-flex mr-2">{{rowData.stockReorderNum}}</div>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end"><ion-badge>
+                           <div class="ion-text-right">{{rowData.trxDate|date:'dd/MM/yyyy'}}</div>
+                        </ion-badge></ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col size="auto" class="ion-flex ion-margin-auto">
+                        <ion-badge>{{rowData.locationCode}}</ion-badge>
+                     </ion-col>
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div class="ion-flex my-auto ml-2">{{rowData.locationDesc}}</div>
+                     </ion-col>
+                  </ion-row>
+               </ion-grid>
+            </ion-item>
+         </ion-list>
       </ng-container>
    </div>
    <ion-fab class="ion-fab-custom" vertical="bottom" horizontal="center" slot="fixed" (click)="selectAction()">

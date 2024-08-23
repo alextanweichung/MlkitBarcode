@@ -12,11 +12,11 @@ import { format, parseISO } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
-   selector: 'app-transfer-out-add',
-   templateUrl: './transfer-out-add.page.html',
-   styleUrls: ['./transfer-out-add.page.scss'],
+   selector: 'app-transfer-out-header',
+   templateUrl: './transfer-out-header.page.html',
+   styleUrls: ['./transfer-out-header.page.scss'],
 })
-export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave {
+export class TransferOutHeaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
 
    objectForm: UntypedFormGroup;
    objectId: number = null;
@@ -44,6 +44,8 @@ export class TransferOutAddPage implements OnInit, ViewWillEnter, ViewWillLeave 
       if (this.objectService.objectHeader?.transferOutId > 0) {
          this.dateValue = format(new Date(this.objectService.objectHeader?.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
          this.objectForm.patchValue(this.objectService.objectHeader);
+      } else {
+         this.objectForm.patchValue({ totalCarton: this.objectService.objectHeader.totalCarton });
       }
       await this.setFormattedDateString();
       if (this.configService.selected_location) {

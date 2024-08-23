@@ -32,6 +32,8 @@ export class TransferOutService {
 
    selectedLocation: number;
 
+   pageNum: number = 1;
+
    constructor(
       private http: HttpClient,
       private authService: AuthService,
@@ -53,6 +55,7 @@ export class TransferOutService {
 
    moduleControl: ModuleControl[] = [];
    configMobileScanItemContinuous: boolean = false;
+   configTransferOutActivateContainerNum : boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -61,6 +64,12 @@ export class TransferOutService {
             this.configMobileScanItemContinuous = true;
          } else {
             this.configMobileScanItemContinuous = false;
+         }
+         let transferOutActivateContainerNum = this.moduleControl.find(x => x.ctrlName === "TransferOutActivateContainerNum");
+         if (transferOutActivateContainerNum && transferOutActivateContainerNum.ctrlValue.toUpperCase() === "Y") {
+            this.configTransferOutActivateContainerNum = true;
+         } else {
+            this.configTransferOutActivateContainerNum = false;
          }
       })
    }
@@ -86,6 +95,7 @@ export class TransferOutService {
    }
 
    resetVariables() {
+      this.pageNum = 1;
       this.removeHeader();
       this.removeLine();
    }

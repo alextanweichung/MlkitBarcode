@@ -4,24 +4,24 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { TransferOutAddPageRoutingModule } from './transfer-out-add-routing.module';
+import { TransferOutHeaderPageRoutingModule } from './transfer-out-header-routing.module';
 
-import { TransferOutAddPage } from './transfer-out-add.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import { TransferOutHeaderPage } from './transfer-out-header.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    TransferOutAddPageRoutingModule,
-    SearchDropdownPageModule,
-    CalendarInputPageModule,
-    ReactiveFormsModule,
-    BarcodeScanInputPageModule
-  ],
-  declarations: [TransferOutAddPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      TransferOutHeaderPageRoutingModule,
+      SearchDropdownPageModule,
+      CalendarInputPageModule,
+      ReactiveFormsModule,
+      BarcodeScanInputPageModule
+   ],
+   declarations: [TransferOutHeaderPage]
 })
-export class TransferOutAddPageModule {}
+export class TransferOutHeaderPageModule { }

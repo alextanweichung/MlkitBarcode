@@ -79,24 +79,24 @@ export class RpCheckQohVariationPage implements OnInit, ViewWillEnter {
    }
 
    loadReport() {
-      this.accordionGroup.value = null;
-      if (this.request.dateStart === null || this.request.dateStart === undefined) {
-         this.toastService.presentToast("Control Error", "Please select a date.", "top", "warning", 1000);
-         return;
-      }
-      this.objectService.getCheckQohVariation(this.configService.loginUser.loginUserType, this.request).subscribe({
-         next: (response) => {
-            this.objects = response;
-            console.log("🚀 ~ RpCheckQohVariationPage ~ this.objectService.getCheckQohVariation ~ this.objects:", this.objects)
-         },
-         error: (error) => {
+      setTimeout(async () => {
+         try {
+            this.accordionGroup.value = null;
+            if (this.request.dateStart === null || this.request.dateStart === undefined) {
+               this.toastService.presentToast("Control Error", "Please select a date.", "top", "warning", 1000);
+               return;
+            }
+            await this.loadingService.showLoading();
+            this.objects = await this.objectService.getCheckQohVariation(this.configService.loginUser.loginUserType, this.request);
+         } catch (error) {
             console.error(error);
+         } finally {
+            await this.loadingService.dismissLoading();
          }
-      })
+      }, 0);
    }
 
    onLocationSelected(event: SearchDropdownList[]) {
-      console.log("🚀 ~ RpCheckQohVariationPage ~ onLocationSelected ~ event:", event)
       if (event) {
          if (this.request) {
             this.request.locationId = event.flatMap(r => r.id);

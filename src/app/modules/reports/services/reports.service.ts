@@ -64,7 +64,7 @@ export class ReportsService {
    }
    
    getCheckQohVariation(loginUserType: string, request: CheckQohVariationRequest) {
-      return this.http.post<CheckQohVariationRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQohVariation/" + loginUserType, request);
+      return this.http.post<CheckQohVariationRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQohVariation/" + loginUserType, request).toPromise();
    }
 
    getCheckCn(object: CheckCnRequest) {

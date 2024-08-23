@@ -31,12 +31,11 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       private alertController: AlertController,
       private formBuilder: FormBuilder
    ) {
-      this.setFormattedDateString();
       this.newObjectForm();
    }
-
+   
    async ionViewWillEnter(): Promise<void> {
-      
+      await this.setFormattedDateString();      
    }
 
    ionViewDidEnter(): void {
@@ -83,24 +82,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    }
 
    ngOnInit() {
-      this.loadModuleControl();
-      // this.bindLocationList();
       this.bindMasterList();
-   }
-
-   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-   precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-   loadModuleControl() {
-      try {
-         this.authService.precisionList$.subscribe(precision => {
-            if (precision) {
-               this.precisionSales = precision.find(x => x.precisionCode === "SALES");
-               this.precisionTax = precision.find(x => x.precisionCode === "TAX");
-            }
-         })
-      } catch (e) {
-         console.error(e);
-      }
    }
    
    customerSearchDropdownList: SearchDropdownList[] = [];
@@ -185,12 +167,12 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
                this.objectForm.patchValue({ currencyRate: parseFloat(lookupValue.attribute1) });
                if (lookupValue.attribute2 === "Y") {
                   this.objectForm.patchValue({ isHomeCurrency: true });
-                  this.objectForm.patchValue({ maxPrecision: this.precisionSales.localMax });
-                  this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.localMax });
+                  this.objectForm.patchValue({ maxPrecision: this.objectService.precisionSales.localMax });
+                  this.objectForm.patchValue({ maxPrecisionTax: this.objectService.precisionTax.localMax });
                } else {
                   this.objectForm.patchValue({ isHomeCurrency: false });
-                  this.objectForm.patchValue({ maxPrecision: this.precisionSales.foreignMax });
-                  this.objectForm.patchValue({ maxPrecisionTax: this.precisionTax.foreignMax });
+                  this.objectForm.patchValue({ maxPrecision: this.objectService.precisionSales.foreignMax });
+                  this.objectForm.patchValue({ maxPrecisionTax: this.objectService.precisionTax.foreignMax });
                }
             }
          }

@@ -105,7 +105,11 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
                   unitPrice: r.itemPricing?.unitPrice,
                   unitPriceExTax: r.itemPricing?.unitPrice,
                   discountGroupCode: r.itemPricing?.discountGroupCode,
-                  discountExpression: r.itemPricing?.discountExpression
+                  discountExpression: r.itemPricing?.discountExpression,
+                  containerNum: null
+               }
+               if (this.objectService.configTransferOutActivateContainerNum) {
+                  outputData.containerNum = this.objectService.pageNum;
                }
                await this.commonService.computeDiscTaxAmount(outputData, false, false, false, 2); // todo : use tax??
                this.insertIntoLine(outputData);
@@ -182,7 +186,7 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
 
    previousStep() {
       try {
-         this.navController.navigateBack("/transactions/transfer-out/transfer-out-add");
+         this.navController.navigateBack("/transactions/transfer-out/transfer-out-header");
       } catch (e) {
          console.error(e);
       }
@@ -279,9 +283,20 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
 
 	/* #endregion */
 
+   modifyPageNum(typeCode: string) {
+      if (typeCode == 'A') {
+         this.objectService.pageNum++;
+         this.objectService.objectHeader.totalCarton = this.objectService.pageNum;
+      } else {
+         if (this.objectService.pageNum != 1) {
+            this.objectService.pageNum--;
+         }
+      }
+   }
+
 	sendForDebug() {
       let object: TransferOutRoot;
-      object = this.objectService.objectHeader;
+      object = this.objectService.objectHeader;      
       object.line = this.objectService.objectDetail;
 		let jsonObjectString = JSON.stringify(object);
 		let debugObject: JsonDebug = {

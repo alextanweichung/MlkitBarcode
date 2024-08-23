@@ -241,7 +241,7 @@
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Detail</ion-title>
+        <ion-title>Transfer Adjustment</ion-title>
         <ion-buttons slot="start">
           <ion-button (click)="hideModal()">Done</ion-button>
         </ion-buttons>
@@ -250,6 +250,27 @@
     <ion-content>
 
       <div class="p-2">
+
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+           <ion-item button [detail]="false" class="ion-no-padding no-ripple">
+             <ion-grid class="ion-no-padding py-2 pl-2">
+               <ion-row>
+                 <ion-col class="ion-flex ion-margin-auto">
+                   <div class="font-bold"> Transfer Adj. Num.</div>
+                 </ion-col>
+                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                  <ion-icon class="ion-flex mr-2" name="ellipse" [class]="object.transferAdjustment.isCompleted?'color-success':'color-danger'"></ion-icon>
+                   {{object.transferAdjustment.transferAdjustmentNum}}
+                 </ion-col>
+               </ion-row>
+             </ion-grid>
+           </ion-item>
+         </ion-list>
+    
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+           <ion-label>Adjustment Line</ion-label>
+         </ion-list-header>
+
         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
         
           <ion-item button detail="false" class="ion-no-padding no-ripple">
@@ -265,7 +286,7 @@
             </ion-grid>
           </ion-item>
         
-          <ion-item-sliding #slidingItem *ngFor="let line of object.transferAdjustment.line let i = index">
+          <ion-item-sliding #slidingItem *ngFor="let rowData of object.transferAdjustment.line let rowIndex = index">
             <ion-item button detail="false" class="ion-no-padding no-ripple">
               <ion-grid class="ion-no-padding py-2 pl-2">
                 <ion-row>
@@ -273,22 +294,22 @@
                     <ion-grid class="ion-no-padding">
                       <ion-row>
                         <ion-col class="ion-flex ion-margin-auto">
-                          <div class="font-bold">{{line.itemCode}}</div>
+                          <div class="font-bold">{{rowData.itemCode}}</div>
                           <div class="ion-flex">
-                            <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="line.xDesc"> {{line.xDesc}}</span>
-                            <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="line.yDesc"> {{line.yDesc}}</span>
+                            <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.xDesc"> {{rowData.xDesc}}</span>
+                            <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.yDesc"> {{rowData.yDesc}}</span>
                           </div>
                         </ion-col>
                       </ion-row>
                       <ion-row>
                         <ion-col class="ion-flex ion-margin-auto">
-                          <div class="ion-flex my-auto">{{line.itemDesc}}</div>
+                          <div class="ion-flex my-auto">{{rowData.itemDesc}}</div>
                         </ion-col>
                       </ion-row>
                     </ion-grid>
                   </ion-col>
                   <ion-col size="2" class="ion-flex ion-margin-auto justify-content-center">
-                    <div class="ion-flex my-auto">{{line.qty|number:'1.0'}}</div>
+                    <div class="ion-flex my-auto">{{rowData.qty|number:'1.0'}}</div>
                   </ion-col>
                 </ion-row>
               </ion-grid>

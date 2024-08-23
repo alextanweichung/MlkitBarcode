@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { StockReorderAddPage } from './stock-reorder-add.page';
+import { StockReorderHeaderPage } from './stock-reorder-header.page';
 
 describe('StockReorderInsertPage', () => {
-  let component: StockReorderAddPage;
-  let fixture: ComponentFixture<StockReorderAddPage>;
+  let component: StockReorderHeaderPage;
+  let fixture: ComponentFixture<StockReorderHeaderPage>;
 
   beforeEach(waitForAsync () => {
-    fixture = TestBed.createComponent(StockReorderAddPage);
+    fixture = TestBed.createComponent(StockReorderHeaderPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
