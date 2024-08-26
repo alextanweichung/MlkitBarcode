@@ -1,6 +1,7 @@
 import { ItemMultiUomBase, LineAssembly } from "src/app/shared/models/transaction-detail"
 import { OtpLine } from "../../managements/models/otp"
 import { VariationDetail } from "src/app/shared/models/variation-detail"
+import { ApprovalHistory } from "src/app/shared/models/approval-history"
 
 export interface DefectRequestList {
    defectRequestId: number
@@ -9,7 +10,7 @@ export interface DefectRequestList {
    customerName: string
    salesAgentName: string
    countryDesc: string
-   currenctCode: string
+   currencyCode: string
    locationCode: string
    locationDesc: string
    toLocationCode: string
@@ -24,6 +25,8 @@ export interface DefectRequestRoot {
    otp?: any
    attachmentFile?: any[]
    comment?: any[]
+   approvalHistory?: ApprovalHistory[]
+   isWorkFlowDone?: boolean
 }
 
 export interface DefectRequestHeader {
@@ -66,6 +69,15 @@ export interface DefectRequestHeader {
    modifiedAt: string
    deactivated: boolean
    revision: number
+   shipAddress?: string
+   shipPostCode?: string
+   shipPhone?: string
+   shipFax?: string
+   shipEmail?: string
+   shipStateId?: number
+   shipAreaId?: number
+   shipName?:string
+   defectRequestCategoryId: number
 }
 
 export interface DefectRequestDetail {

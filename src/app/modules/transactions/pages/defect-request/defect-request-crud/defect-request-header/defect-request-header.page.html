@@ -38,6 +38,7 @@
             <app-search-dropdown #locationsd title="Origin Location" [masterDropdownList]="selectedCustomerLocationList" [selectedId]="objectForm.controls.toLocationId.value" (onActionComplete)="onCustomerLocationSelected($event)"></app-search-dropdown>
          </ng-container>
          <app-search-dropdown #locationsd title="Reason" [masterDropdownList]="objectService.reasonMasterList" [selectedId]="objectForm.controls.reasonId.value" (onActionComplete)="onReasonSelected($event)"></app-search-dropdown>
+         <app-search-dropdown #locationsd title="Category" [masterDropdownList]="objectService.defectRequestCategoryMasterList" [selectedId]="objectForm.controls.defectRequestCategoryId.value" (onActionComplete)="onCategorySelected($event)"></app-search-dropdown>
          <ion-item>
             <ion-label class="font-bold" position="stacked">Remark</ion-label>
             <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>
@@ -179,3 +180,5 @@
       </ion-footer>
    </ng-template>
 </ion-modal>
+
+

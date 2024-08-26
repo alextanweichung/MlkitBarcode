@@ -61,6 +61,25 @@ const routes: Routes = [
       path: 'managements/sales-order-approvals',
       loadChildren: () => import('./modules/managements/pages/sales-order-approvals/sales-order-approvals.module').then(m => m.SalesOrderApprovalsPageModule)
    },
+   // management-pricing
+   {
+      path: 'managements/pricing-approvals',
+      loadChildren: () => import('./modules/managements/pages/pricing-approvals/pricing-approvals.module').then(m => m.PricingApprovalsPageModule)
+   },
+   // management b2b cod
+   {
+      path: 'managements/so-cod-approvals',
+      loadChildren: () => import('./modules/managements/pages/so-cod-approvals/so-cod-approvals.module').then(m => m.SoCodApprovalsPageModule)
+   },
+   {
+      path: 'managements/so-cod-reviews',
+      loadChildren: () => import('./modules/managements/pages/so-cod-reviews/so-cod-reviews.module').then(m => m.SoCodReviewsPageModule)
+   },
+   // managemetn b2b credit
+   {
+      path: 'managements/so-credit-approvals',
+      loadChildren: () => import('./modules/managements/pages/so-credit-approvals/so-credit-approvals.module').then(m => m.SoCreditApprovalsPageModule)
+   },
    {
       path: 'managements/somxq-approvals',
       loadChildren: () => import('./modules/managements/pages/somxq-approval/somxq-approval.module').then(m => m.SomxqApprovalPageModule)
@@ -73,6 +92,34 @@ const routes: Routes = [
    {
       path: 'managements/b2bo-approvals',
       loadChildren: () => import('./modules/managements/pages/b2bo-approvals/b2bo-approvals.module').then(m => m.B2boApprovalsPageModule)
+   },
+   // management-b2bopricing
+   {
+      path: 'managements/b2bopricing-approvals',
+      loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then(m => m.B2bopricingApprovalsPageModule)
+   },
+   // management b2b cod
+   {
+      path: 'managements/b2b-cod-approvals',
+      loadChildren: () => import('./modules/managements/pages/b2b-cod-approvals/b2b-cod-approvals.module').then(m => m.B2bCodApprovalsPageModule)
+   },
+   {
+      path: 'managements/b2b-cod-reviews',
+      loadChildren: () => import('./modules/managements/pages/b2b-cod-reviews/b2b-cod-reviews.module').then(m => m.B2bCodReviewsPageModule)
+   },
+   // managemetn b2b credit
+   {
+      path: 'managements/b2b-credit-approvals',
+      loadChildren: () => import('./modules/managements/pages/b2b-credit-approvals/b2b-credit-approvals.module').then(m => m.B2bCreditApprovalsPageModule)
+   },
+   // management-defect-request
+   {
+      path: 'managements/defect-request-reviews',
+      loadChildren: () => import('./modules/managements/pages/defect-request-reviews/defect-request-reviews.module').then(m => m.DefectRequestReviewsPageModule)
+   },
+   {
+      path: 'managements/defect-request-approvals',
+      loadChildren: () => import('./modules/managements/pages/defect-request-approvals/defect-request-approvals.module').then(m => m.DefectRequestApprovalsPageModule)
    },
    // management-purchase-req
    {
@@ -107,16 +154,6 @@ const routes: Routes = [
    {
       path: 'managements/non-trade-purchase-order-approvals',
       loadChildren: () => import('./modules/managements/pages/non-trade-purchase-order-approvals/non-trade-purchase-order-approvals.module').then(m => m.NonTradePurchaseOrderApprovalsPageModule)
-   },
-   // management-pricing
-   {
-      path: 'managements/pricing-approvals',
-      loadChildren: () => import('./modules/managements/pages/pricing-approvals/pricing-approvals.module').then(m => m.PricingApprovalsPageModule)
-   },
-   // management-b2bopricing
-   {
-      path: 'managements/b2bopricing-approvals',
-      loadChildren: () => import('./modules/managements/pages/b2bopricing-approvals/b2bopricing-approvals.module').then(m => m.B2bopricingApprovalsPageModule)
    },
    //management-branch-receiving
    {
@@ -550,6 +587,43 @@ const routes: Routes = [
       path: 'creditor-application',
       loadChildren: () => import('./modules/transactions/pages/creditor-application/creditor-application.module').then(m => m.CreditorApplicationPageModule)
    },
+  {
+    path: 'b2b-cod-approvals',
+    loadChildren: () => import('./modules/managements/pages/b2b-cod-approvals/b2b-cod-approvals.module').then( m => m.B2bCodApprovalsPageModule)
+  },
+  {
+    path: 'b2b-credit-approvals',
+    loadChildren: () => import('./modules/managements/pages/b2b-credit-approvals/b2b-credit-approvals.module').then( m => m.B2bCreditApprovalsPageModule)
+  },
+  {
+    path: 'b2b-cod-reviews',
+    loadChildren: () => import('./modules/managements/pages/b2b-cod-reviews/b2b-cod-reviews.module').then( m => m.B2bCodReviewsPageModule)
+  },
+  {
+    path: 'so-credit-approvals',
+    loadChildren: () => import('./modules/managements/pages/so-credit-approvals/so-credit-approvals.module').then( m => m.SoCreditApprovalsPageModule)
+  },
+  {
+    path: 'so-cod-approvals',
+    loadChildren: () => import('./modules/managements/pages/so-cod-approvals/so-cod-approvals.module').then( m => m.SoCodApprovalsPageModule)
+  },
+  {
+    path: 'so-cod-reviews',
+    loadChildren: () => import('./modules/managements/pages/so-cod-reviews/so-cod-reviews.module').then( m => m.SoCodReviewsPageModule)
+  },
+  {
+    path: 'defect-request-approvals',
+    loadChildren: () => import('./modules/managements/pages/defect-request-approvals/defect-request-approvals.module').then( m => m.DefectRequestApprovalsPageModule)
+  },
+  {
+    path: 'defect-request-reviews',
+    loadChildren: () => import('./modules/managements/pages/defect-request-reviews/defect-request-reviews.module').then( m => m.DefectRequestReviewsPageModule)
+  },
+
+
+
+
+
 
 
 

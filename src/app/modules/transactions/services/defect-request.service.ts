@@ -44,7 +44,10 @@ export class DefectRequestService {
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
    reasonMasterList: MasterListDetails[] = [];
-
+   defectRequestCategoryMasterList: MasterListDetails[] = [];
+   areaMasterList: MasterListDetails[] = [];
+   stateMasterList: MasterListDetails[] = [];
+   
    customers: Customer[] = [];
 
    constructor(
@@ -88,6 +91,9 @@ export class DefectRequestService {
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.defectRequestCategoryMasterList = this.fullMasterList.filter(x => x.objectName === "DefectRequestCategory").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.stateMasterList = this.fullMasterList.filter(x => x.objectName === "State").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
