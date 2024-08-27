@@ -121,7 +121,6 @@ export class StockCountService {
 
    localObject: LocalTransaction;
    setLocalObject(localObject: LocalTransaction) {
-      console.log("🚀 ~ StockCountService ~ setLocalObject ~ localObject:", JSON.stringify(localObject))
       this.localObject = localObject;
    }
 

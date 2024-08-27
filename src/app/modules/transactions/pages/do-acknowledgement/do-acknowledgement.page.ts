@@ -30,6 +30,8 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    cartonTruckLoadingNum: string
    deliveryOrderNum: string
    vehicleSearchDropdownList: SearchDropdownList[] = [];
+   selectedVehicleId: any;
+   remark: string;
 
    uniqueGrouping: Date[] = [];
 
@@ -52,19 +54,9 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       await this.loadModuleControl();
       await this.objectService.loadRequiredMaster();
       await this.bindVehicleList();
-      // this.selectAction();
    }
 
    ionViewDidEnter(): void {
-      // if (this.configDOAckFocus) {
-      //    if (this.configDOAckFocus === "TA") {
-      //       this.ctln.setFocus();
-      //    } else if (this.configDOAckFocus === "DO") {
-      //       this.don.setFocus();
-      //    } else {
-      //       this.don.setFocus();
-      //    }
-      // }
       this.don.setFocus();
    }
 
@@ -81,11 +73,6 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
             this.moduleControl = obj;
             let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
             this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
-
-            // let focus = this.moduleControl.find(x => x.ctrlName === "DOAckFocus")?.ctrlValue;
-            // if (focus) {
-            //    this.configDOAckFocus = focus.toUpperCase();
-            // }
          })
       } catch (e) {
          console.error(e);
@@ -111,7 +98,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    // Select action
    async selectAction() {
-      try {      
+      try {
          Filesystem.readdir({
             path: IMAGE_DIR,
             directory: Directory.Data
@@ -132,8 +119,8 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                });
             }
          ).then(async (_) => {
-               await this.loadingService.dismissLoading();
-            });
+            await this.loadingService.dismissLoading()
+         });
       } catch (error) {
          console.error(error);
       }
@@ -142,7 +129,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
          vehicleId: this.vehicleIds,
          deliveryOrderNum: this.deliveryOrderNum
       }
-      this.getObject(object);
+      await this.getObject(object);
    }
 
    async getObject(request: DOAcknowledegementRequest) {
@@ -151,15 +138,12 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
          this.objectService.loadObjects(request).subscribe({
             next: async (response) => {
                this.objects = response.body
-               await this.loadingService.dismissLoading();
             },
             error: async (error) => {
-               await this.loadingService.dismissLoading();
                console.error(error);
             }
          })
       } catch (error) {
-         await this.loadingService.dismissLoading();
          console.error(error);
       } finally {
          await this.loadingService.dismissLoading();
@@ -184,15 +168,6 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    signModalDidDismiss() {
       this.signatureModal = false;
-      // if (this.configDOAckFocus) {
-      //    if (this.configDOAckFocus === "TA") {
-      //       this.ctln.setFocus();
-      //    } else if (this.configDOAckFocus === "DO") {
-      //       this.don.setFocus();
-      //    } else {
-      //       this.don.setFocus();
-      //    }
-      // }
       this.don.setFocus();
    }
 
@@ -212,12 +187,19 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       this.signaturePad.clear();
    }
 
+   onVehicleChanged(event: SearchDropdownList) {
+      if (event) {
+         this.selectedVehicleId = event.id;
+      } else {
+         this.selectedVehicleId = null;
+      }
+   }
+
    images: LocalFile[] = [];
    async save() {
       if (!this.signaturePad.isEmpty()) {
-         // this.ctln.manualClearSearchValue();
          this.don.manualClearSearchValue();
-         const fileName = this.selectedDo.deliveryOrderNum.replace(" ", "").replace("/","") + "_Acknowledgement_" + "signature.png";
+         const fileName = this.selectedDo.deliveryOrderNum.replace(" ", "").replace("/", "") + "_Acknowledgement_" + "signature.png";
          const base64Data = this.signaturePad.toDataURL();
          try {
             this.images = [];
@@ -245,6 +227,8 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
             ).then(async (_) => {
                await this.loadingService.dismissLoading();
                this.submit_attempt = false;
+               this.selectedVehicleId = null;
+               this.remark = null;               
             });
          } catch (e) {
             console.error(e);
@@ -269,11 +253,6 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                directory: Directory.Data
             });
             if (f.size > this.fileSizeLimit) {
-               // this.fileToDelete.push({
-               //    name: f.name,
-               //    path: filePath,
-               //    data: `data:image/jpeg;base64,${readFile.data}`
-               // });
                this.toastService.presentToast("", "File size too large", "top", "danger", 1500);
                this.submit_attempt = false;
             } else {
@@ -287,6 +266,13 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
                   const blob = await response.blob();
                   const formData = new FormData();
                   formData.append("file", blob, this.images[0].name);
+                  if (this.selectedVehicleId ) {
+                     formData.append('customObj2[]', this.selectedVehicleId);
+                  }
+                  formData.append('customObj3[]', "Delivery Order");
+                  if (this.remark && this.remark.length > 0) {
+                     formData.append('customObj4[]', this.remark);
+                  }
                   this.objectService.postFile(formData, this.selectedDo.deliveryOrderId, 0).subscribe({
                      next: async (response) => {
                         this.selectedDo = null;
@@ -326,15 +312,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       }
    }
 
-   onCTLNChanged(event) {
-      if (event) {
-         this.cartonTruckLoadingNum = event;
-      } else {
-         this.cartonTruckLoadingNum = null;
-      }
-   }
-
-   onDONChanged(event) {
+   async onDONChanged(event) {
       if (event) {
          this.deliveryOrderNum = event;
       } else {
@@ -349,12 +327,6 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       this.scanActive = event;
       if (this.scanActive) {
          document.body.style.background = "transparent";
-      }
-   }
-
-   async onCTLNDoneScanning(event: string) {
-      if (event) {
-         await this.onCTLNChanged(event);
       }
    }
 

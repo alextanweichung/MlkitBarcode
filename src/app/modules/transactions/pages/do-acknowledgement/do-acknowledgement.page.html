@@ -14,23 +14,11 @@
    <div class="p-2">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
 
-         <!-- <app-search-multi-dropdown title="Vehicle" [showHeaderLabel]="true" [showBoldHeader]="true" [showCode]="true" [searchDropdownList]="vehicleSearchDropdownList" (onActionComplete)="onVechicleSelected($event)"></app-search-multi-dropdown>
-         
-         <app-general-scan-input #ctln placeholder="Truck Arrangement Num" [clearSearchValue]="false" (onScanCompleted)="onCTLNChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onCTLNDoneScanning($event)"></app-general-scan-input> -->
-         
          <app-general-scan-input #don placeholder="Delivery Order Num" [clearSearchValue]="false" (onScanCompleted)="onDONChanged($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDONDoneScanning($event)"></app-general-scan-input>
 
-         <!-- <ion-item>
-            <ion-label position="stacked" class="font-bold">Carton Truck Loading Num</ion-label>
-            <ion-input [(ngModel)]="cartonTruckLoadingNum" placeholder="Enter Carton Truck Loading Num"></ion-input>
-         </ion-item> -->
-         <!-- <ion-item>
-            <ion-label position="stacked" class="font-bold">Delivery Order Num</ion-label>
-            <ion-input [(ngModel)]="deliveryOrderNum" class="mb-0" placeholder="Enter Delivery Order Num"></ion-input>
-         </ion-item> -->
       </ion-list>
    </div>
-   <div class="p-2">      
+   <div class="p-2">
       <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="objects && objects.length === 0">
          <ion-label>Nothing found!</ion-label>
       </ion-list-header>
@@ -98,12 +86,24 @@
       </ion-header>
       <ion-content [fullscreen]="true">
          <div class="p-2">
+
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+
+               <app-search-dropdown #locationDropdown title="Vehicle" optionLabel="description" [masterDropdownList]="objectService.vehicleMasterList" [selectedId]="selectedVehicleId" (onActionComplete)="onVehicleChanged($event)"></app-search-dropdown>
+               <ion-item>
+                  <ion-label position="stacked" class="font-bold">Remark</ion-label>
+                  <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="next" placeholder="Remark" [(ngModel)]="remark"></ion-textarea>
+               </ion-item>
+
+            </ion-list>
+
             <div class="border-dotted">
                <signature-pad #signaturePad [options]="signaturePadOptions"></signature-pad>
             </div>
          </div>
       </ion-content>
-      <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">
+      <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0"
+         style="background-color: white;">
          <ion-grid class="ion-no-padding">
             <ion-row>
                <ion-col>

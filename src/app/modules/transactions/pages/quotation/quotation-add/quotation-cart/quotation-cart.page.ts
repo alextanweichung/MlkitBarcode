@@ -228,8 +228,6 @@ export class QuotationCartPage implements OnInit, ViewWillEnter {
             details: this.objectService.objectDetail,
             otherAmount: this.objectService.objectOtherAmt
          }
-         console.log("🚀 ~ QuotationCartPage ~ insertObject ~ this.objectService.orderingPriceApprovalIgnoreACL:", this.objectService.orderingPriceApprovalIgnoreACL)
-         console.log("🚀 ~ QuotationCartPage ~ insertObject ~ this.originalRestrictTrxFields:", this.originalRestrictTrxFields)
          if (this.objectService.orderingPriceApprovalIgnoreACL) {
             this.checkPricingApprovalLines(trxDto, trxDto.details);
          } else {

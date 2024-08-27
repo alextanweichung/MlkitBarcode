@@ -36,7 +36,11 @@ export class ConsignmentSalesService {
       private configService: ConfigService,
       private authService: AuthService,
       private loadingService: LoadingService
-   ) { }
+   ) {      
+      if (this.configService.selected_location && this.filterLocationId.length === 0) {
+         this.filterLocationId.push(this.configService.selected_location);
+      }
+    }
 
    // Method to clean up the subscription
    stopListening() {

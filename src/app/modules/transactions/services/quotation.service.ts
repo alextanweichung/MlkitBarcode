@@ -363,12 +363,10 @@ export class QuotationService {
    }
 
    insertObject(object: QuotationRoot) {
-      console.log("🚀 ~ QuotationService ~ insertObject ~ object:", object)
       return this.http.post<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
    }
 
    updateObject(object: QuotationRoot) {
-      console.log("🚀 ~ QuotationService ~ updateObject ~ object:", object)
       return this.http.put<QuotationRoot>(this.configService.selected_sys_param.apiUrl + "MobileQuotation", object, httpObserveHeader);
    }
 

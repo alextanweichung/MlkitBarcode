@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NavigationExtras } from '@angular/router';
 import { ActionSheetController, AlertController, IonDatetime, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
@@ -9,6 +10,7 @@ import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-consignment-sales-header',
@@ -33,9 +35,14 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    ) {
       this.newObjectForm();
    }
-   
+
    async ionViewWillEnter(): Promise<void> {
-      await this.setFormattedDateString();      
+      if (this.objectService.objectHeader && this.objectService.objectHeader.consignmentSalesId > 0) {
+         this.objectForm.patchValue(this.objectService.objectHeader);
+         this.onTrxDateSelected(this.objectService.objectHeader.trxDate);         
+      } else {
+         await this.setFormattedDateString();
+      }
    }
 
    ionViewDidEnter(): void {
@@ -64,7 +71,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          businessModelType: [null],
          isBearPromo: [null],
          marginMode: [null],
-         uuid: [null]
+         uuid: [uuidv4()]
       })
       if (this.configService.selected_location) {
          let findLocation = this.objectService.locationMasterList.find(r => r.id === this.configService.selected_location);
@@ -236,8 +243,19 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          await actionSheet.present();
          const { role } = await actionSheet.onWillDismiss();
          if (role === "confirm") {
-            this.objectService.resetVariables();
-            this.navController.navigateBack("/transactions/consignment-sales");
+            if (this.objectService.objectHeader && this.objectService.objectHeader.consignmentSalesId > 0) {
+               let navigationExtras: NavigationExtras = {
+                  queryParams: {
+                     objectId: this.objectService.objectHeader.consignmentSalesId
+                  }
+               }
+               this.objectService.resetVariables();
+               this.navController.navigateRoot("/transactions/consignment-sales/consignment-sales-detail", navigationExtras);
+            }
+            else {
+               this.objectService.resetVariables();
+               this.navController.navigateRoot("/transactions/consignment-sales");
+            }
          }
       } catch (e) {
          console.error(e);

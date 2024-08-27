@@ -28,7 +28,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
    constructor(
       private objectService: ConsignmentSalesService,
-      private authService: AuthService,
+      public authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
@@ -73,10 +73,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
    }
 
    async ngOnInit() {
-      this.objectService.filterLocationId = [];
-      if (this.configService.selected_location) {
-         this.objectService.filterLocationId.push(this.configService.selected_location);
-      }
+
    }
 
    ngOnDestroy(): void {

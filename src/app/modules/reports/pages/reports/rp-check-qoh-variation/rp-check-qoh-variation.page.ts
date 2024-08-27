@@ -41,7 +41,6 @@ export class RpCheckQohVariationPage implements OnInit, ViewWillEnter {
       private loadingService: LoadingService
    ) {
       this.Math = Math;
-      console.log("🚀 ~ RpCheckQohVariationPage ~ this.configService.loginUser.locationId:", this.configService.loginUser.locationId)
    }
 
    async ionViewWillEnter(): Promise<void> {

@@ -86,7 +86,6 @@ export class FilterPage implements OnInit {
 
    selectedLocationId: number[] = [];
    onLocationSelected(event) {
-      console.log("🚀 ~ FilterPage ~ onLocationSelected ~ event:", event)
       this.selectedLocationId = [];
       if (event) {
          event.forEach(r => {

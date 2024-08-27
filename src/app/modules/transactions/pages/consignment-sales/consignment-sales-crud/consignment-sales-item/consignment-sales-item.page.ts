@@ -158,7 +158,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
       // testing performance
-      item.guid = uuidv4()
+      item.guid = uuidv4();
 
       if (this.objectService.consignmentSalesActivateMarginCalculation) {
          if (!this.objectService.configConsignmentActivateMarginExpr && item.marginPct) {
@@ -526,11 +526,11 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    previousStep() {
-      if (this.objectService.objectHeader?.consignmentSalesId && this.objectService.objectHeader.consignmentSalesId > 0) {
-         this.cancelUpdate();
-      } else {
+      // if (this.objectService.objectHeader?.consignmentSalesId && this.objectService.objectHeader.consignmentSalesId > 0) {
+      //    this.cancelUpdate();
+      // } else {
          this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
-      }
+      // }
    }
 
    async cancelUpdate() {

@@ -145,7 +145,6 @@ export class TransferInScanningDetailPage implements OnInit, ViewWillEnter {
    showVariance() {
       this.varianceModel = true;
       this.object.transferAdjustment.line
-      console.log("🚀 ~ TransferInScanningDetailPage ~ showVariance ~ this.object.transferAdjustment.line:", this.object)
    }
 
    hideModal() {

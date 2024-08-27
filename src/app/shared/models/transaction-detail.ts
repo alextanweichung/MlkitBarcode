@@ -167,6 +167,8 @@ export interface TransactionDetail {
    uomRatio?: number;
    ratioExpr?: string;
 
+   containerNum?: number
+
    // testing performance
    guid?: string
 }

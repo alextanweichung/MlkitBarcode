@@ -15,6 +15,7 @@ import { CashDepositService } from '../../../services/cash-deposit.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { CashDepositFile, CashDepositFileSimpleList, CashDepositRoot } from '../../../models/cash-deposit';
+import { v4 as uuidv4 } from 'uuid';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -69,7 +70,7 @@ export class CashDepositEditPage implements OnInit {
          customerId: [null],
          trxDate: [null],
          sequence: [0],
-         uuid: [null]
+         uuid: [uuidv4()]
       })
    }
 

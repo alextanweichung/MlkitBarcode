@@ -251,7 +251,6 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
 
 	resetFilteredObj() {
 		this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
-		console.log("🚀 ~ StockCountDetailPage ~ resetFilteredObj ~ this.filteredObj:", this.filteredObj)
 	}
 
    /* #endregion */

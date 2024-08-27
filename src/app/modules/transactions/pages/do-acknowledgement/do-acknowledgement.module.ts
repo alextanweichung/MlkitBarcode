@@ -12,6 +12,7 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
 import { IdToCodeMappingModule } from 'src/app/shared/pipes/id-to-code-mapping/id-to-code-mapping.module';
 import { SignaturePadModule } from 'angular2-signaturepad';
 import { GeneralScanInputPageModule } from 'src/app/shared/pages/general-scan-input/general-scan-input.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
    declarations: [DoAcknowledgementPage],
@@ -24,7 +25,8 @@ import { GeneralScanInputPageModule } from 'src/app/shared/pages/general-scan-in
       IdMappingModule,
       IdToCodeMappingModule,
       SignaturePadModule,
-      GeneralScanInputPageModule
+      GeneralScanInputPageModule,
+      SearchDropdownPageModule
    ]
 })
 export class DoAcknowledgementPageModule { }
