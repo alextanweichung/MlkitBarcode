@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
+import { OtpLine } from 'src/app/modules/managements/models/otp';
 import { DefectRequestDetail, DefectRequestRoot } from 'src/app/modules/transactions/models/defect-request';
 import { DefectRequestService } from 'src/app/modules/transactions/services/defect-request.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -8,6 +9,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ShippingInfo } from 'src/app/shared/models/master-list-details';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 
 @Component({
@@ -31,7 +33,6 @@ export class DefectRequestCartPage implements OnInit {
    ngOnInit() {
       this.loadAvailableAddresses();
    }
-
 
    availableAddress: ShippingInfo[] = [];
    shippingInfo: ShippingInfo;
@@ -208,6 +209,14 @@ export class DefectRequestCartPage implements OnInit {
 
    /* #endregion */
 
+   onReasonSelected(rowData: DefectRequestDetail, event: SearchDropdownList) {
+      if (event) {
+         rowData.reasonId = event.id;
+      } else {
+         rowData.reasonId = null;
+      }
+   }
+
    onUomChanged(rowData: DefectRequestDetail, event: any, ignoreGetPricing: boolean) {
       if (!rowData.baseRatio) {
          this.toastService.presentToast("Computation Error", "Base UOM ratio is undefined. Please contact system administrator.", "top", "warning", 1000);
@@ -321,6 +330,7 @@ export class DefectRequestCartPage implements OnInit {
    async insertObject() {
       try {
          await this.loadingService.showLoading();
+         this.objectService.object.otp = {};
          this.objectService.insertObject(this.objectService.object).subscribe({
             next: (response) => {
                if (response.status === 201) {
@@ -354,6 +364,7 @@ export class DefectRequestCartPage implements OnInit {
    async updateObject() {
       try {
          await this.loadingService.showLoading();
+         this.objectService.object.otp = {};
          this.objectService.updateObject(this.objectService.object).subscribe({
             next: (response) => {
                if (response.status === 204) {

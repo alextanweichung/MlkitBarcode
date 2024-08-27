@@ -1,5 +1,5 @@
 import { ItemMultiUomBase, LineAssembly } from "src/app/shared/models/transaction-detail"
-import { OtpLine } from "../../managements/models/otp"
+import { OtpSimpleLine } from "../../managements/models/otp"
 import { VariationDetail } from "src/app/shared/models/variation-detail"
 import { ApprovalHistory } from "src/app/shared/models/approval-history"
 
@@ -22,7 +22,7 @@ export interface DefectRequestRoot {
    header: DefectRequestHeader
    details: DefectRequestDetail[]
    barcodeTag?: any
-   otp?: any
+   otp?: OtpSimpleLine
    attachmentFile?: any[]
    comment?: any[]
    approvalHistory?: ApprovalHistory[]
@@ -76,7 +76,8 @@ export interface DefectRequestHeader {
    shipEmail?: string
    shipStateId?: number
    shipAreaId?: number
-   shipName?:string
+   shipName?: string
+   reasonId?: number
    defectRequestCategoryId: number
 }
 
@@ -181,6 +182,7 @@ export interface DefectRequestDetail {
    modifiedAt?: any
    deactivated?: boolean
    revision?: number
+   reasonId?: number
 
    // for local use
    isSelected?: boolean

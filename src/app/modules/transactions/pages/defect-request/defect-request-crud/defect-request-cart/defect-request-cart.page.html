@@ -123,6 +123,7 @@
                   </ion-label>
                   <ion-input #input class="font-size-small ion-text-right ion-no-padding-end" type="number" inputmode="numeric" enterkeyhint="enter" [min]="0" [(ngModel)]="selectedItem.qtyRequest" (ionBlur)="computeQty()" placeholder="0" [disabled]="selectedItem.variationTypeCode !== '0'"></ion-input>
                </ion-item>
+               <app-search-dropdown title="Reason" [masterDropdownList]="objectService.reasonMasterList" [selectedId]="selectedItem.reasonId" (onActionComplete)="onReasonSelected(selectedItem, $event)"></app-search-dropdown>
                <ng-container *ngIf="!objectService.configSystemWideActivateMultiUOM">
                   <ion-item>
                      <ion-label>

@@ -10,6 +10,7 @@ import { DefectRequestCartPage } from './defect-request-cart.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { OfflineItemIdMappingModule } from 'src/app/shared/pipes/offline-item-id-mapping/offline-item-id-mapping.module';
 import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-item-id-desc-mapping/offline-item-id-desc-mapping.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
    imports: [
@@ -19,7 +20,8 @@ import { OfflineItemIdDescMappingModule } from 'src/app/shared/pipes/offline-ite
       DefectRequestCartPageRoutingModule,
       IdMappingModule,
       OfflineItemIdMappingModule,
-      OfflineItemIdDescMappingModule
+      OfflineItemIdDescMappingModule,
+      SearchDropdownPageModule
    ],
    declarations: [DefectRequestCartPage]
 })
