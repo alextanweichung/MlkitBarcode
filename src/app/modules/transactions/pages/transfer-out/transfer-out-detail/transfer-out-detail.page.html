@@ -61,43 +61,43 @@
               </div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.trxDate">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Doc. Date</div>
               <div>{{objectService.objectHeader.trxDate|date:'dd/MM/yyyy'}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.locationId">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">From Location</div>
               <div>{{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.toLocationId">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">To Location</div>
               <div>{{objectService.objectHeader.toLocationId|idMapping:objectService.fullLocationMasterList}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.totalCarton">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Total Carton</div>
               <div>{{objectService.objectHeader.totalCarton|number:'1.0'}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.handleBy">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Handle By</div>
               <div>{{objectService.objectHeader.handleBy}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.totalBag">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Total Bag</div>
               <div>{{objectService.objectHeader.totalBag}}</div>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row *ngIf="objectService.objectHeader.line">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Total Quantity</div>
               <div>{{objectService.objectHeader.line|sum:"lineQty"|number:"1.0"}}</div>

@@ -10,6 +10,8 @@ import { TransferOutService } from '../../services/transfer-out.service';
 import { FilterPage } from '../filter/filter.page';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
    selector: 'app-transfer-out',
@@ -20,6 +22,9 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
 
    private objectDiffer: any;
    objects: TransferOutList[] = [];
+
+   currentPage: number = 1;
+   itemsPerPage: number = 12;
 
    customerIds: number[] = [];
    salesAgentIds: number[] = [];
@@ -44,10 +49,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
    }
 
    ngDoCheck(): void {
-      const objectChanges = this.objectDiffer.diff(this.objects);
-      if (objectChanges) {
-         this.bindUniqueGrouping();
-      }
+      
    }
 
    async ionViewWillEnter(): Promise<void> {
@@ -81,28 +83,16 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
          await this.loadingService.showLoading();
          this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
-            await this.loadingService.dismissLoading();
+            this.resetFilteredObj();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
-            await this.loadingService.dismissLoading();
             console.error(error);
          })
       } catch (error) {
-         await this.loadingService.dismissLoading();
          this.toastService.presentToast("", "Error loading object", "top", "danger", 1000);
       } finally {
          await this.loadingService.dismissLoading();
       }
-   }
-
-   getObjects(date: Date) {
-      return this.objects.filter(r => new Date(r.trxDate).getMonth() === date.getMonth() && new Date(r.trxDate).getFullYear() === date.getFullYear() && new Date(r.trxDate).getDate() === date.getDate());
-   }
-
-   async bindUniqueGrouping() {
-      let dates = [...new Set(this.objects.map(obj => this.commonService.convertDateFormatIgnoreTime(new Date(obj.trxDate))))];
-      this.uniqueGrouping = dates.map(r => r.getTime()).filter((s, i, a) => a.indexOf(s) === i).map(s => new Date(s));
-      await this.uniqueGrouping.sort((a, c) => { return a < c ? 1 : -1 });
    }
 
    /* #endregion */
@@ -177,6 +167,52 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
       } catch (e) {
          console.error(e);
       }
+   }
+
+   highlight(event) {
+      event.getInputElement().then(r => {
+         r.select();
+      })
+   }
+
+   async onKeyDown(event, searchText) {
+      if (event.keyCode === 13) {
+         await this.search(searchText, true);
+      }
+   }
+
+   itemSearchText: string;
+   filteredObj: TransferOutList[] = [];
+   search(searchText, newSearch: boolean = false) {
+      if (newSearch) {
+         this.filteredObj = [];
+      }
+      this.itemSearchText = searchText;
+      try {
+         if (searchText && searchText.trim().length > 2) {
+            if (Capacitor.getPlatform() !== "web") {
+               Keyboard.hide();
+            }
+            this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
+               r.transferOutNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.fromLocationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.fromLocationDesc?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.toLocationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.toLocationDesc?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+            this.currentPage = 1;
+         } else {
+            this.resetFilteredObj();
+            this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   resetFilteredObj() {
+      this.filteredObj = JSON.parse(JSON.stringify(this.objects));
+      this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
    }
 
 }
