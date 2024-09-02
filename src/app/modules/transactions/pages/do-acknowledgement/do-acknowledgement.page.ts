@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DoAcknowledgementService } from '../../services/do-acknowledgement.service';
-import { ModalController, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ModalController, NavController, Platform, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { DOAcknowledegementRequest, DoAcknowledgement } from '../../models/do-acknowledgement';
 import { SignaturePad } from 'angular2-signaturepad';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -11,6 +11,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -48,6 +49,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       private loadingService: LoadingService,
       private modalController: ModalController,
       private navController: NavController,
+      private plt: Platform
    ) { }
 
    async ionViewWillEnter(): Promise<void> {
@@ -341,6 +343,109 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       // this.scanActive = false;
       this.onCameraStatusChanged(false);
    }
+
+   /* #endregion */
+
+   /* #region local attachment */
+
+   async presentAlert() {
+      try {
+         this.selectImage();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async selectImage() {
+      try {
+         const image = await Camera.getPhoto({
+            quality: 90,
+            allowEditing: false,
+            resultType: CameraResultType.Uri,
+            source: CameraSource.Prompt // Camera, Photos or Prompt!
+         });
+
+         if (image) {
+            this.saveImage(image);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   // Create a new file from a capture image
+   async saveImage(photo: Photo) {
+      try {
+         const base64Data = await this.readAsBase64(photo);
+
+         const fileName = new Date().getTime() + ".jpeg";
+         const savedFile = await Filesystem.writeFile({
+            path: `${IMAGE_DIR}/${fileName}`,
+            data: base64Data,
+            directory: Directory.Data,
+            recursive: true
+         });
+         Filesystem.readdir({
+            path: IMAGE_DIR,
+            directory: Directory.Data
+         }).then(
+            async (result) => {
+               await this.loadFileData(result.files);
+            },
+            async (err) => {
+               // Folder does not yet exists!
+               await Filesystem.mkdir({
+                  path: IMAGE_DIR,
+                  directory: Directory.Data
+               });
+            }
+         ).then(async (_) => {
+            await this.loadingService.dismissLoading();
+            this.submit_attempt = false;
+            this.selectedVehicleId = null;
+            this.remark = null;
+         });
+      } catch (e) {
+         await this.loadingService.dismissLoading();
+         this.submit_attempt = false;
+      }
+      finally {
+         await this.loadingService.dismissLoading();
+         this.submit_attempt = false;
+      }
+   }
+
+   // https://ionicframework.com/docs/angular/your-first-app/3-saving-photos
+   private async readAsBase64(photo: Photo) {
+      try {
+         if (this.plt.is("hybrid")) {
+            const file = await Filesystem.readFile({
+               path: photo.path
+            });
+
+            return file.data;
+         }
+         else {
+            // Fetch the photo, read as a blob, then convert to base64 format
+            const response = await fetch(photo.webPath);
+            const blob = await response.blob();
+
+            return await this.convertBlobToBase64(blob) as string;
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   // Helper function
+   convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
+      const reader = new FileReader;
+      reader.onerror = reject;
+      reader.onload = () => {
+         resolve(reader.result);
+      };
+      reader.readAsDataURL(blob);
+   });
 
    /* #endregion */
 
