@@ -69,14 +69,14 @@ export class StockReorderHeaderPage implements OnInit, ViewWillEnter, ViewDidEnt
    onLocationChanged(event: any) {
       if (event) {
          this.objectForm.patchValue({ locationId: event.id });
-         // let found = this.objectService.fullLocationMasterList.find(r => r.id === event.id);
-         // if (found) {
-         //    if (found.attribute1 === "C") {
-         //       this.objectForm.patchValue({ typeCode: "C" });
-         //    } else {
-         //       this.objectForm.patchValue({ typeCode: "T" });
-         //    }
-         // }
+         let found = this.objectService.fullLocationMasterList.find(r => r.id === event.id);
+         if (found) {
+            if (found.attribute1 === "C") {
+               this.objectForm.patchValue({ typeCode: "C" });
+            } else {
+               this.objectForm.patchValue({ typeCode: "T" });
+            }
+         }
       } else {
          this.objectForm.patchValue({ typeCode: "C" });
          this.objectForm.patchValue({ locationId: null });
