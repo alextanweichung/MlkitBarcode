@@ -241,7 +241,7 @@
             </ion-buttons>
          </ion-toolbar>
          <ion-toolbar>
-            <ion-searchbar #remarkSearchBar class="p-0" enterkeyhint="search" [(ngModel)]="remarkSearchText" showCancelButton="never" animated="true" [placeholder]="'Search Remark'" (keydown)="onRemarkKeyDown($event)" (ionClear)="resetRemarkFilter();"></ion-searchbar>
+            <ion-searchbar #remarkSearchBar class="p-0" enterkeyhint="search" [(ngModel)]="remarkSearchText" showCancelButton="never" showClearButton="focus" animated="true" [placeholder]="'Search Remark'" (keydown)="onRemarkKeyDown($event)" (ionClear)="resetRemarkFilter();"></ion-searchbar>
          </ion-toolbar>
       </ion-header>
       <ion-content>

@@ -15,7 +15,7 @@
 </ion-header>
 <ion-content [fullscreen]="true">
    <div class="px-2 pb-2">
-		<ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
+		<ion-searchbar #searchbar class="p-0" showCancelButton="never" showClearButton="focus" animated="true" placeholder="Search" enterkeyhint="search" [(ngModel)]="itemSearchText" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
       <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!objects || objects?.length === 0">
          <ion-label>Nothing found!</ion-label>
       </ion-list-header>

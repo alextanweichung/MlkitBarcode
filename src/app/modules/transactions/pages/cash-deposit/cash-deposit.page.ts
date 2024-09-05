@@ -19,7 +19,7 @@ export class CashDepositPage implements OnInit, OnDestroy, ViewWillEnter, ViewDi
    objects: CashDepositHeader[] = [];
 
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       private authService: AuthService,

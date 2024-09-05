@@ -225,10 +225,12 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
    onLocationSelected(event: SearchDropdownList) {
       if (event) {
          if (this.objectService.object?.details?.length > 0) {
+            this.objectForm.patchValue({ locationId: event.id });
             this.objectService.object?.details?.forEach(r => r.locationId = event.id);
          }
       } else {
          if (this.objectService.object?.details?.length > 0) {
+            this.objectForm.patchValue({ locationId: null });
             this.objectService.object?.details?.forEach(r => r.locationId = null);
          }
       }

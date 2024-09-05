@@ -17,7 +17,7 @@ export class BinCountDetailPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    objectId: number;
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       public objectService: BinCountService,

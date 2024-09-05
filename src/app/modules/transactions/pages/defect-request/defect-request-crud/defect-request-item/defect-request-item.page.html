@@ -15,7 +15,7 @@
       <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!availableItem">
          <ion-label>Nothing found!</ion-label>
       </ion-list-header>
-      <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItem = []; startIndex = 0" (keydown)="onKeyDown($event, searchbar.value)"></ion-searchbar>
+      <ion-searchbar #searchbar class="p-0" showCancelButton="never" showClearButton="focus" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (ionChange)="availableItem = []; startIndex = 0" (keydown)="onKeyDown($event, searchbar.value)"></ion-searchbar>
       <ng-container>
          <ion-list class="list-custom animate__animated animate__fadeIn">
             <ion-grid class="ion-no-padding">

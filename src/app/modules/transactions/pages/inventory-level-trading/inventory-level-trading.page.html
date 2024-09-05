@@ -30,9 +30,11 @@
    <div class="p-2">
 
       <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList" [showVariationModalSelection]="false"></app-barcode-scan-input>
+
       <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
          <ion-label>OR</ion-label>
       </ion-list-header>
+      
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
          <app-search-dropdown title="Item" optionValue="code" [searchDropdownList]="itemSearchDropdownList" [selectedCode]="itemCode" (onActionComplete)="onItemChanged($event)"></app-search-dropdown>
       </ion-list>
@@ -45,18 +47,16 @@
             <ion-label>Variation</ion-label>
          </ion-segment-button>
       </ion-segment>
+      
       <ion-accordion-group #accordionGroup *ngIf="itemInfo" class="py-1">
          <ion-accordion value="advanced filter">
             <ion-item slot="header" color="light">
                <ion-label>Advanced Filter</ion-label>
             </ion-item>
             <ion-list class="list-custom" slot="content" lines="none">
-               <ion-item>
-                  <ion-label position="fixed">Location</ion-label>
-                  <ion-select interface="action-sheet" placeholder="Select Location" [(ngModel)]="selectedLocation" (ionChange)="advancedFilter()">
-                     <ion-select-option *ngFor="let location of locationMasterList" [value]="location.value">{{location.label}}</ion-select-option>
-                  </ion-select>
-               </ion-item>
+
+               <app-search-dropdown #searchLocation title="Location" optionLabel="description" [searchDropdownList]="locationSearchDropdownList" [selectedId]="selectedLocationId" (onActionComplete)="onLocationChanged($event)"></app-search-dropdown>
+               
                <ion-item>
                   <ion-label position="fixed">Hide 0 Balance</ion-label>
                   <ion-checkbox item-right checked="true" [(ngModel)]="hideEmpty" (ionChange)="advancedFilter()"></ion-checkbox>

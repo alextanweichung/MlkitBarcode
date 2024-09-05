@@ -27,7 +27,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
    salesAgentIds: number[] = [];
 
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       private authService: AuthService,

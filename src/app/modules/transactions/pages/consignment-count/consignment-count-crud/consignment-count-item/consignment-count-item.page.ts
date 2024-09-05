@@ -29,7 +29,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 
    submit_attempt: boolean = false;
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 
@@ -108,7 +108,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
    async addItemToLine(trxLine: TransactionDetail) {
       try {
          if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
-            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += 1;
+            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??0);
             let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             this.resetFilteredObj();
@@ -550,8 +550,9 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 					Keyboard.hide();
 				}
 				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
-               r.itemCode?.toUpperCase().includes(searchText.toUpperCase())
-               || r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase())
+               r.itemCode?.toUpperCase().includes(searchText.toUpperCase()) || 
+               r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.itemDescription?.toUpperCase().includes(searchText.toUpperCase())
             )));
 				this.currentPage = 1;
 			} else {

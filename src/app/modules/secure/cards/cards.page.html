@@ -111,7 +111,7 @@
             </ion-buttons>
          </ion-toolbar>
          <ion-toolbar>
-            <ion-searchbar #searchBar class="p-0" enterkeyhint="search" [(ngModel)]="searchText" showCancelButton="never" animated="true" [placeholder]="'Search for Location'" (keydown)="onKeyDown($event)" (ionClear)="resetFilter();"></ion-searchbar>
+            <ion-searchbar #searchBar class="p-0" enterkeyhint="search" [(ngModel)]="searchText" showCancelButton="never" showClearButton="focus" animated="true" [placeholder]="'Search for Location'" (keydown)="onKeyDown($event)" (ionClear)="resetFilter();"></ion-searchbar>
          </ion-toolbar>
       </ion-header>
       <ion-content>

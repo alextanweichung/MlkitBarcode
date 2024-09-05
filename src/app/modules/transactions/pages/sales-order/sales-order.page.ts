@@ -29,7 +29,7 @@ export class SalesOrderPage implements OnInit, OnDestroy, ViewWillEnter, ViewDid
    uniqueGrouping: Date[] = [];
 
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       private authService: AuthService,

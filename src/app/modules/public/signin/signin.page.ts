@@ -96,6 +96,9 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("defney@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
+         // this.signin_form.get("userEmail").setValue("hwsales12@prestar.com.my");
+         // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");
+         // this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("hwsales2@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");         
          this.signin_form.get("userEmail").setValue("admin@idcp.my");
@@ -103,6 +106,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("userEmail").setValue("wayne@idcp.my");
          // this.signin_form.get("userEmail").setValue("defneysup@idcp.my");
          // this.signin_form.get("userEmail").setValue("defneys@idcp.my");
+         // this.signin_form.get("password").setValue("Live1234");
          // this.signin_form.get("password").setValue("Bmm@168spv01");
          // this.signin_form.get("password").setValue("Dev8888");
          // this.signin_form.get("password").setValue("i@Dmin7026");
@@ -213,7 +217,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      if (this.configService.loginUser.loginUserGroupType === "API") {
                         this.toastService.presentToast("System Notification", "Login is not allowed.", "top", "danger", 2000);
                      } else {
-                        
+
                         await OneSignal.User.addEmail(this.configService.loginUser.userEmail);
                         this.show2FaDialog = false;
 
@@ -326,8 +330,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                            this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
                         } else {
 
-                        } 
-                        
+                        }
+
                         this.show2FaDialog = false;
 
                         setTimeout(async () => {
@@ -341,12 +345,12 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                               // show error if consignment user but no location set
                               this.toastService.presentToast("", "Consignment Location not set", "top", "warning", 1000);
                            } else {
-   
+
                            }
                            this.submit_attempt = false;
                            await this.loadingService.dismissLoading();
                            await this.navController.navigateRoot("/dashboard");
-                           
+
                         }, 50);
                      }
                   } else {
@@ -361,14 +365,14 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
                      }
                      else {
                         this.loginModel.twoFactorType = null;
-                        this.loginModel.twoFactorAuthCode = null;  
+                        this.loginModel.twoFactorAuthCode = null;
                      }
                   }
                }
             }, async error => {
                this.submit_attempt = false;
                this.loginModel.twoFactorType = null;
-               this.loginModel.twoFactorAuthCode = null;  
+               this.loginModel.twoFactorAuthCode = null;
                await this.loadingService.dismissLoading();
                console.error(error);
             });
@@ -376,7 +380,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       } catch (error) {
          await this.loadingService.dismissLoading();
          this.loginModel.twoFactorType = null;
-         this.loginModel.twoFactorAuthCode = null;  
+         this.loginModel.twoFactorAuthCode = null;
          console.error(error);
       } finally {
          await this.loadingService.dismissLoading();

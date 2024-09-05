@@ -27,7 +27,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	objects: ConsignmentCountList[] = [];
 	uniqueGrouping: Date[] = [];
 	currentPage: number = 1;
-	itemsPerPage: number = 12;
+	itemsPerPage: number = 20;
 
 	constructor(
 		public objectService: ConsignmentCountService,
@@ -146,6 +146,8 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
                      consignmentCountNum: dd.header.consignmentCountNum,
                      trxDate: dd.header.trxDate,
                      locationId: dd.header.locationId,
+                     locationCode: this.objectService.fullLocationMasterList.find(l => l.id === dd.header.locationId)?.code,
+                     locationDescription: this.objectService.fullLocationMasterList.find(l => l.id === dd.header.locationId)?.description,
                      totalQty: dd.details.reduce((a, b) => a + b.qtyRequest, 0),
                      
                      isLocal: true,
@@ -255,7 +257,11 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 				if (Capacitor.getPlatform() !== "web") {
 					Keyboard.hide();
 				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => r.consignmentCountNum?.toUpperCase().includes(searchText.toUpperCase()))));
+				this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r => 
+               r.consignmentCountNum?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.locationDescription?.toUpperCase().includes(searchText.toUpperCase())            
+            )));
 				this.filteredObj.sort((x, y) => {
 					if (x.isLocal === y.isLocal) {
 						return x.trxDate < y.trxDate ? 0 : 1;

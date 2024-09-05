@@ -24,7 +24,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
    objects: TransferOutList[] = [];
 
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    customerIds: number[] = [];
    salesAgentIds: number[] = [];

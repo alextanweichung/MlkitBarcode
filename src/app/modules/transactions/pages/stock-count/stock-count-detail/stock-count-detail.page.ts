@@ -25,7 +25,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
    isLocal: boolean = false;
 	guid: string = null;
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
    binList: BinList[] = [];
 
    constructor(

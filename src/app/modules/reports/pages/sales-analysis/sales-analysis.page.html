@@ -146,7 +146,7 @@
             <ion-grid class="ion-no-padding">
               <ion-row>
                 <ion-col class="ion-flex ion-margin-auto">Total: </ion-col>
-                <ion-col class="ion-flex ion-margin-auto" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4"></ion-col>
+                <ion-col class="ion-flex ion-margin-auto" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2"></ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"normal"|number:"1.0"}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"bestBuy"|number:"1.0"}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"promotion"|number:"1.0"}}</ion-col>

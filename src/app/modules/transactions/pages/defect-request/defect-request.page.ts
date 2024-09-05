@@ -21,7 +21,7 @@ export class DefectRequestPage implements OnInit, ViewWillEnter, ViewDidEnter, V
 
    objects: DefectRequestList[] = [];
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       private objectService: DefectRequestService,

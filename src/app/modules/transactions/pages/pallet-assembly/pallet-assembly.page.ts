@@ -24,7 +24,7 @@ export class PalletAssemblyPage implements OnInit, ViewWillEnter, ViewDidEnter {
    objects: PalletAssemblyList[] = [];
    filteredObj: PalletAssemblyList[] = [];
 	currentPage: number = 1;
-	itemsPerPage: number = 12;
+	itemsPerPage: number = 20;
 
    constructor(
       private objectService: PalletAssemblyService,

@@ -28,7 +28,7 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
    // uniqueGrouping: Date[] = [];
 
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       private objectService: PickingService,

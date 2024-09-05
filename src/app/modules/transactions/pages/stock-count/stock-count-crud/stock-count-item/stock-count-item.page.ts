@@ -30,9 +30,9 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    submit_attempt: boolean = false;
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
-   binDesc: string = "";
+   binDesc: string = null;
    selectedBin: SearchDropdownList;
    binList: BinList[] = [];
    binListDropDown: SearchDropdownList[] = [];
@@ -136,13 +136,13 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          }
          let rowIndex = this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku);
          if (rowIndex === 0 && !this.objectService.configInvCountActivateLineWithBin) { // already in and first one
-            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??1);
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             this.resetFilteredObj();
          } else if (rowIndex === 0 && this.objectService.configInvCountActivateLineWithBin) { // already in and first one + same binDesc
             if (this.objectService.objectDetail[rowIndex].binDesc === this.binDesc) {
-               this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest++;
+               this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??1);
                let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
                this.resetFilteredObj();

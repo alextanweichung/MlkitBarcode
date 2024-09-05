@@ -9,6 +9,9 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
+import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 
 @Component({
    selector: 'app-consignment-sales-detail',
@@ -18,6 +21,8 @@ import { v4 as uuidv4 } from 'uuid';
 export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
 
    objectId: number;
+   currentPage: number = 1;
+   itemsPerPage: number = 20;
 
    constructor(
       public objectService: ConsignmentSalesService,
@@ -90,6 +95,7 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
                await this.objectService.setHeader(objectRoot.header);
                await this.objectService.setLines(objectRoot.details);
                await this.loadingService.dismissLoading();
+               await this.resetFilteredObj();
             }, async error => {
                await this.loadingService.dismissLoading();
                console.error(error);
@@ -214,6 +220,50 @@ export class ConsignmentSalesDetailPage implements OnInit, ViewWillEnter {
    previousStep() {
       this.objectService.resetVariables();
       this.navController.navigateRoot("/transactions/consignment-sales");
+   }
+
+
+   /* #region line search bar */
+
+   async onKeyDown(event, searchText) {
+      if (event.keyCode === 13) {
+         await this.search(searchText, true);
+      }
+   }
+
+   itemSearchText: string;
+   filteredObj: TransactionDetail[] = [];
+   async search(searchText, newSearch: boolean = false) {
+      if (newSearch) {
+         this.filteredObj = [];
+      }
+      this.itemSearchText = searchText;
+      try {
+         if (searchText && searchText.trim().length > 2) {
+            if (Capacitor.getPlatform() !== "web") {
+               Keyboard.hide();
+            }
+            this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r =>
+               r.itemCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.description?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+            if (newSearch) {
+               this.currentPage = 1;
+            }
+         } else {
+            if (this.itemSearchText && this.itemSearchText.trim().length > 0 && this.itemSearchText.trim().length < 3) {
+               this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+            }
+            await this.resetFilteredObj();
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   resetFilteredObj() {
+      this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
    }
 
 }

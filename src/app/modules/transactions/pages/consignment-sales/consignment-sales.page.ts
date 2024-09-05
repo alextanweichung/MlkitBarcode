@@ -24,7 +24,7 @@ export class ConsignmentSalesPage implements OnInit, OnDestroy, ViewWillEnter, V
 
    uniqueGrouping: Date[] = [];
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       private objectService: ConsignmentSalesService,

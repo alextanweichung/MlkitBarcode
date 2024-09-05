@@ -24,7 +24,7 @@ export class ConsignmentCountDetailPage implements OnInit, ViewWillEnter {
 	isLocal: boolean = false;
 	guid: string = null;
 	currentPage: number = 1;
-	itemsPerPage: number = 12;
+	itemsPerPage: number = 20;
 
 	constructor(
 		public objectService: ConsignmentCountService,

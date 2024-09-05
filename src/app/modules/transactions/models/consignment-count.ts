@@ -5,6 +5,8 @@ export interface ConsignmentCountList {
    consignmentCountNum: string
    trxDate: Date
    locationId: number
+   locationCode: string
+   locationDescription: string
    totalQty: number
 
    // local use

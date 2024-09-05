@@ -24,7 +24,7 @@ export class InboundScanPage implements OnInit, OnDestroy, ViewWillEnter, ViewDi
    uniqueGrouping: Date[] = [];
 
 	currentPage: number = 1;
-	itemsPerPage: number = 12;
+	itemsPerPage: number = 20;
 
    constructor(
       private objectService: InboundScanService,

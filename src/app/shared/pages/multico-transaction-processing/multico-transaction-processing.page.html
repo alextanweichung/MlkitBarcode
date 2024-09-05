@@ -1,5 +1,5 @@
 <div class="px-2 pb-2">
-   <ion-searchbar #searchbar class="p-0" showCancelButton="never" animated="true" placeholder="Search" enterkeyhint="search" [(ngModel)]="searchText" (ionFocus)="highlight(searchbar)"></ion-searchbar>
+   <ion-searchbar #searchbar class="p-0" showCancelButton="never" showClearButton="focus" animated="true" placeholder="Search" enterkeyhint="search" [(ngModel)]="searchText" (ionFocus)="highlight(searchbar)"></ion-searchbar>
    <ion-accordion-group>
       <ng-container *ngFor="let rowData of companyArray">
          <ion-accordion [value]="rowData.otherCompaniesId" [disabled]="!rowData.token">

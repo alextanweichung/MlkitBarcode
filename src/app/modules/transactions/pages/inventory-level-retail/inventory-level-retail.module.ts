@@ -10,6 +10,7 @@ import { InventoryLevelRetailPage } from './inventory-level-retail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
+import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
 
 @NgModule({
    imports: [
@@ -19,7 +20,8 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
       InventoryLevelRetailPageRoutingModule,
       SearchDropdownPageModule,
       IdMappingModule,
-      BarcodeScanInputPageModule
+      BarcodeScanInputPageModule,
+      SearchMultiDropdownPageModule
    ],
    declarations: [InventoryLevelRetailPage]
 })

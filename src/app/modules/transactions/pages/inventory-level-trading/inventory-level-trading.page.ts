@@ -98,6 +98,17 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
       }
    }
 
+   onLocationChanged(event: SearchDropdownList) {
+      if (event) {
+         this.selectedLocationId = event.id;
+         this.selectedLocation = event.code;
+      } else {
+         this.selectedLocationId = null;
+         this.selectedLocation = null;
+      }
+      this.advancedFilter();
+   }
+
    onItemChanged(event) {
       if (event) {
          this.itemCode = event.code;
@@ -168,22 +179,35 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
       }
    }
 
+   locationSearchDropdownList: SearchDropdownList[] = [];
+   selectedLocationId: number;
    locationMasterList: any[] = [{ label: "All", value: "all" }];
    selectedLocation: string = "all";
    computeLocationList() {
       try {
          this.locationMasterList = [{ label: "All", value: "all" }];
+         this.locationSearchDropdownList = [];
          this.selectedLocation = "all";
          if (this.selectedViewOptions === "item") {
             this.object?.itemInfo.forEach(r => {
                if (this.objectService.locationMasterList.filter(rr => rr.attribute11 === "1").findIndex(rr => rr.code.toUpperCase() === r.locationCode) > -1) {
                   this.locationMasterList.push({ label: r.locationDescription, value: r.locationCode });
+                  this.locationSearchDropdownList.push({
+                     id: r.locationId,
+                     code: r.locationCode,
+                     description: r.locationDescription
+                  })
                }
             })
          } else {
             this.variationObject?.itemInfo.forEach(r => {
                if (this.objectService.locationMasterList.filter(rr => rr.attribute11 === "1").findIndex(rr => rr.code.toUpperCase() === r.locationCode) > -1) {
                   this.locationMasterList.push({ label: r.locationDescription, value: r.locationCode });
+                  this.locationSearchDropdownList.push({
+                     id: r.locationId,
+                     code: r.locationCode,
+                     description: r.locationDescription
+                  })
                }
             })
          }
@@ -231,13 +255,12 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
          if (this.selectedViewOptions === "item") {
             this.objectService.getInventoryLevelByItem(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.object = response;
-               if (this.selectedLocation !== "all") {
+               if (this.selectedLocation) {
                   this.object.itemInfo = this.object.itemInfo.filter(r => r.locationCode === this.selectedLocation);
                }
                if (this.hideEmpty) {
                   this.object.itemInfo = this.object.itemInfo.filter(r => r.qty !== 0);
                }
-               // this.toastService.presentToast("Search result has been populated.", "", "top", "success", 1000);
             }, error => {
                console.log(error);
             })
@@ -246,7 +269,7 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
             this.objectService.getInventoryLevelByVariation(this.itemInfo.itemId, this.configService.loginUser.loginUserType, this.configService.loginUser.salesAgentId ?? 0).subscribe(response => {
                this.variationObject = response;
                // location filter
-               if (this.selectedLocation !== "all") {
+               if (this.selectedLocation) {
                   this.variationObject.itemInfo = this.variationObject.itemInfo.filter(r => r.locationCode === this.selectedLocation);
                }
                // show 0 filter

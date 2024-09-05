@@ -24,7 +24,7 @@ export class BinCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    submit_attempt: boolean = false;
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
 

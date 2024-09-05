@@ -27,7 +27,7 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
    objects: StockCount[] = [];
    // uniqueGrouping: Date[] = [];
    currentPage: number = 1;
-   itemsPerPage: number = 12;
+   itemsPerPage: number = 20;
 
    constructor(
       public objectService: StockCountService,

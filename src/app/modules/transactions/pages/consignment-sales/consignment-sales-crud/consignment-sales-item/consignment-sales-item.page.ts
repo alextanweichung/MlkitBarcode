@@ -13,7 +13,6 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
@@ -30,16 +29,17 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
-   max: number = 10;
-
    moduleControl: ModuleControl[] = [];
    allowModifyItemInfo: boolean = true;
+
+   currentPage: number = 1;
+   itemsPerPage: number = 20;
 
    inputType: string = "number";
 
    constructor(
       public objectService: ConsignmentSalesService,
-      private authService: AuthService,
+      public authService: AuthService,
       private commonService: CommonService,
       private configService: ConfigService,
       private toastService: ToastService,
@@ -59,6 +59,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async ionViewWillEnter(): Promise<void> {
       await this.loadRestrictColumms();
       await this.barcodescaninput.setFocus();
+      await this.resetFilteredObj();
    }
 
    ngOnInit() {
@@ -116,7 +117,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
          await this.assignTrxItemToDataLine(trxLine);
          let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
          await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         this.max = 10;
+         await this.resetFilteredObj();
       }
    }
 
@@ -157,7 +158,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       item.oriUnitPrice = item.unitPrice;
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
-      // testing performance
       item.guid = uuidv4();
 
       if (this.objectService.consignmentSalesActivateMarginCalculation) {
@@ -188,9 +188,10 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async deleteLine(index) {
+   async deleteLine(rowData: TransactionDetail) {
       try {
-         if (this.objectService.objectDetail[index]) {
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+         if (this.objectService.objectDetail[findIndex]) {
             const alert = await this.alertController.create({
                cssClass: "custom-alert",
                header: "Delete this line?",
@@ -200,10 +201,11 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                      text: "Delete item",
                      cssClass: "danger",
                      handler: async () => {
-                        await this.objectService.objectDetail.splice(index, 1);
+                        await this.objectService.objectDetail.splice(findIndex, 1);
                         let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
                         this.toastService.presentToast("", "Line removed", "top", "success", 1000);
+                        await this.resetFilteredObj();
                      }
                   },
                   {
@@ -333,23 +335,29 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async computeAllAmount(line: TransactionDetail) {
-      if (line.qtyRequest === null || line.qtyRequest === undefined || isNaN(Number(line.qtyRequest))) {
-         this.toastService.presentToast("", "Invalid Qty", "top", "warning", 1000);
-         return;
-      } else {
-         line.qtyRequest = parseFloat(line.qtyRequest.toFixed(0));
-         try {
-            await this.computeDiscTaxAmount(line);
-            if (this.objectService.consignmentSalesActivateMarginCalculation) {
-               await this.computeMarginAmount(line);
+   async computeAllAmount(rowData: TransactionDetail) {
+      setTimeout(async () => {
+         if (rowData.qtyRequest === null || rowData.qtyRequest === undefined || isNaN(Number(rowData.qtyRequest))) {
+            this.toastService.presentToast("", "Invalid Qty", "top", "warning", 1000);
+            return;
+         } else {
+            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+            this.objectService.objectDetail[findIndex].qtyRequest = parseFloat(rowData.qtyRequest.toFixed(0));
+            try {
+               await this.computeDiscTaxAmount(this.objectService.objectDetail[findIndex]);
+               if (this.objectService.consignmentSalesActivateMarginCalculation) {
+                  await this.computeMarginAmount(this.objectService.objectDetail[findIndex]);
+               }
+               let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+               if (this.itemSearchText) {
+                  await this.search(this.itemSearchText);
+               }
+            } catch (e) {
+               console.error(e);
             }
-            let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         } catch (e) {
-            console.error(e);
          }
-      }
+      }, 0);
    }
 
    /* #endregion */
@@ -359,9 +367,9 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    isModalOpen: boolean = false;
    selectedItem: TransactionDetail;
    selectedIndex: number;
-   showEditModal(data: TransactionDetail, rowIndex: number) {
-      this.selectedItem = JSON.parse(JSON.stringify(data));
-      this.selectedIndex = rowIndex;
+   showEditModal(data: TransactionDetail) {
+      this.selectedItem = JSON.parse(JSON.stringify(this.objectService.objectDetail.find(r => r.guid === data.guid)));
+      this.selectedIndex = this.objectService.objectDetail.findIndex(r => r.guid === data.guid);
       this.isModalOpen = true;
    }
 
@@ -386,6 +394,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
             let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             this.hideEditModal();
+            await this.resetFilteredObj();
          }
       }
    }
@@ -526,11 +535,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    previousStep() {
-      // if (this.objectService.objectHeader?.consignmentSalesId && this.objectService.objectHeader.consignmentSalesId > 0) {
-      //    this.cancelUpdate();
-      // } else {
-         this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
-      // }
+      this.navController.navigateBack("/transactions/consignment-sales/consignment-sales-header");
    }
 
    async cancelUpdate() {
@@ -605,8 +610,51 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       return line.guid;
    }
 
-   async loadALl() {
-      this.max += (this.objectService.objectDetail.length ?? 0)
-   }
+   /* #region line search bar */
+
+	async onKeyDown(event, searchText) {
+		if (event.keyCode === 13) {
+			await this.search(searchText, true);
+      }
+	}
+
+	itemSearchText: string;
+	filteredObj: TransactionDetail[] = [];
+	async search(searchText, newSearch: boolean = false) {
+		if (newSearch) {
+			this.filteredObj = [];
+		}
+		this.itemSearchText = searchText;
+		try {
+			if (searchText && searchText.trim().length > 2) {
+				if (Capacitor.getPlatform() !== "web") {
+					Keyboard.hide();
+				}
+				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
+               r.itemCode?.toUpperCase().includes(searchText.toUpperCase()) || 
+               r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.description?.toUpperCase().includes(searchText.toUpperCase())
+            )));
+            if (newSearch) {
+               this.currentPage = 1;
+            }
+			} else {
+            if (this.itemSearchText && this.itemSearchText.trim().length > 0 && this.itemSearchText.trim().length < 3) {
+               this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+            }
+            await this.resetFilteredObj();
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	resetFilteredObj() {
+      // setTimeout(() => {
+         this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
+      // }, 100);
+	}
+
+   /* #endregion */
 
 }

@@ -10,17 +10,19 @@ import { ConsignmentSalesDetailPage } from './consignment-sales-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { IdToCodeMappingModule } from 'src/app/shared/pipes/id-to-code-mapping/id-to-code-mapping.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ConsignmentSalesDetailPageRoutingModule,
-    IdMappingModule,
-    IdToCodeMappingModule,
-    SumModule
-  ],
-  declarations: [ConsignmentSalesDetailPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      ConsignmentSalesDetailPageRoutingModule,
+      IdMappingModule,
+      IdToCodeMappingModule,
+      SumModule,
+      NgxPaginationModule
+   ],
+   declarations: [ConsignmentSalesDetailPage]
 })
-export class ConsignmentSalesDetailPageModule {}
+export class ConsignmentSalesDetailPageModule { }
