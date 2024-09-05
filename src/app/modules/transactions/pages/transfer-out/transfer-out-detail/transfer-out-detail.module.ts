@@ -9,6 +9,7 @@ import { TransferOutDetailPageRoutingModule } from './transfer-out-detail-routin
 import { TransferOutDetailPage } from './transfer-out-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IonicModule,
     TransferOutDetailPageRoutingModule,
     IdMappingModule,
+    CodeMappingModule,
     SumModule
   ],
   declarations: [TransferOutDetailPage]

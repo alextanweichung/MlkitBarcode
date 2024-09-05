@@ -7,6 +7,9 @@ import { CommonService } from 'src/app/shared/services/common.service';
 import { TransferOutLine } from '../../../models/transfer-out';
 import { TransferOutService } from '../../../services/transfer-out.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ApprovalHistory } from 'src/app/shared/models/approval-history';
+import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { BulkConfirmReverse } from 'src/app/shared/models/transaction-processing';
 
 @Component({
    selector: 'app-transfer-out-detail',
@@ -16,7 +19,11 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
    objectId: number;
-
+   processType: string;
+   selectedSegment: string;
+   workflowDone: boolean = false;
+   approvalHistory: ApprovalHistory[] = [];
+   
    constructor(
       public objectService: TransferOutService,
       private authService: AuthService,
@@ -29,10 +36,13 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
       private route: ActivatedRoute,
    ) { }
 
-   ionViewWillEnter(): void {
+   async ionViewWillEnter(): Promise<void> {
       try {
+         await this.objectService.loadRequiredMaster();
          this.route.queryParams.subscribe(params => {
             this.objectId = params["objectId"];
+            this.processType = params["processType"];
+            this.selectedSegment = params["selectedSegment"];
             if (this.objectId && this.objectId > 0) {
                this.loadObject();
             } else {
@@ -69,6 +79,7 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
             let object = response;
             object = this.commonService.convertObjectAllDateType(object);
+            await this.loadWorkflow(object.transferOutId);
             await this.objectService.setHeader(object);
             await this.objectService.setLine(object.line);
             await this.loadingService.dismissLoading();
@@ -82,6 +93,16 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
       } finally {
          await this.loadingService.dismissLoading();
       }
+   }
+
+   workFlowState: WorkFlowState[] = [];
+   loadWorkflow(objectId: number) {
+      this.workFlowState = [];
+      this.objectService.getWorkflow(objectId).subscribe(response => {
+         this.workFlowState = response;
+      }, error => {
+         console.error(error);
+      })
    }
 
    isCountingTimer: boolean = true;
@@ -196,4 +217,144 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
    /* #endregion */
 
+   /* #region history modal */
+
+   historyModal: boolean = false;
+   showHistoryModal() {
+      this.historyModal = true;
+   }
+
+   hideHistoryModal() {
+      this.historyModal = false;
+   }
+
+   /* #endregion */
+
+
+   /* #region approve reject */
+
+   async presentApprovalAlert(action: string) {
+      try {
+         if (this.processType && this.selectedSegment) {
+            const alert = await this.alertController.create({
+               cssClass: "custom-alert",
+               backdropDismiss: false,
+               header: "Are you sure to " + action + " " + this.objectService.objectHeader.transferOutNum + "?",
+               inputs: [
+                  {
+                     name: "actionreason",
+                     type: "textarea",
+                     placeholder: "Please enter Reason",
+                     value: ""
+                  }
+               ],
+               buttons: [
+                  {
+                     text: "OK",
+                     role: "confirm",
+                     cssClass: "success",
+                     handler: (data) => {
+                        if (action === "REJECT" && this.processType) {
+                           if (!data.actionreason && data.actionreason.length === 0) {
+                              this.toastService.presentToast("Please enter reason", "", "top", "danger", 1000);
+                              return false;
+                           } else {
+                              this.updateDoc(action, [this.objectService.objectHeader.transferOutId.toString()], data.actionreason);
+                           }
+                        } else {
+                           this.updateDoc(action, [this.objectService.objectHeader.transferOutId.toString()], data.actionreason);
+                        }
+                     },
+                  },
+                  {
+                     text: "Cancel",
+                     role: "cancel"
+                  },
+               ],
+            });
+            await alert.present();
+         } else {
+            this.toastService.presentToast("System Error", "Something went wrong, please contact Adminstrator", "top", "danger", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   currentWorkflow: WorkFlowState;
+   nextWorkflow: WorkFlowState;
+   updateDoc(action: string, listOfDoc: string[], actionReason: string) {
+      try {
+         if (this.processType && this.selectedSegment) {
+            let bulkConfirmReverse: BulkConfirmReverse = {
+               status: action,
+               reason: actionReason,
+               docId: listOfDoc.map(i => Number(i))
+            }
+            try {
+               this.currentWorkflow = this.workFlowState[this.workFlowState.filter(r => r.isCompleted).length - 1];
+               this.nextWorkflow = this.workFlowState.find(r => r.trxId === null);
+               let workflowApiObject: string;
+               if (action.toUpperCase() === "CONFIRM" || action.toUpperCase() === "REJECT") {
+                  switch (this.nextWorkflow.stateType.toUpperCase()) {
+                     case "REVIEW":
+                        if(this.objectService.objectHeader.typeCode == 'IL'){
+                           workflowApiObject = "MobileTransferOutReview";
+                        } else if (this.objectService.objectHeader.typeCode == 'C'){
+                           workflowApiObject = "MobileCoTransferOutReview";
+                        }
+                        break;
+                     case "APPROVAL":
+                        if (this.objectService.objectHeader.typeCode == 'IL') {
+                           workflowApiObject = "MobileTransferOutApprove";
+                        } else if (this.objectService.objectHeader.typeCode == 'C') {
+                           workflowApiObject = "MobileCoTransferOutApprove";
+                        }
+                        break;
+                     default:
+                        this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                        return;
+                  }
+               }
+               if (action.toUpperCase() === "REVERSE") {
+                  switch (this.currentWorkflow.stateType.toUpperCase()) {
+                     case "REVIEW":
+                        if (this.objectService.objectHeader.typeCode == 'IL') {
+                           workflowApiObject = "MobileTransferOutReview";
+                        } else if (this.objectService.objectHeader.typeCode == 'C') {
+                           workflowApiObject = "MobileCoTransferOutReview";
+                        }
+                        break;
+                     case "APPROVAL":
+                        if (this.objectService.objectHeader.typeCode == 'IL') {
+                           workflowApiObject = "MobileTransferOutApprove";
+                        } else if (this.objectService.objectHeader.typeCode == 'C') {
+                           workflowApiObject = "MobileCoTransferOutApprove";
+                        }
+                        break;
+                     default:
+                        this.toastService.presentToast("System Error", "Workflow not found.", "top", "danger", 1000);
+                        return;
+                  }
+               }
+               this.objectService.bulkUpdateDocumentStatus(workflowApiObject, bulkConfirmReverse).subscribe(async response => {
+                  if (response.status == 204) {
+                     this.toastService.presentToast("Doc review is completed.", "", "top", "success", 1000);
+                     this.navController.back();
+                  }
+               }, error => {
+                  console.error(error);
+               })
+            } catch (error) {
+               this.toastService.presentToast("Update error", "", "top", "danger", 1000);
+            }
+         } else {
+            this.toastService.presentToast("System Error", "Something went wrong, please contact Adminstrator", "top", "danger", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   /* #endregion */
 }

@@ -164,6 +164,23 @@ const routes: Routes = [
       path: 'managements/branch-receiving-approvals',
       loadChildren: () => import('./modules/managements/pages/branch-receiving-approvals/branch-receiving-approvals.module').then(m => m.BranchReceivingApprovalsPageModule)
    },
+   // management-transfer-out
+   {
+      path: 'managements/retail-transfer-out-reviews',
+      loadChildren: () => import('./modules/managements/pages/retail-transfer-out-reviews/retail-transfer-out-reviews.module').then(m => m.RetailTransferOutReviewPageModule)
+   },
+   {
+      path: 'managements/retail-transfer-out-approvals',
+      loadChildren: () => import('./modules/managements/pages/retail-transfer-out-approvals/retail-transfer-out-approvals.module').then(m => m.RetailTransferOutApprovalsPageModule)
+   },
+   {
+      path: 'managements/co-transfer-out-reviews',
+      loadChildren: () => import('./modules/managements/pages/co-transfer-out-reviews/co-transfer-out-reviews.module').then(m => m.CoTransferOutReviewPageModule)
+   },
+   {
+      path: 'managements/co-transfer-out-approvals',
+      loadChildren: () => import('./modules/managements/pages/co-transfer-out-approvals/co-transfer-out-approvals.module').then(m => m.CoTransferOutApprovalsPageModule)
+   },
    // refund, exchange, recall depo
    {
       path: 'managements/refund-approvals',
@@ -619,6 +636,24 @@ const routes: Routes = [
     path: 'defect-request-reviews',
     loadChildren: () => import('./modules/managements/pages/defect-request-reviews/defect-request-reviews.module').then( m => m.DefectRequestReviewsPageModule)
   },
+  {
+    path: 'retail-transfer-out-review',
+    loadChildren: () => import('./modules/managements/pages/retail-transfer-out-reviews/retail-transfer-out-reviews.module').then( m => m.RetailTransferOutReviewPageModule)
+  },
+  {
+    path: 'co-transfer-out-review',
+    loadChildren: () => import('./modules/managements/pages/co-transfer-out-reviews/co-transfer-out-reviews.module').then( m => m.CoTransferOutReviewPageModule)
+  },
+  {
+    path: 'retail-transfer-out-approvals',
+    loadChildren: () => import('./modules/managements/pages/retail-transfer-out-approvals/retail-transfer-out-approvals.module').then( m => m.RetailTransferOutApprovalsPageModule)
+  },
+  {
+    path: 'co-transfer-out-approvals',
+    loadChildren: () => import('./modules/managements/pages/co-transfer-out-approvals/co-transfer-out-approvals.module').then( m => m.CoTransferOutApprovalsPageModule)
+  },
+
+
 
 
 

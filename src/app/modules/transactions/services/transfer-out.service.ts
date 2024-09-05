@@ -8,6 +8,8 @@ import { TransferOutRoot, TransferOutLine, TransferOutList } from "../models/tra
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
 import { ModuleControl } from "src/app/shared/models/module-control";
 import { AuthService } from "src/app/services/auth/auth.service";
+import { WorkFlowState } from "src/app/shared/models/workflow";
+import { BulkConfirmReverse } from "src/app/shared/models/transaction-processing";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -41,6 +43,7 @@ export class TransferOutService {
    ) { }
 
    async loadRequiredMaster() {
+      // await this.loadStaticLovList();
       await this.loadMasterList();
       await this.loadModuleControl();
    }
@@ -52,6 +55,11 @@ export class TransferOutService {
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
    }
+
+   // async loadStaticLovList() {
+   //    let fullMasterList = await this.getStaticLovList();
+   //    this.interTransferTypeList = fullMasterList.filter(x => x.objectName === "InterTransferType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
+   // }
 
    moduleControl: ModuleControl[] = [];
    configMobileScanItemContinuous: boolean = false;
@@ -110,9 +118,9 @@ export class TransferOutService {
    //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/consignmentLocation").toPromise();
    // }
 
-   getStaticLovList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/staticLov");
-   }
+   // getStaticLovList() {
+   //    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/staticLov").toPromise();
+   // }
 
    getObjectList(dateStart: string, dateEnd: string) {
       return this.http.get<TransferOutList[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferOut/toList/${dateStart}/${dateEnd}`);
@@ -152,6 +160,14 @@ export class TransferOutService {
 
    sendDebug(debugObject: JsonDebug) {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/jsonDebug", debugObject, httpObserveHeader);
+   }
+
+   bulkUpdateDocumentStatus(apiObject: string, bulkConfirmReverse: BulkConfirmReverse) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + apiObject + "/bulkUpdate", bulkConfirmReverse, httpObserveHeader);
+   }
+   
+   getWorkflow(objectId: number) {
+      return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/workflow/" + objectId);
    }
 
 }
