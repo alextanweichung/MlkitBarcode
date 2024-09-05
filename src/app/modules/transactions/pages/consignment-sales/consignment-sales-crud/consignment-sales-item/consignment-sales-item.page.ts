@@ -86,6 +86,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
    async onItemAdd(event: TransactionDetail[]) {
+      console.log("🚀 ~ ConsignmentSalesItemPage ~ onItemAdd ~ event:", JSON.stringify(event))
       if (event && event.length > 0) {
          if (event.filter(r => r.typeCode === "AS")?.length > 0) {
             this.toastService.presentToast("Control Validation", `Item ${event[0].itemCode} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
@@ -100,25 +101,29 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async addItemToLine(trxLine: TransactionDetail) {
-      if (this.objectService.consignmentSalesActivateMarginCalculation) {
-         if (!this.objectService.objectHeader.marginMode) {
-            this.toastService.presentToast("Control Validation", "Unable to proceed. Please setup location margin mode.", "top", "warning", 1000);
-            return;
+      setTimeout(async () => {
+         if (this.objectService.consignmentSalesActivateMarginCalculation) {
+            if (!this.objectService.objectHeader.marginMode) {
+               this.toastService.presentToast("Control Validation", "Unable to proceed. Please setup location margin mode.", "top", "warning", 1000);
+               return;
+            }
          }
-      }
-      let isBlock: boolean = false;
-      isBlock = this.validateNewItemConversion(trxLine);
-      if (!isBlock) {
-         this.objectService.objectDetail.forEach(r => r.sequence += 1);
-         trxLine.qtyRequest = (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1;
-         trxLine.locationId = this.objectService.objectHeader.toLocationId;
-         trxLine.sequence = 0;
-         trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.objectHeader.trxDate, this.objectService.objectHeader.toLocationId);
-         await this.assignTrxItemToDataLine(trxLine);
-         let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         await this.resetFilteredObj();
-      }
+         let isBlock: boolean = false;
+         isBlock = this.validateNewItemConversion(trxLine);
+         if (!isBlock) {
+            this.objectService.objectDetail.forEach(r => r.sequence += 1);
+            trxLine.qtyRequest = (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1;
+            trxLine.locationId = this.objectService.objectHeader.toLocationId;
+            trxLine.sequence = 0;
+            trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.objectHeader.trxDate, this.objectService.objectHeader.toLocationId);
+            await this.assignTrxItemToDataLine(trxLine);
+            let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            setTimeout(async () => {
+               await this.resetFilteredObj();
+            }, 500);
+         }         
+      }, 0);
    }
 
    validateNewItemConversion(trxLine: TransactionDetail): boolean {
@@ -296,9 +301,11 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async computeDiscTaxAmount(trxLine: TransactionDetail) {
       try {
          trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.useTax, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.maxPrecision);
+         console.log("🚀 ~ ConsignmentSalesItemPage ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
          if (this.objectService.consignmentSalesActivateMarginCalculation) {
             await this.computeMarginAmount(trxLine);
          }
+         console.log("🚀 ~ ConsignmentSalesItemPage ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
       } catch (e) {
          console.error(e);
       }

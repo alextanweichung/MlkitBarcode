@@ -463,6 +463,7 @@ export class CommonService {
             trxLine.taxAmt = null;
             trxLine.taxInclusive = null;
          }
+         console.log("🚀 ~ CommonService ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
          return trxLine;
       } catch (e) {
          console.error(e);
