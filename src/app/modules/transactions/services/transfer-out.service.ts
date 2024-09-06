@@ -33,6 +33,7 @@ export class TransferOutService {
    itemVariationYMasterList: MasterListDetails[] = [];
 
    selectedLocation: number;
+   selectedTypeCode: string;
 
    pageNum: number = 1;
 
@@ -43,7 +44,7 @@ export class TransferOutService {
    ) { }
 
    async loadRequiredMaster() {
-      // await this.loadStaticLovList();
+      await this.loadStaticLovList();
       await this.loadMasterList();
       await this.loadModuleControl();
    }
@@ -56,10 +57,10 @@ export class TransferOutService {
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
    }
 
-   // async loadStaticLovList() {
-   //    let fullMasterList = await this.getStaticLovList();
-   //    this.interTransferTypeList = fullMasterList.filter(x => x.objectName === "InterTransferType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0);
-   // }
+   async loadStaticLovList() {
+      let fullMasterList = await this.getStaticLovList();
+      this.interTransferTypeList = fullMasterList.filter(x => x.objectName === "InterTransferType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0 && (y.code == 'IL' || y.code == 'C'));
+   }
 
    moduleControl: ModuleControl[] = [];
    configMobileScanItemContinuous: boolean = false;
@@ -118,9 +119,9 @@ export class TransferOutService {
    //   return this.http.get<ConsignmentSalesLocation[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/consignmentLocation").toPromise();
    // }
 
-   // getStaticLovList() {
-   //    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/staticLov").toPromise();
-   // }
+   getStaticLovList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/staticLov").toPromise();
+   }
 
    getObjectList(dateStart: string, dateEnd: string) {
       return this.http.get<TransferOutList[]>(this.configService.selected_sys_param.apiUrl + `MobileTransferOut/toList/${dateStart}/${dateEnd}`);

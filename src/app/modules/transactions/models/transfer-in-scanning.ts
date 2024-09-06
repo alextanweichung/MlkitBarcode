@@ -91,4 +91,5 @@ export interface TransferInScanningList {
    locationDesc: string
    deactivated: boolean
    isCompleted: boolean
+   typeCode: string
 }

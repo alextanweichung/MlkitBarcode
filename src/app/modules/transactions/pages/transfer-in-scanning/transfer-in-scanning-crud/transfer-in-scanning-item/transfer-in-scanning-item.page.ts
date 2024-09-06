@@ -424,7 +424,7 @@ export class TransferInScanningItemPage implements OnInit, OnDestroy, ViewWillEn
          interTransferNum: this.objectService.object.interTransferNum,
          trxDate: this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()),
          trxDateTime: null,
-         typeCode: "C",
+         typeCode: this.objectService.object.typeCode,
          locationId: this.objectService.object.locationId,
          locationDesc: null,
          toLocationId: this.objectService.object.toLocationId,

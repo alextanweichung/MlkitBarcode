@@ -8,6 +8,7 @@ import { FilterPageRoutingModule } from './filter-routing.module';
 
 import { FilterPage } from './filter.page';
 import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
+import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi
     FormsModule,
     IonicModule,
     FilterPageRoutingModule,
-    SearchMultiDropdownPageModule
+    SearchMultiDropdownPageModule,
+    SearchDropdownPageModule,
   ],
   declarations: [FilterPage]
 })

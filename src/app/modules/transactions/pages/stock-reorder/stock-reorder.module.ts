@@ -8,6 +8,7 @@ import { StockReorderPageRoutingModule } from './stock-reorder-routing.module';
 
 import { StockReorderPage } from './stock-reorder.page';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
    imports: [
@@ -15,7 +16,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
       FormsModule,
       IonicModule,
       StockReorderPageRoutingModule,
-      NgxPaginationModule
+      NgxPaginationModule,
+      CodeMappingModule
    ],
    declarations: [StockReorderPage]
 })

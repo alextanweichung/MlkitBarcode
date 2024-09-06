@@ -76,6 +76,15 @@
          </ion-list>
       </div>
 
+      <div *ngIf="typeCodeFilter">
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+            <ion-label class="pl-2">Type</ion-label>
+         </ion-list-header>
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <app-search-dropdown title="Type" optionValue="code" [masterDropdownList]="typeCodeList" [selectedCode]="selectedTypeCode" (onActionComplete)="onTypeCodeSelected($event)"></app-search-dropdown>
+         </ion-list>
+      </div>
+
       <ng-container *ngIf="useDraft || useShowClosed">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label class="pl-2">Other</ion-label>

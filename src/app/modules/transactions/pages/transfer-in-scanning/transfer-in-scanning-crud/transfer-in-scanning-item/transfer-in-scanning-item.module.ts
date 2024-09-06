@@ -10,6 +10,7 @@ import { TransferInScanningItemPage } from './transfer-in-scanning-item.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     TransferInScanningItemPageRoutingModule,
     IdMappingModule,
     BarcodeScanInputPageModule,
-    SumModule
+    SumModule,
+    CodeMappingModule
   ],
   declarations: [TransferInScanningItemPage]
 })

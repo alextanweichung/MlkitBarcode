@@ -46,5 +46,6 @@ export interface StockReorderList {
    locationDesc: string
    deactivated: boolean
    isCompleted: boolean
+   typeCode: string
 }
 

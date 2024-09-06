@@ -9,6 +9,7 @@ import { TransferInScanningDetailPageRoutingModule } from './transfer-in-scannin
 import { TransferInScanningDetailPage } from './transfer-in-scanning-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     IonicModule,
     TransferInScanningDetailPageRoutingModule,
     IdMappingModule,
-    SumModule
+    SumModule,
+    CodeMappingModule
   ],
   declarations: [TransferInScanningDetailPage]
 })

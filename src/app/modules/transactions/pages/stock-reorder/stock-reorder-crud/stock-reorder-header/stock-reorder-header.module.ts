@@ -9,6 +9,7 @@ import { StockReorderHeaderPageRoutingModule } from './stock-reorder-header-rout
 import { StockReorderHeaderPage } from './stock-reorder-header.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
    imports: [
@@ -18,7 +19,8 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
       StockReorderHeaderPageRoutingModule,
       SearchDropdownPageModule,
       ReactiveFormsModule,
-      BarcodeScanInputPageModule
+      BarcodeScanInputPageModule,
+      CodeMappingModule
    ],
    declarations: [StockReorderHeaderPage]
 })

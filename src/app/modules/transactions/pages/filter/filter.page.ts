@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from '../../../../shared/services/common.service';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 
 @Component({
    selector: 'app-filter',
@@ -29,6 +30,9 @@ export class FilterPage implements OnInit {
 
    locationFilter: boolean = false;
    locationList: SearchDropdownList[] = [];
+
+   typeCodeFilter: boolean = false;
+   typeCodeList: MasterListDetails[] = [];
 
    useDraft: boolean = false;
    showDraftOnly: boolean = true;
@@ -104,17 +108,26 @@ export class FilterPage implements OnInit {
       }
    }
 
+   selectedTypeCode: string = null
+   onTypeCodeSelected(event){
+      if (event) {
+         this.selectedTypeCode = event.code;
+      } else {
+         this.selectedTypeCode = null;
+      }
+   }
+
    // Cancel
    cancel() {
       // Dismiss modal
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, locationIds: this.selectedLocationId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
+      this.filters = null;
       
       this.modalController.dismiss(this.filters);
    }
 
    // Apply filter
    apply() {
-      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, locationIds: this.selectedLocationId, salesAgentIds: this.selectedSalesAgentId, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
+      this.filters = { startDate: this.startDate, endDate: this.endDate, customerIds: this.selectedCustomerId, locationIds: this.selectedLocationId, salesAgentIds: this.selectedSalesAgentId, selectedTypeCode: this.selectedTypeCode, showDraftOnly: this.showDraftOnly, showClosed: this.showClosed };
 
       // Dismiss modal and apply filters
       this.modalController.dismiss(this.filters);

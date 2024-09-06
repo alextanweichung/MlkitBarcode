@@ -63,4 +63,5 @@ export interface TransferOutList {
    toLocationDesc: string
    isCompleted: boolean
    deactivated: boolean
+   typeCode: string
 }

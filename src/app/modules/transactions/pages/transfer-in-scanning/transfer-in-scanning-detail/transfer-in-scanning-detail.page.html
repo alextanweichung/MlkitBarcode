@@ -82,10 +82,18 @@
           </ion-row>
           <ion-row>
             <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Type</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{objectService.object.typeCode|codeMapping:objectService.salesTypeMasterList}}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold"> From Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{object.locationId|idMapping:objectService.locationMasterList}}
+              {{object.locationId|idMapping:objectService.fullLocationMasterList}}
             </ion-col>
           </ion-row>
           <ion-row>
@@ -93,7 +101,7 @@
               <div class="font-bold"> To Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{object.toLocationId|idMapping:objectService.locationMasterList}}
+              {{object.toLocationId|idMapping:objectService.fullLocationMasterList}}
             </ion-col>
           </ion-row>
           <ion-row>

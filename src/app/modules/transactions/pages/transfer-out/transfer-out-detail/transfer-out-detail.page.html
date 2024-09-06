@@ -135,16 +135,16 @@
               <div>{{objectService.objectHeader.trxDate|date:'dd/MM/yyyy'}}</div>
             </ion-col>
           </ion-row>
-          <!-- <ion-row *ngIf="objectService.objectHeader.typeCode">
+          <ion-row *ngIf="objectService.objectHeader.typeCode">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">Type</div>
             <div>{{objectService.objectHeader.typeCode|codeMapping:objectService.interTransferTypeList}}</div>
             </ion-col>
-          </ion-row> -->
+          </ion-row>
           <ion-row *ngIf="objectService.objectHeader.locationId">
             <ion-col class="ion-flex ion-margin-auto justify-content-between">
               <div class="font-bold">From Location</div>
-              <div>{{objectService.objectHeader.locationId|idMapping:objectService.locationMasterList}}</div>
+              <div>{{objectService.objectHeader.locationId|idMapping:objectService.fullLocationMasterList}}</div>
             </ion-col>
           </ion-row>
           <ion-row *ngIf="objectService.objectHeader.toLocationId">

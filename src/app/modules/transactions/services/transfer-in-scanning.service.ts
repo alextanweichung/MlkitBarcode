@@ -23,13 +23,14 @@ export class TransferInScanningService {
    filterEndDate: Date;
 
    fullMasterList: MasterList[] = [];
-   interTransferTypeList: MasterListDetails[] = [];
+   salesTypeMasterList: MasterListDetails[] = [];
    fullLocationMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
 
    selectedLocation: number;
+   selectedTypeCode: string;
 
    constructor(
       private http: HttpClient,
@@ -37,6 +38,7 @@ export class TransferInScanningService {
    ) { }
 
    async loadRequiredMaster() {
+      await this.loadStaticLovList();
       await this.loadMasterList();
    }
 
@@ -47,6 +49,11 @@ export class TransferInScanningService {
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
    }
+
+   async loadStaticLovList() {
+      let fullMasterList = await this.getStaticLovList();
+      this.salesTypeMasterList = fullMasterList.filter(x => x.objectName === "SalesType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0 && (y.code == 'T' || y.code == 'C'));
+   }
    
    /* #region  for insert */
 
@@ -54,6 +61,16 @@ export class TransferInScanningService {
    objectUuid: string = null;
    setObject(object: TransferInScanningRoot) {
       this.object = object;
+      let found = this.fullLocationMasterList.find(r => r.id === object.locationId);
+      if (found) {
+         if (found.attribute1 === "C") {
+            this.object.typeCode = "C";
+         } else {
+            this.object.typeCode = "T";
+         }
+      }else{
+         this.object.typeCode = "C";
+      }
       if (!this.objectUuid) {
          this.objectUuid = uuidv4();
       }
@@ -75,7 +92,7 @@ export class TransferInScanningService {
    }
 
    getStaticLovList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferInScanning/staticLov");
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferInScanning/staticLov").toPromise();
    }
 
    getPendingList(locationCode: string) {

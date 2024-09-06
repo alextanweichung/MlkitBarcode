@@ -23,16 +23,27 @@
                <ion-item [button]="false" [detail]="false" class="ion-no-padding" *ngFor="let rowData of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}" (click)="goToDetail(rowData.transferOutId)">
                   <ion-grid class="ion-no-padding py-2 pl-2">
                      <ion-row>
-                        <ion-col class="ion-flex ion-margin-auto justify-content-between">
+                        <ion-col class="ion-flex ion-margin-auto">
                            <div class="ion-flex my-auto">
                               <ion-icon class="ion-flex mr-2" name="ellipse" [class]="rowData.isCompleted?'color-success':'color-danger'"></ion-icon>
                               <div class="ion-flex mr-2 font-bold">{{rowData.transferOutNum}}</div>
                            </div>
-                           <div>
-                              <ion-badge>
-                                 <div>{{rowData.trxDate|date:'dd/MM/yyyy'}}</div>
-                              </ion-badge>
-                           </div>
+                        </ion-col>
+                        <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                           <ion-grid class="ion-no-padding">
+                              <ion-row>
+                                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                    <div class="font-bold">{{rowData.typeCode | codeMapping: objectService.interTransferTypeList}}</div>
+                                 </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                 <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                                    <ion-badge>
+                                       <div>{{rowData.trxDate|date:'dd/MM/yyyy'}}</div>
+                                    </ion-badge>
+                                 </ion-col>
+                              </ion-row>
+                           </ion-grid>
                         </ion-col>
                      </ion-row>
                      <ion-row>

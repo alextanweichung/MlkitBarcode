@@ -8,6 +8,7 @@ import { TransferOutPageRoutingModule } from './transfer-out-routing.module';
 
 import { TransferOutPage } from './transfer-out.page';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
    imports: [
@@ -15,7 +16,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
       FormsModule,
       IonicModule,
       TransferOutPageRoutingModule,
-      NgxPaginationModule
+      NgxPaginationModule,
+      CodeMappingModule
    ],
    declarations: [TransferOutPage]
 })

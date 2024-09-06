@@ -22,11 +22,12 @@ const httpObserveHeader = {
 export class StockReorderService {
 
    fullMasterList: MasterList[] = [];
-   salesType: MasterListDetails[] = [];
+   salesTypeMasterList: MasterListDetails[] = [];
    fullLocationMasterList: MasterListDetails[] = [];
    locationMasterList: MasterListDetails[] = [];
    itemVariationXMasterList: MasterListDetails[] = [];
    itemVariationYMasterList: MasterListDetails[] = [];
+   selectedTypeCode: string;
 
    constructor(
       private http: HttpClient,
@@ -36,6 +37,7 @@ export class StockReorderService {
 
    async loadRequiredMaster() {
       await this.loadModuleControl();
+      await this.loadStaticLovList();
       await this.loadMasterList();
    }
 
@@ -74,6 +76,11 @@ export class StockReorderService {
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details);
    }
 
+   async loadStaticLovList() {
+      let fullMasterList = await this.getStaticLovList();
+      this.salesTypeMasterList = fullMasterList.filter(x => x.objectName === "SalesType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0 && (y.code == 'T' || y.code == 'C'));
+   }
+
    /* #region  for insert */
 
    object: StockReorderRoot;
@@ -100,7 +107,7 @@ export class StockReorderService {
    // }
 
    getStaticLovList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileStockReorder/staticLov");
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileStockReorder/staticLov").toPromise();
    }
 
    getObjectList(dateStart: string, dateEnd: string) {

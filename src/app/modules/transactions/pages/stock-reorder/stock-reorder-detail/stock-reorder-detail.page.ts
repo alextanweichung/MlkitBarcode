@@ -36,8 +36,8 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
       }
    }
 
-   ionViewWillEnter(): void {
-
+   async ionViewWillEnter(): Promise<void> {
+      await this.objectService.loadRequiredMaster();
    }
 
    ngOnInit() {

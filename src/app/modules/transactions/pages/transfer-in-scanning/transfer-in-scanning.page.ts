@@ -58,6 +58,7 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
       if (this.configService.selected_location) {
          this.objectService.selectedLocation = this.configService.selected_location;
       }
+      this.objectService.selectedTypeCode = null;
       // await this.bindLocationList();
       await this.loadObjects();
    }
@@ -105,6 +106,16 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
    }
 
    selectDoc(object: TransferInScanningRoot) {
+      let found = this.objectService.fullLocationMasterList.find(r => r.id === object.locationId);
+      if (found) {
+         if (found.attribute1 === "C") {
+            object.typeCode = "C";
+         } else {
+            object.typeCode = "T";
+         }
+      } else {
+         object.typeCode = "C";
+      }
       this.objectService.setObject(object);
       this.navController.navigateForward("/transactions/transfer-in-scanning/transfer-in-scanning-item");
    }
@@ -119,6 +130,9 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
          this.objects = []; // clear list when enter
          this.objectService.getObjectList(format(this.objectService.filterStartDate, "yyyy-MM-dd"), format(this.objectService.filterEndDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
+            if (this.objectService.selectedTypeCode) {
+               this.objects = this.objects.filter(r => r.typeCode === this.objectService.selectedTypeCode);
+            }
             await this.loadingService.dismissLoading();
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
@@ -152,6 +166,9 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
             componentProps: {
                startDate: this.objectService.filterStartDate,
                endDate: this.objectService.filterEndDate,
+               typeCodeFilter: true,
+               typeCodeList: this.objectService.salesTypeMasterList,
+               selectedTypeCode: this.objectService.selectedTypeCode
             },
             canDismiss: true
          })
@@ -162,6 +179,7 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
             this.uniqueGrouping = [];
             this.objectService.filterStartDate = new Date(data.startDate);
             this.objectService.filterEndDate = new Date(data.endDate);
+            this.objectService.selectedTypeCode = data.selectedTypeCode;
             this.loadObjects();
          }
       } catch (e) {

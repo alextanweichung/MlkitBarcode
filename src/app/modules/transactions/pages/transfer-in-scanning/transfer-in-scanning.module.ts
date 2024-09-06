@@ -9,6 +9,7 @@ import { TransferInScanningPageRoutingModule } from './transfer-in-scanning-rout
 import { TransferInScanningPage } from './transfer-in-scanning.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.modu
     IonicModule,
     TransferInScanningPageRoutingModule,
     SearchDropdownPageModule,
-    IdMappingModule
+    IdMappingModule,
+    CodeMappingModule
   ],
   declarations: [TransferInScanningPage]
 })

@@ -49,7 +49,7 @@ export class StockReorderHeaderPage implements OnInit, ViewWillEnter, ViewDidEnt
          stockReorderId: [0],
          stockReorderNum: [null],
          trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-         typeCode: ["C"],
+         typeCode: [null],
          locationId: [(defaultLocation ? defaultLocation : null), [Validators.required]],
          deactivated: [false],
          isCompleted: [false],
@@ -78,7 +78,7 @@ export class StockReorderHeaderPage implements OnInit, ViewWillEnter, ViewDidEnt
             }
          }
       } else {
-         this.objectForm.patchValue({ typeCode: "C" });
+         // this.objectForm.patchValue({ typeCode: "C" });
          this.objectForm.patchValue({ locationId: null });
       }
    }

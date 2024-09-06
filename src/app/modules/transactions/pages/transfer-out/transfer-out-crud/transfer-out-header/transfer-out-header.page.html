@@ -30,6 +30,10 @@
                   </ion-content>
                </ng-template>
             </ion-modal>
+            <ion-item>
+               <ion-label position="stacked" class="font-bold">Type</ion-label>
+               <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="-" value="{{objectForm.controls.typeCode.value | codeMapping: objectService.interTransferTypeList}}" [readonly]="true"></ion-input>
+            </ion-item>
             <app-search-dropdown title="From Location" [masterDropdownList]="objectService.locationMasterList" [selectedId]="objectForm.controls.locationId.value" (onActionComplete)="onLocationChanged($event)" [disabled]="objectService.objectHeader?.transferOutId > 0"></app-search-dropdown>
             <app-search-dropdown title="To Location" [masterDropdownList]="objectService.fullLocationMasterList" [selectedId]="objectForm.controls.toLocationId?.value" (onActionComplete)="onToLocationChanged($event)" [disabled]="objectService.objectHeader?.transferOutId > 0"></app-search-dropdown>
             <ion-item>
@@ -59,7 +63,7 @@
 </ion-content>
 
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="authService.hideFooter">
-   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">
+   <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()" [disabled]="!objectForm.valid">
       Next
    </ion-button>
 </ion-footer>

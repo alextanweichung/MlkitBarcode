@@ -41,11 +41,9 @@ export class TransferOutHeaderPage implements OnInit, ViewWillEnter, ViewWillLea
 
    async ionViewWillEnter(): Promise<void> {
       // await this.bindLocationList();
-      if (this.objectService.objectHeader?.transferOutId > 0) {
+      if (this.objectService.objectHeader && this.objectService.objectHeader?.transferOutId > 0) {
          this.dateValue = format(new Date(this.objectService.objectHeader?.trxDate), "yyyy-MM-dd") + "T08:00:00.000Z";
          this.objectForm.patchValue(this.objectService.objectHeader);
-      } else {
-         this.objectForm.patchValue({ totalCarton: this.objectService.objectHeader.totalCarton });
       }
       await this.setFormattedDateString();
       if (this.configService.selected_location) {
@@ -62,7 +60,7 @@ export class TransferOutHeaderPage implements OnInit, ViewWillEnter, ViewWillLea
          transferOutId: [0],
          transferOutNum: [null],
          trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-         typeCode: ["C"],
+         typeCode: [null],
          locationId: [(this.objectService.selectedLocation ? this.objectService.selectedLocation : null), [Validators.required]],
          toLocationId: [null, [Validators.required]],
          deactivated: [false],
@@ -109,6 +107,12 @@ export class TransferOutHeaderPage implements OnInit, ViewWillEnter, ViewWillLea
       })
    }
 
+   onTypeCodeChange(event:any){
+      if(event){
+         this.objectForm.patchValue({ typeCode: event.code });
+      }
+   }
+
    onLocationChanged(event: any) {
       if (event) {
          this.objectService.selectedLocation = event.id;
@@ -123,7 +127,7 @@ export class TransferOutHeaderPage implements OnInit, ViewWillEnter, ViewWillLea
          }
       } else {
          this.objectService.selectedLocation = null;
-         this.objectForm.patchValue({ typeCode: "C" });
+         // this.objectForm.patchValue({ typeCode: "C" });
          this.objectForm.patchValue({ locationId: null });
       }
    }

@@ -32,7 +32,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
    constructor(
       private authService: AuthService,
       private commonService: CommonService,
-      private objectService: StockReorderService,
+      public objectService: StockReorderService,
       private actionSheetController: ActionSheetController,
       private alertController: AlertController,
       private modalController: ModalController,
@@ -60,6 +60,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
          this.endDate = this.commonService.getTodayDate();
       }
       await this.objectService.loadRequiredMaster();
+      this.objectService.selectedTypeCode = null;
       await this.loadObjects();
       this.itemSearchText = null;
    }
@@ -132,6 +133,9 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
             componentProps: {
                startDate: this.startDate,
                endDate: this.endDate,
+               typeCodeFilter: true,
+               typeCodeList: this.objectService.salesTypeMasterList,
+               selectedTypeCode: this.objectService.selectedTypeCode
             },
             canDismiss: true
          })
@@ -141,6 +145,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
             this.objects = [];
             this.startDate = new Date(data.startDate);
             this.endDate = new Date(data.endDate);
+            this.objectService.selectedTypeCode = data.selectedTypeCode;
             this.loadObjects();
          }
       } catch (e) {
@@ -188,7 +193,7 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
             this.filteredObj = JSON.parse(JSON.stringify(this.objects.filter(r =>
                r.stockReorderNum?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
-               r.locationDesc?.toUpperCase().includes(searchText.toUpperCase())
+               r.locationDesc?.toUpperCase().includes(searchText.toUpperCase()) 
             )));
             this.currentPage = 1;
          } else {
@@ -203,6 +208,9 @@ export class StockReorderPage implements OnInit, ViewWillEnter, ViewDidEnter, Do
    resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
       this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
+      if (this.objectService.selectedTypeCode) {
+         this.filteredObj = this.filteredObj.filter(r => r.typeCode === this.objectService.selectedTypeCode);
+      }
    }
 
 }

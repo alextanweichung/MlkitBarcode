@@ -19,7 +19,6 @@ import { Keyboard } from '@capacitor/keyboard';
    styleUrls: ['./transfer-out.page.scss'],
 })
 export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCheck {
-
    private objectDiffer: any;
    objects: TransferOutList[] = [];
 
@@ -32,7 +31,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
    uniqueGrouping: Date[] = [];
 
    constructor(
-      private objectService: TransferOutService,
+      public objectService: TransferOutService,
       private authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,
@@ -64,6 +63,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
          this.objectService.selectedLocation = this.configService.selected_location;
       }
       await this.objectService.loadRequiredMaster();
+      this.objectService.selectedTypeCode = null;
       await this.loadObjects();
    }
 
@@ -139,6 +139,9 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
             componentProps: {
                startDate: this.objectService.filterStartDate,
                endDate: this.objectService.filterEndDate,
+               typeCodeFilter: true,
+               typeCodeList: this.objectService.interTransferTypeList,
+               selectedTypeCode: this.objectService.selectedTypeCode
             },
             canDismiss: true
          })
@@ -149,6 +152,7 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
             this.uniqueGrouping = [];
             this.objectService.filterStartDate = new Date(data.startDate);
             this.objectService.filterEndDate = new Date(data.endDate);
+            this.objectService.selectedTypeCode = data.selectedTypeCode;
             this.loadObjects();
          }
       } catch (e) {
@@ -213,6 +217,9 @@ export class TransferOutPage implements OnInit, ViewWillEnter, ViewDidEnter, DoC
    resetFilteredObj() {
       this.filteredObj = JSON.parse(JSON.stringify(this.objects));
       this.filteredObj = this.filteredObj.sort((a, b) => new Date(b.trxDate).getTime() - new Date(a.trxDate).getTime());
+      if(this.objectService.selectedTypeCode){
+         this.filteredObj = this.filteredObj.filter(r => r.typeCode === this.objectService.selectedTypeCode);
+      }
    }
 
 }

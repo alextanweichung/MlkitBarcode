@@ -10,6 +10,7 @@ import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-in
 import { CalendarInputPageModule } from 'src/app/shared/pages/calendar-input/calendar-input.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { TransferOutHeaderPage } from './transfer-out-header.page';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
    imports: [
@@ -20,7 +21,8 @@ import { TransferOutHeaderPage } from './transfer-out-header.page';
       SearchDropdownPageModule,
       CalendarInputPageModule,
       ReactiveFormsModule,
-      BarcodeScanInputPageModule
+      BarcodeScanInputPageModule,
+      CodeMappingModule
    ],
    declarations: [TransferOutHeaderPage]
 })
