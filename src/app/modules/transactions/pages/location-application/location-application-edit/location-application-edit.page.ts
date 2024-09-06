@@ -133,22 +133,38 @@ export class LocationApplicationEditPage implements OnInit {
   }
 
   onPriceSegmentSelected(event) {
-    this.objectForm.patchValue({ priceSegment: event.code });
+    if (event) {
+      this.objectForm.patchValue({ priceSegmentCode: event.code });
+    } else {
+      this.objectForm.patchValue({ priceSegmentCode: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 
   onWhLocationSelected(event) {
-    this.objectForm.patchValue({ whLocationId: event.id });
+    if (event) {
+      this.objectForm.patchValue({ whLocationId: event.id });
+    } else {
+      this.objectForm.patchValue({ whLocationId: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 
   onAreaSelected(event) {
-    this.objectForm.patchValue({ areaId: event.id });
+    if (event) {
+      this.objectForm.patchValue({ areaId: event.id });
+    } else {
+      this.objectForm.patchValue({ areaId: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 
   onStateSelected(event) {
-    this.objectForm.patchValue({ stateId: event.id });
+    if (event) {
+      this.objectForm.patchValue({ stateId: event.id });
+    } else {
+      this.objectForm.patchValue({ stateId: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 

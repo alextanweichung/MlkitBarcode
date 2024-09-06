@@ -91,17 +91,21 @@ export class LocationApplicationAddPage implements OnInit {
   }
 
   onLocationTypeSelected(event) {
-    this.objectForm.patchValue({ locationType: event.code });
-    if (this.objectForm.controls.locationType.value === "O") {
-      this.resetConsignmentConfig();
-    }
-    else if (this.objectForm.controls.locationType.value === "C") {
-      this.objectForm.patchValue({
-        isBearPromo: false,
-        isBearShortOver: false,
-        marginMode: 'N',
-        invoiceMode: 'N'
-      })
+    if(event){
+      this.objectForm.patchValue({ locationType: event.code });
+      if (this.objectForm.controls.locationType.value === "O") {
+        this.resetConsignmentConfig();
+      }
+      else if (this.objectForm.controls.locationType.value === "C") {
+        this.objectForm.patchValue({
+          isBearPromo: false,
+          isBearShortOver: false,
+          marginMode: 'N',
+          invoiceMode: 'N'
+        })
+      }
+    }else{
+      this.objectForm.patchValue({ locationType: null });
     }
     this.objectForm.updateValueAndValidity();
   }
@@ -116,22 +120,38 @@ export class LocationApplicationAddPage implements OnInit {
   }
 
   onPriceSegmentSelected(event){
-    this.objectForm.patchValue({ priceSegmentCode: event.code });
+    if (event) {
+      this.objectForm.patchValue({ priceSegmentCode: event.code });
+    }else{
+      this.objectForm.patchValue({ priceSegmentCode: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 
   onWhLocationSelected(event) {
-    this.objectForm.patchValue({ whLocationId: event.id });
+    if(event){
+      this.objectForm.patchValue({ whLocationId: event.id });
+    }else{
+      this.objectForm.patchValue({ whLocationId: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
   
   onAreaSelected(event) {
-    this.objectForm.patchValue({ areaId: event.id });
+    if (event) {
+      this.objectForm.patchValue({ areaId: event.id });
+    } else {
+      this.objectForm.patchValue({ areaId: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 
   onStateSelected(event) {
-    this.objectForm.patchValue({ stateId: event.id });
+    if (event) {
+      this.objectForm.patchValue({ stateId: event.id });
+    } else {
+      this.objectForm.patchValue({ stateId: null });
+    }
     this.objectForm.updateValueAndValidity();
   }
 
