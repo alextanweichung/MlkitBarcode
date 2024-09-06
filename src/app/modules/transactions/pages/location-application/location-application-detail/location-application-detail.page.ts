@@ -94,7 +94,7 @@ export class LocationApplicationDetailPage implements OnInit {
       if (currenctStatus && currenctStatus.title) {
         this.toastService.presentToast("Doc Status", "Pending " + currenctStatus.title, "top", "success", 2000);
       } else {
-        this.toastService.presentToast("Doc Status", "Workflow completed, debtor generated.", "top", "success", 1000);
+        this.toastService.presentToast("Doc Status", "Workflow completed, location generated.", "top", "success", 1000);
       }
     }
   }

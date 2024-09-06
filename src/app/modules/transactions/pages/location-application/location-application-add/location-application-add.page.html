@@ -76,7 +76,7 @@
         </ion-item>
         <app-search-dropdown title="Area" optionLabel="description" [masterDropdownList]="objectService.areaMasterList"
           [selectedId]="objectForm?.controls?.areaId?.value"
-          (onActionComplete)="onStateSelected($event)"></app-search-dropdown>
+          (onActionComplete)="onAreaSelected($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked">Attention</ion-label>
           <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Attention"

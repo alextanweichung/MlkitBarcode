@@ -133,7 +133,7 @@ export class LocationApplicationPage implements OnInit, ViewWillEnter, ViewDidEn
   async addObject() {
     try {
       if (this.objectService.hasSalesAgent()) {
-        this.navController.navigateForward("/transactions/debtor-application/debtor-application-add");
+        this.navController.navigateForward("/transactions/location-application/location-application-add");
       }
       else {
         this.toastService.presentToast("System Error", "Sales Agent not set.", "top", "danger", 1000);

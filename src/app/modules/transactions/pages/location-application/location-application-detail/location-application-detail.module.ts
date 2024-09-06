@@ -8,7 +8,6 @@ import { LocationApplicationDetailPageRoutingModule } from './location-applicati
 
 import { LocationApplicationDetailPage } from './location-application-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
-import { DebtorApplicationDetailPageRoutingModule } from '../../debtor-application/debtor-application-detail/debtor-application-detail-routing.module';
 import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 import { IdToCodeMappingModule } from 'src/app/shared/pipes/id-to-code-mapping/id-to-code-mapping.module';
 
@@ -18,7 +17,6 @@ import { IdToCodeMappingModule } from 'src/app/shared/pipes/id-to-code-mapping/i
     FormsModule,
     IonicModule,
     LocationApplicationDetailPageRoutingModule,
-    DebtorApplicationDetailPageRoutingModule,
     IdMappingModule,
     CodeMappingModule,
     IdToCodeMappingModule
