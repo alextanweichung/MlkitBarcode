@@ -60,17 +60,19 @@
             </ion-grid>
          </ion-item>
 
-         <div *ngIf="objectService.configTransferOutActivateContainerNum" class="ion-flex">
-            <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="modifyPageNum('M')">
-               <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-            </ion-button>
-            <div class="my-auto">
-               Carton <span class="font-bold">{{objectService.pageNum}}</span>
+         <!-- <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full"> -->
+            <div *ngIf="objectService.configTransferOutActivateContainerNum" class="ion-flex">
+               <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="modifyPageNum('M')">
+                  <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+               </ion-button>
+               <div class="my-auto">
+                  Carton <span class="font-bold">{{objectService.pageNum}}</span>
+               </div>
+               <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="modifyPageNum('A')">
+                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+               </ion-button>
             </div>
-            <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="modifyPageNum('A')">
-               <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-            </ion-button>
-        </div>
+         <!-- </ion-item> -->
 
          <ion-item-sliding #slidingItem *ngFor="let rowData of objectService.objectDetail; let rowIndex = index">
             <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="qtyInput.setFocus()">

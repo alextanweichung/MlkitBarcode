@@ -1805,9 +1805,11 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
    async cloneItemToRight(rowData: any, typeCode: string) {
       let udItemList: TransactionDetail;
       udItemList = await this.barcodescaninput.validateBarcode(rowData.itemBarcode, false);
-      let itemQty: number
-      itemQty = rowData.qtyRequest - (rowData.qtyCurrent ?? 0) - rowData.qtyPacked;
-      await this.runPackingEngine(udItemList, itemQty);
+      if (udItemList) {
+         let itemQty: number
+         itemQty = rowData.qtyRequest - (rowData.qtyCurrent ?? 0) - rowData.qtyPacked;
+         await this.runPackingEngine(udItemList, itemQty);
+      }
    }
 
    async duplicateCartonConfirmation() {

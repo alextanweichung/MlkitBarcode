@@ -281,6 +281,7 @@ export class PackingService {
    warehouseAgentMasterList: MasterListDetails[] = [];
    reasonMasterList: MasterListDetails[] = [];
    packagingMasterList: MasterListDetails[] = [];
+   shipMethodMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       setTimeout(async () => {
          this.fullMasterList = await this.getMasterList();
@@ -298,7 +299,8 @@ export class PackingService {
          }
          this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
          this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
-         this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);        
+         this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);  
+         this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName === "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);      
       }, 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;

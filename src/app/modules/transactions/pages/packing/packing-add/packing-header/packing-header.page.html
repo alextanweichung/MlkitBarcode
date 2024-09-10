@@ -54,6 +54,7 @@
                      <app-search-dropdown title="Customer" optionLabel="description" [searchDropdownList]="objectService.customerMasterList" [selectedId]="objectForm.controls.customerId.value" (onActionComplete)="onCustomerSelected($event, true)" [disabled]="customerDisabled"></app-search-dropdown>
                   </ng-container>
                </ng-container>
+               <app-search-dropdown title="Ship Method" optionLabel="description" [searchDropdownList]="objectService.shipMethodMasterList" [selectedId]="objectForm.controls.shipMethodId.value" (onActionComplete)="onShipMethodSelected($event)"></app-search-dropdown>
                <ion-item>
                   <ion-label class="font-bold" position="stacked">Remark</ion-label>
                   <ion-textarea formControlName="remark" placeholder="Enter Remark" [autoGrow]="true"></ion-textarea>

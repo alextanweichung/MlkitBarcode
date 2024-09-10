@@ -34,7 +34,13 @@ export class ConsignmentCountService {
       private configService: ConfigService,
       private commonService: CommonService,
       private loadingService: LoadingService
-   ) { }
+   ) { 
+      if (this.filterLocationId && this.filterLocationId.length === 0) {
+         if (this.configService.selected_location) {
+            this.filterLocationId.push(this.configService.selected_location);
+         }
+      }
+   }
 
    async loadRequiredMaster() {
       try {
@@ -79,6 +85,7 @@ export class ConsignmentCountService {
       } else {
          this.locationMasterList = this.fullLocationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
       }
+      await this.bindLocationList();
    }
 
    locationSearchDropdownList: SearchDropdownList[] = [];

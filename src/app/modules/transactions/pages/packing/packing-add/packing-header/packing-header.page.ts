@@ -657,6 +657,14 @@ export class PackingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
       this.customerDisabled = false;
    }
 
+   onShipMethodSelected(event: SearchDropdownList) {
+      if (event) {
+         this.objectForm.patchValue({ shipMethodId: event.id });
+      } else {
+         this.objectForm.patchValue({ shipMethodId: null });
+      }
+   }
+
    @ViewChild("segment", { static: false }) segment: IonSegment;
    isWithType: string = "SO";
    async isWithDocChanged(event) {

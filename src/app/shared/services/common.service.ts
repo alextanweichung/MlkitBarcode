@@ -5,7 +5,7 @@ import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { TransactionDetail } from '../models/transaction-detail';
+import { ItemPricing, TransactionDetail } from '../models/transaction-detail';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { AnnouncementFile } from 'src/app/modules/dashboard/models/dashboard';
 import { environment } from 'src/environments/environment';
@@ -463,7 +463,6 @@ export class CommonService {
             trxLine.taxAmt = null;
             trxLine.taxInclusive = null;
          }
-         console.log("🚀 ~ CommonService ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
          return trxLine;
       } catch (e) {
          console.error(e);
@@ -662,6 +661,39 @@ export class CommonService {
             }
          }
          return item;
+      }
+   }
+
+   computeItemPriceListLineDiscAmount(priceListLine: ItemPricing, useAddDiscountExpression) {
+      if (priceListLine) {
+         if (useAddDiscountExpression) {
+            let totalDiscAmt: Decimal = new Decimal(0);
+            let unitPrice: Decimal = new Decimal(priceListLine.unitPrice ? (priceListLine.unitPrice * (1 - (priceListLine.discountPercent / 100))) : 0);
+            let discExpression = priceListLine.addDiscountExpression;
+
+            if (unitPrice.toNumber() === 0) {
+               return null;
+            }
+
+            if (discExpression && discExpression !== "" && discExpression !== null) {
+               let splittedDisc = discExpression.split(/[+/]/g);
+               splittedDisc.forEach(x => {
+                  let xDecimal: Decimal = new Decimal(parseFloat(x) ? parseFloat(x) : 0);
+                  if (x.includes('%')) {
+                     let currentdiscPct: Decimal = xDecimal.div(100);
+                     let currentDiscAmt: Decimal = unitPrice.mul(currentdiscPct);
+                     totalDiscAmt = totalDiscAmt.add(currentDiscAmt);
+                     unitPrice = unitPrice.sub(currentDiscAmt);
+                  } else {
+                     totalDiscAmt = totalDiscAmt.add(xDecimal);
+                     unitPrice = unitPrice.sub(xDecimal);
+                  }
+               })
+            }
+            return unitPrice.toNumber();
+         } else {
+            return priceListLine.unitPrice * (1 - (priceListLine.discountPercent / 100));
+         }
       }
    }
 

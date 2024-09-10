@@ -6,6 +6,10 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { CheckQohRoot } from '../../../models/rp-check-qoh';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ItemPricing } from 'src/app/shared/models/transaction-detail';
+import { CommonService } from 'src/app/shared/services/common.service';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { PrecisionList } from 'src/app/shared/models/precision-list';
 
 @Component({
    selector: 'app-rp-check-qoh',
@@ -21,8 +25,9 @@ export class RpCheckQohPage implements OnInit {
    columns: any;
 
    constructor(
-      private authService: AuthService,
       private objectService: ReportsService,
+      private authService: AuthService,
+      private commonService: CommonService,
       private toastService: ToastService,
       private loadingService: LoadingService
    ) {
@@ -31,12 +36,44 @@ export class RpCheckQohPage implements OnInit {
    }
 
    ngOnInit() {
+      this.loadModuleControl();
       this.columns = [
          { prop: "itemCode", name: "Stock Code", draggable: false },
          { prop: "itemDescription", name: "Description", draggable: false },
          { prop: "qoh", name: "QOH", draggable: false },
          { prop: "price", name: "Price", draggable: false }
       ]
+   }
+   
+   moduleControl: ModuleControl[];
+   configSystemWideActivateExtraDiscount: boolean = false;
+   precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
+   loadModuleControl() {
+      try {
+         this.authService.moduleControlConfig$.subscribe(obj => {
+            this.moduleControl = obj;
+
+            let systemWideActivateExtraDiscount = this.moduleControl.find(x => x.ctrlName === "SystemWideActivateExtraDiscount")?.ctrlValue;
+            if (systemWideActivateExtraDiscount && systemWideActivateExtraDiscount.toUpperCase() === "Y") {
+               this.configSystemWideActivateExtraDiscount = true;
+            } else {
+               this.configSystemWideActivateExtraDiscount = false;
+            }
+         })
+         this.authService.precisionList$.subscribe(precision => {
+            if (precision) {
+               this.precisionSales = precision.find(x => x.precisionCode === "SALES");
+               if (this.precisionSales.localMin === null) this.precisionSales.localMin = 2;
+               if (this.precisionSales.localMax === null) this.precisionSales.localMax = 2;
+               if (this.precisionSales.localFormat === null) this.precisionSales.localFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
+               if (this.precisionSales.foreignMin === null) this.precisionSales.foreignMin = 2;
+               if (this.precisionSales.foreignMax === null) this.precisionSales.foreignMax = 2;
+               if (this.precisionSales.foreignFormat === null) this.precisionSales.foreignFormat = `1.${this.precisionSales.localMin}-${this.precisionSales.localMax}`;
+            }
+         })
+      } catch (e) {
+         console.error(e);
+      }
    }
 
 	async onKeyDown(event, searchText) {
@@ -81,19 +118,12 @@ export class RpCheckQohPage implements OnInit {
       this.realObject = [];
 
       for await (const r of this.objects) {
-         let price: any[] = [];
-         for await (const rr of r.segmentPricing) {
-            price.push({
-               segmentCode: rr.itemPricing.priceSegmentCode,
-               price: rr.itemPricing.unitPrice
-            })
-         }
          this.realObject.push({
             itemId: r.itemId,
             itemCode: r.itemCode,
             itemDescription: r.itemDescription,
             qoh: r.inventoryLevel.reduce((a, c) => a + (c.qty - c.openQty), 0),
-            price: price
+            price: r.segmentPricing.flatMap(r => r.itemPricing)
          })
       }
    }
@@ -110,6 +140,12 @@ export class RpCheckQohPage implements OnInit {
 
    getInventoryLevel(row) {
       return this.objects.find(r => r.itemId === row.itemId).inventoryLevel;
+   }
+
+   getNettPrice(rowData: ItemPricing) {
+      if (rowData) {
+         return this.commonService.computeItemPriceListLineDiscAmount(rowData, this.configSystemWideActivateExtraDiscount);
+      }
    }
 
 }

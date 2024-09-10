@@ -108,7 +108,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
    async addItemToLine(trxLine: TransactionDetail) {
       try {
          if (this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku) === 0) { // already in and first one
-            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??0);
+            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??1);
             let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             this.resetFilteredObj();

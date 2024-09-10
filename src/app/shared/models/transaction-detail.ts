@@ -85,10 +85,12 @@ export interface TransactionDetail {
    itemVariationLineXId?: number
    itemVariationXCd?: string
    itemVariationXDesc?: string
+   itemVariationXSeq?: number
    itemVariationYId?: number
    itemVariationLineYId?: number
    itemVariationYCd?: string
    itemVariationYDesc?: string
+   itemVariationYSeq?: number
    itemSku?: string
    itemBarcode?: string
    cartonNum?: number
@@ -206,6 +208,7 @@ export interface ItemPricing {
    discountExpression: string
    discountPercent: number
    priceSegmentCode?: string
+   addDiscountExpression?: string
 }
 
 export interface ItemGroupInfo {

@@ -1351,9 +1351,11 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
    async cloneItemToRight(rowData: any, typeCode: string) {
       let udItemList: TransactionDetail;
       udItemList = await this.barcodescaninput.validateBarcode(rowData.itemBarcode, false);
-      let itemQty: number
-      itemQty = rowData.qtyRequest - (rowData.qtyCurrent ?? 0) - rowData.qtyPicked;
-      await this.runPickingEngine(udItemList, itemQty);
+      if (udItemList) {
+         let itemQty: number
+         itemQty = rowData.qtyRequest - (rowData.qtyCurrent ?? 0) - rowData.qtyPicked;
+         await this.runPickingEngine(udItemList, itemQty);
+      }
    }
 
 }

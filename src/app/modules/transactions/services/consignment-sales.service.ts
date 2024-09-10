@@ -38,7 +38,9 @@ export class ConsignmentSalesService {
       private loadingService: LoadingService
    ) {      
       if (this.configService.selected_location && this.filterLocationId.length === 0) {
-         this.filterLocationId.push(this.configService.selected_location);
+         if (this.configService.selected_location) {
+            this.filterLocationId.push(this.configService.selected_location);
+         }
       }
     }
 
@@ -102,6 +104,7 @@ export class ConsignmentSalesService {
    systemWideBlockConvertedCode: boolean;
    configMobileScanItemContinuous: boolean = false;
    configConsignmentActivateMarginExpr: boolean = false;
+   configRestrictEditAfterCompleteFullMonth: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
@@ -155,6 +158,13 @@ export class ConsignmentSalesService {
             } else {
                this.configConsignmentActivateMarginExpr = false;
             }
+
+            let restrictEditAfterCompleteFullMonth = this.moduleControl.find(x => x.ctrlName === "RestrictEditAfterCompleteFullMonth");
+            if (restrictEditAfterCompleteFullMonth && restrictEditAfterCompleteFullMonth.ctrlValue.toUpperCase() == 'Y') {
+               this.configRestrictEditAfterCompleteFullMonth = true;
+            } else {
+               this.configRestrictEditAfterCompleteFullMonth = false;
+            }            
          });
          this.authService.precisionList$.subscribe(precision => {
             if (precision) {
@@ -187,7 +197,7 @@ export class ConsignmentSalesService {
       } else {
          this.locationMasterList = this.fullLocationMasterList.filter(r => r.attribute1 === "C" && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
       }
-      this.bindLocationList();
+      await this.bindLocationList();
       this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationXMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationX").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.itemVariationYMasterList = this.fullMasterList.filter(x => x.objectName === "ItemVariationY").flatMap(src => src.details).filter(y => y.deactivated === 0);

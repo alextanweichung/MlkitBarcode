@@ -86,7 +86,6 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    @ViewChild("barcodescaninput", { static: false }) barcodescaninput: BarcodeScanInputPage;
    async onItemAdd(event: TransactionDetail[]) {
-      console.log("🚀 ~ ConsignmentSalesItemPage ~ onItemAdd ~ event:", JSON.stringify(event))
       if (event && event.length > 0) {
          if (event.filter(r => r.typeCode === "AS")?.length > 0) {
             this.toastService.presentToast("Control Validation", `Item ${event[0].itemCode} is assembly type. Not allow in transaction.`, "top", "warning", 1000);
@@ -167,15 +166,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
       if (this.objectService.consignmentSalesActivateMarginCalculation) {
          if (!this.objectService.configConsignmentActivateMarginExpr && item.marginPct) {
-            item.marginExpression = null;
+            item.marginExpression = item.marginPct + "%";
             this.objectService.objectDetail.unshift(item);
             await this.computeAllAmount(this.objectService.objectDetail[0]);
          } else if (this.objectService.configConsignmentActivateMarginExpr && item.marginExpression) {
-            item.marginPct = null;
             this.objectService.objectDetail.unshift(item);
             await this.computeAllAmount(this.objectService.objectDetail[0]);
-         }
-         else {
+         } else {
             if (this.objectService.consignmentSalesBlockItemWithoutMargin !== "0") {
                this.toastService.presentToast("", `Margin unavailable for code ${item.itemCode}`, "top", "warning", 1000);
                if (this.objectService.consignmentSalesBlockItemWithoutMargin === "1") {

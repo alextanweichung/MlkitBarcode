@@ -63,6 +63,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    configSystemWideActivateMultiUOM: boolean = false;
    configItemVariationShowMatrix: boolean = false;
    configItemVariationMatrixShowCodeDesc: boolean = false;
+   configSystemWideBarcodeScanBeep: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -105,17 +106,26 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
             this.configSystemWideActivateMultiUOM = false;
          }
 
+         let systemWideBarcodeScanBeep = this.moduleControl.find(x => x.ctrlName === "SystemWideBarcodeScanBeep")?.ctrlValue;
+         if (systemWideBarcodeScanBeep && systemWideBarcodeScanBeep.toUpperCase() === "Y") {
+            this.configSystemWideBarcodeScanBeep = true;
+         } else {
+            this.configSystemWideBarcodeScanBeep = false;
+         }
+
       }, error => {
          console.log(error);
       })
    }
 
-   async handleBarcodeKeyDown(e: any, key: string) {
+   handleBarcodeKeyDown(e: any, key: string) {
       if (e.keyCode === 13) {
-         let barcode = this.manipulateBarcodeCheckDigit(key);
-         await this.validateBarcode(barcode);
-         e.preventDefault();
-         this.setFocus();
+         setTimeout(() => {
+            let barcode = JSON.parse(JSON.stringify(this.manipulateBarcodeCheckDigit(key)));
+            this.validateBarcode(barcode);
+            this.setFocus();
+            e.preventDefault();
+         }, 0);
       }
    }
 
@@ -135,66 +145,77 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    barcodeSearchValue: string;
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
    async validateBarcode(barcode: string, emit: boolean = true) {
-      console.log("🚀 ~ BarcodeScanInputPage ~ validateBarcode ~ barcode:", barcode)
-      if (barcode) {
-         this.barcodeSearchValue = "";
-         if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
-            let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
-            console.log("🚀 ~ BarcodeScanInputPage ~ validateBarcode ~ found_barcode:", JSON.stringify(found_barcode))
-            if (found_barcode) {
-               let found_item_master = this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
-               let outputData: TransactionDetail = {
-                  itemId: found_item_master.id,
-                  itemCode: found_item_master.code,
-                  description: found_item_master.itemDesc,
-                  typeCode: found_item_master.typeCode,
-                  variationTypeCode: found_item_master.varCd,
-                  discountGroupCode: found_item_master.discCd,
-                  discountExpression: (found_item_master.discPct ?? "0") + "%",
-                  taxId: found_item_master.taxId,
-                  taxCode: found_item_master.taxCd,
-                  taxPct: found_item_master.taxPct,
-                  qtyRequest: null,
-                  itemPricing: {
+      setTimeout(async () => {
+         if (barcode) {
+            barcode = barcode.toUpperCase();
+            this.barcodeSearchValue = "";
+            if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
+               let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
+               if (found_barcode) {
+                  let found_item_master = this.configService.item_Masters.find(r => found_barcode.itemId === r.id);
+                  let outputData: TransactionDetail = {
                      itemId: found_item_master.id,
-                     unitPrice: found_item_master.price,
+                     itemCode: found_item_master.code,
+                     description: found_item_master.itemDesc,
+                     typeCode: found_item_master.typeCode,
+                     variationTypeCode: found_item_master.varCd,
                      discountGroupCode: found_item_master.discCd,
                      discountExpression: (found_item_master.discPct ?? "0") + "%",
-                     discountPercent: found_item_master.discPct ?? 0,
-                     discountGroupId: null,
-                     unitPriceMin: null,
-                     currencyId: null
-                  },
-                  itemVariationXId: found_barcode.xId,
-                  itemVariationXCd: found_barcode.xCd,
-                  itemVariationXDesc: found_barcode.xDesc,
-                  itemVariationYId: found_barcode.yId,
-                  itemVariationYCd: found_barcode.yCd,
-                  itemVariationYDesc: found_barcode.yDesc,
-                  itemSku: found_barcode.sku,
-                  itemBarcode: found_barcode.barcode,
-                  itemBrandId: found_item_master.brandId,
-                  itemGroupId: found_item_master.groupId,
-                  itemUomId: found_barcode.itemUomId,
-                  itemUomDesc: found_barcode.itemUomDesc,
-                  itemCategoryId: found_item_master.catId,
-                  itemDepartmentId: found_item_master.deptId,
-                  itemBarcodeTagId: found_barcode.id,
-                  newItemId: found_item_master.newId,
-                  newItemEffectiveDate: found_item_master.newDate
-               }
-               if (emit) {
-                  this.onItemAdd.emit([outputData]);
+                     taxId: found_item_master.taxId,
+                     taxCode: found_item_master.taxCd,
+                     taxPct: found_item_master.taxPct,
+                     qtyRequest: null,
+                     itemPricing: {
+                        itemId: found_item_master.id,
+                        unitPrice: found_item_master.price,
+                        discountGroupCode: found_item_master.discCd,
+                        discountExpression: (found_item_master.discPct ?? "0") + "%",
+                        discountPercent: found_item_master.discPct ?? 0,
+                        discountGroupId: null,
+                        unitPriceMin: null,
+                        currencyId: null
+                     },
+                     itemVariationXId: found_barcode.xId,
+                     itemVariationXCd: found_barcode.xCd,
+                     itemVariationXDesc: found_barcode.xDesc,
+                     itemVariationYId: found_barcode.yId,
+                     itemVariationYCd: found_barcode.yCd,
+                     itemVariationYDesc: found_barcode.yDesc,
+                     itemSku: found_barcode.sku,
+                     itemBarcode: found_barcode.barcode,
+                     itemBrandId: found_item_master.brandId,
+                     itemGroupId: found_item_master.groupId,
+                     itemUomId: found_barcode.itemUomId,
+                     itemUomDesc: found_barcode.itemUomDesc,
+                     itemCategoryId: found_item_master.catId,
+                     itemDepartmentId: found_item_master.deptId,
+                     itemBarcodeTagId: found_barcode.id,
+                     newItemId: found_item_master.newId,
+                     newItemEffectiveDate: found_item_master.newDate
+                  }
+                  if (this.configSystemWideBarcodeScanBeep) {
+                     beep(150, 2500, 100);
+                  }
+                  if (emit) {
+                     this.onItemAdd.emit([outputData]);
+                  } else {
+                     return outputData;
+                  }
                } else {
-                  return outputData;
+                  this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
+                  if (this.configSystemWideBarcodeScanBeep) {
+                     beep(150, 80, 100);
+                  }
                }
             } else {
-               this.toastService.presentToast("", "Barcode not found", "top", "warning", 1000);
+               this.toastService.presentToast("System Error", "Local db not found", "top", "danger", 1000);
+               if (this.configSystemWideBarcodeScanBeep) {
+                  beep(150, 80, 100);
+               }
             }
-         } else {
-            this.toastService.presentToast("System Error", "Local db not found", "top", "danger", 1000);
          }
-      }
+      }, 0);
+      return null;
    }
 
    async handleItemCodeKeyDown(e: any, key: string) {
@@ -608,7 +629,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
          } else {
             this.focusItemSearch();
          }
-      }, 100);
+      }, 0);
    }
 
    focusBarcodeSearch() {
@@ -682,5 +703,42 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    }
 
    /* #endregion */
-   
+
+}
+
+const myAudioContext = new AudioContext();
+function beep(duration, frequency, volume) {
+   return new Promise((resolve, reject) => {
+      // Set default duration if not provided
+      duration = duration || 200;
+      frequency = frequency || 440;
+      volume = volume || 100;
+
+      try {
+         let oscillatorNode = myAudioContext.createOscillator();
+         let gainNode = myAudioContext.createGain();
+         oscillatorNode.connect(gainNode);
+
+         // Set the oscillator frequency in hertz
+         oscillatorNode.frequency.value = frequency;
+
+         // Set the type of oscillator
+         oscillatorNode.type = "square";
+         gainNode.connect(myAudioContext.destination);
+
+         // Set the gain to the volume
+         gainNode.gain.value = volume * 0.01;
+
+         // Start audio with the desired duration
+         oscillatorNode.start(myAudioContext.currentTime);
+         oscillatorNode.stop(myAudioContext.currentTime + duration * 0.001);
+
+         // Resolve the promise when the sound is finished
+         oscillatorNode.onended = () => {
+            resolve(true);
+         };
+      } catch (error) {
+         reject(error);
+      }
+   });
 }
