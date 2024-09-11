@@ -68,7 +68,7 @@
       [columnMode]="'force'"
       [footerHeight]="50">
 
-      <ngx-datatable-column prop="trxDate" name="Trx. Date" *ngIf="selectedType.id === 1 || selectedType.id === 3">
+      <ngx-datatable-column prop="trxDate" name="Trx. Date" *ngIf="selectedType.id === 1 || selectedType.id === 3 || selectedType.id === 5">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.trxDate|date:"yyyy-MM-dd"}}</div>
         </ng-template>
@@ -98,13 +98,13 @@
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="qtyRequest" name="Qty." *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4">
+      <ngx-datatable-column prop="qtyRequest" name="Qty." *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size justify-content-end">{{row.qtyRequest|number:'1.0'}}</div>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="subTotal" name="Total" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4">
+      <ngx-datatable-column prop="subTotal" name="Total" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size justify-content-end">{{row.subTotal|number:'1.2-2'}}</div>
         </ng-template>
@@ -152,8 +152,8 @@
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"promotion"|number:"1.0"}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"total"|number:"1.0"}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto" *ngIf="selectedType.id === 2"></ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4">{{object|sum:"qtyRequest"|number:"1.0"}}</ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4">{{object|sum:"subTotal"|number:"1.2-2"}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">{{object|sum:"qtyRequest"|number:"1.0"}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">{{object|sum:"subTotal"|number:"1.2-2"}}</ion-col>
               </ion-row>
             </ion-grid>
           </div>

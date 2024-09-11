@@ -24,6 +24,7 @@ export const trxAppCode = {
    mobileLocationApp: "MATRLA",
    mobileStockReplenish: "MATRSP",
    mobileConsignmentCount: "MATRCC",
+   mobileConsignmentCountEntry: "MATRCCE",
    mobileInboundScan: "MATRIS",
    mobileStockReorder: "MATRSR",
    mobileTransferOut: "MATRTO",

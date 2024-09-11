@@ -31,7 +31,7 @@
             <div>Undo Full Month</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); edit()" *ngIf="!objectService?.objectHeader?.isEntryCompleted && !objectService.configRestrictEditAfterCompleteFullMonth">
+        <ion-item (click)="popover.dismiss(); edit()" *ngIf="!objectService?.objectHeader?.isEntryCompleted">
           <ion-icon name="create-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Edit</div>

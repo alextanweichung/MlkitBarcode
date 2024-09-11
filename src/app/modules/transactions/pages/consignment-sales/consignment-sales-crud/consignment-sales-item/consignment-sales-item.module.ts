@@ -10,7 +10,6 @@ import { ConsignmentSalesItemPage } from './consignment-sales-item.page';
 import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 import { ItemAddListFlatPageModule } from 'src/app/shared/pages/item-add-list-flat/item-add-list-flat.module';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
-import { ItemCodeInputOfflinePageModule } from 'src/app/shared/pages/item-code-input-offline/item-code-input-offline.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -24,7 +23,6 @@ import { NgxPaginationModule } from 'ngx-pagination';
       BarcodeScanInputPageModule,
       ItemAddListFlatPageModule,
       IdMappingModule,
-      ItemCodeInputOfflinePageModule,
       SumModule,
       SearchDropdownPageModule,
       NgxPaginationModule

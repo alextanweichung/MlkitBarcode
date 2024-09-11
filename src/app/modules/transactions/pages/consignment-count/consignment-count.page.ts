@@ -72,10 +72,7 @@ export class ConsignmentCountPage implements OnInit, ViewWillEnter, ViewDidEnter
 	}
 
 	ngOnInit() {
-      this.objectService.filterLocationId = [];
-      if (this.configService.selected_location) {
-         this.objectService.filterLocationId.push(this.configService.selected_location);
-      }
+      
 	}
 
 	async promptIncompleteTrxAlert() {

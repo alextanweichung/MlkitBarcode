@@ -10,14 +10,14 @@ import { ConsignmentCountHeaderPage } from './consignment-count-header.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ConsignmentCountHeaderPageRoutingModule,
-    SearchDropdownPageModule,
-    ReactiveFormsModule
-    ],
-  declarations: [ConsignmentCountHeaderPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      ConsignmentCountHeaderPageRoutingModule,
+      SearchDropdownPageModule,
+      ReactiveFormsModule
+   ],
+   declarations: [ConsignmentCountHeaderPage]
 })
-export class ConsignmentCountHeaderPageModule {}
+export class ConsignmentCountHeaderPageModule { }

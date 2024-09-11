@@ -611,24 +611,22 @@ export class ItemCatalogPage implements OnInit, OnChanges {
    increaseVariationQty(data: InnerVariationDetail) {
       let qtyInCart = 0;
       qtyInCart += this.itemInCart.filter(r => r.variationTypeCode !== "0").flatMap(r => r.variationDetails).flatMap(r => r.details).filter(r => r.itemSku === data.itemSku).flatMap(r => r.qtyRequest).reduce((a, c) => a + c, 0);
-      if (data.qtyRequest) {
-         if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
-            if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.actualQty) {
-               data.qtyRequest = null;
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
-            } else {
-               data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-            }
-         } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
-            if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.availableQty) {
-               data.qtyRequest = null;
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
-            } else {
-               data.qtyRequest = (data.qtyRequest ?? 0) + 1;
-            }
+      if (this.isSalesOrder && this.salesOrderQuantityControl === "1") {
+         if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.actualQty) {
+            data.qtyRequest = null;
+            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
          } else {
             data.qtyRequest = (data.qtyRequest ?? 0) + 1;
          }
+      } else if (this.isSalesOrder && this.salesOrderQuantityControl === "2") {
+         if (((data.qtyRequest ?? 0) + qtyInCart + 1) > data.availableQty) {
+            data.qtyRequest = null;
+            this.toastService.presentToast("Invalid Quantity", `Requested quantity exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+         } else {
+            data.qtyRequest = (data.qtyRequest ?? 0) + 1;
+         }
+      } else {
+         data.qtyRequest = (data.qtyRequest ?? 0) + 1;
       }
    }
 

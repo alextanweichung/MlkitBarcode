@@ -36,13 +36,7 @@ export class ConsignmentSalesService {
       private configService: ConfigService,
       private authService: AuthService,
       private loadingService: LoadingService
-   ) {      
-      if (this.configService.selected_location && this.filterLocationId.length === 0) {
-         if (this.configService.selected_location) {
-            this.filterLocationId.push(this.configService.selected_location);
-         }
-      }
-    }
+   ) { }
 
    // Method to clean up the subscription
    stopListening() {
@@ -77,6 +71,12 @@ export class ConsignmentSalesService {
 
    async loadRequiredMaster() {
       try {
+         if (this.configService.selected_location) {
+            this.filterLocationId = [];
+            if (this.filterLocationId.findIndex(r => r === this.configService.selected_location) === -1) {
+               this.filterLocationId.push(this.configService.selected_location);
+            }
+         }
          await this.loadingService.showLoading();
          await this.loadModuleControl();
          await this.loadMasterList();

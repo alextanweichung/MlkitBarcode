@@ -86,7 +86,7 @@
                                  <div class="font-bold">{{rowData.itemBarcode}}</div>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto justify-content-center">
-                                 <ion-input #qtyRequestInput class="ion-text-center" type="number" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode)" (ionBlur)="computeAllAmount(rowData)"></ion-input>
+                                 <ion-input #qtyRequestInput class="ion-text-center" type="number" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode)" (ionBlur)="computeAllAmount(rowData, true)"></ion-input>
                               </ion-col>
                            </ion-row>
                            <ion-row>

@@ -7,6 +7,7 @@ import { StockReorderService } from 'src/app/modules/transactions/services/stock
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -60,13 +61,16 @@ export class StockReorderHeaderPage implements OnInit, ViewWillEnter, ViewDidEnt
          workFlowTransactionId: [null],
          uuid: [uuidv4()]
       })
+      if (this.objectForm.controls.locationId.value) {
+         this.onLocationChanged({ id: this.objectForm.controls.locationId.value });
+      }
    }
 
    ngOnInit() {
 
    }
 
-   onLocationChanged(event: any) {
+   onLocationChanged(event: SearchDropdownList) {
       if (event) {
          this.objectForm.patchValue({ locationId: event.id });
          let found = this.objectService.fullLocationMasterList.find(r => r.id === event.id);

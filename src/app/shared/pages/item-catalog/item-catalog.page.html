@@ -80,7 +80,7 @@
                                  <div class="font-bold ml-1">
                                     {{getLatestSalesHistoryByItemId(rowData.itemId)?.unitPrice|number:"1.2"}}
                                     <ng-container *ngIf="getLatestSalesHistoryByItemId(rowData.itemId)?.discountExpression">[{{getLatestSalesHistoryByItemId(rowData.itemId)?.discountExpression}}]</ng-container>
-                                    @{{getLatestSalesHistoryByItemId(rowData.itemId)?.documentDate|date:"dd/MM/yyyy"}}
+                                    @ {{getLatestSalesHistoryByItemId(rowData.itemId)?.documentDate|date:"dd/MM/yyyy"}}
                                  </div>
                               </ion-col>
                            </ng-container>

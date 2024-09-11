@@ -237,7 +237,54 @@ const routes: Routes = [
       path: 'managements/payment-arrangement-approvals',
       loadChildren: () => import('./modules/managements/pages/payment-arrangement-approvals/payment-arrangement-approvals.module').then(m => m.PaymentArrangementApprovalsPageModule)
    },
-
+   {
+      path: 'managements/b2b-cod-approvals',
+      loadChildren: () => import('./modules/managements/pages/b2b-cod-approvals/b2b-cod-approvals.module').then(m => m.B2bCodApprovalsPageModule)
+   },
+   {
+      path: 'managements/b2b-credit-approvals',
+      loadChildren: () => import('./modules/managements/pages/b2b-credit-approvals/b2b-credit-approvals.module').then(m => m.B2bCreditApprovalsPageModule)
+   },
+   {
+      path: 'managements/b2b-cod-reviews',
+      loadChildren: () => import('./modules/managements/pages/b2b-cod-reviews/b2b-cod-reviews.module').then(m => m.B2bCodReviewsPageModule)
+   },
+   {
+      path: 'managements/so-credit-approvals',
+      loadChildren: () => import('./modules/managements/pages/so-credit-approvals/so-credit-approvals.module').then(m => m.SoCreditApprovalsPageModule)
+   },
+   {
+      path: 'managements/so-cod-approvals',
+      loadChildren: () => import('./modules/managements/pages/so-cod-approvals/so-cod-approvals.module').then(m => m.SoCodApprovalsPageModule)
+   },
+   {
+      path: 'managements/so-cod-reviews',
+      loadChildren: () => import('./modules/managements/pages/so-cod-reviews/so-cod-reviews.module').then(m => m.SoCodReviewsPageModule)
+   },
+   {
+      path: 'managements/defect-request-approvals',
+      loadChildren: () => import('./modules/managements/pages/defect-request-approvals/defect-request-approvals.module').then(m => m.DefectRequestApprovalsPageModule)
+   },
+   {
+      path: 'managements/defect-request-reviews',
+      loadChildren: () => import('./modules/managements/pages/defect-request-reviews/defect-request-reviews.module').then(m => m.DefectRequestReviewsPageModule)
+   },
+   {
+      path: 'managements/retail-transfer-out-review',
+      loadChildren: () => import('./modules/managements/pages/retail-transfer-out-reviews/retail-transfer-out-reviews.module').then(m => m.RetailTransferOutReviewPageModule)
+   },
+   {
+      path: 'managements/co-transfer-out-review',
+      loadChildren: () => import('./modules/managements/pages/co-transfer-out-reviews/co-transfer-out-reviews.module').then(m => m.CoTransferOutReviewPageModule)
+   },
+   {
+      path: 'managements/retail-transfer-out-approvals',
+      loadChildren: () => import('./modules/managements/pages/retail-transfer-out-approvals/retail-transfer-out-approvals.module').then(m => m.RetailTransferOutApprovalsPageModule)
+   },
+   {
+      path: 'managements/co-transfer-out-approvals',
+      loadChildren: () => import('./modules/managements/pages/co-transfer-out-approvals/co-transfer-out-approvals.module').then(m => m.CoTransferOutApprovalsPageModule)
+   },
    // management-otp-configuration
    {
       path: 'managements/otp-configuration',
@@ -337,7 +384,6 @@ const routes: Routes = [
       path: 'transactions/inventory-level-retail',
       loadChildren: () => import('./modules/transactions/pages/inventory-level-retail/inventory-level-retail.module').then(m => m.InventoryLevelRetailPageModule)
    },
-
    // transaction-cash-deposit
    {
       path: 'transactions/cash-deposit',
@@ -374,6 +420,10 @@ const routes: Routes = [
    {
       path: 'transactions/consignment-count',
       loadChildren: () => import('./modules/transactions/pages/consignment-count/consignment-count.module').then(m => m.ConsignmentCountPageModule)
+   },
+   {
+      path: 'transactions/consignment-count-entry',
+      loadChildren: () => import('./modules/transactions/pages/consignment-count-entry/consignment-count-entry.module').then(m => m.ConsignmentCountEntryPageModule)
    },
    {
       path: 'transactions/inbound-scan',
@@ -573,10 +623,6 @@ const routes: Routes = [
       loadChildren: () => import('./shared/pages/camera-scan-input/camera-scan-input.module').then(m => m.CameraScanInputPageModule)
    },
    {
-      path: 'item-code-input-offline',
-      loadChildren: () => import('./shared/pages/item-code-input-offline/item-code-input-offline.module').then(m => m.ItemCodeInputOfflinePageModule)
-   },
-   {
       path: 'pos-approval-processing',
       loadChildren: () => import('./shared/pages/pos-approval-processing/pos-approval-processing.module').then(m => m.PosApprovalProcessingPageModule)
    },
@@ -604,62 +650,10 @@ const routes: Routes = [
       path: 'creditor-application',
       loadChildren: () => import('./modules/transactions/pages/creditor-application/creditor-application.module').then(m => m.CreditorApplicationPageModule)
    },
-  {
-    path: 'b2b-cod-approvals',
-    loadChildren: () => import('./modules/managements/pages/b2b-cod-approvals/b2b-cod-approvals.module').then( m => m.B2bCodApprovalsPageModule)
-  },
-  {
-    path: 'b2b-credit-approvals',
-    loadChildren: () => import('./modules/managements/pages/b2b-credit-approvals/b2b-credit-approvals.module').then( m => m.B2bCreditApprovalsPageModule)
-  },
-  {
-    path: 'b2b-cod-reviews',
-    loadChildren: () => import('./modules/managements/pages/b2b-cod-reviews/b2b-cod-reviews.module').then( m => m.B2bCodReviewsPageModule)
-  },
-  {
-    path: 'so-credit-approvals',
-    loadChildren: () => import('./modules/managements/pages/so-credit-approvals/so-credit-approvals.module').then( m => m.SoCreditApprovalsPageModule)
-  },
-  {
-    path: 'so-cod-approvals',
-    loadChildren: () => import('./modules/managements/pages/so-cod-approvals/so-cod-approvals.module').then( m => m.SoCodApprovalsPageModule)
-  },
-  {
-    path: 'so-cod-reviews',
-    loadChildren: () => import('./modules/managements/pages/so-cod-reviews/so-cod-reviews.module').then( m => m.SoCodReviewsPageModule)
-  },
-  {
-    path: 'defect-request-approvals',
-    loadChildren: () => import('./modules/managements/pages/defect-request-approvals/defect-request-approvals.module').then( m => m.DefectRequestApprovalsPageModule)
-  },
-  {
-    path: 'defect-request-reviews',
-    loadChildren: () => import('./modules/managements/pages/defect-request-reviews/defect-request-reviews.module').then( m => m.DefectRequestReviewsPageModule)
-  },
-  {
-    path: 'retail-transfer-out-review',
-    loadChildren: () => import('./modules/managements/pages/retail-transfer-out-reviews/retail-transfer-out-reviews.module').then( m => m.RetailTransferOutReviewPageModule)
-  },
-  {
-    path: 'co-transfer-out-review',
-    loadChildren: () => import('./modules/managements/pages/co-transfer-out-reviews/co-transfer-out-reviews.module').then( m => m.CoTransferOutReviewPageModule)
-  },
-  {
-    path: 'retail-transfer-out-approvals',
-    loadChildren: () => import('./modules/managements/pages/retail-transfer-out-approvals/retail-transfer-out-approvals.module').then( m => m.RetailTransferOutApprovalsPageModule)
-  },
-  {
-    path: 'co-transfer-out-approvals',
-    loadChildren: () => import('./modules/managements/pages/co-transfer-out-approvals/co-transfer-out-approvals.module').then( m => m.CoTransferOutApprovalsPageModule)
-  },
-
-
-
-
-
-
-
-
+   {
+      path: 'item-code-input',
+      loadChildren: () => import('./shared/pages/item-code-input/item-code-input.module').then(m => m.ItemCodeInputPageModule)
+   },
 
 
 ];

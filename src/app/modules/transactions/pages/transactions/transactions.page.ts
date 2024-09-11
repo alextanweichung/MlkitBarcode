@@ -27,6 +27,7 @@ export class TransactionsPage implements OnInit {
    showCreditorApplication: boolean = false;
    showStockReplenish: boolean = false;
    showConsignmentCount: boolean = false;
+   showConsignmentCountEntry: boolean = false;
    showInboundScan: boolean = false;
    showStockReorder: boolean = false;
    showTransferOut: boolean = false;
@@ -64,8 +65,8 @@ export class TransactionsPage implements OnInit {
                this.showDebtorApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileDebtorApp) > -1;
                this.showCreditorApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileCreditorApp) > -1;
                this.showLocationApplication = pageItems.findIndex(r => r.title === trxAppCode.mobileLocationApp) > -1;
-               // this.showStockReplenish = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReplenish) > -1;
                this.showConsignmentCount = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignmentCount) > -1;
+               this.showConsignmentCountEntry = pageItems.findIndex(r => r.title === trxAppCode.mobileConsignmentCountEntry) > -1;
                this.showInboundScan = pageItems.findIndex(r => r.title === trxAppCode.mobileInboundScan) > -1;
                this.showStockReorder = pageItems.findIndex(r => r.title === trxAppCode.mobileStockReorder) > -1;
                this.showTransferOut = pageItems.findIndex(r => r.title === trxAppCode.mobileTransferOut) > -1;

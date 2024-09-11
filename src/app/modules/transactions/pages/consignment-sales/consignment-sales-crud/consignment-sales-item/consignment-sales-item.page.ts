@@ -10,6 +10,7 @@ import { ConsignmentSalesRoot } from 'src/app/modules/transactions/models/consig
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { ModuleControl } from 'src/app/shared/models/module-control';
@@ -43,6 +44,7 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       private commonService: CommonService,
       private configService: ConfigService,
       private toastService: ToastService,
+      private loadingService: LoadingService,
       private navController: NavController,
       private alertController: AlertController,
       private route: ActivatedRoute,
@@ -316,8 +318,10 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    async onDiscCodeChanged(trxLine: TransactionDetail, event: SearchDropdownList) {
       try {
+         console.log("🚀 ~ ConsignmentSalesItemPage ~ onDiscCodeChanged ~ event:", event)
          if (event) {
             let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.code)?.attribute1
+            console.log("🚀 ~ ConsignmentSalesItemPage ~ onDiscCodeChanged ~ discPct:", discPct)
             if (discPct) {
                trxLine.discountGroupCode = event.code;
                if (discPct === "0") {
@@ -339,21 +343,23 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async computeAllAmount(rowData: TransactionDetail) {
+   async computeAllAmount(rowData: TransactionDetail, reflectToDetail: boolean = false) {
       setTimeout(async () => {
          if (rowData.qtyRequest === null || rowData.qtyRequest === undefined || isNaN(Number(rowData.qtyRequest))) {
             this.toastService.presentToast("", "Invalid Qty", "top", "warning", 1000);
             return;
          } else {
-            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
-            this.objectService.objectDetail[findIndex].qtyRequest = parseFloat(rowData.qtyRequest.toFixed(0));
             try {
-               await this.computeDiscTaxAmount(this.objectService.objectDetail[findIndex]);
+               await this.computeDiscTaxAmount(rowData);
                if (this.objectService.consignmentSalesActivateMarginCalculation) {
-                  await this.computeMarginAmount(this.objectService.objectDetail[findIndex]);
+                  await this.computeMarginAmount(rowData);
                }
-               let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+               if (reflectToDetail) {
+                  let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+                  this.objectService.objectDetail[findIndex] = JSON.parse(JSON.stringify(rowData));
+                  let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+                  await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+               }
                if (this.itemSearchText) {
                   await this.search(this.itemSearchText);
                }
@@ -397,8 +403,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
             this.objectService.objectDetail[this.selectedIndex] = JSON.parse(JSON.stringify(this.selectedItem));
             let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-            this.hideEditModal();
-            await this.resetFilteredObj();
+            await this.hideEditModal();
+            await this.search(this.itemSearchText);
          }
       }
    }
@@ -481,14 +487,16 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       }
    }
 
-   insertObject() {
+   async insertObject() {
       try {
+         await this.loadingService.showLoading();
          let trxDto: ConsignmentSalesRoot = {
             header: this.objectService.objectHeader,
             details: this.objectService.objectDetail
          }
-         this.objectService.insertObject(trxDto).subscribe(response => {
+         this.objectService.insertObject(trxDto).subscribe(async response => {
             if (response.status === 201) {
+               await this.loadingService.dismissLoading();
                let object = response.body as ConsignmentSalesRoot;
                this.toastService.presentToast("", "Insert Complete", "top", "success", 1000);
                let navigationExtras: NavigationExtras = {
@@ -507,6 +515,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       } catch (e) {
          this.sendForDebug();
          console.error(e);
+      } finally {
+         await this.loadingService.dismissLoading();
       }
    }
 

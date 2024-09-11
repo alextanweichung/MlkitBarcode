@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
@@ -10,7 +10,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
    templateUrl: './filter.page.html',
    styleUrls: ['./filter.page.scss'],
 })
-export class FilterPage implements OnInit {
+export class FilterPage implements OnInit, OnChanges {
 
    filters: any;
 
@@ -44,6 +44,10 @@ export class FilterPage implements OnInit {
       private commonService: CommonService,
       private modalController: ModalController
    ) { }
+   
+   ngOnChanges(changes: SimpleChanges): void {
+      throw new Error('Method not implemented.');
+   }
 
    ngOnInit() {
       this.date_from = format(parseISO(this.startDate.toISOString()), 'MMM d, yyyy');

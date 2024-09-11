@@ -46,6 +46,7 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
          { id: 2, code: "IXY", description: "Sales by Item Code, X Code, Y Code" },
          { id: 3, code: "SMC", description: "Sales by Discount Code (Margin Cat.)" },
          { id: 4, code: "SDC", description: "Sales by Discount Code" },
+         { id: 5, code: "SQA", description: "Sales, Qty., Amt." },
       );
    }
 

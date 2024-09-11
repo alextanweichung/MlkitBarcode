@@ -165,6 +165,7 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
    selectLocationModal: boolean = false;
    @ViewChild("searchBar") searchBar: IonSearchbar;
    showLocationModal() {
+      this.tempDropdownList = [];
       this.selectLocationModal = true;
       this.searchText = null;
       this.assignToTemp();

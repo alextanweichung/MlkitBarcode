@@ -1,8 +1,7 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, OnDestroy } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
-import { ConsignmentCountDetail, ConsignmentCountHeader, ConsignmentCountList, ConsignmentCountRoot } from "../models/consignment-count";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
 import { LocalTransaction } from "src/app/shared/models/pos-download";
@@ -11,6 +10,7 @@ import { LoadingService } from "src/app/services/loading/loading.service";
 import { CommonService } from "src/app/shared/services/common.service";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { ModuleControl } from "src/app/shared/models/module-control";
+import { ConsignmentCountEntryHeader, ConsignmentCountEntryList, ConsignmentCountEntryRoot } from "../models/consignment-count-entry";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -20,13 +20,13 @@ const httpObserveHeader = {
 @Injectable({
    providedIn: 'root'
 })
-export class ConsignmentCountService {
+export class ConsignmentCountEntryService {
 
    filterStartDate: Date;
    filterEndDate: Date;
    filterLocationId: number[] = [];
 
-   trxKey: string = "consignmentCount";
+   trxKey: string = "consignmentCountEntry";
 
    constructor(
       private http: HttpClient,
@@ -57,10 +57,26 @@ export class ConsignmentCountService {
    }
 
    moduleControl: ModuleControl[];
+   configMobileScanItemContinuous: boolean = false;
+   configItemVariationMatrixShowCodeDesc: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
             this.moduleControl = obj;
+
+            let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
+            if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileScanItemContinuous = true;
+            } else {
+               this.configMobileScanItemContinuous = false;
+            }
+
+            let itemVariationMatrixShowCodeDesc = this.moduleControl.find(x => x.ctrlName === "ItemVariationMatrixShowCodeDesc");
+            if (itemVariationMatrixShowCodeDesc && itemVariationMatrixShowCodeDesc.ctrlValue.toUpperCase() === "Y") {
+               this.configItemVariationMatrixShowCodeDesc = true
+            } else {
+               this.configItemVariationMatrixShowCodeDesc = false;
+            }
          });
       } catch (e) {
          console.error(e);
@@ -100,63 +116,43 @@ export class ConsignmentCountService {
       }
    }
 
-   objectHeader: ConsignmentCountHeader;
-   setHeader(objectHeader: ConsignmentCountHeader) {
-      this.objectHeader = objectHeader;
+   object: ConsignmentCountEntryRoot;
+   setObject(object: ConsignmentCountEntryRoot) {
+      this.object = object;
+      console.log("🚀 ~ ConsignmentCountEntryService ~ setObject ~ this.object:", JSON.stringify(this.object))
    }
 
-   objectDetail: ConsignmentCountDetail[] = []
-   setLines(objectDetail: ConsignmentCountDetail[]) {
-      this.objectDetail = objectDetail;
-   }
-
-   localObject: LocalTransaction;
-   setLocalObject(localObject: LocalTransaction) {
-      this.localObject = localObject;
-   }
-
-   removeHeader() {
-      this.objectHeader = null
-   }
-
-   removeLines() {
-      this.objectDetail = [];
-   }
-
-   removeLocalObject() {
-      this.localObject = null;
+   removeObject() {
+      this.object = null
    }
 
    async resetVariables() {
-      this.removeHeader();
-      this.removeLines();
-      this.removeLocalObject();
+      this.removeObject();
       await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
    getMasterList() {
-      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/masterList").toPromise();
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry/masterList").toPromise();
    }
 
-   // getObjects() {
    getObjects(dateStart: string, dateEnd: string) {
-      return this.http.get<ConsignmentCountList[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCount/cclist/${dateStart}/${dateEnd}`);
+      return this.http.get<ConsignmentCountEntryList[]>(this.configService.selected_sys_param.apiUrl + `MobileConsignmentCountEntry/listing/${dateStart}/${dateEnd}`);
    }
 
    getObjectById(objectId: number) {
-      return this.http.get<ConsignmentCountRoot>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/" + objectId);
+      return this.http.get<ConsignmentCountEntryRoot>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry/" + objectId);
    }
 
-   insertObject(objectRoot: ConsignmentCountRoot) {
-      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
+   insertObject(objectRoot: ConsignmentCountEntryRoot) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry", objectRoot, httpObserveHeader);
    }
 
-   updateObject(objectRoot: ConsignmentCountRoot) {
-      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount", objectRoot, httpObserveHeader);
+   updateObject(objectRoot: ConsignmentCountEntryRoot) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry", objectRoot, httpObserveHeader);
    }
 
    sendDebug(debugObject: JsonDebug) {
-      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCount/jsonDebug", debugObject, httpObserveHeader);
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry/jsonDebug", debugObject, httpObserveHeader);
    }
 
 }
