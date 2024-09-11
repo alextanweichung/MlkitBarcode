@@ -4,7 +4,7 @@ import { ViewWillEnter, NavController, ActionSheetController, ViewDidEnter, Aler
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ConsignmentCountService } from '../../services/consignment-count.service';
-import { ConsignmentCountHeader, ConsignmentCountList, ConsignmentCountRoot } from '../../models/consignment-count';
+import { ConsignmentCountList, ConsignmentCountRoot } from '../../models/consignment-count';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';

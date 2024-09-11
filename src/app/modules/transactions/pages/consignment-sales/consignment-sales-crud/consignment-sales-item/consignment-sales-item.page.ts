@@ -300,11 +300,9 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    async computeDiscTaxAmount(trxLine: TransactionDetail) {
       try {
          trxLine = this.commonService.computeDiscTaxAmount(trxLine, this.objectService.useTax, this.objectService.objectHeader.isItemPriceTaxInclusive, this.objectService.objectHeader.isDisplayTaxInclusive, this.objectService.maxPrecision);
-         console.log("🚀 ~ ConsignmentSalesItemPage ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
          if (this.objectService.consignmentSalesActivateMarginCalculation) {
             await this.computeMarginAmount(trxLine);
          }
-         console.log("🚀 ~ ConsignmentSalesItemPage ~ computeDiscTaxAmount ~ trxLine:", JSON.stringify(trxLine))
       } catch (e) {
          console.error(e);
       }
@@ -318,10 +316,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    async onDiscCodeChanged(trxLine: TransactionDetail, event: SearchDropdownList) {
       try {
-         console.log("🚀 ~ ConsignmentSalesItemPage ~ onDiscCodeChanged ~ event:", event)
          if (event) {
             let discPct = this.objectService.discountGroupMasterList.find(x => x.code === event.code)?.attribute1
-            console.log("🚀 ~ ConsignmentSalesItemPage ~ onDiscCodeChanged ~ discPct:", discPct)
             if (discPct) {
                trxLine.discountGroupCode = event.code;
                if (discPct === "0") {

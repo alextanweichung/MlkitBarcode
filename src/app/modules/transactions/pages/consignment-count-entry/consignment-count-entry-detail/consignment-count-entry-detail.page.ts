@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Keyboard } from '@capacitor/keyboard';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
+import { TransactionCode } from '../../../models/transaction-type-constant';
+import { ConsignmentCountEntryRoot } from '../../../models/consignment-count-entry';
 
 @Component({
    selector: 'app-consignment-count-entry-detail',
@@ -41,12 +43,22 @@ export class ConsignmentCountEntryDetailPage implements OnInit, ViewWillEnter {
       if ((await Network.getStatus()).connected) {
          await this.objectService.loadRequiredMaster();
       }
-      this.route.queryParams.subscribe(async params => {         
-         this.objectId = params["objectId"];
-         if (this.objectId) {
-            await this.loadObject();
-         }
-      })
+		this.route.queryParams.subscribe(async params => {
+			this.isLocal = params["isLocal"];
+			this.guid = params["guid"];
+			if (this.isLocal) {
+				if (this.guid) {
+					await this.loadLocalObject();
+				} else {
+					this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
+				}
+			} else {
+				this.objectId = params["objectId"];
+				if (this.objectId) {
+					await this.loadObject();
+				}
+			}
+		})
    }
 
    ngOnInit() {
@@ -72,6 +84,35 @@ export class ConsignmentCountEntryDetailPage implements OnInit, ViewWillEnter {
          await this.loadingService.dismissLoading();
       }
    }
+
+	async loadLocalObject() {
+		try {
+			await this.loadingService.showLoading();
+			let localObject = await this.configService.getLocalTransactionById(TransactionCode.consignmentCountEntryTrx, this.guid);
+			let object = JSON.parse(localObject.jsonData) as ConsignmentCountEntryRoot;
+			object.header.isLocal = true;
+			object.header.guid = localObject.id;
+			object.header.lastUpdated = localObject.lastUpdated;
+			object.details.forEach(r => {
+				if (r.itemVariationXId) {
+					r.itemVariationXDesc = this.objectService.itemVariationXMasterList.find(rr => rr.id === r.itemVariationXId)?.description;
+				}
+				if (r.itemVariationYId) {
+					r.itemVariationYDesc = this.objectService.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description;
+				}
+            r.guid = uuidv4();
+			})
+			if (this.isLocal) {
+				await this.objectService.setLocalObject(JSON.parse(JSON.stringify(localObject)));
+			}
+			await this.objectService.setObject(JSON.parse(JSON.stringify(object)));
+         await this.resetFilteredObj();
+		} catch (e) {
+			console.error(e);
+		} finally {
+			await this.loadingService.dismissLoading();
+		}
+	}
 
    edit() {
       this.navController.navigateRoot("/transactions/consignment-count-entry/consignment-count-entry-header");
@@ -100,6 +141,47 @@ export class ConsignmentCountEntryDetailPage implements OnInit, ViewWillEnter {
    }
 
    /* #endregion */
+
+	async deleteLocal() {
+		try {
+			if (this.objectService.object?.header?.isLocal) {
+				const alert = await this.alertController.create({
+					cssClass: "custom-alert",
+					header: "Delete this Consignment Count Entry?",
+					message: "This action cannot be undone.",
+					buttons: [
+						{
+							text: "Delete",
+							cssClass: "danger",
+							handler: async () => {
+								if (this.objectService.localObject) {
+									await this.configService.deleteLocalTransaction(TransactionCode.consignmentCountEntryTrx, this.objectService.localObject);
+									this.toastService.presentToast("", "Consignment Count Entry deleted", "top", "success", 1000);
+									await this.objectService.resetVariables();
+									this.navController.navigateRoot("transactions/consignment-count");
+								} else {
+									this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+								}
+							}
+						},
+						{
+							text: "Cancel",
+							role: "cancel",
+							cssClass: "cancel",
+							handler: async () => {
+
+							}
+						}
+					]
+				});
+				await alert.present();
+			} else {
+				this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
 
    /* #region line search bar */
 

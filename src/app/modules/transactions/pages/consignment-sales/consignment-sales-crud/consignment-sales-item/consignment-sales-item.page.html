@@ -216,6 +216,12 @@
                   <ion-input *ngIf="objectService.objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmt|number:'1.2-2'}}" [disabled]="true"></ion-input>
                   <ion-input *ngIf="!objectService.objectHeader.isDisplayTaxInclusive" #discAmt slot="end" class="font-size-small ion-text-right ion-no-padding-end" value="{{selectedItem.discountAmtExTax|number:'1.2-2'}}" [disabled]="true"></ion-input>
                </ion-item>
+               <ion-item>
+                  <ion-label>
+                     <div>Tax Amt.</div>
+                  </ion-label>
+                  <ion-input slot="end" class="font-size-small ion-text-right ion-no-padding-end" inputmode="text" enterkeyhint="done" type="text" [(ngModel)]="selectedItem.taxAmt" [disabled]="true"></ion-input>
+               </ion-item>
             </ion-list>
          </div>
       </ion-content>

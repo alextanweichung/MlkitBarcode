@@ -5,12 +5,14 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { ConsignmentCountEntryRoot } from 'src/app/modules/transactions/models/consignment-count-entry';
+import { TransactionCode } from 'src/app/modules/transactions/models/transaction-type-constant';
 import { ConsignmentCountEntryService } from 'src/app/modules/transactions/services/consignment-count-entry.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { LocalTransaction } from 'src/app/shared/models/pos-download';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 import { InnerVariationDetail } from 'src/app/shared/models/variation-detail';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
@@ -68,7 +70,6 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
             return;
          } else {
             let findLineCount = this.objectService.object.details.filter(r => r.itemId === event.itemId);
-            console.log("🚀 ~ ConsignmentCountEntryItemPage ~ onItemAdd ~ findLineCount:", findLineCount)
             if (findLineCount.length > 0) {
                this.toastService.presentToast("Duplicate Code Detected", `Item ${event[0].itemCode} has been added to transaction previously. Same item in multiple lines are not allowed.`, "top", "warning", 1000);
                return;
@@ -290,6 +291,84 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
       }
    }
 
+   async nextStepLocal() {
+      try {
+         this.submit_attempt = true;
+         const alert = await this.alertController.create({
+            cssClass: "custom-alert",
+            header: "Are you sure to proceed?",
+            buttons: [
+               {
+                  text: "Confirm",
+                  cssClass: "success",
+                  handler: async () => {
+                     await this.insertObjectLocal();
+                  }
+               },
+               {
+                  text: "Cancel",
+                  role: "cancel",
+                  cssClass: "cancel",
+                  handler: async () => {
+                     this.submit_attempt = false;
+                  }
+               }
+            ]
+         });
+         await alert.present();
+      } catch (e) {
+         this.submit_attempt = false;
+         console.error(e);
+      } finally {
+         this.submit_attempt = false;
+      }
+   }
+
+	async insertObjectLocal() {
+		try {
+			await this.loadingService.showLoading();
+			let localTrx: LocalTransaction;
+			if (this.objectService.object.header.isLocal) {
+				localTrx = {
+					id: this.objectService.object.header.guid,
+					apiUrl: this.configService.selected_sys_param.apiUrl,
+					trxType: TransactionCode.consignmentCountEntryTrx,
+					lastUpdated: new Date(),
+					jsonData: JSON.stringify(this.objectService.object)
+				}
+				await this.configService.updateLocalTransaction(localTrx);
+			} else {
+				localTrx = {
+					id: uuidv4(),
+					apiUrl: this.configService.selected_sys_param.apiUrl,
+					trxType: TransactionCode.consignmentCountEntryTrx,
+					lastUpdated: new Date(),
+					jsonData: JSON.stringify(this.objectService.object)
+				}
+				await this.configService.insertLocalTransaction(localTrx);
+			}
+			this.submit_attempt = false;
+			await this.objectService.resetVariables();
+			await this.loadingService.dismissLoading();
+			let navigationExtras: NavigationExtras = {
+				queryParams: {
+					objectId: 0,
+					isLocal: true,
+					guid: localTrx.id
+				}
+			}
+			this.navController.navigateForward("/transactions/consignment-count-entry/consignment-count-entry-detail", navigationExtras);
+		} catch (error) {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+			this.toastService.presentToast("System Error", "Please contact administrator", "top", "danger", 1000);
+			console.error(error);
+		} finally {
+			this.submit_attempt = false;
+			await this.loadingService.dismissLoading();
+		}
+	}
+
    async insertObject() {
       try {
          await this.loadingService.showLoading();
@@ -297,12 +376,15 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
             if (response.status === 201) {
                this.submit_attempt = false;
                let object = response.body as ConsignmentCountEntryRoot;
-               this.toastService.presentToast("", "Consignment Count added", "top", "success", 1000);
+               this.toastService.presentToast("", "Consignment Coun Entry added", "top", "success", 1000);
                let navigationExtras: NavigationExtras = {
                   queryParams: {
                      objectId: object.header.consignmentCountEntryId
                   }
                }
+					if (this.objectService.localObject) {
+						await this.configService.deleteLocalTransaction(TransactionCode.consignmentCountEntryTrx, this.objectService.localObject);
+					}
                await this.objectService.resetVariables();
                this.navController.navigateRoot("/transactions/consignment-count-entry/consignment-count-entry-detail", navigationExtras);
             }
@@ -325,12 +407,15 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
          this.objectService.updateObject(this.objectService.object).subscribe(async response => {
             if (response.status === 204) {
                this.submit_attempt = false;
-               this.toastService.presentToast("", "Consignment Count updated", "top", "success", 1000);
+               this.toastService.presentToast("", "Consignment Count Entry updated", "top", "success", 1000);
                let navigationExtras: NavigationExtras = {
                   queryParams: {
                      objectId: this.objectService.object.header.consignmentCountEntryId
                   }
                }
+					if (this.objectService.localObject) {
+						await this.configService.deleteLocalTransaction(TransactionCode.consignmentCountEntryTrx, this.objectService.localObject);
+					}
                await this.objectService.resetVariables();
                await this.loadingService.dismissLoading();
                this.navController.navigateRoot("/transactions/consignment-count-entry/consignment-count-entry-detail", navigationExtras);
@@ -370,6 +455,26 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
    }
 
    /* #endregion */
+
+   populateDetail() {
+      if (this.objectService.object.header.trxDate && this.objectService.object.header.locationId) {
+         this.objectService.populateDetail(this.objectService.object.header.trxDate, this.objectService.object.header.locationId).subscribe({
+            next: (response) => {
+               console.log("🚀 ~ ConsignmentCountEntryItemPage ~ this.objectService.populateDetail ~ response:", response)
+               if (response && response.length > 0) {
+                  response.forEach(r => {
+                     this.addItemToLine(r);
+                  })
+               }
+            },
+            error: (error) => {
+               console.error(error);
+            }
+         })
+      } else {
+         this.toastService.presentToast("", "Invalid Start Date/Location", "top", "warning", 1000);
+      }
+   }
 
    sendForDebug() {
       let jsonObjectString = JSON.stringify(this.objectService.object);

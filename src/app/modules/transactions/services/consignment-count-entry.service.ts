@@ -11,6 +11,7 @@ import { CommonService } from "src/app/shared/services/common.service";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { ModuleControl } from "src/app/shared/models/module-control";
 import { ConsignmentCountEntryHeader, ConsignmentCountEntryList, ConsignmentCountEntryRoot } from "../models/consignment-count-entry";
+import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -119,15 +120,24 @@ export class ConsignmentCountEntryService {
    object: ConsignmentCountEntryRoot;
    setObject(object: ConsignmentCountEntryRoot) {
       this.object = object;
-      console.log("🚀 ~ ConsignmentCountEntryService ~ setObject ~ this.object:", JSON.stringify(this.object))
+   }
+
+   localObject: LocalTransaction;
+   setLocalObject(localObject: LocalTransaction) {
+      this.localObject = localObject;
    }
 
    removeObject() {
       this.object = null
    }
 
+   removeLocalObject() {
+      this.localObject = null;
+   }
+
    async resetVariables() {
       this.removeObject();
+      this.removeLocalObject();
       await this.configService.removeFromLocalStorage(this.trxKey);
    }
 
@@ -149,6 +159,10 @@ export class ConsignmentCountEntryService {
 
    updateObject(objectRoot: ConsignmentCountEntryRoot) {
       return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry", objectRoot, httpObserveHeader);
+   }
+
+   populateDetail(startDate: Date, locationId: number) {
+      return this.http.post<TransactionDetail[]>(this.configService.selected_sys_param.apiUrl + "MobileConsignmentCountEntry/populate", { startDate: startDate, locationId: locationId });
    }
 
    sendDebug(debugObject: JsonDebug) {

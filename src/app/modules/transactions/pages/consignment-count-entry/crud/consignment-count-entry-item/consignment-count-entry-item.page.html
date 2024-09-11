@@ -14,7 +14,7 @@
    <ng-template>
       <ion-content class="p-2">
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-            <ion-item (click)="popover.dismiss();" *ngIf="objectService.object.header.locationId">
+            <ion-item (click)="popover.dismiss(); populateDetail();" *ngIf="objectService.object.header.locationId">
                <ion-icon slot="end" name="download-outline" color="success"></ion-icon>
                <ion-label>
                   <div>Populate</div>
@@ -143,6 +143,12 @@
    <ion-grid class="ion-no-padding">
       <ion-row>
          <ion-col>
+           <ion-button class="ion-margin" expand="block" size="default" color="warning" (click)="submit_attempt = true; nextStepLocal()" [disabled]="submit_attempt">
+             Save Local
+             <ion-icon slot="end" name="cloud-offline-outline"></ion-icon>
+           </ion-button>
+         </ion-col>
+         <ion-col>
             <ion-button class="ion-margin" expand="block" size="default" color="success" (click)="submit_attempt = true; nextStep()" [disabled]="submit_attempt">
                Save
                <ion-icon slot="end" name="cloud-done-outline"></ion-icon>
@@ -156,7 +162,7 @@
    <ng-template>
       <ion-header>
          <ion-toolbar>
-            <ion-title>{{selectedItem.itemCode}}</ion-title>
+            <ion-title>{{selectedItem?.itemCode}}</ion-title>
             <ion-buttons slot="start">
                <ion-button (click)="cancelChanges()">Cancel</ion-button>
             </ion-buttons>
@@ -165,7 +171,7 @@
       <ion-content>
          <div class="p-2" *ngIf="selectedItem">
             
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="selectedItem.variationTypeCode === '0'">
                <ion-item>
                   <ion-label>
                      <div>Quantity</div>

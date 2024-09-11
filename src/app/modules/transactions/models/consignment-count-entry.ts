@@ -9,6 +9,11 @@ export interface ConsignmentCountEntryList {
    locationCode: string
    locationDescription: string
    totalQty: number
+
+   // local use
+   isLocal: boolean
+   guid: string
+   lastUpdated: Date
 }
 
 export interface ConsignmentCountEntryRoot {
@@ -20,8 +25,8 @@ export interface ConsignmentCountEntryRoot {
 export interface ConsignmentCountEntryHeader {
    consignmentCountEntryId: number
    consignmentCountEntryNum: string
-   description: any
-   trxDate: string
+   description: string
+   trxDate: Date
    trxDateTime: string
    locationId: number
    consignmentCountEntryUDField1: any
@@ -44,6 +49,11 @@ export interface ConsignmentCountEntryHeader {
    modifiedAt: any
    deactivated: boolean
    revision: number
+
+   // local use
+   isLocal: boolean
+   guid: string
+   lastUpdated: Date
 }
 
 export interface ConsignmentCountEntryDetail {

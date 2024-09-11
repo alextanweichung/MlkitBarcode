@@ -71,6 +71,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          businessModelType: [null],
          isBearPromo: [null],
          marginMode: [null],
+         isEntryCompleted: [false],
          uuid: [uuidv4()]
       })
       if (this.configService.selected_location) {
