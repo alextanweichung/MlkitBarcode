@@ -70,8 +70,9 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
             return;
          } else {
             let findLineCount = this.objectService.object.details.filter(r => r.itemId === event.itemId);
+            console.log("🚀 ~ ConsignmentCountEntryItemPage ~ onItemAdd ~ findLineCount:", findLineCount)
             if (findLineCount.length > 0) {
-               this.toastService.presentToast("Duplicate Code Detected", `Item ${event[0].itemCode} has been added to transaction previously. Same item in multiple lines are not allowed.`, "top", "warning", 1000);
+               this.toastService.presentToast("Duplicate Code Detected", `Item ${event.itemCode} has been added to transaction previously. Same item in multiple lines are not allowed.`, "top", "warning", 1000);
                return;
             } else {
                this.addItemToLine(event);
@@ -81,7 +82,7 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
       }
    }
 
-   async addItemToLine(trxLine: TransactionDetail) {
+   async addItemToLine(trxLine: TransactionDetail, isPush: boolean = false) {
       try {
          if (this.objectService.object.details.findIndex(r => r.itemId === trxLine.itemId) === 0) { // already in and first one
             this.objectService.object.details.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest ?? 1);
@@ -93,7 +94,11 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
             trxLine.locationId = this.objectService.object.header.locationId;
             trxLine.guid = uuidv4();
             this.objectService.object.details.forEach(r => { r.sequence += 1 });
-            await this.objectService.object.details.unshift(trxLine);
+            if (isPush) {
+               await this.objectService.object.details.push(trxLine);
+            } else {
+               await this.objectService.object.details.unshift(trxLine);
+            }
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, this.objectService.object);
             this.resetFilteredObj();
          }
@@ -460,10 +465,9 @@ export class ConsignmentCountEntryItemPage implements OnInit, ViewWillEnter, Vie
       if (this.objectService.object.header.trxDate && this.objectService.object.header.locationId) {
          this.objectService.populateDetail(this.objectService.object.header.trxDate, this.objectService.object.header.locationId).subscribe({
             next: (response) => {
-               console.log("🚀 ~ ConsignmentCountEntryItemPage ~ this.objectService.populateDetail ~ response:", response)
                if (response && response.length > 0) {
                   response.forEach(r => {
-                     this.addItemToLine(r);
+                     this.addItemToLine(r, true );
                   })
                }
             },

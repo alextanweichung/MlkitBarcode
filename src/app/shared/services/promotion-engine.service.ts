@@ -13,6 +13,11 @@ export class PromotionEngineService {
    }
 
    runPromotionEngine(salesBillLine: TransactionDetail[], promotionObject: PromotionMaster[], useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number, discountGroupList: MasterListDetails[], debugFlag: boolean, computeTradingMargin?: boolean) {
+      let findFreeGiftEventIndex = promotionObject.findIndex(x => x.promoRuleType == "S" && x.specialRuleType == "05");
+      let freeGiftPromoEvent: PromotionMaster;
+      if (findFreeGiftEventIndex != -1) {
+         freeGiftPromoEvent = promotionObject.splice(findFreeGiftEventIndex, 1)[0];
+      }
       if (debugFlag) {
          console.log("================ START ================");
          console.log("Promotion Object: ");
@@ -1328,6 +1333,66 @@ export class PromotionEngineService {
             line = this.commonService.computeTradingMargin(line, useTax, isItemPriceTaxInclusive, roundingPrecision);
          }
       })
+      //Special Free Gift Rule Handling, to be executed at last after all PWP calculated
+      if (freeGiftPromoEvent) {
+         promotionObject.push(freeGiftPromoEvent);
+         if (debugFlag) {
+            console.log("[Special Promo Event]: Free Gift With Min Purchase");
+         }
+         let freeGiftImpactArray: PromotionLine = freeGiftPromoEvent.line[0];
+         let freeGiftItemList = freeGiftImpactArray.lineItemList.map(x => x.itemId);
+         let toApplyPromo: boolean = false;
+         let nonFreeGiftLine = salesBillLine.filter(line => !(freeGiftItemList.includes(line.itemId)));
+         let freeGiftLine = salesBillLine.filter(line => freeGiftItemList.includes(line.itemId));
+         let nonFreeGiftSum = nonFreeGiftLine.reduce((sum, current) => sum + current.subTotal, 0);
+         nonFreeGiftSum = this.commonService.roundToPrecision(nonFreeGiftSum, roundingPrecision);
+         let impactFreeGiftLine: TransactionDetail[] = [];
+         if (nonFreeGiftSum >= freeGiftPromoEvent.eligibleBillAmount) {
+            toApplyPromo = true;
+            if (debugFlag) {
+               console.log("*** Triggering Items ***")
+               console.log(nonFreeGiftLine);
+               console.log("[Special Promo Event]: Amount " + nonFreeGiftSum + " matched for free gift. Continue to apply discount.");
+            }
+            if (!freeGiftPromoEvent.isRepeat) {
+               let uniquefreeGiftItemArray = [...new Set(freeGiftLine.map(x => x.itemId))];
+               for (let item of uniquefreeGiftItemArray) {
+                  let firstOccurance = freeGiftLine.find(x => x.itemId == item);
+                  if (firstOccurance) {
+                     impactFreeGiftLine.push(firstOccurance);
+                  }
+               }
+            } else {
+               impactFreeGiftLine = freeGiftLine;
+            }
+         }
+         if (toApplyPromo) {
+            let freeGiftType = freeGiftImpactArray.impactCode;
+            let freeGiftValue = freeGiftImpactArray.impactDiscExpr;
+            if (impactFreeGiftLine.length > 0) {
+               impactFreeGiftLine.forEach(line => {
+                  switch (freeGiftType) {
+                     //Set Total Disc Amount
+                     case "L03":
+                        line = this.replacePromoDiscAmt(line, (freeGiftValue * line.qtyRequest), freeGiftPromoEvent, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                        break;
+                     //Set Total Disc%
+                     case "L04":
+                        line = this.replacePromoDiscPct(line, freeGiftValue, freeGiftPromoEvent, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                        break;
+                     //Add Total Disc Amount
+                     case "L07":
+                        line = this.addPromoDiscAmt(line, (freeGiftValue * line.qtyRequest), freeGiftPromoEvent, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                        break;
+                     //Add Total Disc%
+                     case "L08":
+                        line = this.addPromoDiscPct(line, freeGiftValue, freeGiftPromoEvent, useTax, isItemPriceTaxInclusive, isDisplayTaxInclusive, roundingPrecision, pwp, line.qtyRequest);
+                        break;
+                  }
+               });
+            }
+         }
+      }
       //#endregion "First Loop - Promotion Event"
    }
 

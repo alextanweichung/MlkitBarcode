@@ -164,6 +164,36 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       item.oriUnitPrice = item.unitPrice;
       item.oriUnitPriceExTax = item.unitPriceExTax;
 
+      if (item.taxId && this.objectService.useTax) {
+         if (this.objectService.objectHeader.customerId) {
+            let foundCustomer = this.objectService.customerMasterList.find(r => r.id === this.objectService.objectHeader.customerId);
+            if (foundCustomer && foundCustomer.attribute7) {
+               let foundSupplyTax = this.objectService.taxMasterList.find(r => r.id === Number(foundCustomer.attribute7));
+               if (foundSupplyTax && foundSupplyTax.attribute1) {
+                  item.taxCode = foundSupplyTax.code;
+                  item.taxPct = Number(foundSupplyTax.attribute1);
+                  item.taxAmt = null
+               } else {
+                  item.taxCode = null;
+                  item.taxPct = null;
+                  item.taxAmt = null;
+               }
+            } else {
+               item.taxCode = null;
+               item.taxPct = null;
+               item.taxAmt = null;
+            }
+         } else {
+            item.taxCode = null;
+            item.taxPct = null;
+            item.taxAmt = null;
+         }
+      } else {
+         item.taxCode = null;
+         item.taxPct = null;
+         item.taxAmt = null;
+      }
+
       item.guid = uuidv4();
 
       if (this.objectService.consignmentSalesActivateMarginCalculation) {

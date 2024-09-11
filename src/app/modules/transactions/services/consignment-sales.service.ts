@@ -188,6 +188,7 @@ export class ConsignmentSalesService {
    itemUomMasterList: MasterListDetails[] = [];
    currencyMasterList: MasterListDetails[] = [];
    discountGroupMasterList: MasterListDetails[] = [];
+   taxMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
@@ -204,6 +205,7 @@ export class ConsignmentSalesService {
       this.itemUomMasterList = this.fullMasterList.filter(x => x.objectName === "ItemUom").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.discountGroupMasterList = this.fullMasterList.filter(x => x.objectName === "DiscountGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.taxMasterList = this.fullMasterList.filter(x => x.objectName === "Tax").flatMap(src => src.details).filter(y => y.deactivated === 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;
          if (savedCustomerList) {
@@ -211,6 +213,7 @@ export class ConsignmentSalesService {
          } else {
             await this.authService.rebuildCustomerList();
          }
+         this.customerMasterList.find(r => r.id === 10039)
       })
    }
 

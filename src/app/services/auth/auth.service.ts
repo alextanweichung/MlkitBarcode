@@ -205,6 +205,7 @@ export class AuthService {
          } catch (error) {
             console.error(JSON.stringify(error));
          } finally {
+            
          }
       }
    }
