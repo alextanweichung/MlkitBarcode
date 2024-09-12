@@ -242,7 +242,7 @@ export class StockReorderItemPage implements OnInit {
    updateObject() {
       if (this.objectService.object.line !== null && this.objectService.object.line.length > 0) {
          this.objectService.updateObject(this.objectService.object).subscribe(response => {
-            if (response.status === 204) {
+            if (response.status === 201) {
                this.toastService.presentToast("", "Stock Reorder updated", "top", "success", 1000);
                let objectId = (response.body as StockReorderRoot).stockReorderId;
                let navigationExtras: NavigationExtras = {
