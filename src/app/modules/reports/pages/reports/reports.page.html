@@ -56,7 +56,7 @@
       </ion-item>
       <ion-item button (click)="goToReport('sales-analysis')" *ngIf="showSalesAnalysis">
         <ion-label>
-          <div>Sales Analysis</div>
+          <div>Consignment Sales Analysis</div>
         </ion-label>
       </ion-item>
       <ion-item button (click)="goToReport('item-sales-analysis')" *ngIf="showItemSalesAnalysis">
@@ -64,6 +64,11 @@
           <div>Item Sales Analysis</div>
         </ion-label>
       </ion-item>
+      <ion-item button (click)="goToReport('consignment-count-analysis')" *ngIf="showConsignmentCountAnalysis">
+        <ion-label>
+          <div>Consignment Count Analysis</div>
+        </ion-label>
+      </ion-item>      
     </ion-list>
     
     <ng-container *ngIf="showCustomerDetail">

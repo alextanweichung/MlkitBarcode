@@ -1004,7 +1004,10 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                      if (!isBlock) {
                         if (this.mobilePickPackAutoFocusQtyUponScan) {
                            await this.cartonLineQtyInput().then(async res => {
-                              await this.runPackingEngine(r, Number(res));
+                              setTimeout(async () => {
+                                 await this.runPackingEngine(r, Number(res));
+                                 await this.barcodescaninput.setFocus();                                 
+                              }, 0);
                            })
                         } else {
                            await this.runPackingEngine(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
@@ -1023,7 +1026,10 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
                      if (!isBlock) {
                         if (this.mobilePickPackAutoFocusQtyUponScan) {
                            await this.cartonLineQtyInput().then(async res => {
-                              await this.insertPackingLineWithoutSo(r, Number(res));
+                              setTimeout(async () => {
+                                 await this.insertPackingLineWithoutSo(r, Number(res));
+                                 await this.barcodescaninput.setFocus();                                 
+                              }, 0);
                            })
                         } else {
                            await this.insertPackingLineWithoutSo(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));
@@ -1035,6 +1041,7 @@ export class PackingItemPage implements OnInit, ViewDidEnter {
          }
       } catch (e) {
          console.error(e);
+      } finally {
       }
    }
 

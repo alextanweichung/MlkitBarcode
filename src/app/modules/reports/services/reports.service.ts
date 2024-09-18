@@ -16,6 +16,7 @@ import { ConsignmentSalesLocation } from '../../transactions/models/consignment-
 import { ItemSalesAnalysis, ItemSalesAnalysisRequestObject } from '../models/item-sales-analysis';
 import { Item } from '../../transactions/models/item';
 import { MasterList } from 'src/app/shared/models/master-list';
+import { ConsignmentCountAnalysisObject, ConsignmentCountAnalysisRequestObject } from '../models/consignment-count-analysis';
 
 @Injectable({
    providedIn: 'root'
@@ -89,6 +90,10 @@ export class ReportsService {
 
    getItemSalesAnalysis(requestObject: ItemSalesAnalysisRequestObject) {
       return this.http.post<ItemSalesAnalysis[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/itemSalesAnalysis", requestObject);
+   }
+
+   getConsignmentCountAnalysis(requestObject: ConsignmentCountAnalysisRequestObject) {
+      return this.http.post<ConsignmentCountAnalysisObject[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/consignmentCountAnalysis", requestObject);
    }
 
    getConsignmentLocation() {
