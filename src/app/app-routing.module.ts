@@ -559,6 +559,10 @@ const routes: Routes = [
       path: 'reports/item-sales-analysis',
       loadChildren: () => import('./modules/reports/pages/reports/item-sales-analysis/item-sales-analysis.module').then(m => m.ItemSalesAnalysisPageModule)
    },
+   {
+      path: 'reports/consignment-count-analysis',
+      loadChildren: () => import('./modules/reports/pages/reports/consignment-count-analysis/consignment-count-analysis.module').then(m => m.ConsignmentCountAnalysisPageModule)
+   },
 
 
 

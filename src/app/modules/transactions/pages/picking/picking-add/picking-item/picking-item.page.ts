@@ -850,7 +850,10 @@ export class PickingItemPage implements OnInit, ViewDidEnter {
                      if (!isBlock) {
                         if (this.mobilePickPackAutoFocusQtyUponScan) {
                            await this.cartonLineQtyInput().then(async res => {
-                              await this.runPickingEngine(r, Number(res));
+                              setTimeout(async () => {
+                                 await this.runPickingEngine(r, Number(res));
+                                 await this.barcodescaninput.setFocus();                                 
+                              }, 0);
                            })
                         } else {
                            await this.runPickingEngine(r, Number(((r.qtyRequest && r.qtyRequest) > 0 ? r.qtyRequest : 1)));

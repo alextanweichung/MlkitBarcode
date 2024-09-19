@@ -231,13 +231,33 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
                trxLine.deptId = trxLine.itemGroupInfo.deptId;
                trxLine.oriDiscId = trxLine.itemPricing.discountGroupId;
             }
-         }
+         }        
 
          // for isPricingApproval
          trxLine.oriUnitPrice = trxLine.unitPrice;
          trxLine.oriUnitPriceExTax = trxLine.unitPriceExTax;
          trxLine.oriDiscountGroupCode = trxLine.discountGroupCode;
          trxLine.oriDiscountExpression = trxLine.discountExpression;
+
+         //Handle Multi UOM
+         if (trxLine.multiUom && trxLine.multiUom.length > 0) {
+            let primaryUom = trxLine.multiUom.find(x => x.isPrimary == true);
+            if (primaryUom) {
+               trxLine.baseRatio = primaryUom.ratio;
+               trxLine.uomRatio = primaryUom.ratio;
+            } else {
+               trxLine.baseRatio = 1;
+               trxLine.uomRatio = 1;
+            }
+            trxLine.ratioExpr = "1";
+            trxLine.uomMaster = [];
+            trxLine.uomMaster = trxLine.multiUom;
+         } else {
+            trxLine.baseRatio = 1;
+            trxLine.uomRatio = 1;
+            trxLine.ratioExpr = "1";
+            trxLine.uomMaster = [];
+         }
 
          // update qtyToShip
          trxLine.qtyToShip = trxLine.qtyRequest;

@@ -108,5 +108,6 @@ export const reportAppCode = {
    mobileTrxInq: "MARPTI",
    mobileSalesAnalysis: "MARPSAL",
    mobileItemSalesAnalysis: "MARPISAL",
+   mobileConsignmentCountAnalysis: "MARPCCA",
    mobileCustomerDetail: "MARPCD"
 }
