@@ -63,4 +63,12 @@ export class DoAcknowledgementService {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDeliveryOrderAck/signatureUpload/" + objectId + '/' + fileId, formData);
    }
 
+   uploadFile(keyId: number, fileId: number, file: any) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileDeliveryOrderAck/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
+   }
+
+   downloadFile(keyId: number) {
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDeliveryOrderAck/downloadFile/" + keyId, { responseType: "blob" });
+   }
+
 }

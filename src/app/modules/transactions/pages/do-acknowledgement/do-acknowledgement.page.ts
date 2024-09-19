@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { DoAcknowledgementService } from '../../services/do-acknowledgement.service';
-import { ModalController, NavController, Platform, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, ModalController, NavController, Platform, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { DOAcknowledegementRequest, DoAcknowledgement } from '../../models/do-acknowledgement';
 import { SignaturePad } from 'angular2-signaturepad';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -11,7 +11,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource, GalleryPhoto, GalleryPhotos, Photo } from '@capacitor/camera';
 
 const IMAGE_DIR = 'stored-images';
 
@@ -48,6 +48,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
       private toastService: ToastService,
       private loadingService: LoadingService,
       private modalController: ModalController,
+      private actionSheetController: ActionSheetController,
       private navController: NavController,
       private plt: Platform
    ) { }
@@ -63,7 +64,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    }
 
    ngOnInit() {
-
+      this.removeDir();
    }
 
    moduleControl: ModuleControl[] = [];
@@ -156,6 +157,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
    selectedDo: DoAcknowledgement;
    acknowledge(object: DoAcknowledgement) {
       this.selectedDo = object;
+      this.submit_attempt = false;
       this.openSignatureModal();
    }
 
@@ -165,6 +167,7 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    hideSignatureModal() {
       this.signaturePad.clear();
+      this.images = [];
       this.signatureModal = false;
    }
 
@@ -204,34 +207,16 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
          const fileName = this.selectedDo.deliveryOrderNum.replace(" ", "").replace("/", "") + "_Acknowledgement_" + "signature.png";
          const base64Data = this.signaturePad.toDataURL();
          try {
-            this.images = [];
             await this.loadingService.showLoading();
-            const savedFile = await Filesystem.writeFile({
-               path: `${IMAGE_DIR}/${fileName}`,
-               data: base64Data,
-               directory: Directory.Data,
-               recursive: true
-            });
-            Filesystem.readdir({
-               path: IMAGE_DIR,
-               directory: Directory.Data
-            }).then(
-               async (result) => {
-                  await this.loadFileData(result.files);
-               },
-               async (err) => {
-                  // Folder does not yet exists!
-                  await Filesystem.mkdir({
-                     path: IMAGE_DIR,
-                     directory: Directory.Data
-                  });
-               }
-            ).then(async (_) => {
-               await this.loadingService.dismissLoading();
-               this.submit_attempt = false;
-               this.selectedVehicleId = null;
-               this.remark = null;               
-            });
+            const splitDataURI = base64Data.split(',')
+            const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+            const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+            const ia = new Uint8Array(byteString.length)
+            for (let i = 0; i < byteString.length; i++) {
+               ia[i] = byteString.charCodeAt(i)
+            }
+            var blob = new Blob([ia], { type: mimeString })
+            await this.loadFileData(blob, fileName);
          } catch (e) {
             console.error(e);
             await this.loadingService.dismissLoading();
@@ -241,74 +226,23 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
             await this.loadingService.dismissLoading();
             this.submit_attempt = false;
          }
-      }
-   }
-
-   fileToDelete: LocalFile[] = [];
-   async loadFileData(fileNames: FileInfo[]) {
-      try {
-         this.fileToDelete = [];
-         for (let f of fileNames) {
-            const filePath = `${IMAGE_DIR}/${f.name}`;
-            const readFile = await Filesystem.readFile({
-               path: filePath,
-               directory: Directory.Data
-            });
-            if (f.size > this.fileSizeLimit) {
-               this.toastService.presentToast("", "File size too large", "top", "danger", 1500);
-               this.submit_attempt = false;
-            } else {
-               this.images.push({
-                  name: f.name,
-                  path: filePath,
-                  data: `data:image/jpeg;base64,${readFile.data}`
-               });
-               if (this.images && this.images.length > 0) {
-                  const response = await fetch(this.images[0].data);
-                  const blob = await response.blob();
-                  const formData = new FormData();
-                  formData.append("file", blob, this.images[0].name);
-                  if (this.selectedVehicleId ) {
-                     formData.append('customObj2[]', this.selectedVehicleId);
-                  }
-                  formData.append('customObj3[]', "Delivery Order");
-                  if (this.remark && this.remark.length > 0) {
-                     formData.append('customObj4[]', this.remark);
-                  }
-                  this.objectService.postFile(formData, this.selectedDo.deliveryOrderId, 0).subscribe({
-                     next: async (response) => {
-                        this.selectedDo = null;
-                        this.toastService.presentToast("", "DO Acknowledged", "top", "success", 1000);
-                        this.hideSignatureModal();
-                        await this.selectAction();
-                        await this.deleteImage({
-                           name: f.name,
-                           path: filePath,
-                           data: `data:image/jpeg;base64,${readFile.data}`
-                        });
-                        this.submit_attempt = false;
-                     },
-                     error: (error) => {
-                        console.error(error);
-                        this.submit_attempt = false;
-                     }
-                  })
-               }
-            }
-         }
-      } catch (error) {
-         console.error(error);
+      }else{
+         this.toastService.presentToast("", "Please sign", "top", "danger", 1000);
          this.submit_attempt = false;
       }
    }
 
-   async deleteImage(file: LocalFile) {
+   async saveAttachments(file: LocalFile, objectId: number, fileId: number) {
       try {
-         await Filesystem.deleteFile({
-            directory: Directory.Data,
-            path: file.path
-         });
-         this.signaturePad.clear();
+         const response = await fetch(file.data);
+         const blob = await response.blob();
+         const formData = new FormData();
+         formData.append("file", blob, file.name);
+         this.objectService.uploadFile(objectId, fileId, formData).subscribe(response => {
+         
+         }, error => {
+            console.log(error);
+         })
       } catch (e) {
          console.error(e);
       }
@@ -350,31 +284,76 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
 
    async presentAlert() {
       try {
-         this.selectImage();
+         const actionSheet = await this.actionSheetController.create({
+            header: "Choose an action",
+            cssClass: "custom-action-sheet",
+            buttons: [
+               {
+                  text: "Select Multiple Images",
+                  icon: "image-outline",
+                  handler: async () => {
+                     await this.selectImage(1);
+                  }
+               },
+               {
+                  text: "Snap Picture",
+                  icon: "camera-outline",
+                  handler: async () => {
+                     await this.selectImage(2);
+                  }
+               },
+               {
+                  text: "Cancel",
+                  icon: "close",
+                  role: "cancel"
+               }]
+         });
+         await actionSheet.present();
       } catch (e) {
          console.error(e);
       }
    }
 
-   async selectImage() {
-      try {
+   async selectImage(type:number) {
+      if (type == 1) {
+         try {
+            const images: GalleryPhotos = await Camera.pickImages({
+               quality: 50,
+            });
+
+            if (images && images.photos.length > 0) {
+               for await (let image of images.photos) {
+                  await this.saveImage(image);
+               }
+
+               // Reload the file list
+               // Improve by only loading for the new image and unshifting array!
+               await this.loadFiles();
+            }
+         } catch (e) {
+            console.error(e);
+         }
+      }
+      if (type == 2) {
          const image = await Camera.getPhoto({
-            quality: 90,
+            quality: 50,
             allowEditing: false,
             resultType: CameraResultType.Uri,
-            source: CameraSource.Prompt // Camera, Photos or Prompt!
+            source: CameraSource.Camera, // Camera, Photos or Prompt!
          });
 
          if (image) {
-            this.saveImage(image);
+            await this.saveImage(image);
+
+            // Reload the file list
+            // Improve by only loading for the new image and unshifting array!
+            await this.loadFiles();
          }
-      } catch (e) {
-         console.error(e);
       }
    }
 
    // Create a new file from a capture image
-   async saveImage(photo: Photo) {
+   async saveImage(photo: Photo | GalleryPhoto) {
       try {
          const base64Data = await this.readAsBase64(photo);
 
@@ -385,38 +364,131 @@ export class DoAcknowledgementPage implements OnInit, ViewWillEnter, ViewDidEnte
             directory: Directory.Data,
             recursive: true
          });
-         Filesystem.readdir({
-            path: IMAGE_DIR,
-            directory: Directory.Data
-         }).then(
-            async (result) => {
-               await this.loadFileData(result.files);
-            },
-            async (err) => {
-               // Folder does not yet exists!
-               await Filesystem.mkdir({
-                  path: IMAGE_DIR,
-                  directory: Directory.Data
-               });
-            }
-         ).then(async (_) => {
-            await this.loadingService.dismissLoading();
-            this.submit_attempt = false;
-            this.selectedVehicleId = null;
-            this.remark = null;
-         });
       } catch (e) {
          await this.loadingService.dismissLoading();
-         this.submit_attempt = false;
       }
-      finally {
-         await this.loadingService.dismissLoading();
+   }
+
+   async loadFileData(blob: Blob, fileNme?: string) {
+      try {
+         if (blob && fileNme) {
+            const formData = new FormData();
+            formData.append("file", blob, fileNme);
+            this.objectService.postFile(formData, this.selectedDo.deliveryOrderId, 0).subscribe({
+               next: async (response) => {
+                  for await (const image of this.images) {
+                     await this.saveAttachments(image, this.selectedDo.deliveryOrderId, 0);
+                  }
+                  this.selectedDo = null;
+                  this.toastService.presentToast("", "DO Acknowledged", "top", "success", 1000);
+                  this.selectedVehicleId = null;
+                  this.remark = null;      
+                  this.hideSignatureModal();
+                  await this.selectAction();
+                  await this.removeDir();
+                  this.submit_attempt = false;
+               },
+               error: (error) => {
+                  console.error(error);
+                  this.submit_attempt = false;
+               }
+            })
+         }
+      } catch (error) {
+         console.error(error);
          this.submit_attempt = false;
       }
    }
 
+   async loadFiles() {
+      try {
+         this.images = [];
+
+         await this.loadingService.showLoading();
+
+         Filesystem.readdir({
+            path: IMAGE_DIR,
+            directory: Directory.Data
+         })
+            .then(
+               (result) => {
+                  this.loadImages(result.files);
+               },
+               async (err) => {
+                  // Folder does not yet exists!
+                  await Filesystem.mkdir({
+                     path: IMAGE_DIR,
+                     directory: Directory.Data
+                  });
+               }
+            )
+            .then(async (_) => {
+               await this.loadingService.dismissLoading();
+            });
+      } catch (e) {
+         console.error(e);
+      }
+   }
+   
+   imageToDelete: LocalFile[] = [];
+   async loadImages(fileNames: FileInfo[]) {
+      try {
+         this.imageToDelete = [];
+         for (let f of fileNames) {
+            const filePath = `${IMAGE_DIR}/${f.name}`;
+            const readFile = await Filesystem.readFile({
+               path: filePath,
+               directory: Directory.Data
+            });
+            if (f.size > this.fileSizeLimit) {
+               this.imageToDelete.push({
+                  name: f.name,
+                  path: filePath,
+                  data: `data:image/jpeg;base64,${readFile.data}`
+               });
+               this.toastService.presentToast("", "File size too large", "top", "danger", 1500);
+            } else {
+               this.images.push({
+                  name: f.name,
+                  path: filePath,
+                  data: `data:image/jpeg;base64,${readFile.data}`
+               });
+            }
+         }
+         this.imageToDelete.forEach(e => {
+            this.deleteImage(e);
+         });
+      } catch (error) {
+         console.error(error);
+      }
+   }
+
+   async deleteImage(file: LocalFile) {
+      try {
+         await Filesystem.deleteFile({
+            directory: Directory.Data,
+            path: file.path
+         });
+         this.loadFiles();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async removeDir() {
+      try {
+         await Filesystem.rmdir({
+            path: IMAGE_DIR,
+            directory: Directory.Data,
+            recursive: true
+         })
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
    // https://ionicframework.com/docs/angular/your-first-app/3-saving-photos
-   private async readAsBase64(photo: Photo) {
+   private async readAsBase64(photo: Photo | GalleryPhoto) {
       try {
          if (this.plt.is("hybrid")) {
             const file = await Filesystem.readFile({
