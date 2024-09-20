@@ -17,5 +17,6 @@ export interface SalesAnalysisRequestObject {
    dateStart?: Date
    dateEnd?: Date
    reportType?: number
+   itemid?: number[]
 }
 

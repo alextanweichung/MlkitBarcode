@@ -159,6 +159,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
    isModalOpen: boolean = false;
    showModal() {
       this.startIndex = 0;
+      this.tempDropdownList = [];
       this.assignToTemp(this.startIndex, this.size);
       this.isModalOpen = true;
    }
@@ -192,6 +193,7 @@ export class SearchDropdownPage implements OnInit, OnChanges {
       } else {
          this.tempDropdownList = [...this.tempDropdownList, ...this.searchDropdownList.slice(startIndex, startIndex + size)];
       }
+      console.log("🚀 ~ SearchDropdownPage ~ assignToTemp ~ this.tempDropdownList:", this.tempDropdownList)
    }
 
    startIndex: number = 0;

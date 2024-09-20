@@ -56,6 +56,7 @@
          </ion-grid>
       </ion-item>
       <app-search-dropdown #searchType title="Type" optionLabel="description" [searchDropdownList]="type" [selectedId]="selectedType?.id" (onActionComplete)="onTypeChanged($event)"></app-search-dropdown>
+      <app-search-multi-dropdown #searchItem title="Item" optionLabel="description" [searchDropdownList]="itemSearchDropDown" [selectedIds]="selectedItem" (onActionComplete)="onItemSelected($event)" *ngIf="selectedType?.id === 6" ></app-search-multi-dropdown>
     </ion-list>
     <ion-button class="pt-2" expand="block" size="default" (click)="loadReport()" [disabled]="selectedType === null || startDateValue === null || endDateValue === null || selectedLocation === null">Search</ion-button>
     <ion-list-header class="ion-list-header ion-flex ion-text-center" *ngIf="!object || object?.length === 0">
@@ -68,9 +69,15 @@
       [columnMode]="'force'"
       [footerHeight]="50">
 
-      <ngx-datatable-column prop="trxDate" name="Trx. Date" *ngIf="selectedType.id === 1 || selectedType.id === 3 || selectedType.id === 5">
+      <ngx-datatable-column prop="trxDate" name="Trx. Date" *ngIf="selectedType.id === 1 || selectedType.id === 3 || selectedType.id === 5 || selectedType.id === 6">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.trxDate|date:"yyyy-MM-dd"}}</div>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="docNum" name="Doc. Num." *ngIf="selectedType.id === 6">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div class="flex ion-text-wrap font-half-size">{{row.docNum}}</div>
         </ng-template>
       </ngx-datatable-column>
 
@@ -80,7 +87,7 @@
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="itemCode" name="Item Code" *ngIf="selectedType.id === 0 || selectedType.id === 2">
+      <ngx-datatable-column prop="itemCode" name="Item Code" *ngIf="selectedType.id === 0 || selectedType.id === 2 || selectedType.id === 6">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.itemCode}}</div>
         </ng-template>
@@ -92,19 +99,19 @@
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="itemVariationYCode" name="X Code" *ngIf="selectedType.id === 2">
+      <ngx-datatable-column prop="itemVariationYCode" name="Y Code" *ngIf="selectedType.id === 2">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size">{{row.itemVariationYCode}}</div>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="qtyRequest" name="Qty." *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">
+      <ngx-datatable-column prop="qtyRequest" name="Qty." *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5 || selectedType.id === 6">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size justify-content-end">{{row.qtyRequest|number:'1.0'}}</div>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="subTotal" name="Total" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">
+      <ngx-datatable-column prop="subTotal" name="Total" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5 || selectedType.id === 6">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <div class="flex ion-text-wrap font-half-size justify-content-end">{{row.subTotal|number:'1.2-2'}}</div>
         </ng-template>
@@ -152,8 +159,8 @@
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"promotion"|number:"1.0"}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 3">{{object|sum:"total"|number:"1.0"}}</ion-col>
                 <ion-col class="ion-flex ion-margin-auto" *ngIf="selectedType.id === 2"></ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">{{object|sum:"qtyRequest"|number:"1.0"}}</ion-col>
-                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5">{{object|sum:"subTotal"|number:"1.2-2"}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5 || selectedType.id === 6">{{object|sum:"qtyRequest"|number:"1.0"}}</ion-col>
+                <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedType.id === 0 || selectedType.id === 1 || selectedType.id === 2 || selectedType.id === 4 || selectedType.id === 5 || selectedType.id === 6">{{object|sum:"subTotal"|number:"1.2-2"}}</ion-col>
               </ion-row>
             </ion-grid>
           </div>

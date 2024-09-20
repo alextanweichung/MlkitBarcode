@@ -53,7 +53,7 @@
               <div class="font-bold">Type</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.object.typeCode |codeMapping:objectService.salesTypeMasterList }}
+              {{objectService.object.typeCode|codeMapping:objectService.salesTypeMasterList }}
             </ion-col>
           </ion-row>
           <ion-row>
@@ -61,7 +61,7 @@
               <div class="font-bold"> From Location</div>
             </ion-col>
             <ion-col class="ion-flex ion-margin-auto justify-content-end">
-              {{objectService.object.locationId|idMapping:objectService.locationMasterList}}
+              {{objectService.object.locationId|idMapping:objectService.fullLocationMasterList}}
             </ion-col>
           </ion-row>
         </ion-grid>

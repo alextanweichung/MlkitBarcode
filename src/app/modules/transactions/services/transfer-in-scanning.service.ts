@@ -53,6 +53,7 @@ export class TransferInScanningService {
    async loadStaticLovList() {
       let fullMasterList = await this.getStaticLovList();
       this.salesTypeMasterList = fullMasterList.filter(x => x.objectName === "SalesType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated === 0 && (y.code == 'T' || y.code == 'C'));
+      console.log("🚀 ~ TransferInScanningService ~ loadStaticLovList ~ this.salesTypeMasterList:", this.salesTypeMasterList)
    }
    
    /* #region  for insert */
@@ -61,7 +62,7 @@ export class TransferInScanningService {
    objectUuid: string = null;
    setObject(object: TransferInScanningRoot) {
       this.object = object;
-      let found = this.fullLocationMasterList.find(r => r.id === object.locationId);
+      let found = this.fullLocationMasterList.find(r => r.id === object.toLocationId);
       if (found) {
          if (found.attribute1 === "C") {
             this.object.typeCode = "C";

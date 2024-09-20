@@ -10,6 +10,7 @@ import { SalesAnalysisPage } from './sales-analysis.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
+import { SearchMultiDropdownPageModule } from "../../../../shared/pages/search-multi-dropdown/search-multi-dropdown.module";
 
 @NgModule({
   imports: [
@@ -19,8 +20,9 @@ import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
     SalesAnalysisPageRoutingModule,
     SearchDropdownPageModule,
     NgxDatatableModule,
-    SumModule
-  ],
+    SumModule,
+    SearchMultiDropdownPageModule
+],
   declarations: [SalesAnalysisPage]
 })
 export class SalesAnalysisPageModule {}

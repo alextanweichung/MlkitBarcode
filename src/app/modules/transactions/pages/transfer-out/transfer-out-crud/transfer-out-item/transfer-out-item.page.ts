@@ -228,6 +228,11 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
       let object: TransferOutRoot;
       object = this.objectService.objectHeader;
       object.line = this.objectService.objectDetail;
+      if (object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).length > 0) {
+         let itemCodeString = object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).flatMap(r => r.itemCode).join(", ");
+         this.toastService.presentToast("Control Error", `Unable to insert line with no QtyRequest, Item Code: ${itemCodeString}`, "top", "warning", 1000);
+         return;
+      }
       if (object.line !== null && object.line.length > 0) {
          if (this.objectService.objectHeader.transferOutId > 0) {
             this.objectService.updateObject(object).subscribe(response => {

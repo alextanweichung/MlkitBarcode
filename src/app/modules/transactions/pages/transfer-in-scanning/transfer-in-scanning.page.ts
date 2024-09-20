@@ -106,7 +106,8 @@ export class TransferInScanningPage implements OnInit, ViewWillEnter, ViewDidEnt
    }
 
    selectDoc(object: TransferInScanningRoot) {
-      let found = this.objectService.fullLocationMasterList.find(r => r.id === object.locationId);
+      let found = this.objectService.fullLocationMasterList.find(r => r.id === object.toLocationId);
+      console.log("🚀 ~ TransferInScanningPage ~ selectDoc ~ found:", found)
       if (found) {
          if (found.attribute1 === "C") {
             object.typeCode = "C";
