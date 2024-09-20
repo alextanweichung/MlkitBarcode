@@ -134,7 +134,7 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
    async insertIntoLine(event: TransferOutLine) {
       if (event) {
          if (this.objectService.objectDetail !== null && this.objectService.objectDetail.length > 0) {
-            if (this.objectService.objectDetail[0].itemSku === event.itemSku) {
+            if (this.objectService.objectDetail[0].itemSku === event.itemSku && this.objectService.objectDetail[0].containerNum === event.containerNum) {
                this.objectService.objectDetail[0].lineQty += event.lineQty;
                this.objectService.objectDetail[0].qtyRequest = this.objectService.objectDetail[0].lineQty;
                await this.commonService.computeDiscTaxAmount(this.objectService.objectDetail[0], false, false, false, 2);
@@ -224,13 +224,12 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
       }, 1000);
    }
 
-   saveObject() {
+   async saveObject() {
       let object: TransferOutRoot;
       object = this.objectService.objectHeader;
       object.line = this.objectService.objectDetail;
       if (object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).length > 0) {
-         let itemCodeString = object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).flatMap(r => r.itemCode).join(", ");
-         this.toastService.presentToast("Control Error", `Unable to insert line with no QtyRequest, Item Code: ${itemCodeString}`, "top", "warning", 1000);
+         await this.removeInvalidLine(object);
          return;
       }
       if (object.line !== null && object.line.length > 0) {
@@ -270,6 +269,35 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
          this.toastService.presentToast("", "Unable to insert without line", "top", "warning", 1000);
       }
    }
+   
+   async removeInvalidLine(object: TransferOutRoot) {
+      let itemCodeString = object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).flatMap(r => r.itemCode + ` [Ctr. ${r.containerNum}]`).join(", ");
+      const alert = await this.alertController.create({
+         header: "Do you want to remove invalid lines and save?",
+         subHeader: itemCodeString,
+         cssClass: "custom-action-sheet",
+         buttons: [
+            {
+               text: "Yes",
+               role: "confirm",
+               cssClass: "success",
+               handler: async () => {
+                  this.objectService.objectDetail = this.objectService.objectDetail.filter(r => r.qtyRequest > 0);
+                  await this.saveObject();
+               },
+            },
+            {
+               text: "Cancel",
+               role: "cancel",
+               handler: () => {
+
+               }
+            },
+         ],
+      });
+      await alert.present();
+   }
+
 
    /* #endregion */
 
