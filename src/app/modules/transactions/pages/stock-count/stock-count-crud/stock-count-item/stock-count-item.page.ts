@@ -750,11 +750,14 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          let found = this.binList.find(r => r.binId === event.id);
          if (found) {
             this.selectedBin = event;
+            this.binDesc = found.binCode;
          } else {
             this.selectedBin = null;
+            this.binDesc = null;
          }
       } else {
          this.selectedBin = null;
+         this.binDesc = null;
       }
    }
 
