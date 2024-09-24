@@ -289,6 +289,7 @@ export class SalesCartPage implements OnInit, OnChanges {
          } else {
             this.configSystemWideActivateMultiUOM = false;
          }
+         console.log("🚀 ~ SalesCartPage ~ loadModuleControl ~ this.configSystemWideActivateMultiUOM:", this.configSystemWideActivateMultiUOM)
 
          let itemVariationShowMatrix = this.moduleControl.find(x => x.ctrlName === "ItemVariationShowMatrix");
          if (itemVariationShowMatrix && itemVariationShowMatrix.ctrlValue.toUpperCase() === "Y") {
@@ -359,6 +360,7 @@ export class SalesCartPage implements OnInit, OnChanges {
    selectedIndex: number;
    showEditModal(data: TransactionDetail, rowIndex: number) {
       this.selectedItem = JSON.parse(JSON.stringify(data)) as TransactionDetail;
+      console.log("🚀 ~ SalesCartPage ~ showEditModal ~ this.selectedItem:", this.selectedItem)
       this.selectedIndex = rowIndex;
       this.onPricingApprovalSwitch({ detail: { checked: this.selectedItem.isPricingApproval } });
       this.isModalOpen = true;

@@ -94,12 +94,12 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("userEmail").setValue("kh@idcp.my");
          // this.signin_form.get("userEmail").setValue("john@idcp.my");
          // this.signin_form.get("userEmail").setValue("johncon@idcp.my");
-         this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
+         // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
          // this.signin_form.get("userEmail").setValue("defney@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
          // this.signin_form.get("userEmail").setValue("hwsales12@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");
-         // this.signin_form.get("userEmail").setValue("admin@idcp.my");
+         this.signin_form.get("userEmail").setValue("admin@idcp.my");
          // this.signin_form.get("userEmail").setValue("hwsales2@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");         
          // this.signin_form.get("userEmail").setValue("admin@idcp.my");
@@ -109,11 +109,11 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("userEmail").setValue("defneys@idcp.my");
          // this.signin_form.get("password").setValue("Live1234");
          // this.signin_form.get("password").setValue("Bmm@168spv01");
-         this.signin_form.get("password").setValue("Dev8888");
+         // this.signin_form.get("password").setValue("Dev8888");
          // this.signin_form.get("password").setValue("i@Dmin7026");
          // this.signin_form.get("password").setValue("c0nnecT#7026");
          // this.signin_form.get("password").setValue("c0nnecT@2024");
-         // this.signin_form.get("password").setValue("c0nnecT=88-");
+         this.signin_form.get("password").setValue("c0nnecT=88-");
          // this.signin_form.get("password").setValue("Testing1234");
          // this.signin_form.get("password").setValue("String1234");
       } else {

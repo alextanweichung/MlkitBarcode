@@ -703,13 +703,14 @@ export class CommonService {
 
    async commonDownload(file: Blob, object: AnnouncementFile) {
       let mimeType = this.getMimeType(object.filesType);
+      console.log("🚀 ~ CommonService ~ commonDownload ~ mimeType:", mimeType)
       try {
          await this.loadingService.showLoading("Downloading");
          let filename = object.filesName;
-         filename = filename.replace(" ", "").replace("/", "").replace(".pdf", "_" + format(this.getTodayDate(), "yyyyMMdd") + ".pdf");
+         filename = filename.replace(" ", "").replace("/", "").replace(object.filesType, "_" + format(this.getTodayDate(), "yyyyMMdd") + object.filesType);
          if (Capacitor.getPlatform() === "android") {
             await this.file.writeFile(this.file.externalApplicationStorageDirectory, filename + object.filesType, file, { replace: true }).then(async () => {
-               await this.opener.open(this.file.externalApplicationStorageDirectory + filename + object.filesType, "application/pdf");
+               await this.opener.open(this.file.externalApplicationStorageDirectory + filename + object.filesType, mimeType);
                await this.loadingService.dismissLoading();
             }).catch(async (error) => {
                await this.loadingService.dismissLoading();

@@ -14,7 +14,7 @@ export class PromotionEngineService {
 
    runPromotionEngine(salesBillLine: TransactionDetail[], promotionObject: PromotionMaster[], useTax: boolean, isItemPriceTaxInclusive: boolean, isDisplayTaxInclusive: boolean, roundingPrecision: number, discountGroupList: MasterListDetails[], debugFlag: boolean, computeTradingMargin?: boolean) {
       let freeGiftPromoEvent: PromotionMaster[] = promotionObject.filter(x => x.promoRuleType == "S" && x.specialRuleType == "05");
-      let nonFreeGiftPromoEvent: PromotionMaster[] = promotionObject.filter(x => x.promoRuleType != "S" && x.specialRuleType != "05");
+      let nonFreeGiftPromoEvent: PromotionMaster[] = promotionObject.filter(x => !(x.promoRuleType == "S" && x.specialRuleType == "05"));
       if (debugFlag) {
          console.log("================ START ================");
          console.log("Promotion Object: ");

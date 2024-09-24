@@ -130,7 +130,7 @@ export class DebtorApplicationDetailPage implements OnInit {
    downloadFile(object) {
       this.objectService.downloadFile(object.filesId).subscribe(async response => {
          await this.commonService.commonDownload(response, object);
-         this.toastService.presentToast("Download Complete", "", "top", "success", 1000);
+         this.toastService.presentToast("", "Download Complete", "top", "success", 1000);
       }, error => {
          console.error(error);
       })

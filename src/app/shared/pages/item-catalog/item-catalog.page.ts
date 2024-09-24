@@ -465,7 +465,6 @@ export class ItemCatalogPage implements OnInit, OnChanges {
          item.ratioExpr = "1";
          item.uomMaster = [];
       }
-      item.multiUom = [];
    }
 
    calculatNetPrice(price, discountExpression) {

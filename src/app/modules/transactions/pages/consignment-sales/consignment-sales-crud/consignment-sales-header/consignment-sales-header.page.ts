@@ -6,9 +6,8 @@ import { format, parseISO } from 'date-fns';
 import { ConsignmentSalesService } from 'src/app/modules/transactions/services/consignment-sales.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { PrecisionList } from 'src/app/shared/models/precision-list';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
-import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,8 +18,6 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
-   @ViewChild("locationDropdown", { static: false }) locationDropdown: SearchDropdownPage;
-
    objectForm: FormGroup;
 
    constructor(
@@ -28,6 +25,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       private authService: AuthService,
       private configService: ConfigService,
       private commonService: CommonService,
+      private toastService: ToastService,
       private navController: NavController,
       private actionSheetController: ActionSheetController,
       private alertController: AlertController,
@@ -86,6 +84,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          if (customerId) {
             this.onCustomerChanged(customerId)
          }
+         this.onLocationChanged({ id: this.configService.selected_location, code: findLocation.code });
       }
    }
 
@@ -150,7 +149,7 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
                this.objectForm.patchValue({ customerId: lookupValue.id });
                this.objectForm.patchValue({ businessModelType: lookupValue.attribute5 });
                this.objectForm.patchValue({
-                  salesAgentId: parseFloat(lookupValue.attribute1),
+                  // salesAgentId: parseFloat(lookupValue.attribute1),
                   currencyId: parseFloat(lookupValue.attribute4),
                   isItemPriceTaxInclusive: lookupValue.attribute8 === "1" ? true : false,
                   isDisplayTaxInclusive: lookupValue.attribute9 === "1" ? true : false
@@ -189,39 +188,30 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
       }
    }
 
-   async onLocationChanged(event) {
+   async onLocationChanged(event: SearchDropdownList) {
+      console.log("🚀 ~ ConsignmentSalesHeaderPage ~ onLocationChanged ~ event:", event)
       if (event) {
-         const alert = await this.alertController.create({
-            cssClass: "custom-alert",
-            header: "Are you sure to change?",
-            subHeader: "Changing location required to sync price.",
-            buttons: [{
-               text: "Proceed",
-               cssClass: "success",
-               handler: async () => {
-                  let customerId = Number(this.objectService.locationMasterList.find(r => r.id === event.id)?.attribute13);
-                  if (customerId) {
-                     this.onCustomerChanged(customerId);
-                  }
-                  this.objectForm.patchValue({ toLocationId: event.id, toLocationCode: event.code });
-                  let findLocation = this.objectService.locationMasterList.find(r => r.id === event.id);
-                  this.objectForm.patchValue({
-                     isBearPromo: findLocation.attribute6 === "1" ? true : false,
-                     marginMode: findLocation.attribute8
-                  })
-               },
-            },
-            {
-               text: "Cancel",
-               role: "cancel",
-               cssClass: "cancel",
-               handler: () => {
-                  this.locationDropdown.selectedId = this.objectForm.controls.toLocationId.value;
-                  this.locationDropdown.selected = this.locationDropdown.searchDropdownList.find(r => r.id === this.locationDropdown.selectedId);
+         let findLocation = this.objectService.fullLocationMasterList.find(x => x.id === event.id);
+         console.log("🚀 ~ ConsignmentSalesHeaderPage ~ onLocationChanged ~ findLocation:", findLocation)
+         if (findLocation) {
+            this.objectForm.patchValue({ toLocationId: findLocation.id, toLocationCode: findLocation.code, salesAgentId: parseInt(findLocation.attribute17) });
+            if (findLocation.attribute13) {
+               let findCustomer = this.objectService.customerMasterList.find(x => x.id === parseInt(findLocation.attribute13));
+               console.log("🚀 ~ ConsignmentSalesHeaderPage ~ onLocationChanged ~ findCustomer:", findCustomer)
+               if (!findCustomer) {
+                  this.objectForm.patchValue({ toLocationId: null, customerId: null });
+                  this.toastService.presentToast("Selection Denied", findLocation.description + " is not mapped to consignment customer.", "top", "warning", 1000);
+               } else {
+                  this.objectForm.patchValue({ customerId: parseInt(findLocation.attribute13) });
+                  this.objectForm.controls["customerId"].disable();
                }
-            }]
-         });
-         await alert.present();
+            } else {
+               this.objectForm.patchValue({ toLocationId: null, customerId: null });
+               this.objectForm.controls["customerId"].enable();
+               this.toastService.presentToast("Selection Denied", findLocation.description + " is not mapped to any customer.", "top", "warning", 1000);
+            }
+            this.onCustomerChanged(this.objectForm.controls.customerId.value);
+         }
       }
    }
 

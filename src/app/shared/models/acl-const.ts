@@ -109,5 +109,8 @@ export const reportAppCode = {
    mobileSalesAnalysis: "MARPSAL",
    mobileItemSalesAnalysis: "MARPISAL",
    mobileConsignmentCountAnalysis: "MARPCCA",
-   mobileCustomerDetail: "MARPCD"
+   
+   mobileCustomerDetail: "MARPCD",
+
+   mobileInventoryLevel: "MARPIVL",
 }

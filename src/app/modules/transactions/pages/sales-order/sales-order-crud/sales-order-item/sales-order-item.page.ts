@@ -195,6 +195,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
    }
 
    assignTrxItemToDataLine(trxLine: TransactionDetail): TransactionDetail {
+      console.log("🚀 ~ SalesOrderItemPage ~ assignTrxItemToDataLine ~ trxLine:", trxLine)
       try {
          trxLine.lineId = 0;
          trxLine.headerId = this.objectService.objectHeader.salesOrderId;
@@ -261,6 +262,7 @@ export class SalesOrderItemPage implements OnInit, ViewWillEnter {
 
          // update qtyToShip
          trxLine.qtyToShip = trxLine.qtyRequest;
+         console.log("🚀 ~ SalesOrderItemPage ~ assignTrxItemToDataLine ~ trxLine:", trxLine)
 
          return trxLine;
       } catch (e) {

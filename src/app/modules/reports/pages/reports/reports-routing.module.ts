@@ -8,7 +8,6 @@ const routes: Routes = [
       path: '',
       component: ReportsPage
    }
-
 ];
 
 @NgModule({

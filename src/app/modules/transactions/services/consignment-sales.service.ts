@@ -192,6 +192,7 @@ export class ConsignmentSalesService {
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
       this.customerMasterList = this.fullMasterList.filter(x => x.objectName === "Customer").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.customerMasterList = this.customerMasterList.filter(x => x.attribute5 === "C");
       this.fullLocationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
       if (this.commonService.getModCtrlBoolValue(this.moduleControl, "TransformCSBizModelAsRetail")) {
          this.locationMasterList = this.fullLocationMasterList.filter(r => (r.attribute1 === "C" || r.attribute1 === "O") && (this.configService.loginUser.locationId.length === 0 || this.configService.loginUser.locationId.includes(r.id)));
@@ -210,10 +211,10 @@ export class ConsignmentSalesService {
          let savedCustomerList = obj;
          if (savedCustomerList) {
             this.customerMasterList = savedCustomerList.filter(y => y.deactivated === 0);
+            this.customerMasterList = this.customerMasterList.filter(x => x.attribute5 === "C");
          } else {
             await this.authService.rebuildCustomerList();
          }
-         this.customerMasterList.find(r => r.id === 10039)
       })
    }
 

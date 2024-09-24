@@ -563,10 +563,10 @@ const routes: Routes = [
       path: 'reports/consignment-count-analysis',
       loadChildren: () => import('./modules/reports/pages/reports/consignment-count-analysis/consignment-count-analysis.module').then(m => m.ConsignmentCountAnalysisPageModule)
    },
-
-
-
-
+   {
+      path: 'reports/rp-inventory-level',
+      loadChildren: () => import('./modules/reports/pages/reports/rp-inventory-level/rp-inventory-level.module').then(m => m.RpInventoryLevelPageModule)
+   },
 
 
    // shared

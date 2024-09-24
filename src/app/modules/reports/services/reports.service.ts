@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { ReportParameterModel } from 'src/app/shared/models/report-param-model';
+import { ReportParameterModel, ReportParamsValueModel } from 'src/app/shared/models/report-param-model';
 import { Customer } from '../../transactions/models/customer';
 import { DebtorOutstanding, DebtorOutstandingRequest } from '../models/debtor-outstanding';
 import { SAPerformanceListing, SalesAgentAllPerformanceObject } from '../models/rp-sa-performance-listing';
@@ -63,7 +63,7 @@ export class ReportsService {
    getCheckQoh(search: string, loginUserType: string, salesAgentId: number) {
       return this.http.get<CheckQohRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQoh/" + search + "/" + loginUserType + "/" + salesAgentId);
    }
-   
+
    getCheckQohVariation(loginUserType: string, request: CheckQohVariationRequest) {
       return this.http.post<CheckQohVariationRoot[]>(this.configService.selected_sys_param.apiUrl + "mobileReport/checkQohVariation/" + loginUserType, request).toPromise();
    }
@@ -102,6 +102,10 @@ export class ReportsService {
 
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileReport/masterList");
+   }
+
+   getInventoryLevel(reportNum: string, paramModel: ReportParamsValueModel[]) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + `MobileReport/inventoryLevel/${reportNum}`, paramModel, { responseType: "blob" });
    }
 
 }

@@ -10,3 +10,8 @@ export interface CustomReportParamModel {
    parameter1: number[]
    statementDate: Date
 }
+
+export interface ReportParamsValueModel {
+   rpName: string
+   rpValue: any
+}
