@@ -106,7 +106,7 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
                   unitPriceExTax: r.itemPricing?.unitPrice,
                   discountGroupCode: r.itemPricing?.discountGroupCode,
                   discountExpression: r.itemPricing?.discountExpression,
-                  containerNum: null
+                  containerNum: null,
                }
                if (this.objectService.configTransferOutActivateContainerNum) {
                   outputData.containerNum = this.objectService.pageNum;
@@ -139,9 +139,11 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
                this.objectService.objectDetail[0].qtyRequest = this.objectService.objectDetail[0].lineQty;
                await this.commonService.computeDiscTaxAmount(this.objectService.objectDetail[0], false, false, false, 2);
             } else {
+               this.objectService.objectDetail.forEach(r => r.sequence += 1);
                this.objectService.objectDetail.unshift(event);
             }
          } else {
+            this.objectService.objectDetail.forEach(r => r.sequence += 1);
             this.objectService.objectDetail.unshift(event);
          }
       }
@@ -271,7 +273,12 @@ export class TransferOutItemPage implements OnInit, ViewWillEnter {
    }
    
    async removeInvalidLine(object: TransferOutRoot) {
-      let itemCodeString = object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).flatMap(r => r.itemCode + ` [Ctr. ${r.containerNum}]`).join(", ");
+      let itemCodeString = "";
+      if (this.objectService.configTransferOutActivateContainerNum) {
+         itemCodeString = object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).flatMap(r => r.itemCode + ` [Ctr. ${r.containerNum}]`).join(", ");
+      } else {
+         itemCodeString = object.line.filter(r => r.qtyRequest === null || r.qtyRequest === undefined || r.qtyRequest <= 0).flatMap(r => r.itemCode).join(", ");
+      }
       const alert = await this.alertController.create({
          header: "Do you want to remove invalid lines and save?",
          subHeader: itemCodeString,

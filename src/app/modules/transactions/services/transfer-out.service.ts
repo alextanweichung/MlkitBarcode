@@ -93,6 +93,9 @@ export class TransferOutService {
 
    setLine(objectDetail: TransferOutLine[]) {
       this.objectDetail = JSON.parse(JSON.stringify(objectDetail));
+      this.objectDetail.forEach(r => {
+         r.qtyRequest = r.lineQty;
+      })
    }
 
    removeHeader() {

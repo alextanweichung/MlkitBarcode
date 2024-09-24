@@ -59,25 +59,12 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
    }
 
-   // precisionSales: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-   // precisionTax: PrecisionList = { precisionId: null, precisionCode: null, description: null, localMin: null, localMax: null, foreignMin: null, foreignMax: null, localFormat: null, foreignFormat: null };
-   // loadModuleControl() {
-   //   try {
-   //     this.authService.precisionList$.subscribe(precision => {
-   //       this.precisionSales = precision.find(x => x.precisionCode == "SALES");
-   //       this.precisionTax = precision.find(x => x.precisionCode == "TAX");
-   //     })
-   //   } catch (e) {
-   //     console.error(e);
-   //     this.toastService.presentToast("Error loading module control", "", "top", "danger", 1000);
-   //   }
-   // }
-
    async loadObject() {
       try {
          await this.loadingService.showLoading();
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
             let object = response;
+            console.log("🚀 ~ TransferOutDetailPage ~ this.objectService.getObjectById ~ object:", object)
             object = this.commonService.convertObjectAllDateType(object);
             await this.loadWorkflow(object.transferOutId);
             await this.objectService.setHeader(object);
