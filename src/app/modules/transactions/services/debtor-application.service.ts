@@ -6,6 +6,8 @@ import { MasterList } from 'src/app/shared/models/master-list';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -19,11 +21,12 @@ export class DebtorApplicationService {
 
    constructor(
       private http: HttpClient,
+      private authService: AuthService,
       private configService: ConfigService
    ) { }
 
    hasSalesAgent(): boolean {
-      let salesAgentId = JSON.parse(localStorage.getItem('loginUser'))?.salesAgentId;
+      let salesAgentId = JSON.parse(localStorage.getItem("loginUser"))?.salesAgentId;
       if (salesAgentId === undefined || salesAgentId === null || salesAgentId === 0) {
          return false;
       }
@@ -31,8 +34,38 @@ export class DebtorApplicationService {
    }
 
    async loadRequiredMaster() {
+      await this.loadModuleControl();
       await this.loadMasterList();
       await this.loadStaticLov();
+   }
+
+   moduleControl: ModuleControl[];
+   configSystemWideEInvoiceStrictControl: boolean = false;
+   eInvoiceDefaultForeignDebtorTIN: string;
+   loadModuleControl() {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+         this.moduleControl = obj;
+
+         let systemWideEInvoiceStrictControl = this.moduleControl.find(x => x.ctrlName === "SystemWideEInvoiceStrictControl");
+         if (systemWideEInvoiceStrictControl?.ctrlValue.toUpperCase() === "Y") {
+            this.configSystemWideEInvoiceStrictControl = true;
+         }
+
+         this.eInvoiceDefaultForeignDebtorTIN = this.moduleControl.find(x => x.ctrlName === "EInvoiceDefaultForeignDebtorTIN")?.ctrlValue;
+      })
+   }
+
+   object: DebtorApplicationRoot = null;
+   setObject(object: DebtorApplicationRoot) {
+      this.object = object;
+   }
+
+   removeObject() {
+      this.object = null;
+   }
+
+   resetVariables() {
+      this.removeObject();
    }
 
    fullMasterList: MasterList[] = [];
@@ -49,17 +82,17 @@ export class DebtorApplicationService {
    termPeriodMasterList: MasterListDetails[] = [];
    async loadMasterList() {
       this.fullMasterList = await this.getMasterList();
-      this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.countryMasterList = this.fullMasterList.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.glAccountMasterList = this.fullMasterList.filter(x => x.objectName == 'GlAccount').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.paymentMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.priceSegmentMasterList = this.fullMasterList.filter(x => x.objectName == 'PriceSegment').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'SalesAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.stateMasterList = this.fullMasterList.filter(x => x.objectName == 'State').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.taxMasterList = this.fullMasterList.filter(x => x.objectName == 'Tax').flatMap(src => src.details).filter(y => y.deactivated == 0);
-      this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);
+      this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.glAccountMasterList = this.fullMasterList.filter(x => x.objectName === "GlAccount").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.paymentMethodMasterList = this.fullMasterList.filter(x => x.objectName === "PaymentMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.priceSegmentMasterList = this.fullMasterList.filter(x => x.objectName === "PriceSegment").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.salesAgentMasterList = this.fullMasterList.filter(x => x.objectName === "SalesAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.stateMasterList = this.fullMasterList.filter(x => x.objectName === "State").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.taxMasterList = this.fullMasterList.filter(x => x.objectName === "Tax").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
    }
 
    loadStaticLov() {

@@ -135,7 +135,34 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                break;
          }
          let rowIndex = this.objectService.objectDetail.findIndex(r => r.itemSku === trxLine.itemSku);
-         if (rowIndex === 0 && !this.objectService.configInvCountActivateLineWithBin) { // already in and first one
+         if (this.objectService.configMobileStockCountItemAlwaysCreateNewLine) {
+            let newLine: StockCountDetail = {
+               inventoryCountLineId: 0,
+               inventoryCountId: this.objectService.objectHeader.inventoryCountId,
+               locationId: this.objectService.objectHeader.locationId,
+               itemId: trxLine.itemId,
+               itemVariationXId: trxLine.itemVariationXId,
+               itemVariationYId: trxLine.itemVariationYId,
+               itemSku: trxLine.itemSku,
+               itemBarcodeTagId: trxLine.itemBarcodeTagId,
+               itemBarcode: trxLine.itemBarcode,
+               qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
+               binDesc: (this.objectService.configInvCountActivateLineWithBin && !this.objectService.configInvCountBinFromLocation) ? this.binDesc : null,
+               binId: (this.objectService.configInvCountActivateLineWithBin && this.objectService.configInvCountBinFromLocation) ? this.selectedBin?.id : null,
+               sequence: 0,
+               // for local use
+               itemCode: trxLine.itemCode,
+               itemDescription: trxLine.description,
+               // testing performance
+               guid: uuidv4()
+            }
+            this.objectService.objectDetail.forEach(r => { r.sequence += 1 });
+            await this.objectService.objectDetail.unshift(newLine);
+            let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            this.resetFilteredObj();
+         }
+         else if (rowIndex === 0 && !this.objectService.configInvCountActivateLineWithBin) { // already in and first one
             this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??1);
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
@@ -578,6 +605,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             details: this.objectService.objectDetail
          }
          let localTrx: LocalTransaction;
+         console.log("🚀 ~ StockCountItemPage ~ insertObjectLocal ~ s.objectService.objectHeader.isLocal:", this.objectService.objectHeader.isLocal)
          if (this.objectService.objectHeader.isLocal) {
             localTrx = {
                id: this.objectService.objectHeader.guid,
@@ -586,6 +614,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                lastUpdated: new Date(),
                jsonData: JSON.stringify(object)
             }
+            console.log("🚀 ~ StockCountItemPage ~ insertObjectLocal ~ localTrx:", localTrx.id)
             await this.configService.updateLocalTransaction(localTrx);
          } else {
             localTrx = {
@@ -607,7 +636,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                guid: localTrx.id
             }
          }
-         this.navController.navigateForward("/transactions/stock-count/stock-count-detail", navigationExtras);
+         this.navController.navigateRoot("/transactions/stock-count/stock-count-detail", navigationExtras);
       } catch (error) {
          this.submit_attempt = false;
          await this.loadingService.dismissLoading();

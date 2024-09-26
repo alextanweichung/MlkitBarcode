@@ -11,5 +11,6 @@ export interface ConsignmentCountAnalysisObject {
 
 export interface ConsignmentCountAnalysisRequestObject {
    dateStart: string
+   dateEnd: string
    locationId: number[]
 }

@@ -44,6 +44,7 @@ export class StockCountService {
    configHeaderShowBinDesc: boolean = false;
    configMobileScanItemContinuous: boolean = false;
    configInvCountBinFromLocation: boolean = false;
+   configMobileStockCountItemAlwaysCreateNewLine: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -82,6 +83,13 @@ export class StockCountService {
          } else {
             this.configInvCountBinFromLocation = false;
          }
+
+         let mobileStockCountItemAlwaysCreateNewLine = this.moduleControl.find(x => x.ctrlName === "MobileStockCountItemAlwaysCreateNewLine");
+         if (mobileStockCountItemAlwaysCreateNewLine && mobileStockCountItemAlwaysCreateNewLine.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileStockCountItemAlwaysCreateNewLine = true;
+         } else {
+            this.configMobileStockCountItemAlwaysCreateNewLine = false;
+         }         
       })
    }
 
@@ -112,6 +120,7 @@ export class StockCountService {
    objectHeader: StockCountHeader = null;
    setHeader(objectHeader: StockCountHeader) {
       this.objectHeader = objectHeader;
+      console.log("🚀 ~ StockCountService ~ setHeader ~ this.objectHeader:", JSON.stringify(this.objectHeader))
    }
 
    objectDetail: StockCountDetail[] = []

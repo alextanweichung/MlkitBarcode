@@ -6,7 +6,7 @@ import { Directive, ElementRef, HostListener, NgModule, Renderer2 } from '@angul
 
 export class HideKeyboardDirective {
    private readonly: boolean;
-   private focusTimeout = 500;
+   private focusTimeout = 0;
 
    constructor(private el: ElementRef, private renderer: Renderer2) {
       this.readonly = true;

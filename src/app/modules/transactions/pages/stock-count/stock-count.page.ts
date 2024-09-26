@@ -237,7 +237,7 @@ export class StockCountPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.objects = [];
             this.objectService.filterStartDate = new Date(data.startDate);
             this.objectService.filterEndDate = new Date(data.endDate);
-            this.loadObjects();
+            this.loadLocalObjects();
          }
       } catch (e) {
          console.error(e);

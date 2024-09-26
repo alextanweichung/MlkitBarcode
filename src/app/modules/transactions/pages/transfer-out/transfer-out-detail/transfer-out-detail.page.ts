@@ -191,7 +191,8 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
    async downloadPdf() {
       try {
-         this.objectService.downloadPdf("WDWO003", "pdf", this.objectService.objectHeader.interTransferId, "Inter Transfer").subscribe(response => {
+         await this.loadingService.showLoading();
+         this.objectService.downloadPdf("WDWO003", "pdf", this.objectService.objectHeader.interTransferId, null).subscribe(response => {
             let filename = this.objectService.objectHeader.interTransferNum + ".pdf";
             this.commonService.commonDownloadPdf(response, filename);
          }, error => {
@@ -199,6 +200,8 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
          })
       } catch (e) {
          console.error(e);
+      } finally {
+         await this.loadingService.dismissLoading();
       }
    }
 

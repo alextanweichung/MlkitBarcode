@@ -72,7 +72,10 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
          zoneDesc: [null, [Validators.maxLength(100)]],
          rackDesc: [null, [Validators.maxLength(100)]],
          sourceType: ["M"],
-         deactivated: [0]
+         deactivated: [0],
+         isLocal: [false],
+         guid: [null],
+         lastUpdated: [null]
       })
    }
 

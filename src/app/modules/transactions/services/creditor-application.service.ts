@@ -6,119 +6,152 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { CreditorApplicationHeader, CreditorApplicationList, CreditorApplicationRoot } from '../models/creditor-application';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { WorkFlowState } from 'src/app/shared/models/workflow';
+import { ModuleControl } from 'src/app/shared/models/module-control';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
-  observe: 'response' as 'response'
+   observe: 'response' as 'response'
 };
 
 @Injectable({
-  providedIn: 'root'
+   providedIn: 'root'
 })
 export class CreditorApplicationService {
 
-  constructor(
-    private http: HttpClient,
-    private configService: ConfigService
-  ) { }
+   constructor(
+      private http: HttpClient,
+      private authService: AuthService,
+      private configService: ConfigService
+   ) { }
 
-  hasProcurementAgent(): boolean {
-    let procurementAgentId = JSON.parse(localStorage.getItem('loginUser'))?.procurementAgentId;
-    if (procurementAgentId === undefined || procurementAgentId === null || procurementAgentId === 0) {
-      return false;
-    }
-    return true
-  }
+   hasProcurementAgent(): boolean {
+      let procurementAgentId = JSON.parse(localStorage.getItem('loginUser'))?.procurementAgentId;
+      if (procurementAgentId === undefined || procurementAgentId === null || procurementAgentId === 0) {
+         return false;
+      }
+      return true
+   }
 
-  async loadRequiredMaster() {
-    await this.loadMasterList();
-    await this.loadStaticLov();
-  }
+   async loadRequiredMaster() {
+      await this.loadModuleControl();
+      await this.loadMasterList();
+      await this.loadStaticLov();
+   }
 
-  fullMasterList: MasterList[] = [];
-  areaMasterList: MasterListDetails[] = [];
-  countryMasterList: MasterListDetails[] = [];
-  currencyMasterList: MasterListDetails[] = [];
-  glAccountMasterList: MasterListDetails[] = [];
-  locationMasterList: MasterListDetails[] = [];
-  paymentMethodMasterList: MasterListDetails[] = [];
-  priceSegmentMasterList: MasterListDetails[] = [];
-  procurementAgentMasterList: MasterListDetails[] = [];
-  stateMasterList: MasterListDetails[] = [];
-  taxMasterList: MasterListDetails[] = [];
-  termPeriodMasterList: MasterListDetails[] = [];
-  async loadMasterList() {
-    this.fullMasterList = await this.getMasterList();
-    this.areaMasterList = this.fullMasterList.filter(x => x.objectName == 'Area').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.countryMasterList = this.fullMasterList.filter(x => x.objectName == 'Country').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.currencyMasterList = this.fullMasterList.filter(x => x.objectName == 'Currency').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.glAccountMasterList = this.fullMasterList.filter(x => x.objectName == 'GlAccount').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.locationMasterList = this.fullMasterList.filter(x => x.objectName == 'Location').flatMap(src => src.details).filter(y => y.deactivated == 0 && y.attribute1 == "W");
-    this.paymentMethodMasterList = this.fullMasterList.filter(x => x.objectName == 'PaymentMethod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.priceSegmentMasterList = this.fullMasterList.filter(x => x.objectName == 'PriceSegment').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.procurementAgentMasterList = this.fullMasterList.filter(x => x.objectName == 'ProcurementAgent').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.stateMasterList = this.fullMasterList.filter(x => x.objectName == 'State').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.taxMasterList = this.fullMasterList.filter(x => x.objectName == 'Tax').flatMap(src => src.details).filter(y => y.deactivated == 0);
-    this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName == 'TermPeriod').flatMap(src => src.details).filter(y => y.deactivated == 0);
-  }
+   moduleControl: ModuleControl[];
+   configSystemWideEInvoiceStrictControl: boolean = false;
+   eInvoiceDefaultForeignDebtorTIN: string;
+   loadModuleControl() {
+      this.authService.moduleControlConfig$.subscribe(obj => {
+         this.moduleControl = obj;
 
-  loadStaticLov() {
+         let systemWideEInvoiceStrictControl = this.moduleControl.find(x => x.ctrlName === "SystemWideEInvoiceStrictControl");
+         if (systemWideEInvoiceStrictControl?.ctrlValue.toUpperCase() === "Y") {
+            this.configSystemWideEInvoiceStrictControl = true;
+         }
 
-  }
+         this.eInvoiceDefaultForeignDebtorTIN = this.moduleControl.find(x => x.ctrlName === "EInvoiceDefaultForeignDebtorTIN")?.ctrlValue;
+      })
+   }
 
-  getObjects() {
-    return this.http.get<CreditorApplicationList[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/vendorPreList");
-  }
+   object: CreditorApplicationRoot = null;
+   setObject(object: CreditorApplicationRoot) {
+      this.object = object;
+   }
 
-  getObjectById(objectId: number) {
-    return this.http.get<CreditorApplicationRoot>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/" + objectId);
-  }
+   removeObject() {
+      this.object = null;
+   }
 
-  insertObject(object: CreditorApplicationHeader) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre", object, httpObserveHeader);
-  }
+   resetVariables() {
+      this.removeObject();
+   }
 
-  updateObject(object: CreditorApplicationHeader) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileVendorPre", object, httpObserveHeader);
-  }
+   fullMasterList: MasterList[] = [];
+   areaMasterList: MasterListDetails[] = [];
+   countryMasterList: MasterListDetails[] = [];
+   currencyMasterList: MasterListDetails[] = [];
+   glAccountMasterList: MasterListDetails[] = [];
+   locationMasterList: MasterListDetails[] = [];
+   paymentMethodMasterList: MasterListDetails[] = [];
+   priceSegmentMasterList: MasterListDetails[] = [];
+   procurementAgentMasterList: MasterListDetails[] = [];
+   stateMasterList: MasterListDetails[] = [];
+   taxMasterList: MasterListDetails[] = [];
+   termPeriodMasterList: MasterListDetails[] = [];
+   async loadMasterList() {
+      this.fullMasterList = await this.getMasterList();
+      this.areaMasterList = this.fullMasterList.filter(x => x.objectName === "Area").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.countryMasterList = this.fullMasterList.filter(x => x.objectName === "Country").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.currencyMasterList = this.fullMasterList.filter(x => x.objectName === "Currency").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.glAccountMasterList = this.fullMasterList.filter(x => x.objectName === "GlAccount").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.locationMasterList = this.fullMasterList.filter(x => x.objectName === "Location").flatMap(src => src.details).filter(y => y.deactivated === 0 && y.attribute1 === "W");
+      this.paymentMethodMasterList = this.fullMasterList.filter(x => x.objectName === "PaymentMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.priceSegmentMasterList = this.fullMasterList.filter(x => x.objectName === "PriceSegment").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.procurementAgentMasterList = this.fullMasterList.filter(x => x.objectName === "ProcurementAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.stateMasterList = this.fullMasterList.filter(x => x.objectName === "State").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.taxMasterList = this.fullMasterList.filter(x => x.objectName === "Tax").flatMap(src => src.details).filter(y => y.deactivated === 0);
+      this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
+   }
 
-  toggleObject(objectId: number) {
-    return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileVendorPre/deactivate/${objectId}`, null, httpObserveHeader);
-  }
+   loadStaticLov() {
 
-  getMasterList() {
-    return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/masterlist").toPromise();
-  }
+   }
 
-  getWorkflow(objectId: number) {
-    return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/workflow/" + objectId);
-  }
+   getObjects() {
+      return this.http.get<CreditorApplicationList[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/vendorPreList");
+   }
 
-  uploadFile(keyId: number, fileId: number, file: any) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
-  }
+   getObjectById(objectId: number) {
+      return this.http.get<CreditorApplicationRoot>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/" + objectId);
+   }
 
-  downloadFile(keyId: number) {
-    return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/downloadFile/" + keyId, { responseType: "blob" });
-  }
+   insertObject(object: CreditorApplicationHeader) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre", object, httpObserveHeader);
+   }
 
-  deleteFile(keyId: number) {
-    return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/deleteFile/" + keyId, httpObserveHeader);
-  }
+   updateObject(object: CreditorApplicationHeader) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + "MobileVendorPre", object, httpObserveHeader);
+   }
 
-  downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/exportPdf",
-      {
-        "appCode": appCode,
-        "format": format,
-        "documentIds": [documentId],
-        "reportName": reportName ?? null
-      },
-      { responseType: "blob" });
-  }
+   toggleObject(objectId: number) {
+      return this.http.put(this.configService.selected_sys_param.apiUrl + `MobileVendorPre/deactivate/${objectId}`, null, httpObserveHeader);
+   }
 
-  sendDebug(debugObject: JsonDebug) {
-    return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/jsonDebug", debugObject, httpObserveHeader);
-  }
+   getMasterList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/masterlist").toPromise();
+   }
+
+   getWorkflow(objectId: number) {
+      return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/workflow/" + objectId);
+   }
+
+   uploadFile(keyId: number, fileId: number, file: any) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
+   }
+
+   downloadFile(keyId: number) {
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/downloadFile/" + keyId, { responseType: "blob" });
+   }
+
+   deleteFile(keyId: number) {
+      return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/deleteFile/" + keyId, httpObserveHeader);
+   }
+
+   downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/exportPdf",
+         {
+            "appCode": appCode,
+            "format": format,
+            "documentIds": [documentId],
+            "reportName": reportName ?? null
+         },
+         { responseType: "blob" });
+   }
+
+   sendDebug(debugObject: JsonDebug) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/jsonDebug", debugObject, httpObserveHeader);
+   }
 
 }

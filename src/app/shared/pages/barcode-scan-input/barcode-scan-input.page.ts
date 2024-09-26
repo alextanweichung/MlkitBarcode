@@ -55,9 +55,9 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    showKeyboard(event) {
       event.preventDefault();
       this.setFocus();
-      setTimeout(async () => {
-         await Keyboard.show();
-      }, 100);
+      // setTimeout(async () => {
+      Keyboard.show();
+      // }, 100);
    }
 
    configSystemWideActivateMultiUOM: boolean = false;
@@ -120,12 +120,12 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    handleBarcodeKeyDown(e: any, key: string) {
       if (e.keyCode === 13) {
-         setTimeout(() => {
+         // setTimeout(() => {
+            this.setFocus();
             let barcode = JSON.parse(JSON.stringify(this.manipulateBarcodeCheckDigit(key)));
             this.validateBarcode(barcode);
-            this.setFocus();
             e.preventDefault();
-         }, 0);
+         // }, 0);
       }
    }
 
@@ -142,13 +142,14 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    /* #region scan */
 
-   barcodeSearchValue: string;
+   // barcodeSearchValue: string;
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
    async validateBarcode(barcode: string, emit: boolean = true) {
       setTimeout(async () => {
          if (barcode) {
             barcode = barcode.toUpperCase();
-            this.barcodeSearchValue = "";
+            this.barcodeInput.nativeElement.value = "";
+            this.setFocus();
             if (this.configService.item_Barcodes && this.configService.item_Barcodes.length > 0) {
                let found_barcode = this.configService.item_Barcodes.filter(r => r.barcode.length > 0).find(r => r.barcode.toUpperCase() === barcode.toUpperCase());
                if (found_barcode) {

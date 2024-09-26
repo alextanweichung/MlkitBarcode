@@ -9,6 +9,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { ReportsService } from '../../../services/reports.service';
+import { CommonService } from 'src/app/shared/services/common.service';
 
 @Component({
    selector: 'app-consignment-count-analysis',
@@ -24,12 +25,13 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
 
    locationMasterList: MasterListDetails[] = [];
 
-   request: ConsignmentCountAnalysisRequestObject = { dateStart: null, locationId: [] };
+   request: ConsignmentCountAnalysisRequestObject = { dateStart: null, dateEnd: null, locationId: [] };
 
    constructor(
       private objectService: ReportsService,
       private authService: AuthService,
       private configService: ConfigService,
+      private commonService: CommonService,
       private toastService: ToastService,
       private loadingService: LoadingService
    ) {
@@ -38,6 +40,7 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
 
    async ionViewWillEnter(): Promise<void> {
       await this.setFormattedDateString();
+      await this.setFormattedDateString2();
       await this.loadingService.showLoading();
       await this.loadMasterList();
       await this.loadingService.dismissLoading();
@@ -99,6 +102,7 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
          } else {
             this.request = {
                dateStart: this.request.dateStart,
+               dateEnd: this.request.dateEnd,
                locationId: event.flatMap(r => r.id),
             }
          }
@@ -108,6 +112,7 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
          } else {
             this.request = {
                dateStart: this.request.dateStart,
+               dateEnd: this.request.dateEnd,
                locationId: []
             }
          }
@@ -129,7 +134,7 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
    /* #region calendar handle here */
 
    formattedDateString: string = "";
-   dateValue = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+   dateValue = format(this.commonService.getFirstDayOfTodayMonth(), "yyyy-MM-dd") + "T08:00:00.000Z";
    maxDate = format(new Date("2099-12-31"), "yyyy-MM-dd") + "T08:00:00.000Z";
    @ViewChild("datetime") datetime: IonDatetime
    setFormattedDateString() {
@@ -139,6 +144,7 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
       } else {
          this.request = {
             dateStart: null,
+            dateEnd: this.request.dateEnd,
             locationId: this.request.locationId
          }
       }
@@ -155,6 +161,35 @@ export class ConsignmentCountAnalysisPage implements OnInit, ViewWillEnter {
 
    dateSelect() {
       this.datetime.confirm(true);
+   }
+   
+   formattedDateString2: string = "";
+   dateValue2 = format(new Date(), "yyyy-MM-dd") + "T08:00:00.000Z";
+   @ViewChild("datetime2") datetime2: IonDatetime
+   setFormattedDateString2() {
+      this.formattedDateString2 = format(parseISO(format(new Date(this.dateValue2), 'yyyy-MM-dd') + `T00:00:00.000Z`), "MMM d, yyyy");
+      if (this.request) {
+         this.request.dateEnd = format(new Date(this.dateValue2), "yyyy-MM-dd")
+      } else {
+         this.request = {
+            dateStart: this.request.dateStart,
+            dateEnd: null,
+            locationId: this.request.locationId
+         }
+      }
+   }
+
+   onTrxDateSelected2(value: any) {
+      this.dateValue2 = format(new Date(value), 'yyyy-MM-dd') + "T08:00:00.000Z";
+      this.setFormattedDateString2();
+   }
+
+   dateDismiss2() {
+      this.datetime2.cancel(true);
+   }
+
+   dateSelect2() {
+      this.datetime2.confirm(true);
    }
 
    /* #endregion */

@@ -56,7 +56,7 @@
             <div>Reverse</div>
           </ion-label>
         </ion-item>
-        <ion-item (click)="popover.dismiss(); presentAlertViewPdf()" *ngIf="objectService.objectHeader?.isCompleted">
+        <ion-item (click)="popover.dismiss(); presentAlertViewPdf()" *ngIf="objectService.objectHeader?.isCompleted && objectService.objectHeader?.interTransferId">
           <ion-icon name="download-outline" slot="end"></ion-icon>
           <ion-label>
             <div>Download PDF</div>
