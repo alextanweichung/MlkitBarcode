@@ -64,9 +64,14 @@
          <!-- Group Header Template -->
          <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
             <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
-               <div class="color-blue font-smaller ion-flex" (click)="toggleExpandGroup(group)">
-                  <div class="font-bold">{{group.value[0]["locationCode"]}}</div>
-                  <div class="ml-1">[{{group.value[0]["locationDesc"]}}]</div>
+               <div class="color-blue font-smaller ion-flex justify-content-between w-full" (click)="toggleExpandGroup(group)">
+                  <div class="ion-flex">
+                     <div class="font-bold">{{group.value[0]["locationCode"]}}</div>
+                     <div class="ml-1">[{{group.value[0]["locationDesc"]}}]</div>
+                  </div>
+                  <div class="ion-flex ml-3">
+                     <div>Total: {{objects|sum:"qtyRequest"|number:"1.0-0"}}</div>
+                  </div>
                </div>
             </ng-template>
          </ngx-datatable-group-header>

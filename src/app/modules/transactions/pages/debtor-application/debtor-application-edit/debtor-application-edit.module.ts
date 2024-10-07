@@ -8,16 +8,18 @@ import { DebtorApplicationEditPageRoutingModule } from './debtor-application-edi
 
 import { DebtorApplicationEditPage } from './debtor-application-edit.page';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
+import SeparatorModule from 'src/app/shared/utilities/seperator.modules';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    DebtorApplicationEditPageRoutingModule,
-    ReactiveFormsModule,
-    SearchDropdownPageModule
-  ],
-  declarations: [DebtorApplicationEditPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      DebtorApplicationEditPageRoutingModule,
+      ReactiveFormsModule,
+      SearchDropdownPageModule,
+      SeparatorModule
+   ],
+   declarations: [DebtorApplicationEditPage]
 })
-export class DebtorApplicationEditPageModule {}
+export class DebtorApplicationEditPageModule { }

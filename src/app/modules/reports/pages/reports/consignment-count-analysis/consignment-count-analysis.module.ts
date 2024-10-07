@@ -10,6 +10,7 @@ import { ConsignmentCountAnalysisPage } from './consignment-count-analysis.page'
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SearchDropdownPageModule } from 'src/app/shared/pages/search-dropdown/search-dropdown.module';
 import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi-dropdown/search-multi-dropdown.module';
+import { SumModule } from 'src/app/shared/pipes/sum/sum.module';
 
 @NgModule({
    imports: [
@@ -19,7 +20,8 @@ import { SearchMultiDropdownPageModule } from 'src/app/shared/pages/search-multi
       ConsignmentCountAnalysisPageRoutingModule,
       NgxDatatableModule,
       SearchDropdownPageModule,
-      SearchMultiDropdownPageModule
+      SearchMultiDropdownPageModule,
+      SumModule
    ],
    declarations: [ConsignmentCountAnalysisPage]
 })

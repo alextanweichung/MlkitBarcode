@@ -38,7 +38,7 @@ export class DashboardService {
    }
 
    getDashboard() {
-      return this.http.get<Dashboard>(this.configService.selected_sys_param.apiUrl + "account/mobileDashboard")
+      return this.http.get<Dashboard>(this.configService.selected_sys_param.apiUrl + "account/mobileDashboard");
    }
 
    downloadFiles(fileId: number) {

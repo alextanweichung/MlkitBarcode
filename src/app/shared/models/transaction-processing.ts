@@ -24,6 +24,7 @@ export interface TransactionProcessingDoc {
    reportName: string
    deactivated: boolean
    typeDetail: string
+   amountString?: string
 }
 
 export interface TransactionProcessingCount {

@@ -7,6 +7,13 @@ export interface Sys_Parameter {
    username?: string
    password?: string
    companyName?: string
+   jsonConfig?: string
+}
+
+export interface Sys_ParameterJsonConfig {
+   name: string
+   description: string
+   value: string
 }
 
 export interface FireStoreReturn {

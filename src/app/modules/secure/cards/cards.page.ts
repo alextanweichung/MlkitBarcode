@@ -13,7 +13,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { format } from 'date-fns';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { DashboardService } from '../../dashboard/services/dashboard.service';
-import { Sys_Parameter } from 'src/app/shared/database/tables/tables';
+import { Sys_Parameter, Sys_ParameterJsonConfig } from 'src/app/shared/database/tables/tables';
 import { LoginUser } from 'src/app/services/auth/login-user';
 
 SwiperCore.use([Pagination]);
@@ -202,6 +202,19 @@ export class CardsPage implements OnInit, AfterContentChecked, ViewWillEnter {
    }
 
    /* #endregion */
+
+   localConfigModal: boolean = false;
+   showLocalConfig() {
+      this.localConfigModal = true;
+   }
+
+   hideLocalConfig() {
+      this.localConfigModal = false;
+   }
+
+   getAvailableJsonConfig() {
+      return (JSON.parse(this.configService.sys_parameter.find(r => r.apiUrl === this.configService.selected_sys_param.apiUrl)?.jsonConfig) as Sys_ParameterJsonConfig[]);
+   }
 
    async addNewActivation() {
       const alert = await this.alertController.create({

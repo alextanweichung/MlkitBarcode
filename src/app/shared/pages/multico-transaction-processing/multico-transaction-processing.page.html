@@ -36,7 +36,20 @@
                                  <div *ngIf="!limitCol" class="mr-2">{{rowData2.currency}}</div>
                               </ion-col>
                               <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                                 <div *ngIf="limitCol">{{rowData2.amount|number:"1.2-2"}}</div>
+                                 <div *ngIf="limitCol">
+                                    <ng-container *ngIf="displayAmountCountLength(rowData2.amountString) > 0 && specialTransaction; else normal">
+                                        <div *ngFor="let row of mapAmountStringToArr(rowData2.amountString)" class="ion-flex ion-margin-auto justify-content-end">
+                                            <div class="ion-flex ion-text-right my-1">
+                                               <ion-badge>
+                                                  <div class="ion-text-right">{{row.currency}} {{row.amount | number:"1.2-2"}}</div>                                                  
+                                               </ion-badge>
+                                             </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-template #normal>
+                                       {{rowData2.amount|number:"1.2-2"}}
+                                    </ng-template>
+                                 </div>
                               </ion-col>
                            </ion-row>
                            <ion-row *ngIf="!limitCol">
@@ -61,16 +74,19 @@
                         </ion-grid>
                      </ion-item>
                      <ion-item-options side="start">
+                        <!-- <ion-item-option color="warning" (click)="slidingItem.close(); previewPdf(rowData, rowData2)">
+                           <ion-icon name="eye-outline" slot="bottom"></ion-icon>Preview
+                        </ion-item-option> -->
                         <ion-item-option (click)="slidingItem.close(); presentAlertViewPdf(rowData, rowData2)">
-                           <ion-icon name="document-attach-outline"></ion-icon>
+                           <ion-icon name="document-attach-outline" slot="bottom"></ion-icon>Download
                         </ion-item-option>
                      </ion-item-options>
                      <ion-item-options side="end">
                         <ion-item-option color="danger" (click)="slidingItem.close(); presentConfirmAlert('REJECT', rowData, rowData2)">
-                           <ion-icon name="close-circle-outline"></ion-icon>
+                           <ion-icon name="close-circle-outline" slot="bottom"></ion-icon>Reject
                         </ion-item-option>
                         <ion-item-option color="success" (click)="slidingItem.close(); presentConfirmAlert('CONFIRM', rowData, rowData2)">
-                           <ion-icon name="checkmark-circle-outline"></ion-icon>
+                           <ion-icon name="checkmark-circle-outline" slot="bottom"></ion-icon>Confirm
                         </ion-item-option>
                      </ion-item-options>
                   </ion-item-sliding>

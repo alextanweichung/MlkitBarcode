@@ -18,6 +18,7 @@ export class MultiCoTransactionProcessingPage implements OnInit {
 
    @Input() trxEndPoint: string;
    @Input() limitCol: boolean = false;
+   @Input() specialTransaction: boolean = false;
    constructor(
       private objectService: MultiCoTransactionProcessingService,
       private commonService: CommonService,
@@ -168,6 +169,15 @@ export class MultiCoTransactionProcessingPage implements OnInit {
       }
    }
 
+   async previewPdf(company: OtherCompanyTrx, doc: TransactionProcessingDoc) {
+      let req: any = [doc.docId];
+      this.objectService.downloadPdf(company.token, company.otherCompaniesUrl, this.trxEndPoint, req).subscribe(async blob => {
+         var fileURL = window.URL.createObjectURL(blob);
+      }, error => {
+         console.log(error);
+      })
+   }
+
    /* #endregion */
 
    /* #region approve action */
@@ -233,5 +243,21 @@ export class MultiCoTransactionProcessingPage implements OnInit {
    }
 
    /* #endregion */
+
+   displayAmountCountLength(columnData: string) {
+      const result = columnData?.split(';').map(s => {
+         const [currency, amount] = s?.split('|').map(part => part?.trim());
+         return { currency, amount: parseFloat(amount) ?? 0 };
+      }) ?? [];
+      return result.length ?? 0
+   }
+
+   mapAmountStringToArr(columnData: string) {
+      const result = columnData?.split(';').map(s => {
+         const [currency, amount] = s?.split('|').map(part => part?.trim());
+         return { currency, amount: parseFloat(amount) ?? 0 };
+      }) ?? [];
+      return result
+   }
 
 }

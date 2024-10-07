@@ -45,6 +45,7 @@ export class StockCountService {
    configMobileScanItemContinuous: boolean = false;
    configInvCountBinFromLocation: boolean = false;
    configMobileStockCountItemAlwaysCreateNewLine: boolean = false;
+   configMobileStockCountHideBinSelection: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -89,7 +90,14 @@ export class StockCountService {
             this.configMobileStockCountItemAlwaysCreateNewLine = true;
          } else {
             this.configMobileStockCountItemAlwaysCreateNewLine = false;
-         }         
+         }
+
+         let mobileStockCountHideBinSelection = this.moduleControl.find(x => x.ctrlName === "MobileStockCountHideBinSelection");
+         if (mobileStockCountHideBinSelection && mobileStockCountHideBinSelection.ctrlValue.toUpperCase() === "Y") {
+            this.configMobileStockCountHideBinSelection = true;
+         } else {
+            this.configMobileStockCountHideBinSelection = false;
+         }
       })
    }
 

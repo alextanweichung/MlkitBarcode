@@ -7,6 +7,7 @@ export const sys_Parameter_Table: string = `CREATE TABLE IF NOT EXISTS Sys_Param
 
 export const check_system_parameter_table: string = `PRAGMA TABLE_INFO(Sys_Parameter)`;
 export const system_parameter_add_new_col: string = `ALTER TABLE Sys_Parameter ADD COLUMN companyName TEXT; `;
+export const system_parameter_add_new_col2: string = `ALTER TABLE Sys_Parameter ADD COLUMN jsonConfig TEXT; `;
 
 export const create_item_master_table: string = `CREATE TABLE IF NOT EXISTS ITEM_MASTER (id INTEGER, code VARCHAR(100), itemDesc TEXT, typeCode VARCHAR(20), newId INTEGER, newDate DATE, brandId INTEGER, brandCd VARCHAR(20), brandDesc VARCHAR(100), groupId INTEGER, groupCd VARCHAR(20), groupDesc VARCHAR(100), catId INTEGER, catCd VARCHAR(20), catDesc VARCHAR(100), deptId INTEGER, seasonId INTEGER, varCd VARCHAR(100), price DECIMAL(6,6), minPrice DECIMAL(6,6), discId INTEGER, discCd VARCHAR(20), discPct DECIMAL(3,2), taxId INTEGER, taxCd VARCHAR(20), taxPct DECIMAL(3,2), imgUrl VARCHAR(255), launchDate DATE, uomId INTEGER, uomCd VARCHAR(20), uomDesc VARCHAR(100), isActiveMobile NUMERIC);`;
 
@@ -51,6 +52,11 @@ export class MigrationService {
       if (ret2.values && !ret2.values.flatMap(r => r["name"]).includes("companyName")) {
          const ret3: any = await db.execute(system_parameter_add_new_col);
          console.log(`ret3: ${JSON.stringify(ret3)}`);
+      }
+
+      if (ret2.values && !ret2.values.flatMap(r => r["name"]).includes("jsonConfig")) {
+         const ret4: any = await db.execute(system_parameter_add_new_col2);
+         console.log(`ret4: ${JSON.stringify(ret4)}`);
       }
 
 		await this.sqliteService.closeConnection(dbConfig.idcpcore);

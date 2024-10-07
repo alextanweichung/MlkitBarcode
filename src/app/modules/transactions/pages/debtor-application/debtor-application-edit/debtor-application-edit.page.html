@@ -27,7 +27,9 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Credit Limit</ion-label>
-          <ion-input placeholder="Enter Credit Limit" type="number" inputmode="decimal" formControlName="creditLimit"></ion-input>
+          <!-- <ion-input placeholder="Enter Credit Limit" inputmode="decimal" [value]="objectForm?.controls?.creditLimit?.value | number" (ionInput)="test($event)"></ion-input> -->
+          <!-- <input type="text" separator /> -->
+          <ion-input separator placeholder="Enter Credit Limit" type="text" inputmode="decimal" [max]="999999999" formControlName="creditLimit"></ion-input>
         </ion-item>
         <ion-item class="ion-no-padding">
           <app-search-dropdown title="Term Period" optionLabel="description" [masterDropdownList]="objectService.termPeriodMasterList" [selectedId]="objectForm?.controls?.termPeriodId?.value" (onActionComplete)="onTermPeriodSelected($event)"></app-search-dropdown>

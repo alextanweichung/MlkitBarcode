@@ -55,7 +55,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             next: async (response) => {
                this.binList = response;
                for await (let rowData of this.binList) {
-                  this.binListDropDown.push({ id: rowData.binId, code: rowData.binCode, description: rowData.binCode });                  
+                  this.binListDropDown.push({ id: rowData.binId, code: rowData.binCode, description: rowData.binCode });
                }
             },
             error: (error) => {
@@ -163,13 +163,13 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             this.resetFilteredObj();
          }
          else if (rowIndex === 0 && !this.objectService.configInvCountActivateLineWithBin) { // already in and first one
-            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??1);
+            this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest ?? 1);
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
             await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             this.resetFilteredObj();
          } else if (rowIndex === 0 && this.objectService.configInvCountActivateLineWithBin) { // already in and first one + same binDesc
             if (this.objectService.objectDetail[rowIndex].binDesc === this.binDesc) {
-               this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest??1);
+               this.objectService.objectDetail.find(r => r.itemSku === trxLine.itemSku).qtyRequest += (trxLine.qtyRequest ?? 1);
                let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
                await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
                this.resetFilteredObj();
@@ -242,30 +242,31 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async decreaseQty(line: StockCountDetail) {
       try {
-         if (line.qtyRequest - 1 < 0) {
-            line.qtyRequest = 0;
-            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-            if (findIndex > -1) {
-               this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-            } else {
-               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-            }
-            let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         } else {
-            line.qtyRequest--;
-            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-            if (findIndex > -1) {
-               this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-            } else {
-               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-            }
-            let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         }
-         if (line.qtyRequest === 0) {
-            await this.deleteLine(line);
-         }
+         line.qtyRequest -= 1;
+         // if (line.qtyRequest - 1 < 0) {
+         //    line.qtyRequest = 0;
+         //    let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         //    if (findIndex > -1) {
+         //       this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+         //    } else {
+         //       this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+         //    }
+         //    let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         //    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+         // } else {
+         //    line.qtyRequest--;
+         //    let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         //    if (findIndex > -1) {
+         //       this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+         //    } else {
+         //       this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+         //    }
+         //    let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         //    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+         // }
+         // if (line.qtyRequest === 0) {
+         //    await this.deleteLine(line);
+         // }
       } catch (e) {
          console.error(e);
       }
@@ -281,26 +282,26 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async onQtyBlur(line: StockCountDetail) {
       line.qtyRequest = Math.floor(line.qtyRequest);
-      let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-      if (findIndex > -1) {
-         this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-      } else {
-         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-      }
-      let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      // let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+      // if (findIndex > -1) {
+      //    this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+      // } else {
+      //    this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+      // }
+      // let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+      // await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
    async increaseQty(line: StockCountDetail) {
       line.qtyRequest += 1;
-      let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-      if (findIndex > -1) {
-         this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-      } else {
-         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-      }
-      let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      // let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+      // if (findIndex > -1) {
+      //    this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+      // } else {
+      //    this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+      // }
+      // let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+      // await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
    async deleteLine(line: StockCountDetail) {
@@ -398,22 +399,35 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
-   updateBinModal: boolean = false;
+   editModal: boolean = false;
    selectedStockCountDetail: StockCountDetail;
-   updateBinId(rowData: StockCountDetail) {
+   showEditModal(rowData: StockCountDetail) {
       let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
       if (index > -1) {
-         this.selectedStockCountDetail = this.objectService.objectDetail[index];
-         this.updateBinModal = true;
+         this.selectedStockCountDetail = JSON.parse(JSON.stringify(this.objectService.objectDetail[index]));
+         this.editModal = true;
       } else {
          this.selectedStockCountDetail = null;
          this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
       }
    }
 
-   hideUpdateBinModal() {
-      this.selectedStockCountDetail = null;
-      this.updateBinModal = false;
+   hideEditModal() {
+      this.editModal = false;
+      setTimeout(async () => {
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === this.selectedStockCountDetail.guid);
+         this.objectService.objectDetail[findIndex] = JSON.parse(JSON.stringify(this.selectedStockCountDetail));
+
+         // handle filtered list
+         let findIndexFiltered = this.filteredObj.findIndex(r => r.guid === this.selectedStockCountDetail.guid);
+         if (findIndexFiltered > -1) {
+            this.filteredObj[findIndexFiltered] = JSON.parse(JSON.stringify(this.selectedStockCountDetail));
+         }
+
+         this.selectedStockCountDetail = null;
+         let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      }, 0);
    }
 
    onUpdateBinSelected(event: SearchDropdownList) {
@@ -458,7 +472,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          console.error(e);
       }
    }
-   
+
    /* #endregion */
 
    /* #region  camera scanner */
@@ -564,6 +578,30 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async insertObject() {
       try {
+
+         // validate quantity by itemSku
+         let validateObject: Map<string, number> = new Map<string, number>();
+         this.objectService.objectDetail.forEach(r => {
+            if (validateObject.has(r.itemSku)) {
+               validateObject.set(r.itemSku, validateObject.get(r.itemSku) + r.qtyRequest);
+            } else {
+               validateObject.set(r.itemSku, r.qtyRequest);
+            }
+         })
+         let validationError = false;
+         let errorItemSku: string[] = [];
+         validateObject.forEach((value, key) => {
+            if (value <= 0) {
+               validationError = true;
+               errorItemSku.push(key);
+            }
+         })
+         if (validationError) {
+            this.toastService.presentToast("Control Error", `${errorItemSku.join(", ")} Quantity must be greater than 0.`, "top", "warning", 1000);
+            return;
+         }
+         // validate quantity by itemSku
+
          await this.loadingService.showLoading();
          this.objectService.insertInventoryCount({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
             if (response.status === 201) {
@@ -605,7 +643,6 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
             details: this.objectService.objectDetail
          }
          let localTrx: LocalTransaction;
-         console.log("🚀 ~ StockCountItemPage ~ insertObjectLocal ~ s.objectService.objectHeader.isLocal:", this.objectService.objectHeader.isLocal)
          if (this.objectService.objectHeader.isLocal) {
             localTrx = {
                id: this.objectService.objectHeader.guid,
@@ -614,7 +651,6 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                lastUpdated: new Date(),
                jsonData: JSON.stringify(object)
             }
-            console.log("🚀 ~ StockCountItemPage ~ insertObjectLocal ~ localTrx:", localTrx.id)
             await this.configService.updateLocalTransaction(localTrx);
          } else {
             localTrx = {
@@ -651,6 +687,30 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async updateObject() {
       try {
+
+         // validate quantity by itemSku
+         let validateObject: Map<string, number> = new Map<string, number>();
+         this.objectService.objectDetail.forEach(r => {
+            if (validateObject.has(r.itemSku)) {
+               validateObject.set(r.itemSku, validateObject.get(r.itemSku) + r.qtyRequest);
+            } else {
+               validateObject.set(r.itemSku, r.qtyRequest);
+            }
+         })
+         let validationError = false;
+         let errorItemSku: string[] = [];
+         validateObject.forEach((value, key) => {
+            if (value <= 0) {
+               validationError = true;
+               errorItemSku.push(key);
+            }
+         })
+         if (validationError) {
+            this.toastService.presentToast("Control Error", `${errorItemSku.join(", ")} Quantity must be greater than 0.`, "top", "warning", 1000);
+            return
+         }
+         // validate quantity by itemSku
+
          await this.loadingService.showLoading();
          this.objectService.updateInventoryCount({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
             if (response.status === 204) {
@@ -830,41 +890,41 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
       })
    }
 
-	async onKeyDown(event, searchText) {
-		if (event.keyCode === 13) {
-			await this.search(searchText, true);
-		}
-	}
+   async onKeyDown(event, searchText) {
+      if (event.keyCode === 13) {
+         await this.search(searchText, true);
+      }
+   }
 
-	itemSearchText: string;
-	filteredObj: StockCountDetail[] = [];
-	search(searchText, newSearch: boolean = false) {
-		if (newSearch) {
-			this.filteredObj = [];
-		}
-		this.itemSearchText = searchText;
-		try {
-			if (searchText && searchText.trim().length > 2) {
-				if (Capacitor.getPlatform() !== "web") {
-					Keyboard.hide();
-				}
-				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
+   itemSearchText: string;
+   filteredObj: StockCountDetail[] = [];
+   search(searchText, newSearch: boolean = false) {
+      if (newSearch) {
+         this.filteredObj = [];
+      }
+      this.itemSearchText = searchText;
+      try {
+         if (searchText && searchText.trim().length > 2) {
+            if (Capacitor.getPlatform() !== "web") {
+               Keyboard.hide();
+            }
+            this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r =>
                r.itemCode?.toUpperCase().includes(searchText.toUpperCase())
                || r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase())
             )));
-				this.currentPage = 1;
-			} else {
-				this.resetFilteredObj();
-				this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
-			}
-		} catch (e) {
-			console.error(e);
-		}
-	}
+            this.currentPage = 1;
+         } else {
+            this.resetFilteredObj();
+            this.toastService.presentToast("", "Search with 3 characters and above", "top", "warning", 1000);
+         }
+      } catch (e) {
+         console.error(e);
+      }
+   }
 
-	resetFilteredObj() {
-		this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
-	}
+   resetFilteredObj() {
+      this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail));
+   }
 
    /* #endregion */
 
