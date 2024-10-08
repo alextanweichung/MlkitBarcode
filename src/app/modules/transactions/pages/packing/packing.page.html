@@ -40,8 +40,10 @@
                   </ion-row>
                   <ion-row>
                      <ion-col class="ion-flex ion-margin-auto">{{rowData.locationCode}} - {{rowData.locationDescription}}</ion-col>
-                     <ion-col
-                        class="ion-flex ion-margin-auto justify-content-end">{{rowData.warehouseAgentName}}</ion-col>
+                     <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="rowData.toLocationCode">{{rowData.toLocationCode}} - {{rowData.toLocationDescription}}</ion-col>
+                  </ion-row>
+                  <ion-row>
+                     <ion-col class="ion-flex ion-margin-auto">{{rowData.warehouseAgentName}}</ion-col>
                   </ion-row>
                </ion-grid>
             </ion-item>

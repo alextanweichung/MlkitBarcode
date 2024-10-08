@@ -16,7 +16,6 @@ import { ConfigService } from 'src/app/services/config/config.service';
 export class PickingDetailPage implements OnInit, ViewWillEnter {
 
    objectId: number;
-   object: MultiPickingRoot;
    isMobile: boolean = true;
 
    constructor(
@@ -54,10 +53,13 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
       this.uniqueSalesOrder = []
       try {
          this.objectService.getObjectById(this.objectId).subscribe(response => {
-            this.object = response;
-            this.object.header = this.commonService.convertObjectAllDateType(this.object.header);
-            if (this.object.outstandingPickList && this.object.outstandingPickList.length > 0) {
-               this.uniqueSalesOrder = [...new Set(this.object.outstandingPickList.flatMap(r => r.salesOrderNum))];
+            let object = response as MultiPickingRoot;
+            object.header = this.commonService.convertObjectAllDateType(object.header);
+            this.objectService.setPickingObject(object);
+            this.objectService.setHeader(object.header)
+            this.objectService.setMultiPickingObject({ outstandingPickList: object.outstandingPickList, pickingCarton: object.details });
+            if (object.outstandingPickList && object.outstandingPickList.length > 0) {
+               this.uniqueSalesOrder = [...new Set(object.outstandingPickList.flatMap(r => r.salesOrderNum))];
             }
          }, error => {
             console.error(error);
@@ -85,7 +87,7 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
    /* #region find outstanding item in this SO */
 
    getItemOfSO(salesOrderNum: string) {
-      let find = this.object.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum);
+      let find = this.objectService.object.outstandingPickList.filter(r => r.salesOrderNum === salesOrderNum);
       if (find && find.length > 0) {
          return find;
       }
@@ -108,15 +110,7 @@ export class PickingDetailPage implements OnInit, ViewWillEnter {
    /* #endregion */
 
    editObject() {
-      this.objectService.object = this.object;
-      this.objectService.setHeader(this.object.header);
-      this.objectService.multiPickingObject = { outstandingPickList: this.object.outstandingPickList, pickingCarton: this.object.details };
-      let navigationExtras: NavigationExtras = {
-         queryParams: {
-            objectId: this.object.header.multiPickingId
-         }
-      }
-      this.navController.navigateRoot('/transactions/picking/picking-item', navigationExtras);
+      this.navController.navigateRoot('/transactions/picking/picking-item');
    }
 
 }

@@ -579,29 +579,6 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    async insertObject() {
       try {
 
-         // validate quantity by itemSku
-         let validateObject: Map<string, number> = new Map<string, number>();
-         this.objectService.objectDetail.forEach(r => {
-            if (validateObject.has(r.itemSku)) {
-               validateObject.set(r.itemSku, validateObject.get(r.itemSku) + r.qtyRequest);
-            } else {
-               validateObject.set(r.itemSku, r.qtyRequest);
-            }
-         })
-         let validationError = false;
-         let errorItemSku: string[] = [];
-         validateObject.forEach((value, key) => {
-            if (value <= 0) {
-               validationError = true;
-               errorItemSku.push(key);
-            }
-         })
-         if (validationError) {
-            this.toastService.presentToast("Control Error", `${errorItemSku.join(", ")} Quantity must be greater than 0.`, "top", "warning", 1000);
-            return;
-         }
-         // validate quantity by itemSku
-
          await this.loadingService.showLoading();
          this.objectService.insertInventoryCount({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {
             if (response.status === 201) {
@@ -687,29 +664,6 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async updateObject() {
       try {
-
-         // validate quantity by itemSku
-         let validateObject: Map<string, number> = new Map<string, number>();
-         this.objectService.objectDetail.forEach(r => {
-            if (validateObject.has(r.itemSku)) {
-               validateObject.set(r.itemSku, validateObject.get(r.itemSku) + r.qtyRequest);
-            } else {
-               validateObject.set(r.itemSku, r.qtyRequest);
-            }
-         })
-         let validationError = false;
-         let errorItemSku: string[] = [];
-         validateObject.forEach((value, key) => {
-            if (value <= 0) {
-               validationError = true;
-               errorItemSku.push(key);
-            }
-         })
-         if (validationError) {
-            this.toastService.presentToast("Control Error", `${errorItemSku.join(", ")} Quantity must be greater than 0.`, "top", "warning", 1000);
-            return
-         }
-         // validate quantity by itemSku
 
          await this.loadingService.showLoading();
          this.objectService.updateInventoryCount({ header: this.objectService.objectHeader, details: this.objectService.objectDetail }).subscribe(async response => {

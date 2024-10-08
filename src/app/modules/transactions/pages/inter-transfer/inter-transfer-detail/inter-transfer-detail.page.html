@@ -51,6 +51,14 @@
                      <div>{{object.header.shipMethodId|idMapping: objectService.shipMethodMasterList}}</div>
                   </ion-col>
                </ion-row>
+               <ion-row *ngIf="getObjectDetailSO()">
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Parent Doc. Num.</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">[{{getObjectDetailSO()}}]</div>
+                  </ion-col>
+               </ion-row>
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
                      <div class="font-bold">Created By</div>

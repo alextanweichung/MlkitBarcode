@@ -253,10 +253,10 @@
                                  <ion-row>
                                     <ion-col class="ion-flex ion-margin-auto">
                                        <div>{{rowData.itemCode}}</div>
-                                       <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXDescription">
-                                          {{rowData.itemVariationXDescription}}</span>
-                                       <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYDescription">
-                                          {{rowData.itemVariationYDescription}}</span>
+                                       <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXId">
+                                          {{rowData.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                                       <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYId">
+                                          {{rowData.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                                     </ion-col>
                                  </ion-row>
                               </ion-grid>

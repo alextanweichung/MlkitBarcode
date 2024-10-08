@@ -6,6 +6,8 @@ export interface MultiPackingList {
    trxDate: Date
    locationCode: string
    locationDescription: string
+   toLocationCode: string
+   toLocationDescription: string
    warehouseAgentId: number
    warehouseAgentName: string
    deactivated: boolean
@@ -154,9 +156,9 @@ export interface SalesOrderLineForWD {
    itemVariationYId: number
    itemCode: string
    itemSku: string
-   description: string
-   itemVariationXDescription: string
-   itemVariationYDescription: string
+   // description: string
+   // itemVariationXDescription: string
+   // itemVariationYDescription: string
    itemBarcode: string
    rack: string
    subRack: string

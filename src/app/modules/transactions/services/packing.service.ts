@@ -69,7 +69,7 @@ export class PackingService {
       this.multiPackingObject = { outstandingPackList: [], packingCarton: [] };
    }
 
-   removePackingSummary() {
+   removePackinGObject() {
       this.object = null;
    }
 
@@ -80,7 +80,7 @@ export class PackingService {
    async resetVariables() {
       this.removeHeader();
       this.removeMultiPackingObject();
-      this.removePackingSummary();
+      this.removePackinGObject();
       this.removeLocalObject();
       await this.configService.removeFromLocalStorage(this.trxKey);
    }
@@ -88,6 +88,12 @@ export class PackingService {
    /* #endregion */
 
    /* #region get data */
+
+   getTotalPacked() {
+      if (this.object.details) {
+         return this.object.details.flatMap(r => r.packList).flatMap(r => r.qtyPacked).reduce((a, c) => a + c, 0);
+      }
+   }
 
    getUniqueSo(): string[] {
       if (this.multiPackingObject && this.multiPackingObject.outstandingPackList.length > 0) {
@@ -103,16 +109,16 @@ export class PackingService {
       return [];
    }
 
-   getItemDescriptionByItemCode(itemCode: string): string {
-      if (this.multiPackingObject && this.multiPackingObject.outstandingPackList.length > 0) {
-         let description = "";
-         let found = this.multiPackingObject.outstandingPackList.find(r => r.itemCode === itemCode);
-         if (found) {
-            return found.description;
-         }
-      }
-      return null;
-   }
+   // getItemDescriptionByItemCode(itemCode: string): string {
+   //    if (this.multiPackingObject && this.multiPackingObject.outstandingPackList.length > 0) {
+   //       let description = "";
+   //       let found = this.multiPackingObject.outstandingPackList.find(r => r.itemCode === itemCode);
+   //       if (found) {
+   //          return found.description;
+   //       }
+   //    }
+   //    return null;
+   // }
 
    getLocationByItemCode(itemCode: string): string {
       if (this.multiPackingObject && this.multiPackingObject.outstandingPackList.length > 0) {
@@ -228,7 +234,12 @@ export class PackingService {
             let results: any[] = [];
             lines.forEach(r => {
                if (!results.flatMap(rr => rr.itemSku).includes(r.itemSku)) {
-                  results.push({ itemSku: r.itemSku, variationTypeCode: r.variationTypeCode, xDesc: r.itemVariationXDescription, yDesc: r.itemVariationYDescription });
+                  results.push({
+                     itemSku: r.itemSku,
+                     variationTypeCode: r.variationTypeCode,
+                     xDesc: this.itemVariationXMasterList.find(rr => rr.id === r.itemVariationXId)?.description,
+                     yDesc: this.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description,
+                  });
                }
             })
             return results;
@@ -299,8 +310,8 @@ export class PackingService {
          }
          this.warehouseAgentMasterList = this.fullMasterList.filter(x => x.objectName === "WarehouseAgent").flatMap(src => src.details).filter(y => y.deactivated === 0);
          this.reasonMasterList = this.fullMasterList.filter(x => x.objectName === "Reason").flatMap(src => src.details).filter(y => y.deactivated === 0);
-         this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);  
-         this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName === "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);      
+         this.packagingMasterList = this.fullMasterList.filter(x => x.objectName === "Packaging").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         this.shipMethodMasterList = this.fullMasterList.filter(x => x.objectName === "ShipMethod").flatMap(src => src.details).filter(y => y.deactivated === 0);
       }, 0);
       this.custSubscription = this.authService.customerMasterList$.subscribe(async obj => {
          let savedCustomerList = obj;

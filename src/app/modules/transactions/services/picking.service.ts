@@ -49,7 +49,7 @@ export class PickingService {
       this.multiPickingObject = object;
    }
 
-   setPickingSummary(object: MultiPickingRoot) {
+   setPickingObject(object: MultiPickingRoot) {
       this.object = object;
    }
 
@@ -61,19 +61,25 @@ export class PickingService {
       this.multiPickingObject = { outstandingPickList: [], pickingCarton: [] };
    }
 
-   removePickingSummary() {
+   removePickingObject() {
       this.object = null;
    }
 
    resetVariables() {
       this.removeHeader();
       this.removeMultiPickingObject();
-      this.removePickingSummary();
+      this.removePickingObject();
    }
 
    /* #endregion */
 
    /* #region get data */
+
+   getTotalPicked() {
+      if (this.object.details) {
+         return this.object.details.flatMap(r => r.pickList).flatMap(r => r.qtyPicked).reduce((a, c) => a + c, 0);
+      }
+   }
 
    getUniqueSo(): string[] {
       if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
@@ -85,41 +91,25 @@ export class PickingService {
    getUniqueItem(): string[] { //{ itemCode: string, variationTypeCode: string, isSelected: boolean }[] {
       if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
          return [...new Set(this.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
-         // let result: { itemCode: string, variationTypeCode: string, isSelected: boolean }[] = [];
-         // let uniqueItemCode = [...new Set(this.multiPickingObject.outstandingPickList.flatMap(r => r.itemCode))];
-         // uniqueItemCode.forEach(r => {
-         //   result.push({
-         //     itemCode: r,
-         //     variationTypeCode: this.multiPickingObject.outstandingPickList.find(rr => rr.itemCode === r).variationTypeCode,
-         //     isSelected: false
-         //   })
-         // })
-         // return result;
       }
       return [];
    }
 
-   getItemDescriptionByItemCode(itemCode: string): string {
-      if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
-         let description = "";
-         let found = this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode);
-         if (found) {
-            return found.description;
-         }
-      }
-      return null;
-   }
+   // getItemDescriptionByItemCode(itemCode: string): string {
+   //    if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
+   //       let description = "";
+   //       let found = this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode);
+   //       if (found) {            
+   //          return found.description;
+   //       }
+   //    }
+   //    return null;
+   // }
 
    getLocationByItemCode(itemCode: string): string {
       if (this.multiPickingObject && this.multiPickingObject.outstandingPickList.length > 0) {
          let location = "";
          let found = this.multiPickingObject.outstandingPickList.find(r => r.itemCode === itemCode);
-         // if (found && found.rack) {
-         //    location += found.rack;
-         // }
-         // if (found && found.subRack) {
-         //    location += " - " + found.subRack;
-         // }
          return location;
       }
       return null;
@@ -224,7 +214,12 @@ export class PickingService {
             let results: any[] = [];
             lines.forEach(r => {
                if (!results.flatMap(rr => rr.itemSku).includes(r.itemSku)) {
-                  results.push({ itemSku: r.itemSku, variationTypeCode: r.variationTypeCode, xDesc: r.itemVariationXDescription, yDesc: r.itemVariationYDescription });
+                  results.push({ 
+                     itemSku: r.itemSku, 
+                     variationTypeCode: r.variationTypeCode, 
+                     xDesc: this.itemVariationXMasterList.find(rr => rr.id === r.itemVariationXId)?.description,
+                     yDesc: this.itemVariationYMasterList.find(rr => rr.id === r.itemVariationYId)?.description
+                  });
                }
             })
             return results;

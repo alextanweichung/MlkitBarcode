@@ -1,7 +1,7 @@
 <ion-header>
    <ion-toolbar>
       <ion-title>
-         <div class="ion-text-wrap">{{object?.header?.multiPickingNum}}</div>
+         <div class="ion-text-wrap">{{objectService.object?.header?.multiPickingNum}}</div>
       </ion-title>
       <ion-buttons slot="start">
          <ion-back-button text="" defaultHref="/transactions/picking"></ion-back-button>
@@ -26,7 +26,7 @@
    </ng-template>
 </ion-popover>
 <ion-content fullscreen>
-   <div class="p-2" *ngIf="object">
+   <div class="p-2" *ngIf="objectService.object">
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
          <ion-item button detail="false" class="ion-no-padding no-ripple">
             <ion-grid class="ion-no-padding py-2 pl-2">
@@ -35,7 +35,7 @@
                      <div class="font-bold">Picking Num.</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.multiPickingNum}}</div>
+                     <div>{{objectService.object.header.multiPickingNum}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -43,7 +43,7 @@
                      <div class="font-bold">Doc. Date</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.trxDate|date:'dd/MM/yyyy'}}</div>
+                     <div>{{objectService.object.header.trxDate|date:'dd/MM/yyyy'}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -51,7 +51,7 @@
                      <div class="font-bold">Origin Location</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.locationId|idMapping:objectService.locationMasterList}}</div>
+                     <div>{{objectService.object.header.locationId|idMapping:objectService.locationMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -59,7 +59,7 @@
                      <div class="font-bold">Destination Location</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.toLocationId|idMapping:objectService.locationMasterList}}</div>
+                     <div>{{objectService.object.header.toLocationId|idMapping:objectService.locationMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -67,7 +67,7 @@
                      <div class="font-bold">Customer</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.customerId|idMapping:objectService.customerMasterList}}</div>
+                     <div>{{objectService.object.header.customerId|idMapping:objectService.customerMasterList}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -75,7 +75,15 @@
                      <div class="font-bold">Warehouse Agent</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.warehouseAgentId|idMapping:objectService.warehouseAgentMasterList}}</div>
+                     <div>{{objectService.object.header.warehouseAgentId|idMapping:objectService.warehouseAgentMasterList}}</div>
+                  </ion-col>
+               </ion-row>
+               <ion-row>
+                  <ion-col class="ion-flex ion-margin-auto">
+                     <div class="font-bold">Total Picked</div>
+                  </ion-col>
+                  <ion-col class="ion-flex ion-margin-auto justify-content-end">
+                     <div class="font-bold">{{objectService.getTotalPicked()}}</div>
                   </ion-col>
                </ion-row>
                <ion-row>
@@ -83,13 +91,13 @@
                      <div class="font-bold">Created By</div>
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
-                     <div>{{object.header.createdBy}} {{object.header.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
+                     <div>{{objectService.object.header.createdBy}} {{objectService.object.header.createdAt|date:"dd/MM/yy hh:mm a"}}</div>
                   </ion-col>
                </ion-row>
             </ion-grid>
          </ion-item>
       </ion-list>
-      <div *ngIf="object.header.isWithSo">
+      <div *ngIf="objectService.object.header.isWithSo">
          <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
             <ion-label>Outstanding Picked List</ion-label>
          </ion-list-header>
@@ -124,8 +132,8 @@
                            <ion-col size="5" class="ion-flex ion-margin-auto">
                               <ion-icon name="ellipse" [class]="rowData.qtyRequest === rowData.qtyCurrent?'color-success':'color-danger'"></ion-icon>
                               <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">{{rowData.itemCode}}</div>
-                              <span class="badge-green px-1 mx-1 ion-text-wrap ion-flex my-auto" *ngIf="rowData.itemVariationXId"> {{rowData.itemVariationXDescription}}</span>
-                              <span class="badge-purple px-1 ion-text-wrap ion-flex my-auto" *ngIf="rowData.itemVariationYId"> {{rowData.itemVariationYDescription}}</span>
+                              <span class="badge-green px-1 mx-1 ion-text-wrap ion-flex my-auto" *ngIf="rowData.itemVariationXId">{{rowData.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                              <span class="badge-purple px-1 ion-text-wrap ion-flex my-auto" *ngIf="rowData.itemVariationYId">{{rowData.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                            </ion-col>
                            <ion-col class="ion-flex ion-margin-auto justify-content-end">
                               <div [ngClass]="{'font-underline font-bold color-blue':(rowData.isComponentScan && rowData.assembly && rowData.assembly.length > 0)}">{{rowData.qtyRequest}}</div>
@@ -164,7 +172,7 @@
          <ion-label>Current Picked List</ion-label>
       </ion-list-header>
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let rowData of object.details">
+         <ion-item button detail="false" class="ion-no-padding no-ripple" *ngFor="let rowData of objectService.object.details">
             <ion-grid class="ion-no-padding py-2 pl-2">
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto justify-content-center">
@@ -196,11 +204,6 @@
                         </ion-col>
                         <ion-col class="ion-flex ion-margin-auto">
                            <ion-grid class="ion-no-padding">
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <div>{{rowData2.itemBarcode}}</div>
-                                 </ion-col>
-                              </ion-row>
                               <ion-row>
                                  <ion-col class="ion-flex ion-margin-auto">
                                     <div>{{rowData2.itemCode}}</div>

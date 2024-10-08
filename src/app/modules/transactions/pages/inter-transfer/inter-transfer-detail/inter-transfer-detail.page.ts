@@ -63,6 +63,10 @@ export class InterTransferDetailPage implements OnInit {
       }
    }
 
+   getObjectDetailSO() {
+      return this.object.details.flatMap(r => r.parentNum).join(", ");
+   }
+
    /* #endregion */
 
 }

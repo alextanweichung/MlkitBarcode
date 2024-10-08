@@ -254,6 +254,8 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
                   trxDate: dd.header.trxDate,
                   locationCode: this.objectService.locationMasterList.find(rr => rr.id === dd.header.locationId)?.code,
                   locationDescription: this.objectService.locationMasterList.find(rr => rr.id === dd.header.locationId)?.description,
+                  toLocationCode: this.objectService.locationMasterList.find(rr => rr.id === dd.header.toLocationId)?.code,
+                  toLocationDescription: this.objectService.locationMasterList.find(rr => rr.id === dd.header.toLocationId)?.description,
                   warehouseAgentId: dd.header.warehouseAgentId,
                   warehouseAgentName: this.objectService.locationMasterList.find(rr => rr.id === dd.header.warehouseAgentId)?.description,
                   deactivated: dd.header.deactivated,
@@ -320,6 +322,8 @@ export class PackingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
                r.multiPackingNum?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.locationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.toLocationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.toLocationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.warehouseAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));
 				this.filteredObj.sort((x, y) => {

@@ -205,6 +205,8 @@ export class PickingPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
                r.multiPickingNum?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.locationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.locationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.toLocationCode?.toUpperCase().includes(searchText.toUpperCase()) ||
+               r.toLocationDescription?.toUpperCase().includes(searchText.toUpperCase()) ||
                r.warehouseAgentName?.toUpperCase().includes(searchText.toUpperCase())
             )));
             this.currentPage = 1;

@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { InterTransferPageRoutingModule } from './inter-transfer-routing.module';
 
 import { InterTransferPage } from './inter-transfer.page';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    InterTransferPageRoutingModule
-  ],
-  declarations: [InterTransferPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      InterTransferPageRoutingModule,
+      NgxPaginationModule
+   ],
+   declarations: [InterTransferPage]
 })
-export class InterTransferPageModule {}
+export class InterTransferPageModule { }
