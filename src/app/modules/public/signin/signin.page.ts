@@ -1,5 +1,5 @@
 import { Component, IterableDiffers, OnInit, ViewChild } from '@angular/core';
-import { ActionSheetController, AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonPopover, NavController, Platform, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -14,11 +14,13 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/shared/models/pos-download';
 import { Network } from '@capacitor/network';
 import { CodeInputComponent } from 'angular-code-input';
+import { Market } from '@ionic-native/market/ngx';
 
 @Component({
    selector: 'app-signin',
    templateUrl: './signin.page.html',
    styleUrls: ['./signin.page.scss'],
+   providers: [Market]
 })
 export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
@@ -46,7 +48,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       private alertController: AlertController,
       private navController: NavController,
       private actionSheetController: ActionSheetController,
-      private differs: IterableDiffers
+      private differs: IterableDiffers,
+      private market: Market
    ) {
       this.currentVersion = environment.version;
       this.newForm();
@@ -72,9 +75,13 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       }
    }
 
-   ionViewDidEnter(): void {
+   async ionViewDidEnter(): Promise<void> {
       if (this.configService.selected_sys_param) {
          this.signin_form.patchValue({ apiUrl: this.configService.selected_sys_param.apiUrl });
+      }
+
+      if ((await Network.getStatus()).connected) {
+         await this.openAppStore();
       }
    }
 
@@ -479,6 +486,19 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    onCodeCompleted(event: any) {
       this.signIn(true, event);
+   }
+
+   openAppStore() {
+      let id;
+      if (Capacitor.getPlatform() === "android") {
+         id = "io.ionic.idcp";
+      } else if (Capacitor.getPlatform() === "ios") {
+         id = "io.ionic.idcp";
+      }
+      console.log("🚀 ~ SigninPage ~ openAppStore ~ id:", id)
+      if (id) {
+         this.market.open(id);
+      }
    }
 
    /* #endregion */
