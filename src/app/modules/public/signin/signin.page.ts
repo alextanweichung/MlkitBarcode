@@ -497,9 +497,27 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          id = "io.ionic.idcp";
       }
       console.log("🚀 ~ SigninPage ~ openAppStore ~ id:", id)
-      console.log(JSON.stringify(await getCurrentAppVersion()));
+      let marketVersion = await getCurrentAppVersion();
+      console.log("🚀 ~ SigninPage ~ openAppStore ~ marketVersion:", marketVersion)
       if (id) {
-         this.market.open(id);
+         if (marketVersion !== this.currentVersion) {
+            const alert = await this.alertController.create({
+               header: "Update Required!",
+               message: "We have launched a new and improved version. Please update the app for better experience.",
+               buttons: [
+                  {
+                     text: "Update Now",
+                     cssClass: "success",
+                     role: "confirm",
+                     handler: () => {
+                        this.market.open(id);
+                     }
+                  }
+               ],
+               backdropDismiss: true
+            });
+            await alert.present();
+         }
       }
    }
 
@@ -509,10 +527,10 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
 const getCurrentAppVersion = async () => {
    const result = await AppUpdate.getAppUpdateInfo();
-   console.log("🚀 ~ getCurrentAppVersion ~ result:", JSON.stringify(result))
-   if (Capacitor.getPlatform() === "android") {
-      return result.currentVersionCode;
-   } else {
-      return result.currentVersionName;
-   }
+   return result.currentVersionName;
+   // if (Capacitor.getPlatform() === "android") {
+   //    return result.currentVersionCode;
+   // } else {
+   //    return result.currentVersionName;
+   // }
 };
