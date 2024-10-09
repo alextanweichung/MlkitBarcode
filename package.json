@@ -37,6 +37,7 @@
       "@capacitor/push-notifications": "^5.0.0",
       "@capacitor/splash-screen": "^5.0.0",
       "@capacitor/status-bar": "^5.0.0",
+      "@capawesome/capacitor-app-update": "^6.0.0",
       "@fortawesome/fontawesome-free": "^6.4.0",
       "@ionic-native/android-permissions": "^5.36.0",
       "@ionic-native/file": "^5.36.0",

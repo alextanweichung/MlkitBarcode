@@ -15,6 +15,7 @@ import { LocalItemBarcode, LocalItemMaster, LocalMarginConfig } from 'src/app/sh
 import { Network } from '@capacitor/network';
 import { CodeInputComponent } from 'angular-code-input';
 import { Market } from '@ionic-native/market/ngx';
+import { AppUpdate } from '@capawesome/capacitor-app-update';
 
 @Component({
    selector: 'app-signin',
@@ -488,7 +489,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       this.signIn(true, event);
    }
 
-   openAppStore() {
+   async openAppStore() {
       let id;
       if (Capacitor.getPlatform() === "android") {
          id = "io.ionic.idcp";
@@ -496,6 +497,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          id = "io.ionic.idcp";
       }
       console.log("🚀 ~ SigninPage ~ openAppStore ~ id:", id)
+      console.log(JSON.stringify(await getCurrentAppVersion()));
       if (id) {
          this.market.open(id);
       }
@@ -504,3 +506,13 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
    /* #endregion */
 
 }
+
+const getCurrentAppVersion = async () => {
+   const result = await AppUpdate.getAppUpdateInfo();
+   console.log("🚀 ~ getCurrentAppVersion ~ result:", JSON.stringify(result))
+   if (Capacitor.getPlatform() === "android") {
+      return result.currentVersionCode;
+   } else {
+      return result.currentVersionName;
+   }
+};
