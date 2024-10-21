@@ -55,6 +55,7 @@ export class ConfigService {
                // apiUrl: "https://demo.idcp-demo.com/api/",
                // apiUrl: "https://idcp-testing.motorparts.asia/api/",
                // apiUrl: "https://idcp-testing.umaracing.com/api/",
+               // apiUrl: "https://test.roncato-erp.com/api/",
                // apiUrl: "https://idcp.motorparts.asia/api/",
                // apiUrl: "https://idcp.umaracing.com/api/",
                // apiUrl: "https://idcp-ararat.com:8081/api/",

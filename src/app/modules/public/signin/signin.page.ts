@@ -100,6 +100,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("userEmail").setValue("kccon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychia@idcp.my");
          // this.signin_form.get("userEmail").setValue("kh@idcp.my");
+         this.signin_form.get("userEmail").setValue("testsupervisor@roncato.com.my");
          // this.signin_form.get("userEmail").setValue("john@idcp.my");
          // this.signin_form.get("userEmail").setValue("johncon@idcp.my");
          // this.signin_form.get("userEmail").setValue("aychiacon@idcp.my");
@@ -107,7 +108,8 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("userEmail").setValue("aychiapos@idcp.my");
          // this.signin_form.get("userEmail").setValue("hwsales12@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");
-         this.signin_form.get("userEmail").setValue("admin@idcp.my");
+         // this.signin_form.get("userEmail").setValue("admin@idcp.my");
+         // this.signin_form.get("userEmail").setValue("jwchin@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("hwsales2@prestar.com.my");
          // this.signin_form.get("userEmail").setValue("spv1@byford.com.my");
          // this.signin_form.get("userEmail").setValue("admin@idcp.my");
@@ -118,10 +120,11 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.signin_form.get("password").setValue("Live1234");
          // this.signin_form.get("password").setValue("Bmm@168spv01");
          // this.signin_form.get("password").setValue("Dev8888");
+         this.signin_form.get("password").setValue("Supervisor@123");
          // this.signin_form.get("password").setValue("i@Dmin7026");
          // this.signin_form.get("password").setValue("c0nnecT#7026");
          // this.signin_form.get("password").setValue("c0nnecT@2024");
-         this.signin_form.get("password").setValue("c0nnecT=88-");
+         // this.signin_form.get("password").setValue("c0nnecT=88-");
          // this.signin_form.get("password").setValue("Testing1234");
          // this.signin_form.get("password").setValue("String1234");
       } else {
@@ -496,9 +499,7 @@ export class SigninPage implements OnInit, ViewWillEnter, ViewDidEnter {
       } else if (Capacitor.getPlatform() === "ios") {
          id = "io.ionic.idcp";
       }
-      console.log("🚀 ~ SigninPage ~ openAppStore ~ id:", id)
       let marketVersion = await getCurrentAppVersion();
-      console.log("🚀 ~ SigninPage ~ openAppStore ~ marketVersion:", marketVersion)
       if (id) {
          if (marketVersion !== this.currentVersion) {
             const alert = await this.alertController.create({

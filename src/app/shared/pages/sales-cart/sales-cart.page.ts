@@ -527,12 +527,12 @@ export class SalesCartPage implements OnInit, OnChanges {
       if (data.qtyRequest) {
          if (this.isSalesOrder && this.configSalesOrderQuantityControl === "1") {
             if (((data.qtyRequest ?? 0) + qtyInCart) > data.actualQty) {
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest }] exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest}] exceeded actual quantity [${data.actualQty}]`, "top", "warning", 1000);
                data.qtyRequest = null;
             }
          } else if (this.isSalesOrder && this.configSalesOrderQuantityControl === "2") {
             if (((data.qtyRequest ?? 0) + qtyInCart) > data.availableQty) {
-               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest }] exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
+               this.toastService.presentToast("Invalid Quantity", `Requested quantity [${data.qtyRequest}] exceeded available quantity [${data.availableQty}]`, "top", "warning", 1000);
                data.qtyRequest = null;
             }
          }
@@ -566,9 +566,15 @@ export class SalesCartPage implements OnInit, OnChanges {
    }
 
    computeMarginAmount(trxLine: TransactionDetail) {
-      //trxLine = this.commonService.computeMarginAmt(trxLine, this.useTax, this.objectHeader.isItemPriceTaxInclusive, this.objectHeader.isDisplayTaxInclusive, this.maxPrecision);
+      let isComputeGross: boolean = this.consignBearingComputeGrossMargin;
+      if (this.objectHeader.grossPromoMarginCategoryCode) {
+         let grossDiscountCodeList = this.discountGroupMasterList.filter(x => x.attribute3 == this.objectHeader.grossPromoMarginCategoryCode);
+         let findTrxDiscount = grossDiscountCodeList.find(x => x.code == trxLine.discountGroupCode);
+         if (findTrxDiscount) {
+            isComputeGross = true;
+         }
+      }
       trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectHeader, this.consignBearingComputeGrossMargin, true);
-      // this.onEditComplete();
    }
 
    async computeUnitPriceExTax(trxLine: TransactionDetail, objectDetail?: TransactionDetail[]) {
@@ -840,7 +846,7 @@ export class SalesCartPage implements OnInit, OnChanges {
       itemTrx.oriUnitPriceExTax = itemTrx.unitPriceExTax;
       itemTrx.oriDiscountGroupCode = itemTrx.discountGroupCode;
       itemTrx.oriDiscountExpression = itemTrx.discountExpression;
-      
+
       return itemTrx;
    }
 

@@ -242,31 +242,34 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async decreaseQty(line: StockCountDetail) {
       try {
-         line.qtyRequest -= 1;
-         // if (line.qtyRequest - 1 < 0) {
-         //    line.qtyRequest = 0;
-         //    let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-         //    if (findIndex > -1) {
-         //       this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-         //    } else {
-         //       this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-         //    }
-         //    let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-         //    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         // } else {
-         //    line.qtyRequest--;
-         //    let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-         //    if (findIndex > -1) {
-         //       this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-         //    } else {
-         //       this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-         //    }
-         //    let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-         //    await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         // }
-         // if (line.qtyRequest === 0) {
-         //    await this.deleteLine(line);
-         // }
+         if (this.objectService.configMobileStockCountSlideToEdit) {
+            line.qtyRequest -= 1;
+         } else {
+            if (line.qtyRequest - 1 < 0) {
+               line.qtyRequest = 0;
+               let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+               if (findIndex > -1) {
+                  this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+               } else {
+                  this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+               }
+               let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            } else {
+               line.qtyRequest--;
+               let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+               if (findIndex > -1) {
+                  this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+               } else {
+                  this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+               }
+               let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+            }
+            if (line.qtyRequest === 0) {
+               await this.deleteLine(line);
+            }
+         }
       } catch (e) {
          console.error(e);
       }
@@ -282,26 +285,30 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
 
    async onQtyBlur(line: StockCountDetail) {
       line.qtyRequest = Math.floor(line.qtyRequest);
-      // let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-      // if (findIndex > -1) {
-      //    this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-      // } else {
-      //    this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-      // }
-      // let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-      // await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      if (!this.objectService.configMobileStockCountSlideToEdit) {
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         if (findIndex > -1) {
+            this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+         } else {
+            this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+         }
+         let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      } 
    }
 
    async increaseQty(line: StockCountDetail) {
       line.qtyRequest += 1;
-      // let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-      // if (findIndex > -1) {
-      //    this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-      // } else {
-      //    this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-      // }
-      // let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-      // await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      if (!this.objectService.configMobileStockCountSlideToEdit) {
+            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         if (findIndex > -1) {
+            this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+         } else {
+            this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+         }
+         let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      }
    }
 
    async deleteLine(line: StockCountDetail) {

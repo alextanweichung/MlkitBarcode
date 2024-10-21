@@ -47,6 +47,7 @@ export interface ConsignmentCountHeader {
   modifiedBy: string
   modifiedAt: string
   deactivated: boolean
+  uuId: string
 
   // local use
   isLocal: boolean

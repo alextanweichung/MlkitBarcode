@@ -18,13 +18,11 @@ import { CashDepositHeader } from '../../../models/cash-deposit';
 import { v4 as uuidv4 } from 'uuid';
 
 const IMAGE_DIR = 'stored-images';
-
 interface LocalFile {
    name: string;
    path: string;
    data: string;
 }
-
 @Component({
    selector: 'app-cash-deposit-add',
    templateUrl: './cash-deposit-add.page.html',

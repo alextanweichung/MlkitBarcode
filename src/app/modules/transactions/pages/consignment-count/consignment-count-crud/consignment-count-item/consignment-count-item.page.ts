@@ -148,29 +148,33 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 
    async decreaseQty(line: ConsignmentCountDetail) {
       try {
-         if (line.qtyRequest - 1 < 0) {
-            line.qtyRequest = 0;
-            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-            if (findIndex > -1) {
-               this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-            } else {
-               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
-            }
-            let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+         if (this.objectService.configMobileStockCountSlideToEdit) {
+            line.qtyRequest -= 1;
          } else {
-            line.qtyRequest--;
-            let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-            if (findIndex > -1) {
-               this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+            if (line.qtyRequest - 1 < 0) {
+               line.qtyRequest = 0;
+               let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+               if (findIndex > -1) {
+                  this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+               } else {
+                  this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+               }
+               let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             } else {
-               this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+               line.qtyRequest--;
+               let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+               if (findIndex > -1) {
+                  this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+               } else {
+                  this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+               }
+               let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+               await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
             }
-            let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-            await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
-         }
-         if (line.qtyRequest === 0) {
-            await this.deleteLine(line);
+            if (line.qtyRequest === 0) {
+               await this.deleteLine(line);
+            }
          }
       } catch (e) {
          console.error(e);
@@ -185,27 +189,32 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       }
    }
 
-   async updateQty(line: ConsignmentCountDetail) {
-      let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-      if (findIndex > -1) {
-         this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-      } else {
-         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+   async onQtyBlur(line: ConsignmentCountDetail) {
+      line.qtyRequest = Math.floor(line.qtyRequest);
+      if (!this.objectService.configMobileStockCountSlideToEdit) {
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         if (findIndex > -1) {
+            this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+         } else {
+            this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+         }
+         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
-      let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
    async increaseQty(line: ConsignmentCountDetail) {
       line.qtyRequest += 1;
-      let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
-      if (findIndex > -1) {
-         this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
-      } else {
-         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+      if (!this.objectService.configMobileStockCountSlideToEdit) {
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === line.guid);
+         if (findIndex > -1) {
+            this.objectService.objectDetail[findIndex].qtyRequest = line.qtyRequest;
+         } else {
+            this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+         }
+         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
       }
-      let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
-      await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
 
    async deleteLine(line: ConsignmentCountDetail) {
@@ -569,5 +578,36 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
 	}
 
    /* #endregion */
+
+   editModal: boolean = false;
+   selectedDetail: ConsignmentCountDetail;
+   showEditModal(rowData: ConsignmentCountDetail) {
+      let index = this.objectService.objectDetail.findIndex(r => r.guid === rowData.guid);
+      if (index > -1) {
+         this.selectedDetail = JSON.parse(JSON.stringify(this.objectService.objectDetail[index]));
+         this.editModal = true;
+      } else {
+         this.selectedDetail = null;
+         this.toastService.presentToast("System Error", "Invalid Index", "top", "danger", 1000);
+      }
+   }
+
+   hideEditModal() {
+      this.editModal = false;
+      setTimeout(async () => {
+         let findIndex = this.objectService.objectDetail.findIndex(r => r.guid === this.selectedDetail.guid);
+         this.objectService.objectDetail[findIndex] = JSON.parse(JSON.stringify(this.selectedDetail));
+
+         // handle filtered list
+         let findIndexFiltered = this.filteredObj.findIndex(r => r.guid === this.selectedDetail.guid);
+         if (findIndexFiltered > -1) {
+            this.filteredObj[findIndexFiltered] = JSON.parse(JSON.stringify(this.selectedDetail));
+         }
+
+         this.selectedDetail = null;
+         let data: ConsignmentCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
+         await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
+      }, 0);
+   }
 
 }

@@ -14,6 +14,12 @@
    <ng-template>
       <ion-content class="p-2">
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item (click)="popover.dismiss(); viewAttachment()">
+               <ion-icon slot="end" name="attach-outline"></ion-icon>
+               <ion-label>
+                  <div>Attachment</div>
+               </ion-label>
+            </ion-item>
             <ion-item (click)="popover.dismiss(); sendForDebug()">
                <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
                <ion-label>
@@ -31,16 +37,28 @@
       <app-barcode-scan-input #barcodescaninput (onItemAdd)="onItemAdd($event)" (onCameraStatusChanged)="onCameraStatusChanged($event)" (onDoneScanning)="onDoneScanning($event)" [itemVariationXMasterList]="objectService.itemVariationXMasterList" [itemVariationYMasterList]="objectService.itemVariationYMasterList"></app-barcode-scan-input>
 
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full" *ngIf="objectService.objectDetail">
-         <ion-item button detail="false" class="ion-no-padding no-ripple">
+         <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="showTotalByCarton = !showTotalByCarton">
             <ion-grid class="ion-no-padding py-2 pl-2">
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
+                     <ion-icon style="position:relative; top:0.1rem" *ngIf="!showTotalByCarton" name="add-circle-outline"></ion-icon>
+                     <ion-icon style="position:relative; top:0.1rem" *ngIf="showTotalByCarton" name="remove-circle-outline"></ion-icon>
                      <div class="font-bold">Total Quantity</div>
                   </ion-col>
                   <ion-col class="ion-margin-auto justify-content-end">
                      <div>{{objectService.objectDetail|sum:"lineQty"|number:"1.0"}}</div>
                   </ion-col>
                </ion-row>
+               <ng-container *ngIf="showTotalByCarton">
+                  <ion-row *ngFor="let rowData of getTotalByCarton()|keyvalue">
+                     <ion-col class="ion-flex ion-margin-auto">
+                        <div>[Ctr. {{rowData.key}}]</div>
+                     </ion-col>
+                     <ion-col class="ion-margin-auto justify-content-end">
+                        <div>{{rowData.value}}</div>
+                     </ion-col>
+                  </ion-row>
+               </ng-container>
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto">
                      <div class="font-bold">Total Amount</div>
@@ -162,6 +180,54 @@
 
    </div>
 </ion-content>
+
+<ion-modal [isOpen]="attachmentModel" (didDismiss)="attachmentModel = false">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>Attachments</ion-title>
+            <ion-buttons slot="start">
+               <ion-button (click)="hideAttachmentModal()">Done</ion-button>
+            </ion-buttons>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content>
+         <div class="p-2">
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <div *ngIf="objectService.attachment && objectService.attachment.length > 0">
+                  <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+                     <ion-label>Attachments</ion-label>
+                  </ion-list-header>
+                  <ion-item *ngFor="let file of objectService.attachment">
+                     <ion-thumbnail slot="start">
+                        <img [src]="file.imageUrl">
+                     </ion-thumbnail>
+                     <ion-label class="ion-text-wrap"> {{ file.filesName }} </ion-label>
+                     <ion-button slot="end" fill="clear" (click)="presentDeleteOnlineImageAlert(file)">
+                        <ion-icon slot="icon-only" name="trash"></ion-icon>
+                     </ion-button>
+                  </ion-item>
+               </div>
+               <div class="mt-2">
+                  <ion-button fill="clear" expand="full" color="dark" (click)="imageAction()">
+                     <ion-icon slot="start" name="camera"></ion-icon>
+                     Upload Image
+                  </ion-button>
+                  <ion-item *ngFor="let file of images; let i = index">
+                     <ion-thumbnail slot="start">
+                        <ion-img [src]="file.data"></ion-img>
+                     </ion-thumbnail>
+                     <ion-label class="ion-text-wrap"> {{ file.name }} </ion-label>
+                     <ion-button slot="end" fill="clear" (click)="deleteAction(file)">
+                        <ion-icon slot="icon-only" name="trash"></ion-icon>
+                     </ion-button>
+                  </ion-item>
+               </div>
+            </ion-list>
+         </div>
+      </ion-content>
+   </ng-template>
+</ion-modal>
 
 <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;" [hidden]="scanActive || authService.hideFooter">
    <ion-button class="ion-margin" expand="block" size="default" (click)="nextStep()">

@@ -72,6 +72,7 @@ export interface StockCountHeader {
    modifiedBy?: string
    modifiedAt?: Date
    deactivated?: boolean
+   uuId: string
 
    // local use
    isLocal: boolean

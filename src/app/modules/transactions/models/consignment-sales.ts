@@ -65,6 +65,7 @@ export interface ConsignmentSalesHeader {
   localGrandTotalExTax: number
   isBearPromo: boolean
   marginMode: string
+  grossPromoMarginCategoryCode: string
   consignmentSettlementId?: number
   consignmentSettlementNum?: string
   isEntryCompleted?: boolean

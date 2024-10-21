@@ -57,16 +57,23 @@ export class ConsignmentCountService {
    }
 
    moduleControl: ModuleControl[];
+   configMobileStockCountSlideToEdit: boolean = false;
    loadModuleControl() {
       try {
          this.authService.moduleControlConfig$.subscribe(obj => {
             this.moduleControl = obj;
+
+            let mobileStockCountSlideToEdit = this.moduleControl.find(x => x.ctrlName === "MobileStockCountSlideToEdit");
+            if (mobileStockCountSlideToEdit && mobileStockCountSlideToEdit.ctrlValue.toUpperCase() === "Y") {
+               this.configMobileStockCountSlideToEdit = true;
+            } else {
+               this.configMobileStockCountSlideToEdit = false;
+            }
          });
       } catch (e) {
          console.error(e);
       }
    }
-
 
    fullMasterList: MasterList[] = [];
    itemUomMasterList: MasterListDetails[] = [];

@@ -9,6 +9,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-consignment-count-header',
@@ -55,7 +56,8 @@ export class ConsignmentCountHeaderPage implements OnInit, ViewWillEnter, ViewDi
          sourceType: ["M"],
          isLocal: [null],
          guid: [null],
-         lastUpdated: [null]
+         lastUpdated: [null],
+         uuid: [uuidv4()]
       });
    }
 

@@ -90,7 +90,7 @@
       <ion-searchbar #searchbar class="p-0" showCancelButton="never" showClearButton="focus" animated="true" placeholder="Search for Item" enterkeyhint="search" (ionFocus)="highlight(searchbar)" (keydown)="onKeyDown($event, searchbar.value)" (ionClear)="resetFilteredObj()"></ion-searchbar>
 
       <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-         <ion-item-sliding #slidingItem *ngFor="let rowData of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index" (click)="showEditModal(rowData)">
+         <ion-item-sliding #slidingItem *ngFor="let rowData of filteredObj|paginate:{itemsPerPage:itemsPerPage,currentPage:currentPage}; trackBy:identify; let rowIndex = index">
             <ion-item button detail="false" class="no-ripple ion-no-padding">
                <ion-grid class="ion-no-padding p-2">
                   <ion-row>
@@ -122,41 +122,38 @@
                                  <div class="ion-text-wrap">{{rowData.itemDescription}}</div>
                               </ion-col>
                            </ion-row>
-                           <ion-row>
+                           <ion-row *ngIf="objectService.configMobileStockCountSlideToEdit">
                               <ion-col class="ion-flex ion-margin-auto justify-content-between">
                                 <div class="font-bold">Qty</div>
                                 <div class="font-bold">{{rowData.qtyRequest|number:"1.0"}}</div>
                               </ion-col>
                            </ion-row>
-                           <!-- <ion-row>
-                              <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)">
-                                    <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                                 </ion-button>
-                              </ion-col>
-                              <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-input #qtyInput class="ion-text-center" type="number" inputmode="numeric" pattern="[0-9]*" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode, rowData)" (ionBlur)="onQtyBlur(rowData)"></ion-input>
-                              </ion-col>
-                              <ion-col class="ion-flex ion-margin-auto">
-                                 <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)">
-                                    <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                                 </ion-button>
-                              </ion-col>
-                           </ion-row> -->
+                           <ng-container *ngIf="!objectService.configMobileStockCountSlideToEdit">
+                              <ion-row>
+                                 <ion-col class="ion-flex ion-margin-auto">
+                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(rowData)">
+                                       <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                                    </ion-button>
+                                 </ion-col>
+                                 <ion-col class="ion-flex ion-margin-auto">
+                                    <ion-input #qtyInput class="ion-text-center" type="number" inputmode="numeric" pattern="[0-9]*" [min]="0" placeholder="0" [(ngModel)]="rowData.qtyRequest" (keypress)="eventHandler($event.keyCode, rowData)" (ionBlur)="onQtyBlur(rowData)"></ion-input>
+                                 </ion-col>
+                                 <ion-col class="ion-flex ion-margin-auto">
+                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(rowData)">
+                                       <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                                    </ion-button>
+                                 </ion-col>
+                              </ion-row>
+                           </ng-container>
                         </ion-grid>
                      </ion-col>
                   </ion-row>
                </ion-grid>
             </ion-item>
             <ion-item-options>
-               <!-- <ng-container *ngIf="!objectService.configMobileStockCountHideBinSelection"> -->
-                  <!-- <ion-item-option color="success" (click)="slidingItem.close(); updateBinDesc(rowData)" *ngIf="objectService.configInvCountActivateLineWithBin && !objectService.configInvCountBinFromLocation">
-                     <ion-icon slot="top" name="create-outline"></ion-icon>Bin
-                  </ion-item-option> -->
-                  <ion-item-option color="success" (click)="slidingItem.close(); showEditModal(rowData)" *ngIf="objectService.configInvCountActivateLineWithBin && objectService.configInvCountBinFromLocation">
-                     <ion-icon slot="top" name="create-outline"></ion-icon>Bin
-                  </ion-item-option>
-               <!-- </ng-container> -->
+               <ion-item-option color="primary" (click)="slidingItem.close(); showEditModal(rowData)" *ngIf="objectService.configInvCountActivateLineWithBin || objectService.configMobileStockCountSlideToEdit">
+                  <ion-icon slot="top" name="create-outline"></ion-icon>Edit
+               </ion-item-option>
                <ion-item-option color="danger" (click)="slidingItem.close(); deleteLine(rowData)">
                   <ion-icon slot="top" name="trash-outline"></ion-icon>Delete
                </ion-item-option>
@@ -170,15 +167,13 @@
    <ion-grid class="ion-no-padding">
       <ion-row>
          <ion-col>
-            <ion-button class="ion-margin" expand="block" size="default" color="warning"
-               (click)="submit_attempt = true; nextStepLocal()" [disabled]="submit_attempt">
+            <ion-button class="ion-margin" expand="block" size="default" color="warning" (click)="submit_attempt = true; nextStepLocal()" [disabled]="submit_attempt">
                Save Local
                <ion-icon slot="end" name="cloud-offline-outline"></ion-icon>
             </ion-button>
          </ion-col>
          <ion-col>
-            <ion-button class="ion-margin" expand="block" size="default" color="success"
-               (click)="submit_attempt = true; nextStep()" [disabled]="submit_attempt">
+            <ion-button class="ion-margin" expand="block" size="default" color="success" (click)="submit_attempt = true; nextStep()" [disabled]="submit_attempt">
                Save Online
                <ion-icon slot="end" name="cloud-done-outline"></ion-icon>
             </ion-button>
@@ -218,55 +213,57 @@
                   </ng-container>
                </ng-container>
             </ion-list>
-            <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
-               <ion-label>Item Info</ion-label>
-            </ion-list-header>
-            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
-               <ion-item button detail="false" class="no-ripple ion-no-padding">
-                  <ion-grid class="ion-no-padding p-2">
-                     <ion-row>
-                        <ion-col class="ion-flex ion-margin-auto">
-                           <ion-grid class="ion-no-padding">
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <div class="font-bold">{{selectedStockCountDetail.itemBarcode}}</div>
-                                 </ion-col>
-                              </ion-row>
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <div class="ion-flex">
-                                       {{selectedStockCountDetail.itemCode}}
-                                       <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="selectedStockCountDetail.itemVariationXId">{{selectedStockCountDetail.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
-                                       <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="selectedStockCountDetail.itemVariationYId">{{selectedStockCountDetail.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
-                                    </div>
-                                 </ion-col>
-                              </ion-row>
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <div class="ion-text-wrap">{{selectedStockCountDetail.itemDescription}}</div>
-                                 </ion-col>
-                              </ion-row>
-                              <ion-row>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(selectedStockCountDetail)">
-                                       <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
-                                    </ion-button>
-                                 </ion-col>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <ion-input #qtyInput class="ion-text-center" type="number" inputmode="numeric" pattern="[0-9]*" [min]="0" placeholder="0" [(ngModel)]="selectedStockCountDetail.qtyRequest" (keypress)="eventHandler($event.keyCode, selectedStockCountDetail)" (ionBlur)="onQtyBlur(selectedStockCountDetail)"></ion-input>
-                                 </ion-col>
-                                 <ion-col class="ion-flex ion-margin-auto">
-                                    <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(selectedStockCountDetail)">
-                                       <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                                    </ion-button>
-                                 </ion-col>
-                              </ion-row>
-                           </ion-grid>
-                        </ion-col>
-                     </ion-row>
-                  </ion-grid>
-               </ion-item>
-            </ion-list>
+            <ng-container *ngIf="objectService.configMobileStockCountSlideToEdit">
+               <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+                  <ion-label>Item Info</ion-label>
+               </ion-list-header>
+               <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+                  <ion-item button detail="false" class="no-ripple ion-no-padding" (click)="qtyInput.setFocus()">
+                     <ion-grid class="ion-no-padding p-2">
+                        <ion-row>
+                           <ion-col class="ion-flex ion-margin-auto">
+                              <ion-grid class="ion-no-padding">
+                                 <ion-row>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <div class="font-bold">{{selectedStockCountDetail.itemBarcode}}</div>
+                                    </ion-col>
+                                 </ion-row>
+                                 <ion-row>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <div class="ion-flex">
+                                          {{selectedStockCountDetail.itemCode}}
+                                          <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="selectedStockCountDetail.itemVariationXId">{{selectedStockCountDetail.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
+                                          <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="selectedStockCountDetail.itemVariationYId">{{selectedStockCountDetail.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
+                                       </div>
+                                    </ion-col>
+                                 </ion-row>
+                                 <ion-row>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <div class="ion-text-wrap">{{selectedStockCountDetail.itemDescription}}</div>
+                                    </ion-col>
+                                 </ion-row>
+                                 <ion-row>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="decreaseQty(selectedStockCountDetail)">
+                                          <ion-icon slot="icon-only" name="remove-circle"></ion-icon>
+                                       </ion-button>
+                                    </ion-col>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <ion-input #qtyInput class="ion-text-center" type="number" inputmode="numeric" pattern="[0-9]*" [min]="0" placeholder="0" [(ngModel)]="selectedStockCountDetail.qtyRequest" (keypress)="eventHandler($event.keyCode, selectedStockCountDetail)" (ionBlur)="onQtyBlur(selectedStockCountDetail)"></ion-input>
+                                    </ion-col>
+                                    <ion-col class="ion-flex ion-margin-auto">
+                                       <ion-button class="ion-button-custom" fill="clear" color="primary" size="small" (click)="increaseQty(selectedStockCountDetail)">
+                                          <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                                       </ion-button>
+                                    </ion-col>
+                                 </ion-row>
+                              </ion-grid>
+                           </ion-col>
+                        </ion-row>
+                     </ion-grid>
+                  </ion-item>
+               </ion-list>
+            </ng-container>
          </div>
       </ion-content>
       <ion-footer class="ion-padding-bottom-large animate__animated animate__fadeInUp p-0" style="background-color: white;">

@@ -64,7 +64,7 @@
             <ion-grid class="ion-no-padding">
                <ion-row>
                   <ion-col class="ion-flex ion-margin-auto" size="10">
-                     <input #barcodeInput hideKeyboard class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" [ngModelOptions]="{standalone:true}" placeholder="Enter or Scan Doc" (keydown)="handleSoKeyDown($event)">
+                     <input #barcodeInput class="p-2 ion-flex ion-text-center" type="text" enterkeyhint="enter" [(ngModel)]="itemSearchValue" [ngModelOptions]="{standalone:true}" placeholder="Enter or Scan Doc" (keydown)="handleSoKeyDown($event)">
                   </ion-col>
                   <ion-col class="ion-flex ion-margin-auto justify-content-end">
                      <ion-button size="small" fill="clear" (click)="showKeyboard($event)">

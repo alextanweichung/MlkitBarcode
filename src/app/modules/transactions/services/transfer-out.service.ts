@@ -10,6 +10,9 @@ import { ModuleControl } from "src/app/shared/models/module-control";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { WorkFlowState } from "src/app/shared/models/workflow";
 import { BulkConfirmReverse } from "src/app/shared/models/transaction-processing";
+import { FileListObject } from "src/app/shared/models/file-list-object";
+import { CashDepositFileSimpleList } from "../models/cash-deposit";
+import { DomSanitizer } from "@angular/platform-browser";
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {
@@ -40,7 +43,8 @@ export class TransferOutService {
    constructor(
       private http: HttpClient,
       private authService: AuthService,
-      private configService: ConfigService
+      private configService: ConfigService,
+      private sanitizer: DomSanitizer
    ) { }
 
    async loadRequiredMaster() {
@@ -65,6 +69,7 @@ export class TransferOutService {
    moduleControl: ModuleControl[] = [];
    configMobileScanItemContinuous: boolean = false;
    configTransferOutActivateContainerNum: boolean = false;
+   fileSizeLimit: number = 1 * 1024 * 1024;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -80,6 +85,8 @@ export class TransferOutService {
          } else {
             this.configTransferOutActivateContainerNum = false;
          }
+         let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
+         this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
       })
    }
 
@@ -98,6 +105,25 @@ export class TransferOutService {
       })
    }
 
+   objectAttachment: FileListObject[] = [];
+   attachment: CashDepositFileSimpleList[] = [];
+   setAttachment(objectAttachment: FileListObject[]) {
+      this.objectAttachment = objectAttachment;
+      this.attachment = [];
+      this.objectAttachment.forEach(r => {
+         this.downloadFile(r.filesId).subscribe(blob => {
+            let objectURL = URL.createObjectURL(blob);
+            this.attachment.push({
+               filesId: r.filesId,
+               filesName: r.filesName,
+               imageUrl: this.sanitizer.bypassSecurityTrustUrl(objectURL)
+            })
+         }, error => {
+            console.error(error);
+         })
+      })
+   }
+
    removeHeader() {
       this.objectHeader = null;
    }
@@ -106,10 +132,15 @@ export class TransferOutService {
       this.objectDetail = [];
    }
 
+   removeAttachment() {
+      this.objectAttachment = [];
+   }
+
    resetVariables() {
       this.pageNum = 1;
       this.removeHeader();
       this.removeLine();
+      this.removeAttachment();
    }
 
    /* #endregion */
@@ -172,6 +203,22 @@ export class TransferOutService {
    
    getWorkflow(objectId: number) {
       return this.http.get<WorkFlowState[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/workflow/" + objectId);
+   }
+
+   uploadFile(keyId: number, fileId: number, file: any) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/uploadFile/" + keyId + "/" + fileId, file, httpObserveHeader);
+   }
+
+   downloadFile(fileId: number) {
+      return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/downloadFile/" + fileId, { responseType: 'blob' });
+   }
+
+   deleteFile(fileId: number) {
+      return this.http.delete(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/deleteFile/" + fileId, httpObserveHeader);
+   }
+
+   getAttachmentIdByDocId(keyId: number) {
+      return this.http.get<FileListObject[]>(this.configService.selected_sys_param.apiUrl + "MobileTransferOut/attachment/" + keyId);
    }
 
 }

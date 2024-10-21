@@ -521,11 +521,9 @@ export class PickingHeaderPage implements OnInit, OnDestroy, ViewWillEnter, View
    onWarehouseAgentSelected(event) {
       if (event) {
          this.objectForm.patchValue({ warehouseAgentId: event.id });
-         setTimeout(() => {
-            if (this.isWithType === "SO" || this.isWithType === "B2B") {
-               this.barcodeInput.nativeElement.focus();
-            }
-         }, 10);
+         if (this.isWithType === "SO" || this.isWithType === "B2B") {
+            this.barcodeInput.nativeElement.focus();
+         }
       } else {
          this.objectForm.patchValue({ warehouseAgentId: null });
       }

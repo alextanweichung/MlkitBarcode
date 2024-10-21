@@ -339,7 +339,15 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
    }
 
    async computeMarginAmount(trxLine: TransactionDetail) {
-      trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.objectHeader, this.objectService.consignBearingComputeGrossMargin, true);
+      let isComputeGross: boolean = this.objectService.consignBearingComputeGrossMargin;
+      if (this.objectService.objectHeader.grossPromoMarginCategoryCode) {
+         let grossDiscountCodeList = this.objectService.discountGroupMasterList.filter(x => x.attribute3 == this.objectService.objectHeader.grossPromoMarginCategoryCode);
+         let findTrxDiscount = grossDiscountCodeList.find(x => x.code == trxLine.discountGroupCode);
+         if (findTrxDiscount) {
+            isComputeGross = true;
+         }
+      }
+      trxLine = this.commonService.computeMarginAmtByConsignmentConfig(trxLine, this.objectService.objectHeader, isComputeGross, true);
       let data: ConsignmentSalesRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
       await this.configService.saveToLocaLStorage(this.objectService.trxKey, data);
    }
@@ -359,10 +367,8 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
                await this.computeAllAmount(trxLine);
             }
          } else {
-            trxLine.discountGroupCode = null;
-            trxLine.discountExpression = null;
-            trxLine = await this.commonService.getMarginPct(trxLine, this.objectService.objectHeader.trxDate, this.objectService.objectHeader.toLocationId);
-            await this.computeAllAmount(trxLine);
+            this.toastService.presentToast("Control Error", "Disc. Code is required to calculate Margin", "top", "warning", 1000);
+            return;
          }
       } catch (e) {
          console.error(e);

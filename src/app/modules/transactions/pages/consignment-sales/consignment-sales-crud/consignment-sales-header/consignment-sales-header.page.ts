@@ -69,17 +69,12 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
          businessModelType: [null],
          isBearPromo: [null],
          marginMode: [null],
+         grossPromoMarginCategoryCode: [null],
          isEntryCompleted: [false],
          uuid: [uuidv4()]
       })
       if (this.configService.selected_location) {
          let findLocation = this.objectService.locationMasterList.find(r => r.id === this.configService.selected_location);
-         this.objectForm.patchValue({
-            toLocationId: findLocation.id,
-            toLocationCode: findLocation.code,
-            isBearPromo: findLocation.attribute6 === "1" ? true : false,
-            marginMode: findLocation.attribute8
-         })
          let customerId = Number(this.objectService.locationMasterList.find(r => r.id === this.configService.selected_location)?.attribute13);
          if (customerId) {
             this.onCustomerChanged(customerId)
@@ -189,15 +184,12 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
    }
 
    async onLocationChanged(event: SearchDropdownList) {
-      console.log("🚀 ~ ConsignmentSalesHeaderPage ~ onLocationChanged ~ event:", event)
       if (event) {
          let findLocation = this.objectService.fullLocationMasterList.find(x => x.id === event.id);
-         console.log("🚀 ~ ConsignmentSalesHeaderPage ~ onLocationChanged ~ findLocation:", findLocation)
          if (findLocation) {
             this.objectForm.patchValue({ toLocationId: findLocation.id, toLocationCode: findLocation.code, salesAgentId: parseInt(findLocation.attribute17) });
             if (findLocation.attribute13) {
                let findCustomer = this.objectService.customerMasterList.find(x => x.id === parseInt(findLocation.attribute13));
-               console.log("🚀 ~ ConsignmentSalesHeaderPage ~ onLocationChanged ~ findCustomer:", findCustomer)
                if (!findCustomer) {
                   this.objectForm.patchValue({ toLocationId: null, customerId: null });
                   this.toastService.presentToast("Selection Denied", findLocation.description + " is not mapped to consignment customer.", "top", "warning", 1000);
@@ -211,7 +203,20 @@ export class ConsignmentSalesHeaderPage implements OnInit, ViewWillEnter, ViewDi
                this.toastService.presentToast("Selection Denied", findLocation.description + " is not mapped to any customer.", "top", "warning", 1000);
             }
             this.onCustomerChanged(this.objectForm.controls.customerId.value);
+            this.objectForm.patchValue({
+               toLocationId: findLocation.id,
+               toLocationCode: findLocation.code,
+               isBearPromo: findLocation.attribute6 === "1" ? true : false,
+               marginMode: findLocation.attribute8,
+               grossPromoMarginCategoryCode: findLocation.attribute22
+            })
          }
+      } else {
+         this.objectForm.patchValue({
+            isBearPromo: null,
+            marginMode: null,
+            grossPromoMarginCategoryCode: null
+         })
       }
    }
 

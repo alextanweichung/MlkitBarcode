@@ -41,6 +41,6 @@ export interface CashDepositFile {
 
 export interface CashDepositFileSimpleList {
    filesId: number
-   filesName: string
+   filesName?: string
    imageUrl: SafeUrl
 }

@@ -10,6 +10,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
 import { SearchDropdownPage } from 'src/app/shared/pages/search-dropdown/search-dropdown.page';
 import { CommonService } from 'src/app/shared/services/common.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
    selector: 'app-stock-count-header',
@@ -75,7 +76,8 @@ export class StockCountHeaderPage implements OnInit, ViewWillEnter, ViewDidEnter
          deactivated: [0],
          isLocal: [false],
          guid: [null],
-         lastUpdated: [null]
+         lastUpdated: [null],
+         uuid: [uuidv4()]
       })
    }
 

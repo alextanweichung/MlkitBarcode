@@ -64,18 +64,24 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
          await this.loadingService.showLoading();
          this.objectService.getObjectById(this.objectId).subscribe(async response => {
             let object = response;
-            console.log("🚀 ~ TransferOutDetailPage ~ this.objectService.getObjectById ~ object:", object)
             object = this.commonService.convertObjectAllDateType(object);
+            this.objectService.getAttachmentIdByDocId(object.transferOutId).subscribe({
+               next: async (response2) => {
+                  if (response2) {
+                     await this.objectService.setAttachment(response2);
+                  }
+               },
+               error: (error) => {
+                  console.error(error);
+               }
+            })
             await this.loadWorkflow(object.transferOutId);
             await this.objectService.setHeader(object);
             await this.objectService.setLine(object.line);
-            await this.loadingService.dismissLoading();
          }, async error => {
-            await this.loadingService.dismissLoading();
             console.error(error);
          })
       } catch (e) {
-         await this.loadingService.dismissLoading();
          console.error(e);
       } finally {
          await this.loadingService.dismissLoading();
@@ -94,32 +100,32 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
 
    isCountingTimer: boolean = true;
    async completeObjectAlert() {
-      if (this.isCountingTimer) {
-         this.isCountingTimer = false;
-         const alert = await this.alertController.create({
-            header: "Are you sure to proceed?",
-            cssClass: "custom-action-sheet",
-            buttons: [
-               {
-                  text: "Yes",
-                  role: "confirm",
-                  cssClass: "success",
-                  handler: async () => {
+      const alert = await this.alertController.create({
+         header: "Are you sure to proceed?",
+         cssClass: "custom-action-sheet",
+         buttons: [
+            {
+               text: "Yes",
+               role: "confirm",
+               cssClass: "success",
+               handler: async () => {
+                  if (this.isCountingTimer) {
+                     this.isCountingTimer = false;
                      this.completeObject();
-                  },
+                  }
+                  setTimeout(() => {
+                     this.isCountingTimer = true;
+                  }, 1000);
                },
-               {
-                  text: "Cancel",
-                  role: "cancel",
-                  cssClass: "cancel",
-               },
-            ],
-         });
-         await alert.present();
-      }
-      setTimeout(() => {
-         this.isCountingTimer = true;
-      }, 1000);
+            },
+            {
+               text: "Cancel",
+               role: "cancel",
+               cssClass: "cancel",
+            },
+         ],
+      });
+      await alert.present();
    }
 
    completeObject() {
@@ -347,4 +353,31 @@ export class TransferOutDetailPage implements OnInit, ViewWillEnter {
    }
 
    /* #endregion */
+
+   /* #region attachment */
+
+   attachmentModel: boolean = false;
+   viewAttachment() {
+      this.showAttachmentModal();
+   }
+
+   showAttachmentModal() {
+      this.attachmentModel = true;
+   }
+
+   hideAttachmentModal() {
+      this.attachmentModel = false;
+   }
+
+   /* #endregion */
+
+   showTotalByCarton: boolean = false;
+   getTotalByCarton() {
+      let result: Map<number, number> = new Map([]);
+      this.objectService.objectDetail.flatMap(r => r.containerNum).forEach(r => {
+         result.set(r, this.objectService.objectDetail.filter(rr => rr.containerNum === r).map(rr => rr.lineQty).reduce((a, b) => a + b, 0));
+      })
+      return result;
+   }
+   
 }

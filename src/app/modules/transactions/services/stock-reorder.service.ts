@@ -134,6 +134,17 @@ export class StockReorderService {
       return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileStockReorder/jsonDebug", debugObject, httpObserveHeader);
    }
 
+   downloadPdf(appCode: any, format: string = "pdf", documentId: any, reportName?: string) {
+      return this.http.post(this.configService.selected_sys_param.apiUrl + "MobileStockReorder/exportPdf",
+         {
+            "appCode": appCode,
+            "format": format,
+            "documentIds": [documentId],
+            "reportName": reportName ?? null
+         },
+         { responseType: "blob" });
+   }
+
    // for web testing 
    validateBarcode(barcode: string) {
       return this.http.get<TransactionDetail>(this.configService.selected_sys_param.apiUrl + "MobileStockReorder/itemByBarcode/" + barcode);

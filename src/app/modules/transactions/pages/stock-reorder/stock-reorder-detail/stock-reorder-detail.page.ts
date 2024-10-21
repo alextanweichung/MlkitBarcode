@@ -4,6 +4,7 @@ import { ViewWillEnter, NavController, AlertController, IonPopover, ActionSheetC
 import { StockReorderLine, StockReorderRoot } from 'src/app/modules/transactions/models/stock-reorder';
 import { StockReorderService } from 'src/app/modules/transactions/services/stock-reorder.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { PrecisionList } from 'src/app/shared/models/precision-list';
 import { CommonService } from 'src/app/shared/services/common.service';
@@ -18,14 +19,15 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
    objectId: number;
 
    constructor(
-      private authService: AuthService,
-      private route: ActivatedRoute,
-      private navController: NavController,
       public objectService: StockReorderService,
+      private authService: AuthService,
+      private commonService: CommonService,
+      private toastService: ToastService,
+      private loadingService: LoadingService,
+      private navController: NavController,
       private actionSheetController: ActionSheetController,
       private alertController: AlertController,
-      private toastService: ToastService,
-      private commonService: CommonService
+      private route: ActivatedRoute,
    ) {
       try {
          this.route.queryParams.subscribe(params => {
@@ -138,5 +140,52 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
          console.error(e);
       }
    }
+
+   /* #region download pdf */
+
+   async presentAlertViewPdf() {
+      try {
+         const alert = await this.alertController.create({
+            header: "Download PDF?",
+            message: "",
+            buttons: [
+               {
+                  text: "OK",
+                  cssClass: "success",
+                  role: "confirm",
+                  handler: async () => {
+                     await this.downloadPdf();
+                  },
+               },
+               {
+                  cssClass: "cancel",
+                  text: "Cancel",
+                  role: "cancel"
+               },
+            ]
+         });
+         await alert.present();
+      } catch (e) {
+         console.error(e);
+      }
+   }
+
+   async downloadPdf() {
+      try {
+         await this.loadingService.showLoading();
+         this.objectService.downloadPdf("SMSC002", "pdf", this.objectService.object.salesOrderId, null).subscribe(response => {
+            let filename = this.objectService.object.salesOrderNum + ".pdf";
+            this.commonService.commonDownloadPdf(response, filename);
+         }, error => {
+            console.log(error);
+         })
+      } catch (e) {
+         console.error(e);
+      } finally {
+         await this.loadingService.dismissLoading();
+      }
+   }
+
+   /* #endregion */
 
 }

@@ -25,6 +25,12 @@
                   <div>Complete</div>
                </ion-label>
             </ion-item>
+            <ion-item (click)="popover.dismiss(); presentAlertViewPdf()" *ngIf="objectService.object?.isCompleted && objectService.object?.salesOrderId">
+               <ion-icon name="download-outline" slot="end"></ion-icon>
+               <ion-label>
+                  <div>Download PDF</div>
+               </ion-label>
+            </ion-item>
          </ion-list>
       </ion-content>
    </ng-template>

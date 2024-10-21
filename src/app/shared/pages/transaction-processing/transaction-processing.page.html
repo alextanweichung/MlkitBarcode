@@ -80,7 +80,7 @@
                   <ion-col class="ion-flex ion-margin-auto">
                      <span class="ion-text-wrap badge-purple px-1" *ngIf="object.country"><ion-icon name="globe-outline"></ion-icon> {{object.country}}</span>
                      <span class="ion-text-wrap badge-purple px-1" *ngIf="object.currency"><ion-icon name="logo-usd"></ion-icon> {{object.currency}}</span>
-                     <span class="ion-text-wrap badge-purple px-1" *ngIf="object.createdBy"><ion-icon name="person-outline"></ion-icon> {{object.createdAt}}</span>
+                     <span class="ion-text-wrap badge-purple px-1" *ngIf="object.createdBy"><ion-icon name="person-outline"></ion-icon> {{object.createdAt|date:'dd/MM/yyyy'}}</span>
                   </ion-col>
                </ion-row>
                <ion-row *ngIf="object.typeDetail">
