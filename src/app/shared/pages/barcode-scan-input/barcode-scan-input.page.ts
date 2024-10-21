@@ -8,9 +8,8 @@ import { ModuleControl } from '../../models/module-control';
 import { LocalItemBarcode, LocalItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
-// import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { Barcode, BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 @Component({
    selector: 'app-barcode-scan-input',
@@ -51,9 +50,6 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    ngOnInit() {
       this.loadModuleControl();
-      BarcodeScanner.isSupported().then((result) => {
-         this.isSupported = result.supported;
-      });
    }
 
    showKeyboard(event) {
@@ -655,89 +651,56 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    /* #region camera scanner */
 
-   // async startScanning() {
-   //    const allowed = await this.checkPermission();
-   //    if (allowed) {
-   //       // this.scanActive = true;
-   //       this.onCameraStatusChanged.emit(true);
-   //       const result = await BarcodeScanner.startScan();
-   //       if (result.hasContent) {
-   //          let barcode = result.content;
-   //          // this.scanActive = false;
-   //          this.onCameraStatusChanged.emit(false);
-   //          barcode = this.manipulateBarcodeCheckDigit(barcode);
-   //          await this.onDoneScanning.emit(barcode);
-   //       }
-   //    }
-   // }
-
-   // async checkPermission() {
-   //    return new Promise(async (resolve) => {
-   //       const status = await BarcodeScanner.checkPermission({ force: true });
-   //       if (status.granted) {
-   //          resolve(true);
-   //       } else if (status.denied) {
-   //          const alert = await this.alertController.create({
-   //             header: "No permission",
-   //             message: "Please allow camera access in your setting",
-   //             buttons: [
-   //                {
-   //                   text: "Open Settings",
-   //                   handler: () => {
-   //                      BarcodeScanner.openAppSettings();
-   //                      resolve(false);
-   //                   },
-   //                },
-   //                {
-   //                   text: "No",
-   //                   role: "cancel",
-   //                },
-   //             ],
-   //          });
-   //          await alert.present();
-   //       } else {
-   //          resolve(false);
-   //       }
-   //    });
-   // }
-
-   // stopScanner() {
-   //    BarcodeScanner.stopScan();
-   //    // this.scanActive = false;
-   //    this.onCameraStatusChanged.emit(false);
-   // }
-
-   /* #endregion */
-
-   /* #region new barcode scanner */
-
-   isSupported = false;
-   barcodes: Barcode[] = [];
-   async startScanning(): Promise<void> {
-      const granted = await this.requestPermissions();
-      if (!granted) {
-         this.presentAlert();
-         return;
-      }
-      const { barcodes } = await BarcodeScanner.scan();
-      if (barcodes && barcodes.length > 0) {
-         let barcode = this.manipulateBarcodeCheckDigit(barcodes[0].rawValue);
-         await this.onDoneScanning.emit(barcode);
+   async startScanning() {
+      const allowed = await this.checkPermission();
+      if (allowed) {
+         // this.scanActive = true;
+         this.onCameraStatusChanged.emit(true);
+         const result = await BarcodeScanner.startScan();
+         if (result.hasContent) {
+            let barcode = result.content;
+            // this.scanActive = false;
+            this.onCameraStatusChanged.emit(false);
+            barcode = this.manipulateBarcodeCheckDigit(barcode);
+            await this.onDoneScanning.emit(barcode);
+         }
       }
    }
 
-   async requestPermissions(): Promise<boolean> {
-      const { camera } = await BarcodeScanner.requestPermissions();
-      return camera === "granted" || camera === "limited";
-   }
-
-   async presentAlert(): Promise<void> {
-      const alert = await this.alertController.create({
-         header: "Permission denied",
-         message: "Please grant camera permission to use the barcode scanner.",
-         buttons: ["Ok"],
+   async checkPermission() {
+      return new Promise(async (resolve) => {
+         const status = await BarcodeScanner.checkPermission({ force: true });
+         if (status.granted) {
+            resolve(true);
+         } else if (status.denied) {
+            const alert = await this.alertController.create({
+               header: "No permission",
+               message: "Please allow camera access in your setting",
+               buttons: [
+                  {
+                     text: "Open Settings",
+                     handler: () => {
+                        BarcodeScanner.openAppSettings();
+                        resolve(false);
+                     },
+                  },
+                  {
+                     text: "No",
+                     role: "cancel",
+                  },
+               ],
+            });
+            await alert.present();
+         } else {
+            resolve(false);
+         }
       });
-      await alert.present();
+   }
+
+   stopScanner() {
+      BarcodeScanner.stopScan();
+      // this.scanActive = false;
+      this.onCameraStatusChanged.emit(false);
    }
 
    /* #endregion */

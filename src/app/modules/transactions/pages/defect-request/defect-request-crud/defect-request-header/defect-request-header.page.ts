@@ -379,7 +379,7 @@ export class DefectRequestHeaderPage implements OnInit, ViewWillEnter, ViewDidEn
    async proceedWithSI() {
       await this.hidePreviewModal();
       this.objectForm.patchValue({ parentObject: "SM_SalesInvoice"});
-      this.objectForm.patchValue({ workFlowTransactionId: this.copyFromSIHeaderList.find(r => r.isSelected)?.workFlowTransactionId });
+      // this.objectForm.patchValue({ workFlowTransactionId: this.copyFromSIHeaderList.find(r => r.isSelected)?.workFlowTransactionId });
       this.objectService.setObject({ header: this.objectForm.getRawValue(), details: this.objectService.object?.details ?? [] });
       await this.transformCopyFromSI(this.copyFromSILineList);
       setTimeout(() => {
