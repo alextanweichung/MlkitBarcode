@@ -262,13 +262,13 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
 
    /* #region  barcode scanner */
 
-   scanActive: boolean = false;
-   onCameraStatusChanged(event) {
-      this.scanActive = event;
-      if (this.scanActive) {
-         document.body.style.background = "transparent";
-      }
-   }
+   // scanActive: boolean = false;
+   // onCameraStatusChanged(event) {
+   //    this.scanActive = event;
+   //    if (this.scanActive) {
+   //       document.body.style.background = "transparent";
+   //    }
+   // }
 
    async onDoneScanning(barcode) {
       if (barcode) {
@@ -279,11 +279,11 @@ export class ConsignmentSalesItemPage implements OnInit, ViewWillEnter {
       }
    }
 
-   stopScanner() {
-      BarcodeScanner.stopScan();
+   // stopScanner() {
+      // BarcodeScanner.stopScan();
       // this.scanActive = false;
-      this.onCameraStatusChanged(false);
-   }
+      // this.onCameraStatusChanged(false);
+   // }
 
    /* #endregion */
 
