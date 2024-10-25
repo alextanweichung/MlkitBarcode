@@ -407,6 +407,7 @@ export class ItemCatalogPage implements OnInit, OnChanges {
                item.tradingMarginExpression = item.tradingMarginPct + "%";
             }
             if (this.configSalesActivateTradingMargin && this.configTradingActivateMarginExpr && item.tradingMarginExpression) {
+               item.tradingMarginPct = null;
                item.tradingMarginExpression = item.tradingMarginExpression;
             }
          } else {
