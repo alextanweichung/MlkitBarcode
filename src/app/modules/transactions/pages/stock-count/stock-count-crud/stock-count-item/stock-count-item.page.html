@@ -112,6 +112,7 @@
                               <ion-col class="ion-flex ion-margin-auto">
                                  <div class="ion-flex">
                                     {{rowData.itemCode}}
+                                    <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.variationTypeCode === '0' && rowData.itemUomId">{{rowData.itemUomId|idMapping:objectService.itemUomMasterList}}</span>
                                     <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXId">{{rowData.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
                                     <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYId">{{rowData.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                                  </div>
@@ -232,6 +233,7 @@
                                     <ion-col class="ion-flex ion-margin-auto">
                                        <div class="ion-flex">
                                           {{selectedStockCountDetail.itemCode}}
+                                          <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="selectedStockCountDetail.variationTypeCode === '0' && selectedStockCountDetail.itemUomId">{{selectedStockCountDetail.itemUomId|idMapping:objectService.itemUomMasterList}}</span>
                                           <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="selectedStockCountDetail.itemVariationXId">{{selectedStockCountDetail.itemVariationXId|idMapping:objectService.itemVariationXMasterList}}</span>
                                           <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="selectedStockCountDetail.itemVariationYId">{{selectedStockCountDetail.itemVariationYId|idMapping:objectService.itemVariationYMasterList}}</span>
                                        </div>

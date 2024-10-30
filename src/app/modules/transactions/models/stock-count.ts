@@ -109,6 +109,8 @@ export interface StockCountDetail {
    itemDescription: string
    itemVariationXDescription?: string
    itemVariationYDescription?: string
+   variationTypeCode: string
+   itemUomId: number
 
    // testing performance
    guid?: string

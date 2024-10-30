@@ -190,10 +190,9 @@
                            <ion-col class="ion-flex ion-margin-auto">
                               <div class="ion-flex">
                                  {{rowData.itemCode}}
-                                 <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXDescription">
-                                    {{rowData.itemVariationXDescription}}</span>
-                                 <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYDescription">
-                                    {{rowData.itemVariationYDescription}}</span>
+                                 <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.variationTypeCode === '0' && rowData.itemUomId">{{rowData.itemUomId|idMapping:objectService.itemUomMasterList}}</span>
+                                 <span class="badge-green ion-text-wrap ion-flex my-auto px-1 mx-1" *ngIf="rowData.itemVariationXDescription">{{rowData.itemVariationXDescription}}</span>
+                                 <span class="badge-purple ion-text-wrap ion-flex my-auto px-1" *ngIf="rowData.itemVariationYDescription">{{rowData.itemVariationYDescription}}</span>
                               </div>
                            </ion-col>
                         </ion-row>

@@ -89,6 +89,8 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
                   r.itemDescription = found.description;
                   r.itemVariationXDescription = found.itemVariationLineXDescription;
                   r.itemVariationYDescription = found.itemVariationLineYDescription;
+                  r.variationTypeCode = found.variationTypeCode;
+                  r.itemUomId = found.itemUomId;
                   r.guid = uuidv4();
                }
             })
@@ -238,6 +240,7 @@ export class StockCountDetailPage implements OnInit, ViewWillEnter {
 				this.filteredObj = JSON.parse(JSON.stringify(this.objectService.objectDetail.filter(r => 
                r.itemCode?.toUpperCase().includes(searchText.toUpperCase())
                || r.itemBarcode?.toUpperCase().includes(searchText.toUpperCase())
+               || r.itemDescription?.toUpperCase().includes(searchText.toUpperCase())
             )));
 				this.currentPage = 1;
 			} else {

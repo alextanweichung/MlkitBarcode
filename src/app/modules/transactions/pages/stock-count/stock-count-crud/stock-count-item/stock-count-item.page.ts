@@ -111,6 +111,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    async addItemToLine(trxLine: TransactionDetail) {
+      console.log("🚀 ~ StockCountItemPage ~ addItemToLine ~ trxLine:", JSON.stringify({barcode: trxLine.itemBarcode, uomCode: trxLine.itemUomCode, uomId: trxLine.itemUomId }))
       try {
          switch (this.inventoryCountBatchCriteria.randomCountType) {
             case "Item":
@@ -148,14 +149,17 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                itemBarcode: trxLine.itemBarcode,
                qtyRequest: (trxLine.qtyRequest && trxLine.qtyRequest) > 0 ? trxLine.qtyRequest : 1,
                binDesc: (this.objectService.configInvCountActivateLineWithBin && !this.objectService.configInvCountBinFromLocation) ? this.binDesc : null,
-               binId: (this.objectService.configInvCountActivateLineWithBin && this.objectService.configInvCountBinFromLocation) ? this.selectedBin?.id : null,
+               binId: (this.objectService.configInvCountActivateLineWithBin && this.objectService.configInvCountBinFromLocation) ? this.selectedBin?.id : null,               
                sequence: 0,
                // for local use
                itemCode: trxLine.itemCode,
                itemDescription: trxLine.description,
+               variationTypeCode: trxLine.variationTypeCode,
+               itemUomId: trxLine.itemUomId,
                // testing performance
                guid: uuidv4()
             }
+            console.log("🚀 ~ StockCountItemPage ~ addItemToLine ~ newLine:", JSON.stringify(newLine))
             this.objectService.objectDetail.forEach(r => { r.sequence += 1 });
             await this.objectService.objectDetail.unshift(newLine);
             let data: StockCountRoot = { header: this.objectService.objectHeader, details: this.objectService.objectDetail };
@@ -191,6 +195,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                   // for local use
                   itemCode: trxLine.itemCode,
                   itemDescription: trxLine.description,
+                  variationTypeCode: trxLine.variationTypeCode,
+                  itemUomId: trxLine.itemUomId,
                   // testing performance
                   guid: uuidv4()
                }
@@ -218,6 +224,8 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                // for local use
                itemCode: trxLine.itemCode,
                itemDescription: trxLine.description,
+               variationTypeCode: trxLine.variationTypeCode,
+               itemUomId: trxLine.itemUomId,
                // testing performance
                guid: uuidv4()
             }
