@@ -84,26 +84,11 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
 
    /* #region pending objects */
 
-   // consignmentLocationSearchDropdownList: SearchDropdownList[] = [];
-   // bindLocationList() {
-   //   this.consignmentLocationSearchDropdownList = [];
-   //   try {
-   //     this.objectService.locationList.forEach(r => {
-   //       this.consignmentLocationSearchDropdownList.push({
-   //         id: r.locationId,
-   //         code: r.locationCode,
-   //         description: r.locationDescription
-   //       })
-   //     })
-   //   } catch (e) {
-   //     console.error(e);
-   //   }
-   // }
-
    onLocationChanged(event: any) {
       if (event) {
          this.objectService.selectedLocation = event.id;
          this.loadPendingList();
+         this.loadObjects();
       } else {
          this.objectService.selectedLocation = null;
          this.pendingObject = [];
@@ -118,16 +103,12 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          if (this.objectService.selectedLocation) {
             this.objectService.getPendingList(this.objectService.locationMasterList.find(r => r.id === this.objectService.selectedLocation)?.code).subscribe(async response => {
                this.pendingObject = response;
-               await this.loadingService.dismissLoading();
             }, async error => {
-               await this.loadingService.dismissLoading();
                console.error(error);
             })
          } else {
-            await this.loadingService.dismissLoading();
          }
       } catch (error) {
-         await this.loadingService.dismissLoading();
          console.error(error);
       } finally {
          await this.loadingService.dismissLoading();
@@ -153,14 +134,14 @@ export class TransferInPage implements OnInit, ViewWillEnter, ViewDidEnter, DoCh
          await this.loadingService.showLoading();
          this.objectService.getObjectList(format(this.startDate, "yyyy-MM-dd"), format(this.endDate, "yyyy-MM-dd")).subscribe(async response => {
             this.objects = response;
-            await this.loadingService.dismissLoading();
+            if (this.objectService.selectedLocation) {
+               this.objects = this.objects.filter(r => r.toLocationCode === this.objectService.locationMasterList.find(s => s.id === this.objectService.selectedLocation)?.code);
+            }
             this.toastService.presentToast("Search Complete", `${this.objects.length} record(s) found.`, "top", "success", 1000, this.authService.showSearchResult);
          }, async error => {
-            await this.loadingService.dismissLoading();
             console.error(error);
          })
       } catch (error) {
-         await this.loadingService.dismissLoading();
          this.toastService.presentToast("System Error", "Please contact adminstrator", "top", "danger", 1000);
       } finally {
          await this.loadingService.dismissLoading();
