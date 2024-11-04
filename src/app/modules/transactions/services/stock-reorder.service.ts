@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { ConfigService } from "src/app/services/config/config.service";
 import { MasterList } from "src/app/shared/models/master-list";
 import { MasterListDetails } from "src/app/shared/models/master-list-details";
-import { StockReorderLine, StockReorderList, StockReorderRoot } from "../models/stock-reorder";
+import { InventoryCurrentModel, StockReorderLine, StockReorderList, StockReorderRoot } from "../models/stock-reorder";
 import { ConsignmentSalesLocation } from "../models/consignment-sales";
 import { TransactionDetail } from "src/app/shared/models/transaction-detail";
 import { JsonDebug } from "src/app/shared/models/jsonDebug";
@@ -47,6 +47,7 @@ export class StockReorderService {
    systemWideScanningMethod: string;
    configMobileScanItemContinuous: boolean = false;
    systemWideEAN13IgnoreCheckDigit: boolean = false;
+   configStockReorderBlockCheckBalance: boolean = false;
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
@@ -65,6 +66,14 @@ export class StockReorderService {
          } else {
             this.configMobileScanItemContinuous = false;
          }
+
+         let stockReorderBlockCheckBalance = this.moduleControl.find(x => x.ctrlName === "StockReorderBlockCheckBalance");
+         if (stockReorderBlockCheckBalance && stockReorderBlockCheckBalance.ctrlValue.toUpperCase() === "Y") {
+            this.configStockReorderBlockCheckBalance = true;
+         } else {
+            this.configStockReorderBlockCheckBalance = false;
+         }
+
       })
    }
 
@@ -143,6 +152,10 @@ export class StockReorderService {
             "reportName": reportName ?? null
          },
          { responseType: "blob" });
+   }
+
+   getInventoryQty(locationId: number, itemId: number) {
+      return this.http.get<InventoryCurrentModel>(this.configService.selected_sys_param.apiUrl + `MobileStockReorder/inventoryQty/${locationId}/${itemId}`).toPromise();
    }
 
    // for web testing 

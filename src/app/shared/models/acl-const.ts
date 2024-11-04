@@ -35,7 +35,8 @@ export const trxAppCode = {
    mobileBinCount: "MAMBC",
    mobileDoAck: "MAMDOACK",
    mobileCartonTruckLoading: "MAMCTL",
-   mobileDefectRequest: "MAMDR"
+   mobileDefectRequest: "MAMDR",
+   mobileScanBarcode: "MATSB"
 }
 
 export const approvalAppCode = {
@@ -109,6 +110,7 @@ export const reportAppCode = {
    mobileSalesAnalysis: "MARPSAL",
    mobileItemSalesAnalysis: "MARPISAL",
    mobileConsignmentCountAnalysis: "MARPCCA",
+   mobileCustomConsignmentSalesReport: "MARPCCSR",
    
    mobileCustomerDetail: "MARPCD",
 

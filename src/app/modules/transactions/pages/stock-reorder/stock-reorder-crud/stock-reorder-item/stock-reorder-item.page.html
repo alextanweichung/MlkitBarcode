@@ -14,6 +14,12 @@
    <ng-template>
       <ion-content class="p-2">
          <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item (click)="popover.dismiss(); viewBalance()" *ngIf="objectService.configStockReorderBlockCheckBalance">
+               <ion-icon slot="end" name="hand-left-outline"></ion-icon>
+               <ion-label>
+                  <div>View Balance</div>
+               </ion-label>
+            </ion-item>
             <ion-item (click)="popover.dismiss(); sendForDebug()">
                <ion-icon slot="end" name="push-outline" color="danger"></ion-icon>
                <ion-label>
@@ -86,3 +92,54 @@
    </ion-col>
 </ion-row>
 <div class="scan-box" [hidden]="!scanActive"></div>
+
+<ion-modal [isOpen]="balanceModal" (didDismiss)="balanceModal = false">
+   <ng-template>
+      <ion-header>
+         <ion-toolbar>
+            <ion-title>Detail</ion-title>
+            <ion-buttons slot="start">
+               <ion-button (click)="hideBalanceModal()">Done</ion-button>
+            </ion-buttons>
+         </ion-toolbar>
+      </ion-header>
+      <ion-content *ngIf="objectService.object.line">
+         <div class="p-2">
+
+            <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+               <ion-item>
+                  <ion-grid class="ion-no-padding py-2 pl-2">
+                     <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                           <div class="font-bold">Item Code</div>
+                        </ion-col>
+                        <ion-col class="ion-margin-auto justify-content-end">
+                           <div>Line Qty.</div>
+                        </ion-col>
+                        <ion-col class="ion-margin-auto justify-content-end">
+                           <div>Balance Qty.</div>
+                        </ion-col>
+                     </ion-row>
+                  </ion-grid>
+               </ion-item>
+               <ion-item *ngFor="let rowData of objectService.object.line">
+                  <ion-grid class="ion-no-padding py-2 pl-2">
+                     <ion-row>
+                        <ion-col class="ion-flex ion-margin-auto">
+                           <div class="font-bold">{{rowData.itemCode}}</div>
+                        </ion-col>
+                        <ion-col class="ion-margin-auto justify-content-end">
+                           <div [ngStyle]="{'color': (rowData.lineQty > rowData.balanceQty ? 'red' : '')}">{{rowData.lineQty|number:"1.0"}}</div>
+                        </ion-col>
+                        <ion-col class="ion-margin-auto justify-content-end">
+                           <div>{{rowData.balanceQty|number:"1.0"}}</div>
+                        </ion-col>
+                     </ion-row>
+                  </ion-grid>
+
+               </ion-item>
+            </ion-list>
+         </div>
+      </ion-content>
+   </ng-template>
+</ion-modal>

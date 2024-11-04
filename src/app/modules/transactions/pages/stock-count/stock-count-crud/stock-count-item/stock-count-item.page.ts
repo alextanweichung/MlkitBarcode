@@ -111,7 +111,6 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
    }
 
    async addItemToLine(trxLine: TransactionDetail) {
-      console.log("🚀 ~ StockCountItemPage ~ addItemToLine ~ trxLine:", JSON.stringify({barcode: trxLine.itemBarcode, uomCode: trxLine.itemUomCode, uomId: trxLine.itemUomId }))
       try {
          switch (this.inventoryCountBatchCriteria.randomCountType) {
             case "Item":

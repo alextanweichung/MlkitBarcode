@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
          <ion-back-button text="" defaultHref="/transactions/stock-reorder"></ion-back-button>
       </ion-buttons>
-      <ion-buttons slot="end" *ngIf="!objectService.object?.isCompleted">
+      <ion-buttons slot="end">
          <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
       </ion-buttons>
    </ion-toolbar>

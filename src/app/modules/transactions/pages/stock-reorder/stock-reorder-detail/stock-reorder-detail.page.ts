@@ -173,7 +173,7 @@ export class StockReorderDetailPage implements OnInit, ViewWillEnter {
    async downloadPdf() {
       try {
          await this.loadingService.showLoading();
-         this.objectService.downloadPdf("SMSC002", "pdf", this.objectService.object.salesOrderId, null).subscribe(response => {
+         this.objectService.downloadPdf("SMSC002", "pdf", this.objectService.object.salesOrderId, "Sales Order").subscribe(response => {
             let filename = this.objectService.object.salesOrderNum + ".pdf";
             this.commonService.commonDownloadPdf(response, filename);
          }, error => {

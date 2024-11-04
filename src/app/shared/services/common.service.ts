@@ -52,6 +52,14 @@ export class CommonService {
       }
    }
 
+   getMasterList() {
+      try {
+         return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileDownload/masterlist").toPromise();
+      } catch (error) {
+         console.error(error);
+      }
+   }
+
    syncInbound() {
       try {
          return this.http.get(this.configService.selected_sys_param.apiUrl + "MobileDownload/itemMaster").toPromise();

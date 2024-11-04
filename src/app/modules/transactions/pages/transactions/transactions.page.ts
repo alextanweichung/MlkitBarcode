@@ -39,6 +39,7 @@ export class TransactionsPage implements OnInit {
    showDoAck: boolean = false;
    showCartonTruckLoading: boolean = false;
    showDefectRequest: boolean = false;
+   showScanBarcode: boolean = false;
 
    constructor(
       private authService: AuthService
@@ -78,6 +79,7 @@ export class TransactionsPage implements OnInit {
                this.showDoAck = pageItems.findIndex(r => r.title === trxAppCode.mobileDoAck) > -1;
                this.showCartonTruckLoading = pageItems.findIndex(r => r.title === trxAppCode.mobileCartonTruckLoading) > -1;
                this.showDefectRequest = pageItems.findIndex(r => r.title === trxAppCode.mobileDefectRequest) > -1;
+               this.showScanBarcode = pageItems.findIndex(r => r.title === trxAppCode.mobileScanBarcode) > -1;
             }
          })
       } catch (e) {

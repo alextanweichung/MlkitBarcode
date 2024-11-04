@@ -102,7 +102,7 @@ export class StockReorderItemPage implements OnInit {
 
    /* #endregion */
 
-   insertIntoLine(event: StockReorderLine) {
+   async insertIntoLine(event: StockReorderLine) {
       if (event) {
          if (this.objectService.object.line === null || this.objectService.object.line === undefined) {
             this.objectService.object.line = [];
@@ -116,6 +116,7 @@ export class StockReorderItemPage implements OnInit {
          } else {
             this.objectService.object.line.unshift(event);
          }
+         await this.checkOriginQtyBalance(false);
       }
    }
 
@@ -199,10 +200,12 @@ export class StockReorderItemPage implements OnInit {
                role: "confirm",
                cssClass: "success",
                handler: async () => {
-                  if (this.objectService.object.stockReorderId === 0) {
-                     this.insertObject();
-                  } else {
-                     this.updateObject();
+                  if (await this.checkOriginQtyBalance() === true) {
+                     if (this.objectService.object.stockReorderId === 0) {
+                        this.insertObject();
+                     } else {
+                        this.updateObject();
+                     }
                   }
                },
             },
@@ -260,6 +263,39 @@ export class StockReorderItemPage implements OnInit {
       }
    }
 
+   async checkOriginQtyBalance(throwError: boolean = true): Promise<boolean> {
+      return new Promise<boolean>(async (resolve) => {
+         if (this.objectService.configStockReorderBlockCheckBalance) {
+            // check balance qty
+            this.objectService.object.line.filter(r => r.balanceQty).forEach(r => {
+               if (throwError) {
+                  if (r.lineQty > r.balanceQty) {
+                     this.toastService.presentToast("", `Balance qty ${r.itemCode} is not enough`, "top", "warning", 1000);
+                     resolve(false);
+                     return;
+                  }
+               }
+            });
+            this.objectService.object.line.filter(r => r.balanceQty === null).forEach(async r => {
+               let invInfo = await this.objectService.getInventoryQty(this.objectService.object.locationId, r.itemId);
+               if (invInfo) {
+                  r.balanceQty = invInfo.qty;
+                  if (throwError) {
+                     if (r.lineQty > r.balanceQty) {
+                        this.toastService.presentToast("", `Balance qty ${r.itemCode} is not enough`, "top", "warning", 1000);
+                        resolve(false);
+                        return;
+                     }
+                  }
+               }
+            });
+            resolve(true);
+         } else {
+            resolve(true);
+         }
+      });
+   }
+
    sendForDebug() {
       let jsonObjectString = JSON.stringify(this.objectService.object);
       let debugObject: JsonDebug = {
@@ -290,5 +326,14 @@ export class StockReorderItemPage implements OnInit {
    }
 
    /* #endregion */
+
+   balanceModal: boolean = false;
+   viewBalance() {
+      this.balanceModal = true;
+   }
+
+   hideBalanceModal() {
+      this.balanceModal = false;
+   }
 
 }

@@ -1,37 +1,45 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, IonDatetime, ViewWillEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
-import { ToastService } from 'src/app/services/toast/toast.service';
+import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
+import { Item } from 'src/app/modules/transactions/models/item';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';
+import { CustomConsignmentSalesReportObject } from '../../models/consignment-sales-report';
+import { LoadingService } from 'src/app/services/loading/loading.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { ReportsService } from '../../services/reports.service';
-import { ConsignmentSalesLocation } from 'src/app/modules/transactions/models/consignment-sales';
-import { SalesAnalysisObject } from '../../models/sales-analysis';
-import { LoadingService } from 'src/app/services/loading/loading.service';
-import { Item } from 'src/app/modules/transactions/models/item';
+import { MasterListDetails } from 'src/app/shared/models/master-list-details';
+import { MasterList } from 'src/app/shared/models/master-list';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { SortType } from '@swimlane/ngx-datatable';
 
 @Component({
-   selector: 'app-sales-analysis',
-   templateUrl: './sales-analysis.page.html',
-   styleUrls: ['./sales-analysis.page.scss'],
+   selector: 'app-custom-consignment-sales-report',
+   templateUrl: './custom-consignment-sales-report.page.html',
+   styleUrls: ['./custom-consignment-sales-report.page.scss'],
 })
-export class SalesAnalysisPage implements OnInit, ViewWillEnter {
-
-   type: SearchDropdownList[] = [];
-   selectedType: SearchDropdownList = null;
+export class CustomConsignmentSalesReportPage implements OnInit, ViewWillEnter {
 
    itemList: Item[] = [];
    itemSearchDropDown: SearchDropdownList[] = [];
    selectedItem: number[] = [];
 
+   sortType: SortType = SortType.multi;
+
+   selectedItemBrand: number[] = [];
+   selectedItemCategory: number[] = [];
+   selectedItemGroup: number[] = [];
+
    location: ConsignmentSalesLocation[] = [];
    locationSearchDropDown: SearchDropdownList[] = [];
-   selectedLocation: SearchDropdownList = null;
+   selectedLocation: number[] = [];
 
-   object: SalesAnalysisObject[] = [];
+   object: CustomConsignmentSalesReportObject[] = [];
 
    constructor(
       private objectService: ReportsService,
+      private configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
       private loadingService: LoadingService,
@@ -41,21 +49,12 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
    }
 
    async ionViewWillEnter(): Promise<void> {
-      this.type = [];
       setTimeout(async () => {
          await this.loadingService.showLoading();
+         await this.loadMasterList();
          await this.loadLocation();
          await this.loadItem();
          await this.loadingService.dismissLoading();
-         this.type.push(
-            { id: 0, code: "SDI", description: "Sales by Discount Code, Item Code" },
-            { id: 1, code: "SDD", description: "Sales by Trx Date, Discount Code" },
-            { id: 2, code: "IXY", description: "Sales by Item Code, X Code, Y Code" },
-            { id: 3, code: "SMC", description: "Sales by Discount Code (Margin Cat.)" },
-            { id: 4, code: "SDC", description: "Sales by Discount Code" },
-            { id: 5, code: "SQA", description: "Sales, Qty., Amt." },
-            { id: 6, code: "STI", description: "Sales By Transaction, Item" }
-         );
       }, 0);
    }
 
@@ -99,24 +98,36 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
       })
    }
 
-   objects: any[] = [];
+   fullMasterList: MasterList[] = [];
+   itemBrandMasterList: MasterListDetails[] = [];
+   itemCategoryMasterList: MasterListDetails[] = [];
+   itemGroupMasterList: MasterListDetails[] = [];
+   async loadMasterList() {
+      this.objectService.getMasterList().subscribe({
+         next: (response) => {
+            this.fullMasterList = response;
+            this.itemBrandMasterList = this.fullMasterList.filter(x => x.objectName === "ItemBrand").flatMap(src => src.details).filter(y => y.deactivated === 0);
+            this.itemCategoryMasterList = this.fullMasterList.filter(x => x.objectName === "ItemCategory").flatMap(src => src.details).filter(y => y.deactivated === 0);
+            this.itemGroupMasterList = this.fullMasterList.filter(x => x.objectName === "ItemGroup").flatMap(src => src.details).filter(y => y.deactivated === 0);
+         },
+         error: (error) => {
+            console.error(error);
+         }
+      })
+   }
+
    async loadReport() {
       try {
-         console.log("🚀 ~ SalesAnalysisPage ~ loadReport ~ this.selectedItem:", this.selectedItem)
-         if (this.selectedType?.id === 6) {
-            if (this.selectedItem.length === 0) {
-               this.toastService.presentToast("Control Error", "Please select at least one item.", "top", "warning", 1000, true);
-               return;
-            }
-         }
          await this.loadingService.showLoading();
          this.object = [];
-         this.objectService.getSalesAnalysis({
-            reportType: this.selectedType?.id,
+         this.objectService.getCustomConsignmentSalesReport({
             dateStart: new Date(format(new Date(this.startDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
             dateEnd: new Date(format(new Date(this.endDateValue), "yyyy-MM-dd") + "T00:00:00.000Z"),
-            locationId: this.selectedLocation.id,
-            itemid: this.selectedItem
+            locationId: this.selectedLocation,
+            itemId: this.selectedItem,
+            itemBrandId: this.selectedItemBrand,
+            itemCategoryId: this.selectedItemCategory,
+            itemGroupId: this.selectedItemGroup
          }).subscribe(async response => {
             this.object = response;
             this.toastService.presentToast("Search Complete", `${this.object.length} record(s) found.`, "top", "success", 300, true);
@@ -130,23 +141,43 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
       }
    }
 
-   onTypeChanged(event: any) {
-      this.object = [];
-      this.selectedType = event;
-   }
-
    onLocationChanged(event: any) {
-      this.object = [];
-      this.selectedLocation = event;
+      if (event) {
+         this.selectedLocation = event.flatMap(r => r.id);
+      } else {
+         this.selectedLocation = [];
+      }
    }
 
    onItemSelected(event: SearchDropdownList[]) {
-      console.log("🚀 ~ SalesAnalysisPage ~ onItemSelected ~ event:", event)
       if (event) {
          this.selectedItem = event.flatMap(r => r.id);
-         console.log("🚀 ~ SalesAnalysisPage ~ onItemSelected ~ this.selectedItem:", this.selectedItem)
       } else {
          this.selectedItem = [];
+      }
+   }
+
+   onItemBrandSelected(event: SearchDropdownList[]) {
+      if (event) {
+         this.selectedItemBrand = event.flatMap(r => r.id);
+      } else {
+         this.selectedItemBrand = [];
+      }
+   }
+
+   onItemCategorySelected(event: SearchDropdownList[]) {
+      if (event) {
+         this.selectedItemCategory = event.flatMap(r => r.id);
+      } else {
+         this.selectedItemCategory = [];
+      }
+   }
+
+   onItemGroupSelected(event: SearchDropdownList[]) {
+      if (event) {
+         this.selectedItemGroup = event.flatMap(r => r.id);
+      } else {
+         this.selectedItemGroup = [];
       }
    }
 
@@ -191,5 +222,11 @@ export class SalesAnalysisPage implements OnInit, ViewWillEnter {
    }
 
    /* #endregion */
+
+   countSum(field: string) {
+      let sum = 0;
+      sum = this.object.flatMap(r => r[field]).reduce((total, cell) => total + cell, 0);
+      return Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+   }
 
 }

@@ -73,18 +73,21 @@ export class TransferOutService {
    loadModuleControl() {
       this.authService.moduleControlConfig$.subscribe(obj => {
          this.moduleControl = obj;
+
          let mobileScanItemContinuous = this.moduleControl.find(x => x.ctrlName === "MobileScanItemContinuous");
          if (mobileScanItemContinuous && mobileScanItemContinuous.ctrlValue.toUpperCase() === "Y") {
             this.configMobileScanItemContinuous = true;
          } else {
             this.configMobileScanItemContinuous = false;
          }
+
          let transferOutActivateContainerNum = this.moduleControl.find(x => x.ctrlName === "TransferOutActivateContainerNum");
          if (transferOutActivateContainerNum && transferOutActivateContainerNum.ctrlValue.toUpperCase() === "Y") {
             this.configTransferOutActivateContainerNum = true;
          } else {
             this.configTransferOutActivateContainerNum = false;
          }
+         
          let uploadFileSizeLimit = this.moduleControl.find(x => x.ctrlName === "UploadFileSizeLimit")?.ctrlValue;
          this.fileSizeLimit = Number(uploadFileSizeLimit) * 1024 * 1024;
       })

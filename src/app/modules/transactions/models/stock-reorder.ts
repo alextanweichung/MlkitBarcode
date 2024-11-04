@@ -35,6 +35,9 @@ export interface StockReorderLine {
    barcode: string
    lineQty: number
    isDeleted: boolean
+
+   // local usage
+   balanceQty?: number
 }
 
 export interface StockReorderList {
@@ -49,3 +52,14 @@ export interface StockReorderList {
    typeCode: string
 }
 
+export interface InventoryCurrentModel {
+   itemId: number
+   itemCode: string
+   itemSku: string
+   locationId: number
+   locationCode: string
+   locationDescription: string
+   qty: number
+   transitQty: number
+   openQty: number
+}

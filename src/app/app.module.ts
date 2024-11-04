@@ -31,7 +31,7 @@ export function initializeFactory(init: InitializeAppService) {
 
 @NgModule({
    declarations: [
-      AppComponent
+      AppComponent,
    ],
    imports: [
       BrowserModule,

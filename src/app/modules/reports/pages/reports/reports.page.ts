@@ -32,6 +32,7 @@ export class ReportsPage implements OnInit {
    showConsignmentCountAnalysis: boolean = false;
    showCustomerDetail: boolean = false;
    showInventoryLevel: boolean = false;
+   showConsignmentSalesReport: boolean = false;
 
    constructor(
       private authService: AuthService,
@@ -61,7 +62,7 @@ export class ReportsPage implements OnInit {
                this.showConsignmentCountAnalysis = pageItems.findIndex(r => r.title === reportAppCode.mobileConsignmentCountAnalysis) > -1;
                this.showCustomerDetail = pageItems.findIndex(r => r.title === reportAppCode.mobileCustomerDetail) > -1;
                this.showInventoryLevel = pageItems.findIndex(r => r.title === reportAppCode.mobileInventoryLevel) > -1;
-               console.log("🚀 ~ ReportsPage ~ ngOnInit ~ this.showInventoryLevel:", this.showInventoryLevel)
+               this.showConsignmentSalesReport = pageItems.findIndex(r => r.title === reportAppCode.mobileCustomConsignmentSalesReport) > -1;
             }
          })
          this.loginUser = JSON.parse(localStorage.getItem('loginUser'));

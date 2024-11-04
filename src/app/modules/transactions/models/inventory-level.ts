@@ -28,9 +28,9 @@ export interface InventoryLevelPriceInfo {
 export interface InventoryLevelVariationRoot {
    itemInfo: InventoryLevelVariationItemInfo[]
    priceInfo: InventoryLevelPriceInfo[]
- }
- 
- export interface InventoryLevelVariationItemInfo {
+}
+
+export interface InventoryLevelVariationItemInfo {
    locationId: number
    locationCode: string
    locationDescription: string
@@ -39,22 +39,22 @@ export interface InventoryLevelVariationRoot {
    itemVariationYDescription: string[]
    itemVariationXCode: string[]
    itemVariationYCode: string[]
- }
- 
- export interface InventoryLevelVariation {
+}
+
+export interface InventoryLevelVariation {
    itemId: number
    itemCode: string
    variationDetails: InventoryLevelVariationDetail[]
- }
- 
- export interface InventoryLevelVariationDetail {
+}
+
+export interface InventoryLevelVariationDetail {
    itemVariationXId: number
    itemVariationXCode: string
    itemVariationXDescription: string
    variationDetails: InventoryLevelVariationDetail2[]
- }
- 
- export interface InventoryLevelVariationDetail2 {
+}
+
+export interface InventoryLevelVariationDetail2 {
    itemVariationYId: number
    itemVariationYCode: string
    itemVariationYDescription: string
@@ -62,9 +62,9 @@ export interface InventoryLevelVariationRoot {
    qty?: number
    transitQty?: number
    openQty?: number
- }
- 
+}
+
 export interface ItemPriceBySegment {
    locationId: number
    itemPricing: ItemPricing
- }
+}

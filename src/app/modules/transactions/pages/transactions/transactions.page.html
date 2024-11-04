@@ -223,5 +223,19 @@
             </ion-item>
          </ion-list>
       </ng-container>
+
+      <ng-container *ngIf="showScanBarcode">
+         <ion-list-header class="ion-list-header-small ion-flex ion-text-center">
+            <ion-label>[Misc]</ion-label>
+         </ion-list-header>
+         <ion-list class="list-custom animate__animated animate__fadeIn" lines="full">
+            <ion-item button routerLink="scan-barcode" *ngIf="showScanBarcode">
+               <ion-icon name="qr-code-outline" slot="start"></ion-icon>
+               <ion-label>
+                  <h3>Scan Barcode</h3>
+               </ion-label>
+            </ion-item>
+         </ion-list>
+      </ng-container>
    </div>
 </ion-content>

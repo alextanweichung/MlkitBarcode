@@ -505,7 +505,10 @@ const routes: Routes = [
       path: 'transactions/payment-arrangement/payment-arrangement-detail',
       loadChildren: () => import('./modules/transactions/pages/payment-arrangement/payment-arrangement-detail/payment-arrangement-detail.module').then(m => m.PaymentArrangementDetailPageModule)
    },
-
+   {
+      path: 'transactions/scan-barcode',
+      loadChildren: () => import('./modules/transactions/pages/scan-barcode/scan-barcode.module').then(m => m.ScanBarcodePageModule)
+   },
 
 
 
@@ -562,6 +565,10 @@ const routes: Routes = [
    {
       path: 'reports/consignment-count-analysis',
       loadChildren: () => import('./modules/reports/pages/reports/consignment-count-analysis/consignment-count-analysis.module').then(m => m.ConsignmentCountAnalysisPageModule)
+   },
+   {
+     path: 'reports/custom-consignment-sales-report',
+     loadChildren: () => import('./modules/reports/pages/custom-consignment-sales-report/custom-consignment-sales-report.module').then( m => m.CustomConsignmentSalesReportPageModule)
    },
    {
       path: 'reports/rp-inventory-level',
@@ -658,6 +665,8 @@ const routes: Routes = [
       path: 'item-code-input',
       loadChildren: () => import('./shared/pages/item-code-input/item-code-input.module').then(m => m.ItemCodeInputPageModule)
    },
+
+
 
 
 ];
