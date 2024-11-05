@@ -93,7 +93,7 @@
          <!-- </ion-item> -->
 
          <ion-item-sliding #slidingItem *ngFor="let rowData of objectService.objectDetail; let rowIndex = index">
-            <ion-item button detail="false" class="ion-no-padding no-ripple" lines="full" (click)="qtyInput.setFocus()">
+            <ion-item button detail="false" class="ion-no-padding no-ripple" (click)="qtyInput.setFocus()">
                <ion-grid class="ion-no-padding py-2 pl-2">
                   <ion-row>
                      <ion-col size="1" class="ion-flex ion-margin-auto">

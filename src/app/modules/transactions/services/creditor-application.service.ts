@@ -95,8 +95,10 @@ export class CreditorApplicationService {
       this.termPeriodMasterList = this.fullMasterList.filter(x => x.objectName === "TermPeriod").flatMap(src => src.details).filter(y => y.deactivated === 0);
    }
 
-   loadStaticLov() {
-
+   typeMasterList: MasterListDetails[] = [];
+   async loadStaticLov() {
+      let masterList = await this.getStaticLovList();
+      this.typeMasterList = masterList.filter(x => x.objectName === "VendorType" && x.details != null).flatMap(src => src.details).filter(y => y.deactivated == 0 && y);
    }
 
    getObjects() {
@@ -121,6 +123,10 @@ export class CreditorApplicationService {
 
    getMasterList() {
       return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/masterlist").toPromise();
+   }
+   
+   getStaticLovList() {
+      return this.http.get<MasterList[]>(this.configService.selected_sys_param.apiUrl + "MobileVendorPre/staticLov").toPromise();
    }
 
    getWorkflow(objectId: number) {

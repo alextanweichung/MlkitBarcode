@@ -60,7 +60,7 @@ export class TransferOutHeaderPage implements OnInit, ViewWillEnter, ViewWillLea
          transferOutId: [0],
          transferOutNum: [null],
          trxDate: [this.commonService.getDateWithoutTimeZone(this.commonService.getTodayDate()), [Validators.required]],
-         typeCode: [null],
+         typeCode: [null, [Validators.required]],
          locationId: [(this.objectService.selectedLocation ? this.objectService.selectedLocation : null), [Validators.required]],
          toLocationId: [null, [Validators.required]],
          deactivated: [false],

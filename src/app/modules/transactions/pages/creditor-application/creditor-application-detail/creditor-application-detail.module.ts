@@ -8,15 +8,17 @@ import { CreditorApplicationDetailPageRoutingModule } from './creditor-applicati
 
 import { CreditorApplicationDetailPage } from './creditor-application-detail.page';
 import { IdMappingModule } from 'src/app/shared/pipes/id-mapping/id-mapping.module';
+import { CodeMappingModule } from 'src/app/shared/pipes/code-mapping/code-mapping.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    CreditorApplicationDetailPageRoutingModule,
-    IdMappingModule
-  ],
-  declarations: [CreditorApplicationDetailPage]
+   imports: [
+      CommonModule,
+      FormsModule,
+      IonicModule,
+      CreditorApplicationDetailPageRoutingModule,
+      IdMappingModule,
+      CodeMappingModule
+   ],
+   declarations: [CreditorApplicationDetailPage]
 })
-export class CreditorApplicationDetailPageModule {}
+export class CreditorApplicationDetailPageModule { }

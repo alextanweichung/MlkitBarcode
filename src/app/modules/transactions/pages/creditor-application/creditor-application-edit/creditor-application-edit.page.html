@@ -17,32 +17,30 @@
           <div *ngIf="objectForm.controls['name'].errors && objectForm.controls['name'].touched"
             class="font-x-smaller pb-1 color-danger" padding>Name is required</div>
         </ion-item>
+        <app-search-dropdown title="Type" optionLabel="description"
+           [masterDropdownList]="objectService.typeMasterList"
+           [selectedCode]="objectForm?.controls?.typeCode?.value" [optionValue]="'code'"
+           (onActionComplete)="onTypeCodeSelected($event)"></app-search-dropdown>
         <ion-item>
           <ion-label position="stacked">Company Reg. Num</ion-label>
           <ion-input inputmode="text" type="text" enterkeyhint="next" placeholder="Enter Company Reg. Num"
             formControlName="companyRegNum"></ion-input>
         </ion-item>
-        <ion-item class="ion-no-padding">
           <app-search-dropdown title="Country" optionLabel="description"
             [masterDropdownList]="objectService.countryMasterList" [selectedId]="objectForm?.controls?.countryId?.value"
             (onActionComplete)="onCountrySelected($event)"></app-search-dropdown>
-        </ion-item>
-        <ion-item class="ion-no-padding">
           <app-search-dropdown title="State" optionLabel="description"
             [masterDropdownList]="objectService.stateMasterList" [selectedId]="objectForm?.controls?.stateId?.value"
             (onActionComplete)="onStateSelected($event)"></app-search-dropdown>
-        </ion-item>
         <ion-item>
           <ion-label position="stacked">Credit Limit</ion-label>
           <ion-input placeholder="Enter Credit Limit" type="number" inputmode="decimal"
             formControlName="creditLimit"></ion-input>
         </ion-item>
-        <ion-item class="ion-no-padding">
           <app-search-dropdown title="Term Period" optionLabel="description"
             [masterDropdownList]="objectService.termPeriodMasterList"
             [selectedId]="objectForm?.controls?.termPeriodId?.value"
             (onActionComplete)="onTermPeriodSelected($event)"></app-search-dropdown>
-        </ion-item>
         <ion-item>
           <ion-label position="stacked">Remark</ion-label>
           <ion-textarea autoGrow="true" inputmode="text" type="text" enterkeyhint="enter" placeholder="Enter Remark"

@@ -57,6 +57,14 @@
               <div>{{object.header.name}}</div>
             </ion-col>
           </ion-row>
+          <ion-row *ngIf="object?.header?.typeCode">
+            <ion-col class="ion-flex ion-margin-auto">
+              <div class="font-bold">Type</div>
+            </ion-col>
+            <ion-col class="ion-flex ion-margin-auto justify-content-end">
+              <div>{{object?.header?.typeCode|codeMapping:objectService.typeMasterList}}</div>
+            </ion-col>
+          </ion-row>
           <ion-row *ngIf="object?.header?.companyRegNum">
             <ion-col class="ion-flex ion-margin-auto">
               <div class="font-bold">Company Reg. Num.</div>
