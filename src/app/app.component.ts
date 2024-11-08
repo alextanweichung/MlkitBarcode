@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ConfigService } from './services/config/config.service';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { NotificationsService } from './shared/services/notifications.service';
 import OneSignal from 'onesignal-cordova-plugin';
 
@@ -50,7 +50,7 @@ export class AppComponent {
 
             // Set StatusBar style (dark / light)
             await StatusBar.setStyle({ style: Style.Dark });
-            await BarcodeScanner.checkPermission({ force: true });
+            await BarcodeScanner.checkPermissions();
          }
 
          // ...

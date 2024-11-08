@@ -12,6 +12,13 @@
          <ion-button (click)="showPopover($event)"><ion-icon name="menu-outline" slot="icon-only"></ion-icon></ion-button>
       </ion-buttons>
    </ion-toolbar>
+
+   <ion-header [hidden]="!scanActive">
+      <ion-toolbar>
+        <ion-title>Scanning</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
 </ion-header>
 <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
    <ng-template>
@@ -197,9 +204,29 @@
    </ng-template>
 </ion-modal>
 
+<ion-content [hidden]="!scanActive">
+   <div #square class="square"></div>
+   <div class="zoom-ratio-wrapper">
+     <ion-range
+       [min]="minZoomRatio"
+       [max]="maxZoomRatio"
+       [disabled]="minZoomRatio === undefined || maxZoomRatio === undefined"
+       (ionChange)="setZoomRatio($any($event))"
+     ></ion-range>
+   </div>
+   <ion-fab *ngIf="isTorchAvailable" slot="fixed" horizontal="end" vertical="bottom">
+      <ion-fab-button (click)="toggleTorch()">
+        <ion-icon name="flashlight"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+ </ion-content>
+
 <ion-row class="scanner-buttons" [hidden]="!scanActive">
    <ion-col class="ion-no-padding">
       <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
    </ion-col>
 </ion-row>
-<div class="scan-box" [hidden]="!scanActive"></div>
+<!-- Green Scanning Box for Barcode Alignment -->
+<div #scanBox class="scan-box" [hidden]="!scanActive">
+   <p style="text-align: center; color: white; padding-top: 90px;">Align barcode here</p>
+</div>

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController, IonPopover, NavController, ViewDidEnter } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { CurrentInboundAssignment, CurrentInboundList, InboundLineForWD, MultiInboundCarton, MultiInboundObject, MultiInboundRoot } from 'src/app/modules/transactions/models/inbound-scan';

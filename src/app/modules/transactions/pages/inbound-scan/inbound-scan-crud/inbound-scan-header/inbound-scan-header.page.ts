@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { Keyboard } from '@capacitor/keyboard';
 import { ActionSheetController, IonSegment, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { InboundHeaderForWD, MultiInboundRoot } from 'src/app/modules/transactions/models/inbound-scan';

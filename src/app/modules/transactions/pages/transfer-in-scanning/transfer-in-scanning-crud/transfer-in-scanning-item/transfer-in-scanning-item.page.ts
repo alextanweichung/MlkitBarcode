@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController, ActionSheetController, NavController, ViewWillEnter, IonPopover } from '@ionic/angular';
 import { TransferInScanningLine, TransferInScanningRoot } from 'src/app/modules/transactions/models/transfer-in-scanning';
 import { TransferInScanningService } from 'src/app/modules/transactions/services/transfer-in-scanning.service';

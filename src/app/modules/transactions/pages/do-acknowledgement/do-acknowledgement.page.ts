@@ -10,7 +10,7 @@ import { ModuleControl } from 'src/app/shared/models/module-control';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { GeneralScanInputPage } from 'src/app/shared/pages/general-scan-input/general-scan-input.page';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { Camera, CameraResultType, CameraSource, GalleryPhoto, GalleryPhotos, Photo } from '@capacitor/camera';
 
 const IMAGE_DIR = 'stored-images';

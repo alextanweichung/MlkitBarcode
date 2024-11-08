@@ -11,7 +11,7 @@ import { ItemListMultiUom, LineAssembly, TransactionDetail } from 'src/app/share
 import { CurrentPickList, MultiPickingCarton, MultiPickingObject, MultiPickingRoot, PickingLineVariation, SalesOrderLineForWD } from 'src/app/modules/transactions/models/picking';
 import { NavigationExtras } from '@angular/router';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { JsonDebug } from 'src/app/shared/models/jsonDebug';
 import { format } from 'date-fns';
 import { Capacitor } from '@capacitor/core';

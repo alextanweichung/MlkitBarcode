@@ -9,7 +9,15 @@ import { LocalItemBarcode, LocalItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
 import { AlertController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import {
+   Barcode,
+   BarcodeFormat,
+   BarcodeScanner,
+   LensFacing,
+   StartScanOptions,
+ } from '@capacitor-mlkit/barcode-scanning';
+import { InventoryLevelRetailPage } from 'src/app/modules/transactions/pages/inventory-level-retail/inventory-level-retail.page';
+
 
 @Component({
    selector: 'app-barcode-scan-input',
@@ -27,6 +35,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    systemWideEAN13IgnoreCheckDigit: boolean = false;
    systemWideScanningMethod: string;
    systemWideBlockConvertedCode: boolean = false;
+   detectionBox;
 
    selectedScanningMethod: string = "B";
 
@@ -142,8 +151,11 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    /* #region scan */
 
+   @ViewChild(InventoryLevelRetailPage) inventorylevelretailPage: InventoryLevelRetailPage;
    // barcodeSearchValue: string;
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
+   @ViewChild('scanBox', { static: true }) scanBox: ElementRef;
+
    async validateBarcode(barcode: string, emit: boolean = true) {
       setTimeout(async () => {
          if (barcode) {
@@ -650,57 +662,106 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    /* #endregion */
 
    /* #region camera scanner */
+   @ViewChild('square')
+   public squareElement: ElementRef<HTMLDivElement> | undefined;
 
-   async startScanning() {
-      const allowed = await this.checkPermission();
-      if (allowed) {
-         // this.scanActive = true;
-         this.onCameraStatusChanged.emit(true);
-         const result = await BarcodeScanner.startScan();
-         if (result.hasContent) {
-            let barcode = result.content;
-            // this.scanActive = false;
-            this.onCameraStatusChanged.emit(false);
-            barcode = this.manipulateBarcodeCheckDigit(barcode);
-            await this.onDoneScanning.emit(barcode);
-         }
-      }
-   }
-
-   async checkPermission() {
-      return new Promise(async (resolve) => {
-         const status = await BarcodeScanner.checkPermission({ force: true });
-         if (status.granted) {
-            resolve(true);
-         } else if (status.denied) {
-            const alert = await this.alertController.create({
-               header: "No permission",
-               message: "Please allow camera access in your setting",
-               buttons: [
-                  {
-                     text: "Open Settings",
-                     handler: () => {
-                        BarcodeScanner.openAppSettings();
-                        resolve(false);
-                     },
-                  },
-                  {
-                     text: "No",
-                     role: "cancel",
-                  },
-               ],
-            });
-            await alert.present();
-         } else {
-            resolve(false);
-         }
+   async startScanning(): Promise<void> {
+      // Hide everything behind the modal (see `src/theme/variables.scss`)
+      document.querySelector('body')?.classList.add('barcode-scanning-active');
+  
+      const squareElementBoundingClientRect =
+        this.squareElement?.nativeElement.getBoundingClientRect();
+      const scaledRect = squareElementBoundingClientRect
+        ? {
+            left: squareElementBoundingClientRect.left * window.devicePixelRatio,
+            right:
+              squareElementBoundingClientRect.right * window.devicePixelRatio,
+            top: squareElementBoundingClientRect.top * window.devicePixelRatio,
+            bottom:
+              squareElementBoundingClientRect.bottom * window.devicePixelRatio,
+            width:
+              squareElementBoundingClientRect.width * window.devicePixelRatio,
+            height:
+              squareElementBoundingClientRect.height * window.devicePixelRatio,
+          }
+        : undefined;
+      const detectionCornerPoints = scaledRect
+        ? [
+            [scaledRect.left, scaledRect.top],
+            [scaledRect.left + scaledRect.width, scaledRect.top],
+            [
+              scaledRect.left + scaledRect.width,
+              scaledRect.top + scaledRect.height,
+            ],
+            [scaledRect.left, scaledRect.top + scaledRect.height],
+          ]
+        : undefined;
+      const listener = await BarcodeScanner.addListener(
+        'barcodeScanned',
+        async (event) => {
+          /*this.ngZone.run(() => {
+            const cornerPoints = event.barcode.cornerPoints;
+            if (detectionCornerPoints && cornerPoints) {
+              if (
+                detectionCornerPoints[0][0] > cornerPoints[0][0] ||
+                detectionCornerPoints[0][1] > cornerPoints[0][1] ||
+                detectionCornerPoints[1][0] < cornerPoints[1][0] ||
+                detectionCornerPoints[1][1] > cornerPoints[1][1] ||
+                detectionCornerPoints[2][0] < cornerPoints[2][0] ||
+                detectionCornerPoints[2][1] < cornerPoints[2][1] ||
+                detectionCornerPoints[3][0] > cornerPoints[3][0] ||
+                detectionCornerPoints[3][1] < cornerPoints[3][1]
+              ) {
+                return;
+              }
+            }
+            listener.remove();
+          })*/;
+        },
+      );
+      /*await BarcodeScanner.startScan(options);
+      void BarcodeScanner.getMinZoomRatio().then((result) => {
+        this.minZoomRatio = result.zoomRatio;
       });
+      void BarcodeScanner.getMaxZoomRatio().then((result) => {
+        this.maxZoomRatio = result.zoomRatio;
+      });*/
+    }
+
+   async checkPermission(): Promise<boolean> {
+      const status = await BarcodeScanner.checkPermissions();
+
+      if (status.camera === "granted") {
+         return true;
+      } else if (status.camera === "denied") {
+         const alert = await this.alertController.create({
+            header: "No permission",
+            message: "Please allow camera access in your settings",
+            buttons: [
+               {
+                  text: "Open Settings",
+                  handler: () => {
+                     BarcodeScanner.openSettings();
+                  },
+               },
+               {
+                  text: "No",
+                  role: "cancel",
+               },
+            ],
+         });
+         await alert.present();
+         return false;
+      }
+
+      return false;
    }
+
 
    stopScanner() {
       BarcodeScanner.stopScan();
-      // this.scanActive = false;
       this.onCameraStatusChanged.emit(false);
+
    }
 
    /* #endregion */

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController, IonPopover, NavController } from '@ionic/angular';
 import { StockReorderLine, StockReorderRoot } from 'src/app/modules/transactions/models/stock-reorder';
 import { StockReorderService } from 'src/app/modules/transactions/services/stock-reorder.service';

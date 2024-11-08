@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AlertController } from '@ionic/angular';
 
 @Component({
@@ -30,13 +30,13 @@ export class CameraScanInputPage implements OnInit {
          // this.scanActive = true;
          this.onCameraStatusChanged.emit(true);
          const result = await BarcodeScanner.startScan();
-         if (result.hasContent) {
+         /*if (result.hasContent) {
             let barcode = result.content;
             // this.scanActive = false;
             this.onCameraStatusChanged.emit(false);
             barcode = this.manipulateBarcodeCheckDigit(barcode);
             await this.onDoneScanning.emit(barcode);
-         }
+         }*/
       }
    }
 
@@ -53,10 +53,10 @@ export class CameraScanInputPage implements OnInit {
 
    async checkPermission() {
       return new Promise(async (resolve) => {
-         const status = await BarcodeScanner.checkPermission({ force: true });
-         if (status.granted) {
+         const status = await BarcodeScanner.checkPermissions();
+         if (status.camera === 'granted') {
             resolve(true);
-         } else if (status.denied) {
+         } else if (status.camera === 'denied') {
             const alert = await this.alertController.create({
                header: 'No permission',
                message: 'Please allow camera access in your setting',
@@ -64,7 +64,7 @@ export class CameraScanInputPage implements OnInit {
                   {
                      text: 'Open Settings',
                      handler: () => {
-                        BarcodeScanner.openAppSettings();
+                        BarcodeScanner.openSettings();
                         resolve(false);
                      },
                   },

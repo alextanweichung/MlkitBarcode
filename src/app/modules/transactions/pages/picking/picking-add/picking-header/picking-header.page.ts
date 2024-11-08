@@ -9,7 +9,7 @@ import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { Keyboard } from '@capacitor/keyboard';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { Capacitor } from '@capacitor/core';
 import { SearchDropdownList } from 'src/app/shared/models/search-dropdown-list';

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AlertController, IonPopover, NavController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
@@ -758,22 +758,22 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
          // this.scanActive = true;
          this.onCameraStatusChanged(true);
          const result = await BarcodeScanner.startScan();
-         if (result.hasContent) {
+         /*if (result.hasContent) {
             let value = result.content;
             // this.scanActive = false;
             await this.onCameraStatusChanged(false);
             this.binDesc = value;
             this.barcodescaninput.setFocus();
-         }
+         }*/
       }
    }
 
    async checkPermission() {
       return new Promise(async (resolve) => {
-         const status = await BarcodeScanner.checkPermission({ force: true });
-         if (status.granted) {
+         const status = await BarcodeScanner.checkPermissions();
+         if (status.camera === "granted") {
             resolve(true);
-         } else if (status.denied) {
+         } else if (status.camera === "denied") {
             const alert = await this.alertController.create({
                header: "No permission",
                message: "Please allow camera access in your setting",
@@ -781,7 +781,7 @@ export class StockCountItemPage implements OnInit, ViewWillEnter, ViewDidEnter {
                   {
                      text: "Open Settings",
                      handler: () => {
-                        BarcodeScanner.openAppSettings();
+                        BarcodeScanner.openSettings();
                         resolve(false);
                      },
                   },

@@ -52,4 +52,5 @@
       <ion-button expand="full" (click)="stopScanner()">Stop</ion-button>
    </ion-col>
 </ion-row>
-<div class="scan-box" [hidden]="!scanActive"></div>
+<!-- Scanning box only appears when scanActive is true -->
+<div class="scan-box" *ngIf="scanActive"></div>

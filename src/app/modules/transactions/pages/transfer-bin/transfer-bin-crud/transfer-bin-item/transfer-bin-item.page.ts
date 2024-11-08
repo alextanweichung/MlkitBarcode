@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, NavController, IonPopover, ViewWillEnter, ViewDidEnter } from '@ionic/angular';
 import { BinFromPalletList, TransferBinGroupList, TransferBinRoot } from 'src/app/modules/transactions/models/transfer-bin';

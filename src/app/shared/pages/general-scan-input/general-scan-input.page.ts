@@ -4,7 +4,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonService } from '../../services/common.service';
 import { AlertController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
@@ -99,7 +99,7 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
          // this.scanActive = true;
          this.onCameraStatusChanged.emit(true);
          const result = await BarcodeScanner.startScan();
-         if (result.hasContent) {
+         /*if (result.hasContent) {
             let value = result.content;
             if (!this.clearSearchValue) {
                this.searchValue = value;
@@ -107,16 +107,16 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
             // this.scanActive = false;
             await this.onCameraStatusChanged.emit(false);
             await this.onDoneScanning.emit(value);
-         }
+         }*/
       }
    }
 
    async checkPermission() {
       return new Promise(async (resolve) => {
-         const status = await BarcodeScanner.checkPermission({ force: true });
-         if (status.granted) {
+         const status = await BarcodeScanner.checkPermissions();
+         if (status.camera === "granted") {
             resolve(true);
-         } else if (status.denied) {
+         } else if (status.camera === "denied") {
             const alert = await this.alertController.create({
                header: "No permission",
                message: "Please allow camera access in your setting",
@@ -124,7 +124,7 @@ export class GeneralScanInputPage implements OnInit, ViewWillEnter, ViewDidEnter
                   {
                      text: "Open Settings",
                      handler: () => {
-                        BarcodeScanner.openAppSettings();
+                        BarcodeScanner.openSettings();
                         resolve(false);
                      },
                   },

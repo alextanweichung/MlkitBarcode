@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { NavController, ActionSheetController, ViewWillEnter, ViewDidEnter, AlertController } from '@ionic/angular';
 import { CartonInfo, CartonTruckLoadingDetail, CartonTruckLoadingRoot, TruckArrangementListForCTL, TruckArrangementRootForCTL } from 'src/app/modules/transactions/models/carton-truck-loading';
 import { CartonTruckLoadingService } from 'src/app/modules/transactions/services/carton-truck-loading.service';

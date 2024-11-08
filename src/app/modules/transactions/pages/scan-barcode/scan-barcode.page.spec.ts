@@ -5,11 +5,11 @@ describe('ScanBarcodePage', () => {
   let component: ScanBarcodePage;
   let fixture: ComponentFixture<ScanBarcodePage>;
 
-  beforeEach(waitForAsync () => {
+  beforeEach(waitForAsync (() => {
     fixture = TestBed.createComponent(ScanBarcodePage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();

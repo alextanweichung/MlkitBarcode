@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ModuleControl } from 'src/app/shared/models/module-control';
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { BarcodeScanInputPage } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.page';
 import { TransactionDetail } from 'src/app/shared/models/transaction-detail';
 

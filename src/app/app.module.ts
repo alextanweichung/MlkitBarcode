@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -32,6 +32,9 @@ export function initializeFactory(init: InitializeAppService) {
 @NgModule({
    declarations: [
       AppComponent,
+   ],
+   schemas: [
+      CUSTOM_ELEMENTS_SCHEMA
    ],
    imports: [
       BrowserModule,

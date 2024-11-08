@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { ActionSheetController, AlertController, IonPopover, NavController, Platform, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
 import { TransferOutLine, TransferOutRoot } from 'src/app/modules/transactions/models/transfer-out';
 import { TransferOutService } from 'src/app/modules/transactions/services/transfer-out.service';
