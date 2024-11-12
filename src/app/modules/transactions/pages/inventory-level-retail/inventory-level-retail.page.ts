@@ -458,7 +458,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter, AfterVie
       }
    }
 
-   private async startScan(): Promise<void> {
+   /*private async startScan(): Promise<void> {
       // Hide everything behind the modal (see `src/theme/variables.scss`)
       document.querySelector('body')?.classList.add('barcode-scanning-active');
   
@@ -530,7 +530,7 @@ export class InventoryLevelRetailPage implements OnInit, ViewWillEnter, AfterVie
       BarcodeScanner.stopScan();
       // this.scanActive = false;
       this.onCameraStatusChanged(false);
-   }
+   }*/
 
    async onItemAdd(event: TransactionDetail[]) {
       if (event && event.length > 0) {

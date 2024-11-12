@@ -116,6 +116,23 @@
   --ion-card-background: #ffffff;
 }
 
+body.barcode-scanning-active {
+  visibility: hidden;
+  --background: transparent;
+  --ion-background-color: transparent;
+}
+
+.barcode-scanning-modal {
+  visibility: visible;
+}
+
+@media (prefers-color-scheme: dark) {
+  .barcode-scanning-modal {
+    --background: transparent;
+    --ion-background-color: transparent;
+  }
+}
+
 .ios ion-modal {
   --ion-background-color: #ffffff;
   --ion-toolbar-background: transparent;

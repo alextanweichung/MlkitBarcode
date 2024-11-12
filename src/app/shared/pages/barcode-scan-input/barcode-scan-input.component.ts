@@ -143,10 +143,10 @@ import { format } from 'date-fns';
       // Hide everything behind the modal (see `src/theme/variables.scss`)
       document.querySelector('body')?.classList.add('barcode-scanning-active');
   
-      const options: StartScanOptions = {
+      /*const options: StartScanOptions = {
         formats: this.formats,
         lensFacing: this.lensFacing,
-      };
+      };*/
   
       const squareElementBoundingClientRect =
         this.squareElement?.nativeElement.getBoundingClientRect();
@@ -199,7 +199,7 @@ import { format } from 'date-fns';
           });
         },
       );
-      const result = await BarcodeScanner.startScan(options);
+      const result = await BarcodeScanner.startScan();
       void BarcodeScanner.getMinZoomRatio().then((result) => {
         this.minZoomRatio = result.zoomRatio;
       });
