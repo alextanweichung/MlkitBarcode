@@ -50,7 +50,7 @@
                   <br />
                </ng-container>
                <span> {{p.priceSegmentCode}} </span>
-               <span *ngIf="p.discountGroupCode"> @ {{p.discountGroupCode}} </span>
+               <span *ngIf="p.discountGroupCode">  {{p.discountGroupCode}} </span>
                <span *ngIf="p.discountExpression"> [{{p.discountExpression}}] </span>
                <br />
                <span> Unit Price: {{p.unitPrice|number:precisionSales.localFormat}} </span>

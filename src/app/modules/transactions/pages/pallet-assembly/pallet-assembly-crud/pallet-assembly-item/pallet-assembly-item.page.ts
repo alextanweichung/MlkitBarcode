@@ -245,7 +245,7 @@ export class PalletAssemblyItemPage implements OnInit, ViewWillEnter, ViewDidEnt
       }
    }
 
-   async onDoneScanning(barcode: string) {
+   async onDoneScanning(barcode: any) {
       if (barcode) {
          await this.barcodescaninput.validateBarcode(barcode);
          if (this.objectService.configMobileScanItemContinuous) {

@@ -19,7 +19,7 @@
                (keydown)="handleItemCodeKeyDown($event, itemSearchValue)">
          </ion-col>
          <ion-col class="ion-flex ion-margin-auto justify-content-end" *ngIf="selectedScanningMethod === 'B'">
-            <ion-button fill="clear" (click)="startScanning()">
+            <ion-button fill="clear" (click)="startScanning()" [disabled]="!isSupported">
                <i slot="icon-only" class="fas fa-camera"></i>
             </ion-button>
             <ion-button fill="clear" (click)="showKeyboard($event)">

@@ -279,7 +279,7 @@ export class ConsignmentCountItemPage implements OnInit, ViewWillEnter, ViewDidE
       }
    }
 
-   async onDoneScanning(barcode: string) {
+   async onDoneScanning(barcode: any) {
       if (barcode) {
          await this.barcodescaninput.validateBarcode(barcode);
          if (this.configMobileScanItemContinuous) {

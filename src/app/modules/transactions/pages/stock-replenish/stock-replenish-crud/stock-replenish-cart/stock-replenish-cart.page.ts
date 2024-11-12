@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, NavController, IonPopover } from '@ionic/angular';
-import { ViewWillEnter } from '@ionic/angular/types/ionic-lifecycle-hooks';
+import { AlertController, NavController, IonPopover, ViewWillEnter } from '@ionic/angular';
 import { SalesOrderRoot } from 'src/app/modules/transactions/models/sales-order';
 import { StockReplenishService } from 'src/app/modules/transactions/services/stock-replenish.service';
 import { AuthService } from 'src/app/services/auth/auth.service';

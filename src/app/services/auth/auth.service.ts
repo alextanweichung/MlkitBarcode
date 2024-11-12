@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import jwt_decode, { JwtPayload } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import { ConfigService } from '../config/config.service';
 import { CustomToken, ForgotPasswordRequest, LoginRequest, LoginUser, ResetPassword, TokenRequest } from './login-user';
 import { NavController } from '@ionic/angular';
@@ -160,18 +160,18 @@ export class AuthService {
    }
 
    getDecodedToken(token: string) {
-      const decoded = jwt_decode<CustomToken>(token);
+      const decoded = jwtDecode<CustomToken>(token);
       return decoded;
    }
 
    setDebugMode(token: string) {
-      const decoded = jwt_decode<CustomToken>(token);
+      const decoded = jwtDecode<CustomToken>(token);
       //After decode, assign debug mode variable
       this.isDebug = decoded.debug_mode;
    }
 
    checkAdminRights(token: string) {
-      const decoded = jwt_decode<CustomToken>(token);
+      const decoded = jwtDecode<CustomToken>(token);
       if (decoded.role == "Admin") {
          this.isAdmin = true;
       }
@@ -346,7 +346,7 @@ export class AuthService {
    }
 
    getTokenExpirationDate(token: string): Date {
-      const decoded: JwtPayload = jwt_decode(token);
+      const decoded: JwtPayload = jwtDecode(token);
       if (decoded.exp === undefined) return null;
 
       const date = new Date(0);

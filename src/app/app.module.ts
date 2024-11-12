@@ -7,7 +7,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { Storage } from '@ionic/storage';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -46,7 +46,7 @@ export function initializeFactory(init: InitializeAppService) {
       IonicModule.forRoot({ mode: 'ios' }),
       ReactiveFormsModule,
       AppRoutingModule,
-      NgChartsModule,
+      BaseChartDirective,
       HttpClientModule,
       CommonModule,
       IonicModule,

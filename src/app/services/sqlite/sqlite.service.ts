@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteDBConnection, SQLiteConnection, capSQLiteSet,
          capSQLiteChanges, capSQLiteValues, capEchoResult, capSQLiteResult,
-         capNCDatabasePathResult } from '@capacitor-community/sqlite';
+         capNCDatabasePathResult, capSQLiteVersionUpgrade } from '@capacitor-community/sqlite';
 
 @Injectable()
 
@@ -100,20 +100,25 @@ export class SQLiteService {
      * @param toVersion 
      * @param statements 
      */
-    async addUpgradeStatement(database:string,
-                              toVersion: number, statements: string[])
-                                        : Promise<void> {
-        if(this.sqlite != null) {
+    async addUpgradeStatement(database: string, toVersion: number, statements: string[]): Promise<void> {
+        if (this.sqlite != null) {
             try {
-                await this.sqlite.addUpgradeStatement(database, toVersion,
-                                                      statements);
+                // Structure statements into capSQLiteVersionUpgrade format
+                const upgradeStatements: capSQLiteVersionUpgrade[] = [
+                    {
+                        toVersion,
+                        statements,
+                    },
+                ];
+    
+                await this.sqlite.addUpgradeStatement(database, upgradeStatements);
                 return Promise.resolve();
             } catch (err) {
                 return Promise.reject(new Error(err));
             }
         } else {
-            return Promise.reject(new Error(`no connection open for ${database}`));
-        }                             
+            return Promise.reject(new Error(`No connection open for ${database}`));
+        }
     }
     /**
      * get a non-conformed database path

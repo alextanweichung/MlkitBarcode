@@ -9,6 +9,10 @@ import { LocalItemBarcode, LocalItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
 import { AlertController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+
+import { DialogService } from '../../../core/services/dialog/dialog.service';
+import { BarcodeScanningModalComponent } from './barcode-scan-input.component';
+
 import {
    Barcode,
    BarcodeFormat,
@@ -31,6 +35,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    @Input() itemVariationYMasterList: MasterListDetails[] = [];
    @Input() itemUomMasterList: MasterListDetails[] = [];
 
+   
+
    moduleControl: ModuleControl[];
    systemWideEAN13IgnoreCheckDigit: boolean = false;
    systemWideScanningMethod: string;
@@ -39,6 +45,11 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    selectedScanningMethod: string = "B";
 
+
+   public isSupported = false;
+   public isPermissionGranted = false;
+   public barcodes: Barcode[] = [];
+
    @Output() onItemAdd = new EventEmitter<any>();
 
    constructor(
@@ -46,7 +57,8 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       private configService: ConfigService,
       private commonService: CommonService,
       private toastService: ToastService,
-      private alertController: AlertController
+      private alertController: AlertController,
+      private readonly dialogService: DialogService
    ) { }
 
    ionViewWillEnter(): void {
@@ -59,6 +71,12 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    ngOnInit() {
       this.loadModuleControl();
+      BarcodeScanner.isSupported().then((result) => {
+         this.isSupported = result.supported;
+       });
+       BarcodeScanner.checkPermissions().then((result) => {
+         this.isPermissionGranted = result.camera === 'granted';
+       });
    }
 
    showKeyboard(event) {
@@ -154,7 +172,6 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    @ViewChild(InventoryLevelRetailPage) inventorylevelretailPage: InventoryLevelRetailPage;
    // barcodeSearchValue: string;
    @ViewChild("barcodeInput", { static: false }) barcodeInput: ElementRef;
-   @ViewChild('scanBox', { static: true }) scanBox: ElementRef;
 
    async validateBarcode(barcode: string, emit: boolean = true) {
       setTimeout(async () => {
@@ -627,10 +644,6 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    /* #region focus */
 
-   @Input() scanActive: boolean;
-   @Output() onCameraStatusChanged = new EventEmitter<boolean>();
-   @Output() onDoneScanning = new EventEmitter<string>();
-
    scanningMethodChanged() {
       this.setFocus();
    }
@@ -662,70 +675,27 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
    /* #endregion */
 
    /* #region camera scanner */
-   @ViewChild('square')
-   public squareElement: ElementRef<HTMLDivElement> | undefined;
 
-   async startScanning(): Promise<void> {
-      // Hide everything behind the modal (see `src/theme/variables.scss`)
-      document.querySelector('body')?.classList.add('barcode-scanning-active');
-  
-      const squareElementBoundingClientRect =
-        this.squareElement?.nativeElement.getBoundingClientRect();
-      const scaledRect = squareElementBoundingClientRect
-        ? {
-            left: squareElementBoundingClientRect.left * window.devicePixelRatio,
-            right:
-              squareElementBoundingClientRect.right * window.devicePixelRatio,
-            top: squareElementBoundingClientRect.top * window.devicePixelRatio,
-            bottom:
-              squareElementBoundingClientRect.bottom * window.devicePixelRatio,
-            width:
-              squareElementBoundingClientRect.width * window.devicePixelRatio,
-            height:
-              squareElementBoundingClientRect.height * window.devicePixelRatio,
-          }
-        : undefined;
-      const detectionCornerPoints = scaledRect
-        ? [
-            [scaledRect.left, scaledRect.top],
-            [scaledRect.left + scaledRect.width, scaledRect.top],
-            [
-              scaledRect.left + scaledRect.width,
-              scaledRect.top + scaledRect.height,
-            ],
-            [scaledRect.left, scaledRect.top + scaledRect.height],
-          ]
-        : undefined;
-      const listener = await BarcodeScanner.addListener(
-        'barcodeScanned',
-        async (event) => {
-          /*this.ngZone.run(() => {
-            const cornerPoints = event.barcode.cornerPoints;
-            if (detectionCornerPoints && cornerPoints) {
-              if (
-                detectionCornerPoints[0][0] > cornerPoints[0][0] ||
-                detectionCornerPoints[0][1] > cornerPoints[0][1] ||
-                detectionCornerPoints[1][0] < cornerPoints[1][0] ||
-                detectionCornerPoints[1][1] > cornerPoints[1][1] ||
-                detectionCornerPoints[2][0] < cornerPoints[2][0] ||
-                detectionCornerPoints[2][1] < cornerPoints[2][1] ||
-                detectionCornerPoints[3][0] > cornerPoints[3][0] ||
-                detectionCornerPoints[3][1] < cornerPoints[3][1]
-              ) {
-                return;
-              }
-            }
-            listener.remove();
-          })*/;
+   public async startScanning(): Promise<void> {
+      //const formats = this.formGroup.get('formats')?.value || [];
+      //const lensFacing =
+        //this.formGroup.get('lensFacing')?.value || LensFacing.Back;
+      const element = await this.dialogService.showModal({
+        component: BarcodeScanningModalComponent,
+        // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+        cssClass: 'barcode-scanning-modal',
+        showBackdrop: false,
+        componentProps: {
+          lensFacing: LensFacing.Back,
         },
-      );
-      /*await BarcodeScanner.startScan(options);
-      void BarcodeScanner.getMinZoomRatio().then((result) => {
-        this.minZoomRatio = result.zoomRatio;
       });
-      void BarcodeScanner.getMaxZoomRatio().then((result) => {
-        this.maxZoomRatio = result.zoomRatio;
-      });*/
+      element.onDidDismiss().then((result) => {
+        const barcode: Barcode | undefined = result.data?.barcode;
+        if (barcode) {
+          this.barcodes = [barcode];
+         
+        }
+      });
     }
 
    async checkPermission(): Promise<boolean> {
@@ -760,8 +730,6 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
 
    stopScanner() {
       BarcodeScanner.stopScan();
-      this.onCameraStatusChanged.emit(false);
-
    }
 
    /* #endregion */

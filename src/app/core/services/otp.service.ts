@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
 import { MasterList } from 'src/app/shared/models/master-list';
 import { User } from 'src/app/shared/models/user';
-import { OtpDTO } from '../models/otp';
+import { OtpDTO } from '../../modules/managements/models/otp';
 
 //Only use this header for HTTP POST/PUT/DELETE, to observe whether the operation is successful
 const httpObserveHeader = {

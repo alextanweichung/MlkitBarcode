@@ -3,7 +3,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { User } from 'src/app/shared/models/user';
 import { CommonService } from 'src/app/shared/services/common.service';
 import { Otp, OtpLine, OtpDTO } from '../../../models/otp';
-import { OtpService } from '../../../services/otp.service';
+import { OtpService } from '../../../../../core/services/otp.service';
 import { MasterListDetails } from 'src/app/shared/models/master-list-details';
 import { App } from 'src/app/shared/models/app';
 
