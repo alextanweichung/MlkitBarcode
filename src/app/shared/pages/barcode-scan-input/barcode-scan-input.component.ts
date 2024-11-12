@@ -141,7 +141,7 @@ import { format } from 'date-fns';
   
     private async startScan(): Promise<void> {
       // Hide everything behind the modal (see `src/theme/variables.scss`)
-      document.querySelector('body')?.classList.add('barcode-scanning-active');
+      document.querySelector('bca')?.classList.add('barcode-scanning-active');
   
       /*const options: StartScanOptions = {
         formats: this.formats,

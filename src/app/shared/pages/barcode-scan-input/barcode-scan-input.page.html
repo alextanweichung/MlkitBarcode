@@ -1,4 +1,5 @@
-<ion-segment [scrollable]="true" [(ngModel)]="selectedScanningMethod" (ionChange)="scanningMethodChanged()">
+<ion-content class="bca">
+   <ion-segment [scrollable]="true" [(ngModel)]="selectedScanningMethod" (ionChange)="scanningMethodChanged()">
       <ion-segment-button value="I">
          <ion-label>By Item</ion-label>
       </ion-segment-button>
@@ -144,3 +145,4 @@
          </ion-footer>
       </ng-template>
    </ion-modal>
+</ion-content>
