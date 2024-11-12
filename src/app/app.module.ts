@@ -6,7 +6,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
 import { Storage } from '@ionic/storage';
 
@@ -24,6 +24,10 @@ import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CommonModule } from '@angular/common';
+import { IdMappingModule } from './shared/pipes/id-mapping/id-mapping.module';
+import { IdToCodeMappingModule } from './shared/pipes/id-to-code-mapping/id-to-code-mapping.module';
+import HideKeyboardModule from './shared/utilities/hide-keyboard.module';
 
 export function initializeFactory(init: InitializeAppService) {
    return () => init.initializeApp();
@@ -44,6 +48,12 @@ export function initializeFactory(init: InitializeAppService) {
       AppRoutingModule,
       NgChartsModule,
       HttpClientModule,
+      CommonModule,
+      IonicModule,
+      FormsModule,
+      IdMappingModule,
+      IdToCodeMappingModule,
+      HideKeyboardModule,
       BrowserAnimationsModule,
       NgCircleProgressModule.forRoot({
          // set defaults here
