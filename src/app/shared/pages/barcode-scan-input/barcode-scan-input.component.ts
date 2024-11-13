@@ -47,7 +47,7 @@ import { format } from 'date-fns';
         </div>
         @if (isTorchAvailable) {
           <ion-fab slot="fixed" horizontal="end" vertical="bottom">
-            <ion-fab-button (click)="toggleTorch()">
+            <ion-fab-button >
               <ion-icon name="flashlight"></ion-icon>
             </ion-fab-button>
           </ion-fab>
@@ -112,9 +112,9 @@ import { format } from 'date-fns';
     }
   
     public ngAfterViewInit(): void {
-      setTimeout(() => {
+      /*setTimeout(() => {
         this.startScan();
-      }, 500);
+      }, 500);*/
     }
   
     public ngOnDestroy(): void {
@@ -136,11 +136,11 @@ import { format } from 'date-fns';
       });
     }*/
   
-    public async toggleTorch(): Promise<void> {
+    /*public async toggleTorch(): Promise<void> {
       await BarcodeScanner.toggleTorch();
-    }
+    }*/
   
-    private async startScan(): Promise<void> {
+    /*private async startScan(): Promise<void> {
       // Hide everything behind the modal (see `src/theme/variables.scss`)
       document.querySelector('bca')?.classList.add('barcode-scanning-active');
   
@@ -149,7 +149,7 @@ import { format } from 'date-fns';
         lensFacing: this.lensFacing,
       };*/
   
-      const squareElementBoundingClientRect =
+      /*const squareElementBoundingClientRect =
         this.squareElement?.nativeElement.getBoundingClientRect();
       const scaledRect = squareElementBoundingClientRect
         ? {
@@ -213,7 +213,7 @@ import { format } from 'date-fns';
           await this.onDoneScanning.emit(result.barcode.format.toString());
         }
       }
-    }
+    }*/
   
     private async stopScan(): Promise<void> {
       // Show everything behind the modal again

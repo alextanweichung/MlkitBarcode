@@ -969,6 +969,21 @@ export class BarcodeScanInputPage
       this.isScanning = true;
     }
 
+    // Start the scanning listener and display the camera interface
+    const listener = await BarcodeScanner.addListener('barcodeScanned', (event) => {
+      if (event?.barcode) {
+        this.barcodes = [event.barcode];
+        this.onItemAdd.emit(event.barcode); // Emit scanned barcode
+        this.closeScanningModal(); // Close scanning modal after a scan
+      }
+    });
+
+    // Begin the scan
+    await BarcodeScanner.startScan({
+      formats: [BarcodeFormat.Codabar], // Replace with your preferred formats
+      lensFacing: LensFacing.Back,
+    });
+
     /*try {
       // Set up the modal for barcode scanning
       const element = await this.modalController.create({
@@ -1030,6 +1045,7 @@ export class BarcodeScanInputPage
 
   closeScanningModal(): void {
    this.isScanning = false; // Set to false to hide the scanning modal
+   BarcodeScanner.stopScan();
  }
 
   /* #endregion */
