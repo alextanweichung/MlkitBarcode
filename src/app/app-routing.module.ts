@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { BarcodeScanInputPageModule } from 'src/app/shared/pages/barcode-scan-input/barcode-scan-input.module';
 
 const routes: Routes = [
    {
@@ -506,8 +507,8 @@ const routes: Routes = [
       loadChildren: () => import('./modules/transactions/pages/payment-arrangement/payment-arrangement-detail/payment-arrangement-detail.module').then(m => m.PaymentArrangementDetailPageModule)
    },
    {
-      path: 'transactions/scan-barcode',
-      loadChildren: () => import('./modules/transactions/pages/scan-barcode/scan-barcode.module').then(m => m.ScanBarcodePageModule)
+      path: 'transactions/barcode-scanning',
+      loadChildren: () => import('./modules/transactions/pages/barcode-scanning/barcode-scanning.module').then(m => m.BarcodeScanningModule)
    },
 
 
