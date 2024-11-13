@@ -63,15 +63,9 @@ td.sticky-left {
    --background: transparent;
    --ion-background-color: transparent;
  }
-
- .bca {
-   // Styling for when modal is hidden
-   visibility: visible;
- }
  
  .barcode-scanning-modal {
    visibility: visible;
-   backdrop-filter: blur(4px);
  }
  
  @media (prefers-color-scheme: dark) {
