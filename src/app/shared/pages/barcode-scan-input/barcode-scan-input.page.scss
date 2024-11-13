@@ -57,20 +57,3 @@ td.sticky-left {
    z-index: 1;
    font-weight: bold;
 }
-
-.bca.barcode-scanning-active {
-   visibility: hidden;
-   --background: transparent;
-   --ion-background-color: transparent;
- }
- 
- .barcode-scanning-modal {
-   visibility: visible;
- }
- 
- @media (prefers-color-scheme: dark) {
-   .barcode-scanning-modal {
-     --background: transparent;
-     --ion-background-color: transparent;
-   }
- }
