@@ -683,7 +683,7 @@ export class BarcodeScanInputPage implements OnInit, ViewDidEnter, ViewWillEnter
       const element = await this.dialogService.showModal({
         component: BarcodeScanningModalComponent,
         // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-        cssClass: 'barcode-scanning-modal',
+        cssClass: 'barcode-scanning-modalSSS',
         showBackdrop: false,
         componentProps: {
           lensFacing: LensFacing.Back,
