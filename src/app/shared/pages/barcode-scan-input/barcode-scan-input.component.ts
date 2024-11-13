@@ -222,7 +222,8 @@ import { format } from 'date-fns';
       await BarcodeScanner.stopScan();
     }
 
-    closeModal() {
+    public closeModal(): void {
+      this.stopScan();
       this.close.emit(); // Emit close event
     }
   }
