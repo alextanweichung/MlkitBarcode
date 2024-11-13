@@ -6,6 +6,7 @@ import {
   OnInit,
   Output,
   ViewChild,
+  NgZone
 } from '@angular/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -16,7 +17,12 @@ import { ModuleControl } from '../../models/module-control';
 import { LocalItemBarcode, LocalItemMaster } from '../../models/pos-download';
 import { TransactionDetail } from '../../models/transaction-detail';
 import { CommonService } from '../../services/common.service';
-import { AlertController, ViewDidEnter, ViewWillEnter } from '@ionic/angular';
+import {
+  AlertController,
+  ViewDidEnter,
+  ViewWillEnter,
+  ModalController,
+} from '@ionic/angular';
 
 import { DialogService } from '../../../core/services/dialog/dialog.service';
 import { BarcodeScanningModalComponent } from './barcode-scan-input.component';
@@ -63,7 +69,9 @@ export class BarcodeScanInputPage
     private commonService: CommonService,
     private toastService: ToastService,
     private alertController: AlertController,
-    private readonly dialogService: DialogService
+    private readonly dialogService: DialogService,
+    private modalController: ModalController,
+    private ngZone: NgZone
   ) {}
 
   ionViewWillEnter(): void {
@@ -958,24 +966,30 @@ export class BarcodeScanInputPage
     const permissionGranted = await this.checkPermission();
     if (!permissionGranted) return;
 
-    // Set up the modal for barcode scanning
-    const element = await this.dialogService.showModal({
-      component: BarcodeScanningModalComponent,
-      // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-      cssClass: 'barcode-scanning-modal',
-      showBackdrop: true,
-      componentProps: {
-        lensFacing: LensFacing.Back,
-      },
-    });
-    element.onDidDismiss().then((result) => {
-      const barcode: Barcode | undefined = result.data?.barcode;
-      if (barcode) {
-        // Store scanned barcode or trigger any further actions needed
-        this.barcodes = [barcode];
-        this.onItemAdd.emit(barcode.displayValue); // Emit the scanned value
-      }
-    });
+    try {
+      // Set up the modal for barcode scanning
+      const element = await this.modalController.create({
+        component: BarcodeScanningModalComponent,
+        // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+        cssClass: 'barcode-scanning-modal',
+        showBackdrop: true,
+        backdropDismiss: true,
+        componentProps: {
+          lensFacing: LensFacing.Back,
+        },
+      });
+      element.onDidDismiss().then((result) => {
+        const barcode: Barcode | undefined = result.data?.barcode;
+        if (barcode) {
+          // Store scanned barcode or trigger any further actions needed
+          this.barcodes = [barcode];
+          this.onItemAdd.emit(barcode.displayValue); // Emit the scanned value
+        }
+      });
+      await element.present();
+    } catch (error) {
+      console.error('Error showing modal:', error);
+    }
   }
 
   async checkPermission(): Promise<boolean> {
