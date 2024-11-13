@@ -60,6 +60,7 @@ export class BarcodeScanInputPage
   public isSupported = false;
   public isPermissionGranted = false;
   public barcodes: Barcode[] = [];
+  isScanning: boolean;
 
   @Output() onItemAdd = new EventEmitter<any>();
 
@@ -966,6 +967,7 @@ export class BarcodeScanInputPage
     const permissionGranted = await this.checkPermission();
     if (!permissionGranted) return;
 
+    this.isScanning = true;
     try {
       // Set up the modal for barcode scanning
       const element = await this.modalController.create({
@@ -1024,6 +1026,10 @@ export class BarcodeScanInputPage
   stopScanner() {
     BarcodeScanner.stopScan();
   }
+
+  closeScanningModal() {
+   this.isScanning = false; // Set to false to hide the scanning modal
+ }
 
   /* #endregion */
 }

@@ -91,6 +91,7 @@ import { format } from 'date-fns';
     public lensFacing: LensFacing = LensFacing.Back;
 
     @Output() onDoneScanning = new EventEmitter<string>();
+    @Output() close = new EventEmitter<void>();
   
     @ViewChild('square')
     public squareElement: ElementRef<HTMLDivElement> | undefined;
@@ -129,11 +130,11 @@ import { format } from 'date-fns';
       });
     }
   
-    public async closeModal(barcode?: Barcode): Promise<void> {
+    /*public async closeModal(barcode?: Barcode): Promise<void> {
       this.dialogService.dismissModal({
         barcode: barcode,
       });
-    }
+    }*/
   
     public async toggleTorch(): Promise<void> {
       await BarcodeScanner.toggleTorch();
@@ -195,7 +196,8 @@ import { format } from 'date-fns';
               }
             }
             listener.remove();
-            this.closeModal(event.barcode);
+            //this.closeModal(event.barcode);
+            this.closeModal();
           });
         },
       );
@@ -218,5 +220,9 @@ import { format } from 'date-fns';
       document.querySelector('body')?.classList.remove('barcode-scanning-active');
   
       await BarcodeScanner.stopScan();
+    }
+
+    closeModal() {
+      this.close.emit(); // Emit close event
     }
   }

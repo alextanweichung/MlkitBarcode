@@ -1,4 +1,4 @@
-<ion-content class="bca">
+<ion-content class="bca" *ngIf="!isScanning">
    <ion-segment [scrollable]="true" [(ngModel)]="selectedScanningMethod" (ionChange)="scanningMethodChanged()">
       <ion-segment-button value="I">
          <ion-label>By Item</ion-label>
@@ -146,3 +146,6 @@
       </ng-template>
    </ion-modal>
 </ion-content>
+
+<!-- Scanning Modal - Visible when scanning -->
+<app-barcode-scanning *ngIf="isScanning" (close)="closeScanningModal()"></app-barcode-scanning>
