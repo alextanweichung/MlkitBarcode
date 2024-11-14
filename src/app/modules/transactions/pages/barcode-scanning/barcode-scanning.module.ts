@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 
 import { BarcodeScanningRoutingModule } from './barcode-scanning-routing.module';
 
@@ -9,5 +9,6 @@ import { BarcodeScanningPage } from './barcode-scanning.page';
 @NgModule({
   imports: [SharedTestingModule, BarcodeScanningRoutingModule],
   declarations: [BarcodeScanningPage, BarcodeScanningModalComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class BarcodeScanningModule {}
