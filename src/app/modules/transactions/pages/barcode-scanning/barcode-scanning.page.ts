@@ -1,6 +1,7 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { DialogService } from '../../../../core/services/dialog/dialog.service';
+import { NavController } from '@ionic/angular';
 import {
   Barcode,
   BarcodeFormat,
@@ -35,6 +36,7 @@ export class BarcodeScanningPage implements OnInit {
   constructor(
     private readonly dialogService: DialogService,
     private readonly ngZone: NgZone,
+    private navCtrl: NavController
   ) {}
 
   public ngOnInit(): void {
@@ -59,6 +61,10 @@ export class BarcodeScanningPage implements OnInit {
         },
       );
     });
+  }
+
+  goBack() {
+    this.navCtrl.back();
   }
 
   public async startScan(): Promise<void> {
