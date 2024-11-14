@@ -73,6 +73,7 @@ export class BarcodeScanInputPage
   public isScanning = false;
 
   @Output() onItemAdd = new EventEmitter<any>();
+  @Output() onDoneScanning = new EventEmitter<string>();
 
   constructor(
     private authService: AuthService,
@@ -991,10 +992,15 @@ export class BarcodeScanInputPage
           if (barcode) {
             // Store scanned barcode or trigger any further actions needed
             this.barcodes = [barcode];
-            this.onItemAdd.emit(barcode.displayValue); // Emit the scanned value
+            
           }
         });
         await element.present();
+        for(const barcodeData of this.barcodes){
+          const checkData = this.manipulateBarcodeCheckDigit(barcodeData.displayValue);
+          await this.onDoneScanning.emit(checkData);
+        }
+        
       } else {
         console.log('Barcode scanning is not supported on this device.');
       }
