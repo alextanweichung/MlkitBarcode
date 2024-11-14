@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { NavController, ModalController } from '@ionic/angular';
+import { NavController, ModalController, AlertController } from '@ionic/angular';
 import {
   Barcode,
   BarcodeFormat,
@@ -35,7 +35,8 @@ export class BarcodeScanningPage implements OnInit {
   constructor(
     private readonly ngZone: NgZone,
     private navController: NavController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private alertController: AlertController
   ) {}
 
   public ngOnInit(): void {
@@ -71,26 +72,59 @@ export class BarcodeScanningPage implements OnInit {
   }
 
   public async startScan(): Promise<void> {
-    const formats = this.formGroup.get('formats')?.value || [];
-    const lensFacing =
-      this.formGroup.get('lensFacing')?.value || LensFacing.Back;
-    const element = await this.modalController.create({
-      component: BarcodeScanningModalComponent,
-      // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-      cssClass: 'barcode-scanning-modal',
-      showBackdrop: false,
-      componentProps: {
-        formats: formats,
-        lensFacing: lensFacing,
-      },
-    });
-    element.onDidDismiss().then((result) => {
-      const barcode: Barcode | undefined = result.data?.barcode;
-      if (barcode) {
-        this.barcodes = [barcode];
-      }
-    });
+    const allowed = await this.checkPermission();
+    if (allowed){
+      const formats = this.formGroup.get('formats')?.value || [];
+      const lensFacing =
+        this.formGroup.get('lensFacing')?.value || LensFacing.Back;
+      const element = await this.modalController.create({
+        component: BarcodeScanningModalComponent,
+        // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+        cssClass: 'barcode-scanning-modal',
+        showBackdrop: false,
+        componentProps: {
+          formats: formats,
+          lensFacing: lensFacing,
+        },
+      });
+      element.onDidDismiss().then((result) => {
+        const barcode: Barcode | undefined = result.data?.barcode;
+        if (barcode) {
+          this.barcodes = [barcode];
+        }
+      });
+    }
   }
+
+  async checkPermission() {
+    return new Promise(async (resolve) => {
+       const status = await BarcodeScanner.checkPermissions();
+       if (status.camera === "granted") {
+          resolve(true);
+       } else if (status.camera === "denied") {
+          const alert = await this.alertController.create({
+             header: "No permission",
+             message: "Please allow camera access in your setting",
+             buttons: [
+                {
+                   text: "Open Settings",
+                   handler: () => {
+                      BarcodeScanner.openSettings();
+                      resolve(false);
+                   },
+                },
+                {
+                   text: "No",
+                   role: "cancel",
+                },
+             ],
+          });
+          await alert.present();
+       } else {
+          resolve(false);
+       }
+    });
+ }
 
   public async readBarcodeFromImage(): Promise<void> {
     const { files } = await FilePicker.pickImages({ limit: 1 });
