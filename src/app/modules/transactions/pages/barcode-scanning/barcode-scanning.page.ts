@@ -64,7 +64,11 @@ export class BarcodeScanningPage implements OnInit {
   }
 
   goBack() {
-    this.navCtrl.back();
+    try {
+      this.navCtrl.navigateBack("/transactions");
+   } catch (e) {
+      console.error(e);
+   }
   }
 
   public async startScan(): Promise<void> {
