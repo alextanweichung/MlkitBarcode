@@ -23,8 +23,6 @@ import {
   ViewWillEnter,
   ModalController,
 } from '@ionic/angular';
- 
-import { DialogService } from '../../../core/services/dialog/dialog.service';
 import { BarcodeScanningModalComponent } from './barcode-scan-input.component';
  
 import {
@@ -70,7 +68,6 @@ export class BarcodeScanInputPage
     private commonService: CommonService,
     private toastService: ToastService,
     private alertController: AlertController,
-    private readonly dialogService: DialogService,
     private modalController: ModalController,
     private ngZone: NgZone
   ) {}

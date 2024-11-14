@@ -86,6 +86,9 @@ export class BarcodeScanningPage implements OnInit {
       const barcode: Barcode | undefined = result.data?.barcode;
       if (barcode) {
         this.barcodes = [barcode];
+        for(const barcodeData of this.barcodes){
+          barcodeData.rawValue;
+        }
       }
     });
   }

@@ -25,7 +25,7 @@ import { InputCustomEvent } from '@ionic/angular';
       <ion-toolbar>
         <ion-title>Scanning</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="closeModal()">
+          <ion-button>
             <ion-icon name="close"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -95,7 +95,6 @@ export class BarcodeScanningModalComponent
   public maxZoomRatio: number | undefined;
 
   constructor(
-    private readonly dialogService: DialogService,
     private readonly ngZone: NgZone,
   ) {}
 
@@ -124,11 +123,11 @@ export class BarcodeScanningModalComponent
     });
   }
 
-  public async closeModal(barcode?: Barcode): Promise<void> {
+  /*public async closeModal(barcode?: Barcode): Promise<void> {
     this.dialogService.dismissModal({
       barcode: barcode,
     });
-  }
+  }*/
 
   public async toggleTorch(): Promise<void> {
     await BarcodeScanner.toggleTorch();
@@ -190,7 +189,7 @@ export class BarcodeScanningModalComponent
             }
           }
           listener.remove();
-          this.closeModal(event.barcode);
+          //this.closeModal(event.barcode);
         });
       },
     );
