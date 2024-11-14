@@ -1,7 +1,6 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { DialogService } from '../../../../core/services/dialog/dialog.service';
-import { NavController } from '@ionic/angular';
+import { NavController, ModalController } from '@ionic/angular';
 import {
   Barcode,
   BarcodeFormat,
@@ -34,9 +33,9 @@ export class BarcodeScanningPage implements OnInit {
     'https://github.com/capawesome-team/capacitor-barcode-scanning';
 
   constructor(
-    private readonly dialogService: DialogService,
     private readonly ngZone: NgZone,
-    private navController: NavController
+    private navController: NavController,
+    private modalController: ModalController
   ) {}
 
   public ngOnInit(): void {
@@ -75,7 +74,7 @@ export class BarcodeScanningPage implements OnInit {
     const formats = this.formGroup.get('formats')?.value || [];
     const lensFacing =
       this.formGroup.get('lensFacing')?.value || LensFacing.Back;
-    const element = await this.dialogService.showModal({
+    const element = await this.modalController.create({
       component: BarcodeScanningModalComponent,
       // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
       cssClass: 'barcode-scanning-modal',

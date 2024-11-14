@@ -8,7 +8,7 @@ import {
     OnInit,
     ViewChild,
   } from '@angular/core';
-  import { DialogService } from '../../../../core/services/dialog/dialog.service';
+  import { ModalController } from '@ionic/angular';
   import {
     Barcode,
     BarcodeFormat,
@@ -95,8 +95,8 @@ import {
     public maxZoomRatio: number | undefined;
   
     constructor(
-      private readonly dialogService: DialogService,
       private readonly ngZone: NgZone,
+      private modalController: ModalController
     ) {}
   
     public ngOnInit(): void {
@@ -125,7 +125,7 @@ import {
     }
   
     public async closeModal(barcode?: Barcode): Promise<void> {
-      this.dialogService.dismissModal({
+      this.modalController.dismiss({
         barcode: barcode,
       });
     }
