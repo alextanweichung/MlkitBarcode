@@ -6,6 +6,58 @@
     <ion-title>Barcode Scanning</ion-title>
   </ion-toolbar>
 </ion-header>
+<ion-popover>
+  <ng-template>
+    <ion-content class="p-2">
+      <ion-list
+        class="list-custom animate__animated animate__fadeIn"
+        lines="full"
+      >
+        <ion-item>
+          <ion-label>
+            <div>View Price</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+<ion-segment [scrollable]="true">
+  <ion-segment-button value="I">
+    <ion-label>By Item</ion-label>
+  </ion-segment-button>
+  <ion-segment-button value="B">
+    <ion-label>By BarcodeS</ion-label>
+  </ion-segment-button>
+</ion-segment>
+
+<ion-grid class="ion-no-padding">
+  <ion-row>
+    <ion-col class="ion-flex ion-margin-auto">
+      <input
+        #barcodeInput
+        class="p-2 ion-flex ion-text-center"
+        enterkeyhint="enter"
+        placeholder="Enter or Scan Barcode"
+      />
+      <input
+        #itemInput
+        class="p-2 ion-flex ion-text-center"
+        enterkeyhint="enter"
+        placeholder="Enter or Scan Item Code/Sku"
+      />
+    </ion-col>
+    <ion-col class="ion-flex ion-margin-auto justify-content-end">
+      <ion-button fill="clear" [disabled]="!isSupported">
+        <i slot="icon-only" class="fas fa-camera"></i>
+      </ion-button>
+      <ion-button fill="clear">
+        <i slot="icon-only" class="fas fa-keyboard"></i>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
 
 <ion-content>
   <ion-card>
@@ -73,31 +125,36 @@
             >
           </ion-select>
         </ion-item>
-        <ion-button class="ion-margin-vertical"
+        <ion-button
+          class="ion-margin-vertical"
           expand="block"
           (click)="startScan()"
           [disabled]="!isSupported"
           >Start Scan</ion-button
         >
-        <ion-button class="ion-margin-vertical"
+        <ion-button
+          class="ion-margin-vertical"
           expand="block"
           (click)="readBarcodeFromImage()"
           [disabled]="!isSupported"
           >Read Barcode From Image</ion-button
         >
-        <ion-button class="ion-margin-vertical" 
-        expand="block" 
-        (click)="scan()" 
-        [disabled]="!isSupported"
+        <ion-button
+          class="ion-margin-vertical"
+          expand="block"
+          (click)="scan()"
+          [disabled]="!isSupported"
           >Scan</ion-button
         >
-        <ion-button class="ion-margin-vertical"
+        <ion-button
+          class="ion-margin-vertical"
           expand="block"
           (click)="openSettings()"
           [disabled]="!isSupported"
           >Open Settings</ion-button
         >
-        <ion-button class="ion-margin-vertical"
+        <ion-button
+          class="ion-margin-vertical"
           expand="block"
           (click)="requestPermissions()"
           [disabled]="isPermissionGranted"

@@ -969,7 +969,7 @@ export class BarcodeScanInputPage
     } else {
       console.log("Barcode scanning is not supported on this device.");
     }
-    /*try {
+    try {
       // Set up the modal for barcode scanning
       const element = await this.modalController.create({
         component: BarcodeScanningModalComponent,
@@ -992,7 +992,7 @@ export class BarcodeScanInputPage
       await element.present();
     } catch (error) {
       console.error('Error showing modal:', error);
-    }*/
+    }
   }
  
   async checkPermission(): Promise<boolean> {
