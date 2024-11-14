@@ -111,34 +111,31 @@
             [readonly]="true"
           ></ion-input>
         </ion-item>
-        <ion-button
+        <ion-button class="ion-margin-horizontal"
           expand="block"
           (click)="startScan()"
           [disabled]="!isSupported"
           >Start Scan</ion-button
         >
-        <ion-button
+        <ion-button class="ion-margin-horizontal"
           expand="block"
           (click)="readBarcodeFromImage()"
           [disabled]="!isSupported"
           >Read Barcode From Image</ion-button
         >
-        <ion-button expand="block" (click)="scan()" [disabled]="!isSupported"
+        <ion-button class="ion-margin-horizontal" 
+        expand="block" 
+        (click)="scan()" 
+        [disabled]="!isSupported"
           >Scan</ion-button
         >
-        <ion-button
+        <ion-button class="ion-margin-horizontal"
           expand="block"
           (click)="openSettings()"
           [disabled]="!isSupported"
           >Open Settings</ion-button
         >
-        <ion-button
-          expand="block"
-          (click)="installGoogleBarcodeScannerModule()"
-          [disabled]="!isSupported"
-          >Install Google Barcode Scanner Module</ion-button
-        >
-        <ion-button
+        <ion-button class="ion-margin-horizontal"
           expand="block"
           (click)="requestPermissions()"
           [disabled]="isPermissionGranted"

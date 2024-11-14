@@ -12,6 +12,7 @@ import {
 } from '@capacitor-mlkit/barcode-scanning';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
+import { element } from 'protractor';
 
 @Component({
   selector: 'app-barcode-scanning',
@@ -65,14 +66,6 @@ export class BarcodeScanningPage implements OnInit {
     });
   }
 
-  goBack() {
-    try {
-      this.navController.navigateBack('/transactions');
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   public async startScan(): Promise<void> {
     const formats = this.formGroup.get('formats')?.value || [];
     const lensFacing =
@@ -87,6 +80,8 @@ export class BarcodeScanningPage implements OnInit {
         lensFacing: lensFacing,
       },
     });
+    await element.present();
+
     element.onDidDismiss().then((result) => {
       const barcode: Barcode | undefined = result.data?.barcode;
       if (barcode) {
@@ -119,10 +114,6 @@ export class BarcodeScanningPage implements OnInit {
 
   public async openSettings(): Promise<void> {
     await BarcodeScanner.openSettings();
-  }
-
-  public async installGoogleBarcodeScannerModule(): Promise<void> {
-    await BarcodeScanner.installGoogleBarcodeScannerModule();
   }
 
   public async requestPermissions(): Promise<void> {

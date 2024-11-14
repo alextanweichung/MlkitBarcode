@@ -6,7 +6,7 @@ import {
   ModalController,
   PopoverController,
 } from '@ionic/angular';
-import { SharedTestingModule } from '@tests/modules';
+import { SharedTestingModule } from '@tests/modules/shared-testing.module';
 import { DialogService } from './dialog.service';
 
 describe('DialogService', () => {

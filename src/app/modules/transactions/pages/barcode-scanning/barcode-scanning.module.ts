@@ -3,6 +3,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IonicModule, NavController } from '@ionic/angular';
 
+import { SharedTestingModule } from '@tests/modules/shared-testing.module';
+
 import { BarcodeScanningRoutingModule } from './barcode-scanning-routing.module';
 import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
 import { BarcodeScanningPage } from './barcode-scanning.page';

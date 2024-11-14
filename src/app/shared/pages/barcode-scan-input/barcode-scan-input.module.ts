@@ -22,7 +22,6 @@ import { IdToCodeMappingModule } from "../../pipes/id-to-code-mapping/id-to-code
         IdToCodeMappingModule,
         BarcodeScanInputPageRoutingModule,
         HideKeyboardModule,
-        SharedTestingModule
     ],
     declarations:[BarcodeScanInputPage, BarcodeScanningModalComponent],
     exports: [BarcodeScanInputPage]
