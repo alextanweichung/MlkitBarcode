@@ -6,8 +6,9 @@ import {
   OnInit,
   Output,
   ViewChild,
-  NgZone
+  NgZone,
 } from '@angular/core';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Keyboard } from '@capacitor/keyboard';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { ConfigService } from 'src/app/services/config/config.service';
@@ -24,7 +25,7 @@ import {
   ModalController,
 } from '@ionic/angular';
 import { BarcodeScanningModalComponent } from './barcode-scan-input.component';
- 
+
 import {
   Barcode,
   BarcodeFormat,
@@ -33,7 +34,7 @@ import {
   StartScanOptions,
 } from '@capacitor-mlkit/barcode-scanning';
 import { InventoryLevelRetailPage } from 'src/app/modules/transactions/pages/inventory-level-retail/inventory-level-retail.page';
- 
+
 @Component({
   selector: 'app-barcode-scan-input',
   templateUrl: './barcode-scan-input.page.html',
@@ -46,22 +47,33 @@ export class BarcodeScanInputPage
   @Input() itemVariationXMasterList: MasterListDetails[] = [];
   @Input() itemVariationYMasterList: MasterListDetails[] = [];
   @Input() itemUomMasterList: MasterListDetails[] = [];
- 
+
   moduleControl: ModuleControl[];
   systemWideEAN13IgnoreCheckDigit: boolean = false;
   systemWideScanningMethod: string;
   systemWideBlockConvertedCode: boolean = false;
   detectionBox;
- 
+
   selectedScanningMethod: string = 'B';
- 
+
+  // Barcode Here::
+  public readonly barcodeFormat = BarcodeFormat;
+  public readonly lensFacing = LensFacing;
+
+  public formGroup = new UntypedFormGroup({
+    formats: new UntypedFormControl([]),
+    lensFacing: new UntypedFormControl(LensFacing.Back),
+    googleBarcodeScannerModuleInstallState: new UntypedFormControl(0),
+    googleBarcodeScannerModuleInstallProgress: new UntypedFormControl(0),
+  });
+
   public isSupported = false;
   public isPermissionGranted = false;
   public barcodes: Barcode[] = [];
-  public isScanning =  false;
- 
+  public isScanning = false;
+
   @Output() onItemAdd = new EventEmitter<any>();
- 
+
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
@@ -71,15 +83,15 @@ export class BarcodeScanInputPage
     private modalController: ModalController,
     private ngZone: NgZone
   ) {}
- 
+
   ionViewWillEnter(): void {
     this.setFocus();
   }
- 
+
   ionViewDidEnter(): void {
     this.setFocus();
   }
- 
+
   ngOnInit() {
     this.loadModuleControl();
     BarcodeScanner.isSupported().then((result) => {
@@ -89,7 +101,7 @@ export class BarcodeScanInputPage
       this.isPermissionGranted = result.camera === 'granted';
     });
   }
- 
+
   showKeyboard(event) {
     event.preventDefault();
     this.setFocus();
@@ -97,7 +109,7 @@ export class BarcodeScanInputPage
     Keyboard.show();
     // }, 100);
   }
- 
+
   configSystemWideActivateMultiUOM: boolean = false;
   configItemVariationShowMatrix: boolean = false;
   configItemVariationMatrixShowCodeDesc: boolean = false;
@@ -106,7 +118,7 @@ export class BarcodeScanInputPage
     this.authService.moduleControlConfig$.subscribe(
       (obj) => {
         this.moduleControl = obj;
- 
+
         let ignoreCheckdigit = this.moduleControl.find(
           (x) => x.ctrlName === 'SystemWideEAN13IgnoreCheckDigit'
         );
@@ -114,14 +126,14 @@ export class BarcodeScanInputPage
           this.systemWideEAN13IgnoreCheckDigit =
             ignoreCheckdigit.ctrlValue.toUpperCase() == 'Y' ? true : false;
         }
- 
+
         let scanningMethod = this.moduleControl.find(
           (x) => x.ctrlName === 'SystemWideScanningMethod'
         );
         if (scanningMethod != undefined) {
           this.systemWideScanningMethod = scanningMethod.ctrlValue;
         }
- 
+
         let blockConvertedCode = this.moduleControl.find(
           (x) => x.ctrlName === 'SystemWideBlockConvertedCode'
         );
@@ -131,7 +143,7 @@ export class BarcodeScanInputPage
         } else {
           this.systemWideBlockConvertedCode = false;
         }
- 
+
         let itemVariationShowMatrix = this.moduleControl.find(
           (x) => x.ctrlName === 'ItemVariationShowMatrix'
         );
@@ -143,7 +155,7 @@ export class BarcodeScanInputPage
         } else {
           this.configItemVariationShowMatrix = false;
         }
- 
+
         let itemVariationMatrixShowCodeDesc = this.moduleControl.find(
           (x) => x.ctrlName === 'ItemVariationMatrixShowCodeDesc'
         );
@@ -155,7 +167,7 @@ export class BarcodeScanInputPage
         } else {
           this.configItemVariationMatrixShowCodeDesc = false;
         }
- 
+
         let activateMultiUom = this.moduleControl.find(
           (x) => x.ctrlName === 'SystemWideActivateMultiUOM'
         )?.ctrlValue;
@@ -164,7 +176,7 @@ export class BarcodeScanInputPage
         } else {
           this.configSystemWideActivateMultiUOM = false;
         }
- 
+
         let systemWideBarcodeScanBeep = this.moduleControl.find(
           (x) => x.ctrlName === 'SystemWideBarcodeScanBeep'
         )?.ctrlValue;
@@ -182,7 +194,7 @@ export class BarcodeScanInputPage
       }
     );
   }
- 
+
   handleBarcodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
       // setTimeout(() => {
@@ -195,7 +207,7 @@ export class BarcodeScanInputPage
       // }, 0);
     }
   }
- 
+
   manipulateBarcodeCheckDigit(itemBarcode: string) {
     if (itemBarcode) {
       if (this.systemWideEAN13IgnoreCheckDigit) {
@@ -206,14 +218,14 @@ export class BarcodeScanInputPage
     }
     return itemBarcode;
   }
- 
+
   /* #region scan */
- 
+
   @ViewChild(InventoryLevelRetailPage)
   inventorylevelretailPage: InventoryLevelRetailPage;
   // barcodeSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
- 
+
   async validateBarcode(barcode: string, emit: boolean = true) {
     setTimeout(async () => {
       if (barcode) {
@@ -307,7 +319,7 @@ export class BarcodeScanInputPage
     }, 0);
     return null;
   }
- 
+
   async handleItemCodeKeyDown(e: any, key: string) {
     if (e.keyCode === 13) {
       await this.validateItem(key);
@@ -315,7 +327,7 @@ export class BarcodeScanInputPage
       this.setFocus();
     }
   }
- 
+
   itemSearchValue: string;
   availableItemmmm: TransactionDetail[] = [];
   availableVariations: TransactionDetail[] = [];
@@ -646,11 +658,11 @@ export class BarcodeScanInputPage
       }
     }
   }
- 
+
   /* #endregion */
- 
+
   /* #region modal for user to select item (if more than 1 item found when they search) */
- 
+
   itemModalOpen: boolean = false;
   async showItemModal() {
     if (this.availableItemmmm && this.availableItemmmm.length > 0) {
@@ -660,12 +672,12 @@ export class BarcodeScanInputPage
     }
     this.itemModalOpen = true;
   }
- 
+
   hideItemModel() {
     this.itemModalOpen = false;
     this.setFocus();
   }
- 
+
   availableVariationsByItemId: TransactionDetail[] = [];
   async showVariations(item: TransactionDetail) {
     this.availableVariationsByItemId = [];
@@ -840,21 +852,21 @@ export class BarcodeScanInputPage
       }
     }
   }
- 
+
   /* #endregion */
- 
+
   /* #region modal for user to select item variation (final layer) */
- 
+
   variationModalOpen: boolean = false;
   showVariationModal() {
     this.variationModalOpen = true;
   }
- 
+
   hideVariationModel() {
     this.variationModalOpen = false;
     this.setFocus();
   }
- 
+
   addVariations() {
     if (!this.configItemVariationShowMatrix) {
       let found = this.availableVariationsByItemId.filter((r) => r.isSelected);
@@ -918,15 +930,15 @@ export class BarcodeScanInputPage
     this.hideVariationModel();
     this.hideItemModel();
   }
- 
+
   /* #endregion */
- 
+
   /* #region focus */
- 
+
   scanningMethodChanged() {
     this.setFocus();
   }
- 
+
   setFocus() {
     setTimeout(() => {
       if (this.selectedScanningMethod === 'B') {
@@ -936,68 +948,64 @@ export class BarcodeScanInputPage
       }
     }, 0);
   }
- 
+
   focusBarcodeSearch() {
     this.barcodeInput.nativeElement.focus();
   }
- 
+
   focusItemSearch() {
     this.itemInput.nativeElement.focus();
   }
- 
+
   highlight(event) {
     event.getInputElement().then((r) => {
       r.select();
     });
   }
- 
+
   /* #endregion */
- 
+
   /* #region camera scanner */
- 
+
   public async startScanning(): Promise<void> {
-    //const formats = this.formGroup.get('formats')?.value || [];
-    //const lensFacing =
-    //this.formGroup.get('lensFacing')?.value || LensFacing.Back;
- 
-    if (this.isSupported) {
-      const modal = await this.modalController.create({
-        component: BarcodeScanningModalComponent,
-        cssClass: 'barcode-scanning-modal'
-      });
-      await modal.present();
-    } else {
-      console.log("Barcode scanning is not supported on this device.");
-    }
+    const formats = this.formGroup.get('formats')?.value || [];
+    const lensFacing =
+      this.formGroup.get('lensFacing')?.value || LensFacing.Back;
+
     try {
       // Set up the modal for barcode scanning
-      const element = await this.modalController.create({
-        component: BarcodeScanningModalComponent,
-        // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-        cssClass: 'barcode-scanning-modal',
-        showBackdrop: true,
-        backdropDismiss: true,
-        componentProps: {
-          lensFacing: LensFacing.Back,
-        },
-      });
-      element.onDidDismiss().then((result) => {
-        const barcode: Barcode | undefined = result.data?.barcode;
-        if (barcode) {
-          // Store scanned barcode or trigger any further actions needed
-          this.barcodes = [barcode];
-          this.onItemAdd.emit(barcode.displayValue); // Emit the scanned value
-        }
-      });
-      await element.present();
+      if (this.isSupported) {
+        const element = await this.modalController.create({
+          component: BarcodeScanningModalComponent,
+          // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+          cssClass: 'barcode-scanning-modal',
+          showBackdrop: true,
+          backdropDismiss: true,
+          componentProps: {
+            formats: BarcodeFormat.Code128,
+            lensFacing: LensFacing.Back,
+          },
+        });
+        element.onDidDismiss().then((result) => {
+          const barcode: Barcode | undefined = result.data?.barcode;
+          if (barcode) {
+            // Store scanned barcode or trigger any further actions needed
+            this.barcodes = [barcode];
+            this.onItemAdd.emit(barcode.displayValue); // Emit the scanned value
+          }
+        });
+        await element.present();
+      } else {
+        console.log('Barcode scanning is not supported on this device.');
+      }
     } catch (error) {
       console.error('Error showing modal:', error);
     }
   }
- 
-  async checkPermission(): Promise<boolean> {
+
+  /*async checkPermission(): Promise<boolean> {
     const status = await BarcodeScanner.checkPermissions();
- 
+
     if (status.camera === 'granted') {
       return true;
     } else if (status.camera === 'denied') {
@@ -1020,22 +1028,22 @@ export class BarcodeScanInputPage
       await alert.present();
       return false;
     }
- 
+
     return false;
-  }
- 
-  stopScanner() {
+  }*/
+
+  /*stopScanner() {
     BarcodeScanner.stopScan();
   }
- 
+
   closeScanningModal(): void {
-   this.isScanning = false; // Set to false to hide the scanning modal
-   BarcodeScanner.stopScan();
- }
- 
+    this.isScanning = false; // Set to false to hide the scanning modal
+    BarcodeScanner.stopScan();
+  }*/
+
   /* #endregion */
 }
- 
+
 const myAudioContext = new AudioContext();
 function beep(duration, frequency, volume) {
   return new Promise((resolve, reject) => {
@@ -1043,26 +1051,26 @@ function beep(duration, frequency, volume) {
     duration = duration || 200;
     frequency = frequency || 440;
     volume = volume || 100;
- 
+
     try {
       let oscillatorNode = myAudioContext.createOscillator();
       let gainNode = myAudioContext.createGain();
       oscillatorNode.connect(gainNode);
- 
+
       // Set the oscillator frequency in hertz
       oscillatorNode.frequency.value = frequency;
- 
+
       // Set the type of oscillator
       oscillatorNode.type = 'square';
       gainNode.connect(myAudioContext.destination);
- 
+
       // Set the gain to the volume
       gainNode.gain.value = volume * 0.01;
- 
+
       // Start audio with the desired duration
       oscillatorNode.start(myAudioContext.currentTime);
       oscillatorNode.stop(myAudioContext.currentTime + duration * 0.001);
- 
+
       // Resolve the promise when the sound is finished
       oscillatorNode.onended = () => {
         resolve(true);

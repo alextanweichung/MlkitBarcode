@@ -8,7 +8,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { DialogService } from '../../../core/services/dialog/dialog.service';
+import { ModalController } from '@ionic/angular';
 import {
   Barcode,
   BarcodeFormat,
@@ -25,7 +25,7 @@ import { InputCustomEvent } from '@ionic/angular';
       <ion-toolbar>
         <ion-title>Scanning</ion-title>
         <ion-buttons slot="end">
-          <ion-button>
+          <ion-button (click)="closeModal()">
             <ion-icon name="close"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -96,6 +96,7 @@ export class BarcodeScanningModalComponent
 
   constructor(
     private readonly ngZone: NgZone,
+    private modalController: ModalController
   ) {}
 
   public ngOnInit(): void {
@@ -123,11 +124,11 @@ export class BarcodeScanningModalComponent
     });
   }
 
-  /*public async closeModal(barcode?: Barcode): Promise<void> {
-    this.dialogService.dismissModal({
+  public async closeModal(barcode?: Barcode): Promise<void> {
+    this.modalController.dismiss({
       barcode: barcode,
     });
-  }*/
+  }
 
   public async toggleTorch(): Promise<void> {
     await BarcodeScanner.toggleTorch();
@@ -189,7 +190,7 @@ export class BarcodeScanningModalComponent
             }
           }
           listener.remove();
-          //this.closeModal(event.barcode);
+          this.closeModal(event.barcode);
         });
       },
     );
