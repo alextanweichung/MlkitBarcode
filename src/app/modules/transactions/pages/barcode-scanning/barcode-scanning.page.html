@@ -10,24 +10,6 @@
 <ion-content>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>About</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      ⚡️ Capacitor plugin for scanning barcodes and QR codes.
-    </ion-card-content>
-    <ion-row class="ion-no-padding">
-      <ion-col>
-        <ion-button
-          fill="clear"
-          (click)="openOnGithub()"
-          class="ion-float-right"
-          >GitHub</ion-button
-        >
-      </ion-col>
-    </ion-row>
-  </ion-card>
-  <ion-card>
-    <ion-card-header>
       <ion-card-title>Demo</ion-card-title>
     </ion-card-header>
     <ion-card-content>
@@ -91,51 +73,31 @@
             >
           </ion-select>
         </ion-item>
-        <ion-item>
-          <ion-label position="fixed"
-            >Google Barcode Scanner Module Install State</ion-label
-          >
-          <ion-input
-            formControlName="googleBarcodeScannerModuleInstallState"
-            type="number"
-            [readonly]="true"
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="fixed"
-            >Google Barcode Scanner Module Install Progress</ion-label
-          >
-          <ion-input
-            formControlName="googleBarcodeScannerModuleInstallProgress"
-            type="number"
-            [readonly]="true"
-          ></ion-input>
-        </ion-item>
-        <ion-button class="ion-margin-horizontal"
+        <ion-button class="ion-margin-vertical"
           expand="block"
           (click)="startScan()"
           [disabled]="!isSupported"
           >Start Scan</ion-button
         >
-        <ion-button class="ion-margin-horizontal"
+        <ion-button class="ion-margin-vertical"
           expand="block"
           (click)="readBarcodeFromImage()"
           [disabled]="!isSupported"
           >Read Barcode From Image</ion-button
         >
-        <ion-button class="ion-margin-horizontal" 
+        <ion-button class="ion-margin-vertical" 
         expand="block" 
         (click)="scan()" 
         [disabled]="!isSupported"
           >Scan</ion-button
         >
-        <ion-button class="ion-margin-horizontal"
+        <ion-button class="ion-margin-vertical"
           expand="block"
           (click)="openSettings()"
           [disabled]="!isSupported"
           >Open Settings</ion-button
         >
-        <ion-button class="ion-margin-horizontal"
+        <ion-button class="ion-margin-vertical"
           expand="block"
           (click)="requestPermissions()"
           [disabled]="isPermissionGranted"
