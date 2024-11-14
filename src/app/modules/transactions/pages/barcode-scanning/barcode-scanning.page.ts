@@ -36,7 +36,7 @@ export class BarcodeScanningPage implements OnInit {
   constructor(
     private readonly dialogService: DialogService,
     private readonly ngZone: NgZone,
-    private navCtrl: NavController
+    private navController: NavController
   ) {}
 
   public ngOnInit(): void {
@@ -65,7 +65,7 @@ export class BarcodeScanningPage implements OnInit {
 
   goBack() {
     try {
-      this.navCtrl.navigateBack("/transactions");
+      this.navController.navigateBack("/transactions");
    } catch (e) {
       console.error(e);
    }
