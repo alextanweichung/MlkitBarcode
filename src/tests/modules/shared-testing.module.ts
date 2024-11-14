@@ -4,17 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 
-// Mock classes for testing
-class NavControllerMock {
-  navigateForward = jest.fn();
-  navigateBack = jest.fn();
-  setDirection = jest.fn();
-}
-
-class RouterMock {
-  navigate = jest.fn();
-}
-
 @NgModule({
   imports: [
     CommonModule,
@@ -24,8 +13,8 @@ class RouterMock {
   ],
   declarations: [],
   providers: [
-    { provide: NavController, useClass: NavControllerMock },
-    { provide: Router, useClass: RouterMock },
+    { provide: NavController, useValue: {} },
+    { provide: Router, useValue: {} },
   ],
   exports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
