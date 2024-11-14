@@ -403,7 +403,7 @@ export class InventoryLevelTradingPage implements OnInit, ViewWillEnter {
       }
    }
 
-   async onDoneScanning(barcode: any) {
+   async onDoneScanning(barcode: string) {
       if (barcode) {
          await this.barcodescaninput.validateBarcode(barcode);
          // if (this.configMobileScanItemContinuous) {

@@ -33,7 +33,6 @@ import {
   LensFacing,
   StartScanOptions,
 } from '@capacitor-mlkit/barcode-scanning';
-import { InventoryLevelRetailPage } from 'src/app/modules/transactions/pages/inventory-level-retail/inventory-level-retail.page';
 
 @Component({
   selector: 'app-barcode-scan-input',
@@ -222,11 +221,8 @@ export class BarcodeScanInputPage
 
   /* #region scan */
 
-  @ViewChild(InventoryLevelRetailPage)
-  inventorylevelretailPage: InventoryLevelRetailPage;
   // barcodeSearchValue: string;
   @ViewChild('barcodeInput', { static: false }) barcodeInput: ElementRef;
-
   async validateBarcode(barcode: string, emit: boolean = true) {
     setTimeout(async () => {
       if (barcode) {
@@ -992,15 +988,20 @@ export class BarcodeScanInputPage
           if (barcode) {
             // Store scanned barcode or trigger any further actions needed
             this.barcodes = [barcode];
-            
+            let checkData: string;
+            for (const barcodeData of this.barcodes) {
+              checkData = this.manipulateBarcodeCheckDigit(
+                barcodeData.displayValue
+              );
+            }
+            // Set barcode value in input field
+            this.barcodeInput.nativeElement.value = checkData;
+            this.setFocus();
+            this.onDoneScanning.emit(checkData);
           }
         });
+
         await element.present();
-        for(const barcodeData of this.barcodes){
-          const checkData = this.manipulateBarcodeCheckDigit(barcodeData.displayValue);
-          await this.onDoneScanning.emit(checkData);
-        }
-        
       } else {
         console.log('Barcode scanning is not supported on this device.');
       }
