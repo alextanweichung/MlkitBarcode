@@ -994,9 +994,6 @@ export class BarcodeScanInputPage
                 barcodeData.displayValue
               );
             }
-            // Set barcode value in input field
-            this.barcodeInput.nativeElement.value = checkData;
-            this.setFocus();
             this.onDoneScanning.emit(checkData);
           }
         });
