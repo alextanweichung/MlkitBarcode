@@ -1,42 +1,45 @@
 import { Injectable } from '@angular/core';
-import { LoadingController, ModalController } from '@ionic/angular';
-import { CustomLoadingComponent } from '../../shared/pages/custom-loading-input/cusom-loading.component';
+import { LoadingController } from '@ionic/angular';
 
 @Injectable({
-  providedIn: 'root',
+   providedIn: 'root'
 })
 export class LoadingService {
-  loading: HTMLIonLoadingElement;
-  isShowing: boolean = false;
-  private loadingModal: HTMLIonModalElement | null = null; // Store modal instance
 
-  constructor(
-    public loadingController: LoadingController,
-    public modalController: ModalController
-  ) {}
+   loading: HTMLIonLoadingElement;
+   isShowing: boolean = false;
 
-  async showLoading(message: string = 'Loading') {
-    // Check if a modal is already being shown
-    if (this.loadingModal) {
-      return;
-    }
+   constructor(
+      public loadingController: LoadingController
+   ) { }
 
-    // Create and present the modal
-    this.loadingModal = await this.modalController.create({
-      component: CustomLoadingComponent,
-      componentProps: { message },
-      cssClass: 'custom-loading-modal',
-      backdropDismiss: false,
-    });
-    await this.loadingModal.present();
-  }
+   async showLoading(message: string = "Loading", backdropDismiss: boolean = true) {
+      if (!this.isShowing && (this.loading === undefined || this.loading === null)) {
+         this.isShowing = true;
+         this.loading = await this.loadingController.create({
+            cssClass: "default-loading",
+            message: `${message}... Please be patient.`,
+            spinner: "crescent",
+            backdropDismiss: backdropDismiss
+         });
+         this.loading.present();
+      } else {
+         // If loader is showing, only change text, won't create a new loader.
+         this.isShowing = true;
+         this.loading = null;
+         this.loading = await this.loadingController.create({
+            cssClass: "default-loading",
+            message: `${message}... Please be patient.`,
+            spinner: "crescent",
+            backdropDismiss: backdropDismiss
+         });
+         this.loading.present();
+      }
+   }
 
-  async dismissLoading() {
-    // Dismiss the modal if it exists
-    if (this.loadingModal) {
+   dismissLoading() {
       this.isShowing = false;
-      await this.loadingModal.dismiss();
-      this.loadingModal = null; // Reset the reference
-    }
-  }
+      this.loading?.dismiss();
+   }
+
 }

@@ -356,13 +356,13 @@ ion-toolbar {
   --width: 100% !important;
 }
 
-.default-loading .loading-wrapper .load-message {
+.default-loading .loading-wrapper p {
   margin: 0;
   font-size: 16px;
   color: var(--ion-color-dark);
 }
 
-.default-loading .load-content {
+.default-loading .loading-wrapper span {
   font-weight: 400;
   margin-top: 6px;
   display: block;
