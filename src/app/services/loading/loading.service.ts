@@ -18,22 +18,22 @@ export class LoadingService {
          this.isShowing = true;
          this.loading = await this.loadingController.create({
             cssClass: "default-loading",
-            message: `<p>${message}... </p> <span>Please be patient.</span>`,
+            message: `${message}... Please be patient.`,
             spinner: "crescent",
             backdropDismiss: backdropDismiss
          });
-         this.loading.present();
+         await this.loading.present();
       } else {
          // If loader is showing, only change text, won't create a new loader.
          this.isShowing = true;
          this.loading = null;
          this.loading = await this.loadingController.create({
             cssClass: "default-loading",
-            message: `<p>${message}... </p> <span>Please be patient.</span>`,
+            message: `${message}... Please be patient.`,
             spinner: "crescent",
             backdropDismiss: backdropDismiss
          });
-         this.loading.present();
+         await this.loading.present();
       }
    }
 

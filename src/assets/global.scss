@@ -356,17 +356,25 @@ ion-toolbar {
   --width: 100% !important;
 }
 
-.default-loading .loading-wrapper p {
-  margin: 0;
-  font-size: 16px;
-  color: var(--ion-color-dark);
+.default-loading .loading-wrapper {
+  text-align: center; /* Center-align text */
 }
 
-.default-loading .loading-wrapper span {
-  font-weight: 400;
-  margin-top: 6px;
+.default-loading .loading-wrapper::after {
+  content: attr(data-message); /* Display the message */
   display: block;
+  font-size: 16px;
+  color: var(--ion-color-dark);
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.default-loading .loading-wrapper::before {
+  content: "Please be patient.";
+  display: block;
+  font-size: 14px;
   color: var(--ion-color-medium);
+  font-weight: 400;
 }
 
 /* Buttons */
