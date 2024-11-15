@@ -350,31 +350,46 @@ ion-toolbar {
 }
 
 /* Loading controller */
-.default-loading {
+.custom-loading {
   --background: var(--ion-color-white);
+}
+
+.custom-loading .loading-wrapper {
+  display: flex;
+  align-items: center; /* Align spinner and text vertically */
+  justify-content: center; /* Center content */
+}
+
+.loading-message-wrapper {
+  display: flex;
+  align-items: center; /* Align spinner and text vertically */
+  text-align: left;
+}
+
+.loading-spinner {
+  margin-right: 15px; /* Space between spinner and text */
   --spinner-color: var(--ion-color-primary);
-  --width: 100% !important;
+  width: 50px; /* Larger spinner */
+  height: 50px; /* Larger spinner */
 }
 
-.default-loading .loading-wrapper {
-  text-align: center; /* Center-align text */
+.text-content {
+  display: flex;
+  flex-direction: column; /* Stack the two text lines vertically */
+  justify-content: center;
 }
 
-.default-loading .loading-wrapper::after {
-  content: attr(data-message); /* Display the message */
-  display: block;
-  font-size: 16px;
-  color: var(--ion-color-dark);
+.loading-message {
+  font-size: 18px; /* Slightly larger font for "Loading your data..." */
   font-weight: bold;
-  margin-top: 8px;
+  color: var(--ion-color-dark);
+  margin: 0;
 }
 
-.default-loading .loading-wrapper::before {
-  content: "Please be patient.";
-  display: block;
-  font-size: 14px;
+.loading-note {
+  font-size: 16px; /* Smaller font for "Please be patient." */
   color: var(--ion-color-medium);
-  font-weight: 400;
+  margin: 0;
 }
 
 /* Buttons */
