@@ -13,38 +13,29 @@ export class LoadingService {
       public loadingController: LoadingController
    ) { }
 
-   async showLoading(message: string = "Loading your data", backdropDismiss: boolean = true) {
-      const safeMessage = `
-        <div class="loading-message-wrapper">
-          <ion-spinner name="crescent" class="loading-spinner"></ion-spinner>
-          <div class="text-content">
-            <p class="loading-message">${message}</p>
-            <span class="loading-note">Please be patient.</span>
-          </div>
-        </div>`;
-    
+   async showLoading(message: string = "Loading", backdropDismiss: boolean = true) {
       if (!this.isShowing && (this.loading === undefined || this.loading === null)) {
-        this.isShowing = true;
-        this.loading = await this.loadingController.create({
-          cssClass: "custom-loading",
-          message: safeMessage, // Custom HTML message
-          spinner: null, // Disable default spinner
-          backdropDismiss: backdropDismiss,
-        });
-        await this.loading.present();
+         this.isShowing = true;
+         this.loading = await this.loadingController.create({
+            cssClass: "default-loading",
+            message: `<div class="load-message">${message}... </div> <div class="load-content">Please be patient.</div>`,
+            spinner: "crescent",
+            backdropDismiss: backdropDismiss
+         });
+         this.loading.present();
       } else {
-        this.isShowing = true;
-        this.loading = null;
-        this.loading = await this.loadingController.create({
-          cssClass: "custom-loading",
-          message: safeMessage, // Custom HTML message
-          spinner: null, // Disable default spinner
-          backdropDismiss: backdropDismiss,
-        });
-        await this.loading.present();
+         // If loader is showing, only change text, won't create a new loader.
+         this.isShowing = true;
+         this.loading = null;
+         this.loading = await this.loadingController.create({
+            cssClass: "default-loading",
+            message: `<div class="load-message">${message}... </div> <div class="load-content">Please be patient.</div>`,
+            spinner: "crescent",
+            backdropDismiss: backdropDismiss
+         });
+         this.loading.present();
       }
-    }
-    
+   }
 
    dismissLoading() {
       this.isShowing = false;

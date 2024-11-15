@@ -350,46 +350,23 @@ ion-toolbar {
 }
 
 /* Loading controller */
-.custom-loading {
+.default-loading {
   --background: var(--ion-color-white);
-}
-
-.custom-loading .loading-wrapper {
-  display: flex;
-  align-items: center; /* Align spinner and text vertically */
-  justify-content: center; /* Center content */
-}
-
-.loading-message-wrapper {
-  display: flex;
-  align-items: center; /* Align spinner and text vertically */
-  text-align: left;
-}
-
-.loading-spinner {
-  margin-right: 15px; /* Space between spinner and text */
   --spinner-color: var(--ion-color-primary);
-  width: 50px; /* Larger spinner */
-  height: 50px; /* Larger spinner */
+  --width: 100% !important;
 }
 
-.text-content {
-  display: flex;
-  flex-direction: column; /* Stack the two text lines vertically */
-  justify-content: center;
-}
-
-.loading-message {
-  font-size: 18px; /* Slightly larger font for "Loading your data..." */
-  font-weight: bold;
+.default-loading .loading-wrapper .load-message {
+  margin: 0;
+  font-size: 16px;
   color: var(--ion-color-dark);
-  margin: 0;
 }
 
-.loading-note {
-  font-size: 16px; /* Smaller font for "Please be patient." */
+.default-loading .load-content {
+  font-weight: 400;
+  margin-top: 6px;
+  display: block;
   color: var(--ion-color-medium);
-  margin: 0;
 }
 
 /* Buttons */
