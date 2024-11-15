@@ -1,45 +1,42 @@
 import { Injectable } from '@angular/core';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
+import { CustomLoadingComponent } from '../../shared/pages/custom-loading-input/cusom-loading.component';
 
 @Injectable({
-   providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoadingService {
+  loading: HTMLIonLoadingElement;
+  isShowing: boolean = false;
+  private loadingModal: HTMLIonModalElement | null = null; // Store modal instance
 
-   loading: HTMLIonLoadingElement;
-   isShowing: boolean = false;
+  constructor(
+    public loadingController: LoadingController,
+    public modalController: ModalController
+  ) {}
 
-   constructor(
-      public loadingController: LoadingController
-   ) { }
+  async showLoading(message: string = 'Loading') {
+    // Check if a modal is already being shown
+    if (this.loadingModal) {
+      return;
+    }
 
-   async showLoading(message: string = "Loading", backdropDismiss: boolean = true) {
-      if (!this.isShowing && (this.loading === undefined || this.loading === null)) {
-         this.isShowing = true;
-         this.loading = await this.loadingController.create({
-            cssClass: "default-loading",
-            message: `<div class="load-message">${message}... </div> <div class="load-content">Please be patient.</div>`,
-            spinner: "crescent",
-            backdropDismiss: backdropDismiss
-         });
-         this.loading.present();
-      } else {
-         // If loader is showing, only change text, won't create a new loader.
-         this.isShowing = true;
-         this.loading = null;
-         this.loading = await this.loadingController.create({
-            cssClass: "default-loading",
-            message: `<div class="load-message">${message}... </div> <div class="load-content">Please be patient.</div>`,
-            spinner: "crescent",
-            backdropDismiss: backdropDismiss
-         });
-         this.loading.present();
-      }
-   }
+    // Create and present the modal
+    this.loadingModal = await this.modalController.create({
+      component: CustomLoadingComponent,
+      componentProps: { message },
+      cssClass: 'custom-loading-modal',
+      backdropDismiss: false,
+    });
+    await this.loadingModal.present();
+  }
 
-   dismissLoading() {
+  async dismissLoading() {
+    // Dismiss the modal if it exists
+    if (this.loadingModal) {
       this.isShowing = false;
-      this.loading?.dismiss();
-   }
-
+      await this.loadingModal.dismiss();
+      this.loadingModal = null; // Reset the reference
+    }
+  }
 }
