@@ -18,7 +18,7 @@ export class LoadingService {
          this.isShowing = true;
          this.loading = await this.loadingController.create({
             cssClass: "default-loading",
-            message: `${message}... Please be patient.`,
+            message: `<p>${message}... </p> <span>Please be patient.</span>`,
             spinner: "crescent",
             backdropDismiss: backdropDismiss
          });
@@ -29,7 +29,7 @@ export class LoadingService {
          this.loading = null;
          this.loading = await this.loadingController.create({
             cssClass: "default-loading",
-            message: `${message}... Please be patient.`,
+            message: `<p>${message}... </p> <span>Please be patient.</span>`,
             spinner: "crescent",
             backdropDismiss: backdropDismiss
          });
